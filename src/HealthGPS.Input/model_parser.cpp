@@ -297,17 +297,19 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         // Print a sample of the loaded policy coefficients for verification
         if (!policy_csv_coefficients.empty()) {
             auto first_rf = policy_csv_coefficients.begin()->first;
-            //std::cout << "\n\nSample policy coefficient values for risk factor '" << first_rf << "':";
-            //std::cout << "\n  Policy Intercept: " << policy_csv_coefficients[first_rf].intercept;
+            // std::cout << "\n\nSample policy coefficient values for risk factor '" << first_rf <<
+            // "':"; std::cout << "\n  Policy Intercept: " <<
+            // policy_csv_coefficients[first_rf].intercept;
 
             // Print a few coefficients
             /*for (const auto &coef_pair : policy_csv_coefficients[first_rf].coefficients) {
                 std::cout << "\n  " << coef_pair.first.to_string() << ": " << coef_pair.second;
-            }*/ 
+            }*/
 
             // Print range if available
             if (policy_ranges_map.find(first_rf) != policy_ranges_map.end()) {
-                //std::cout << "\n  Policy range: [" << policy_ranges_map[first_rf].lower() << ", "<< policy_ranges_map[first_rf].upper() << "]";
+                // std::cout << "\n  Policy range: [" << policy_ranges_map[first_rf].lower() << ",
+                // "<< policy_ranges_map[first_rf].upper() << "]";
             }
         }
     }
@@ -725,13 +727,14 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                 auto it = physical_activity_models.begin();
                 if (it->second.coefficients.count("stddev") > 0) {
                     physical_activity_stddev = it->second.coefficients.at("stddev");
-                    //std::cout << "\nLoaded physical activity standard deviation from CSV: " << physical_activity_stddev;
+                    // std::cout << "\nLoaded physical activity standard deviation from CSV: " <<
+                    // physical_activity_stddev;
                 } else {
                     std::cout << "\nWARNING: No stddev coefficient found in model";
                 }
 
                 // Also verify intercept was loaded correctly
-                //std::cout << "\nVerified model intercept: " << it->second.intercept;
+                // std::cout << "\nVerified model intercept: " << it->second.intercept;
             }
         } catch (const std::exception &e) {
             std::cout << "\nError loading physical activity model from CSV: " << e.what();
@@ -1284,8 +1287,8 @@ load_risk_factor_coefficients_from_csv(const std::filesystem::path &csv_path, bo
             if (!result.empty()) {
                 // Take the first risk factor as an example
                 auto first_rf = result.begin()->first;
-                //std::cout << "\n\nSample coefficient values for risk factor '" << first_rf << "':";
-                //std::cout << "\n  Intercept: " << result[first_rf].intercept;
+                // std::cout << "\n\nSample coefficient values for risk factor '" << first_rf <<
+                // "':"; std::cout << "\n  Intercept: " << result[first_rf].intercept;
 
                 // Print a few coefficients
                 for (const auto &coef_pair : result[first_rf].coefficients) {
@@ -1293,8 +1296,9 @@ load_risk_factor_coefficients_from_csv(const std::filesystem::path &csv_path, bo
                 }
 
                 // Print total number of risk factors and coefficients loaded
-                //std::cout << "\n\nTotal risk factors loaded: " << result.size();
-                //std::cout << "\nAverage coefficients per risk factor: " << (result.empty() ? 0 : result.begin()->second.coefficients.size());
+                // std::cout << "\n\nTotal risk factors loaded: " << result.size();
+                // std::cout << "\nAverage coefficients per risk factor: " << (result.empty() ? 0 :
+                // result.begin()->second.coefficients.size());
             }
         }
     } catch (const std::exception &e) {
@@ -1397,8 +1401,9 @@ load_policy_ranges_from_csv(const std::filesystem::path &csv_path) {
         if (!result.empty()) {
             // Take the first risk factor as an example
             auto first_rf = result.begin()->first;
-            //std::cout << "\n\nSample range values for policy risk factor '" << first_rf << "':";
-            //std::cout << "\n  Range: [" << result[first_rf].lower() << ", "<< result[first_rf].upper() << "]";
+            // std::cout << "\n\nSample range values for policy risk factor '" << first_rf << "':";
+            // std::cout << "\n  Range: [" << result[first_rf].lower() << ", "<<
+            // result[first_rf].upper() << "]";
             std::cout << "\n\nTotal policy ranges loaded: " << result.size() << "\n";
         }
     } catch (const std::exception &e) {
@@ -1509,8 +1514,9 @@ load_logistic_regression_coefficients_from_csv(const std::filesystem::path &csv_
             if (!result.empty()) {
                 // Take the first risk factor as an example
                 auto first_rf = result.begin()->first;
-                //std::cout << "\n\nSample logistic regression coefficient values for risk factor '" << first_rf << "':";
-                //std::cout << "\n  Intercept: " << result[first_rf].intercept;
+                // std::cout << "\n\nSample logistic regression coefficient values for risk factor
+                // '" << first_rf << "':"; std::cout << "\n  Intercept: " <<
+                // result[first_rf].intercept;
 
                 // Print a few coefficients
                 for (const auto &coef_pair : result[first_rf].coefficients) {
@@ -1518,8 +1524,10 @@ load_logistic_regression_coefficients_from_csv(const std::filesystem::path &csv_
                 }
 
                 // Print total number of risk factors and coefficients loaded
-                std::cout << "\n\nTotal risk factors with logistic regression coefficients loaded: "  << result.size();
-                //std::cout << "\nAverage coefficients per risk factor: " << (result.empty() ? 0 : result.begin()->second.coefficients.size());
+                std::cout << "\n\nTotal risk factors with logistic regression coefficients loaded: "
+                          << result.size();
+                // std::cout << "\nAverage coefficients per risk factor: " << (result.empty() ? 0 :
+                // result.begin()->second.coefficients.size());
             }
         }
     } catch (const std::exception &e) {
@@ -1556,8 +1564,8 @@ load_region_prevalence_from_csv(const std::filesystem::path &csv_path) {
 
         // Process each row in the CSV file
         int sample_count = 0;
-        //std::cout << "\n--- SAMPLE OF REGION DATA LOADED FROM CSV ---" ;
-        //std::cout << "Age | Gender | England | Wales | Scotland | N.Ireland" ;
+        // std::cout << "\n--- SAMPLE OF REGION DATA LOADED FROM CSV ---" ;
+        // std::cout << "Age | Gender | England | Wales | Scotland | N.Ireland" ;
 
         for (size_t i = 0; i < doc.GetRowCount(); i++) {
             // Get all values for this row
@@ -1592,7 +1600,7 @@ load_region_prevalence_from_csv(const std::filesystem::path &csv_path) {
                           << " | " << england_prob << " | " << wales_prob << " | " << scotland_prob
                           << " | " << ni_prob << std::endl;
                 sample_count++;
-            }*/ 
+            }*/
 
             // Store in result map with same structure as the existing JSON-loaded data
             result[age_id][gender][core::Region::England] = england_prob;
@@ -1609,7 +1617,7 @@ load_region_prevalence_from_csv(const std::filesystem::path &csv_path) {
             }
         }
 
-        //std::cout << "\n--- END OF SAMPLE ---" << std::endl;
+        // std::cout << "\n--- END OF SAMPLE ---" << std::endl;
         std::cout << "\nLoaded region prevalence data for " << result.size()
                   << " age groups from CSV file" << std::endl;
     } catch (const std::exception &e) {
@@ -1649,8 +1657,8 @@ load_ethnicity_prevalence_from_csv(const std::filesystem::path &csv_path) {
 
         // Process each row in the CSV file
         int sample_count = 0;
-        //std::cout << "\n--- SAMPLE OF ETHNICITY DATA LOADED FROM CSV ---" << std::endl;
-        //std::cout << "Adult | Gender | Ethnicity | England | Wales | N.Ireland | Scotland";
+        // std::cout << "\n--- SAMPLE OF ETHNICITY DATA LOADED FROM CSV ---" << std::endl;
+        // std::cout << "Adult | Gender | Ethnicity | England | Wales | N.Ireland | Scotland";
 
         for (size_t i = 0; i < doc.GetRowCount(); i++) {
             // Get all values for this row
@@ -1709,7 +1717,7 @@ load_ethnicity_prevalence_from_csv(const std::filesystem::path &csv_path) {
                           << " | " << ethnicity_code << " | " << england_prob << " | " << wales_prob
                           << " | " << ni_prob << " | " << scotland_prob << std::endl;
                 sample_count++;
-            }*/ 
+            }*/
 
             // Store in result map with same structure as the existing JSON-loaded data
             // Each row in the CSV represents one ethnicity for a specific age group and gender
@@ -1739,8 +1747,9 @@ load_ethnicity_prevalence_from_csv(const std::filesystem::path &csv_path) {
             }
         }
 
-        //std::cout << "\n--- END OF SAMPLE ---" << std::endl;
-        std::cout << "\nLoaded ethnicity prevalence data for " << result.size() << " age groups from CSV file" << std::endl;
+        // std::cout << "\n--- END OF SAMPLE ---" << std::endl;
+        std::cout << "\nLoaded ethnicity prevalence data for " << result.size()
+                  << " age groups from CSV file" << std::endl;
     } catch (const std::exception &e) {
         std::cout << "\nERROR: Failed to process ethnicity prevalence CSV: " << e.what()
                   << std::endl;
