@@ -31,7 +31,6 @@ DiseaseModule::operator[](const core::Identifier &disease_id) const {
 
 void DiseaseModule::initialise_population(RuntimeContext &context) {
     // Initialise disease status based on prevalence
-    int disease_count = 0;
     for (auto &model : models_) {
         // std::cout << "\nDEBUG: Initializing disease status for: " << model.first.to_string() << "
         // (" << ++disease_count << "/" << models_.size() << ")";
@@ -40,7 +39,6 @@ void DiseaseModule::initialise_population(RuntimeContext &context) {
     std::cout << "\nDEBUG: Completed initializing disease status for all diseases";
 
     // Recalculate relative risks once diseases status were generated
-    disease_count = 0;
     for (auto &model : models_) {
         // std::cout << "\nDEBUG: Initializing average relative risk for: " <<
         // model.first.to_string() << " (" << ++disease_count << "/" << models_.size() << ")";
@@ -49,7 +47,6 @@ void DiseaseModule::initialise_population(RuntimeContext &context) {
     std::cout << "\nDEBUG: Completed initializing average relative risk for all diseases";
 
     // After initialising with prevalence, do a 'dry run' to simulate incidence.
-    disease_count = 0;
     for (auto &model : models_) {
         // std::cout << "\nDEBUG: Updating disease status (dry run) for: " <<
         // model.first.to_string() << " (" << ++disease_count << "/" << models_.size() << ")";

@@ -480,7 +480,22 @@ StaticLinearModel::compute_linear_models(Person &person,
     std::vector<double> linear{};
     linear.reserve(names_.size());
 
-    // Approximate risk factors with linear models.
+    // Pre-calculate capped age values once (outside the model loop)- Mahima
+    constexpr double max_age = 80.0; // Define appropriate maximum age
+    const double capped_age = std::min(static_cast<double>(person.age), max_age);
+    const double capped_age_squared = capped_age * capped_age;
+    const double capped_age_cubed = capped_age_squared * capped_age;
+
+    // Cache common age identifiers for faster comparison using case sensitive approach for Age and age- Mahima
+    static const core::Identifier age_id("age");
+    static const core::Identifier age2_id("age2");
+    static const core::Identifier age3_id("age3");
+    static const core::Identifier Age_id("Age");
+    static const core::Identifier Age2_id("Age2");
+    static const core::Identifier Age3_id("Age3");
+    static const core::Identifier stddev_id("stddev");
+
+    // Approximate risk factors with linear models
     for (size_t i = 0; i < names_.size(); i++) {
         if (i >= models.size()) {
             std::cout << "\nERROR: compute_linear_models - Index " << i
@@ -495,11 +510,21 @@ StaticLinearModel::compute_linear_models(Person &person,
 
         for (const auto &[coefficient_name, coefficient_value] : model.coefficients) {
             // Skip the standard deviation entry as it's not a factor
-            if (coefficient_name == "stddev"_id)
+            if (coefficient_name == stddev_id)
                 continue;
 
-            double value = person.get_risk_factor_value(coefficient_name);
-            factor += coefficient_value * value;
+            // Efficiently handle age-related coefficients
+            if (coefficient_name == age_id || coefficient_name == Age_id) {
+                factor += coefficient_value * capped_age;
+            } else if (coefficient_name == age2_id || coefficient_name == Age2_id) {
+                factor += coefficient_value * capped_age_squared;
+            } else if (coefficient_name == age3_id || coefficient_name == Age3_id) {
+                factor += coefficient_value * capped_age_cubed;
+            } else {
+                // Regular coefficient processing
+                double value = person.get_risk_factor_value(coefficient_name);
+                factor += coefficient_value * value;
+            }
         }
 
         for (const auto &[coefficient_name, coefficient_value] : model.log_coefficients) {
