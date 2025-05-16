@@ -1540,6 +1540,9 @@ load_logistic_regression_coefficients_from_csv(const std::filesystem::path &csv_
 // NOLINTEND(readability-function-cognitive-complexity)
 
 // Function to load the region data using csv- Mahima
+// For code maintainability, I'm using different functions for each as region, ethnicity, income and
+// physical acivity are being used to assign demographics to people and not like risk factors where
+// we don't have particularly verify what each column is
 // NOLINTBEGIN(readability-function-cognitive-complexity)
 std::unordered_map<core::Identifier,
                    std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>>
@@ -1563,7 +1566,7 @@ load_region_prevalence_from_csv(const std::filesystem::path &csv_path) {
         rapidcsv::Document doc(csv_path.string());
 
         // Process each row in the CSV file
-        int sample_count = 0;
+        // Removed unused variable: int sample_count = 0;
         // std::cout << "\n--- SAMPLE OF REGION DATA LOADED FROM CSV ---" ;
         // std::cout << "Age | Gender | England | Wales | Scotland | N.Ireland" ;
 
@@ -1656,7 +1659,7 @@ load_ethnicity_prevalence_from_csv(const std::filesystem::path &csv_path) {
         rapidcsv::Document doc(csv_path.string());
 
         // Process each row in the CSV file
-        int sample_count = 0;
+        // int sample_count = 0;
         // std::cout << "\n--- SAMPLE OF ETHNICITY DATA LOADED FROM CSV ---" << std::endl;
         // std::cout << "Adult | Gender | Ethnicity | England | Wales | N.Ireland | Scotland";
 
@@ -1707,9 +1710,11 @@ load_ethnicity_prevalence_from_csv(const std::filesystem::path &csv_path) {
             // Get England probability for this specific ethnicity
             // (we only use England probabilities as specified)
             double england_prob = std::stod(row[3]);
-            double wales_prob = std::stod(row[4]);
-            double ni_prob = std::stod(row[5]);
-            double scotland_prob = std::stod(row[6]);
+            
+            // These variables are unused - removed to fix compiler warnings
+            // double wales_prob = std::stod(row[4]);
+            // double ni_prob = std::stod(row[5]);
+            // double scotland_prob = std::stod(row[6]);
 
             // Print a sample of the first few rows
             /*if (sample_count < 5) {

@@ -246,22 +246,23 @@ void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
         // Check if the table contains this age
         if (!definition_.get().table().contains(person.age)) {
             std::cout << "\nMAP ERROR DETAIL: Age " << person.age << " not found in disease table";
+            continue; // Skip this person if age not found
+        }
 
-            double relative_risk = 1.0;
-            relative_risk *= calculate_relative_risk_for_risk_factors(person);
-            relative_risk *= calculate_relative_risk_for_diseases(person);
+        double relative_risk = 1.0;
+        relative_risk *= calculate_relative_risk_for_risk_factors(person);
+        relative_risk *= calculate_relative_risk_for_diseases(person);
 
-            double average_relative_risk = average_relative_risk_.at(person.age, person.gender);
+        double average_relative_risk = average_relative_risk_.at(person.age, person.gender);
 
-            double incidence =
-                definition_.get().table()(person.age, person.gender).at(incidence_id);
-            double probability = incidence * relative_risk / average_relative_risk;
-            double hazard = context.random().next_double();
-            if (hazard < probability) {
-                person.diseases[disease_type()] =
-                    Disease{.status = DiseaseStatus::active, .start_time = context.time_now()};
-            }
+        double incidence = definition_.get().table()(person.age, person.gender).at(incidence_id);
+        double probability = incidence * relative_risk / average_relative_risk;
+        double hazard = context.random().next_double();
+        if (hazard < probability) {
+            person.diseases[disease_type()] =
+                Disease{.status = DiseaseStatus::active, .start_time = context.time_now()};
         }
     }
+}
 
 } // namespace hgps
