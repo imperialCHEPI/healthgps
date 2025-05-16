@@ -1710,7 +1710,7 @@ load_ethnicity_prevalence_from_csv(const std::filesystem::path &csv_path) {
             // Get England probability for this specific ethnicity
             // (we only use England probabilities as specified)
             double england_prob = std::stod(row[3]);
-            
+
             // These variables are unused - removed to fix compiler warnings
             // double wales_prob = std::stod(row[4]);
             // double ni_prob = std::stod(row[5]);
