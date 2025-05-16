@@ -486,7 +486,8 @@ StaticLinearModel::compute_linear_models(Person &person,
     const double capped_age_squared = capped_age * capped_age;
     const double capped_age_cubed = capped_age_squared * capped_age;
 
-    // Cache common age identifiers for faster comparison using case sensitive approach for Age and age- Mahima
+    // Cache common age identifiers for faster comparison using case sensitive approach for Age and
+    // age- Mahima
     static const core::Identifier age_id("age");
     static const core::Identifier age2_id("age2");
     static const core::Identifier age3_id("age3");
