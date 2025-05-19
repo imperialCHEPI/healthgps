@@ -199,10 +199,10 @@ void DefaultDiseaseModel::update_remission_cases(RuntimeContext &context) {
             continue;
         }
         // Enhanced logging with more details
-        std::cout << "\nDEBUG MAP ACCESS: Person #" << person.id() << " Age=" << person.age
+        /*std::cout << "\nDEBUG MAP ACCESS: Person #" << person.id() << " Age=" << person.age
                   << " Gender=" << (person.gender == core::Gender::male ? "male" : "female")
                   << " Disease=" << disease_type().to_string()
-                  << " Checking remission_id=" << remission_id;
+                  << " Checking remission_id=" << remission_id;*/ 
 
         // Check if the table contains this age
         if (!definition_.get().table().contains(person.age)) {
@@ -238,10 +238,10 @@ void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
             continue;
         }
         // Enhanced logging with more details
-        std::cout << "\nDEBUG MAP ACCESS: Person #" << person.id() << " Age=" << person.age
+        /*std::cout << "\nDEBUG MAP ACCESS: Person #" << person.id() << " Age=" << person.age
                   << " Gender=" << (person.gender == core::Gender::male ? "male" : "female")
                   << " Disease=" << disease_type().to_string()
-                  << " Checking incidence_id=" << incidence_id;
+                  << " Checking incidence_id=" << incidence_id;*/ 
 
         // Check if the table contains this age
         if (!definition_.get().table().contains(person.age)) {
