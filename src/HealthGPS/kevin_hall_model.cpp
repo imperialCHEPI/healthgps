@@ -450,7 +450,7 @@ void KevinHallModel::initialise_nutrient_intakes(Person &person) const {
             person.risk_factors[nutrient_key] = 0.0;
         }
     }
-    
+
     // Now compute nutrient intakes
     compute_nutrient_intakes(person);
 
@@ -489,15 +489,16 @@ void KevinHallModel::compute_nutrient_intakes(Person &person) const {
         double food_intake = person.risk_factors.at(food_key);
         // Ensure food intake is not negative
         food_intake = std::max(0.0, food_intake);
-        
+
         for (const auto &[nutrient_key, nutrient_coefficient] : nutrient_coefficients) {
-            double new_value = person.risk_factors.at(nutrient_key) + food_intake * nutrient_coefficient;
-            
+            double new_value =
+                person.risk_factors.at(nutrient_key) + food_intake * nutrient_coefficient;
+
             // Clamp to valid range if one exists
             if (nutrient_ranges_.contains(nutrient_key)) {
                 new_value = nutrient_ranges_.at(nutrient_key).clamp(new_value);
             }
-            
+
             person.risk_factors.at(nutrient_key) = new_value;
         }
     }
@@ -605,12 +606,11 @@ void KevinHallModel::initialise_kevin_hall_state(Person &person,
 void KevinHallModel::kevin_hall_run(Person &person) const {
     // Get initial body weight.
     double BW_0 = person.risk_factors.at("Weight"_id);
-    
+
     // Debug NaN check
     if (std::isnan(BW_0)) {
         std::cout << "\nDEBUG NaN DETECTED in kevin_hall_run - Initial weight is NaN for person:"
-                  << "\n  ID: " << person.id()
-                  << "\n  Age: " << person.age
+                  << "\n  ID: " << person.id() << "\n  Age: " << person.age
                   << "\n  Gender: " << (person.gender == core::Gender::male ? "Male" : "Female")
                   << "\n  Previous weight: " << BW_0;
         std::exit(1);
@@ -686,18 +686,12 @@ void KevinHallModel::kevin_hall_run(Person &person) const {
     // Debug NaN check
     if (std::isnan(BW)) {
         std::cout << "\nDEBUG NaN DETECTED in kevin_hall_run - Final weight calculation:"
-                  << "\n  Person ID: " << person.id()
-                  << "\n  Age: " << person.age
+                  << "\n  Person ID: " << person.id() << "\n  Age: " << person.age
                   << "\n  Gender: " << (person.gender == core::Gender::male ? "Male" : "Female")
-                  << "\n  Initial weight: " << BW_0
-                  << "\n  Body fat: " << F
-                  << "\n  Lean tissue: " << L
-                  << "\n  Glycogen: " << G
-                  << "\n  Water: " << W
-                  << "\n  ECF: " << ECF
-                  << "\n  Energy intake: " << EI
-                  << "\n  Physical activity: " << PAL
-                  << "\n  Height: " << H;
+                  << "\n  Initial weight: " << BW_0 << "\n  Body fat: " << F
+                  << "\n  Lean tissue: " << L << "\n  Glycogen: " << G << "\n  Water: " << W
+                  << "\n  ECF: " << ECF << "\n  Energy intake: " << EI
+                  << "\n  Physical activity: " << PAL << "\n  Height: " << H;
         std::exit(1);
     }
 
@@ -777,11 +771,9 @@ void KevinHallModel::initialise_weight(RuntimeContext &context, Person &person) 
     // Debug NaN check
     if (std::isnan(weight)) {
         std::cout << "\nDEBUG NaN DETECTED in initialise_weight:"
-                  << "\n  Person ID: " << person.id()
-                  << "\n  Age: " << person.age
+                  << "\n  Person ID: " << person.id() << "\n  Age: " << person.age
                   << "\n  Gender: " << (person.gender == core::Gender::male ? "Male" : "Female")
-                  << "\n  Expected weight: " << w_expected
-                  << "\n  Weight quantile: " << w_quantile
+                  << "\n  Expected weight: " << w_expected << "\n  Weight quantile: " << w_quantile
                   << "\n  Energy intake expected: " << ei_expected
                   << "\n  Physical activity expected: " << pa_expected
                   << "\n  Energy intake actual: " << ei_actual
