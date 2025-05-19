@@ -441,8 +441,17 @@ double KevinHallModel::get_expected(RuntimeContext &context, core::Gender sex, i
 }
 
 void KevinHallModel::initialise_nutrient_intakes(Person &person) const {
-
-    // Initialise nutrient intakes.
+    // Set all nutrients to valid initial values before computing
+    for (const auto &[nutrient_key, unused] : energy_equation_) {
+        // Initialize to minimum valid value if range exists
+        if (nutrient_ranges_.contains(nutrient_key)) {
+            person.risk_factors[nutrient_key] = nutrient_ranges_.at(nutrient_key).lower();
+        } else {
+            person.risk_factors[nutrient_key] = 0.0;
+        }
+    }
+    
+    // Now compute nutrient intakes
     compute_nutrient_intakes(person);
 
     // Start with previous = current.
@@ -465,17 +474,31 @@ void KevinHallModel::update_nutrient_intakes(Person &person) const {
 }
 
 void KevinHallModel::compute_nutrient_intakes(Person &person) const {
-
-    // Reset nutrient intakes to zero.
+    // Reset nutrient intakes to valid minimum values
     for (const auto &[nutrient_key, unused] : energy_equation_) {
-        person.risk_factors[nutrient_key] = 0.0;
+        // Reset to minimum valid value if range exists
+        if (nutrient_ranges_.contains(nutrient_key)) {
+            person.risk_factors[nutrient_key] = nutrient_ranges_.at(nutrient_key).lower();
+        } else {
+            person.risk_factors[nutrient_key] = 0.0;
+        }
     }
 
-    // Compute nutrient intakes from food intakes.
+    // Compute nutrient intakes from food intakes and clamp within ranges in a single pass
     for (const auto &[food_key, nutrient_coefficients] : nutrient_equations_) {
         double food_intake = person.risk_factors.at(food_key);
+        // Ensure food intake is not negative
+        food_intake = std::max(0.0, food_intake);
+        
         for (const auto &[nutrient_key, nutrient_coefficient] : nutrient_coefficients) {
-            person.risk_factors.at(nutrient_key) += food_intake * nutrient_coefficient;
+            double new_value = person.risk_factors.at(nutrient_key) + food_intake * nutrient_coefficient;
+            
+            // Clamp to valid range if one exists
+            if (nutrient_ranges_.contains(nutrient_key)) {
+                new_value = nutrient_ranges_.at(nutrient_key).clamp(new_value);
+            }
+            
+            person.risk_factors.at(nutrient_key) = new_value;
         }
     }
 }
@@ -582,6 +605,16 @@ void KevinHallModel::initialise_kevin_hall_state(Person &person,
 void KevinHallModel::kevin_hall_run(Person &person) const {
     // Get initial body weight.
     double BW_0 = person.risk_factors.at("Weight"_id);
+    
+    // Debug NaN check
+    if (std::isnan(BW_0)) {
+        std::cout << "\nDEBUG NaN DETECTED in kevin_hall_run - Initial weight is NaN for person:"
+                  << "\n  ID: " << person.id()
+                  << "\n  Age: " << person.age
+                  << "\n  Gender: " << (person.gender == core::Gender::male ? "Male" : "Female")
+                  << "\n  Previous weight: " << BW_0;
+        std::exit(1);
+    }
 
     // Compute energy cost per unit body weight.
     double PAL = person.risk_factors.at("PhysicalActivity"_id);
@@ -649,6 +682,24 @@ void KevinHallModel::kevin_hall_run(Person &person) const {
 
     // Compute body weight.
     double BW = F + L + G + W + ECF;
+
+    // Debug NaN check
+    if (std::isnan(BW)) {
+        std::cout << "\nDEBUG NaN DETECTED in kevin_hall_run - Final weight calculation:"
+                  << "\n  Person ID: " << person.id()
+                  << "\n  Age: " << person.age
+                  << "\n  Gender: " << (person.gender == core::Gender::male ? "Male" : "Female")
+                  << "\n  Initial weight: " << BW_0
+                  << "\n  Body fat: " << F
+                  << "\n  Lean tissue: " << L
+                  << "\n  Glycogen: " << G
+                  << "\n  Water: " << W
+                  << "\n  ECF: " << ECF
+                  << "\n  Energy intake: " << EI
+                  << "\n  Physical activity: " << PAL
+                  << "\n  Height: " << H;
+        std::exit(1);
+    }
 
     // Clamp weight within valid range if it exists in nutrient_ranges_
     if (nutrient_ranges_.contains("Weight"_id)) {
@@ -722,6 +773,22 @@ void KevinHallModel::initialise_weight(RuntimeContext &context, Person &person) 
         get_expected(context, person.gender, person.age, "Weight"_id, std::nullopt, true);
     double w_quantile = get_weight_quantile(epa_quantile, person.gender);
     double weight = w_expected * w_quantile;
+
+    // Debug NaN check
+    if (std::isnan(weight)) {
+        std::cout << "\nDEBUG NaN DETECTED in initialise_weight:"
+                  << "\n  Person ID: " << person.id()
+                  << "\n  Age: " << person.age
+                  << "\n  Gender: " << (person.gender == core::Gender::male ? "Male" : "Female")
+                  << "\n  Expected weight: " << w_expected
+                  << "\n  Weight quantile: " << w_quantile
+                  << "\n  Energy intake expected: " << ei_expected
+                  << "\n  Physical activity expected: " << pa_expected
+                  << "\n  Energy intake actual: " << ei_actual
+                  << "\n  Physical activity actual: " << pa_actual
+                  << "\n  EPA quantile: " << epa_quantile;
+        std::exit(1);
+    }
 
     // Clamp weight within valid range if it exists in nutrient_ranges_
     if (nutrient_ranges_.contains("Weight"_id)) {
