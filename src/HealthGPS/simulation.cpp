@@ -151,17 +151,17 @@ void Simulation::initialise_population() {
     // std::cout << "\nDEBUG: Simulation::initialise_population - Risk factors completed";
 
     // Initialise diseases
-    //std::cout << "\nDEBUG: Simulation::initialise_population - Initializing diseases";
+    // std::cout << "\nDEBUG: Simulation::initialise_population - Initializing diseases";
     disease_->initialise_population(context_);
-    //std::cout << "\nDEBUG: Simulation::initialise_population - Diseases completed";
+    // std::cout << "\nDEBUG: Simulation::initialise_population - Diseases completed";
 
     // Initialise analysis
-    //std::cout << "\nDEBUG: Simulation::initialise_population - Initializing analysis";
+    // std::cout << "\nDEBUG: Simulation::initialise_population - Initializing analysis";
     analysis_->initialise_population(context_);
-    //std::cout << "\nDEBUG: Simulation::initialise_population - Analysis completed";
+    // std::cout << "\nDEBUG: Simulation::initialise_population - Analysis completed";
 
     print_initial_population_statistics();
-    //std::cout << "\nDEBUG: Simulation::initialise_population - Completed";
+    // std::cout << "\nDEBUG: Simulation::initialise_population - Completed";
 }
 
 void Simulation::update_population() {
