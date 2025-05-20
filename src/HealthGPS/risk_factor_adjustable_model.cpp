@@ -122,7 +122,8 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
             person.set_risk_factor(context, factors[i], value);
         }
 
-        // Special handling for demographic attributes
+        // Special handling for demographic attributes- Mahima
+        // Adjusting income and physical activity to factors mean
         // Map income_continuous to Income
         if (std::find(factors.begin(), factors.end(), "Income"_id) != factors.end()) {
             double delta = adjustments.at(person.gender, "Income"_id).at(person.age);

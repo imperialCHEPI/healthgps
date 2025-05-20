@@ -474,32 +474,45 @@ void KevinHallModel::update_nutrient_intakes(Person &person) const {
 }
 
 void KevinHallModel::compute_nutrient_intakes(Person &person) const {
-    // Reset nutrient intakes to valid minimum values
+    // Reset nutrient intakes to zero
     for (const auto &[nutrient_key, unused] : energy_equation_) {
-        // Reset to minimum valid value if range exists
-        if (nutrient_ranges_.contains(nutrient_key)) {
-            person.risk_factors[nutrient_key] = nutrient_ranges_.at(nutrient_key).lower();
-        } else {
-            person.risk_factors[nutrient_key] = 0.0;
-        }
+        person.risk_factors[nutrient_key] = 0.0;
     }
 
-    // Compute nutrient intakes from food intakes and clamp within ranges in a single pass
+    // First, compute all nutrient intakes from food intakes WITHOUT clamping
     for (const auto &[food_key, nutrient_coefficients] : nutrient_equations_) {
         double food_intake = person.risk_factors.at(food_key);
         // Ensure food intake is not negative
         food_intake = std::max(0.0, food_intake);
-
+        
         for (const auto &[nutrient_key, nutrient_coefficient] : nutrient_coefficients) {
             double new_value =
                 person.risk_factors.at(nutrient_key) + food_intake * nutrient_coefficient;
-
-            // Clamp to valid range if one exists
-            if (nutrient_ranges_.contains(nutrient_key)) {
-                new_value = nutrient_ranges_.at(nutrient_key).clamp(new_value);
-            }
-
             person.risk_factors.at(nutrient_key) = new_value;
+        }
+    }
+    
+    // Second, apply clamping to ensure values are within valid ranges
+    for (const auto &[nutrient_key, unused] : energy_equation_) {
+        if (nutrient_ranges_.contains(nutrient_key)) {
+            double current_value = person.risk_factors.at(nutrient_key);
+            double clamped_value = nutrient_ranges_.at(nutrient_key).clamp(current_value);
+            person.risk_factors.at(nutrient_key) = clamped_value;
+        }
+    }
+    
+    // Quick verification - only print if something is out of range
+    for (const auto &[nutrient_key, unused] : energy_equation_) {
+        if (nutrient_ranges_.contains(nutrient_key)) {
+            double value = person.risk_factors.at(nutrient_key);
+            const auto& range = nutrient_ranges_.at(nutrient_key);
+            if (value < range.lower() || value > range.upper()) {
+                std::cout << "\nNUTRIENT RANGE ERROR: Person " << person.id() 
+                          << " has " << nutrient_key.to_string() << "=" << value 
+                          << " outside valid range [" << range.lower() 
+                          << ", " << range.upper() << "]";
+                //break; // Print only first error to keep output minimal
+            }
         }
     }
 }
@@ -688,8 +701,12 @@ void KevinHallModel::kevin_hall_run(Person &person) const {
         std::cout << "\nDEBUG NaN DETECTED in kevin_hall_run - Final weight calculation:"
                   << "\n  Person ID: " << person.id() << "\n  Age: " << person.age
                   << "\n  Gender: " << (person.gender == core::Gender::male ? "Male" : "Female")
-                  << "\n  Initial weight: " << BW_0 << "\n  Body fat: " << F
-                  << "\n  Lean tissue: " << L << "\n  Glycogen: " << G << "\n  Water: " << W
+                  << "\n  Initial EI: " << EI_0 << "\n  Current EI: " << EI
+                  << "\n  Delta EI: " << delta_EI << "\n  TEF: " << TEF
+                  << "\n  AT: " << AT
+                  << "\n  Initial carb: " << CI_0 << "\n  Current carb: " << CI
+                  << "\n  Initial weight: " << BW_0 << "\n  Body fat: " << F << "\n  Lean tissue: " << L
+                  << "\n  Previous G: " << G_0 << "\n  Glycogen: " << G << "\n  Water: " << W
                   << "\n  ECF: " << ECF << "\n  Energy intake: " << EI
                   << "\n  Physical activity: " << PAL << "\n  Height: " << H;
         std::exit(1);
