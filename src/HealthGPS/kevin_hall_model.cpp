@@ -701,66 +701,68 @@ void KevinHallModel::kevin_hall_run(Person &person) const {
     double denominator = (a1 * b2 - a2 * b1);
     if (std::abs(denominator) < 1e-10) {
         // Log the issue
-        std::cout << "\nWARNING: Near-zero denominator detected in kevin_hall_run for person ID: " 
+        std::cout << "\nWARNING: Near-zero denominator detected in kevin_hall_run for person ID: "
                   << person.id() << ". Using fallback values.";
-        
+
         // Use F_0 and L_0 as the final values
         double F = F_0;
         double L = L_0;
-        
+
         // Compute body weight with the fallback values
         double BW = F + L + G + W + ECF;
         if (nutrient_ranges_.contains("Weight"_id)) {
             BW = nutrient_ranges_.at("Weight"_id).clamp(BW);
         }
-        
+
         // Set the state values
         person.risk_factors.at("Glycogen"_id) = G;
         person.risk_factors.at("ExtracellularFluid"_id) = ECF;
         person.risk_factors.at("BodyFat"_id) = F;
         person.risk_factors.at("LeanTissue"_id) = L;
         person.risk_factors.at("Weight"_id) = BW;
-        
+
         return; // Exit the function early
     }
-    
+
     // Compute body fat and lean tissue steady state.
     double steady_F = -(b1 * c2 - b2 * c1) / denominator;
     double steady_L = -(c1 * a2 - c2 * a1) / denominator;
 
     // Extra safety check for steady state values
     if (!std::isfinite(steady_F) || !std::isfinite(steady_L)) {
-        std::cout << "\nWARNING: Non-finite steady state values detected in final F/L calculation for person ID: " 
+        std::cout << "\nWARNING: Non-finite steady state values detected in final F/L calculation "
+                     "for person ID: "
                   << person.id() << ". Using fallback values.";
-        
+
         // Use previous values as fallback
         steady_F = F_0;
         steady_L = L_0;
     }
 
     // Compute time constant with safety check
-    double tau_denominator = ((gamma_F + delta) * (1.0 - p) * rho_L + (gamma_L + delta) * p * rho_F);
+    double tau_denominator =
+        ((gamma_F + delta) * (1.0 - p) * rho_L + (gamma_L + delta) * p * rho_F);
     if (std::abs(tau_denominator) < 1e-10) {
-        std::cout << "\nWARNING: Near-zero denominator in tau calculation for person ID: " 
+        std::cout << "\nWARNING: Near-zero denominator in tau calculation for person ID: "
                   << person.id() << ". Using fallback values.";
-        
+
         // Use previous values as fallback
         double F = F_0;
         double L = L_0;
-        
+
         // Compute body weight with the fallback values
         double BW = F + L + G + W + ECF;
         if (nutrient_ranges_.contains("Weight"_id)) {
             BW = nutrient_ranges_.at("Weight"_id).clamp(BW);
         }
-        
+
         // Set the state values
         person.risk_factors.at("Glycogen"_id) = G;
         person.risk_factors.at("ExtracellularFluid"_id) = ECF;
         person.risk_factors.at("BodyFat"_id) = F;
         person.risk_factors.at("LeanTissue"_id) = L;
         person.risk_factors.at("Weight"_id) = BW;
-        
+
         return; // Exit the function early
     }
 
@@ -771,20 +773,20 @@ void KevinHallModel::kevin_hall_run(Person &person) const {
         // Use previous values as fallback
         double F = F_0;
         double L = L_0;
-        
+
         // Compute body weight with the fallback values
         double BW = F + L + G + W + ECF;
         if (nutrient_ranges_.contains("Weight"_id)) {
             BW = nutrient_ranges_.at("Weight"_id).clamp(BW);
         }
-        
+
         // Set the state values
         person.risk_factors.at("Glycogen"_id) = G;
         person.risk_factors.at("ExtracellularFluid"_id) = ECF;
         person.risk_factors.at("BodyFat"_id) = F;
         person.risk_factors.at("LeanTissue"_id) = L;
         person.risk_factors.at("Weight"_id) = BW;
-        
+
         return; // Exit the function early
     }
 
@@ -802,9 +804,10 @@ void KevinHallModel::kevin_hall_run(Person &person) const {
 
     // Extra safety check for F and L - if they're not finite after calculation, use previous values
     if (!std::isfinite(F) || !std::isfinite(L)) {
-        std::cout << "\nWARNING: Non-finite values detected in final F/L calculation for person ID: " 
-                  << person.id() << ". Using fallback values.";
-        
+        std::cout
+            << "\nWARNING: Non-finite values detected in final F/L calculation for person ID: "
+            << person.id() << ". Using fallback values.";
+
         // Use previous values as fallback
         F = F_0;
         L = L_0;
