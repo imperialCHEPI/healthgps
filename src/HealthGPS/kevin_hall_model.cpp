@@ -78,7 +78,15 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
     }
 
     // Adjust weight mean to match expected.
-    adjust_risk_factors(context, {"Weight"_id}, std::nullopt, true);
+    // Create a vector of ranges with the Weight range if available
+    std::vector<core::DoubleInterval> weight_ranges;
+    if (nutrient_ranges_.contains("Weight"_id)) {
+        weight_ranges.push_back(nutrient_ranges_.at("Weight"_id));
+        adjust_risk_factors(context, {"Weight"_id}, weight_ranges, true);
+    } else {
+        // Fall back to std::nullopt if no Weight range is defined
+        adjust_risk_factors(context, {"Weight"_id}, std::nullopt, true);
+    }
 
     // Print weight values for a sample of people after adjustment
     std::cout << "\n===== WEIGHT ADJUSTMENT CHECK: SAMPLE OF 5 PEOPLE =====";
@@ -153,6 +161,8 @@ void KevinHallModel::update_newborns(RuntimeContext &context) const {
     // `adjust_risk_factors(context, {"Weight"_id}, IntegerInterval{0, 0});` once age_range
     // is implemented in the adjustment method, as it is redundant and does not communicate
     // the newborn weight adjustment to the intervention (see #266).
+    // NOTE: FOR REFACTORING: When implementing this, ensure the Weight range from nutrient_ranges_
+    // is passed to prevent NaN values, similar to generate_risk_factors implementation.
 
     // NOTE: FOR REFACTORING: Then, this whole method can be replaced with a generalised
     // initialise method, which accepts an age range, and both the `generate_risk_factors`
@@ -169,6 +179,13 @@ void KevinHallModel::update_newborns(RuntimeContext &context) const {
 
         double adjustment = adjustments.at(person.gender, person.age);
         person.risk_factors.at("Weight"_id) += adjustment;
+        
+        // Ensure weight is within valid range
+        if (nutrient_ranges_.contains("Weight"_id)) {
+            double current_weight = person.risk_factors.at("Weight"_id);
+            double clamped_weight = nutrient_ranges_.at("Weight"_id).clamp(current_weight);
+            person.risk_factors.at("Weight"_id) = clamped_weight;
+        }
     }
 
     // NOTE: FOR REFACTORING: End of semi-redundant block.
@@ -487,7 +504,7 @@ void KevinHallModel::compute_nutrient_intakes(Person &person) const {
 
         for (const auto &[nutrient_key, nutrient_coefficient] : nutrient_coefficients) {
             double new_value =
-                person.risk_factors.at(nutrient_key) + food_intake * nutrient_coefficient;
+                person.risk_factors.at(nutrient_key) + (food_intake * nutrient_coefficient);
             person.risk_factors.at(nutrient_key) = new_value;
         }
     }
@@ -680,9 +697,46 @@ void KevinHallModel::kevin_hall_run(Person &person) const {
     double b2 = gamma_L + delta;
     double c2 = EI - K - TEF - AT - delta * (G + W + ECF);
 
+    // Check for division by zero in denominator
+    double denominator = (a1 * b2 - a2 * b1);
+    if (std::abs(denominator) < 1e-10) {
+        // Log the issue
+        std::cout << "\nWARNING: Near-zero denominator detected in kevin_hall_run for person ID: " 
+                  << person.id() << ". Using fallback values.";
+        
+        // Use F_0 and L_0 as the final values
+        double F = F_0;
+        double L = L_0;
+        
+        // Compute body weight with the fallback values
+        double BW = F + L + G + W + ECF;
+        if (nutrient_ranges_.contains("Weight"_id)) {
+            BW = nutrient_ranges_.at("Weight"_id).clamp(BW);
+        }
+        
+        // Set the state values
+        person.risk_factors.at("Glycogen"_id) = G;
+        person.risk_factors.at("ExtracellularFluid"_id) = ECF;
+        person.risk_factors.at("BodyFat"_id) = F;
+        person.risk_factors.at("LeanTissue"_id) = L;
+        person.risk_factors.at("Weight"_id) = BW;
+        
+        return; // Exit the function early
+    }
+    
     // Compute body fat and lean tissue steady state.
-    double steady_F = -(b1 * c2 - b2 * c1) / (a1 * b2 - a2 * b1);
-    double steady_L = -(c1 * a2 - c2 * a1) / (a1 * b2 - a2 * b1);
+    double steady_F = -(b1 * c2 - b2 * c1) / denominator;
+    double steady_L = -(c1 * a2 - c2 * a1) / denominator;
+
+    // Extra safety check for F and L - if they're not finite after calculation, use previous values
+    if (!std::isfinite(steady_F) || !std::isfinite(steady_L)) {
+        std::cout << "\nWARNING: Non-finite values detected in final F/L calculation for person ID: " 
+                  << person.id() << ". Using fallback values.";
+        
+        // Use previous values as fallback
+        steady_F = F_0;
+        steady_L = L_0;
+    }
 
     // Compute time constant.
     double tau = rho_L * rho_F * (1.0 + x) /
@@ -692,21 +746,34 @@ void KevinHallModel::kevin_hall_run(Person &person) const {
     double F = steady_F - (steady_F - F_0) * exp(-365.0 / tau);
     double L = steady_L - (steady_L - L_0) * exp(-365.0 / tau);
 
+    // Extra safety check for F and L - if they're not finite after calculation, use previous values
+    if (!std::isfinite(F) || !std::isfinite(L)) {
+        std::cout << "\nWARNING: Non-finite values detected in final F/L calculation for person ID: " 
+                  << person.id() << ". Using fallback values.";
+        
+        // Use previous values as fallback
+        F = F_0;
+        L = L_0;
+    }
+
     // Compute body weight.
     double BW = F + L + G + W + ECF;
 
     // Debug NaN check
-    if (std::isnan(BW)) {
+    if (std::isnan(BW) || !std::isfinite(BW)) {
         std::cout << "\nDEBUG NaN DETECTED in kevin_hall_run - Final weight calculation:"
                   << "\n  Person ID: " << person.id() << "\n  Age: " << person.age
                   << "\n  Gender: " << (person.gender == core::Gender::male ? "Male" : "Female")
                   << "\n  Initial EI: " << EI_0 << "\n  Current EI: " << EI
                   << "\n  Delta EI: " << delta_EI << "\n  TEF: " << TEF << "\n  AT: " << AT
                   << "\n  Initial carb: " << CI_0 << "\n  Current carb: " << CI
-                  << "\n  Initial weight: " << BW_0 << "\n  Body fat: " << F
+                  << "\n  Initial weight: " << BW_0 << "\n  Current weight: " << BW
+                  << "\n  Body fat: " << F
                   << "\n  Lean tissue: " << L << "\n  Previous G: " << G_0 << "\n  Glycogen: " << G
                   << "\n  Water: " << W << "\n  ECF: " << ECF << "\n  Energy intake: " << EI
                   << "\n  Physical activity: " << PAL << "\n  Height: " << H;
+        
+        // Exit to help identify NaN sources
         std::exit(1);
     }
 

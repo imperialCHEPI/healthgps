@@ -70,8 +70,7 @@ template <typename T> class Channel {
         }
 
         if (buffer_.empty()) {
-            std::cout
-                << "\nWARNING: Channel::try_receive - Buffer is empty, returning empty result";
+            //std::cout << "\nWARNING: Channel::try_receive - Buffer is empty, returning empty result";
             return {};
         }
 

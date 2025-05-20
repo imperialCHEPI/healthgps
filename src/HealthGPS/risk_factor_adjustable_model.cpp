@@ -68,23 +68,22 @@ double RiskFactorAdjustableModel::get_expected(RuntimeContext &context, core::Ge
 void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
                                                     const std::vector<core::Identifier> &factors,
                                                     OptionalRanges ranges, bool apply_trend) const {
-    // std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Starting
-    // (apply_trend=" << (apply_trend ? "true" : "false") << ")" << std::endl;
+    // std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Starting (apply_trend=" << (apply_trend ? "true" : "false") << ")" << std::endl;
     RiskFactorSexAgeTable adjustments;
+    
+    // Flag to track if ranges are applied at least once
+    //bool any_ranges_applied = false;
 
     // Baseline scenario: compute adjustments.
     if (context.scenario().type() == ScenarioType::baseline) {
-        // std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Calculating
-        // adjustments for baseline";
+        // std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Calculating adjustments for baseline";
         adjustments = calculate_adjustments(context, factors, ranges, apply_trend);
-        // std::cout<< "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Adjustments
-        // calculated";
+        // std::cout<< "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Adjustments calculated";
     }
 
     // Intervention scenario: receive adjustments from baseline scenario.
     else {
-        // std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Receiving
-        // adjustments for intervention";
+        // std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Receiving adjustments for intervention";
         auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
         while (!message.has_value()) {
             message = context.scenario().channel().try_receive(context.sync_timeout_millis());
@@ -101,25 +100,44 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
         }
 
         adjustments = messagePrt->data();
-        // std::cout<< "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Adjustments
-        // received";
+        // std::cout<< "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Adjustments received";
     }
 
     // All scenarios: apply adjustments to population.
-    // std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Applying adjustments
-    // to population";
+    // std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Applying adjustments to population";
     auto &pop = context.population();
     tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         if (!person.is_active()) {
             return;
         }
 
-        for (size_t i = 0; i < factors.size(); i++) {
-            double delta = adjustments.at(person.gender, factors[i]).at(person.age);
-            double value = person.risk_factors.at(factors[i]) + delta;
+        for (size_t factor_index = 0; factor_index < factors.size(); factor_index++) {
+            const auto& factor = factors[factor_index];
+            double delta = adjustments.at(person.gender, factor).at(person.age);
+            double value = person.risk_factors.at(factor) + delta;
 
-            // Set the adjusted value with range validation
-            person.set_risk_factor(context, factors[i], value);
+            // Check for NaN values and fix them
+            if (std::isnan(value)) {
+                std::cout << "\nWARNING: NaN value detected during risk factor adjustment for "
+                          << factor.to_string() << " (Person ID: " << person.id() 
+                          << ", Gender: " << (person.gender == core::Gender::male ? "Male" : "Female")
+                          << ", Age: " << person.age 
+                          << ", Original value: " << person.risk_factors.at(factor)
+                          << ", Delta: " << delta << ")";
+                
+                // Use original value as fallback
+                value = person.risk_factors.at(factor);
+            }
+
+            // Apply range clamping if ranges are provided
+            if (ranges.has_value()) {
+                // Make sure we're using the right index for the range
+                value = ranges.value().get().at(factor_index).clamp(value);
+                //any_ranges_applied = true; // Mark that ranges were applied at least once
+            }
+
+            // Set the adjusted value with any additional validation
+            person.set_risk_factor(context, factor, value);
         }
 
         // Special handling for demographic attributes- Mahima
@@ -138,18 +156,18 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
     });
     // std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Adjustments applied";
 
+    // Print single debug message about range application
+    //std::cout << "\nRANGE DEBUG: " << (any_ranges_applied ? "Ranges were applied for risk factor adjustment": "NO ranges were applied during adjustment");
+
     // Baseline scenario: send adjustments to intervention scenario.
     if (context.scenario().type() == ScenarioType::baseline) {
-        // std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Sending
-        // adjustments to intervention";
+        // std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Sending adjustments to intervention";
         context.scenario().channel().send(std::make_unique<RiskFactorAdjustmentMessage>(
             context.current_run(), context.time_now(), std::move(adjustments)));
-        // std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Adjustments
-        // sent";
+        // std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Adjustments sent";
     }
 
-    // std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Completed" <<
-    // std::endl;
+    // std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Completed" << std::endl;
 }
 
 int RiskFactorAdjustableModel::get_trend_steps(const core::Identifier &factor) const {
