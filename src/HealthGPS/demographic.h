@@ -34,8 +34,7 @@ class DemographicModule final : public SimulationModule {
             core::Identifier,
             std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>>
             ethnicity_prevalence,
-        std::unordered_map<core::Income, LinearModelParams> income_models,
-        double info_speed);
+        std::unordered_map<core::Income, LinearModelParams> income_models, double info_speed);
 
     /// @brief Gets the module type identifier
     /// @return The module type identifier

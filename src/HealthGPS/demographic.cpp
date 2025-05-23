@@ -33,13 +33,11 @@ DemographicModule::DemographicModule(
         core::Identifier,
         std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>>
         ethnicity_prevalence,
-    std::unordered_map<core::Income, LinearModelParams> income_models,
-    double info_speed)
+    std::unordered_map<core::Income, LinearModelParams> income_models, double info_speed)
     : pop_data_{std::move(pop_data)}, life_table_{std::move(life_table)},
       region_prevalence_{std::move(region_prevalence)},
       ethnicity_prevalence_{std::move(ethnicity_prevalence)},
-      income_models_{std::move(income_models)},
-      info_speed_{info_speed} {
+      income_models_{std::move(income_models)}, info_speed_{info_speed} {
     if (pop_data_.empty()) {
         if (!life_table_.empty()) {
             throw std::invalid_argument("empty population and life table content mismatch.");
@@ -463,7 +461,7 @@ void DemographicModule::initialise_income_continuous([[maybe_unused]] RuntimeCon
             }
         }
 
-       // Get the standard deviation from the model using iterator (it) instead of looking up again
+        // Get the standard deviation from the model using iterator (it) instead of looking up again
         // and again
         double income_stddev = 0.0;
         if (auto it = model.coefficients.find("IncomeContinuousStdDev");
@@ -475,7 +473,7 @@ void DemographicModule::initialise_income_continuous([[maybe_unused]] RuntimeCon
         double noise = random.next_normal(0.0, income_stddev);
         // Store the noise as a residual for future updates
         person.risk_factors[core::Identifier("income_continuous_residual")] = noise;
-        
+
         double final_value = value + noise; // Add noise instead of multiplying
 
         // Apply min/max bounds if they exist in the model
@@ -580,7 +578,7 @@ void DemographicModule::update_population(RuntimeContext &context,
     auto number_of_deaths = update_age_and_death_events(context, disease_host);
 
     // Update income continuous values for all active people- Mahima
-    //Added update income_continuous
+    // Added update income_continuous
     for (auto &person : context.population()) {
         if (person.is_active()) {
             update_income_continuous(context, person, context.random());
@@ -842,9 +840,11 @@ void DemographicModule::initialize_newborns(RuntimeContext &context) {
     // std::endl;
 }
 
-//Added update continuous income using teh same logic as initialization where it depends on age, gender, region,ethnicity and noise- Mahima
-// Here for update, the previous noise is considred to maintain longitudanal correlation of residuals/noise (whatever you wnat to call them)
-// NOLINTBEGIN(readability-function-cognitive-complexity)
+// Added update continuous income using teh same logic as initialization where it depends on age,
+// gender, region,ethnicity and noise- Mahima
+//  Here for update, the previous noise is considred to maintain longitudanal correlation of
+//  residuals/noise (whatever you wnat to call them)
+//  NOLINTBEGIN(readability-function-cognitive-complexity)
 void DemographicModule::update_income_continuous([[maybe_unused]] RuntimeContext &context,
                                                  Person &person, Random &random) {
     // Skip if no income models available
@@ -861,8 +861,7 @@ void DemographicModule::update_income_continuous([[maybe_unused]] RuntimeContext
     // Apply coefficients based on person's attributes
     for (const auto &[factor_name, coefficient] : model.coefficients) {
         // Skip special entries that aren't factors
-        if (factor_name == "IncomeContinuousStdDev" || factor_name == "min" ||
-            factor_name == "max")
+        if (factor_name == "IncomeContinuousStdDev" || factor_name == "min" || factor_name == "max")
             continue;
 
         // Age effects
@@ -915,7 +914,8 @@ void DemographicModule::update_income_continuous([[maybe_unused]] RuntimeContext
         }
     }
 
-    // Get the standard deviation from the model using iterator (it) instead of looking up again and again
+    // Get the standard deviation from the model using iterator (it) instead of looking up again and
+    // again
     double income_stddev = 0.0;
     if (auto it = model.coefficients.find("IncomeContinuousStdDev");
         it != model.coefficients.end()) {
@@ -934,8 +934,8 @@ void DemographicModule::update_income_continuous([[maybe_unused]] RuntimeContext
 
     // Update residual using the same formula as other risk factors
     // Using info_speed_ from the class for consistency with other risk factors
-    double new_residual = info_speed_ * new_noise + 
-                         sqrt(1.0 - info_speed_ * info_speed_) * old_residual;
+    double new_residual =
+        info_speed_ * new_noise + sqrt(1.0 - info_speed_ * info_speed_) * old_residual;
 
     // Store the updated residual
     person.risk_factors[residual_name] = new_residual;
@@ -982,7 +982,7 @@ std::unique_ptr<DemographicModule> build_population_module(Repository &repositor
     auto region_prevalence = static_model.get_region_prevalence();
     auto ethnicity_prevalence = static_model.get_ethnicity_prevalence();
     auto income_models = static_model.get_income_models();
-    
+
     // Extract physical activity parameters
     std::unordered_map<std::string, double> physical_activity_params;
     physical_activity_params["StandardDeviation"] = static_model.get_physical_activity_stddev();
