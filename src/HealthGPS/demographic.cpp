@@ -37,7 +37,7 @@ DemographicModule::DemographicModule(
     : pop_data_{std::move(pop_data)}, life_table_{std::move(life_table)},
       region_prevalence_{std::move(region_prevalence)},
       ethnicity_prevalence_{std::move(ethnicity_prevalence)},
-      income_models_{std::move(income_models)}, info_speed_{info_speed} {
+      info_speed_{info_speed}, income_models_{std::move(income_models)} {
     if (pop_data_.empty()) {
         if (!life_table_.empty()) {
             throw std::invalid_argument("empty population and life table content mismatch.");

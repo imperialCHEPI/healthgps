@@ -76,6 +76,7 @@ class DemographicModule final : public SimulationModule {
     std::string name_{"Demographic"};
     std::vector<double> income_quartile_thresholds_;
     double info_speed_;
+    std::unordered_map<core::Income, LinearModelParams> income_models_;
 
     // Demographic configuration data from JSON
     std::unordered_map<core::Identifier,
@@ -85,7 +86,6 @@ class DemographicModule final : public SimulationModule {
         core::Identifier,
         std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>>
         ethnicity_prevalence_;
-    std::unordered_map<core::Income, LinearModelParams> income_models_;
     RuntimeContext *context_{nullptr}; // Store reference to context for range validation
 
     void initialise_birth_rates();
