@@ -33,11 +33,13 @@ DemographicModule::DemographicModule(
         core::Identifier,
         std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>>
         ethnicity_prevalence,
-    std::unordered_map<core::Income, LinearModelParams> income_models)
+    std::unordered_map<core::Income, LinearModelParams> income_models,
+    double info_speed)
     : pop_data_{std::move(pop_data)}, life_table_{std::move(life_table)},
       region_prevalence_{std::move(region_prevalence)},
       ethnicity_prevalence_{std::move(ethnicity_prevalence)},
-      income_models_{std::move(income_models)} {
+      income_models_{std::move(income_models)},
+      info_speed_{info_speed} {
     if (pop_data_.empty()) {
         if (!life_table_.empty()) {
             throw std::invalid_argument("empty population and life table content mismatch.");
@@ -403,7 +405,6 @@ void DemographicModule::initialise_income_continuous([[maybe_unused]] RuntimeCon
 
         // Start with the intercept
         double value = model.intercept;
-        // std::cout << "\nDEBUG: Found intercept value of:" << value;
 
         // Directly apply coefficients based on person's attributes
         for (const auto &[factor_name, coefficient] : model.coefficients) {
@@ -462,14 +463,19 @@ void DemographicModule::initialise_income_continuous([[maybe_unused]] RuntimeCon
             }
         }
 
-        // Get the standard deviation from the model
+       // Get the standard deviation from the model using iterator (it) instead of looking up again
+        // and again
         double income_stddev = 0.0;
-        if (model.coefficients.count("IncomeContinuousStdDev") > 0) {
-            income_stddev = model.coefficients.at("IncomeContinuousStdDev");
+        if (auto it = model.coefficients.find("IncomeContinuousStdDev");
+            it != model.coefficients.end()) {
+            income_stddev = it->second;
         }
 
         // Add random noise
         double noise = random.next_normal(0.0, income_stddev);
+        // Store the noise as a residual for future updates
+        person.risk_factors[core::Identifier("income_continuous_residual")] = noise;
+        
         double final_value = value + noise; // Add noise instead of multiplying
 
         // Apply min/max bounds if they exist in the model
@@ -479,8 +485,8 @@ void DemographicModule::initialise_income_continuous([[maybe_unused]] RuntimeCon
         // Set the income_continuous value
         person.income_continuous = final_value;
     }
-    // std::cout << "\nDEBUG: Finished initialise_income_continuous";
-} // NOLINTEND(readability-function-cognitive-complexity)
+}
+// NOLINTEND(readability-function-cognitive-complexity)
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
 void DemographicModule::initialise_income_category(Person &person, const Population &population) {
@@ -572,6 +578,14 @@ void DemographicModule::update_population(RuntimeContext &context,
     // apply death events and update basic information (age)
     residual_future.get();
     auto number_of_deaths = update_age_and_death_events(context, disease_host);
+
+    // Update income continuous values for all active people- Mahima
+    //Added update income_continuous
+    for (auto &person : context.population()) {
+        if (person.is_active()) {
+            update_income_continuous(context, person, context.random());
+        }
+    }
 
     // Update demographic variables including income categories
     update_income_category(context);
@@ -828,10 +842,118 @@ void DemographicModule::initialize_newborns(RuntimeContext &context) {
     // std::endl;
 }
 
+//Added update continuous income using teh same logic as initialization where it depends on age, gender, region,ethnicity and noise- Mahima
+// Here for update, the previous noise is considred to maintain longitudanal correlation of residuals/noise (whatever you wnat to call them)
+// NOLINTBEGIN(readability-function-cognitive-complexity)
+void DemographicModule::update_income_continuous([[maybe_unused]] RuntimeContext &context,
+                                                 Person &person, Random &random) {
+    // Skip if no income models available
+    if (income_models_.empty()) {
+        return;
+    }
+
+    const auto &model_pair = *income_models_.begin(); // Get the first model regardless of key
+    const auto &model = model_pair.second;
+
+    // Start with the intercept
+    double value = model.intercept;
+
+    // Apply coefficients based on person's attributes
+    for (const auto &[factor_name, coefficient] : model.coefficients) {
+        // Skip special entries that aren't factors
+        if (factor_name == "IncomeContinuousStdDev" || factor_name == "min" ||
+            factor_name == "max")
+            continue;
+
+        // Age effects
+        if (factor_name == "Age") {
+            value += coefficient * static_cast<double>(person.age);
+        }
+        if (factor_name == "Age2") {
+            value += coefficient * pow(person.age, 2);
+        }
+        if (factor_name == "Age3") {
+            value += coefficient * pow(person.age, 3);
+        }
+        // Gender effect
+        if (factor_name == "Gender") {
+            // Male = 1, Female = 0
+            if (person.gender == core::Gender::male) {
+                value += coefficient;
+            }
+        }
+        // Sector effect
+        if (factor_name == "Sector") {
+            // Rural = 1, Urban = 0
+            if (person.sector == core::Sector::rural) {
+                value += coefficient;
+            }
+        }
+        // Region effects - only apply if the region matches
+        else if (factor_name == "England" && person.region == core::Region::England) {
+            value += coefficient;
+        } else if (factor_name == "Wales" && person.region == core::Region::Wales) {
+            value += coefficient;
+        } else if (factor_name == "Scotland" && person.region == core::Region::Scotland) {
+            value += coefficient;
+        } else if (factor_name == "NorthernIreland" &&
+                   person.region == core::Region::NorthernIreland) {
+            value += coefficient;
+        }
+        // Ethnicity effects - only apply if the ethnicity matches
+        else if (factor_name == "White" && person.ethnicity == core::Ethnicity::White) {
+            value += coefficient;
+        } else if (factor_name == "Black" && person.ethnicity == core::Ethnicity::Black) {
+            value += coefficient;
+        } else if (factor_name == "Asian" && person.ethnicity == core::Ethnicity::Asian) {
+            value += coefficient;
+        } else if (factor_name == "Mixed" && person.ethnicity == core::Ethnicity::Mixed) {
+            value += coefficient;
+        } else if ((factor_name == "Others" || factor_name == "Other") &&
+                   person.ethnicity == core::Ethnicity::Other) {
+            value += coefficient;
+        }
+    }
+
+    // Get the standard deviation from the model using iterator (it) instead of looking up again and again
+    double income_stddev = 0.0;
+    if (auto it = model.coefficients.find("IncomeContinuousStdDev");
+        it != model.coefficients.end()) {
+        income_stddev = it->second;
+    }
+
+    // Get existing residual or initialize if not present
+    auto residual_name = core::Identifier("income_continuous_residual");
+    double old_residual = 0.0;
+    if (person.risk_factors.contains(residual_name)) {
+        old_residual = person.risk_factors.at(residual_name);
+    }
+
+    // Generate new random noise
+    double new_noise = random.next_normal(0.0, income_stddev);
+
+    // Update residual using the same formula as other risk factors
+    // Using info_speed_ from the class for consistency with other risk factors
+    double new_residual = info_speed_ * new_noise + 
+                         sqrt(1.0 - info_speed_ * info_speed_) * old_residual;
+
+    // Store the updated residual
+    person.risk_factors[residual_name] = new_residual;
+
+    // Calculate final value with updated residual
+    double final_value = value + new_residual;
+
+    // Apply min/max bounds if they exist in the model
+    final_value = std::max(final_value, model.coefficients.at("min"));
+    final_value = std::min(final_value, model.coefficients.at("max"));
+
+    // Set the income_continuous value
+    person.income_continuous = final_value;
+}
+// NOLINTEND(readability-function-cognitive-complexity)
+
 std::unique_ptr<DemographicModule> build_population_module(Repository &repository,
                                                            const ModelInput &config) {
-    // std::cout << "\nDEBUG: Starting build_population_module" << std::endl;
-
     // year => age [age, male, female]
     auto pop_data = std::map<int, std::map<int, PopulationRecord>>();
 
@@ -852,28 +974,23 @@ std::unique_ptr<DemographicModule> build_population_module(Repository &repositor
     auto deaths = repository.manager().get_mortality(config.settings().country(), time_filter);
     auto life_table = detail::StoreConverter::to_life_table(births, deaths);
 
-    // std::cout << "\nDEBUG: About to get demographic configuration from static model" <<
-    // std::endl;
-
     // Get demographic configuration from the static risk factor model
     const auto &static_model = dynamic_cast<const StaticLinearModelDefinition &>(
         repository.get_risk_factor_model_definition(RiskFactorModelType::Static));
 
     // Extract the configuration data using the getter methods
     auto region_prevalence = static_model.get_region_prevalence();
-
     auto ethnicity_prevalence = static_model.get_ethnicity_prevalence();
     auto income_models = static_model.get_income_models();
-
+    
     // Extract physical activity parameters
     std::unordered_map<std::string, double> physical_activity_params;
     physical_activity_params["StandardDeviation"] = static_model.get_physical_activity_stddev();
-
-    // std::cout << "\nDEBUG: Creating DemographicModule with extracted configuration" << std::endl;
+    auto info_speed = static_model.get_info_speed();
 
     // Create and return the demographic module with all the configuration data
     return std::make_unique<DemographicModule>(
         std::move(pop_data), std::move(life_table), std::move(region_prevalence),
-        std::move(ethnicity_prevalence), std::move(income_models));
+        std::move(ethnicity_prevalence), std::move(income_models), info_speed);
 }
 } // namespace hgps

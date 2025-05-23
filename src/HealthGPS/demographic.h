@@ -23,6 +23,7 @@ class DemographicModule final : public SimulationModule {
     /// @param region_prevalence Region prevalence by age group and gender
     /// @param ethnicity_prevalence Ethnicity prevalence by age group and gender
     /// @param income_models Income models for different income classifications
+    /// @param info_speed The speed of information dissemination
     DemographicModule(
         std::map<int, std::map<int, PopulationRecord>> &&pop_data, LifeTable &&life_table,
         std::unordered_map<
@@ -33,7 +34,8 @@ class DemographicModule final : public SimulationModule {
             core::Identifier,
             std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>>
             ethnicity_prevalence,
-        std::unordered_map<core::Income, LinearModelParams> income_models);
+        std::unordered_map<core::Income, LinearModelParams> income_models,
+        double info_speed);
 
     /// @brief Gets the module type identifier
     /// @return The module type identifier
@@ -74,6 +76,7 @@ class DemographicModule final : public SimulationModule {
     GenderTable<int, double> residual_death_rates_;
     std::string name_{"Demographic"};
     std::vector<double> income_quartile_thresholds_;
+    double info_speed_;
 
     // Demographic configuration data from JSON
     std::unordered_map<core::Identifier,
@@ -96,6 +99,7 @@ class DemographicModule final : public SimulationModule {
     void calculate_income_quartiles(const Population &population);
     void update_income_category(RuntimeContext &context);
     void initialize_newborns(RuntimeContext &context);
+    void update_income_continuous(RuntimeContext &context, Person &person, Random &random);
 
     double get_total_deaths(int time_year) const noexcept;
     std::map<int, DoubleGenderValue> get_age_gender_distribution(int time_year) const noexcept;

@@ -270,6 +270,10 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
         return physical_activity_models_;
     }
 
+    /// @brief Gets the information speed
+    /// @return The information speed value
+    double get_info_speed() const { return info_speed_; }
+
   private:
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox_;
     std::vector<core::Identifier> names_;
