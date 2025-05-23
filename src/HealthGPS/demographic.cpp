@@ -34,14 +34,9 @@ DemographicModule::DemographicModule(
         std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>>
         ethnicity_prevalence,
     std::unordered_map<core::Income, LinearModelParams> income_models, double info_speed)
-    : pop_data_{std::move(pop_data)}, 
-      life_table_{std::move(life_table)},
-      birth_rates_{},
-      residual_death_rates_{},
-      name_{"Demographic"},
-      income_quartile_thresholds_{},
-      info_speed_{info_speed},
-      income_models_{std::move(income_models)},
+    : pop_data_{std::move(pop_data)}, life_table_{std::move(life_table)}, birth_rates_{},
+      residual_death_rates_{}, name_{"Demographic"}, income_quartile_thresholds_{},
+      info_speed_{info_speed}, income_models_{std::move(income_models)},
       region_prevalence_{std::move(region_prevalence)},
       ethnicity_prevalence_{std::move(ethnicity_prevalence)} {
     if (pop_data_.empty()) {
