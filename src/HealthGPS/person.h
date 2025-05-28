@@ -203,7 +203,8 @@ struct Person {
     unsigned int time_of_migration_{};
 
     static std::atomic<std::size_t> newUID;
-    static std::unordered_map<core::Identifier, std::function<double(const Person &)>> current_dispatcher;
+    static std::unordered_map<core::Identifier, std::function<double(const Person &)>>
+        current_dispatcher;
 };
 
 } // namespace hgps

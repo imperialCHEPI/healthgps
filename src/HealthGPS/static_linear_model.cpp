@@ -296,22 +296,27 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
         auto residual_name = core::Identifier{name.to_string() + "_residual"};
         double old_residual = person.risk_factors.at(residual_name);
 
-        // Blend old and new residuals 
+        // Blend old and new residuals
         double new_residual = new_residuals[i];
-        double blended_residual = 0.5 * old_residual + 0.5 * new_residual; // average of previous residual and current residuals
+        double blended_residual =
+            0.5 * old_residual +
+            0.5 * new_residual; // average of previous residual and current residuals
 
         // Save the new blended residual
         person.risk_factors[residual_name] = blended_residual;
 
         // TWO-STAGE RISK FACTOR MODELING APPROACH- Mahima
         // =======================================================================
-        // Use both previous year's zero probability and new calculation 
+        // Use both previous year's zero probability and new calculation
         // =======================================================================
 
         // STAGE 1: Calculate new zero probability and blend with previous year's
         double new_zero_probability = calculate_zero_probability(person, i);
         double previous_zero_probability = person.previous_zero_probabilities[name];
-        double blended_zero_probability = 0.5 * previous_zero_probability + 0.5 * new_zero_probability; // average of previous zero probability and current zero probability
+        double blended_zero_probability =
+            0.5 * previous_zero_probability +
+            0.5 * new_zero_probability; // average of previous zero probability and current zero
+                                        // probability
 
         // Store the new zero probability for next year
         person.previous_zero_probabilities[name] = new_zero_probability;
