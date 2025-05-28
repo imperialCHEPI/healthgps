@@ -80,8 +80,11 @@ struct Person {
     /// @brief Region assigned value
     core::Region region{core::Region::unknown};
 
-    /// @brief Current risk factors values
+    /// @brief The risk factors values
     std::unordered_map<core::Identifier, double> risk_factors{};
+
+    /// @brief The previous year's zero probabilities for each risk factor
+    std::unordered_map<core::Identifier, double> previous_zero_probabilities{};
 
     /// @brief Diseases history and current status
     std::map<core::Identifier, Disease> diseases;
@@ -200,8 +203,7 @@ struct Person {
     unsigned int time_of_migration_{};
 
     static std::atomic<std::size_t> newUID;
-    static std::unordered_map<core::Identifier, std::function<double(const Person &)>>
-        current_dispatcher;
+    static std::unordered_map<core::Identifier, std::function<double(const Person &)>> current_dispatcher;
 };
 
 } // namespace hgps

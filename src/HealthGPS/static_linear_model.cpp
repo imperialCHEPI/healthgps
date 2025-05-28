@@ -247,12 +247,15 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
         // =======================================================================
         // Previous approach: Use BoxCox transformation to calculate risk factor values
         // New approach: First use logistic regression to determine if the risk factor value should
-        // be zero
+        //              be zero
         //              If non-zero, then use BoxCox transformation to calculate the actual value
         // =======================================================================
 
         // STAGE 1: Determine if risk factor should be zero using logistic regression
         double zero_probability = calculate_zero_probability(person, i);
+
+        // Store the zero probability for next year's update
+        person.previous_zero_probabilities[names_[i]] = zero_probability;
 
         // Sample from this probability to determine if risk factor should be zero
         // if logistic regression output = 1, risk factor value = 0
@@ -271,16 +274,6 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
 
         // Save risk factor
         person.risk_factors[names_[i]] = factor;
-
-        // Print sample risk factor values for verification
-        /*static int factor_sample_counter = 0;
-        if (++factor_sample_counter % 2000 == 0) {  // Even less frequent to avoid flooding
-            std::cout << "\nRISK FACTOR VALUE IN INITIALISE FACTORS: " << names_[i].to_string()
-                      << " = " << factor
-                      << " (Person ID: " << person.id()
-                      << ", Age: " << person.age
-                      << ", Gender: " << (person.gender == core::Gender::male ? "M" : "F") << ")";
-        }*/
     }
 }
 
@@ -288,66 +281,56 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
                                        Random &random) const {
 
     // Correlated residual sampling.
-    auto residuals = compute_residuals(random, cholesky_);
+    auto new_residuals = compute_residuals(random, cholesky_);
 
     // Approximate risk factors with linear models.
     auto linear = compute_linear_models(person, models_);
 
     // Update residuals and risk factors (should exist).
-    for (size_t RiskFactorIndex = 0; RiskFactorIndex < names_.size(); RiskFactorIndex++) {
+    for (size_t i = 0; i < names_.size(); i++) {
+        // Get the risk factor name and expected value
+        auto name = names_[i];
+        double expected = get_expected(context, person.gender, person.age, name, ranges_[i], false);
 
-        // Update residual.
-        auto residual_name = core::Identifier{names_[RiskFactorIndex].to_string() + "_residual"};
-        double residual_old = person.risk_factors.at(residual_name);
-        double residual = residuals[RiskFactorIndex] * info_speed_;
-        residual += sqrt(1.0 - info_speed_ * info_speed_) * residual_old;
+        // Get the old residual
+        auto residual_name = core::Identifier{name.to_string() + "_residual"};
+        double old_residual = person.risk_factors.at(residual_name);
 
-        // Save residual.
-        person.risk_factors.at(residual_name) = residual;
+        // Blend old and new residuals 
+        double new_residual = new_residuals[i];
+        double blended_residual = 0.5 * old_residual + 0.5 * new_residual; // average of previous residual and current residuals
 
-        // Update risk factor.
-        double expected = get_expected(context, person.gender, person.age, names_[RiskFactorIndex],
-                                       ranges_[RiskFactorIndex], false);
+        // Save the new blended residual
+        person.risk_factors[residual_name] = blended_residual;
 
         // TWO-STAGE RISK FACTOR MODELING APPROACH- Mahima
         // =======================================================================
-        // Previous approach: Use BoxCox transformation to calculate risk factor values
-        // New approach: First use logistic regression to determine if the risk factor value should
-        // be zero
-        //              If non-zero, then use BoxCox transformation to calculate the actual value
+        // Use both previous year's zero probability and new calculation 
         // =======================================================================
 
-        // STAGE 1: Determine if risk factor should be zero using logistic regression
-        double zero_probability = calculate_zero_probability(person, RiskFactorIndex);
+        // STAGE 1: Calculate new zero probability and blend with previous year's
+        double new_zero_probability = calculate_zero_probability(person, i);
+        double previous_zero_probability = person.previous_zero_probabilities[name];
+        double blended_zero_probability = 0.5 * previous_zero_probability + 0.5 * new_zero_probability; // average of previous zero probability and current zero probability
 
-        // Sample from this probability to determine if risk factor should be zero
-        // if logistic regression output = 1, risk factor value = 0
-        double random_sample = random.next_double(); // Uniform random value between 0 and 1
-        if (random_sample < zero_probability) {
+        // Store the new zero probability for next year
+        person.previous_zero_probabilities[name] = new_zero_probability;
+
+        // Sample from blended probability to determine if risk factor should be zero
+        double random_sample = random.next_double();
+        if (random_sample < blended_zero_probability) {
             // Risk factor should be zero
-            person.risk_factors.at(names_[RiskFactorIndex]) = 0.0;
-            continue; // Skip to next risk factor
+            person.risk_factors[name] = 0.0;
+            continue;
         }
 
         // STAGE 2: Calculate non-zero risk factor value using BoxCox transformation
-        // Using the original model logic from before
-        double factor = linear[RiskFactorIndex] + residual * stddev_[RiskFactorIndex];
-        factor = expected * inverse_box_cox(factor, lambda_[RiskFactorIndex]);
-        factor = ranges_[RiskFactorIndex].clamp(factor);
+        double factor = linear[i] + blended_residual * stddev_[i];
+        factor = expected * inverse_box_cox(factor, lambda_[i]);
+        factor = ranges_[i].clamp(factor);
 
         // Save risk factor
-        person.risk_factors.at(names_[RiskFactorIndex]) = factor;
-
-        // Occasionally print sample risk factor values for verification
-        /* static int factor_sample_counter = 0;
-        if (++factor_sample_counter % 2000 == 0) {  // Even less frequent to avoid flooding
-            std::cout << "\nRISK FACTOR VALUE IN UPDATE FACTORS: " <<
-        names_[RiskFactorIndex].to_string()
-                      << " = " << factor
-                      << " (Person ID: " << person.id()
-                      << ", Age: " << person.age
-                      << ", Gender: " << (person.gender == core::Gender::male ? "M" : "F") << ")";
-        }*/
+        person.risk_factors[name] = factor;
     }
 }
 
