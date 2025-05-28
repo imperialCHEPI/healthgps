@@ -105,6 +105,13 @@ class RuntimeContext {
     /// @param message The message instance to publish
     void publish_async(std::unique_ptr<EventMessage> message) const noexcept;
 
+    /// @brief Ensures a risk factor value stays within its specified range in the configuration
+    /// @param factor_key The risk factor identifier
+    /// @param value The value to be clamped
+    /// @return The value clamped to the factor's range if one exists, or the original value
+    double ensure_risk_factor_in_range(const core::Identifier &factor_key,
+                                       double value) const noexcept;
+
   private:
     std::shared_ptr<const EventAggregator> event_bus_;
     std::shared_ptr<const ModelInput> inputs_;
