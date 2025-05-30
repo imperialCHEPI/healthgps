@@ -262,20 +262,20 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
 
         // STAGE 1: Calculate new zero probability and blend with previous year's
         double new_zero_probability = calculate_zero_probability(person, i);
-        double previous_zero_probability = person.previous_zero_probabilities[name];
+        double previous_zero_probability = person.previous_zero_probabilities[names_[i]];
         double blended_zero_probability =
             0.5 * previous_zero_probability +
             0.5 * new_zero_probability; // average of previous zero probability and current zero
                                         // probability
 
         // Store the new zero probability for next year
-        person.previous_zero_probabilities[name] = new_zero_probability;
+        person.previous_zero_probabilities[names_[i]] = new_zero_probability;
 
         // Sample from blended probability to determine if risk factor should be zero
         double random_sample = random.next_double();
         if (random_sample < blended_zero_probability) {
             // Risk factor should be zero
-            person.risk_factors[name] = 0.0;
+            person.risk_factors[names_[i]] = 0.0;
             continue;
         }
 
@@ -285,7 +285,7 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
         factor = ranges_[i].clamp(factor);
 
         // Save risk factor
-        person.risk_factors[name] = factor;
+        person.risk_factors[names_[i]] = factor;
     }
 }
 
