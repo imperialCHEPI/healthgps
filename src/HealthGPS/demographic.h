@@ -91,7 +91,8 @@ class DemographicModule final : public SimulationModule {
     void initialise_birth_rates();
 
     // Population-level initialization functions
-    void initialise_region(RuntimeContext &context, Person &person, Random &random);
+    void initialise_region([[maybe_unused]] RuntimeContext &context, Person &person,
+                           Random &random);
     void initialise_ethnicity(RuntimeContext &context, Person &person, Random &random);
     void initialise_income_continuous(RuntimeContext &context, Person &person, Random &random);
     void initialise_income_category(Person &person, const Population &population);

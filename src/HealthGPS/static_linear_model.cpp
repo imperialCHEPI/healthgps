@@ -1,11 +1,15 @@
 #include "static_linear_model.h"
 #include "HealthGPS.Core/exception.h"
 #include "HealthGPS.Input/model_parser.h"
-#include "demographic.h"
 
 #include <iostream>
 #include <ranges>
 #include <utility>
+
+#include <iostream>
+#include <oneapi/tbb/parallel_for_each.h>
+#include "demographic.h"
+
 
 namespace hgps {
 
@@ -22,19 +26,21 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     // initialized by the DemographicModule in initialise_population
 
     // Initialise everyone with risk factors.
-    for (auto &person : context.population()) {
+    auto &pop = context.population();
+    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
+        initialise_sector(person, context.random());
         initialise_factors(context, person, context.random());
         initialise_physical_activity(context, person, context.random());
-    }
+    });
 
     // Adjust such that risk factor means match expected values.
     adjust_risk_factors(context, names_, ranges_, false);
 
     // Initialise everyone with policies and trends.
-    for (auto &person : context.population()) {
+    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         initialise_policies(person, context.random(), false);
         initialise_trends(context, person);
-    }
+    });
 
     // Adjust such that trended risk factor means match trended expected values.
     adjust_risk_factors(context, names_, ranges_, true);
@@ -55,12 +61,11 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
                       (context.time_now() - context.start_time()) >= 2);
 
     // Update risk factors for all people, initializing for newborns.
-    // std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Beginning to process people";
-    for (auto &person : context.population()) {
+    auto &pop = context.population();
+    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         if (!person.is_active()) {
-            continue;
+            return;
         }
-
 
         if (person.age == 0) {
             // For newborns, initialize demographic variables
@@ -74,15 +79,15 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             // update_sector(person, context.random());
             update_factors(context, person, context.random());
         }
-    }
+    });
 
     // Adjust such that risk factor means match expected values.
     adjust_risk_factors(context, names_, ranges_, false);
 
     // Update policies and trends for all people, initializing for newborns.
-    for (auto &person : context.population()) {
+    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         if (!person.is_active()) {
-            continue;
+            return;
         }
 
         if (person.age == 0) {
@@ -92,18 +97,19 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             update_policies(person, intervene);
             update_trends(context, person);
         }
-    }
+    });
 
     // Adjust such that trended risk factor means match trended expected values.
     adjust_risk_factors(context, names_, ranges_, true);
 
     // Apply policies if intervening.
-    for (auto &person : context.population()) {
+    // for (auto &person : context.population()) {
+    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         if (!person.is_active()) {
-            continue;
+            return;
         }
         apply_policies(person, intervene);
-    }
+    });
 }
 
 double StaticLinearModel::inverse_box_cox(double factor, double lambda) {

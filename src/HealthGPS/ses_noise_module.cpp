@@ -29,9 +29,12 @@ SimulationModuleType SESNoiseModule::type() const noexcept { return SimulationMo
 const std::string &SESNoiseModule::name() const noexcept { return name_; }
 
 void SESNoiseModule::initialise_population(RuntimeContext &context) {
-    for (auto &entity : context.population()) {
+
+    // for (auto &entity : context.population()) {
+    auto &pop = context.population();
+    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &entity) {
         entity.ses = context.random().next_normal(parameters_[0], parameters_[1]);
-    }
+    });
 }
 
 void SESNoiseModule::update_population(RuntimeContext &context) {
@@ -41,9 +44,10 @@ void SESNoiseModule::update_population(RuntimeContext &context) {
         pop, [&](const Person &entity) { return entity.age == newborn_age; });
 
     std::sort(indices.begin(), indices.end());
-    for (auto &index : indices) {
+    // for (auto &index : indices) {
+    tbb::parallel_for_each(indices.begin(), indices.end(), [&](auto &index) {
         pop[index].ses = context.random().next_normal(parameters_[0], parameters_[1]);
-    }
+    });
 }
 
 std::unique_ptr<SESNoiseModule> build_ses_noise_module([[maybe_unused]] Repository &repository,

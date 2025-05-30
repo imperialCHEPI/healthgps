@@ -193,15 +193,9 @@ RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context,
     auto age_count = age_range.upper() + 1;
 
     // Compute simulated means.
-    // std::cout<< "\nDEBUG: RiskFactorAdjustableModel::calculate_adjustments - Calculating
-    // simulated means";
     auto simulated_means = calculate_simulated_mean(context.population(), age_range, factors);
-    // std::cout << "\nDEBUG: RiskFactorAdjustableModel::calculate_adjustments - Simulated means
-    // calculated";
 
     // Compute adjustments.
-    // std::cout << "\nDEBUG: RiskFactorAdjustableModel::calculate_adjustments - Computing
-    // adjustments";
     auto adjustments = RiskFactorSexAgeTable{};
     for (const auto &[sex, simulated_means_by_sex] : simulated_means) {
         for (size_t i = 0; i < factors.size(); i++) {
@@ -229,9 +223,6 @@ RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context,
             }
         }
     }
-    // std::cout << "\nDEBUG: RiskFactorAdjustableModel::calculate_adjustments - Adjustments
-    // computed"; std::cout << "\nDEBUG: RiskFactorAdjustableModel::calculate_adjustments -
-    // Completed";
 
     return adjustments;
 }
@@ -245,7 +236,6 @@ RiskFactorAdjustableModel::calculate_simulated_mean(Population &population,
 
     // Compute first moments.
     auto moments = UnorderedMap2d<core::Gender, core::Identifier, std::vector<FirstMoment>>{};
-    int processed_count = 0;
     for (const auto &person : population) {
         if (!person.is_active()) {
             continue;
@@ -267,11 +257,6 @@ RiskFactorAdjustableModel::calculate_simulated_mean(Population &population,
             moments.at(person.gender, factor).at(person.age).append(value);
         }
 
-        processed_count++;
-        /*if (processed_count % 1000 == 0) {
-            std::cout << "\nDEBUG: Processed " << processed_count << " people for first moments"
-                      << std::endl;
-        }*/
     }
 
     // Compute means.
