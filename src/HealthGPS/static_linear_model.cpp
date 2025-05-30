@@ -14,7 +14,6 @@ RiskFactorModelType StaticLinearModel::type() const noexcept { return RiskFactor
 std::string StaticLinearModel::name() const noexcept { return "Static"; }
 
 void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
-    // std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Starting";
 
     // Verify that all expected risk factors are included in the names_ vector
     verify_risk_factors();
@@ -27,25 +26,18 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         initialise_factors(context, person, context.random());
         initialise_physical_activity(context, person, context.random());
     }
-    // std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Factors and physical
-    // activity completed";
 
     // Adjust such that risk factor means match expected values.
     adjust_risk_factors(context, names_, ranges_, false);
-    // std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Risk factors adjusted";
 
     // Initialise everyone with policies and trends.
     for (auto &person : context.population()) {
         initialise_policies(person, context.random(), false);
         initialise_trends(context, person);
     }
-    // std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Policies and trends
-    // initialized";
 
     // Adjust such that trended risk factor means match trended expected values.
     adjust_risk_factors(context, names_, ranges_, true);
-    // std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Trended risk factors
-    // adjusted";
 
     // Print risk factor summary once at the end
     std::string risk_factor_list;
@@ -54,27 +46,13 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
             risk_factor_list += ", ";
         risk_factor_list += names_[i].to_string();
     }
-    // std::cout << "\nDEBUG: Successfully completed processing " << names_.size() << " risk
-    // factors: " << risk_factor_list;
-
-    // std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Completed";
 }
 
 void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
-    /*std::cout
-        << "\nDEBUG: StaticLinearModel::update_risk_factors - Starting with population size: "
-              << context.population().size() << ", scenario: "
-              << (context.scenario().type() == ScenarioType::baseline ? "baseline" : "intervention")
-              << ", current time: " << context.time_now();*/
 
     // HACK: start intervening two years into the simulation.
     bool intervene = (context.scenario().type() == ScenarioType::intervention &&
                       (context.time_now() - context.start_time()) >= 2);
-
-    // Count statistics for summary
-    int total_people = 0;
-    int newborns = 0;
-    int existing = 0;
 
     // Update risk factors for all people, initializing for newborns.
     // std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Beginning to process people";
@@ -83,11 +61,9 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             continue;
         }
 
-        total_people++;
 
         if (person.age == 0) {
             // For newborns, initialize demographic variables
-            newborns++;
             // initialise_sector(person, context.random());
             //  Demographic variables (region, ethnicity, income) are initialized by the
             //  DemographicModule
@@ -95,26 +71,19 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             initialise_physical_activity(context, person, context.random());
         } else {
             // For existing people, only update sector and factors
-            existing++;
             // update_sector(person, context.random());
             update_factors(context, person, context.random());
         }
     }
-    // std::cout << "\nDEBUG: StaticLinearModel - Processed " << total_people << " people (" <<
-    // newborns << " newborns, " << existing << " existing)";
 
     // Adjust such that risk factor means match expected values.
-    // std::cout << "\nDEBUG: StaticLinearModel - Adjusting risk factors";
     adjust_risk_factors(context, names_, ranges_, false);
 
     // Update policies and trends for all people, initializing for newborns.
-    int people_with_policies = 0;
     for (auto &person : context.population()) {
         if (!person.is_active()) {
             continue;
         }
-
-        people_with_policies++;
 
         if (person.age == 0) {
             initialise_policies(person, context.random(), intervene);
@@ -124,24 +93,17 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             update_trends(context, person);
         }
     }
-    // std::cout << "\nDEBUG: StaticLinearModel - Updated policies and trends for "<<
-    // people_with_policies << " people";
 
     // Adjust such that trended risk factor means match trended expected values.
-    // std::cout << "\nDEBUG: StaticLinearModel - Adjusting trended risk factors";
     adjust_risk_factors(context, names_, ranges_, true);
 
     // Apply policies if intervening.
-    int people_with_applied_policies = 0;
     for (auto &person : context.population()) {
         if (!person.is_active()) {
             continue;
         }
-
-        people_with_applied_policies++;
         apply_policies(person, intervene);
     }
-    // std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Completed";
 }
 
 double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
@@ -207,16 +169,6 @@ double StaticLinearModel::calculate_zero_probability(Person &person,
                   << names_[risk_factor_index].to_string() << ": " << probability
                   << " (should be between 0 and 1)";
     }
-
-    // Print sample probability values for verification
-    // Using a hash of the person's ID and risk factor index to create deterministic sampling
-    /* static int sample_counter = 0;
-    if (++sample_counter % 10000 == 0) {  // Print only 1 in 10000 values to avoid flooding
-        std::cout << "\nSAMPLE: Risk factor for LOGISTIC REGRESSION "
-                  << names_[risk_factor_index].to_string() << " probability: " << probability
-                  << ", logistic linear term: " << logistic_linear_term;
-    }*/
-
     return probability;
 }
 
@@ -288,22 +240,20 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
 
     // Update residuals and risk factors (should exist).
     for (size_t i = 0; i < names_.size(); i++) {
-        // Get the risk factor name and expected value
-        auto name = names_[i];
-        double expected = get_expected(context, person.gender, person.age, name, ranges_[i], false);
 
-        // Get the old residual
-        auto residual_name = core::Identifier{name.to_string() + "_residual"};
-        double old_residual = person.risk_factors.at(residual_name);
+        // Get the risk factor name and expected value
+        double expected =
+            get_expected(context, person.gender, person.age, names_[i], ranges_[i], false);
 
         // Blend old and new residuals
-        double new_residual = new_residuals[i];
-        double blended_residual =
-            0.5 * old_residual +
-            0.5 * new_residual; // average of previous residual and current residuals
+        // Update residual.
+        auto residual_name = core::Identifier{names_[i].to_string() + "_residual"};
+        double residual_old = person.risk_factors.at(residual_name);
+        double residual = new_residuals[i] * info_speed_;
+        residual += sqrt(1.0 - info_speed_ * info_speed_) * residual_old;
 
-        // Save the new blended residual
-        person.risk_factors[residual_name] = blended_residual;
+        // Save residual.
+        person.risk_factors.at(residual_name) = residual;
 
         // TWO-STAGE RISK FACTOR MODELING APPROACH- Mahima
         // =======================================================================
@@ -330,7 +280,7 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
         }
 
         // STAGE 2: Calculate non-zero risk factor value using BoxCox transformation
-        double factor = linear[i] + blended_residual * stddev_[i];
+        double factor = linear[i] + residual * stddev_[i];
         factor = expected * inverse_box_cox(factor, lambda_[i]);
         factor = ranges_[i].clamp(factor);
 
