@@ -252,14 +252,14 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
 
         // TWO-STAGE RISK FACTOR MODELING APPROACH- Mahima
         // =======================================================================
-        // Use both previous year's zero probability and new calculation
+        // Use both this year's zero probability and previous outcome
         // =======================================================================
 
-        // STAGE 1: Calculate new zero probability and blend with previous year's
+        // STAGE 1: Calculate new zero probability
         double zero_probability = calculate_zero_probability(person, i);
 
-        // HACK: To maintain longitudinal correlation among peeople, amend their "probabilities of
-        // being a zero" according to their previous zero-probability...
+        // HACK: To maintain longitudinal correlation among peeople, amend their "probability of
+        // being a zero" according to their current zero-probability...
         // ... and either 1 if they were a zero, or 0 if they were not.
         if (person.risk_factors[names_[i]] == 0) { //
             zero_probability = (zero_probability + 1.0) / 2.0;
@@ -267,9 +267,8 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
             zero_probability = (zero_probability + 0.0) / 2.0;
         }
 
-        // Sample from blended probability to determine if risk factor should be zero
-        double random_sample = random.next_double();
-        if (random_sample < zero_probability) {
+        // Draw random number to determine if risk factor should be zero
+        if (random.next_double() < zero_probability) {
             // Risk factor should be zero
             person.risk_factors[names_[i]] = 0.0;
             continue;
