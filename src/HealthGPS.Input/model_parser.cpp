@@ -275,9 +275,11 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     std::filesystem::path physical_activity_csv_path =
         model_dir / "physicalactivity_model.csv"; // loading of physical activity model parameters
     std::filesystem::path blood_pressure_medication_csv_path =
-        model_dir / "bloodpressuremedication.csv"; // loading of blood pressure medication model parameters
+        model_dir /
+        "bloodpressuremedication.csv"; // loading of blood pressure medication model parameters
     std::filesystem::path systolic_blood_pressure_csv_path =
-        model_dir / "systolicbloodpressure.csv"; // loading of systolic blood pressure model parameters
+        model_dir /
+        "systolicbloodpressure.csv"; // loading of systolic blood pressure model parameters
 
     // Load risk factor coefficients from CSV if the file exists
     std::unordered_map<std::string, hgps::LinearModelParams> csv_coefficients;
@@ -2079,7 +2081,8 @@ load_blood_pressure_medication_model_from_csv(const std::filesystem::path &csv_p
     std::ifstream file;
     file.open(csv_path / "bloodpressuremedication.csv");
     if (!file.is_open()) {
-        throw std::runtime_error("Failed to open blood pressure medication model CSV: " + (csv_path / "bloodpressuremedication.csv").string());
+        throw std::runtime_error("Failed to open blood pressure medication model CSV: " +
+                                 (csv_path / "bloodpressuremedication.csv").string());
     }
 
     try {
@@ -2114,17 +2117,28 @@ load_blood_pressure_medication_model_from_csv(const std::filesystem::path &csv_p
             } else {
                 // Map CSV parameter names to the expected names in the code
                 std::string mapped_key = key;
-                if (key == "gender2") mapped_key = "Gender";
-                else if (key == "age1") mapped_key = "Age";
-                else if (key == "age2") mapped_key = "Age2";
-                else if (key == "age3") mapped_key = "Age3";
-                else if (key == "ethnicity2") mapped_key = "Asian";
-                else if (key == "ethnicity3") mapped_key = "Black";
-                else if (key == "ethnicity4") mapped_key = "Others";
-                else if (key == "region2") mapped_key = "Wales";
-                else if (key == "region3") mapped_key = "Scotland";
-                else if (key == "region4") mapped_key = "NorthernIreland";
-                else if (key == "bmi") mapped_key = "BMI";
+                if (key == "gender2")
+                    mapped_key = "Gender";
+                else if (key == "age1")
+                    mapped_key = "Age";
+                else if (key == "age2")
+                    mapped_key = "Age2";
+                else if (key == "age3")
+                    mapped_key = "Age3";
+                else if (key == "ethnicity2")
+                    mapped_key = "Asian";
+                else if (key == "ethnicity3")
+                    mapped_key = "Black";
+                else if (key == "ethnicity4")
+                    mapped_key = "Others";
+                else if (key == "region2")
+                    mapped_key = "Wales";
+                else if (key == "region3")
+                    mapped_key = "Scotland";
+                else if (key == "region4")
+                    mapped_key = "NorthernIreland";
+                else if (key == "bmi")
+                    mapped_key = "BMI";
 
                 model.coefficients[mapped_key] = value;
             }
@@ -2151,7 +2165,8 @@ load_systolic_blood_pressure_model_from_csv(const std::filesystem::path &csv_pat
     std::ifstream file;
     file.open(csv_path / "systolicbloodpressure.csv");
     if (!file.is_open()) {
-        throw std::runtime_error("Failed to open systolic blood pressure model CSV: " + (csv_path / "systolicbloodpressure.csv").string());
+        throw std::runtime_error("Failed to open systolic blood pressure model CSV: " +
+                                 (csv_path / "systolicbloodpressure.csv").string());
     }
 
     try {
@@ -2186,26 +2201,46 @@ load_systolic_blood_pressure_model_from_csv(const std::filesystem::path &csv_pat
             } else {
                 // Map CSV parameter names to the expected names in the code
                 std::string mapped_key = key;
-                if (key == "gender2") mapped_key = "Gender";
-                else if (key == "age1") mapped_key = "Age";
-                else if (key == "age2") mapped_key = "Age2";
-                else if (key == "age3") mapped_key = "Age3";
-                else if (key == "ethnicity2") mapped_key = "Asian";
-                else if (key == "ethnicity3") mapped_key = "Black";
-                else if (key == "ethnicity4") mapped_key = "Others";
-                else if (key == "region2") mapped_key = "Wales";
-                else if (key == "region3") mapped_key = "Scotland";
-                else if (key == "region4") mapped_key = "NorthernIreland";
-                else if (key == "bmi") mapped_key = "BMI";
-                else if (key == "sodium") mapped_key = "Sodium";
-                else if (key == "sodium2") mapped_key = "Sodium2";
-                else if (key == "alcohol") mapped_key = "Alcohol";
-                else if (key == "physicalactivity") mapped_key = "PhysicalActivity";
-                else if (key == "bloodpressuremedication") mapped_key = "BloodPressureMedication";
-                else if (key == "sodium_bloodpressuremedication") mapped_key = "Sodium_BloodPressureMedication";
-                else if (key == "sodium2_bloodpressuremedication") mapped_key = "Sodium2_BloodPressureMedication";
-                else if (key == "sodium_gender2") mapped_key = "Sodium_Gender";
-                else if (key == "sodium2_gender2") mapped_key = "Sodium2_Gender";
+                if (key == "gender2")
+                    mapped_key = "Gender";
+                else if (key == "age1")
+                    mapped_key = "Age";
+                else if (key == "age2")
+                    mapped_key = "Age2";
+                else if (key == "age3")
+                    mapped_key = "Age3";
+                else if (key == "ethnicity2")
+                    mapped_key = "Asian";
+                else if (key == "ethnicity3")
+                    mapped_key = "Black";
+                else if (key == "ethnicity4")
+                    mapped_key = "Others";
+                else if (key == "region2")
+                    mapped_key = "Wales";
+                else if (key == "region3")
+                    mapped_key = "Scotland";
+                else if (key == "region4")
+                    mapped_key = "NorthernIreland";
+                else if (key == "bmi")
+                    mapped_key = "BMI";
+                else if (key == "sodium")
+                    mapped_key = "Sodium";
+                else if (key == "sodium2")
+                    mapped_key = "Sodium2";
+                else if (key == "alcohol")
+                    mapped_key = "Alcohol";
+                else if (key == "physicalactivity")
+                    mapped_key = "PhysicalActivity";
+                else if (key == "bloodpressuremedication")
+                    mapped_key = "BloodPressureMedication";
+                else if (key == "sodium_bloodpressuremedication")
+                    mapped_key = "Sodium_BloodPressureMedication";
+                else if (key == "sodium2_bloodpressuremedication")
+                    mapped_key = "Sodium2_BloodPressureMedication";
+                else if (key == "sodium_gender2")
+                    mapped_key = "Sodium_Gender";
+                else if (key == "sodium2_gender2")
+                    mapped_key = "Sodium2_Gender";
 
                 model.coefficients[mapped_key] = value;
             }

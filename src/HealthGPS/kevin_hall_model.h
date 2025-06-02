@@ -7,9 +7,9 @@
 #include "mapping.h"
 #include "risk_factor_adjustable_model.h"
 
+#include "static_linear_model.h"
 #include <optional>
 #include <vector>
-#include "static_linear_model.h"
 
 namespace hgps {
 
@@ -46,8 +46,10 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
         const std::vector<double> &epa_quantiles,
         const std::unordered_map<core::Gender, double> &height_stddev,
         const std::unordered_map<core::Gender, double> &height_slope,
-        const std::unordered_map<core::Identifier, LinearModelParams> &blood_pressure_medication_models,
-        const std::unordered_map<core::Identifier, LinearModelParams> &systolic_blood_pressure_models);
+        const std::unordered_map<core::Identifier, LinearModelParams>
+            &blood_pressure_medication_models,
+        const std::unordered_map<core::Identifier, LinearModelParams>
+            &systolic_blood_pressure_models);
 
     RiskFactorModelType type() const noexcept override;
 
@@ -239,7 +241,8 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     const std::vector<double> &epa_quantiles_;
     const std::unordered_map<core::Gender, double> &height_stddev_;
     const std::unordered_map<core::Gender, double> &height_slope_;
-    const std::unordered_map<core::Identifier, LinearModelParams> &blood_pressure_medication_models_;
+    const std::unordered_map<core::Identifier, LinearModelParams>
+        &blood_pressure_medication_models_;
     const std::unordered_map<core::Identifier, LinearModelParams> &systolic_blood_pressure_models_;
 
     // Model parameters.

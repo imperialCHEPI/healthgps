@@ -63,7 +63,8 @@ void DiseaseModule::initialise_population(RuntimeContext &context) {
         update_blood_pressure_medication(person, context.random());
         update_systolic_blood_pressure(person, context.random());
     }
-    std::cout << "\nDEBUG: Completed updating blood pressure medication and systolic blood pressure";
+    std::cout
+        << "\nDEBUG: Completed updating blood pressure medication and systolic blood pressure";
 }
 
 void DiseaseModule::update_population(RuntimeContext &context) {
@@ -79,7 +80,8 @@ void DiseaseModule::update_population(RuntimeContext &context) {
         update_blood_pressure_medication(person, context.random());
         update_systolic_blood_pressure(person, context.random());
     }
-    std::cout << "\nDEBUG: Completed updating blood pressure medication and systolic blood pressure";
+    std::cout
+        << "\nDEBUG: Completed updating blood pressure medication and systolic blood pressure";
 }
 
 double DiseaseModule::get_excess_mortality(const core::Identifier &disease_code,
@@ -93,7 +95,7 @@ double DiseaseModule::get_excess_mortality(const core::Identifier &disease_code,
 
 void DiseaseModule::update_blood_pressure_medication(Person &person, Random &random) const {
     // If person is already on medication, they stay on it
-    if (person.risk_factors.contains("BloodPressureMedication"_id) && 
+    if (person.risk_factors.contains("BloodPressureMedication"_id) &&
         person.risk_factors.at("BloodPressureMedication"_id) == 1.0) {
         return;
     }
@@ -103,8 +105,8 @@ void DiseaseModule::update_blood_pressure_medication(Person &person, Random &ran
     double bmi = person.risk_factors.at("BMI"_id);
 
     // Check if person has diabetes
-    bool has_diabetes = person.diseases.contains("diabetes"_id) && 
-                       person.diseases.at("diabetes"_id).status == DiseaseStatus::active;
+    bool has_diabetes = person.diseases.contains("diabetes"_id) &&
+                        person.diseases.at("diabetes"_id).status == DiseaseStatus::active;
 
     // Start medication if:
     // 1. SBP >= 160 OR
@@ -125,43 +127,43 @@ void DiseaseModule::update_systolic_blood_pressure(Person &person, Random &rando
     }
 
     const auto &model = model_it->second;
-    
+
     // Calculate the linear predictor
     double predictor = model.intercept;
-    
+
     // Add gender effect
     if (person.gender == core::Gender::male) {
         predictor += model.coefficients.at("Gender");
     }
-    
+
     // Add age effects
     predictor += model.coefficients.at("Age") * person.age;
     predictor += model.coefficients.at("Age2") * person.age * person.age;
     predictor += model.coefficients.at("Age3") * person.age * person.age * person.age;
-    
+
     // Add BMI effect
     double bmi = person.risk_factors.at("BMI"_id);
     predictor += model.coefficients.at("BMI") * bmi;
-    
+
     // Add blood pressure medication effect if available
     if (person.risk_factors.contains("BloodPressureMedication"_id)) {
         double medication = person.risk_factors.at("BloodPressureMedication"_id);
         predictor += model.coefficients.at("BloodPressureMedication") * medication;
     }
-    
+
     // Add random noise and store it as residual for longitudinal correlation
     double stddev = model.coefficients.at("stddev");
     double residual = random.next_normal(0.0, stddev);
     person.sbp_residual = residual;
-    
+
     // Calculate final SBP value
     double sbp = predictor + residual;
-    
+
     // Clamp value between min and max if specified
     if (model.coefficients.contains("min") && model.coefficients.contains("max")) {
         sbp = std::clamp(sbp, model.coefficients.at("min"), model.coefficients.at("max"));
     }
-    
+
     // Set the systolic blood pressure value
     person.risk_factors["SystolicBloodPressure"_id] = sbp;
 }

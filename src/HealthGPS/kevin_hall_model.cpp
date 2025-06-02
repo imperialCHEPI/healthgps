@@ -577,7 +577,7 @@ void KevinHallModel::compute_energy_intake(Person &person) const {
 }
 
 void KevinHallModel::initialise_kevin_hall_state(RuntimeContext &context, Person &person,
-                                                std::optional<double> adjustment) const {
+                                                 std::optional<double> adjustment) const {
     // std::cout << "\nDEBUG: KevinHallModel::initialise_kevin_hall_state - Starting for person #"
     // << person.id() << std::endl;
     //  Apply optional weight adjustment.
@@ -1099,7 +1099,7 @@ void KevinHallModel::initialise_blood_pressure_medication(Person &person, Random
     }
 
     const auto &model = blood_pressure_medication_models_.at(model_key);
-    
+
     // Calculate the predicted value using the model
     double predicted = model.intercept; // β₀
 
@@ -1116,29 +1116,36 @@ void KevinHallModel::initialise_blood_pressure_medication(Person &person, Random
 
     // Add gender term: β₄×sex
     if (model.coefficients.contains("Gender"_id)) {
-        predicted += model.coefficients.at("Gender"_id) * (person.gender == core::Gender::female ? 1.0 : 0.0);
+        predicted += model.coefficients.at("Gender"_id) *
+                     (person.gender == core::Gender::female ? 1.0 : 0.0);
     }
 
     // Add ethnicity terms: β₅×ethnicity
     if (model.coefficients.contains("Asian"_id)) {
-        predicted += model.coefficients.at("Asian"_id) * (person.ethnicity == core::Ethnicity::Asian ? 1.0 : 0.0);
+        predicted += model.coefficients.at("Asian"_id) *
+                     (person.ethnicity == core::Ethnicity::Asian ? 1.0 : 0.0);
     }
     if (model.coefficients.contains("Black"_id)) {
-        predicted += model.coefficients.at("Black"_id) * (person.ethnicity == core::Ethnicity::Black ? 1.0 : 0.0);
+        predicted += model.coefficients.at("Black"_id) *
+                     (person.ethnicity == core::Ethnicity::Black ? 1.0 : 0.0);
     }
     if (model.coefficients.contains("Others"_id)) {
-        predicted += model.coefficients.at("Others"_id) * (person.ethnicity == core::Ethnicity::Other ? 1.0 : 0.0);
+        predicted += model.coefficients.at("Others"_id) *
+                     (person.ethnicity == core::Ethnicity::Other ? 1.0 : 0.0);
     }
 
     // Add region terms: β₆×region
     if (model.coefficients.contains("Wales"_id)) {
-        predicted += model.coefficients.at("Wales"_id) * (person.region == core::Region::Wales ? 1.0 : 0.0);
+        predicted +=
+            model.coefficients.at("Wales"_id) * (person.region == core::Region::Wales ? 1.0 : 0.0);
     }
     if (model.coefficients.contains("Scotland"_id)) {
-        predicted += model.coefficients.at("Scotland"_id) * (person.region == core::Region::Scotland ? 1.0 : 0.0);
+        predicted += model.coefficients.at("Scotland"_id) *
+                     (person.region == core::Region::Scotland ? 1.0 : 0.0);
     }
     if (model.coefficients.contains("NorthernIreland"_id)) {
-        predicted += model.coefficients.at("NorthernIreland"_id) * (person.region == core::Region::NorthernIreland ? 1.0 : 0.0);
+        predicted += model.coefficients.at("NorthernIreland"_id) *
+                     (person.region == core::Region::NorthernIreland ? 1.0 : 0.0);
     }
 
     // Add BMI term: β₇×BMI
@@ -1165,7 +1172,7 @@ void KevinHallModel::initialise_systolic_blood_pressure(Person &person, Random &
     }
 
     const auto &model = systolic_blood_pressure_models_.at(model_key);
-    
+
     // Calculate the predicted value using the model
     double predicted = model.intercept; // α₀
 
@@ -1182,29 +1189,36 @@ void KevinHallModel::initialise_systolic_blood_pressure(Person &person, Random &
 
     // Add gender term: α₄×sex
     if (model.coefficients.contains("Gender"_id)) {
-        predicted += model.coefficients.at("Gender"_id) * (person.gender == core::Gender::female ? 1.0 : 0.0);
+        predicted += model.coefficients.at("Gender"_id) *
+                     (person.gender == core::Gender::female ? 1.0 : 0.0);
     }
 
     // Add ethnicity terms: α₅×ethnicity
     if (model.coefficients.contains("Asian"_id)) {
-        predicted += model.coefficients.at("Asian"_id) * (person.ethnicity == core::Ethnicity::Asian ? 1.0 : 0.0);
+        predicted += model.coefficients.at("Asian"_id) *
+                     (person.ethnicity == core::Ethnicity::Asian ? 1.0 : 0.0);
     }
     if (model.coefficients.contains("Black"_id)) {
-        predicted += model.coefficients.at("Black"_id) * (person.ethnicity == core::Ethnicity::Black ? 1.0 : 0.0);
+        predicted += model.coefficients.at("Black"_id) *
+                     (person.ethnicity == core::Ethnicity::Black ? 1.0 : 0.0);
     }
     if (model.coefficients.contains("Others"_id)) {
-        predicted += model.coefficients.at("Others"_id) * (person.ethnicity == core::Ethnicity::Other ? 1.0 : 0.0);
+        predicted += model.coefficients.at("Others"_id) *
+                     (person.ethnicity == core::Ethnicity::Other ? 1.0 : 0.0);
     }
 
     // Add region terms: α₆×region
     if (model.coefficients.contains("Wales"_id)) {
-        predicted += model.coefficients.at("Wales"_id) * (person.region == core::Region::Wales ? 1.0 : 0.0);
+        predicted +=
+            model.coefficients.at("Wales"_id) * (person.region == core::Region::Wales ? 1.0 : 0.0);
     }
     if (model.coefficients.contains("Scotland"_id)) {
-        predicted += model.coefficients.at("Scotland"_id) * (person.region == core::Region::Scotland ? 1.0 : 0.0);
+        predicted += model.coefficients.at("Scotland"_id) *
+                     (person.region == core::Region::Scotland ? 1.0 : 0.0);
     }
     if (model.coefficients.contains("NorthernIreland"_id)) {
-        predicted += model.coefficients.at("NorthernIreland"_id) * (person.region == core::Region::NorthernIreland ? 1.0 : 0.0);
+        predicted += model.coefficients.at("NorthernIreland"_id) *
+                     (person.region == core::Region::NorthernIreland ? 1.0 : 0.0);
     }
 
     // Add BMI term: α₇×BMI
@@ -1233,33 +1247,35 @@ void KevinHallModel::initialise_systolic_blood_pressure(Person &person, Random &
 
     // Add medication term: α₁₂×medication
     if (model.coefficients.contains("BloodPressureMedication"_id)) {
-        predicted += model.coefficients.at("BloodPressureMedication"_id) * 
-                    person.risk_factors.at("BloodPressureMedication"_id);
+        predicted += model.coefficients.at("BloodPressureMedication"_id) *
+                     person.risk_factors.at("BloodPressureMedication"_id);
     }
 
     // Add interaction terms
     if (model.coefficients.contains("Sodium_BloodPressureMedication"_id)) {
         double sodium = person.risk_factors.at("Sodium"_id);
         double medication = person.risk_factors.at("BloodPressureMedication"_id);
-        predicted += model.coefficients.at("Sodium_BloodPressureMedication"_id) * sodium * medication;
+        predicted +=
+            model.coefficients.at("Sodium_BloodPressureMedication"_id) * sodium * medication;
     }
 
     if (model.coefficients.contains("Sodium2_BloodPressureMedication"_id)) {
         double sodium = person.risk_factors.at("Sodium"_id);
         double medication = person.risk_factors.at("BloodPressureMedication"_id);
-        predicted += model.coefficients.at("Sodium2_BloodPressureMedication"_id) * sodium * sodium * medication;
+        predicted += model.coefficients.at("Sodium2_BloodPressureMedication"_id) * sodium * sodium *
+                     medication;
     }
 
     if (model.coefficients.contains("Sodium_Gender"_id)) {
         double sodium = person.risk_factors.at("Sodium"_id);
-        predicted += model.coefficients.at("Sodium_Gender"_id) * sodium * 
-                    (person.gender == core::Gender::female ? 1.0 : 0.0);
+        predicted += model.coefficients.at("Sodium_Gender"_id) * sodium *
+                     (person.gender == core::Gender::female ? 1.0 : 0.0);
     }
 
     if (model.coefficients.contains("Sodium2_Gender"_id)) {
         double sodium = person.risk_factors.at("Sodium"_id);
-        predicted += model.coefficients.at("Sodium2_Gender"_id) * sodium * sodium * 
-                    (person.gender == core::Gender::female ? 1.0 : 0.0);
+        predicted += model.coefficients.at("Sodium2_Gender"_id) * sodium * sodium *
+                     (person.gender == core::Gender::female ? 1.0 : 0.0);
     }
 
     // Add random residual ε
@@ -1327,12 +1343,10 @@ KevinHallModelDefinition::KevinHallModelDefinition(
 }
 
 std::unique_ptr<RiskFactorModel> KevinHallModelDefinition::create_model() const {
-    return std::make_unique<KevinHallModel>(expected_, expected_trend_, trend_steps_,
-                                            energy_equation_, nutrient_ranges_, nutrient_equations_,
-                                            food_prices_, weight_quantiles_, epa_quantiles_,
-                                            height_stddev_, height_slope_,
-                                            blood_pressure_medication_models_,
-                                            systolic_blood_pressure_models_);
+    return std::make_unique<KevinHallModel>(
+        expected_, expected_trend_, trend_steps_, energy_equation_, nutrient_ranges_,
+        nutrient_equations_, food_prices_, weight_quantiles_, epa_quantiles_, height_stddev_,
+        height_slope_, blood_pressure_medication_models_, systolic_blood_pressure_models_);
 }
 
 } // namespace hgps

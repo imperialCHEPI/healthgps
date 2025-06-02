@@ -69,7 +69,8 @@ class Repository {
 
     /// @brief Gets the systolic blood pressure models
     /// @return The systolic blood pressure models
-    virtual std::unordered_map<core::Identifier, LinearModelParams> get_systolic_blood_pressure_models() const = 0;
+    virtual std::unordered_map<core::Identifier, LinearModelParams>
+    get_systolic_blood_pressure_models() const = 0;
 };
 
 /// @brief Implements the cached data repository for input datasets and back-end storage
@@ -107,7 +108,8 @@ class CachedRepository final : public Repository {
 
     void clear_cache() noexcept;
 
-    std::unordered_map<core::Identifier, LinearModelParams> get_systolic_blood_pressure_models() const override;
+    std::unordered_map<core::Identifier, LinearModelParams>
+    get_systolic_blood_pressure_models() const override;
 
   private:
     mutable std::mutex mutex_;
