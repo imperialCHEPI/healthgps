@@ -83,9 +83,6 @@ struct Person {
     /// @brief The risk factors values
     std::unordered_map<core::Identifier, double> risk_factors{};
 
-    /// @brief The previous year's zero probabilities for each risk factor
-    std::unordered_map<core::Identifier, double> previous_zero_probabilities{};
-
     /// @brief Diseases history and current status
     std::map<core::Identifier, Disease> diseases;
 

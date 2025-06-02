@@ -204,9 +204,6 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
         // STAGE 1: Determine if risk factor should be zero using logistic regression
         double zero_probability = calculate_zero_probability(person, i);
 
-        // Store the zero probability for next year's update
-        person.previous_zero_probabilities[names_[i]] = zero_probability;
-
         // Sample from this probability to determine if risk factor should be zero
         // if logistic regression output = 1, risk factor value = 0
         double random_sample = random.next_double(); // Uniform random value between 0 and 1
@@ -259,30 +256,20 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
         // =======================================================================
 
         // STAGE 1: Calculate new zero probability and blend with previous year's
-        double new_zero_probability = calculate_zero_probability(person, i);
-        double previous_zero_probability = person.previous_zero_probabilities[names_[i]];
+        double zero_probability = calculate_zero_probability(person, i);
 
-        double blended_zero_probability =
-            0.5 * previous_zero_probability +
-            0.5 * new_zero_probability; // average of previous zero probability and current zero
-                                        // probability; 
-        
-        //// HACK: To maintain longitudinal correlation among peeople, amend their "probabilities of
-        //// being a zero" according to their previous zero-probability...
-        //// ... and either 1 if they were a zero, or 0 if they were not.
-        //if (person.risk_factors[names_[i]] == 0) { //
-        //    blended_zero_probability = (blended_zero_probability + 1.0) / 2.0;
-        //} else {
-        //    blended_zero_probability = (blended_zero_probability + 0.0) / 2.0;
-        //}
-        
-
-        // Store the new zero probability for next year
-        person.previous_zero_probabilities[names_[i]] = new_zero_probability;
+        // HACK: To maintain longitudinal correlation among peeople, amend their "probabilities of
+        // being a zero" according to their previous zero-probability...
+        // ... and either 1 if they were a zero, or 0 if they were not.
+        if (person.risk_factors[names_[i]] == 0) { //
+            zero_probability = (zero_probability + 1.0) / 2.0;
+        } else {
+            zero_probability = (zero_probability + 0.0) / 2.0;
+        }
 
         // Sample from blended probability to determine if risk factor should be zero
         double random_sample = random.next_double();
-        if (random_sample < blended_zero_probability) {
+        if (random_sample < zero_probability) {
             // Risk factor should be zero
             person.risk_factors[names_[i]] = 0.0;
             continue;
