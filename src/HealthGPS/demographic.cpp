@@ -1,12 +1,19 @@
 #include "demographic.h"
 #include "HealthGPS.Core/thread_util.h"
 #include "converter.h"
+#include "person.h"
+#include "runtime_context.h"
+#include "static_linear_model.h"
 #include "sync_message.h"
 #include <algorithm>
+#include <atomic>
 #include <cassert>
+#include <cmath>
+#include <iostream>
 #include <mutex>
-
 #include <oneapi/tbb/parallel_for_each.h>
+
+using namespace hgps;
 
 namespace { // anonymous namespace
 
@@ -17,9 +24,21 @@ using ResidualMortalityMessage = hgps::SyncDataMessage<hgps::GenderTable<int, do
 
 namespace hgps {
 
-DemographicModule::DemographicModule(std::map<int, std::map<int, PopulationRecord>> &&pop_data,
-                                     LifeTable &&life_table)
-    : pop_data_{std::move(pop_data)}, life_table_{std::move(life_table)} {
+DemographicModule::DemographicModule(
+    std::map<int, std::map<int, PopulationRecord>> &&pop_data, LifeTable &&life_table,
+    std::unordered_map<core::Identifier,
+                       std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>>
+        region_prevalence,
+    std::unordered_map<
+        core::Identifier,
+        std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>>
+        ethnicity_prevalence,
+    std::unordered_map<core::Income, LinearModelParams> income_models, double info_speed)
+    : pop_data_{std::move(pop_data)}, life_table_{std::move(life_table)}, birth_rates_{},
+      residual_death_rates_{}, name_{"Demographic"}, income_quartile_thresholds_{},
+      info_speed_{info_speed}, income_models_{std::move(income_models)},
+      region_prevalence_{std::move(region_prevalence)},
+      ethnicity_prevalence_{std::move(ethnicity_prevalence)} {
     if (pop_data_.empty()) {
         if (!life_table_.empty()) {
             throw std::invalid_argument("empty population and life table content mismatch.");
@@ -121,7 +140,10 @@ double DemographicModule::get_residual_death_rate(int age, core::Gender gender) 
     return 0.0;
 }
 
-void DemographicModule::initialise_population(RuntimeContext &context) {
+// Made changes- Mahima
+// Created a function to initialise age and gender using the same functionality as before just in a
+// different function
+void DemographicModule::initialise_age_gender(RuntimeContext &context) {
     auto age_gender_dist = get_age_gender_distribution(context.start_time());
     auto index = 0;
     auto pop_size = static_cast<int>(context.population().size());
@@ -183,10 +205,368 @@ void DemographicModule::initialise_population(RuntimeContext &context) {
     }
 
     assert(index == pop_size);
+    // std::cout << "\nDEBUG: Finished assigning age and gender";
+}
+
+// Made structural change- Mahima
+// This function now is used to initialise population with age, gender, region, ethncicty, income
+void DemographicModule::initialise_population(RuntimeContext &context) {
+    // Store context reference for range validation
+    context_ = &context;
+
+    // First initialize everyone's age and gender (ONCE)
+    initialise_age_gender(context);
+
+    // Then initialize other attributes for each person
+    for (auto &person : context.population()) {
+        // STEP-2 Initialize region
+        // STEP-3 Initialize ethnicity
+        // STEP-4 Initialize income continuous
+        // STEP-5 Initialize income category
+        // STEP-6 Initialize physical activity- being done in the static_linear_model.cpp
+        if (person.is_active()) {
+            initialise_region(context, person, context.random());
+            initialise_ethnicity(context, person, context.random());
+            initialise_income_continuous(context, person, context.random());
+            initialise_income_category(person, context.population());
+        }
+    }
+    // std::cout << "Finished assigning age, gender, region, ethnicity, income-continuous and
+    // income-category to everybody!";
+}
+
+// Population-level initialization functions
+// after assigning age and gender to everybody, assign region where region is deoendent on age and
+// gender probabilities
+// NOLINTBEGIN(readability-function-cognitive-complexity)
+void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &context, Person &person,
+                                          Random &random) {
+    // Create an age-specific identifier in the format used in the CSV loading
+    core::Identifier age_id("age_" + std::to_string(person.age));
+
+    // Check if this specific age exists in region_prevalence_ map
+    if (region_prevalence_.contains(age_id)) {
+        // Check if the gender exists for this age
+        if (!region_prevalence_.at(age_id).contains(person.gender)) {
+            std::cout << "\nDEBUG: ERROR - Gender not found in region_prevalence_ for age: "
+                      << age_id.to_string() << std::endl;
+            return;
+        }
+
+        // Get region probabilities directly from the stored data for this specific age
+        const auto &region_probs = region_prevalence_.at(age_id).at(person.gender);
+
+        // Debug prints for verification (only for first few people)
+        static std::atomic<int> sample_count{0};
+        // int current_count = sample_count.fetch_add(1);
+
+        // Use CDF for assignment
+        double rand_value = random.next_double(); // next_double is always between 0 and 1
+        double cumulative_prob = 0.0;
+
+        for (const auto &[region, prob] : region_probs) {
+            cumulative_prob += prob;
+            if (rand_value < cumulative_prob) {
+                person.region = region;
+
+                // Print the first 5 region assignments for verification
+                /* if (current_count < 5) {
+                    std::string region_name;
+                    switch (person.region) {
+                        case core::Region::England: region_name = "England"; break;
+                        case core::Region::Wales: region_name = "Wales"; break;
+                        case core::Region::Scotland: region_name = "Scotland"; break;
+                        case core::Region::NorthernIreland: region_name = "N.Ireland"; break;
+                        default: region_name = "Unknown"; break;
+                    }
+                    //std::cout << "\n==== REGION ASSIGNMENT #" << (current_count + 1) << " ====" <<
+                std::cout << "\nAge: " << person.age << ", Gender: "
+                              << (person.gender == core::Gender::male ? "male" : "female");
+                    std::cout << "Assigned: " << region_name
+                              << " (random value: " << rand_value
+                              << ", cumulative prob: " << cumulative_prob << ")";
+                }*/
+
+                return;
+            }
+        }
+
+        // If we get here, there was a problem with the probability distribution
+        std::cout << "\nDEBUG: WARNING - Reached end of region assignment loop without assigning a "
+                     "region for age "
+                  << person.age << std::endl;
+        // person.region = core::Region::England; // Default fallback
+    } else {
+        // Fall back to age groups if specific age not found
+        std::cout << "Failed to assign region using CSV so using JSON- NOOOOOOO!!!";
+        core::Identifier age_group = person.age < 18 ? "Under18"_id : "Over18"_id;
+
+        // Check if the age_group exists in region_prevalence_
+        if (!region_prevalence_.contains(age_group)) {
+            std::cout << "\nDEBUG: ERROR - Neither specific age nor age group found in "
+                         "region_prevalence_: "
+                      << person.age << std::endl;
+            return;
+        }
+
+        // Check if the gender exists for this age_group
+        if (!region_prevalence_.at(age_group).contains(person.gender)) {
+            std::cout << "\nDEBUG: ERROR - Gender not found in region_prevalence_ for age group: "
+                      << age_group.to_string() << std::endl;
+            return;
+        }
+
+        // Get region probabilities from age group data
+        const auto &region_probs = region_prevalence_.at(age_group).at(person.gender);
+
+        // Use CDF for assignment
+        double rand_value = random.next_double(); // next_double is always between 0,1
+        double cumulative_prob = 0.0;
+
+        for (const auto &[region, prob] : region_probs) {
+            cumulative_prob += prob;
+            if (rand_value < cumulative_prob) { // Using < for correct CDF sampling
+                person.region = region;
+                return;
+            }
+        }
+
+        // If we reach here, no region was assigned - this indicates an error in probability
+        // distribution
+        std::cout << "\nDEBUG: WARNING - Reached end of region assignment loop without assigning a "
+                     "region";
+        person.region = core::Region::England; // Default fallback
+    }
+}
+// NOLINTEND(readability-function-cognitive-complexity)
+
+// NOLINTBEGIN(readability-function-cognitive-complexity)
+void DemographicModule::initialise_ethnicity([[maybe_unused]] RuntimeContext &context,
+                                             Person &person, Random &random) {
+    // std::cout << "\nDEBUG: Inside initialise_ethnicity";
+
+    // Determine the age group for this person
+    // In the loading I'm assigning 0-under18 and 1-over18
+    core::Identifier age_group = person.age < 18 ? "Under18"_id : "Over18"_id;
+
+    // Check if the age_group exists in ethnicity_prevalence_
+    if (!ethnicity_prevalence_.contains(age_group)) {
+        std::cout << "\nDEBUG: ERROR - Age group not found in ethnicity_prevalence_ map: "
+                  << age_group.to_string();
+        return;
+    }
+
+    // Check if the gender exists for this age_group
+    if (!ethnicity_prevalence_.at(age_group).contains(person.gender)) {
+        std::cout << "\nDEBUG: ERROR - Gender not found in ethnicity_prevalence_ for age group: "
+                  << age_group.to_string();
+        return;
+    }
+
+    // Get ethnicity probabilities directly from the stored data
+    const auto &ethnicity_probs = ethnicity_prevalence_.at(age_group).at(person.gender);
+
+    double rand_value = random.next_double(); // next_double is between 0,1
+    double cumulative_prob = 0.0;
+
+    for (const auto &[ethnicity, prob] : ethnicity_probs) {
+        cumulative_prob += prob;
+        // std::cout << "\nDEBUG: Ethnicity: " << static_cast<int>(ethnicity) << ", Prob: " << prob
+        // << ", Cumulative: " << cumulative_prob << ", Random: " << rand_value << std::endl;
+
+        if (rand_value < cumulative_prob) {
+            person.ethnicity = ethnicity;
+            return;
+        }
+    }
+
+    // If we reach here, no ethnicity was assigned - this indicates an error in probability
+    // distribution
+    std::cout << "\nDEBUG: WARNING - Reached end of ethnicity assignment loop without assigning "
+                 "ethnicity";
+
+    // If we reach here, no ethnicity was assigned - this indicates an error in probability
+    // distribution
+    throw core::HgpsException("Failed to assign ethnicity: cumulative probabilities do not sum to "
+                              "1.0 or are incorrectly distributed");
+}
+// NOLINTEND(readability-function-cognitive-complexity)
+
+// NOLINTBEGIN(readability-function-cognitive-complexity)
+void DemographicModule::initialise_income_continuous([[maybe_unused]] RuntimeContext &context,
+                                                     Person &person, Random &random) {
+    // income_continuous is considered as household income and assigned to every person
+    // Find the income model to use (there should be only one)
+    // std::cout << "\nDEBUG: Inside initialise_income_continuous";
+    if (!income_models_.empty()) {
+        const auto &model_pair = *income_models_.begin(); // Get the first model regardless of key
+        const auto &model = model_pair.second;
+
+        // Start with the intercept
+        double value = model.intercept;
+
+        // Directly apply coefficients based on person's attributes
+        for (const auto &[factor_name, coefficient] : model.coefficients) {
+            // Skip special entries that aren't factors
+            if (factor_name == "IncomeContinuousStdDev" || factor_name == "min" ||
+                factor_name == "max")
+                continue;
+
+            // Age effects
+            if (factor_name == "Age") {
+                value += coefficient * static_cast<double>(person.age);
+            }
+            if (factor_name == "Age2") {
+                value += coefficient * pow(person.age, 2);
+            }
+            if (factor_name == "Age3") {
+                value += coefficient * pow(person.age, 3);
+            }
+            // Gender effect
+            if (factor_name == "Gender") {
+                // Male = 1, Female = 0
+                if (person.gender == core::Gender::male) {
+                    value += coefficient;
+                }
+            }
+            // Sector effect
+            if (factor_name == "Sector") {
+                // Rural = 1, Urban = 0
+                if (person.sector == core::Sector::rural) {
+                    value += coefficient;
+                }
+            }
+            // Region effects - only apply if the region matches
+            else if (factor_name == "England" && person.region == core::Region::England) {
+                value += coefficient;
+            } else if (factor_name == "Wales" && person.region == core::Region::Wales) {
+                value += coefficient;
+            } else if (factor_name == "Scotland" && person.region == core::Region::Scotland) {
+                value += coefficient;
+            } else if (factor_name == "NorthernIreland" &&
+                       person.region == core::Region::NorthernIreland) {
+                value += coefficient;
+            }
+            // Ethnicity effects - only apply if the ethnicity matches
+            else if (factor_name == "White" && person.ethnicity == core::Ethnicity::White) {
+                value += coefficient;
+            } else if (factor_name == "Black" && person.ethnicity == core::Ethnicity::Black) {
+                value += coefficient;
+            } else if (factor_name == "Asian" && person.ethnicity == core::Ethnicity::Asian) {
+                value += coefficient;
+            } else if (factor_name == "Mixed" && person.ethnicity == core::Ethnicity::Mixed) {
+                value += coefficient;
+            } else if ((factor_name == "Others" || factor_name == "Other") &&
+                       person.ethnicity == core::Ethnicity::Other) {
+                value += coefficient;
+            }
+        }
+
+        // Get the standard deviation from the model using iterator (it) instead of looking up again
+        // and again
+        double income_stddev = 0.0;
+        if (auto it = model.coefficients.find("IncomeContinuousStdDev");
+            it != model.coefficients.end()) {
+            income_stddev = it->second;
+        }
+
+        // Add random noise
+        double noise = random.next_normal(0.0, income_stddev);
+        // Store the noise as a residual for future updates
+        person.risk_factors[core::Identifier("income_continuous_residual")] = noise;
+
+        double final_value = value + noise; // Add noise instead of multiplying
+
+        // Apply min/max bounds if they exist in the model
+        final_value = std::max(final_value, model.coefficients.at("min"));
+        final_value = std::min(final_value, model.coefficients.at("max"));
+
+        // Set the income_continuous value
+        person.income_continuous = final_value;
+    }
+}
+// NOLINTEND(readability-function-cognitive-complexity)
+
+// NOLINTBEGIN(readability-function-cognitive-complexity)
+void DemographicModule::initialise_income_category(Person &person, const Population &population) {
+    // Apply the income category based on the person's income_continuous value and current
+    // thresholds
+    // std::cout << "\nDEBUG: Inside initialise_income_category";
+    if (income_quartile_thresholds_.empty()) {
+        calculate_income_quartiles(population);
+    }
+
+    double income_value = person.income_continuous;
+
+    if (income_value <= income_quartile_thresholds_[0]) {
+        person.income = core::Income::low;
+        person.income_category = 0;
+        if (context_) {
+            person.set_risk_factor(*context_, core::Identifier("income_category"), 0.0); // Low = 0
+        } else {
+            person.risk_factors[core::Identifier("income_category")] = 0.0; // Low = 0
+        }
+    } else if (income_value <= income_quartile_thresholds_[1]) {
+        person.income = core::Income::lowermiddle;
+        person.income_category = 1;
+        if (context_) {
+            person.set_risk_factor(*context_, core::Identifier("income_category"),
+                                   1.0); // Lower middle = 1
+        } else {
+            person.risk_factors[core::Identifier("income_category")] = 1.0; // Lower middle = 1
+        }
+    } else if (income_value <= income_quartile_thresholds_[2]) {
+        person.income = core::Income::uppermiddle;
+        person.income_category = 2;
+        if (context_) {
+            person.set_risk_factor(*context_, core::Identifier("income_category"),
+                                   2.0); // Upper middle = 2
+        } else {
+            person.risk_factors[core::Identifier("income_category")] = 2.0; // Upper middle = 2
+        }
+    } else {
+        person.income = core::Income::high;
+        person.income_category = 3;
+        if (context_) {
+            person.set_risk_factor(*context_, core::Identifier("income_category"), 3.0); // High = 3
+        } else {
+            person.risk_factors[core::Identifier("income_category")] = 3.0; // High = 3
+        }
+    }
+    // std::cout << "\nDEBUG: Finished initialise_income_category";
+}
+// NOLINTEND(readability-function-cognitive-complexity)
+
+void DemographicModule::calculate_income_quartiles(const Population &population) {
+    // Collect all valid income values
+    std::vector<double> sorted_incomes;
+    sorted_incomes.reserve(population.size());
+    // std::cout << "\nDEBUG: Inside calculating quartiles and sorted done";
+
+    for (const auto &p : population) {
+        if (p.is_active() && p.income_continuous > 0) {
+            sorted_incomes.push_back(p.income_continuous);
+        }
+    }
+
+    // Sort to find quartile thresholds
+    std::sort(sorted_incomes.begin(), sorted_incomes.end());
+
+    size_t n = sorted_incomes.size();
+    income_quartile_thresholds_.resize(3);
+    income_quartile_thresholds_[0] = sorted_incomes[n / 4];     // 25th percentile
+    income_quartile_thresholds_[1] = sorted_incomes[n / 2];     // 50th percentile
+    income_quartile_thresholds_[2] = sorted_incomes[3 * n / 4]; // 75th percentile
+
+    // std::cout << "\nDEBUG: Finsihed calculating quartiles- gave data to
+    // initialise_income_category";
 }
 
 void DemographicModule::update_population(RuntimeContext &context,
                                           const DiseaseModule &disease_host) {
+    // Store context reference for range validation
+    context_ = &context;
+
     auto residual_future = core::run_async(&DemographicModule::update_residual_mortality, this,
                                            std::ref(context), std::ref(disease_host));
 
@@ -198,6 +578,17 @@ void DemographicModule::update_population(RuntimeContext &context,
     residual_future.get();
     auto number_of_deaths = update_age_and_death_events(context, disease_host);
 
+    // Update income continuous values for all active people- Mahima
+    // Added update income_continuous
+    for (auto &person : context.population()) {
+        if (person.is_active()) {
+            update_income_continuous(context, person, context.random());
+        }
+    }
+
+    // Update demographic variables including income categories
+    update_income_category(context);
+
     // apply births events
     auto last_year_births_rate = get_birth_rate(context.time_now() - 1);
     auto number_of_boys = static_cast<int>(last_year_births_rate.males * initial_pop_size);
@@ -206,6 +597,9 @@ void DemographicModule::update_population(RuntimeContext &context,
     context.population().add_newborn_babies(number_of_girls, core::Gender::female,
                                             context.time_now());
 
+    // Initialize demographic variables for newborns
+    initialize_newborns(context);
+
     // Calculate statistics.
     auto simulated_death_rate = number_of_deaths * 1000.0 / initial_pop_size;
     auto expected_death_rate = expected_num_deaths * 1000.0 / expected_pop_size;
@@ -213,6 +607,26 @@ void DemographicModule::update_population(RuntimeContext &context,
     context.metrics()["SimulatedDeathRate"] = simulated_death_rate;
     context.metrics()["ExpectedDeathRate"] = expected_death_rate;
     context.metrics()["DeathRateDeltaPercent"] = percent_difference;
+}
+
+void DemographicModule::update_income_category(RuntimeContext &context) {
+    // Income category is updated every 5 years
+    static int last_update_year = 0;
+    int current_year = context.time_now();
+
+    // Only update every 5 years to reduce computational cost
+    if (current_year - last_update_year >= 5) {
+        // First recalculate the income quartiles based on current population
+        calculate_income_quartiles(context.population());
+
+        // Then update everyone's income category
+        for (auto &person : context.population()) {
+            if (person.is_active()) {
+                initialise_income_category(person, context.population());
+            }
+        }
+        last_update_year = current_year;
+    }
 }
 
 void DemographicModule::update_residual_mortality(RuntimeContext &context,
@@ -224,20 +638,27 @@ void DemographicModule::update_residual_mortality(RuntimeContext &context,
         context.scenario().channel().send(std::make_unique<ResidualMortalityMessage>(
             context.current_run(), context.time_now(), std::move(residual_mortality)));
     } else {
-        auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
-        if (message.has_value()) {
-            auto &basePtr = message.value();
-            auto *messagePrt = dynamic_cast<ResidualMortalityMessage *>(basePtr.get());
-            if (messagePrt) {
-                residual_death_rates_ = messagePrt->data();
-            } else {
-                throw std::runtime_error(
-                    "Simulation out of sync, failed to receive a residual mortality message");
-            }
-        } else {
-            throw std::runtime_error(
-                "Simulation out of sync, receive residual mortality message has timed out");
+        // Initialize message with a value that has_value() will return false for
+        std::optional<std::unique_ptr<SyncMessage>> message;
+
+        // Keep trying until we get a message
+        do {
+            message = context.scenario().channel().try_receive(context.sync_timeout_millis());
+        } while (!message.has_value());
+
+        // Keep trying until we get a message of the correct type
+        auto *messagePrt = dynamic_cast<ResidualMortalityMessage *>(message.value().get());
+
+        while (!messagePrt) {
+            // Initialize message again to avoid uninitialized variable warning
+            do {
+                message = context.scenario().channel().try_receive(context.sync_timeout_millis());
+            } while (!message.has_value());
+
+            messagePrt = dynamic_cast<ResidualMortalityMessage *>(message.value().get());
         }
+
+        residual_death_rates_ = messagePrt->data();
     }
 }
 
@@ -378,6 +799,160 @@ int DemographicModule::update_age_and_death_events(RuntimeContext &context,
     return number_of_deaths;
 }
 
+void DemographicModule::initialize_newborns(RuntimeContext &context) {
+    // Initialize demographic variables for newborns (age == 0)
+    // std::cout << "\nDEBUG: Initializing demographic variables for newborns" << std::endl;
+
+    for (auto &person : context.population()) {
+        if (person.is_active() && person.age == 0) {
+            initialise_region(context, person, context.random());
+            initialise_ethnicity(context, person, context.random());
+            initialise_income_continuous(context, person, context.random());
+            initialise_income_category(person, context.population());
+
+            // Double-check that income_category was properly added
+            if (!person.risk_factors.contains(core::Identifier("income_category"))) {
+                std::cout << "\nDEBUG: Adding missing income_category risk factor for newborn";
+                double income_value = 0.0;
+                switch (person.income) {
+                case core::Income::low:
+                    income_value = 0.0;
+                    break;
+                case core::Income::lowermiddle:
+                    income_value = 1.0;
+                    break;
+                case core::Income::uppermiddle:
+                    income_value = 2.0;
+                    break;
+                case core::Income::high:
+                    income_value = 3.0;
+                    break;
+                case core::Income::unknown:
+                default:
+                    income_value = 0.0; // Default to low income if unknown
+                    break;
+                }
+                person.risk_factors[core::Identifier("income_category")] = income_value;
+            }
+        }
+    }
+
+    // std::cout << "\nDEBUG: Finished initializing demographic variables for newborns" <<
+    // std::endl;
+}
+
+// Added update continuous income using teh same logic as initialization where it depends on age,
+// gender, region,ethnicity and noise- Mahima
+//  Here for update, the previous noise is considred to maintain longitudanal correlation of
+//  residuals/noise (whatever you wnat to call them)
+//  NOLINTBEGIN(readability-function-cognitive-complexity)
+void DemographicModule::update_income_continuous([[maybe_unused]] RuntimeContext &context,
+                                                 Person &person, Random &random) {
+    // Skip if no income models available
+    if (income_models_.empty()) {
+        return;
+    }
+
+    const auto &model_pair = *income_models_.begin(); // Get the first model regardless of key
+    const auto &model = model_pair.second;
+
+    // Start with the intercept
+    double value = model.intercept;
+
+    // Apply coefficients based on person's attributes
+    for (const auto &[factor_name, coefficient] : model.coefficients) {
+        // Skip special entries that aren't factors
+        if (factor_name == "IncomeContinuousStdDev" || factor_name == "min" || factor_name == "max")
+            continue;
+
+        // Age effects
+        if (factor_name == "Age") {
+            value += coefficient * static_cast<double>(person.age);
+        }
+        if (factor_name == "Age2") {
+            value += coefficient * pow(person.age, 2);
+        }
+        if (factor_name == "Age3") {
+            value += coefficient * pow(person.age, 3);
+        }
+        // Gender effect
+        if (factor_name == "Gender") {
+            // Male = 1, Female = 0
+            if (person.gender == core::Gender::male) {
+                value += coefficient;
+            }
+        }
+        // Sector effect
+        if (factor_name == "Sector") {
+            // Rural = 1, Urban = 0
+            if (person.sector == core::Sector::rural) {
+                value += coefficient;
+            }
+        }
+        // Region effects - only apply if the region matches
+        else if (factor_name == "England" && person.region == core::Region::England) {
+            value += coefficient;
+        } else if (factor_name == "Wales" && person.region == core::Region::Wales) {
+            value += coefficient;
+        } else if (factor_name == "Scotland" && person.region == core::Region::Scotland) {
+            value += coefficient;
+        } else if (factor_name == "NorthernIreland" &&
+                   person.region == core::Region::NorthernIreland) {
+            value += coefficient;
+        }
+        // Ethnicity effects - only apply if the ethnicity matches
+        else if (factor_name == "White" && person.ethnicity == core::Ethnicity::White) {
+            value += coefficient;
+        } else if (factor_name == "Black" && person.ethnicity == core::Ethnicity::Black) {
+            value += coefficient;
+        } else if (factor_name == "Asian" && person.ethnicity == core::Ethnicity::Asian) {
+            value += coefficient;
+        } else if (factor_name == "Mixed" && person.ethnicity == core::Ethnicity::Mixed) {
+            value += coefficient;
+        } else if ((factor_name == "Others" || factor_name == "Other") &&
+                   person.ethnicity == core::Ethnicity::Other) {
+            value += coefficient;
+        }
+    }
+
+    // Get the standard deviation from the model using iterator (it) instead of looking up again and
+    // again
+    double income_stddev = 0.0;
+    if (auto it = model.coefficients.find("IncomeContinuousStdDev");
+        it != model.coefficients.end()) {
+        income_stddev = it->second;
+    }
+
+    // Get existing residual or initialize if not present
+    auto residual_name = core::Identifier("income_continuous_residual");
+    double old_residual = 0.0;
+    if (person.risk_factors.contains(residual_name)) {
+        old_residual = person.risk_factors.at(residual_name);
+    }
+
+    // Generate new random noise
+    double new_noise = random.next_normal(0.0, income_stddev);
+
+    // Update residual using the same formula as other risk factors
+    // Using info_speed_ from the class for consistency with other risk factors
+    double new_residual =
+        info_speed_ * new_noise + sqrt(1.0 - info_speed_ * info_speed_) * old_residual;
+
+    // Store the updated residual
+    person.risk_factors[residual_name] = new_residual;
+
+    // Calculate final value with updated residual
+    double final_value = value + new_residual;
+
+    // Apply min/max bounds if they exist in the model
+    final_value = std::max(final_value, model.coefficients.at("min"));
+    final_value = std::min(final_value, model.coefficients.at("max"));
+
+    // Set the income_continuous value
+    person.income_continuous = final_value;
+}
+// NOLINTEND(readability-function-cognitive-complexity)
+
 std::unique_ptr<DemographicModule> build_population_module(Repository &repository,
                                                            const ModelInput &config) {
     // year => age [age, male, female]
@@ -400,6 +975,23 @@ std::unique_ptr<DemographicModule> build_population_module(Repository &repositor
     auto deaths = repository.manager().get_mortality(config.settings().country(), time_filter);
     auto life_table = detail::StoreConverter::to_life_table(births, deaths);
 
-    return std::make_unique<DemographicModule>(std::move(pop_data), std::move(life_table));
+    // Get demographic configuration from the static risk factor model
+    const auto &static_model = dynamic_cast<const StaticLinearModelDefinition &>(
+        repository.get_risk_factor_model_definition(RiskFactorModelType::Static));
+
+    // Extract the configuration data using the getter methods
+    auto region_prevalence = static_model.get_region_prevalence();
+    auto ethnicity_prevalence = static_model.get_ethnicity_prevalence();
+    auto income_models = static_model.get_income_models();
+
+    // Extract physical activity parameters
+    std::unordered_map<std::string, double> physical_activity_params;
+    physical_activity_params["StandardDeviation"] = static_model.get_physical_activity_stddev();
+    auto info_speed = static_model.get_info_speed();
+
+    // Create and return the demographic module with all the configuration data
+    return std::make_unique<DemographicModule>(
+        std::move(pop_data), std::move(life_table), std::move(region_prevalence),
+        std::move(ethnicity_prevalence), std::move(income_models), info_speed);
 }
 } // namespace hgps

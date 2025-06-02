@@ -1,6 +1,8 @@
 #pragma once
 
 #include "HealthGPS.Core/datastore.h"
+#include "HealthGPS.Core/forward_type.h"
+#include "HealthGPS.Core/poco.h"
 
 #include "disease_definition.h"
 #include "interfaces.h"
@@ -11,8 +13,15 @@
 #include <memory>
 #include <mutex>
 #include <optional>
+#include <unordered_map>
 
 namespace hgps {
+
+/// @brief Defines the linear model parameters data type
+struct LinearModelParams {
+    double intercept;
+    std::unordered_map<std::string, double> coefficients;
+};
 
 /// @brief Define the data repository interface for input datasets and back-end storage
 class Repository {
@@ -57,6 +66,11 @@ class Repository {
     /// @brief Gets the LMS (lambda-mu-sigma) definition
     /// @return The LMS definition
     virtual LmsDefinition &get_lms_definition() = 0;
+
+    /// @brief Gets the systolic blood pressure models
+    /// @return The systolic blood pressure models
+    virtual std::unordered_map<core::Identifier, LinearModelParams>
+    get_systolic_blood_pressure_models() const = 0;
 };
 
 /// @brief Implements the cached data repository for input datasets and back-end storage
@@ -93,6 +107,9 @@ class CachedRepository final : public Repository {
     LmsDefinition &get_lms_definition() override;
 
     void clear_cache() noexcept;
+
+    std::unordered_map<core::Identifier, LinearModelParams>
+    get_systolic_blood_pressure_models() const override;
 
   private:
     mutable std::mutex mutex_;

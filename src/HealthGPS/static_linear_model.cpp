@@ -1,102 +1,120 @@
 #include "static_linear_model.h"
 #include "HealthGPS.Core/exception.h"
-#include "runtime_context.h"
+#include "HealthGPS.Input/model_parser.h"
+#include "demographic.h"
 
+#include <iostream>
 #include <ranges>
 #include <utility>
 
 namespace hgps {
-
-StaticLinearModel::StaticLinearModel(
-    std::shared_ptr<RiskFactorSexAgeTable> expected,
-    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
-    std::shared_ptr<std::unordered_map<core::Identifier, int>> trend_steps,
-    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox,
-    const std::vector<core::Identifier> &names, const std::vector<LinearModelParams> &models,
-    const std::vector<core::DoubleInterval> &ranges, const std::vector<double> &lambda,
-    const std::vector<double> &stddev, const Eigen::MatrixXd &cholesky,
-    const std::vector<LinearModelParams> &policy_models,
-    const std::vector<core::DoubleInterval> &policy_ranges, const Eigen::MatrixXd &policy_cholesky,
-    std::shared_ptr<std::vector<LinearModelParams>> trend_models,
-    std::shared_ptr<std::vector<core::DoubleInterval>> trend_ranges,
-    std::shared_ptr<std::vector<double>> trend_lambda, double info_speed,
-    const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
-        &rural_prevalence,
-    const std::unordered_map<core::Income, LinearModelParams> &income_models,
-    std::shared_ptr<std::unordered_map<core::Region, LinearModelParams>> region_models,
-    double physical_activity_stddev)
-    : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend),
-                                std::move(trend_steps)},
-      expected_trend_boxcox_{std::move(expected_trend_boxcox)}, names_{names}, models_{models},
-      ranges_{ranges}, lambda_{lambda}, stddev_{stddev}, cholesky_{cholesky},
-      policy_models_{policy_models}, policy_ranges_{policy_ranges},
-      policy_cholesky_{policy_cholesky}, trend_models_{std::move(trend_models)},
-      trend_ranges_{std::move(trend_ranges)}, trend_lambda_{std::move(trend_lambda)},
-      info_speed_{info_speed}, rural_prevalence_{rural_prevalence}, income_models_{income_models},
-      region_models_{std::move(region_models)},
-      physical_activity_stddev_{physical_activity_stddev} {}
 
 RiskFactorModelType StaticLinearModel::type() const noexcept { return RiskFactorModelType::Static; }
 
 std::string StaticLinearModel::name() const noexcept { return "Static"; }
 
 void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
+    // std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Starting";
 
-    // Initialise everyone.
+    // Verify that all expected risk factors are included in the names_ vector
+    verify_risk_factors();
+
+    // NOTE: Demographic variables (region, ethnicity, income, etc.) are already
+    // initialized by the DemographicModule in initialise_population
+
+    // Initialise everyone with risk factors.
     for (auto &person : context.population()) {
-        initialise_sector(person, context.random());
-        initialise_region(person, context.random()); // added region for FINCH
-        initialise_income(person, context.random());
         initialise_factors(context, person, context.random());
         initialise_physical_activity(context, person, context.random());
     }
+    // std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Factors and physical
+    // activity completed";
 
     // Adjust such that risk factor means match expected values.
     adjust_risk_factors(context, names_, ranges_, false);
+    // std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Risk factors adjusted";
 
-    // Initialise everyone.
+    // Initialise everyone with policies and trends.
     for (auto &person : context.population()) {
         initialise_policies(person, context.random(), false);
         initialise_trends(context, person);
     }
+    // std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Policies and trends
+    // initialized";
 
     // Adjust such that trended risk factor means match trended expected values.
     adjust_risk_factors(context, names_, ranges_, true);
+    // std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Trended risk factors
+    // adjusted";
+
+    // Print risk factor summary once at the end
+    std::string risk_factor_list;
+    for (size_t i = 0; i < names_.size(); i++) {
+        if (i > 0)
+            risk_factor_list += ", ";
+        risk_factor_list += names_[i].to_string();
+    }
+    // std::cout << "\nDEBUG: Successfully completed processing " << names_.size() << " risk
+    // factors: " << risk_factor_list;
+
+    // std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Completed";
 }
 
 void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
+    /*std::cout
+        << "\nDEBUG: StaticLinearModel::update_risk_factors - Starting with population size: "
+              << context.population().size() << ", scenario: "
+              << (context.scenario().type() == ScenarioType::baseline ? "baseline" : "intervention")
+              << ", current time: " << context.time_now();*/
 
     // HACK: start intervening two years into the simulation.
     bool intervene = (context.scenario().type() == ScenarioType::intervention &&
                       (context.time_now() - context.start_time()) >= 2);
 
-    // Initialise newborns and update others.
+    // Count statistics for summary
+    int total_people = 0;
+    int newborns = 0;
+    int existing = 0;
+
+    // Update risk factors for all people, initializing for newborns.
+    // std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Beginning to process people";
     for (auto &person : context.population()) {
         if (!person.is_active()) {
             continue;
         }
 
+        total_people++;
+
         if (person.age == 0) {
-            initialise_sector(person, context.random());
-            initialise_region(person, context.random()); // added region for FINCH
-            initialise_income(person, context.random());
+            // For newborns, initialize demographic variables
+            newborns++;
+            // initialise_sector(person, context.random());
+            //  Demographic variables (region, ethnicity, income) are initialized by the
+            //  DemographicModule
             initialise_factors(context, person, context.random());
             initialise_physical_activity(context, person, context.random());
         } else {
-            update_sector(person, context.random());
-            update_income(person, context.random());
+            // For existing people, only update sector and factors
+            existing++;
+            // update_sector(person, context.random());
             update_factors(context, person, context.random());
         }
     }
+    // std::cout << "\nDEBUG: StaticLinearModel - Processed " << total_people << " people (" <<
+    // newborns << " newborns, " << existing << " existing)";
 
     // Adjust such that risk factor means match expected values.
+    // std::cout << "\nDEBUG: StaticLinearModel - Adjusting risk factors";
     adjust_risk_factors(context, names_, ranges_, false);
 
-    // Initialise newborns and update others.
+    // Update policies and trends for all people, initializing for newborns.
+    int people_with_policies = 0;
     for (auto &person : context.population()) {
         if (!person.is_active()) {
             continue;
         }
+
+        people_with_policies++;
 
         if (person.age == 0) {
             initialise_policies(person, context.random(), intervene);
@@ -106,22 +124,100 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             update_trends(context, person);
         }
     }
+    // std::cout << "\nDEBUG: StaticLinearModel - Updated policies and trends for "<<
+    // people_with_policies << " people";
 
     // Adjust such that trended risk factor means match trended expected values.
+    // std::cout << "\nDEBUG: StaticLinearModel - Adjusting trended risk factors";
     adjust_risk_factors(context, names_, ranges_, true);
 
     // Apply policies if intervening.
+    int people_with_applied_policies = 0;
     for (auto &person : context.population()) {
         if (!person.is_active()) {
             continue;
         }
 
+        people_with_applied_policies++;
         apply_policies(person, intervene);
     }
+    // std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Completed";
 }
 
 double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
-    return pow(lambda * factor + 1.0, 1.0 / lambda);
+    // Handle extreme lambda values
+    if (std::abs(lambda) < 1e-10) {
+        // For lambda near zero, use exponential
+        double result = std::exp(factor);
+        // Check for Inf
+        if (!std::isfinite(result)) {
+            return 0.0; // Return safe value for Inf
+        }
+        return result;
+    } else {
+        // For non-zero lambda
+        double base = lambda * factor + 1.0;
+        // Check if base is valid for power
+        if (base <= 0.0) {
+            return 0.0; // Return safe value for negative/zero base
+        }
+
+        // Compute power and check result
+        double result = std::pow(base, 1.0 / lambda);
+        // Validate the result is finite
+        if (!std::isfinite(result)) {
+            return 0.0; // Return safe value for NaN/Inf
+        }
+
+        // Ensure result is non-negative (though power should already guarantee this)
+        return std::max(0.0, result);
+    }
+}
+
+// Calculate the probability of a risk factor being zero using logistic regression- Mahima
+double StaticLinearModel::calculate_zero_probability(Person &person,
+                                                     size_t risk_factor_index) const {
+    // Get the logistic model for this risk factor
+    const auto &logistic_model = logistic_models_[risk_factor_index];
+
+    // Calculate the linear predictor using the logistic model
+    double logistic_linear_term = logistic_model.intercept;
+
+    // Add the coefficients
+    for (const auto &[coef_name, coef_value] : logistic_model.coefficients) {
+        logistic_linear_term += coef_value * person.get_risk_factor_value(coef_name);
+    }
+
+    // Add residual from the person's residual for this risk factor
+    auto residual_name = core::Identifier{names_[risk_factor_index].to_string() + "_residual"};
+    if (person.risk_factors.find(residual_name) != person.risk_factors.end()) {
+        // Use the existing residual stored for this risk factor
+        double residual = person.risk_factors.at(residual_name);
+        logistic_linear_term += residual * stddev_[risk_factor_index];
+    }
+
+    // logistic function: p = 1 / (1 + exp(-linear_term))
+    double probability = 1.0 / (1.0 + std::exp(-logistic_linear_term));
+
+    // Only print if probability is outside the valid range [0,1] coz logistic regression should be
+    // only within 0 and 1 This should never happen with a proper logistic function, but check for
+    // numerical issues
+    if (probability < 0.0 || probability > 1.0) {
+        std::cout << "\nWARNING: Invalid logistic probability for "
+                  << names_[risk_factor_index].to_string() << ": " << probability
+                  << " (should be between 0 and 1)";
+    }
+
+    // Print sample probability values for verification
+    // Using a hash of the person's ID and risk factor index to create deterministic sampling
+    /* static int sample_counter = 0;
+    if (++sample_counter % 10000 == 0) {  // Print only 1 in 10000 values to avoid flooding
+        std::cout << "\nSAMPLE: Risk factor for LOGISTIC REGRESSION "
+                  << names_[risk_factor_index].to_string() << " probability: " << probability
+                  << ", logistic linear term: " << logistic_linear_term;
+    }*/
+
+    return probability;
 }
 
 void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &person,
@@ -146,11 +242,37 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
         // Initialise risk factor.
         double expected =
             get_expected(context, person.gender, person.age, names_[i], ranges_[i], false);
+
+        // TWO-STAGE RISK FACTOR MODELING APPROACH- Mahima
+        // =======================================================================
+        // Previous approach: Use BoxCox transformation to calculate risk factor values
+        // New approach: First use logistic regression to determine if the risk factor value should
+        //              be zero
+        //              If non-zero, then use BoxCox transformation to calculate the actual value
+        // =======================================================================
+
+        // STAGE 1: Determine if risk factor should be zero using logistic regression
+        double zero_probability = calculate_zero_probability(person, i);
+
+        // Store the zero probability for next year's update
+        person.previous_zero_probabilities[names_[i]] = zero_probability;
+
+        // Sample from this probability to determine if risk factor should be zero
+        // if logistic regression output = 1, risk factor value = 0
+        double random_sample = random.next_double(); // Uniform random value between 0 and 1
+        if (random_sample < zero_probability) {
+            // Risk factor should be zero
+            person.risk_factors[names_[i]] = 0.0;
+            continue;
+        }
+
+        // STAGE 2: Calculate non-zero risk factor value using BoxCox transformation
+        // Using the original model logic from before
         double factor = linear[i] + residual * stddev_[i];
         factor = expected * inverse_box_cox(factor, lambda_[i]);
         factor = ranges_[i].clamp(factor);
 
-        // Save risk factor.
+        // Save risk factor
         person.risk_factors[names_[i]] = factor;
     }
 }
@@ -159,32 +281,61 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
                                        Random &random) const {
 
     // Correlated residual sampling.
-    auto residuals = compute_residuals(random, cholesky_);
+    auto new_residuals = compute_residuals(random, cholesky_);
 
     // Approximate risk factors with linear models.
     auto linear = compute_linear_models(person, models_);
 
     // Update residuals and risk factors (should exist).
     for (size_t i = 0; i < names_.size(); i++) {
+        // Get the risk factor name and expected value
+        auto name = names_[i];
+        double expected = get_expected(context, person.gender, person.age, name, ranges_[i], false);
 
-        // Update residual.
-        auto residual_name = core::Identifier{names_[i].to_string() + "_residual"};
-        double residual_old = person.risk_factors.at(residual_name);
-        double residual = residuals[i] * info_speed_;
-        residual += sqrt(1.0 - info_speed_ * info_speed_) * residual_old;
+        // Get the old residual
+        auto residual_name = core::Identifier{name.to_string() + "_residual"};
+        double old_residual = person.risk_factors.at(residual_name);
 
-        // Save residual.
-        person.risk_factors.at(residual_name) = residual;
+        // Blend old and new residuals
+        double new_residual = new_residuals[i];
+        double blended_residual =
+            0.5 * old_residual +
+            0.5 * new_residual; // average of previous residual and current residuals
 
-        // Update risk factor.
-        double expected =
-            get_expected(context, person.gender, person.age, names_[i], ranges_[i], false);
-        double factor = linear[i] + residual * stddev_[i];
+        // Save the new blended residual
+        person.risk_factors[residual_name] = blended_residual;
+
+        // TWO-STAGE RISK FACTOR MODELING APPROACH- Mahima
+        // =======================================================================
+        // Use both previous year's zero probability and new calculation
+        // =======================================================================
+
+        // STAGE 1: Calculate new zero probability and blend with previous year's
+        double new_zero_probability = calculate_zero_probability(person, i);
+        double previous_zero_probability = person.previous_zero_probabilities[name];
+        double blended_zero_probability =
+            0.5 * previous_zero_probability +
+            0.5 * new_zero_probability; // average of previous zero probability and current zero
+                                        // probability
+
+        // Store the new zero probability for next year
+        person.previous_zero_probabilities[name] = new_zero_probability;
+
+        // Sample from blended probability to determine if risk factor should be zero
+        double random_sample = random.next_double();
+        if (random_sample < blended_zero_probability) {
+            // Risk factor should be zero
+            person.risk_factors[name] = 0.0;
+            continue;
+        }
+
+        // STAGE 2: Calculate non-zero risk factor value using BoxCox transformation
+        double factor = linear[i] + blended_residual * stddev_[i];
         factor = expected * inverse_box_cox(factor, lambda_[i]);
         factor = ranges_[i].clamp(factor);
 
-        // Save risk factor.
-        person.risk_factors.at(names_[i]) = factor;
+        // Save risk factor
+        person.risk_factors[name] = factor;
     }
 }
 
@@ -244,6 +395,13 @@ void StaticLinearModel::initialise_policies(Person &person, Random &random, bool
     for (size_t i = 0; i < names_.size(); i++) {
         auto residual_name = core::Identifier{names_[i].to_string() + "_policy_residual"};
         person.risk_factors[residual_name] = residuals[i];
+
+        // Ensure the risk factor exists (might be zero from two-stage model)
+        if (person.risk_factors.find(names_[i]) == person.risk_factors.end()) {
+            std::cout << "\nDEBUG: Risk factor " << names_[i].to_string()
+                      << " not found, initializing to zero";
+            person.risk_factors[names_[i]] = 0.0;
+        }
     }
 
     // Compute policies.
@@ -282,7 +440,6 @@ void StaticLinearModel::update_policies(Person &person, bool intervene) const {
 }
 
 void StaticLinearModel::apply_policies(Person &person, bool intervene) const {
-
     // No-op if not intervening.
     if (!intervene) {
         return;
@@ -311,17 +468,64 @@ StaticLinearModel::compute_linear_models(Person &person,
     std::vector<double> linear{};
     linear.reserve(names_.size());
 
-    // Approximate risk factors with linear models.
+    // Pre-calculate capped age values once (outside the model loop)- Mahima
+    constexpr double max_age = 80.0; // Define appropriate maximum age
+    const double capped_age = std::min(static_cast<double>(person.age), max_age);
+    const double capped_age_squared = capped_age * capped_age;
+    const double capped_age_cubed = capped_age_squared * capped_age;
+
+    // Cache common age identifiers for faster comparison using case sensitive approach for Age and
+    // age- Mahima
+    static const core::Identifier age_id("age");
+    static const core::Identifier age2_id("age2");
+    static const core::Identifier age3_id("age3");
+    static const core::Identifier Age_id("Age");
+    static const core::Identifier Age2_id("Age2");
+    static const core::Identifier Age3_id("Age3");
+    static const core::Identifier stddev_id("stddev");
+
+    // Approximate risk factors with linear models
     for (size_t i = 0; i < names_.size(); i++) {
+        if (i >= models.size()) {
+            std::cout << "\nERROR: compute_linear_models - Index " << i
+                      << " is out of bounds for models vector of size " << models.size();
+            linear.push_back(0.0); // Default value
+            continue;
+        }
+
         auto name = names_[i];
         auto model = models[i];
         double factor = model.intercept;
+
         for (const auto &[coefficient_name, coefficient_value] : model.coefficients) {
-            factor += coefficient_value * person.get_risk_factor_value(coefficient_name);
+            // Skip the standard deviation entry as it's not a factor
+            if (coefficient_name == stddev_id)
+                continue;
+
+            // Efficiently handle age-related coefficients
+            if (coefficient_name == age_id || coefficient_name == Age_id) {
+                factor += coefficient_value * capped_age;
+            } else if (coefficient_name == age2_id || coefficient_name == Age2_id) {
+                factor += coefficient_value * capped_age_squared;
+            } else if (coefficient_name == age3_id || coefficient_name == Age3_id) {
+                factor += coefficient_value * capped_age_cubed;
+            } else {
+                // Regular coefficient processing
+                double value = person.get_risk_factor_value(coefficient_name);
+                factor += coefficient_value * value;
+            }
         }
+
         for (const auto &[coefficient_name, coefficient_value] : model.log_coefficients) {
-            factor += coefficient_value * log(person.get_risk_factor_value(coefficient_name));
+            double value = person.get_risk_factor_value(coefficient_name);
+
+            if (value <= 0) {
+                value = 1e-10; // Avoid log of zero or negative
+            }
+
+            factor += coefficient_value * log(value);
         }
+
         linear.emplace_back(factor);
     }
 
@@ -380,105 +584,133 @@ void StaticLinearModel::update_sector(Person &person, Random &random) const {
         person.sector = core::Sector::urban;
     }
 }
+// Physical activity depends on age. gender, region, ethnicity, income_continuous and random noise
+// with std dev Loaded from the static_model.json under the Physical Activity Models section
+// NOLINTBEGIN(readability-function-cognitive-complexity)
+void StaticLinearModel::initialise_physical_activity([[maybe_unused]] RuntimeContext &context,
+                                                     Person &person, Random &random) const {
+    // std::cout << "\nDEBUG: Inside physical activity initialization";
 
-void StaticLinearModel::initialise_income(Person &person, Random &random) const {
+    // Check if we have any models before proceeding
+    if (physical_activity_models_.empty()) {
+        std::cout
+            << "\nERROR: physical_activity_models_ is empty! Cannot initialize physical activity.";
+        std::cout << "\nERROR: Please check that PhysicalActivityModels are properly defined in "
+                     "the configuration.";
+        // Don't set a default value - let the error surface so it can be diagnosed
+        return;
+    }
 
-    // Compute logits for each income category.
-    auto logits = std::unordered_map<core::Income, double>{};
-    for (const auto &[income, params] : income_models_) {
-        logits[income] = params.intercept;
-        for (const auto &[factor, coefficient] : params.coefficients) {
-            logits.at(income) += coefficient * person.get_risk_factor_value(factor);
+    // Continue only if models are available
+    double final_value = 0.0;
+
+    // Look for the continuous model first
+    auto model_it = physical_activity_models_.find(core::Identifier("continuous"));
+
+    // If continuous model not found, use the first available model
+    if (model_it == physical_activity_models_.end()) {
+        std::cout << "\nERROR: No 'continuous' model found, using first available model";
+        model_it = physical_activity_models_.begin();
+    }
+
+    // Check again that we have a valid iterator
+    if (model_it != physical_activity_models_.end()) {
+        const auto &model = model_it->second;
+
+        // Start with the intercept
+        double value = model.intercept;
+        // std::cout << "\nDEBUG: Using physical activity intercept value: " << value;
+
+        // Process coefficients
+        for (const auto &[factor_name, coefficient] : model.coefficients) {
+            // Skip the standard deviation entry as it's not a factor
+            if (factor_name == "stddev"_id) {
+                continue;
+            }
+            // Apply coefficient based on its name
+            double factor_value = 0.0;
+
+            // Age effects
+            if (factor_name == "age"_id) {
+                factor_value = static_cast<double>(person.age);
+            } else if (factor_name == "age2"_id) {
+                factor_value = std::pow(person.age, 2);
+            } else if (factor_name == "age3"_id) {
+                factor_value = std::pow(person.age, 3);
+            }
+            // Gender effect
+            else if (factor_name == "gender"_id) {
+                factor_value = person.gender_to_value();
+            }
+            // Sector effect
+            else if (factor_name == "sector"_id) {
+                factor_value = person.sector_to_value();
+            }
+            // Region effects
+            else if (factor_name == "england"_id && person.region == core::Region::England) {
+                factor_value = 1.0;
+            } else if (factor_name == "wales"_id && person.region == core::Region::Wales) {
+                factor_value = 1.0;
+            } else if (factor_name == "scotland"_id && person.region == core::Region::Scotland) {
+                factor_value = 1.0;
+            } else if (factor_name == "northernireland"_id &&
+                       person.region == core::Region::NorthernIreland) {
+                factor_value = 1.0;
+            }
+            // Ethnicity effects
+            else if (factor_name == "white"_id && person.ethnicity == core::Ethnicity::White) {
+                factor_value = 1.0;
+            } else if (factor_name == "black"_id && person.ethnicity == core::Ethnicity::Black) {
+                factor_value = 1.0;
+            } else if (factor_name == "asian"_id && person.ethnicity == core::Ethnicity::Asian) {
+                factor_value = 1.0;
+            } else if (factor_name == "mixed"_id && person.ethnicity == core::Ethnicity::Mixed) {
+                factor_value = 1.0;
+            } else if ((factor_name == "others"_id || factor_name == "other"_id) &&
+                       person.ethnicity == core::Ethnicity::Other) {
+                factor_value = 1.0;
+            }
+            // Income continuous value
+            else if (factor_name == "income"_id) {
+                factor_value = person.income_continuous;
+            }
+            // If we already have this factor, use its value
+            else if (person.risk_factors.count(factor_name) > 0) {
+                factor_value = person.risk_factors.at(factor_name);
+            }
+
+            // Add to our value
+            value += coefficient * factor_value;
         }
-    }
 
-    // Compute softmax probabilities for each income category.
-    auto e_logits = std::unordered_map<core::Income, double>{};
-    double e_logits_sum = 0.0;
-    for (const auto &[income, logit] : logits) {
-        e_logits[income] = exp(logit);
-        e_logits_sum += e_logits.at(income);
-    }
-
-    // Compute income category probabilities.
-    auto probabilities = std::unordered_map<core::Income, double>{};
-    for (const auto &[income, e_logit] : e_logits) {
-        probabilities[income] = e_logit / e_logits_sum;
-    }
-
-    // Compute income category.
-    double rand = random.next_double();
-    for (const auto &[income, probability] : probabilities) {
-        if (rand < probability) {
-            person.income = income;
-            return;
+        // Get the standard deviation
+        double pa_stddev = physical_activity_stddev_;
+        if (model.coefficients.contains("stddev"_id)) {
+            pa_stddev = model.coefficients.at("stddev"_id);
         }
-        rand -= probability;
+
+        // Add random noise using the standard deviation
+        double noise = random.next_normal(0.0, pa_stddev);
+
+        // Calculate final value with noise
+        final_value = value + noise; // Add noise instead of multiplying
+
+        // Apply min/max bounds if they exist in the model
+        final_value = std::max(final_value, model.coefficients.at("min"));
+        final_value = std::min(final_value, model.coefficients.at("max"));
+
+        // Set the physical activity value
+        person.risk_factors[core::Identifier("PhysicalActivity")] = final_value;
+        person.physical_activity = final_value;
+    } else {
+        std::cout << "\nERROR: No valid physical activity models found!";
+        // Don't set a default value - let the error surface
+        return;
     }
 
-    throw core::HgpsException("Logic Error: failed to initialise income category");
-}
-
-void StaticLinearModel::update_income(Person &person, Random &random) const {
-
-    // Only update 18 year olds.
-    if (person.age == 18) {
-        initialise_income(person, random);
-    }
-}
-
-void StaticLinearModel::initialise_physical_activity(RuntimeContext &context, Person &person,
-                                                     Random &random) const {
-    double expected = get_expected(context, person.gender, person.age, "PhysicalActivity"_id,
-                                   std::nullopt, false);
-    double rand = random.next_normal(0.0, physical_activity_stddev_);
-    double factor = expected * exp(rand - 0.5 * pow(physical_activity_stddev_, 2));
-    person.risk_factors["PhysicalActivity"_id] = factor;
-}
-
-void StaticLinearModel::initialise_region(Person &person, Random &random) const {
-    // Compute logits for each region category
-    auto logits = std::unordered_map<core::Region, double>{};
-    for (const auto &[region, params] : *region_models_) {
-        logits[region] = params.intercept;
-        for (const auto &[factor, coefficient] : params.coefficients) {
-            logits.at(region) += coefficient * person.get_risk_factor_value(factor);
-        }
-    }
-
-    // Compute softmax probabilities for each region
-    auto e_logits = std::unordered_map<core::Region, double>{};
-    double e_logits_sum = 0.0;
-    for (const auto &[region, logit] : logits) {
-        e_logits[region] = exp(logit);
-        e_logits_sum += e_logits.at(region);
-    }
-
-    // Compute region probabilities for each region
-    auto probabilities = std::unordered_map<core::Region, double>{};
-    for (const auto &[region, e_logit] : e_logits) {
-        probabilities[region] = e_logit / e_logits_sum;
-    }
-
-    // Sample region need to do this for each person (TO VERIFY)
-    double rand = random.next_double();
-    for (const auto &[region, probability] : probabilities) {
-        if (rand < probability) {
-            person.region = region;
-            return;
-        }
-        rand -= probability;
-    }
-
-    throw core::HgpsException("Logic Error: failed to initialise region category");
-}
-
-void StaticLinearModel::update_region(Person &person, Random &random) const {
-    // Only update 18 year olds
-    if (person.age == 18) {
-        initialise_region(person, random);
-    }
-}
+    // std::cout << "\nDEBUG: Finished physical activity initialization for person ID " <<
+    // person.id();
+} // NOLINTEND(readability-function-cognitive-complexity)
 
 StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::unique_ptr<RiskFactorSexAgeTable> expected,
@@ -493,9 +725,18 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::unique_ptr<std::vector<core::DoubleInterval>> trend_ranges,
     std::unique_ptr<std::vector<double>> trend_lambda, double info_speed,
     std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>> rural_prevalence,
+    std::unordered_map<core::Identifier,
+                       std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>>
+        region_prevalence,
+    std::unordered_map<
+        core::Identifier,
+        std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>>
+        ethnicity_prevalence,
     std::unordered_map<core::Income, LinearModelParams> income_models,
     std::unordered_map<core::Region, LinearModelParams> region_models,
-    double physical_activity_stddev)
+    double physical_activity_stddev,
+    const std::unordered_map<core::Identifier, LinearModelParams> &physical_activity_models,
+    std::vector<LinearModelParams> logistic_models)
     : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend),
                                           std::move(trend_steps)},
       expected_trend_boxcox_{std::move(expected_trend_boxcox)}, names_{std::move(names)},
@@ -505,8 +746,12 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
       policy_cholesky_{std::move(policy_cholesky)}, trend_models_{std::move(trend_models)},
       trend_ranges_{std::move(trend_ranges)}, trend_lambda_{std::move(trend_lambda)},
       info_speed_{info_speed}, rural_prevalence_{std::move(rural_prevalence)},
+      region_prevalence_{std::move(region_prevalence)},
+      ethnicity_prevalence_{std::move(ethnicity_prevalence)},
       income_models_{std::move(income_models)}, region_models_{std::move(region_models)},
-      physical_activity_stddev_{physical_activity_stddev} {
+      physical_activity_stddev_{physical_activity_stddev},
+      physical_activity_models_{physical_activity_models},
+      logistic_models_{std::move(logistic_models)} {
 
     if (names_.empty()) {
         throw core::HgpsException("Risk factor names list is empty");
@@ -517,6 +762,15 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     if (ranges_.empty()) {
         throw core::HgpsException("Risk factor ranges list is empty");
     }
+
+    // Print the loaded ranges for verification
+    std::cout << "\n======= LOADED RISK FACTOR RANGES IN STATIC LINEAR MODEL =======";
+    for (size_t i = 0; i < names_.size() && i < ranges_.size(); ++i) {
+        std::cout << "\nRisk factor: " << names_[i].to_string() << ", Range: ["
+                  << ranges_[i].lower() << " , " << ranges_[i].upper() << "]";
+    }
+    std::cout << "\n=========================================\n";
+
     if (lambda_.empty()) {
         throw core::HgpsException("Risk factor lambda list is empty");
     }
@@ -547,12 +801,6 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     if (rural_prevalence_.empty()) {
         throw core::HgpsException("Rural prevalence mapping is empty");
     }
-    if (income_models_.empty()) {
-        throw core::HgpsException("Income models mapping is empty");
-    }
-    if (region_models_.empty()) {
-        throw core::HgpsException("Region models mapping is empty");
-    }
     for (const auto &name : names_) {
         if (!expected_trend_->contains(name)) {
             throw core::HgpsException("One or more expected trend value is missing");
@@ -561,15 +809,79 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
             throw core::HgpsException("One or more expected trend BoxCox value is missing");
         }
     }
+
+    // If logistic models are empty, initialize them to be the same as the boxcox models
+    // This is just a fallback in case logistic models were not provided
+    if (logistic_models_.empty()) {
+        std::cout
+            << "\nWARNING: No logistic regression models provided, using BoxCox models as fallback";
+        logistic_models_ = models_;
+    }
+
+    // Check if the number of logistic models matches the number of risk factors
+    if (logistic_models_.size() != names_.size()) {
+        throw core::HgpsException(
+            fmt::format("Number of logistic models ({}) does not match number of risk factors ({})",
+                        logistic_models_.size(), names_.size()));
+    }
 }
 
 std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() const {
+    // Debug information about physical_activity_models_
+    // std::cout << "\nDEBUG: In create_model - physical_activity_models_ size: " <<
+    // physical_activity_models_.size() << std::endl;
+
+    /*if (!physical_activity_models_.empty()) {
+        std::cout << "\nDEBUG: First model key: "
+                  << physical_activity_models_.begin()->first.to_string() << std::endl;
+    }*/
+
     return std::make_unique<StaticLinearModel>(
         expected_, expected_trend_, trend_steps_, expected_trend_boxcox_, names_, models_, ranges_,
         lambda_, stddev_, cholesky_, policy_models_, policy_ranges_, policy_cholesky_,
-        trend_models_, trend_ranges_, trend_lambda_, info_speed_, rural_prevalence_, income_models_,
-        std::make_shared<std::unordered_map<core::Region, LinearModelParams>>(region_models_),
-        physical_activity_stddev_);
+        trend_models_, trend_ranges_, trend_lambda_, info_speed_, rural_prevalence_,
+        region_prevalence_, ethnicity_prevalence_, income_models_, region_models_,
+        physical_activity_stddev_, get_physical_activity_models(), logistic_models_);
+}
+
+// Add a new method to verify risk factors
+void StaticLinearModel::verify_risk_factors() const {
+    // std::cout << "\nDEBUG: StaticLinearModel::verify_risk_factors - Verifying risk factor
+    // configuration";
+
+    // Check model configuration consistency - no hardcoded values
+    if (names_.size() != models_.size()) {
+        std::cout << "\nWARNING: Mismatch between names_ size (" << names_.size()
+                  << ") and models_ size (" << models_.size() << ")";
+    }
+
+    if (names_.size() != ranges_.size()) {
+        std::cout << "\nWARNING: Mismatch between names_ size (" << names_.size()
+                  << ") and ranges_ size (" << ranges_.size() << ")";
+    }
+
+    if (names_.size() != lambda_.size()) {
+        std::cout << "\nWARNING: Mismatch between names_ size (" << names_.size()
+                  << ") and lambda_ size (" << lambda_.size() << ")";
+    }
+
+    if (names_.size() != stddev_.size()) {
+        std::cout << "\nWARNING: Mismatch between names_ size (" << names_.size()
+                  << ") and stddev_ size (" << stddev_.size() << ")";
+    }
+
+    // Check RiskFactorModels from expected_trend_boxcox_ map against names_
+    if (expected_trend_boxcox_) {
+        for (const auto &name : names_) {
+            if (!expected_trend_boxcox_->contains(name)) {
+                std::cout << "\nWARNING: Risk factor " << name.to_string()
+                          << " not found in expected_trend_boxcox_ map";
+            }
+        }
+    }
+
+    // std::cout << "\nDEBUG: StaticLinearModel::verify_risk_factors - Verification completed with "
+    // << names_.size() << " risk factors";
 }
 
 } // namespace hgps

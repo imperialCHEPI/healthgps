@@ -2,6 +2,9 @@
 #include "converter.h"
 
 #include <fmt/core.h>
+#include <fstream>
+#include <iostream>
+#include <sstream>
 #include <stdexcept>
 
 namespace hgps {
@@ -119,5 +122,91 @@ void CachedRepository::load_disease_definition(const core::DiseaseInfo &info,
                               std::move(relative_risks.risk_factors), std::move(parameter));
         diseases_.emplace(info.code, definition);
     }
+}
+
+std::unordered_map<core::Identifier, LinearModelParams>
+CachedRepository::get_systolic_blood_pressure_models() const {
+    std::unordered_map<core::Identifier, LinearModelParams> models;
+    LinearModelParams model;
+
+    // Open and read CSV file
+    std::ifstream file;
+    file.open(root_path_ / "systolicbloodpressure.csv");
+    if (!file.is_open()) {
+        throw std::runtime_error("Failed to open systolic blood pressure model CSV: " +
+                                 (root_path_ / "systolicbloodpressure.csv").string());
+    }
+
+    try {
+        std::string line;
+        while (std::getline(file, line)) {
+            // Skip empty lines
+            if (line.empty()) {
+                continue;
+            }
+
+            // Split line by comma
+            std::stringstream ss(line);
+            std::string key, value_str;
+            if (!std::getline(ss, key, ',') || !std::getline(ss, value_str, ',')) {
+                continue;
+            }
+
+            // Trim whitespace
+            key = core::trim(key);
+            value_str = core::trim(value_str);
+
+            // Convert value to double
+            double value = std::stod(value_str);
+
+            // Map parameter names
+            if (key == "Intercept") {
+                model.intercept = value;
+            } else if (key == "stddev") {
+                model.coefficients["stddev"] = value;
+            } else if (key == "min" || key == "max") {
+                model.coefficients[key] = value;
+            } else {
+                // Map CSV parameter names to the expected names in the code
+                std::string mapped_key = key;
+                if (key == "gender2")
+                    mapped_key = "Gender";
+                else if (key == "age1")
+                    mapped_key = "Age";
+                else if (key == "age2")
+                    mapped_key = "Age2";
+                else if (key == "age3")
+                    mapped_key = "Age3";
+                else if (key == "ethnicity2")
+                    mapped_key = "Asian";
+                else if (key == "ethnicity3")
+                    mapped_key = "Black";
+                else if (key == "ethnicity4")
+                    mapped_key = "Others";
+                else if (key == "region2")
+                    mapped_key = "Wales";
+                else if (key == "region3")
+                    mapped_key = "Scotland";
+                else if (key == "region4")
+                    mapped_key = "NorthernIreland";
+                else if (key == "bmi")
+                    mapped_key = "BMI";
+                else if (key == "bloodpressuremedication")
+                    mapped_key = "BloodPressureMedication";
+
+                model.coefficients[mapped_key] = value;
+            }
+        }
+
+        std::cout << "\nSuccessfully loaded systolic blood pressure model with intercept "
+                  << model.intercept << " and " << model.coefficients.size() << " coefficients";
+    } catch (const std::exception &e) {
+        std::cout << "\nFailed to load systolic blood pressure model CSV: " << e.what();
+        throw;
+    }
+
+    // Add the model directly to systolicbloodpressure key
+    models[core::Identifier("systolicbloodpressure")] = model;
+    return models;
 }
 } // namespace hgps
