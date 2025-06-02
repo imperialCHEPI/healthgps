@@ -150,14 +150,6 @@ double StaticLinearModel::calculate_zero_probability(Person &person,
         logistic_linear_term += coef_value * person.get_risk_factor_value(coef_name);
     }
 
-    // Add residual from the person's residual for this risk factor
-    auto residual_name = core::Identifier{names_[risk_factor_index].to_string() + "_residual"};
-    if (person.risk_factors.find(residual_name) != person.risk_factors.end()) {
-        // Use the existing residual stored for this risk factor
-        double residual = person.risk_factors.at(residual_name);
-        logistic_linear_term += residual * stddev_[risk_factor_index];
-    }
-
     // logistic function: p = 1 / (1 + exp(-linear_term))
     double probability = 1.0 / (1.0 + std::exp(-logistic_linear_term));
 
