@@ -620,24 +620,6 @@ void DemographicModule::update_income_category(RuntimeContext &context) {
             initialise_income_category(person, context.population());
         }
     }
-
-    //// Income category is updated every 5 years
-    //static int last_update_year = 0;
-    //int current_year = context.time_now();
-
-    //// Only update every 5 years to reduce computational cost
-    //if (current_year - last_update_year >= 5) {
-    //    // First recalculate the income quartiles based on current population
-    //    calculate_income_quartiles(context.population());
-
-    //    // Then update everyone's income category
-    //    for (auto &person : context.population()) {
-    //        if (person.is_active()) {
-    //            initialise_income_category(person, context.population());
-    //        }
-    //    }
-    //    last_update_year = current_year;
-    //}
 }
 
 void DemographicModule::update_residual_mortality(RuntimeContext &context,
