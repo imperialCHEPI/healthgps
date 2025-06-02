@@ -198,9 +198,6 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
         // STAGE 1: Determine if risk factor should be zero using logistic regression
         double zero_probability = calculate_zero_probability(person, i);
 
-        // Store the zero probability for next year's update
-        person.previous_zero_probabilities[names_[i]] = zero_probability;
-
         // Sample from this probability to determine if risk factor should be zero
         // if logistic regression output = 1, risk factor value = 0
         double random_sample = random.next_double(); // Uniform random value between 0 and 1
@@ -254,14 +251,11 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
 
         // STAGE 1: Calculate new zero probability and blend with previous year's
         double new_zero_probability = calculate_zero_probability(person, i);
-        double previous_zero_probability = person.previous_zero_probabilities[names_[i]];
+        double previous_zero_probability;
         double blended_zero_probability =
             0.5 * previous_zero_probability +
             0.5 * new_zero_probability; // average of previous zero probability and current zero
                                         // probability
-
-        // Store the new zero probability for next year
-        person.previous_zero_probabilities[names_[i]] = new_zero_probability;
 
         // Sample from blended probability to determine if risk factor should be zero
         double random_sample = random.next_double();
