@@ -35,13 +35,17 @@ KevinHallModel::KevinHallModel(
     const std::unordered_map<core::Gender, std::vector<double>> &weight_quantiles,
     const std::vector<double> &epa_quantiles,
     const std::unordered_map<core::Gender, double> &height_stddev,
-    const std::unordered_map<core::Gender, double> &height_slope)
+    const std::unordered_map<core::Gender, double> &height_slope,
+    const std::unordered_map<core::Identifier, LinearModelParams> &blood_pressure_medication_models,
+    const std::unordered_map<core::Identifier, LinearModelParams> &systolic_blood_pressure_models)
     : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend),
                                 std::move(trend_steps)},
       energy_equation_{energy_equation}, nutrient_ranges_{nutrient_ranges},
       nutrient_equations_{nutrient_equations}, food_prices_{food_prices},
       weight_quantiles_{weight_quantiles}, epa_quantiles_{epa_quantiles},
-      height_stddev_{height_stddev}, height_slope_{height_slope} {
+      height_stddev_{height_stddev}, height_slope_{height_slope},
+      blood_pressure_medication_models_{blood_pressure_medication_models},
+      systolic_blood_pressure_models_{systolic_blood_pressure_models} {
 
     // Print nutrient ranges to verify they're loaded correctly
     std::cout << "\n======= LOADED NUTRIENT RANGES IN KEVIN HALL =======";
@@ -115,9 +119,12 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
     for (auto &person : context.population()) {
         double W_power_mean = W_power_means.at(person.gender, person.age);
         initialise_height(context, person, W_power_mean, context.random());
-        initialise_kevin_hall_state(person);
+        initialise_kevin_hall_state(context, person);
         compute_bmi(person);
     }
+
+    // Adjust SBP values to match expected means
+    adjust_risk_factors(context, {"SystolicBloodPressure"_id}, std::nullopt, true);
 }
 
 void KevinHallModel::update_risk_factors(RuntimeContext &context) {
@@ -138,6 +145,9 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
 
         compute_bmi(person);
     }
+
+    // Adjust SBP values to match expected means
+    adjust_risk_factors(context, {"SystolicBloodPressure"_id}, std::nullopt, true);
 }
 
 void KevinHallModel::update_newborns(RuntimeContext &context) const {
@@ -202,7 +212,7 @@ void KevinHallModel::update_newborns(RuntimeContext &context) const {
 
         double W_power_mean = W_power_means.at(person.gender, person.age);
         initialise_height(context, person, W_power_mean, context.random());
-        initialise_kevin_hall_state(person);
+        initialise_kevin_hall_state(context, person);
     }
 }
 // NOLINTBEGIN(readability-function-cognitive-complexity)
@@ -252,7 +262,7 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
         }
 
         if (person.age < kevin_hall_age_min) {
-            initialise_kevin_hall_state(person, adjustment);
+            initialise_kevin_hall_state(context, person, adjustment);
         } else {
             // Apply the adjustment
             adjust_weight(person, adjustment);
@@ -566,8 +576,8 @@ void KevinHallModel::compute_energy_intake(Person &person) const {
     }
 }
 
-void KevinHallModel::initialise_kevin_hall_state(Person &person,
-                                                 std::optional<double> adjustment) const {
+void KevinHallModel::initialise_kevin_hall_state(RuntimeContext &context, Person &person,
+                                                std::optional<double> adjustment) const {
     // std::cout << "\nDEBUG: KevinHallModel::initialise_kevin_hall_state - Starting for person #"
     // << person.id() << std::endl;
     //  Apply optional weight adjustment.
@@ -1081,6 +1091,193 @@ void KevinHallModel::update_height(RuntimeContext &context, Person &person,
     person.risk_factors["Height"_id] = H;
 }
 
+void KevinHallModel::initialise_blood_pressure_medication(Person &person, Random &random) const {
+    // Get the model parameters for the person's gender
+    auto model_key = person.gender == core::Gender::male ? "Male"_id : "Female"_id;
+    if (!blood_pressure_medication_models_.contains(model_key)) {
+        throw core::HgpsException("Blood pressure medication model not found for gender");
+    }
+
+    const auto &model = blood_pressure_medication_models_.at(model_key);
+    
+    // Calculate the predicted value using the model
+    double predicted = model.intercept; // β₀
+
+    // Add age terms: β₁×age + β₂×age² + β₃×age³
+    if (model.coefficients.contains("Age"_id)) {
+        predicted += model.coefficients.at("Age"_id) * person.age;
+    }
+    if (model.coefficients.contains("Age2"_id)) {
+        predicted += model.coefficients.at("Age2"_id) * person.age * person.age;
+    }
+    if (model.coefficients.contains("Age3"_id)) {
+        predicted += model.coefficients.at("Age3"_id) * person.age * person.age * person.age;
+    }
+
+    // Add gender term: β₄×sex
+    if (model.coefficients.contains("Gender"_id)) {
+        predicted += model.coefficients.at("Gender"_id) * (person.gender == core::Gender::female ? 1.0 : 0.0);
+    }
+
+    // Add ethnicity terms: β₅×ethnicity
+    if (model.coefficients.contains("Asian"_id)) {
+        predicted += model.coefficients.at("Asian"_id) * (person.ethnicity == core::Ethnicity::Asian ? 1.0 : 0.0);
+    }
+    if (model.coefficients.contains("Black"_id)) {
+        predicted += model.coefficients.at("Black"_id) * (person.ethnicity == core::Ethnicity::Black ? 1.0 : 0.0);
+    }
+    if (model.coefficients.contains("Others"_id)) {
+        predicted += model.coefficients.at("Others"_id) * (person.ethnicity == core::Ethnicity::Other ? 1.0 : 0.0);
+    }
+
+    // Add region terms: β₆×region
+    if (model.coefficients.contains("Wales"_id)) {
+        predicted += model.coefficients.at("Wales"_id) * (person.region == core::Region::Wales ? 1.0 : 0.0);
+    }
+    if (model.coefficients.contains("Scotland"_id)) {
+        predicted += model.coefficients.at("Scotland"_id) * (person.region == core::Region::Scotland ? 1.0 : 0.0);
+    }
+    if (model.coefficients.contains("NorthernIreland"_id)) {
+        predicted += model.coefficients.at("NorthernIreland"_id) * (person.region == core::Region::NorthernIreland ? 1.0 : 0.0);
+    }
+
+    // Add BMI term: β₇×BMI
+    if (model.coefficients.contains("BMI"_id)) {
+        predicted += model.coefficients.at("BMI"_id) * person.risk_factors.at("BMI"_id);
+    }
+
+    // Add random residual ε
+    double residual = random.next_normal(0.0, 1.0);
+    double value = predicted + residual;
+
+    // Ensure value is non-negative
+    value = std::max(0.0, value);
+
+    // Set the value
+    person.risk_factors["BloodPressureMedication"_id] = value;
+}
+
+void KevinHallModel::initialise_systolic_blood_pressure(Person &person, Random &random) const {
+    // Get the model parameters for the person's gender
+    auto model_key = person.gender == core::Gender::male ? "Male"_id : "Female"_id;
+    if (!systolic_blood_pressure_models_.contains(model_key)) {
+        throw core::HgpsException("Systolic blood pressure model not found for gender");
+    }
+
+    const auto &model = systolic_blood_pressure_models_.at(model_key);
+    
+    // Calculate the predicted value using the model
+    double predicted = model.intercept; // α₀
+
+    // Add age terms: α₁×age + α₂×age² + α₃×age³
+    if (model.coefficients.contains("Age"_id)) {
+        predicted += model.coefficients.at("Age"_id) * person.age;
+    }
+    if (model.coefficients.contains("Age2"_id)) {
+        predicted += model.coefficients.at("Age2"_id) * person.age * person.age;
+    }
+    if (model.coefficients.contains("Age3"_id)) {
+        predicted += model.coefficients.at("Age3"_id) * person.age * person.age * person.age;
+    }
+
+    // Add gender term: α₄×sex
+    if (model.coefficients.contains("Gender"_id)) {
+        predicted += model.coefficients.at("Gender"_id) * (person.gender == core::Gender::female ? 1.0 : 0.0);
+    }
+
+    // Add ethnicity terms: α₅×ethnicity
+    if (model.coefficients.contains("Asian"_id)) {
+        predicted += model.coefficients.at("Asian"_id) * (person.ethnicity == core::Ethnicity::Asian ? 1.0 : 0.0);
+    }
+    if (model.coefficients.contains("Black"_id)) {
+        predicted += model.coefficients.at("Black"_id) * (person.ethnicity == core::Ethnicity::Black ? 1.0 : 0.0);
+    }
+    if (model.coefficients.contains("Others"_id)) {
+        predicted += model.coefficients.at("Others"_id) * (person.ethnicity == core::Ethnicity::Other ? 1.0 : 0.0);
+    }
+
+    // Add region terms: α₆×region
+    if (model.coefficients.contains("Wales"_id)) {
+        predicted += model.coefficients.at("Wales"_id) * (person.region == core::Region::Wales ? 1.0 : 0.0);
+    }
+    if (model.coefficients.contains("Scotland"_id)) {
+        predicted += model.coefficients.at("Scotland"_id) * (person.region == core::Region::Scotland ? 1.0 : 0.0);
+    }
+    if (model.coefficients.contains("NorthernIreland"_id)) {
+        predicted += model.coefficients.at("NorthernIreland"_id) * (person.region == core::Region::NorthernIreland ? 1.0 : 0.0);
+    }
+
+    // Add BMI term: α₇×BMI
+    if (model.coefficients.contains("BMI"_id)) {
+        predicted += model.coefficients.at("BMI"_id) * person.risk_factors.at("BMI"_id);
+    }
+
+    // Add sodium terms: α₈×sodium + α₉×sodium²
+    if (model.coefficients.contains("Sodium"_id)) {
+        double sodium = person.risk_factors.at("Sodium"_id);
+        predicted += model.coefficients.at("Sodium"_id) * sodium;
+        if (model.coefficients.contains("Sodium2"_id)) {
+            predicted += model.coefficients.at("Sodium2"_id) * sodium * sodium;
+        }
+    }
+
+    // Add alcohol term: α₁₀×alcohol
+    if (model.coefficients.contains("Alcohol"_id)) {
+        predicted += model.coefficients.at("Alcohol"_id) * person.risk_factors.at("Alcohol"_id);
+    }
+
+    // Add physical activity term: α₁₁×pal
+    if (model.coefficients.contains("PhysicalActivity"_id)) {
+        predicted += model.coefficients.at("PhysicalActivity"_id) * person.physical_activity;
+    }
+
+    // Add medication term: α₁₂×medication
+    if (model.coefficients.contains("BloodPressureMedication"_id)) {
+        predicted += model.coefficients.at("BloodPressureMedication"_id) * 
+                    person.risk_factors.at("BloodPressureMedication"_id);
+    }
+
+    // Add interaction terms
+    if (model.coefficients.contains("Sodium_BloodPressureMedication"_id)) {
+        double sodium = person.risk_factors.at("Sodium"_id);
+        double medication = person.risk_factors.at("BloodPressureMedication"_id);
+        predicted += model.coefficients.at("Sodium_BloodPressureMedication"_id) * sodium * medication;
+    }
+
+    if (model.coefficients.contains("Sodium2_BloodPressureMedication"_id)) {
+        double sodium = person.risk_factors.at("Sodium"_id);
+        double medication = person.risk_factors.at("BloodPressureMedication"_id);
+        predicted += model.coefficients.at("Sodium2_BloodPressureMedication"_id) * sodium * sodium * medication;
+    }
+
+    if (model.coefficients.contains("Sodium_Gender"_id)) {
+        double sodium = person.risk_factors.at("Sodium"_id);
+        predicted += model.coefficients.at("Sodium_Gender"_id) * sodium * 
+                    (person.gender == core::Gender::female ? 1.0 : 0.0);
+    }
+
+    if (model.coefficients.contains("Sodium2_Gender"_id)) {
+        double sodium = person.risk_factors.at("Sodium"_id);
+        predicted += model.coefficients.at("Sodium2_Gender"_id) * sodium * sodium * 
+                    (person.gender == core::Gender::female ? 1.0 : 0.0);
+    }
+
+    // Add random residual ε
+    double residual = random.next_normal(0.0, 1.0);
+    double value = predicted + residual;
+
+    // Store the residual for longitudinal correlation
+    person.sbp_residual = residual;
+
+    // Clamp value using the range from the model
+    if (model.coefficients.contains("min") && model.coefficients.contains("max")) {
+        value = std::clamp(value, model.coefficients.at("min"), model.coefficients.at("max"));
+    }
+
+    // Set the value
+    person.risk_factors["SystolicBloodPressure"_id] = value;
+}
+
 KevinHallModelDefinition::KevinHallModelDefinition(
     std::unique_ptr<RiskFactorSexAgeTable> expected,
     std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
@@ -1091,13 +1288,17 @@ KevinHallModelDefinition::KevinHallModelDefinition(
     std::unordered_map<core::Identifier, std::optional<double>> food_prices,
     std::unordered_map<core::Gender, std::vector<double>> weight_quantiles,
     std::vector<double> epa_quantiles, std::unordered_map<core::Gender, double> height_stddev,
-    std::unordered_map<core::Gender, double> height_slope)
+    std::unordered_map<core::Gender, double> height_slope,
+    std::unordered_map<core::Identifier, LinearModelParams> blood_pressure_medication_models,
+    std::unordered_map<core::Identifier, LinearModelParams> systolic_blood_pressure_models)
     : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend),
                                           std::move(trend_steps)},
       energy_equation_{std::move(energy_equation)}, nutrient_ranges_{std::move(nutrient_ranges)},
       nutrient_equations_{std::move(nutrient_equations)}, food_prices_{std::move(food_prices)},
       weight_quantiles_{std::move(weight_quantiles)}, epa_quantiles_{std::move(epa_quantiles)},
-      height_stddev_{std::move(height_stddev)}, height_slope_{std::move(height_slope)} {
+      height_stddev_{std::move(height_stddev)}, height_slope_{std::move(height_slope)},
+      blood_pressure_medication_models_{std::move(blood_pressure_medication_models)},
+      systolic_blood_pressure_models_{std::move(systolic_blood_pressure_models)} {
 
     if (energy_equation_.empty()) {
         throw core::HgpsException("Energy equation mapping is empty");
@@ -1129,7 +1330,9 @@ std::unique_ptr<RiskFactorModel> KevinHallModelDefinition::create_model() const 
     return std::make_unique<KevinHallModel>(expected_, expected_trend_, trend_steps_,
                                             energy_equation_, nutrient_ranges_, nutrient_equations_,
                                             food_prices_, weight_quantiles_, epa_quantiles_,
-                                            height_stddev_, height_slope_);
+                                            height_stddev_, height_slope_,
+                                            blood_pressure_medication_models_,
+                                            systolic_blood_pressure_models_);
 }
 
 } // namespace hgps

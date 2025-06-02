@@ -86,6 +86,9 @@ struct Person {
     /// @brief The previous year's zero probabilities for each risk factor
     std::unordered_map<core::Identifier, double> previous_zero_probabilities{};
 
+    /// @brief The systolic blood pressure residual for longitudinal correlation
+    double sbp_residual{0.0};
+
     /// @brief Diseases history and current status
     std::map<core::Identifier, Disease> diseases;
 

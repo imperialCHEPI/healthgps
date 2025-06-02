@@ -7,6 +7,12 @@
 
 namespace hgps {
 
+/// @brief Defines the linear model parameters data type
+struct LinearModelParams {
+    double intercept;
+    std::unordered_map<std::string, double> coefficients;
+};
+
 /// @brief Defines the disease module container to hold disease models
 class DiseaseModule final : public UpdatableModule {
   public:
@@ -61,8 +67,20 @@ class DiseaseModule final : public UpdatableModule {
                                 const Person &entity) const noexcept;
 
   private:
+    /// @brief Update blood pressure medication for a person
+    /// @param person The person to update medication for
+    /// @param random Random number generator for residual
+    void update_blood_pressure_medication(Person &person, Random &random) const;
+
+    /// @brief Update systolic blood pressure for a person
+    /// @param person The person to update SBP for
+    /// @param random Random number generator for residual
+    void update_systolic_blood_pressure(Person &person, Random &random) const;
+
     std::map<core::Identifier, std::shared_ptr<DiseaseModel>> models_;
     std::string name_{"Disease"};
+    std::unordered_map<core::Identifier, LinearModelParams> systolic_blood_pressure_models_;
+    std::unordered_map<core::Identifier, LinearModelParams> blood_pressure_medication_models_;
 };
 
 /// @brief Builds a new instance of the DiseaseModule using the given data infrastructure

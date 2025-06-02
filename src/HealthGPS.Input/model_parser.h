@@ -132,4 +132,16 @@ load_income_model_from_csv(const std::filesystem::path &csv_path);
 std::unordered_map<core::Identifier, hgps::LinearModelParams>
 load_physical_activity_model_from_csv(const std::filesystem::path &csv_path);
 
+/// @brief Loads blood pressure medication model data from a CSV file
+/// @param csv_path The path to the CSV file containing blood pressure medication model data
+/// @return A map structure with blood pressure medication model parameters
+std::unordered_map<core::Identifier, hgps::LinearModelParams>
+load_blood_pressure_medication_model_from_csv(const std::filesystem::path &csv_path);
+
+/// @brief Loads systolic blood pressure model data from a CSV file
+/// @param csv_path The path to the CSV file containing systolic blood pressure model data
+/// @return A map structure with systolic blood pressure model parameters
+std::unordered_map<core::Identifier, hgps::LinearModelParams>
+load_systolic_blood_pressure_model_from_csv(const std::filesystem::path &csv_path);
+
 } // namespace hgps::input

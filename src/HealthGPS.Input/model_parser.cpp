@@ -274,6 +274,10 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         model_dir / "income_model.csv"; // loading of income model parameters
     std::filesystem::path physical_activity_csv_path =
         model_dir / "physicalactivity_model.csv"; // loading of physical activity model parameters
+    std::filesystem::path blood_pressure_medication_csv_path =
+        model_dir / "bloodpressuremedication.csv"; // loading of blood pressure medication model parameters
+    std::filesystem::path systolic_blood_pressure_csv_path =
+        model_dir / "systolicbloodpressure.csv"; // loading of systolic blood pressure model parameters
 
     // Load risk factor coefficients from CSV if the file exists
     std::unordered_map<std::string, hgps::LinearModelParams> csv_coefficients;
@@ -322,6 +326,24 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         logistic_coefficients = load_logistic_regression_coefficients_from_csv(logistic_csv_path);
         std::cout << "\nSuccessfully loaded logistic regression coefficients from CSV for "
                   << logistic_coefficients.size() << " risk factors";
+    }
+
+    // Load blood pressure medication model from CSV if the file exists
+    std::unordered_map<core::Identifier, hgps::LinearModelParams> blood_pressure_medication_models;
+    if (std::filesystem::exists(blood_pressure_medication_csv_path)) {
+        std::cout << "\nFound CSV file for blood pressure medication model: "
+                  << blood_pressure_medication_csv_path.string() << std::endl;
+        blood_pressure_medication_models = load_blood_pressure_medication_model_from_csv(model_dir);
+        std::cout << "\nSuccessfully loaded blood pressure medication model from CSV";
+    }
+
+    // Load systolic blood pressure model from CSV if the file exists
+    std::unordered_map<core::Identifier, hgps::LinearModelParams> systolic_blood_pressure_models;
+    if (std::filesystem::exists(systolic_blood_pressure_csv_path)) {
+        std::cout << "\nFound CSV file for systolic blood pressure model: "
+                  << systolic_blood_pressure_csv_path.string() << std::endl;
+        systolic_blood_pressure_models = load_systolic_blood_pressure_model_from_csv(model_dir);
+        std::cout << "\nSuccessfully loaded systolic blood pressure model from CSV";
     }
 
     // Risk factor and intervention policy: names, models, parameters and correlation/covariance.
@@ -1120,11 +1142,18 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
         {hgps::core::Gender::female, opt["HeightSlope"]["Female"].get<double>()},
         {hgps::core::Gender::male, opt["HeightSlope"]["Male"].get<double>()}};
 
+    // Load blood pressure medication and systolic blood pressure models
+    auto blood_pressure_medication_models = load_blood_pressure_medication_model_from_csv(
+        hgps::input::get_file_info(opt["BloodPressureMedicationModel"], config.root_path));
+    auto systolic_blood_pressure_models = load_systolic_blood_pressure_model_from_csv(
+        hgps::input::get_file_info(opt["SystolicBloodPressureModel"], config.root_path));
+
     return std::make_unique<hgps::KevinHallModelDefinition>(
         std::move(expected), std::move(expected_trend), std::move(trend_steps),
         std::move(energy_equation), std::move(nutrient_ranges), std::move(nutrient_equations),
         std::move(food_prices), std::move(weight_quantiles), std::move(epa_quantiles),
-        std::move(height_stddev), std::move(height_slope));
+        std::move(height_stddev), std::move(height_slope),
+        std::move(blood_pressure_medication_models), std::move(systolic_blood_pressure_models));
 }
 
 // NOLINTEND(readability-function-cognitive-complexity)
@@ -2037,6 +2066,161 @@ load_physical_activity_model_from_csv(const std::filesystem::path &csv_path) {
     physical_activity_models[core::Identifier("continuous")] = model;
 
     return physical_activity_models;
+}
+// NOLINTEND(readability-function-cognitive-complexity)
+
+// NOLINTBEGIN(readability-function-cognitive-complexity)
+std::unordered_map<core::Identifier, hgps::LinearModelParams>
+load_blood_pressure_medication_model_from_csv(const std::filesystem::path &csv_path) {
+    std::unordered_map<core::Identifier, hgps::LinearModelParams> blood_pressure_medication_models;
+    LinearModelParams model;
+
+    // Open and read CSV file
+    std::ifstream file;
+    file.open(csv_path / "bloodpressuremedication.csv");
+    if (!file.is_open()) {
+        throw std::runtime_error("Failed to open blood pressure medication model CSV: " + (csv_path / "bloodpressuremedication.csv").string());
+    }
+
+    try {
+        std::string line;
+        while (std::getline(file, line)) {
+            // Skip empty lines
+            if (line.empty()) {
+                continue;
+            }
+
+            // Split line by comma
+            std::stringstream ss(line);
+            std::string key, value_str;
+            if (!std::getline(ss, key, ',') || !std::getline(ss, value_str, ',')) {
+                continue;
+            }
+
+            // Trim whitespace
+            key = core::trim(key);
+            value_str = core::trim(value_str);
+
+            // Convert value to double
+            double value = std::stod(value_str);
+
+            // Map parameter names
+            if (key == "Intercept") {
+                model.intercept = value;
+            } else if (key == "stddev") {
+                model.coefficients["stddev"] = value;
+            } else if (key == "min" || key == "max") {
+                model.coefficients[key] = value;
+            } else {
+                // Map CSV parameter names to the expected names in the code
+                std::string mapped_key = key;
+                if (key == "gender2") mapped_key = "Gender";
+                else if (key == "age1") mapped_key = "Age";
+                else if (key == "age2") mapped_key = "Age2";
+                else if (key == "age3") mapped_key = "Age3";
+                else if (key == "ethnicity2") mapped_key = "Asian";
+                else if (key == "ethnicity3") mapped_key = "Black";
+                else if (key == "ethnicity4") mapped_key = "Others";
+                else if (key == "region2") mapped_key = "Wales";
+                else if (key == "region3") mapped_key = "Scotland";
+                else if (key == "region4") mapped_key = "NorthernIreland";
+                else if (key == "bmi") mapped_key = "BMI";
+
+                model.coefficients[mapped_key] = value;
+            }
+        }
+
+        std::cout << "\nSuccessfully loaded blood pressure medication model with intercept "
+                  << model.intercept << " and " << model.coefficients.size() << " coefficients";
+    } catch (const std::exception &e) {
+        std::cout << "\nFailed to load blood pressure medication model CSV: " << e.what();
+        throw;
+    }
+
+    // Add the model directly to bloodpressurmedication key
+    blood_pressure_medication_models[core::Identifier("bloodpressuremedication")] = model;
+    return blood_pressure_medication_models;
+}
+
+std::unordered_map<core::Identifier, hgps::LinearModelParams>
+load_systolic_blood_pressure_model_from_csv(const std::filesystem::path &csv_path) {
+    std::unordered_map<core::Identifier, hgps::LinearModelParams> systolic_blood_pressure_models;
+    LinearModelParams model;
+
+    // Open and read CSV file
+    std::ifstream file;
+    file.open(csv_path / "systolicbloodpressure.csv");
+    if (!file.is_open()) {
+        throw std::runtime_error("Failed to open systolic blood pressure model CSV: " + (csv_path / "systolicbloodpressure.csv").string());
+    }
+
+    try {
+        std::string line;
+        while (std::getline(file, line)) {
+            // Skip empty lines
+            if (line.empty()) {
+                continue;
+            }
+
+            // Split line by comma
+            std::stringstream ss(line);
+            std::string key, value_str;
+            if (!std::getline(ss, key, ',') || !std::getline(ss, value_str, ',')) {
+                continue;
+            }
+
+            // Trim whitespace
+            key = core::trim(key);
+            value_str = core::trim(value_str);
+
+            // Convert value to double
+            double value = std::stod(value_str);
+
+            // Map parameter names
+            if (key == "Intercept") {
+                model.intercept = value;
+            } else if (key == "stddev") {
+                model.coefficients["stddev"] = value;
+            } else if (key == "min" || key == "max") {
+                model.coefficients[key] = value;
+            } else {
+                // Map CSV parameter names to the expected names in the code
+                std::string mapped_key = key;
+                if (key == "gender2") mapped_key = "Gender";
+                else if (key == "age1") mapped_key = "Age";
+                else if (key == "age2") mapped_key = "Age2";
+                else if (key == "age3") mapped_key = "Age3";
+                else if (key == "ethnicity2") mapped_key = "Asian";
+                else if (key == "ethnicity3") mapped_key = "Black";
+                else if (key == "ethnicity4") mapped_key = "Others";
+                else if (key == "region2") mapped_key = "Wales";
+                else if (key == "region3") mapped_key = "Scotland";
+                else if (key == "region4") mapped_key = "NorthernIreland";
+                else if (key == "bmi") mapped_key = "BMI";
+                else if (key == "sodium") mapped_key = "Sodium";
+                else if (key == "sodium2") mapped_key = "Sodium2";
+                else if (key == "alcohol") mapped_key = "Alcohol";
+                else if (key == "physicalactivity") mapped_key = "PhysicalActivity";
+                else if (key == "bloodpressuremedication") mapped_key = "BloodPressureMedication";
+                else if (key == "sodium_bloodpressuremedication") mapped_key = "Sodium_BloodPressureMedication";
+                else if (key == "sodium2_bloodpressuremedication") mapped_key = "Sodium2_BloodPressureMedication";
+                else if (key == "sodium_gender2") mapped_key = "Sodium_Gender";
+                else if (key == "sodium2_gender2") mapped_key = "Sodium2_Gender";
+
+                model.coefficients[mapped_key] = value;
+            }
+        }
+
+        std::cout << "\nSuccessfully loaded systolic blood pressure model with intercept "
+                  << model.intercept << " and " << model.coefficients.size() << " coefficients";
+    } catch (const std::exception &e) {
+        std::cout << "\nFailed to load systolic blood pressure model CSV: " << e.what();
+        throw;
+    }
+
+    // Add the model directly to systolicbloodpressure key
+    systolic_blood_pressure_models[core::Identifier("systolicbloodpressure")] = model;
+    return systolic_blood_pressure_models;
 }
 // NOLINTEND(readability-function-cognitive-complexity)
 } // namespace hgps::input

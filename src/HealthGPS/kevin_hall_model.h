@@ -9,6 +9,7 @@
 
 #include <optional>
 #include <vector>
+#include "static_linear_model.h"
 
 namespace hgps {
 
@@ -44,7 +45,9 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
         const std::unordered_map<core::Gender, std::vector<double>> &weight_quantiles,
         const std::vector<double> &epa_quantiles,
         const std::unordered_map<core::Gender, double> &height_stddev,
-        const std::unordered_map<core::Gender, double> &height_slope);
+        const std::unordered_map<core::Gender, double> &height_slope,
+        const std::unordered_map<core::Identifier, LinearModelParams> &blood_pressure_medication_models,
+        const std::unordered_map<core::Identifier, LinearModelParams> &systolic_blood_pressure_models);
 
     RiskFactorModelType type() const noexcept override;
 
@@ -133,9 +136,10 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     void initialise_weight(RuntimeContext &context, Person &person) const;
 
     /// @brief  Initialise the Kevin Hall state variables of a person
+    /// @param context The runtime context
     /// @param person The person to initialise
     /// @param adjustment An optional weight adjustment term (default is zero)
-    void initialise_kevin_hall_state(Person &person,
+    void initialise_kevin_hall_state(RuntimeContext &context, Person &person,
                                      std::optional<double> adjustment = std::nullopt) const;
 
     /// @brief Run the Kevin Hall energy balance model for a given person
@@ -207,6 +211,25 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @param W_power_mean The mean hweight power for the person's sex and age
     void update_height(RuntimeContext &context, Person &person, double W_power_mean) const;
 
+    ///@brief Initialise blood pressure medication for a person
+    /// @param person The person to initialise medication for
+    /// @param random Random number generator for residual
+    void initialise_blood_pressure_medication(Person &person, Random &random) const;
+
+    /// @brief Initialise systolic blood pressure for a person
+    /// @param person The person to initialise SBP for
+    /// @param random Random number generator for residual
+    void initialise_systolic_blood_pressure(Person &person, Random &random) const;
+
+    /// @brief Compute mean SBP values by sex and age
+    /// @param population The population to compute means for
+    /// @return The mean SBP values by sex and age
+    KevinHallAdjustmentTable compute_mean_sbp(Population &population) const;
+
+    /// @brief Adjust SBP values to match expected means
+    /// @param context The runtime context
+    void adjust_sbp_values(RuntimeContext &context) const;
+
     const std::unordered_map<core::Identifier, double> &energy_equation_;
     const std::unordered_map<core::Identifier, core::DoubleInterval> &nutrient_ranges_;
     const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
@@ -216,6 +239,8 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     const std::vector<double> &epa_quantiles_;
     const std::unordered_map<core::Gender, double> &height_stddev_;
     const std::unordered_map<core::Gender, double> &height_slope_;
+    const std::unordered_map<core::Identifier, LinearModelParams> &blood_pressure_medication_models_;
+    const std::unordered_map<core::Identifier, LinearModelParams> &systolic_blood_pressure_models_;
 
     // Model parameters.
     static constexpr int kevin_hall_age_min = 19; // Start age for the main Kevin Hall model.
@@ -258,7 +283,9 @@ class KevinHallModelDefinition final : public RiskFactorAdjustableModelDefinitio
         std::unordered_map<core::Identifier, std::optional<double>> food_prices,
         std::unordered_map<core::Gender, std::vector<double>> weight_quantiles,
         std::vector<double> epa_quantiles, std::unordered_map<core::Gender, double> height_stddev,
-        std::unordered_map<core::Gender, double> height_slope);
+        std::unordered_map<core::Gender, double> height_slope,
+        std::unordered_map<core::Identifier, LinearModelParams> blood_pressure_medication_models,
+        std::unordered_map<core::Identifier, LinearModelParams> systolic_blood_pressure_models);
 
     /// @brief Construct a new KevinHallModel from this definition
     /// @return A unique pointer to the new KevinHallModel instance
@@ -273,6 +300,8 @@ class KevinHallModelDefinition final : public RiskFactorAdjustableModelDefinitio
     std::vector<double> epa_quantiles_;
     std::unordered_map<core::Gender, double> height_stddev_;
     std::unordered_map<core::Gender, double> height_slope_;
+    std::unordered_map<core::Identifier, LinearModelParams> blood_pressure_medication_models_;
+    std::unordered_map<core::Identifier, LinearModelParams> systolic_blood_pressure_models_;
 };
 
 } // namespace hgps
