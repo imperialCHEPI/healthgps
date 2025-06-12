@@ -151,18 +151,24 @@ AnalysisModule::calculate_residual_disability_weight(int age, const core::Gender
 }
 
 void AnalysisModule::publish_result_message(RuntimeContext &context) const {
+
     auto sample_size = context.age_range().upper() + 1u;
     auto result = ModelResult{sample_size};
 
+    //// Make vector ModelResult objects, each with different IncomeCategory values
     auto VectorOfModelResults = std::vector<hgps::ModelResult>(); 
     for (int Entry = 0; Entry < context.NumberOfResultsCSVs; Entry++) {
         VectorOfModelResults.emplace_back(ModelResult{sample_size});
         VectorOfModelResults[Entry].IncomeCategory = std::to_string(Entry); 
     }
-
+    
+    //// Run calculate_historical_statistics and calculate_population_statistics for "result", which is a ModelResult object where ModelResult::IncomeCategory has the default value "All"
+    
+    //// Run calculate_historical_statistics asyncrhonously, placing a "handle" on it. 
     auto handle = core::run_async(&AnalysisModule::calculate_historical_statistics, this,
                                   std::ref(context), std::ref(result));
 
+    //// Run calculate_population_statistics asyncrhonously, getting "handle" immediately after.
     calculate_population_statistics(context, result);
     handle.get();
 
@@ -170,10 +176,14 @@ void AnalysisModule::publish_result_message(RuntimeContext &context) const {
         context.identifier(), context.current_run(), context.time_now(), result));
 
 
+    //// Run calculate_historical_statistics and calculate_population_statistics for all the
+    //// IncomeCategories (i.e. do the same as above again), i.e. the different Instances of ModelResult, defined above.
+    //// Each one has a different IncomeCategory value, which is used in
+    //// calculate_historical_statistics and calculate_population_statistics
     for (int Entry = 0; Entry < context.NumberOfResultsCSVs; Entry++) {
 
         handle = core::run_async(&AnalysisModule::calculate_historical_statistics, this,
-                                 std::ref(context), std::ref(result));
+                                 std::ref(context), std::ref(VectorOfModelResults[Entry]));
 
         calculate_population_statistics(context, VectorOfModelResults[Entry]);
         handle.get();
@@ -186,6 +196,11 @@ void AnalysisModule::publish_result_message(RuntimeContext &context) const {
 // NOLINTBEGIN(readability-function-cognitive-complexity)
 void AnalysisModule::calculate_historical_statistics(RuntimeContext &context,
                                                      ModelResult &result) const {
+
+    // extract IncomeCategoryString from ModelResult
+    std::string IncomeCategory = result.IncomeCategory;
+
+
     auto risk_factors = std::map<core::Identifier, std::map<core::Gender, double>>();
     for (const auto &item : context.mapping()) {
         if (item.level() > 0) {
@@ -210,12 +225,18 @@ void AnalysisModule::calculate_historical_statistics(RuntimeContext &context,
 
     auto daly_handle =
         core::run_async(&AnalysisModule::calculate_dalys, this, std::ref(context.population()),
-                        age_upper_bound, analysis_time);
+                        age_upper_bound, analysis_time, IncomeCategory);
 
     auto population_size = static_cast<int>(context.population().size());
     auto population_dead = 0;
     auto population_migrated = 0;
     for (const auto &entity : context.population()) {
+
+        //// Only do this proposed loop if considering all income categories, or if the person belongs to this particular income category. 
+        if (IncomeCategory != "All" &&
+            std::stod(IncomeCategory) != entity.risk_factors.at("income_category"))
+            continue;
+
         if (!entity.is_active()) {
             if (entity.has_emigrated() && entity.time_of_migration() == analysis_time) {
                 population_migrated++;
@@ -313,11 +334,18 @@ double AnalysisModule::calculate_disability_weight(const Person &entity) const {
 }
 
 DALYsIndicator AnalysisModule::calculate_dalys(Population &population, unsigned int max_age,
-                                               unsigned int death_year) const {
+                                               unsigned int death_year, std::string IncomeCategory) const {
     auto yll_sum = 0.0;
     auto yld_sum = 0.0;
     auto count = 0.0;
     for (const auto &entity : population) {
+
+        //// Only do this proposed loop if considering all income categories, or if the person
+        ///belongs to this particular income category.
+        if (IncomeCategory != "All" &&
+            std::stod(IncomeCategory) != entity.risk_factors.at("income_category"))
+            continue; 
+
         if (entity.time_of_death() == death_year && entity.age <= max_age) {
             auto male_reference_age =
                 definition_.life_expectancy().at(death_year, core::Gender::male);
@@ -345,8 +373,10 @@ DALYsIndicator AnalysisModule::calculate_dalys(Population &population, unsigned 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
 void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
                                                      ModelResult &result) const {
-    // extract DataSeries from ModelResult
+    
+    // extract DataSeries and IncomeCategoryString from ModelResult
     DataSeries &series = result.series;
+    std::string IncomeCategory = result.IncomeCategory; 
 
     if (series.size() > 0) {
         throw std::logic_error("This should be a new object!");
@@ -366,6 +396,13 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
 
     auto current_time = static_cast<unsigned int>(context.time_now());
     for (const auto &person : context.population()) {
+
+        //// Only do this proposed loop if considering all income categories, or if the person
+        /// belongs to this particular income category.
+        if (IncomeCategory != "All" &&
+            std::stod(IncomeCategory) != person.risk_factors.at("income_category"))
+            continue; 
+
         auto age = person.age;
         auto gender = person.gender;
 

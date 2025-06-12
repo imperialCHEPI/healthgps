@@ -88,25 +88,25 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
         adjust_risk_factors(context, {"Weight"_id}, std::nullopt, true);
     }
 
-    // Print weight values for a sample of people after adjustment
-    std::cout << "\n===== WEIGHT ADJUSTMENT CHECK: SAMPLE OF 5 PEOPLE =====";
-    int sample_count = 0;
-    int print_interval = std::max(1, static_cast<int>(context.population().size() / 5));
-    for (const auto &person : context.population()) {
-        if (!person.is_active())
-            continue;
+    //// Print weight values for a sample of people after adjustment
+    //std::cout << "\n===== WEIGHT ADJUSTMENT CHECK: SAMPLE OF 5 PEOPLE =====";
+    //int sample_count = 0;
+    //int print_interval = std::max(1, static_cast<int>(context.population().size() / 5));
+    //for (const auto &person : context.population()) {
+    //    if (!person.is_active())
+    //        continue;
 
-        if (person.id() % print_interval == 0 && sample_count < 5) {
-            std::cout << "\nPerson ID: " << person.id() << ", Age: " << person.age
-                      << ", Gender: " << (person.gender == core::Gender::male ? "Male" : "Female")
-                      << ", Weight: " << person.risk_factors.at("Weight"_id) << " kg";
-            sample_count++;
-        }
+    //    if (person.id() % print_interval == 0 && sample_count < 5) {
+    //        std::cout << "\nPerson ID: " << person.id() << ", Age: " << person.age
+    //                  << ", Gender: " << (person.gender == core::Gender::male ? "Male" : "Female")
+    //                  << ", Weight: " << person.risk_factors.at("Weight"_id) << " kg";
+    //        sample_count++;
+    //    }
 
-        if (sample_count >= 5)
-            break;
-    }
-    std::cout << "\n================================================\n";
+    //    if (sample_count >= 5)
+    //        break;
+    //}
+    //std::cout << "\n================================================\n";
 
     // Compute weight power means by sex and age.
     auto W_power_means = compute_mean_weight(context.population(), height_slope_);
@@ -269,7 +269,7 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
     }
 
     // Print weight values for a sample of people after adjustment
-    std::cout << "\n===== WEIGHT ADJUSTMENT CHECK DURING UPDATE: SAMPLE OF 5 PEOPLE =====";
+    /*std::cout << "\n===== WEIGHT ADJUSTMENT CHECK DURING UPDATE: SAMPLE OF 5 PEOPLE =====";
     std::cout << "\nYear: " << context.time_now();
     int sample_count = 0;
     int print_interval = std::max(1, static_cast<int>(context.population().size() / 5));
@@ -293,7 +293,7 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
         if (sample_count >= 5)
             break;
     }
-    std::cout << "\n=================================================================\n";
+    std::cout << "\n=================================================================\n";*/
 
     // Send (baseline) weight adjustments to intervention scenario.
     send_weight_adjustments(context, std::move(adjustments));

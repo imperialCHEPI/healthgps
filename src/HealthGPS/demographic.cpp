@@ -417,10 +417,10 @@ void DemographicModule::initialise_income_continuous([[maybe_unused]] RuntimeCon
                 value += coefficient * static_cast<double>(person.age);
             }
             if (factor_name == "Age2") {
-                value += coefficient * pow(person.age, 2);
+                value += coefficient * person.age * person.age;
             }
             if (factor_name == "Age3") {
-                value += coefficient * pow(person.age, 3);
+                value += coefficient * person.age * person.age * person.age;
             }
             // Gender effect
             if (factor_name == "Gender") {
@@ -544,7 +544,7 @@ void DemographicModule::calculate_income_quartiles(const Population &population)
     // std::cout << "\nDEBUG: Inside calculating quartiles and sorted done";
 
     for (const auto &p : population) {
-        if (p.is_active() && p.income_continuous > 0) {
+        if (p.is_active() /*&& p.income_continuous > 0*/) {
             sorted_incomes.push_back(p.income_continuous);
         }
     }
@@ -552,11 +552,21 @@ void DemographicModule::calculate_income_quartiles(const Population &population)
     // Sort to find quartile thresholds
     std::sort(sorted_incomes.begin(), sorted_incomes.end());
 
+
+
+    //std::cout << "\n\ncalculate_income_quartiles\n\n\n"; 
+
     size_t n = sorted_incomes.size();
     income_quartile_thresholds_.resize(3);
     income_quartile_thresholds_[0] = sorted_incomes[n / 4];     // 25th percentile
     income_quartile_thresholds_[1] = sorted_incomes[n / 2];     // 50th percentile
     income_quartile_thresholds_[2] = sorted_incomes[3 * n / 4]; // 75th percentile
+
+    /*for (int Index = 0; Index < 200; Index++)
+    {
+        std::cout << "Index " << Index << ", income " << sorted_incomes[Index] << std::endl; 
+    }*/
+
 
     // std::cout << "\nDEBUG: Finsihed calculating quartiles- gave data to
     // initialise_income_category";
@@ -614,10 +624,27 @@ void DemographicModule::update_income_category(RuntimeContext &context) {
     // First recalculate the income quartiles based on current population
     calculate_income_quartiles(context.population());
 
+    /*std::cout << "update_income_category\n"
+              << " quartile 1 " << income_quartile_thresholds_[0] << std::endl
+              << " quartile 2 " << income_quartile_thresholds_[1] << std::endl
+              << " quartile 3 " << income_quartile_thresholds_[2] << std::endl; */
+
     // Then update everyone's income category
+
+    int Counter = 0; 
+
     for (auto &person : context.population()) {
         if (person.is_active()) {
             initialise_income_category(person, context.population());
+
+            //if (Counter++ < 20 && person.risk_factors.at("income_category") < 1.0)
+            //{
+            //    std::cout << "\nPerson ID: " << person.id() /*<< ", Age: " << person.age*/
+
+            //              << ", income_continuous: " << person.income_continuous
+            //              << ", income_category "
+            //              << person.risk_factors.at("income_category");
+            //}
         }
     }
 }
