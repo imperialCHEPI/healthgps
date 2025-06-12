@@ -30,7 +30,7 @@ ResultFileWriter::ResultFileWriter(const std::filesystem::path &file_name, Exper
     output_filename_LowerInc.replace_extension("_LowerInc.csv");
     output_filename_LowerMiddleInc.replace_extension("_LowerMiddleInc.csv");
     output_filename_UpperMiddleInc.replace_extension("_UpperMiddleInc.csv");
-    output_filename_UpperInc.replace_extension("_UpperInccsv");
+    output_filename_UpperInc.replace_extension("_UpperInc.csv");
 
     /*fmt::print(fg(fmt::color::yellow) | fmt::emphasis::bold,
                "\n\n\n\n\n\n\n\n\n\nResultsFileWriter Constructor, output_filename_LowerInc = "
@@ -45,7 +45,6 @@ ResultFileWriter::ResultFileWriter(const std::filesystem::path &file_name, Exper
     csvstream_UpperMiddleInc_.open(output_filename_UpperMiddleInc,
                                    std::ofstream::out | std::ofstream::app);
     csvstream_upperInc_.open(output_filename_UpperInc, std::ofstream::out | std::ofstream::app);
-
 
     if (csvstream_.fail() || !csvstream_.is_open()) {
         throw std::invalid_argument(
@@ -179,13 +178,34 @@ std::string ResultFileWriter::to_json_string(const hgps::ResultEventMessage &mes
 }
 
 void ResultFileWriter::write_csv_header(const hgps::ResultEventMessage &message) {
-    csvstream_ << "source,run,time,gender_name,index_id";
+
+    std::string StartOfHeaderString = "source,run,time,gender_name,index_id";
+
+    csvstream_ << StartOfHeaderString;
+    csvstream_LowerInc_ << StartOfHeaderString;
+    csvstream_LowerMiddleInc_ << StartOfHeaderString;
+    csvstream_UpperMiddleInc_ << StartOfHeaderString;
+    csvstream_upperInc_ << StartOfHeaderString;
+
     for (const auto &chan : message.content.series.channels()) {
         csvstream_ << "," << chan;
+        csvstream_LowerInc_ << "," << chan;
+        csvstream_LowerMiddleInc_ << "," << chan;
+        csvstream_UpperMiddleInc_ << "," << chan;
+        csvstream_upperInc_ << "," << chan;
     }
 
     csvstream_ << '\n';
+    csvstream_LowerInc_ << '\n';
+    csvstream_LowerMiddleInc_ << '\n';
+    csvstream_UpperMiddleInc_ << '\n';
+    csvstream_upperInc_ << '\n';
+
     csvstream_.flush();
+    csvstream_LowerInc_.flush();
+    csvstream_LowerMiddleInc_.flush();
+    csvstream_UpperMiddleInc_.flush();
+    csvstream_upperInc_.flush();
 }
 
 void ResultFileWriter::write_csv_channels(const hgps::ResultEventMessage &message) {
@@ -206,7 +226,23 @@ void ResultFileWriter::write_csv_channels(const hgps::ResultEventMessage &messag
             fss << sep << series.at(Gender::female, key).at(index);
         }
 
-        csvstream_ << mss.str() << '\n' << fss.str() << '\n';
+        /// extract "message" to appropriate .csv stream
+        if (message.content.IncomeCategory == "All") {
+
+            csvstream_ << mss.str() << '\n' << fss.str() << '\n';
+        } else if (message.content.IncomeCategory == "0") {
+
+            csvstream_LowerInc_ << mss.str() << '\n' << fss.str() << '\n';
+        } else if (message.content.IncomeCategory == "1") {
+
+            csvstream_LowerMiddleInc_ << mss.str() << '\n' << fss.str() << '\n';
+        } else if (message.content.IncomeCategory == "2") {
+
+            csvstream_UpperMiddleInc_ << mss.str() << '\n' << fss.str() << '\n';
+        } else if (message.content.IncomeCategory == "3") {
+
+            csvstream_upperInc_ << mss.str() << '\n' << fss.str() << '\n';
+        }
 
         // Reset row streams
         mss.str(std::string{});

@@ -158,8 +158,6 @@ void AnalysisModule::publish_result_message(RuntimeContext &context) const {
     for (int Entry = 0; Entry < context.NumberOfResultsCSVs; Entry++) {
         VectorOfModelResults.emplace_back(ModelResult{sample_size});
         VectorOfModelResults[Entry].IncomeCategory = std::to_string(Entry); 
-        std::cout << "VectorOfModelResults[Entry].IncomeCategory "
-                  << VectorOfModelResults[Entry].IncomeCategory << std::endl; 
     }
 
     auto handle = core::run_async(&AnalysisModule::calculate_historical_statistics, this,
@@ -172,17 +170,17 @@ void AnalysisModule::publish_result_message(RuntimeContext &context) const {
         context.identifier(), context.current_run(), context.time_now(), result));
 
 
-    /*for (int Entry = 0; Entry < context.NumberOfResultsCSVs; Entry++) {
+    for (int Entry = 0; Entry < context.NumberOfResultsCSVs; Entry++) {
 
         handle = core::run_async(&AnalysisModule::calculate_historical_statistics, this,
                                  std::ref(context), std::ref(result));
 
-        calculate_population_statistics(context, result);
+        calculate_population_statistics(context, VectorOfModelResults[Entry]);
         handle.get();
 
-        context.publish(std::make_unique<ResultEventMessage>(
-            context.identifier(), context.current_run(), context.time_now(), result));
-    }*/
+        context.publish(std::make_unique<ResultEventMessage>(context.identifier(), context.current_run(),
+                                                 context.time_now(), VectorOfModelResults[Entry]));
+    }
 }
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
