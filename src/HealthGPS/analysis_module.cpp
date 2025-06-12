@@ -13,6 +13,7 @@
 #include <oneapi/tbb/parallel_for_each.h>
 #include <set>
 #include <string>
+#include <vector>
 
 namespace hgps {
 
@@ -152,14 +153,36 @@ AnalysisModule::calculate_residual_disability_weight(int age, const core::Gender
 void AnalysisModule::publish_result_message(RuntimeContext &context) const {
     auto sample_size = context.age_range().upper() + 1u;
     auto result = ModelResult{sample_size};
+
+    auto VectorOfModelResults = std::vector<hgps::ModelResult>(); 
+    for (int Entry = 0; Entry < context.NumberOfResultsCSVs; Entry++) {
+        VectorOfModelResults.emplace_back(ModelResult{sample_size});
+        VectorOfModelResults[Entry].IncomeCategory = std::to_string(Entry); 
+        std::cout << "VectorOfModelResults[Entry].IncomeCategory "
+                  << VectorOfModelResults[Entry].IncomeCategory << std::endl; 
+    }
+
     auto handle = core::run_async(&AnalysisModule::calculate_historical_statistics, this,
                                   std::ref(context), std::ref(result));
 
-    calculate_population_statistics(context, result.series);
+    calculate_population_statistics(context, result);
     handle.get();
 
     context.publish(std::make_unique<ResultEventMessage>(
         context.identifier(), context.current_run(), context.time_now(), result));
+
+
+    /*for (int Entry = 0; Entry < context.NumberOfResultsCSVs; Entry++) {
+
+        handle = core::run_async(&AnalysisModule::calculate_historical_statistics, this,
+                                 std::ref(context), std::ref(result));
+
+        calculate_population_statistics(context, result);
+        handle.get();
+
+        context.publish(std::make_unique<ResultEventMessage>(
+            context.identifier(), context.current_run(), context.time_now(), result));
+    }*/
 }
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
@@ -323,7 +346,10 @@ DALYsIndicator AnalysisModule::calculate_dalys(Population &population, unsigned 
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
 void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
-                                                     DataSeries &series) const {
+                                                     ModelResult &result) const {
+    // extract DataSeries from ModelResult
+    DataSeries &series = result.series;
+
     if (series.size() > 0) {
         throw std::logic_error("This should be a new object!");
     }

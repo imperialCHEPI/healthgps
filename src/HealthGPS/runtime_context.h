@@ -111,6 +111,7 @@ class RuntimeContext {
     /// @return The value clamped to the factor's range if one exists, or the original value
     double ensure_risk_factor_in_range(const core::Identifier &factor_key,
                                        double value) const noexcept;
+    int NumberOfResultsCSVs = 4;
 
   private:
     std::shared_ptr<const EventAggregator> event_bus_;

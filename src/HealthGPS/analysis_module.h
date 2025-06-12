@@ -66,7 +66,7 @@ class AnalysisModule final : public UpdatableModule {
     DALYsIndicator calculate_dalys(Population &population, unsigned int max_age,
                                    unsigned int death_year) const;
 
-    void calculate_population_statistics(RuntimeContext &context, DataSeries &series) const;
+    void calculate_population_statistics(RuntimeContext &context, ModelResult &result) const;
 
     void classify_weight(hgps::DataSeries &series, const hgps::Person &entity) const;
     void initialise_output_channels(RuntimeContext &context);
