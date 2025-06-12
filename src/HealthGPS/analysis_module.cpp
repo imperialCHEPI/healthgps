@@ -322,6 +322,7 @@ DALYsIndicator AnalysisModule::calculate_dalys(Population &population, unsigned 
 }
 
 void AnalysisModule::calculate_population_statistics(RuntimeContext &context) {
+
     size_t num_factors_to_calculate =
         context.mapping().entries().size() - factors_to_calculate_.size();
 

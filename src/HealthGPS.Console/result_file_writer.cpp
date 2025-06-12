@@ -18,9 +18,35 @@ ResultFileWriter::ResultFileWriter(const std::filesystem::path &file_name, Exper
         throw std::invalid_argument(fmt::format("Cannot open output file: {}", file_name.string()));
     }
 
+    // create filenames
     auto output_filename = file_name;
+    auto output_filename_LowerInc = file_name;
+    auto output_filename_LowerMiddleInc = file_name;
+    auto output_filename_UpperMiddleInc = file_name;
+    auto output_filename_UpperInc = file_name;
+    
+    // replace .json extension to .csv extension
     output_filename.replace_extension("csv");
+    output_filename_LowerInc.replace_extension("_LowerInc.csv");
+    output_filename_LowerMiddleInc.replace_extension("_LowerMiddleInc.csv");
+    output_filename_UpperMiddleInc.replace_extension("_UpperMiddleInc.csv");
+    output_filename_UpperInc.replace_extension("_UpperInccsv");
+
+    /*fmt::print(fg(fmt::color::yellow) | fmt::emphasis::bold,
+               "\n\n\n\n\n\n\n\n\n\nResultsFileWriter Constructor, output_filename_LowerInc = "
+               "{}\n\n\n\n\n\n\n\n\n",
+               output_filename_LowerInc.string());*/
+    
+    // open .csv streams
     csvstream_.open(output_filename, std::ofstream::out | std::ofstream::app);
+    csvstream_LowerInc_.open(output_filename_LowerInc, std::ofstream::out | std::ofstream::app);
+    csvstream_LowerMiddleInc_.open(output_filename_LowerMiddleInc,
+                                   std::ofstream::out | std::ofstream::app);
+    csvstream_UpperMiddleInc_.open(output_filename_UpperMiddleInc,
+                                   std::ofstream::out | std::ofstream::app);
+    csvstream_upperInc_.open(output_filename_UpperInc, std::ofstream::out | std::ofstream::app);
+
+
     if (csvstream_.fail() || !csvstream_.is_open()) {
         throw std::invalid_argument(
             fmt::format("Cannot open output file: {}", output_filename.string()));
@@ -54,6 +80,16 @@ ResultFileWriter::~ResultFileWriter() {
     if (csvstream_.is_open()) {
         csvstream_.flush();
         csvstream_.close();
+
+        csvstream_LowerInc_.close();
+        csvstream_LowerMiddleInc_.close();
+        csvstream_UpperMiddleInc_.close();
+        csvstream_upperInc_.close();
+
+        csvstream_LowerInc_.close();
+        csvstream_LowerMiddleInc_.close();
+        csvstream_UpperMiddleInc_.close();
+        csvstream_upperInc_.close();
     }
 }
 
