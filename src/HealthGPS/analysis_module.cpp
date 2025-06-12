@@ -321,41 +321,6 @@ DALYsIndicator AnalysisModule::calculate_dalys(Population &population, unsigned 
                           .disability_adjusted_life_years = yll + yld};
 }
 
-void AnalysisModule::calculate_population_statistics(RuntimeContext &context) {
-
-    size_t num_factors_to_calculate =
-        context.mapping().entries().size() - factors_to_calculate_.size();
-
-    for (const auto &person : context.population()) {
-        // Get the bin index for each factor
-        std::vector<size_t> bin_indices;
-        for (size_t i = 0; i < factors_to_calculate_.size(); i++) {
-            double factor_value = person.get_risk_factor_value(factors_to_calculate_[i]);
-            auto bin_index =
-                static_cast<size_t>((factor_value - factor_min_values_[i]) / factor_bin_widths_[i]);
-            bin_indices.push_back(bin_index);
-        }
-
-        // Calculate the index in the calculated_stats_ vector
-        size_t index = 0;
-        for (size_t i = 0; i < bin_indices.size() - 1; i++) {
-            size_t accumulated_bins =
-                std::accumulate(std::next(factor_bins_.cbegin(), i + 1), factor_bins_.cend(),
-                                size_t{1}, std::multiplies<>());
-            index += bin_indices[i] * accumulated_bins * num_factors_to_calculate;
-        }
-        index += bin_indices.back() * num_factors_to_calculate;
-
-        // Now we can add the values of the factors that are not in factors_to_calculate_
-        for (const auto &factor : context.mapping().entries()) {
-            if (std::find(factors_to_calculate_.cbegin(), factors_to_calculate_.cend(),
-                          factor.key()) == factors_to_calculate_.cend()) {
-                calculated_stats_[index++] += person.get_risk_factor_value(factor.key());
-            }
-        }
-    }
-}
-
 // NOLINTBEGIN(readability-function-cognitive-complexity)
 void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
                                                      DataSeries &series) const {
