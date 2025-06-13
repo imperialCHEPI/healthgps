@@ -39,7 +39,7 @@ load_hlm_risk_model_definition(const nlohmann::json &opt);
 /// @param opt The parsed model definition JSON file
 /// @param config The model configuration
 /// @return An instance of the hgps::StaticLinearModelDefinition type
-std::unique_ptr<hgps::StaticLinearModelDefinition>
+std::unique_ptr<hgps::RiskFactorModelDefinition>
 load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configuration &config);
 
 /// @brief Loads the old energy balance model definition from a JSON file
@@ -70,6 +70,42 @@ load_risk_model_definition(hgps::RiskFactorModelType model_type,
 /// @throw std::invalid_argument if file is missing
 nlohmann::json load_json(const std::filesystem::path &filepath);
 
+/// @brief Loads risk factor coefficients from a CSV file
+/// @param csv_path The path to the CSV file containing the coefficients
+/// @param print_debug Whether to print debug information
+/// @return A map from risk factor names to their linear model parameters
+std::unordered_map<std::string, hgps::LinearModelParams>
+load_risk_factor_coefficients_from_csv(const std::filesystem::path &csv_path,
+                                       bool print_debug = true);
+
+/// @brief Loads policy ranges from a CSV file
+/// @param csv_path The path to the CSV file containing the policy ranges
+/// @return A map from risk factor names to their policy ranges
+std::unordered_map<std::string, hgps::core::DoubleInterval>
+load_policy_ranges_from_csv(const std::filesystem::path &csv_path);
+
+/// @brief Loads region prevalence data from a CSV file
+/// @param csv_path The path to the CSV file containing region prevalence data
+/// @return A map structure with region prevalence data by age, gender, and region
+std::unordered_map<core::Identifier,
+                   std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>>
+load_region_prevalence_from_csv(const std::filesystem::path &csv_path);
+
+/// @brief Loads ethnicity prevalence data from a CSV file
+/// @param csv_path The path to the CSV file containing ethnicity prevalence data
+/// @return A map structure with ethnicity prevalence data by age, gender, and ethnicity
+std::unordered_map<core::Identifier,
+                   std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>>
+load_ethnicity_prevalence_from_csv(const std::filesystem::path &csv_path);
+
+/// @brief Loads logistic regression coefficients from a CSV file
+/// @param csv_path The path to the CSV file containing the logistic regression coefficients
+/// @param print_debug Whether to print debug information
+/// @return A map from risk factor names to their linear model parameters
+std::unordered_map<std::string, hgps::LinearModelParams>
+load_logistic_regression_coefficients_from_csv(const std::filesystem::path &csv_path,
+                                               bool print_debug = true);
+
 /// @brief Registers a risk factor model definition with the repository
 /// @param repository The repository instance to register
 /// @param config The model configuration
@@ -80,5 +116,20 @@ void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
 /// @param value The string representation of the region
 /// @return The parsed region
 core::Region parse_region(const std::string &value);
+
+/// @brief Loads income model data from a CSV file
+/// @param csv_path The path to the CSV file containing income model data
+/// @param csv_path The path to the CSV file containing income model data
+/// @return A map structure with income data by age, gender, region and ethnicity
+std::unordered_map<core::Income, hgps::LinearModelParams>
+load_income_model_from_csv(const std::filesystem::path &csv_path);
+
+/// @brief Loads physical activity model data from a CSV file
+/// @param csv_path The path to the CSV file containing physical activity model data
+/// @param csv_path The path to the CSV file containing physical activity model data
+/// @return A map structure with physical activity data by age, gender, region, ethnicity and
+/// income_continous
+std::unordered_map<core::Identifier, hgps::LinearModelParams>
+load_physical_activity_model_from_csv(const std::filesystem::path &csv_path);
 
 } // namespace hgps::input

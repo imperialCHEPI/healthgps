@@ -92,6 +92,10 @@ class Population {
     /// @return Iterator to the element following the last Person.
     ConstIteratorType cend() const noexcept { return people_.cend(); }
 
+    /// @brief Checks if the population is empty
+    /// @return True if the population is empty, false otherwise
+    bool empty() const noexcept { return people_.empty(); }
+
   private:
     std::size_t initial_size_;
     std::vector<Person> people_;

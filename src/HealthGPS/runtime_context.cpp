@@ -14,7 +14,11 @@ int RuntimeContext::start_time() const noexcept { return model_start_time_; }
 
 unsigned int RuntimeContext::current_run() const noexcept { return current_run_; }
 
-int RuntimeContext::sync_timeout_millis() const noexcept { return inputs_->sync_timeout_ms(); }
+int RuntimeContext::sync_timeout_millis() const noexcept {
+    int timeout = inputs_->sync_timeout_ms();
+    // std::cout << "\nDEBUG: RuntimeContext::sync_timeout_millis - Value: " << timeout << "ms";
+    return timeout;
+}
 
 Population &RuntimeContext::population() noexcept { return population_; }
 
@@ -59,6 +63,20 @@ void RuntimeContext::publish(std::unique_ptr<EventMessage> message) const noexce
 
 void RuntimeContext::publish_async(std::unique_ptr<EventMessage> message) const noexcept {
     event_bus_->publish_async(std::move(message));
+}
+
+double RuntimeContext::ensure_risk_factor_in_range(const core::Identifier &factor_key,
+                                                   double value) const noexcept {
+    try {
+        // Look up the MappingEntry for this risk factor
+        const MappingEntry &entry = mapping().at(factor_key);
+
+        // Use the MappingEntry's get_bounded_value method to clamp the value to its range
+        return entry.get_bounded_value(value);
+    } catch (const std::exception &) {
+        // If the factor is not found or any other error occurs, return the original value
+        return value;
+    }
 }
 
 } // namespace hgps
