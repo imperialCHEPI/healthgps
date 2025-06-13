@@ -324,7 +324,7 @@ KevinHallAdjustmentTable KevinHallModel::receive_weight_adjustments(RuntimeConte
 
     // Intervention scenario: receive adjustments from baseline scenario.
     // Initialize message with a value that has_value() will return false for
-    std::optional<std::unique_ptr<SyncMessage>> message;
+    std::optional<std::unique_ptr<SyncMessage>> message = std::nullopt;
 
     // Keep trying until we get a message
     do {
