@@ -38,7 +38,7 @@ void download_file(const std::string &url, const std::filesystem::path &download
         throw std::runtime_error(fmt::format("Failed to create file {}", download_path.string()));
     }
 
-    fmt::println("Downloading data from {}", url);
+    fmt::print("Downloading data from {}\n", url);
 
     curlpp::Cleanup cleanup;
 
