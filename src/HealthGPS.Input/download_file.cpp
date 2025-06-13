@@ -1,11 +1,11 @@
 #include "download_file.h"
 #include "HealthGPS/program_dirs.h"
 
+#include <cstdlib>
 #include <fmt/format.h>
 #include <fstream>
 #include <random>
 #include <sstream>
-#include <cstdlib>
 #include <stdexcept>
 
 namespace {
@@ -32,15 +32,15 @@ bool download_with_system_tool(const std::string &url, const std::filesystem::pa
     // Try curl first
     auto curl_cmd = fmt::format("curl -L -o \"{}\" \"{}\"", output_path.string(), url);
     int curl_result = system(curl_cmd.c_str());
-    
+
     if (curl_result == 0 && std::filesystem::exists(output_path)) {
         return true;
     }
-    
+
     // Try wget as fallback
     auto wget_cmd = fmt::format("wget -O \"{}\" \"{}\"", output_path.string(), url);
     int wget_result = system(wget_cmd.c_str());
-    
+
     return (wget_result == 0 && std::filesystem::exists(output_path));
 }
 } // anonymous namespace
@@ -50,11 +50,13 @@ void download_file(const std::string &url, const std::filesystem::path &download
     fmt::print("Downloading data from {}\n", url);
 
     if (!download_with_system_tool(url, download_path)) {
-        throw std::runtime_error(fmt::format("Failed to download file from {} to {}", url, download_path.string()));
+        throw std::runtime_error(
+            fmt::format("Failed to download file from {} to {}", url, download_path.string()));
     }
-    
+
     if (!std::filesystem::exists(download_path)) {
-        throw std::runtime_error(fmt::format("Download succeeded but file {} was not created", download_path.string()));
+        throw std::runtime_error(
+            fmt::format("Download succeeded but file {} was not created", download_path.string()));
     }
 }
 
