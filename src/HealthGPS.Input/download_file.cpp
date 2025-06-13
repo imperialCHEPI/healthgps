@@ -1,15 +1,12 @@
 #include "download_file.h"
 #include "HealthGPS/program_dirs.h"
 
-#include <curlpp/Easy.hpp>
-#include <curlpp/Exception.hpp>
-#include <curlpp/Options.hpp>
-#include <curlpp/cURLpp.hpp>
 #include <fmt/format.h>
-
 #include <fstream>
 #include <random>
 #include <sstream>
+#include <cstdlib>
+#include <stdexcept>
 
 namespace {
 std::filesystem::path get_temporary_file_path(const std::string &file_prefix,
@@ -29,27 +26,36 @@ std::filesystem::path get_temporary_file_path(const std::string &file_prefix,
         }
     }
 }
+
+// Use system curl or wget to download file
+bool download_with_system_tool(const std::string &url, const std::filesystem::path &output_path) {
+    // Try curl first
+    auto curl_cmd = fmt::format("curl -L -o \"{}\" \"{}\"", output_path.string(), url);
+    int curl_result = system(curl_cmd.c_str());
+    
+    if (curl_result == 0 && std::filesystem::exists(output_path)) {
+        return true;
+    }
+    
+    // Try wget as fallback
+    auto wget_cmd = fmt::format("wget -O \"{}\" \"{}\"", output_path.string(), url);
+    int wget_result = system(wget_cmd.c_str());
+    
+    return (wget_result == 0 && std::filesystem::exists(output_path));
+}
 } // anonymous namespace
 
 namespace hgps::input {
 void download_file(const std::string &url, const std::filesystem::path &download_path) {
-    std::ofstream ofs{download_path, std::ios::binary};
-    if (!ofs) {
-        throw std::runtime_error(fmt::format("Failed to create file {}", download_path.string()));
-    }
-
     fmt::print("Downloading data from {}\n", url);
 
-    curlpp::Cleanup cleanup;
-
-    // Our request to be sent
-    curlpp::Easy request;
-    request.setOpt<curlpp::options::Url>(url);
-    request.setOpt<curlpp::options::FollowLocation>(true);
-    request.setOpt<curlpp::options::WriteStream>(&ofs);
-
-    // Make request
-    request.perform();
+    if (!download_with_system_tool(url, download_path)) {
+        throw std::runtime_error(fmt::format("Failed to download file from {} to {}", url, download_path.string()));
+    }
+    
+    if (!std::filesystem::exists(download_path)) {
+        throw std::runtime_error(fmt::format("Download succeeded but file {} was not created", download_path.string()));
+    }
 }
 
 std::filesystem::path download_file_to_temporary(const std::string &url,

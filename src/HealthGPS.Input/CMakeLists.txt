@@ -1,7 +1,6 @@
 find_package(fmt CONFIG REQUIRED)
 find_package(jsoncons CONFIG REQUIRED)
 find_package(libzippp CONFIG REQUIRED)
-find_package(unofficial-curlpp CONFIG REQUIRED)
 
 add_library(HealthGPS.Input STATIC "")
 target_compile_features(HealthGPS.Input PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
@@ -36,6 +35,6 @@ target_sources(
             "zip_file.h")
 
 target_link_libraries(HealthGPS.Input PRIVATE HealthGPS HealthGPS.Core fmt::fmt jsoncons
-                                              libzippp::libzippp unofficial::curlpp::curlpp)
+                                              libzippp::libzippp)
 
 set(ROOT_NAMESPACE hgps::input)
