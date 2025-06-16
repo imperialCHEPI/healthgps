@@ -18,26 +18,27 @@ ResultFileWriter::ResultFileWriter(const std::filesystem::path &file_name, Exper
         throw std::invalid_argument(fmt::format("Cannot open output file: {}", file_name.string()));
     }
 
-    // create filenames
+    // Create income-specific filenames for quartile-based output
+    // This creates 4 additional CSV files, one for each income quartile (0=low, 1=lower-middle, 2=upper-middle, 3=high)
     auto output_filename = file_name;
     auto output_filename_LowerInc = file_name;
     auto output_filename_LowerMiddleInc = file_name;
     auto output_filename_UpperMiddleInc = file_name;
     auto output_filename_UpperInc = file_name;
     
-    // replace .json extension to .csv extension
+    // replace .json extension to .csv extension with clearer names
     output_filename.replace_extension("csv");
-    output_filename_LowerInc.replace_extension("_LowerInc.csv");
-    output_filename_LowerMiddleInc.replace_extension("_LowerMiddleInc.csv");
-    output_filename_UpperMiddleInc.replace_extension("_UpperMiddleInc.csv");
-    output_filename_UpperInc.replace_extension("_UpperInc.csv");
+    output_filename_LowerInc.replace_extension("_Q1_LowIncome.csv");
+    output_filename_LowerMiddleInc.replace_extension("_Q2_LowerMiddleIncome.csv");
+    output_filename_UpperMiddleInc.replace_extension("_Q3_UpperMiddleIncome.csv");
+    output_filename_UpperInc.replace_extension("_Q4_HighIncome.csv");
 
     /*fmt::print(fg(fmt::color::yellow) | fmt::emphasis::bold,
                "\n\n\n\n\n\n\n\n\n\nResultsFileWriter Constructor, output_filename_LowerInc = "
                "{}\n\n\n\n\n\n\n\n\n",
                output_filename_LowerInc.string());*/
     
-    // open .csv streams
+    // open .csv streams for main file and all income quartiles
     csvstream_.open(output_filename, std::ofstream::out | std::ofstream::app);
     csvstream_LowerInc_.open(output_filename_LowerInc, std::ofstream::out | std::ofstream::app);
     csvstream_LowerMiddleInc_.open(output_filename_LowerMiddleInc,
@@ -46,29 +47,61 @@ ResultFileWriter::ResultFileWriter(const std::filesystem::path &file_name, Exper
                                    std::ofstream::out | std::ofstream::app);
     csvstream_upperInc_.open(output_filename_UpperInc, std::ofstream::out | std::ofstream::app);
 
-    if (csvstream_.fail() || !csvstream_.is_open()) {
+    // MAHIMA: comprehensive error checking for ALL streams, not just the main one
+    // This ensures that all income-quartile-specific CSV files are properly opened
+    if (csvstream_.fail() || !csvstream_.is_open() ||
+        csvstream_LowerInc_.fail() || !csvstream_LowerInc_.is_open() ||
+        csvstream_LowerMiddleInc_.fail() || !csvstream_LowerMiddleInc_.is_open() ||
+        csvstream_UpperMiddleInc_.fail() || !csvstream_UpperMiddleInc_.is_open() ||
+        csvstream_upperInc_.fail() || !csvstream_upperInc_.is_open()) {
         throw std::invalid_argument(
-            fmt::format("Cannot open output file: {}", output_filename.string()));
+            fmt::format("Failed to open one or more CSV output files. Base file: {}", output_filename.string()));
     }
 
     write_json_begin(output_filename);
 }
 
+// MAHIMA: Complete move constructor to handle ALL streams, not just main ones
+// This prevents resource leaks and ensures proper transfer of income-quartile streams
 ResultFileWriter::ResultFileWriter(ResultFileWriter &&other) noexcept
-    : stream_{std::move(other.stream_)}, csvstream_{std::move(other.csvstream_)},
+    : stream_{std::move(other.stream_)}, 
+      csvstream_{std::move(other.csvstream_)},
+      csvstream_LowerInc_{std::move(other.csvstream_LowerInc_)},
+      csvstream_LowerMiddleInc_{std::move(other.csvstream_LowerMiddleInc_)},
+      csvstream_UpperMiddleInc_{std::move(other.csvstream_UpperMiddleInc_)},
+      csvstream_upperInc_{std::move(other.csvstream_upperInc_)},
       info_{std::move(other.info_)} {}
 
+// MAHIMA: Complete move assignment operator to handle ALL streams
+// This ensures proper resource management when moving ResultFileWriter objects
+//This was preventing the results to be written for all quartiles and not just the highest
 ResultFileWriter &ResultFileWriter::operator=(ResultFileWriter &&other) noexcept {
+    // Close existing streams before moving
     stream_.close();
     stream_ = std::move(other.stream_);
 
     csvstream_.close();
     csvstream_ = std::move(other.csvstream_);
+    
+    // Handle income-quartile-specific streams
+    csvstream_LowerInc_.close();
+    csvstream_LowerInc_ = std::move(other.csvstream_LowerInc_);
+    
+    csvstream_LowerMiddleInc_.close();
+    csvstream_LowerMiddleInc_ = std::move(other.csvstream_LowerMiddleInc_);
+    
+    csvstream_UpperMiddleInc_.close();
+    csvstream_UpperMiddleInc_ = std::move(other.csvstream_UpperMiddleInc_);
+    
+    csvstream_upperInc_.close();
+    csvstream_upperInc_ = std::move(other.csvstream_upperInc_);
 
     info_ = std::move(other.info_);
     return *this;
 }
 
+// MAHIMA: Remove duplicate stream closures that were causing potential crashes
+// Original code had duplicate close() calls for all income-quartile streams
 ResultFileWriter::~ResultFileWriter() {
     if (stream_.is_open()) {
         write_json_end();
@@ -80,15 +113,26 @@ ResultFileWriter::~ResultFileWriter() {
         csvstream_.flush();
         csvstream_.close();
 
-        csvstream_LowerInc_.close();
-        csvstream_LowerMiddleInc_.close();
-        csvstream_UpperMiddleInc_.close();
-        csvstream_upperInc_.close();
-
-        csvstream_LowerInc_.close();
-        csvstream_LowerMiddleInc_.close();
-        csvstream_UpperMiddleInc_.close();
-        csvstream_upperInc_.close();
+        // MAHIMA: Close income-quartile-specific streams (FIXED: removed duplicate calls)
+        if (csvstream_LowerInc_.is_open()) {
+            csvstream_LowerInc_.flush();
+            csvstream_LowerInc_.close();
+        }
+        
+        if (csvstream_LowerMiddleInc_.is_open()) {
+            csvstream_LowerMiddleInc_.flush();
+            csvstream_LowerMiddleInc_.close();
+        }
+        
+        if (csvstream_UpperMiddleInc_.is_open()) {
+            csvstream_UpperMiddleInc_.flush();
+            csvstream_UpperMiddleInc_.close();
+        }
+        
+        if (csvstream_upperInc_.is_open()) {
+            csvstream_upperInc_.flush();
+            csvstream_upperInc_.close();
+        }
     }
 }
 
@@ -181,6 +225,7 @@ void ResultFileWriter::write_csv_header(const hgps::ResultEventMessage &message)
 
     std::string StartOfHeaderString = "source,run,time,gender_name,index_id";
 
+    // Write headers to all CSV files (main + 4 income quartiles)
     csvstream_ << StartOfHeaderString;
     csvstream_LowerInc_ << StartOfHeaderString;
     csvstream_LowerMiddleInc_ << StartOfHeaderString;
@@ -201,6 +246,7 @@ void ResultFileWriter::write_csv_header(const hgps::ResultEventMessage &message)
     csvstream_UpperMiddleInc_ << '\n';
     csvstream_upperInc_ << '\n';
 
+    // MAHIMA: Ensure all headers are written immediately
     csvstream_.flush();
     csvstream_LowerInc_.flush();
     csvstream_LowerMiddleInc_.flush();
@@ -226,25 +272,21 @@ void ResultFileWriter::write_csv_channels(const hgps::ResultEventMessage &messag
             fss << sep << series.at(Gender::female, key).at(index);
         }
 
-        /// extract "message" to appropriate .csv stream
+        // INCOME QUARTILE ROUTING: Extract message to appropriate .csv stream based on IncomeCategory
+        // "All" -> main CSV, "0" -> low income, "1" -> lower-middle, "2" -> upper-middle, "3" -> high income
         if (message.content.IncomeCategory == "All") {
-
             csvstream_ << mss.str() << '\n' << fss.str() << '\n';
         } else if (message.content.IncomeCategory == "0") {
-
             csvstream_LowerInc_ << mss.str() << '\n' << fss.str() << '\n';
         } else if (message.content.IncomeCategory == "1") {
-
             csvstream_LowerMiddleInc_ << mss.str() << '\n' << fss.str() << '\n';
         } else if (message.content.IncomeCategory == "2") {
-
             csvstream_UpperMiddleInc_ << mss.str() << '\n' << fss.str() << '\n';
         } else if (message.content.IncomeCategory == "3") {
-
             csvstream_upperInc_ << mss.str() << '\n' << fss.str() << '\n';
         }
 
-        // Reset row streams
+        // Reset row streams for next iteration
         mss.str(std::string{});
         mss.clear();
 

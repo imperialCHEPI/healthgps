@@ -230,12 +230,32 @@ void AnalysisModule::calculate_historical_statistics(RuntimeContext &context,
     auto population_size = static_cast<int>(context.population().size());
     auto population_dead = 0;
     auto population_migrated = 0;
+    
+    // MAHIMA: Debug counters for filtering
+    int total_people = 0;
+    int people_in_category = 0;
+    int people_missing_income_category = 0;
+    
     for (const auto &entity : context.population()) {
+        total_people++;
 
         //// Only do this proposed loop if considering all income categories, or if the person belongs to this particular income category. 
-        if (IncomeCategory != "All" &&
-            std::stod(IncomeCategory) != entity.risk_factors.at("income_category"))
-            continue;
+        if (IncomeCategory != "All") {
+            // MAHIMA: Safety check - ensure income_category exists
+            if (!entity.risk_factors.contains(core::Identifier("income_category"))) {
+                people_missing_income_category++;
+                continue; // Skip this person if they don't have income_category
+            }
+            
+            double person_income_category = entity.risk_factors.at(core::Identifier("income_category"));
+            double target_income_category = std::stod(IncomeCategory);
+            
+            if (person_income_category != target_income_category) {
+                continue;
+            }
+        }
+        
+        people_in_category++;
 
         if (!entity.is_active()) {
             if (entity.has_emigrated() && entity.time_of_migration() == analysis_time) {
@@ -313,6 +333,15 @@ void AnalysisModule::calculate_historical_statistics(RuntimeContext &context,
                                        .female = item.second.female * 100.0 / females_count});
     }
 
+    // MAHIMA: Debug output for income category filtering
+    /*std::cout << "\n=== ANALYSIS FILTERING DEBUG (Category: " << IncomeCategory
+                   << ") ===" << std::endl;
+    std::cout << "Total people in population: " << total_people << std::endl;
+    std::cout << "People missing income_category: " << people_missing_income_category << std::endl;
+    std::cout << "People in this category: " << people_in_category << std::endl;
+    std::cout << "Males alive in category: " << males_count << std::endl;
+    std::cout << "Females alive in category: " << females_count << std::endl;*/ 
+
     result.indicators = daly_handle.get();
 }
 // NOLINTEND(readability-function-cognitive-complexity)
@@ -342,9 +371,19 @@ DALYsIndicator AnalysisModule::calculate_dalys(Population &population, unsigned 
 
         //// Only do this proposed loop if considering all income categories, or if the person
         ///belongs to this particular income category.
-        if (IncomeCategory != "All" &&
-            std::stod(IncomeCategory) != entity.risk_factors.at("income_category"))
-            continue; 
+        if (IncomeCategory != "All") {
+            // MAHIMA: Safety check - ensure income_category exists
+            if (!entity.risk_factors.contains(core::Identifier("income_category"))) {
+                continue; // Skip this person if they don't have income_category
+            }
+            
+            double person_income_category = entity.risk_factors.at(core::Identifier("income_category"));
+            double target_income_category = std::stod(IncomeCategory);
+            
+            if (person_income_category != target_income_category) {
+                continue;
+            }
+        }
 
         if (entity.time_of_death() == death_year && entity.age <= max_age) {
             auto male_reference_age =
@@ -399,9 +438,19 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
 
         //// Only do this proposed loop if considering all income categories, or if the person
         /// belongs to this particular income category.
-        if (IncomeCategory != "All" &&
-            std::stod(IncomeCategory) != person.risk_factors.at("income_category"))
-            continue; 
+        if (IncomeCategory != "All") {
+            // MAHIMA: Safety check - ensure income_category exists
+            if (!person.risk_factors.contains(core::Identifier("income_category"))) {
+                continue; // Skip this person if they don't have income_category
+            }
+            
+            double person_income_category = person.risk_factors.at(core::Identifier("income_category"));
+            double target_income_category = std::stod(IncomeCategory);
+            
+            if (person_income_category != target_income_category) {
+                continue;
+            }
+        }
 
         auto age = person.age;
         auto gender = person.gender;

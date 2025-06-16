@@ -209,7 +209,7 @@ void DemographicModule::initialise_age_gender(RuntimeContext &context) {
 }
 
 // Made structural change- Mahima
-// This function now is used to initialise population with age, gender, region, ethncicty, income
+// PHRASE 1:This function now is used to initialise population with age, gender, region, ethncicty, income
 void DemographicModule::initialise_population(RuntimeContext &context) {
     // Store context reference for range validation
     context_ = &context;
@@ -228,9 +228,20 @@ void DemographicModule::initialise_population(RuntimeContext &context) {
             initialise_region(context, person, context.random());
             initialise_ethnicity(context, person, context.random());
             initialise_income_continuous(context, person, context.random());
+            // DON'T assign income_category yet!
+        }
+    }
+    
+    // MAHIMA: PHASE 2 - Calculate quartiles ONCE based on everyone's income_continuous
+    calculate_income_quartiles(context.population());
+    
+    // MAHIMA: PHASE 3 - Assign income_category to everyone using the calculated quartiles
+    for (auto &person : context.population()) {
+        if (person.is_active()) {
             initialise_income_category(person, context.population());
         }
     }
+    
     // std::cout << "Finished assigning age, gender, region, ethnicity, income-continuous and
     // income-category to everybody!";
 }
@@ -488,51 +499,39 @@ void DemographicModule::initialise_income_continuous([[maybe_unused]] RuntimeCon
 // NOLINTEND(readability-function-cognitive-complexity)
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
-void DemographicModule::initialise_income_category(Person &person, const Population &population) {
+void DemographicModule::initialise_income_category(Person &person,[[maybe_unused]] const Population &population) {
     // Apply the income category based on the person's income_continuous value and current
     // thresholds
     // std::cout << "\nDEBUG: Inside initialise_income_category";
+    
+    // MAHIMA: Quartiles should already be calculated - don't recalculate here!
     if (income_quartile_thresholds_.empty()) {
-        calculate_income_quartiles(population);
+        std::cout << "\nERROR: Quartile thresholds not calculated yet!" << std::endl;
+        return;
     }
 
     double income_value = person.income_continuous;
 
+    // MAHIMA: Fixed quartile assignment logic to ensure proper distribution
+    // Use <= for all boundaries to avoid gaps and ensure proper 25% distribution
     if (income_value <= income_quartile_thresholds_[0]) {
         person.income = core::Income::low;
         person.income_category = 0;
-        if (context_) {
-            person.set_risk_factor(*context_, core::Identifier("income_category"), 0.0); // Low = 0
-        } else {
-            person.risk_factors[core::Identifier("income_category")] = 0.0; // Low = 0
-        }
+        person.risk_factors[core::Identifier("income_category")] = 0.0; // Low = 0
     } else if (income_value <= income_quartile_thresholds_[1]) {
         person.income = core::Income::lowermiddle;
         person.income_category = 1;
-        if (context_) {
-            person.set_risk_factor(*context_, core::Identifier("income_category"),
-                                   1.0); // Lower middle = 1
-        } else {
-            person.risk_factors[core::Identifier("income_category")] = 1.0; // Lower middle = 1
-        }
+        person.risk_factors[core::Identifier("income_category")] = 1.0; // Lowermiddle = 1
     } else if (income_value <= income_quartile_thresholds_[2]) {
         person.income = core::Income::uppermiddle;
         person.income_category = 2;
-        if (context_) {
-            person.set_risk_factor(*context_, core::Identifier("income_category"),
-                                   2.0); // Upper middle = 2
-        } else {
-            person.risk_factors[core::Identifier("income_category")] = 2.0; // Upper middle = 2
-        }
+        person.risk_factors[core::Identifier("income_category")] = 2.0; // Uppermiddle = 2
     } else {
         person.income = core::Income::high;
         person.income_category = 3;
-        if (context_) {
-            person.set_risk_factor(*context_, core::Identifier("income_category"), 3.0); // High = 3
-        } else {
-            person.risk_factors[core::Identifier("income_category")] = 3.0; // High = 3
-        }
+        person.risk_factors[core::Identifier("income_category")] = 3.0; // High = 3
     }
+
     // std::cout << "\nDEBUG: Finished initialise_income_category";
 }
 // NOLINTEND(readability-function-cognitive-complexity)
@@ -552,21 +551,27 @@ void DemographicModule::calculate_income_quartiles(const Population &population)
     // Sort to find quartile thresholds
     std::sort(sorted_incomes.begin(), sorted_incomes.end());
 
-
-
     //std::cout << "\n\ncalculate_income_quartiles\n\n\n"; 
 
     size_t n = sorted_incomes.size();
     income_quartile_thresholds_.resize(3);
-    income_quartile_thresholds_[0] = sorted_incomes[n / 4];     // 25th percentile
-    income_quartile_thresholds_[1] = sorted_incomes[n / 2];     // 50th percentile
-    income_quartile_thresholds_[2] = sorted_incomes[3 * n / 4]; // 75th percentile
-
-    /*for (int Index = 0; Index < 200; Index++)
-    {
-        std::cout << "Index " << Index << ", income " << sorted_incomes[Index] << std::endl; 
-    }*/
-
+    
+    // MAHIMA: Fixed quartile calculation to ensure proper 25% distribution
+    // Use indices that will split population into exactly 4 equal groups
+    size_t q1_index = n / 4;
+    size_t q2_index = n / 2;  
+    size_t q3_index = (3 * n) / 4;
+    
+    // MAHIMA: Use exact quartile values - FIXED: use index-1 to get proper boundaries
+    if (q1_index > 0 && q1_index <= n) {
+        income_quartile_thresholds_[0] = sorted_incomes[q1_index - 1]; // Exact 25th percentile boundary
+    }
+    if (q2_index > 0 && q2_index <= n) {
+        income_quartile_thresholds_[1] = sorted_incomes[q2_index - 1]; // Exact 50th percentile boundary
+    }
+    if (q3_index > 0 && q3_index <= n) {
+        income_quartile_thresholds_[2] = sorted_incomes[q3_index - 1]; // Exact 75th percentile boundary
+    }
 
     // std::cout << "\nDEBUG: Finsihed calculating quartiles- gave data to
     // initialise_income_category";
@@ -596,9 +601,6 @@ void DemographicModule::update_population(RuntimeContext &context,
         }
     }
 
-    // Update demographic variables including income categories
-    update_income_category(context);
-
     // apply births events
     auto last_year_births_rate = get_birth_rate(context.time_now() - 1);
     auto number_of_boys = static_cast<int>(last_year_births_rate.males * initial_pop_size);
@@ -607,8 +609,12 @@ void DemographicModule::update_population(RuntimeContext &context,
     context.population().add_newborn_babies(number_of_girls, core::Gender::female,
                                             context.time_now());
 
-    // Initialize demographic variables for newborns
+    // Initialize demographic variables for newborns (except income_category)
     initialize_newborns(context);
+
+    // MAHIMA: Update demographic variables including income categories AFTER adding newborns
+    // This ensures quartiles are calculated on the complete population
+    update_income_category(context);
 
     // Calculate statistics.
     auto simulated_death_rate = number_of_deaths * 1000.0 / initial_pop_size;
@@ -624,29 +630,78 @@ void DemographicModule::update_income_category(RuntimeContext &context) {
     // First recalculate the income quartiles based on current population
     calculate_income_quartiles(context.population());
 
-    /*std::cout << "update_income_category\n"
-              << " quartile 1 " << income_quartile_thresholds_[0] << std::endl
-              << " quartile 2 " << income_quartile_thresholds_[1] << std::endl
-              << " quartile 3 " << income_quartile_thresholds_[2] << std::endl; */
-
     // Then update everyone's income category
-
-    int Counter = 0; 
-
     for (auto &person : context.population()) {
         if (person.is_active()) {
-            initialise_income_category(person, context.population());
-
-            //if (Counter++ < 20 && person.risk_factors.at("income_category") < 1.0)
-            //{
-            //    std::cout << "\nPerson ID: " << person.id() /*<< ", Age: " << person.age*/
-
-            //              << ", income_continuous: " << person.income_continuous
-            //              << ", income_category "
-            //              << person.risk_factors.at("income_category");
-            //}
+            double income_value = person.income_continuous;
+            
+            // Direct quartile assignment logic
+            if (income_value <= income_quartile_thresholds_[0]) {
+                person.income = core::Income::low;
+                person.income_category = 0;
+                person.risk_factors[core::Identifier("income_category")] = 0.0; 
+            } else if (income_value <= income_quartile_thresholds_[1]) {
+                person.income = core::Income::lowermiddle;
+                person.income_category = 1;
+                person.risk_factors[core::Identifier("income_category")] = 1.0; 
+            } else if (income_value <= income_quartile_thresholds_[2]) {
+                person.income = core::Income::uppermiddle;
+                person.income_category = 2;
+                person.risk_factors[core::Identifier("income_category")] = 2.0; 
+            } else {
+                person.income = core::Income::high;
+                person.income_category = 3;
+                person.risk_factors[core::Identifier("income_category")] = 3.0; 
+            }
         }
     }
+
+    // MAHIMA: Temporary debug check to verify consistency between storage locations for why the Q1_LowIncome.csv was 0
+    //the problem was the income_category factor is defined with a range like [1.0, 4.0] instead of [0.0, 3.0], so 0.0 gets clamped to the minimum value 1.0
+    //hence the 1st quartile file was empty
+    /* int consistency_check_count = 0;
+    int category_0_direct_count = 0;
+    int category_0_risk_factors_count = 0;
+    int mismatches = 0;
+    
+    for (const auto &person : context.population()) {
+        if (person.is_active() && consistency_check_count < 50) {
+            consistency_check_count++;
+            
+            // Check direct field
+            if (person.income_category == 0) {
+                category_0_direct_count++;
+            }
+            
+            // Check risk_factors map
+            if (person.risk_factors.contains(core::Identifier("income_category"))) {
+                double rf_value = person.risk_factors.at(core::Identifier("income_category"));
+                if (rf_value == 0.0) {
+                    category_0_risk_factors_count++;
+                }
+                
+                // Check for mismatch
+                if (static_cast<double>(person.income_category) != rf_value) {
+                    mismatches++;
+                    if (mismatches <= 5) {
+                        std::cout << "\nMISMATCH: Person ID " << person.id() 
+                                  << " income_category=" << person.income_category 
+                                  << " risk_factors=" << rf_value << std::endl;
+                    }
+                }
+            } else {
+                std::cout << "\nMISSING: Person ID " << person.id() 
+                          << " has no income_category in risk_factors!" << std::endl;
+                mismatches++;
+            }
+        }
+    }
+    
+    std::cout << "\n=== CONSISTENCY CHECK ===" << std::endl;
+    std::cout << "Checked " << consistency_check_count << " people" << std::endl;
+    std::cout << "Category 0 (direct field): " << category_0_direct_count << std::endl;
+    std::cout << "Category 0 (risk_factors): " << category_0_risk_factors_count << std::endl;
+    std::cout << "Mismatches found: " << mismatches << std::endl;*/
 }
 
 void DemographicModule::update_residual_mortality(RuntimeContext &context,
@@ -829,31 +884,6 @@ void DemographicModule::initialize_newborns(RuntimeContext &context) {
             initialise_ethnicity(context, person, context.random());
             initialise_income_continuous(context, person, context.random());
             initialise_income_category(person, context.population());
-
-            // Double-check that income_category was properly added
-            if (!person.risk_factors.contains(core::Identifier("income_category"))) {
-                std::cout << "\nDEBUG: Adding missing income_category risk factor for newborn";
-                double income_value = 0.0;
-                switch (person.income) {
-                case core::Income::low:
-                    income_value = 0.0;
-                    break;
-                case core::Income::lowermiddle:
-                    income_value = 1.0;
-                    break;
-                case core::Income::uppermiddle:
-                    income_value = 2.0;
-                    break;
-                case core::Income::high:
-                    income_value = 3.0;
-                    break;
-                case core::Income::unknown:
-                default:
-                    income_value = 0.0; // Default to low income if unknown
-                    break;
-                }
-                person.risk_factors[core::Identifier("income_category")] = income_value;
-            }
         }
     }
 
@@ -861,10 +891,10 @@ void DemographicModule::initialize_newborns(RuntimeContext &context) {
     // std::endl;
 }
 
-// Added update continuous income using teh same logic as initialization where it depends on age,
+// Added update continuous income using the same logic as initialization where it depends on age,
 // gender, region,ethnicity and noise- Mahima
-//  Here for update, the previous noise is considred to maintain longitudanal correlation of
-//  residuals/noise (whatever you wnat to call them)
+//  Here for update, the previous noise is considered to maintain longitudanal correlation of
+//  residuals/noise (whatever you want to call them)
 //  NOLINTBEGIN(readability-function-cognitive-complexity)
 void DemographicModule::update_income_continuous([[maybe_unused]] RuntimeContext &context,
                                                  Person &person, Random &random) {
