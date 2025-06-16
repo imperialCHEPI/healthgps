@@ -209,7 +209,8 @@ void DemographicModule::initialise_age_gender(RuntimeContext &context) {
 }
 
 // Made structural change- Mahima
-// PHRASE 1:This function now is used to initialise population with age, gender, region, ethncicty, income
+// PHRASE 1:This function now is used to initialise population with age, gender, region, ethncicty,
+// income
 void DemographicModule::initialise_population(RuntimeContext &context) {
     // Store context reference for range validation
     context_ = &context;
@@ -231,17 +232,17 @@ void DemographicModule::initialise_population(RuntimeContext &context) {
             // DON'T assign income_category yet!
         }
     }
-    
+
     // MAHIMA: PHASE 2 - Calculate quartiles ONCE based on everyone's income_continuous
     calculate_income_quartiles(context.population());
-    
+
     // MAHIMA: PHASE 3 - Assign income_category to everyone using the calculated quartiles
     for (auto &person : context.population()) {
         if (person.is_active()) {
             initialise_income_category(person, context.population());
         }
     }
-    
+
     // std::cout << "Finished assigning age, gender, region, ethnicity, income-continuous and
     // income-category to everybody!";
 }
@@ -499,11 +500,12 @@ void DemographicModule::initialise_income_continuous([[maybe_unused]] RuntimeCon
 // NOLINTEND(readability-function-cognitive-complexity)
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
-void DemographicModule::initialise_income_category(Person &person,[[maybe_unused]] const Population &population) {
+void DemographicModule::initialise_income_category(Person &person,
+                                                   [[maybe_unused]] const Population &population) {
     // Apply the income category based on the person's income_continuous value and current
     // thresholds
     // std::cout << "\nDEBUG: Inside initialise_income_category";
-    
+
     // MAHIMA: Quartiles should already be calculated - don't recalculate here!
     if (income_quartile_thresholds_.empty()) {
         std::cout << "\nERROR: Quartile thresholds not calculated yet!" << std::endl;
@@ -551,26 +553,29 @@ void DemographicModule::calculate_income_quartiles(const Population &population)
     // Sort to find quartile thresholds
     std::sort(sorted_incomes.begin(), sorted_incomes.end());
 
-    //std::cout << "\n\ncalculate_income_quartiles\n\n\n"; 
+    // std::cout << "\n\ncalculate_income_quartiles\n\n\n";
 
     size_t n = sorted_incomes.size();
     income_quartile_thresholds_.resize(3);
-    
+
     // MAHIMA: Fixed quartile calculation to ensure proper 25% distribution
     // Use indices that will split population into exactly 4 equal groups
     size_t q1_index = n / 4;
-    size_t q2_index = n / 2;  
+    size_t q2_index = n / 2;
     size_t q3_index = (3 * n) / 4;
-    
+
     // MAHIMA: Use exact quartile values - FIXED: use index-1 to get proper boundaries
     if (q1_index > 0 && q1_index <= n) {
-        income_quartile_thresholds_[0] = sorted_incomes[q1_index - 1]; // Exact 25th percentile boundary
+        income_quartile_thresholds_[0] =
+            sorted_incomes[q1_index - 1]; // Exact 25th percentile boundary
     }
     if (q2_index > 0 && q2_index <= n) {
-        income_quartile_thresholds_[1] = sorted_incomes[q2_index - 1]; // Exact 50th percentile boundary
+        income_quartile_thresholds_[1] =
+            sorted_incomes[q2_index - 1]; // Exact 50th percentile boundary
     }
     if (q3_index > 0 && q3_index <= n) {
-        income_quartile_thresholds_[2] = sorted_incomes[q3_index - 1]; // Exact 75th percentile boundary
+        income_quartile_thresholds_[2] =
+            sorted_incomes[q3_index - 1]; // Exact 75th percentile boundary
     }
 
     // std::cout << "\nDEBUG: Finsihed calculating quartiles- gave data to
@@ -634,69 +639,71 @@ void DemographicModule::update_income_category(RuntimeContext &context) {
     for (auto &person : context.population()) {
         if (person.is_active()) {
             double income_value = person.income_continuous;
-            
+
             // Direct quartile assignment logic
             if (income_value <= income_quartile_thresholds_[0]) {
                 person.income = core::Income::low;
                 person.income_category = 0;
-                person.risk_factors[core::Identifier("income_category")] = 0.0; 
+                person.risk_factors[core::Identifier("income_category")] = 0.0;
             } else if (income_value <= income_quartile_thresholds_[1]) {
                 person.income = core::Income::lowermiddle;
                 person.income_category = 1;
-                person.risk_factors[core::Identifier("income_category")] = 1.0; 
+                person.risk_factors[core::Identifier("income_category")] = 1.0;
             } else if (income_value <= income_quartile_thresholds_[2]) {
                 person.income = core::Income::uppermiddle;
                 person.income_category = 2;
-                person.risk_factors[core::Identifier("income_category")] = 2.0; 
+                person.risk_factors[core::Identifier("income_category")] = 2.0;
             } else {
                 person.income = core::Income::high;
                 person.income_category = 3;
-                person.risk_factors[core::Identifier("income_category")] = 3.0; 
+                person.risk_factors[core::Identifier("income_category")] = 3.0;
             }
         }
     }
 
-    // MAHIMA: Temporary debug check to verify consistency between storage locations for why the Q1_LowIncome.csv was 0
-    //the problem was the income_category factor is defined with a range like [1.0, 4.0] instead of [0.0, 3.0], so 0.0 gets clamped to the minimum value 1.0
-    //hence the 1st quartile file was empty
+    // MAHIMA: Temporary debug check to verify consistency between storage locations for why the
+    // Q1_LowIncome.csv was 0
+    // the problem was the income_category factor is defined with a range like [1.0, 4.0] instead of
+    // [0.0, 3.0], so 0.0 gets clamped to the minimum value 1.0 hence the 1st quartile file was
+    // empty
     /* int consistency_check_count = 0;
     int category_0_direct_count = 0;
     int category_0_risk_factors_count = 0;
     int mismatches = 0;
-    
+
     for (const auto &person : context.population()) {
         if (person.is_active() && consistency_check_count < 50) {
             consistency_check_count++;
-            
+
             // Check direct field
             if (person.income_category == 0) {
                 category_0_direct_count++;
             }
-            
+
             // Check risk_factors map
             if (person.risk_factors.contains(core::Identifier("income_category"))) {
                 double rf_value = person.risk_factors.at(core::Identifier("income_category"));
                 if (rf_value == 0.0) {
                     category_0_risk_factors_count++;
                 }
-                
+
                 // Check for mismatch
                 if (static_cast<double>(person.income_category) != rf_value) {
                     mismatches++;
                     if (mismatches <= 5) {
-                        std::cout << "\nMISMATCH: Person ID " << person.id() 
-                                  << " income_category=" << person.income_category 
+                        std::cout << "\nMISMATCH: Person ID " << person.id()
+                                  << " income_category=" << person.income_category
                                   << " risk_factors=" << rf_value << std::endl;
                     }
                 }
             } else {
-                std::cout << "\nMISSING: Person ID " << person.id() 
+                std::cout << "\nMISSING: Person ID " << person.id()
                           << " has no income_category in risk_factors!" << std::endl;
                 mismatches++;
             }
         }
     }
-    
+
     std::cout << "\n=== CONSISTENCY CHECK ===" << std::endl;
     std::cout << "Checked " << consistency_check_count << " people" << std::endl;
     std::cout << "Category 0 (direct field): " << category_0_direct_count << std::endl;

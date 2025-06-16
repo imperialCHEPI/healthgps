@@ -89,12 +89,12 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
     }
 
     //// Print weight values for a sample of people after adjustment
-    //std::cout << "\n===== WEIGHT ADJUSTMENT CHECK: SAMPLE OF 5 PEOPLE =====";
-    //int sample_count = 0;
-    //int print_interval = std::max(1, static_cast<int>(context.population().size() / 5));
-    //for (const auto &person : context.population()) {
-    //    if (!person.is_active())
-    //        continue;
+    // std::cout << "\n===== WEIGHT ADJUSTMENT CHECK: SAMPLE OF 5 PEOPLE =====";
+    // int sample_count = 0;
+    // int print_interval = std::max(1, static_cast<int>(context.population().size() / 5));
+    // for (const auto &person : context.population()) {
+    //     if (!person.is_active())
+    //         continue;
 
     //    if (person.id() % print_interval == 0 && sample_count < 5) {
     //        std::cout << "\nPerson ID: " << person.id() << ", Age: " << person.age
@@ -106,7 +106,7 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
     //    if (sample_count >= 5)
     //        break;
     //}
-    //std::cout << "\n================================================\n";
+    // std::cout << "\n================================================\n";
 
     // Compute weight power means by sex and age.
     auto W_power_means = compute_mean_weight(context.population(), height_slope_);

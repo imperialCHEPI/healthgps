@@ -79,8 +79,8 @@ struct ModelResult {
     /// @return Number of recycled population slots
     int number_of_recyclable() const noexcept;
 
-    // identifier saying which Income category this model result will apply to. 
-    std::string IncomeCategory = "All"; 
+    // identifier saying which Income category this model result will apply to.
+    std::string IncomeCategory = "All";
 
   private:
     std::size_t caluclate_min_padding() const noexcept;

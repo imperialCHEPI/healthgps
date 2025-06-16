@@ -61,7 +61,6 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             continue;
         }
 
-
         if (person.age == 0) {
             // For newborns, initialize demographic variables
             // initialise_sector(person, context.random());
@@ -255,7 +254,7 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
         // HACK: To maintain longitudinal correlation among peeople, amend their "probability of
         // being a zero" according to their current zero-probability...
         // ... and either 1 if they were a zero, or 0 if they were not.
-        if (person.risk_factors[names_[i]] == 0) { 
+        if (person.risk_factors[names_[i]] == 0) {
             zero_probability = (zero_probability + 1.0) / 2.0;
         } else {
             zero_probability = (zero_probability + 0.0) / 2.0;

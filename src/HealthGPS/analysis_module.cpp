@@ -156,15 +156,16 @@ void AnalysisModule::publish_result_message(RuntimeContext &context) const {
     auto result = ModelResult{sample_size};
 
     //// Make vector ModelResult objects, each with different IncomeCategory values
-    auto VectorOfModelResults = std::vector<hgps::ModelResult>(); 
+    auto VectorOfModelResults = std::vector<hgps::ModelResult>();
     for (int Entry = 0; Entry < context.NumberOfResultsCSVs; Entry++) {
         VectorOfModelResults.emplace_back(ModelResult{sample_size});
-        VectorOfModelResults[Entry].IncomeCategory = std::to_string(Entry); 
+        VectorOfModelResults[Entry].IncomeCategory = std::to_string(Entry);
     }
-    
-    //// Run calculate_historical_statistics and calculate_population_statistics for "result", which is a ModelResult object where ModelResult::IncomeCategory has the default value "All"
-    
-    //// Run calculate_historical_statistics asyncrhonously, placing a "handle" on it. 
+
+    //// Run calculate_historical_statistics and calculate_population_statistics for "result", which
+    ///is a ModelResult object where ModelResult::IncomeCategory has the default value "All"
+
+    //// Run calculate_historical_statistics asyncrhonously, placing a "handle" on it.
     auto handle = core::run_async(&AnalysisModule::calculate_historical_statistics, this,
                                   std::ref(context), std::ref(result));
 
@@ -175,10 +176,9 @@ void AnalysisModule::publish_result_message(RuntimeContext &context) const {
     context.publish(std::make_unique<ResultEventMessage>(
         context.identifier(), context.current_run(), context.time_now(), result));
 
-
     //// Run calculate_historical_statistics and calculate_population_statistics for all the
-    //// IncomeCategories (i.e. do the same as above again), i.e. the different Instances of ModelResult, defined above.
-    //// Each one has a different IncomeCategory value, which is used in
+    //// IncomeCategories (i.e. do the same as above again), i.e. the different Instances of
+    ///ModelResult, defined above. / Each one has a different IncomeCategory value, which is used in
     //// calculate_historical_statistics and calculate_population_statistics
     for (int Entry = 0; Entry < context.NumberOfResultsCSVs; Entry++) {
 
@@ -188,7 +188,8 @@ void AnalysisModule::publish_result_message(RuntimeContext &context) const {
         calculate_population_statistics(context, VectorOfModelResults[Entry]);
         handle.get();
 
-        context.publish(std::make_unique<ResultEventMessage>(context.identifier(), context.current_run(),
+        context.publish(
+            std::make_unique<ResultEventMessage>(context.identifier(), context.current_run(),
                                                  context.time_now(), VectorOfModelResults[Entry]));
     }
 }
@@ -199,7 +200,6 @@ void AnalysisModule::calculate_historical_statistics(RuntimeContext &context,
 
     // extract IncomeCategoryString from ModelResult
     std::string IncomeCategory = result.IncomeCategory;
-
 
     auto risk_factors = std::map<core::Identifier, std::map<core::Gender, double>>();
     for (const auto &item : context.mapping()) {
@@ -230,31 +230,33 @@ void AnalysisModule::calculate_historical_statistics(RuntimeContext &context,
     auto population_size = static_cast<int>(context.population().size());
     auto population_dead = 0;
     auto population_migrated = 0;
-    
+
     // MAHIMA: Debug counters for filtering
     int total_people = 0;
     int people_in_category = 0;
     int people_missing_income_category = 0;
-    
+
     for (const auto &entity : context.population()) {
         total_people++;
 
-        //// Only do this proposed loop if considering all income categories, or if the person belongs to this particular income category. 
+        //// Only do this proposed loop if considering all income categories, or if the person
+        ///belongs to this particular income category.
         if (IncomeCategory != "All") {
             // MAHIMA: Safety check - ensure income_category exists
             if (!entity.risk_factors.contains(core::Identifier("income_category"))) {
                 people_missing_income_category++;
                 continue; // Skip this person if they don't have income_category
             }
-            
-            double person_income_category = entity.risk_factors.at(core::Identifier("income_category"));
+
+            double person_income_category =
+                entity.risk_factors.at(core::Identifier("income_category"));
             double target_income_category = std::stod(IncomeCategory);
-            
+
             if (person_income_category != target_income_category) {
                 continue;
             }
         }
-        
+
         people_in_category++;
 
         if (!entity.is_active()) {
@@ -340,7 +342,7 @@ void AnalysisModule::calculate_historical_statistics(RuntimeContext &context,
     std::cout << "People missing income_category: " << people_missing_income_category << std::endl;
     std::cout << "People in this category: " << people_in_category << std::endl;
     std::cout << "Males alive in category: " << males_count << std::endl;
-    std::cout << "Females alive in category: " << females_count << std::endl;*/ 
+    std::cout << "Females alive in category: " << females_count << std::endl;*/
 
     result.indicators = daly_handle.get();
 }
@@ -363,23 +365,25 @@ double AnalysisModule::calculate_disability_weight(const Person &entity) const {
 }
 
 DALYsIndicator AnalysisModule::calculate_dalys(Population &population, unsigned int max_age,
-                                               unsigned int death_year, std::string IncomeCategory) const {
+                                               unsigned int death_year,
+                                               std::string IncomeCategory) const {
     auto yll_sum = 0.0;
     auto yld_sum = 0.0;
     auto count = 0.0;
     for (const auto &entity : population) {
 
         //// Only do this proposed loop if considering all income categories, or if the person
-        ///belongs to this particular income category.
+        /// belongs to this particular income category.
         if (IncomeCategory != "All") {
             // MAHIMA: Safety check - ensure income_category exists
             if (!entity.risk_factors.contains(core::Identifier("income_category"))) {
                 continue; // Skip this person if they don't have income_category
             }
-            
-            double person_income_category = entity.risk_factors.at(core::Identifier("income_category"));
+
+            double person_income_category =
+                entity.risk_factors.at(core::Identifier("income_category"));
             double target_income_category = std::stod(IncomeCategory);
-            
+
             if (person_income_category != target_income_category) {
                 continue;
             }
@@ -412,10 +416,10 @@ DALYsIndicator AnalysisModule::calculate_dalys(Population &population, unsigned 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
 void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
                                                      ModelResult &result) const {
-    
+
     // extract DataSeries and IncomeCategoryString from ModelResult
     DataSeries &series = result.series;
-    std::string IncomeCategory = result.IncomeCategory; 
+    std::string IncomeCategory = result.IncomeCategory;
 
     if (series.size() > 0) {
         throw std::logic_error("This should be a new object!");
@@ -443,10 +447,11 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
             if (!person.risk_factors.contains(core::Identifier("income_category"))) {
                 continue; // Skip this person if they don't have income_category
             }
-            
-            double person_income_category = person.risk_factors.at(core::Identifier("income_category"));
+
+            double person_income_category =
+                person.risk_factors.at(core::Identifier("income_category"));
             double target_income_category = std::stod(IncomeCategory);
-            
+
             if (person_income_category != target_income_category) {
                 continue;
             }
