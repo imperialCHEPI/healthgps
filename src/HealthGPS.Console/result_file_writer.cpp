@@ -39,6 +39,16 @@ ResultFileWriter::ResultFileWriter(const std::filesystem::path &file_name, Exper
                "{}\n\n\n\n\n\n\n\n\n",
                output_filename_LowerInc.string());*/
 
+    // MAHIMA: Debug output to show exactly where the income quartile files are being saved
+    fmt::print(fg(fmt::color::cyan) | fmt::emphasis::bold,
+               "\n=== INCOME QUARTILE FILES LOCATION ===\n");
+    fmt::print(fg(fmt::color::green), "Main results file: {}\n", output_filename.string());
+    fmt::print(fg(fmt::color::yellow), "Q1 Low Income file: {}\n", output_filename_LowerInc.string());
+    fmt::print(fg(fmt::color::yellow), "Q2 Lower-Middle Income file: {}\n", output_filename_LowerMiddleInc.string());
+    fmt::print(fg(fmt::color::yellow), "Q3 Upper-Middle Income file: {}\n", output_filename_UpperMiddleInc.string());
+    fmt::print(fg(fmt::color::yellow), "Q4 High Income file: {}\n", output_filename_UpperInc.string());
+    fmt::print(fg(fmt::color::cyan), "======================================\n\n");
+
     // open .csv streams for main file and all income quartiles
     csvstream_.open(output_filename, std::ofstream::out | std::ofstream::app);
     csvstream_LowerInc_.open(output_filename_LowerInc, std::ofstream::out | std::ofstream::app);
