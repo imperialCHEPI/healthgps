@@ -194,20 +194,27 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
         //              If non-zero, then use BoxCox transformation to calculate the actual value
         // =======================================================================
 
-        // STAGE 1: Determine if risk factor should be zero using logistic regression
-        double zero_probability = calculate_zero_probability(person, i);
+        // MAHIMA: Check if this risk factor has logistic coefficients
+        // Empty logistic model means intentionally skip Stage 1 and use boxcox-only modeling
+        bool has_logistic_model = !(logistic_models_[i].coefficients.empty() && 
+                                   logistic_models_[i].intercept == 0.0);
 
-        // Sample from this probability to determine if risk factor should be zero
-        // if logistic regression output = 1, risk factor value = 0
-        double random_sample = random.next_double(); // Uniform random value between 0 and 1
-        if (random_sample < zero_probability) {
-            // Risk factor should be zero
-            person.risk_factors[names_[i]] = 0.0;
-            continue;
+        // STAGE 1: Determine if risk factor should be zero (only if logistic model exists)
+        if (has_logistic_model) {
+            double zero_probability = calculate_zero_probability(person, i);
+            
+            // Sample from this probability to determine if risk factor should be zero
+            // if logistic regression output = 1, risk factor value = 0
+            double random_sample = random.next_double(); // Uniform random value between 0 and 1
+            if (random_sample < zero_probability) {
+                // Risk factor should be zero
+                person.risk_factors[names_[i]] = 0.0;
+                continue;
+            }
         }
 
         // STAGE 2: Calculate non-zero risk factor value using BoxCox transformation
-        // Using the original model logic from before
+        // (This code runs whether we have a logistic model or not)
         double factor = linear[i] + residual * stddev_[i];
         factor = expected * inverse_box_cox(factor, lambda_[i]);
         factor = ranges_[i].clamp(factor);

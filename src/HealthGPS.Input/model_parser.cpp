@@ -751,7 +751,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         // Validate the structure
         if (!opt["PhysicalActivityModels"].is_object()) {
             std::cout << "\nDEBUG: ERROR - PhysicalActivityModels is not an object, actual type: "
-                      << opt["PhysicalActivityModels"].type_name() << std::endl;
+                      << opt["PhysicalActivityModels"].type_name() << "\n";
         } else {
             // std::cout << "\nDEBUG: PhysicalActivityModels has " <<
             // opt["PhysicalActivityModels"].size() << " entries" << std::endl;
@@ -859,25 +859,15 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                     }
 
                     if (!found) {
-                        // If no logistic coefficients for this risk factor, use the boxcox
-                        // coefficients
-                        std::cout << "\nWARNING: No logistic regression coefficients found for "
-                                  << name.to_string() << ", using boxcox coefficients";
+                        // MAHIMA: Changed approach - if no logistic coefficients for this risk factor,
+                        // create an empty model instead of using boxcox coefficients as fallback.
+                        // Missing logistic data is intentional and means skip Stage 1 (logistic regression)
+                        // and go directly to Stage 2 (boxcox transformation).
+                        std::cout << "\nINFO: No logistic regression coefficients found for "
+                                  << name.to_string() << ", will use boxcox-only modeling (skip Stage 1)";
 
-                        // Look for boxcox coefficients (also case-insensitive)
-                        bool boxcox_found = false;
-                        for (const auto &[key, model] : csv_coefficients) {
-                            if (core::to_lower(key) == name_lower) {
-                                logistic_models_vec.push_back(model);
-                                boxcox_found = true;
-                                break;
-                            }
-                        }
-
-                        if (!boxcox_found) {
-                            // If no boxcox coefficients either, create empty model
-                            logistic_models_vec.push_back(LinearModelParams{});
-                        }
+                        // Create empty model to signal: skip logistic stage, use boxcox only
+                        logistic_models_vec.push_back(LinearModelParams{});
                     }
                 }
                 return logistic_models_vec;
