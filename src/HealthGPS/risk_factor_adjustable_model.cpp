@@ -119,8 +119,16 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
 
         for (size_t factor_index = 0; factor_index < factors.size(); factor_index++) {
             const auto &factor = factors[factor_index];
+            
+            // MAHIMA: Skip adjustment for risk factors that are currently 0
+            // This preserves zero values set by logistic regression (two-stage modeling)
+            double original_value = person.risk_factors.at(factor);
+            if (original_value == 0.0) {
+                continue; // Don't adjust zero risk factors
+            }
+            
             double delta = adjustments.at(person.gender, factor).at(person.age);
-            double value = person.risk_factors.at(factor) + delta;
+            double value = original_value + delta;
 
             // Check for NaN values and fix them
             if (std::isnan(value)) {
@@ -128,11 +136,11 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
                           << factor.to_string() << " (Person ID: " << person.id() << ", Gender: "
                           << (person.gender == core::Gender::male ? "Male" : "Female")
                           << ", Age: " << person.age
-                          << ", Original value: " << person.risk_factors.at(factor)
+                          << ", Original value: " << original_value
                           << ", Delta: " << delta << ")";
 
                 // Use original value as fallback
-                value = person.risk_factors.at(factor);
+                value = original_value;
             }
 
             // Apply range clamping if ranges are provided
