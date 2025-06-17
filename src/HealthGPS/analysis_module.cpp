@@ -163,7 +163,7 @@ void AnalysisModule::publish_result_message(RuntimeContext &context) const {
     }
 
     //// Run calculate_historical_statistics and calculate_population_statistics for "result", which
-    ///is a ModelResult object where ModelResult::IncomeCategory has the default value "All"
+    /// is a ModelResult object where ModelResult::IncomeCategory has the default value "All"
 
     //// Run calculate_historical_statistics asyncrhonously, placing a "handle" on it.
     auto handle = core::run_async(&AnalysisModule::calculate_historical_statistics, this,
@@ -178,8 +178,8 @@ void AnalysisModule::publish_result_message(RuntimeContext &context) const {
 
     //// Run calculate_historical_statistics and calculate_population_statistics for all the
     //// IncomeCategories (i.e. do the same as above again), i.e. the different Instances of
-    ///ModelResult, defined above. / Each one has a different IncomeCategory value, which is used in
-    //// calculate_historical_statistics and calculate_population_statistics
+    /// ModelResult, defined above. / Each one has a different IncomeCategory value, which is used
+    /// in / calculate_historical_statistics and calculate_population_statistics
     for (int Entry = 0; Entry < context.NumberOfResultsCSVs; Entry++) {
 
         handle = core::run_async(&AnalysisModule::calculate_historical_statistics, this,
@@ -240,7 +240,7 @@ void AnalysisModule::calculate_historical_statistics(RuntimeContext &context,
         total_people++;
 
         //// Only do this proposed loop if considering all income categories, or if the person
-        ///belongs to this particular income category.
+        /// belongs to this particular income category.
         if (IncomeCategory != "All") {
             // MAHIMA: Safety check - ensure income_category exists
             if (!entity.risk_factors.contains(core::Identifier("income_category"))) {
