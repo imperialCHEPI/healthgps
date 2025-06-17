@@ -196,8 +196,7 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
 
         // MAHIMA: Check if this risk factor has logistic coefficients
         // Empty logistic model means intentionally skip Stage 1 and use boxcox-only modeling
-        bool has_logistic_model =
-            !(logistic_models_[i].coefficients.empty());
+        bool has_logistic_model = !(logistic_models_[i].coefficients.empty());
 
         // STAGE 1: Determine if risk factor should be zero (only if logistic model exists)
         if (has_logistic_model) {
@@ -257,8 +256,7 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
 
         // MAHIMA: Check if this risk factor has logistic coefficients
         // Empty logistic model means intentionally skip Stage 1 and use boxcox-only modeling
-        bool has_logistic_model =
-            !(logistic_models_[i].coefficients.empty());
+        bool has_logistic_model = !(logistic_models_[i].coefficients.empty());
 
         // STAGE 1: Determine if risk factor should be zero (only if logistic model exists)
         if (has_logistic_model) {
