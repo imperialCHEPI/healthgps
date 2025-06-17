@@ -859,12 +859,13 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                     }
 
                     if (!found) {
-                        // MAHIMA: Changed approach - if no logistic coefficients for this risk factor,
-                        // create an empty model instead of using boxcox coefficients as fallback.
-                        // Missing logistic data is intentional and means skip Stage 1 (logistic regression)
-                        // and go directly to Stage 2 (boxcox transformation).
+                        // MAHIMA: Changed approach - if no logistic coefficients for this risk
+                        // factor, create an empty model instead of using boxcox coefficients as
+                        // fallback. Missing logistic data is intentional and means skip Stage 1
+                        // (logistic regression) and go directly to Stage 2 (boxcox transformation).
                         std::cout << "\nINFO: No logistic regression coefficients found for "
-                                  << name.to_string() << ", will use boxcox-only modeling (skip Stage 1)";
+                                  << name.to_string()
+                                  << ", will use boxcox-only modeling (skip Stage 1)";
 
                         // Create empty model to signal: skip logistic stage, use boxcox only
                         logistic_models_vec.push_back(LinearModelParams{});
