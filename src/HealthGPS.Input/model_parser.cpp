@@ -525,7 +525,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         if (region_prevalence.empty()) {
             std::cout << "\nWARNING: Failed to load region prevalence from CSV, falling back to "
                          "JSON. NOOOOOO!!!"
-                      << "\n" ;
+                      << "\n";
         } else {
             std::cout << "\nSuccessfully loaded region prevalence from CSV with "
                       << region_prevalence.size() << " age entries" << "\n";

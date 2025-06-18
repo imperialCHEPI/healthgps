@@ -626,7 +626,7 @@ void StaticLinearModel::initialise_physical_activity([[maybe_unused]] RuntimeCon
                 factor_value = person.income_continuous;
             }
             // If we already have this factor, use its value
-            else if (person.risk_factors.contains(factor_name) ) {
+            else if (person.risk_factors.contains(factor_name)) {
                 factor_value = person.risk_factors.at(factor_name);
             }
 
