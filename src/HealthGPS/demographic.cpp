@@ -261,7 +261,7 @@ void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &conte
         // Check if the gender exists for this age
         if (!region_prevalence_.at(age_id).contains(person.gender)) {
             std::cout << "\nDEBUG: ERROR - Gender not found in region_prevalence_ for age: "
-                      << age_id.to_string() << std::endl;
+                      << age_id.to_string() << "\n";
             return;
         }
 
@@ -306,7 +306,7 @@ void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &conte
         // If we get here, there was a problem with the probability distribution
         std::cout << "\nDEBUG: WARNING - Reached end of region assignment loop without assigning a "
                      "region for age "
-                  << person.age << std::endl;
+                  << person.age << "\n";
         // person.region = core::Region::England; // Default fallback
     } else {
         // Fall back to age groups if specific age not found
@@ -317,14 +317,14 @@ void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &conte
         if (!region_prevalence_.contains(age_group)) {
             std::cout << "\nDEBUG: ERROR - Neither specific age nor age group found in "
                          "region_prevalence_: "
-                      << person.age << std::endl;
+                      << person.age << "\n";
             return;
         }
 
         // Check if the gender exists for this age_group
         if (!region_prevalence_.at(age_group).contains(person.gender)) {
             std::cout << "\nDEBUG: ERROR - Gender not found in region_prevalence_ for age group: "
-                      << age_group.to_string() << std::endl;
+                      << age_group.to_string() << "\n";
             return;
         }
 
@@ -508,7 +508,7 @@ void DemographicModule::initialise_income_category(Person &person,
 
     // MAHIMA: Quartiles should already be calculated - don't recalculate here!
     if (income_quartile_thresholds_.empty()) {
-        std::cout << "\nERROR: Quartile thresholds not calculated yet!" << std::endl;
+        std::cout << "\nERROR: Quartile thresholds not calculated yet!" << "\n";
         return;
     }
 
@@ -993,7 +993,7 @@ void DemographicModule::update_income_continuous([[maybe_unused]] RuntimeContext
     // Update residual using the same formula as other risk factors
     // Using info_speed_ from the class for consistency with other risk factors
     double new_residual =
-        info_speed_ * new_noise + sqrt(1.0 - info_speed_ * info_speed_) * old_residual;
+        info_speed_ * new_noise + sqrt(1.0 - (info_speed_ * info_speed_)) * old_residual;
 
     // Store the updated residual
     person.risk_factors[residual_name] = new_residual;

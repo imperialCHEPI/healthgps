@@ -252,7 +252,7 @@ RiskFactorAdjustableModel::calculate_simulated_mean(Population &population,
 
     // Compute first moments.
     auto moments = UnorderedMap2d<core::Gender, core::Identifier, std::vector<FirstMoment>>{};
-    int processed_count = 0;
+    
     for (const auto &person : population) {
         if (!person.is_active()) {
             continue;
@@ -266,7 +266,7 @@ RiskFactorAdjustableModel::calculate_simulated_mean(Population &population,
             // Check if the risk factor exists for this person
             if (!person.risk_factors.contains(factor)) {
                 std::cout << "\nDEBUG: WARNING - Person #" << person.id()
-                          << " is missing risk factor: " << factor.to_string() << std::endl;
+                          << " is missing risk factor: " << factor.to_string() << "\n";
                 continue;
             }
 
@@ -274,7 +274,7 @@ RiskFactorAdjustableModel::calculate_simulated_mean(Population &population,
             moments.at(person.gender, factor).at(person.age).append(value);
         }
 
-        processed_count++;
+        
         /*if (processed_count % 1000 == 0) {
             std::cout << "\nDEBUG: Processed " << processed_count << " people for first moments"
                       << std::endl;

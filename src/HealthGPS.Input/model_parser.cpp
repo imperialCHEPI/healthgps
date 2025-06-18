@@ -278,8 +278,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     // Load risk factor coefficients from CSV if the file exists
     std::unordered_map<std::string, hgps::LinearModelParams> csv_coefficients;
     if (std::filesystem::exists(csv_path)) {
-        std::cout << "\nFound CSV file for risk factor coefficients: " << csv_path.string()
-                  << std::endl;
+        std::cout << "\nFound CSV file for risk factor coefficients: " << csv_path.string() << "\n";
         csv_coefficients = load_risk_factor_coefficients_from_csv(csv_path, false);
     }
 
@@ -288,7 +287,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     std::unordered_map<std::string, hgps::core::DoubleInterval> policy_ranges_map;
     if (std::filesystem::exists(policy_csv_path)) {
         std::cout << "\nFound CSV file for policy coefficients: " << policy_csv_path.string()
-                  << std::endl;
+                  << "\n";
         policy_csv_coefficients = load_risk_factor_coefficients_from_csv(policy_csv_path, false);
         policy_ranges_map = load_policy_ranges_from_csv(policy_csv_path);
         std::cout << "\nSuccessfully loaded policy coefficients from CSV for "
@@ -318,7 +317,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     std::unordered_map<std::string, hgps::LinearModelParams> logistic_coefficients;
     if (std::filesystem::exists(logistic_csv_path)) {
         std::cout << "\nFound CSV file for logistic regression coefficients: "
-                  << logistic_csv_path.string() << std::endl;
+                  << logistic_csv_path.string() << "\n";
         logistic_coefficients = load_logistic_regression_coefficients_from_csv(logistic_csv_path);
         std::cout << "\nSuccessfully loaded logistic regression coefficients from CSV for "
                   << logistic_coefficients.size() << " risk factors";
@@ -519,23 +518,23 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     // First load region prevalence from CSV file if it exists
     if (std::filesystem::exists(region_csv_path)) {
         std::cout << "\nLoading region prevalence from CSV file: " << region_csv_path.string()
-                  << std::endl;
+                  << "\n";
         region_prevalence = load_region_prevalence_from_csv(region_csv_path);
 
         // Validate that we loaded some data
         if (region_prevalence.empty()) {
             std::cout << "\nWARNING: Failed to load region prevalence from CSV, falling back to "
                          "JSON. NOOOOOO!!!"
-                      << std::endl;
+                      << "\n" ;
         } else {
             std::cout << "\nSuccessfully loaded region prevalence from CSV with "
-                      << region_prevalence.size() << " age entries" << std::endl;
+                      << region_prevalence.size() << " age entries" << "\n";
         }
     }
 
     // If region prevalence is still empty (CSV didn't exist or failed to load), load from JSON
     if (region_prevalence.empty() && opt.contains("RegionPrevalence")) {
-        std::cout << "\nLoading region prevalence from JSON configuration" << std::endl;
+        std::cout << "\nLoading region prevalence from JSON configuration" << "\n";
         for (const auto &age_group : opt["RegionPrevalence"]) {
             auto age_group_name = age_group["Name"].get<core::Identifier>();
 
@@ -589,9 +588,9 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             // << male_sum << std::endl;
         }
         std::cout << "\nLoaded region prevalence from JSON with " << region_prevalence.size()
-                  << " age groups" << std::endl;
+                  << " age groups" << "\n";
     } else if (region_prevalence.empty()) {
-        std::cout << "\nWARNING: No region prevalence data found in CSV or JSON" << std::endl;
+        std::cout << "\nWARNING: No region prevalence data found in CSV or JSON" << "\n";
     }
     // NOLINTEND(readability-function-cognitive-complexity)
 
@@ -612,7 +611,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                          "JSON. NOOOOOO!!!";
         } else {
             std::cout << "\nSuccessfully loaded ethnicity prevalence from CSV with "
-                      << ethnicity_prevalence.size() << " age entries" << std::endl;
+                      << ethnicity_prevalence.size() << " age entries" << "\n";
         }
     }
     if (opt.contains("EthnicityPrevalence")) {
@@ -1193,7 +1192,7 @@ load_risk_factor_coefficients_from_csv(const std::filesystem::path &csv_path, bo
     // Check if the file exists
     if (!std::filesystem::exists(csv_path)) {
         std::cout << "\nWARNING: CSV file for risk factor coefficients not found: "
-                  << csv_path.string() << std::endl;
+                  << csv_path.string() << "\n";
         return result;
     }
 
@@ -1317,7 +1316,7 @@ load_policy_ranges_from_csv(const std::filesystem::path &csv_path) {
     // Check if the file exists
     if (!std::filesystem::exists(csv_path)) {
         std::cout << "\nWARNING: CSV file for policy ranges not found: " << csv_path.string()
-                  << std::endl;
+                  << "\n";
         return result;
     }
 
@@ -1420,7 +1419,7 @@ load_logistic_regression_coefficients_from_csv(const std::filesystem::path &csv_
     // Check if the file exists
     if (!std::filesystem::exists(csv_path)) {
         std::cout << "\nWARNING: CSV file for logistic regression coefficients not found: "
-                  << csv_path.string() << std::endl;
+                  << csv_path.string() << "\n";
         return result;
     }
 
@@ -1548,7 +1547,7 @@ load_region_prevalence_from_csv(const std::filesystem::path &csv_path) {
     // Check if the file exists in the same directory as the JSON input files
     if (!std::filesystem::exists(csv_path)) {
         std::cout << "\nWARNING: CSV file for region prevalence not found: " << csv_path.string()
-                  << std::endl;
+                  << "\n";
         return result;
     }
 
@@ -1569,7 +1568,7 @@ load_region_prevalence_from_csv(const std::filesystem::path &csv_path) {
             if (row.size() < 6) {
                 std::cout
                     << "\nWARNING: Invalid row format in region prevalence CSV, skipping row: " << i
-                    << std::endl;
+                    << "\n";
                 continue;
             }
 
@@ -1607,15 +1606,15 @@ load_region_prevalence_from_csv(const std::filesystem::path &csv_path) {
             if (std::abs(sum - 1.0) > 0.001) {
                 std::cout << "\nWARNING: Region probabilities for age " << age << ", gender "
                           << (gender == core::Gender::male ? "male" : "female") << " sum to " << sum
-                          << " (should be 1.0)" << std::endl;
+                          << " (should be 1.0)" << "\n";
             }
         }
 
         // std::cout << "\n--- END OF SAMPLE ---" << std::endl;
         std::cout << "\nLoaded region prevalence data for " << result.size()
-                  << " age groups from CSV file" << std::endl;
+                  << " age groups from CSV file" << "\n";
     } catch (const std::exception &e) {
-        std::cout << "\nERROR: Failed to process region prevalence CSV: " << e.what() << std::endl;
+        std::cout << "\nERROR: Failed to process region prevalence CSV: " << e.what() << "\n";
     }
 
     return result;
@@ -1641,7 +1640,7 @@ load_ethnicity_prevalence_from_csv(const std::filesystem::path &csv_path) {
     // Check if the file exists in the same directory as the JSON input files
     if (!std::filesystem::exists(csv_path)) {
         std::cout << "\nWARNING: CSV file for ethnicity prevalence not found: " << csv_path.string()
-                  << std::endl;
+                  << "\n";
         return result;
     }
 
@@ -1663,7 +1662,7 @@ load_ethnicity_prevalence_from_csv(const std::filesystem::path &csv_path) {
             if (row.size() < 7) {
                 std::cout
                     << "\nWARNING: Invalid row format in ethnicity prevalence CSV, skipping row: "
-                    << i << std::endl;
+                    << i << "\n";
                 continue;
             }
 
@@ -1694,7 +1693,7 @@ load_ethnicity_prevalence_from_csv(const std::filesystem::path &csv_path) {
                 break;
             default:
                 std::cout << "\nWARNING: Unknown ethnicity code: " << ethnicity_code
-                          << ", skipping row " << i << std::endl;
+                          << ", skipping row " << i << "\n";
                 continue;
             }
 
@@ -1733,7 +1732,7 @@ load_ethnicity_prevalence_from_csv(const std::filesystem::path &csv_path) {
                 if (std::abs(sum - 1.0) > 0.001) {
                     std::cout << "\nNormalizing ethnicity probabilities for " << age_id.to_string()
                               << ", gender " << (gender == core::Gender::male ? "male" : "female")
-                              << " (sum was " << sum << ")" << std::endl;
+                              << " (sum was " << sum << ")" << "\n";
 
                     // Normalize each probability
                     for (auto &[ethnicity, prob] : ethnicity_map) {
@@ -1745,10 +1744,9 @@ load_ethnicity_prevalence_from_csv(const std::filesystem::path &csv_path) {
 
         // std::cout << "\n--- END OF SAMPLE ---" << std::endl;
         std::cout << "\nLoaded ethnicity prevalence data for " << result.size()
-                  << " age groups from CSV file" << std::endl;
+                  << " age groups from CSV file" << "\n";
     } catch (const std::exception &e) {
-        std::cout << "\nERROR: Failed to process ethnicity prevalence CSV: " << e.what()
-                  << std::endl;
+        std::cout << "\nERROR: Failed to process ethnicity prevalence CSV: " << e.what() << "\n";
     }
 
     return result;

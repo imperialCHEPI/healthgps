@@ -117,7 +117,7 @@ double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
         return result;
     } else {
         // For non-zero lambda
-        double base = lambda * factor + 1.0;
+        double base = (lambda * factor) + 1.0;
         // Check if base is valid for power
         if (base <= 0.0) {
             return 0.0; // Return safe value for negative/zero base
@@ -626,7 +626,7 @@ void StaticLinearModel::initialise_physical_activity([[maybe_unused]] RuntimeCon
                 factor_value = person.income_continuous;
             }
             // If we already have this factor, use its value
-            else if (person.risk_factors.count(factor_name) > 0) {
+            else if (person.risk_factors.contains(factor_name) ) {
                 factor_value = person.risk_factors.at(factor_name);
             }
 
