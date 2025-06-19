@@ -135,7 +135,7 @@ Configuration get_configuration(const std::string &config_source,
         load_output_info(opt, config, output_folder);
     } catch (const ConfigurationError &e) {
         success = false;
-        fmt::print(fmt::fg(fmt::color::red), e.what());
+        fmt::print(fmt::fg(fmt::color::red), "{}", e.what());
     }
 
     if (!success) {

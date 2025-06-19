@@ -174,7 +174,7 @@ void load_input_info(const json &j, Configuration &config) {
         config.settings = get_settings(inputs);
     } catch (const std::exception &) {
         success = false;
-        fmt::print(fmt::fg(fmt::color::red), "Could not load settings info");
+        fmt::print(fmt::fg(fmt::color::red), "Could not load settings info\n");
     }
 
     if (!success) {
@@ -216,7 +216,7 @@ void load_modelling_info(const json &j, Configuration &config) {
         config.ses = get(modelling, "ses_model").get<SESInfo>();
     } catch (const std::exception &) {
         success = false;
-        fmt::print(fmt::fg(fmt::color::red), "Could not load SES mappings");
+        fmt::print(fmt::fg(fmt::color::red), "Could not load SES mappings\n");
     }
 
     if (!success) {

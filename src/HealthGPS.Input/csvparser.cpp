@@ -109,7 +109,7 @@ hgps::core::DataTable load_datatable_from_csv(const FileInfo &file_info) {
             csv_column_map[col_name] = *it;
         } else {
             success = false;
-            fmt::print(fg(fmt::color::dark_salmon), "Column: {} not found in dataset.\n", col_name);
+            fmt::print(fmt::fg(fmt::color::dark_salmon), "Column: {} not found in dataset.\n", col_name);
         }
     }
 
@@ -134,12 +134,12 @@ hgps::core::DataTable load_datatable_from_csv(const FileInfo &file_info) {
             } else if (col_type == "string") {
                 out_table.add(parse_string_column(col_name, data).build());
             } else {
-                fmt::print(fg(fmt::color::dark_salmon), "Unknown data type: {} in column: {}\n",
+                fmt::print(fmt::fg(fmt::color::dark_salmon), "Unknown data type: {} in column: {}\n",
                            col_type, col_name);
                 success = false;
             }
         } catch (const std::exception &ex) {
-            fmt::print(fg(fmt::color::red), "Error passing column: {}, cause: {}\n", col_name,
+            fmt::print(fmt::fg(fmt::color::red), "Error passing column: {}, cause: {}\n", col_name,
                        ex.what());
             success = false;
         }
