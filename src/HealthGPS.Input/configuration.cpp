@@ -168,7 +168,8 @@ ModelInput create_model_input(core::DataTable &input_table, core::Country countr
     auto diseases_number = static_cast<unsigned int>(diseases.size());
     if (comorbidities > diseases_number) {
         comorbidities = diseases_number;
-        fmt::print(fmt::fg(fmt::color::salmon), "Comorbidities value: {}, set to # of diseases: {}.\n",
+        fmt::print(fmt::fg(fmt::color::salmon),
+                   "Comorbidities value: {}, set to # of diseases: {}.\n",
                    config.output.comorbidities, comorbidities);
     }
 

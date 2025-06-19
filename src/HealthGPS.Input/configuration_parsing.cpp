@@ -197,8 +197,8 @@ void load_modelling_info(const json &j, Configuration &config) {
                 fmt::print("{:<14}, file: {}\n", type, path.string());
             } catch (const ConfigurationError &) {
                 success = false;
-                fmt::print(fmt::fg(fmt::color::red), "Adjustment type: {}, file: {} not found.\n", type,
-                           path.string());
+                fmt::print(fmt::fg(fmt::color::red), "Adjustment type: {}, file: {} not found.\n",
+                           type, path.string());
             }
         }
     }

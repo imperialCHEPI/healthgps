@@ -194,8 +194,8 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
 
         // Create simulation engine for each scenario, baseline is always simulated.
         auto runtime = 0.0;
-        fmt::print(fmt::fg(fmt::color::cyan), "\nStarting baseline simulation with {} trials ...\n\n",
-                   config.trial_runs);
+        fmt::print(fmt::fg(fmt::color::cyan),
+                   "\nStarting baseline simulation with {} trials ...\n\n", config.trial_runs);
         auto baseline_sim = create_baseline_simulation(channel, factory, event_bus, model_input);
         if (config.active_intervention.has_value()) {
             fmt::print(fmt::fg(fmt::color::cyan),
@@ -210,7 +210,8 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
             runtime = runner.run(baseline_sim, config.trial_runs);
         }
 
-        fmt::print(fmt::fg(fmt::color::light_green), "\nCompleted, elapsed time : {}ms\n\n", runtime);
+        fmt::print(fmt::fg(fmt::color::light_green), "\nCompleted, elapsed time : {}ms\n\n",
+                   runtime);
         event_monitor.stop();
 
 #ifdef CATCH_EXCEPTIONS
