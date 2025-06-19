@@ -112,7 +112,7 @@ Configuration get_configuration(const std::string &config_source,
         fmt::print("Input dataset file: {}\n", config.file.name.string());
     } catch (const std::exception &e) {
         success = false;
-        fmt::print(fg(fmt::color::red), "Could not load dataset file: {}\n", e.what());
+        fmt::print(fmt::fg(fmt::color::red), "Could not load dataset file: {}\n", e.what());
     }
 
     // Modelling information
@@ -120,7 +120,7 @@ Configuration get_configuration(const std::string &config_source,
         load_modelling_info(opt, config);
     } catch (const std::exception &e) {
         success = false;
-        fmt::print(fg(fmt::color::red), "Could not load modelling info: {}\n", e.what());
+        fmt::print(fmt::fg(fmt::color::red), "Could not load modelling info: {}\n", e.what());
     }
 
     // Run-time info
@@ -128,14 +128,14 @@ Configuration get_configuration(const std::string &config_source,
         load_running_info(opt, config);
     } catch (const std::exception &e) {
         success = false;
-        fmt::print(fg(fmt::color::red), "Could not load running info: {}\n", e.what());
+        fmt::print(fmt::fg(fmt::color::red), "Could not load running info: {}\n", e.what());
     }
 
     try {
         load_output_info(opt, config, output_folder);
     } catch (const ConfigurationError &e) {
         success = false;
-        fmt::print(fg(fmt::color::red), e.what());
+        fmt::print(fmt::fg(fmt::color::red), e.what());
     }
 
     if (!success) {
@@ -168,7 +168,7 @@ ModelInput create_model_input(core::DataTable &input_table, core::Country countr
     auto diseases_number = static_cast<unsigned int>(diseases.size());
     if (comorbidities > diseases_number) {
         comorbidities = diseases_number;
-        fmt::print(fg(fmt::color::salmon), "Comorbidities value: {}, set to # of diseases: {}.\n",
+        fmt::print(fmt::fg(fmt::color::salmon), "Comorbidities value: {}, set to # of diseases: {}.\n",
                    config.output.comorbidities, comorbidities);
     }
 
@@ -238,7 +238,7 @@ std::string create_output_file_name(const OutputInfo &info, int job_id) {
     }
 
     log_file_name = (output_folder / log_file_name).string();
-    fmt::print(fg(fmt::color::yellow_green), "Output file: {}.\n", log_file_name);
+    fmt::print(fmt::fg(fmt::color::yellow_green), "Output file: {}.\n", log_file_name);
     return log_file_name;
 }
 
@@ -258,7 +258,7 @@ std::unique_ptr<hgps::Scenario> create_intervention_scenario(SyncChannel &channe
                                                              const PolicyScenarioInfo &info) {
     using namespace hgps;
 
-    fmt::print(fg(fmt::color::light_coral), "\nIntervention policy: {}.\n\n", info.identifier);
+    fmt::print(fmt::fg(fmt::color::light_coral), "\nIntervention policy: {}.\n\n", info.identifier);
     auto period = PolicyInterval(info.active_period.start_time, info.active_period.finish_time);
     auto risk_impacts = std::vector<PolicyImpact>{};
     for (const auto &item : info.impacts) {

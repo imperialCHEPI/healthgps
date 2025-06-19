@@ -27,7 +27,7 @@ std::string get_time_now_str() {
 
 /// @brief Prints application start-up messages
 void print_app_title() {
-    fmt::print(fg(fmt::color::yellow) | fmt::emphasis::bold,
+    fmt::print(fmt::fg(fmt::color::yellow) | fmt::emphasis::bold,
                "\n# Health-GPS Microsimulation for Policy Options #\n\n");
 
     fmt::print("Today: {}\nMaximum threads: {}\n\n", get_time_now_str(),
@@ -51,7 +51,7 @@ hgps::ResultFileWriter create_results_file_logger(const hgps::input::Configurati
 /// @return The respective exit code
 int exit_application(int exit_code) {
     fmt::print("\n\n");
-    fmt::print(fg(fmt::color::yellow) | fmt::emphasis::bold, "Goodbye.");
+    fmt::print(fmt::fg(fmt::color::yellow) | fmt::emphasis::bold, "Goodbye.");
     fmt::print(" {}.\n\n", get_time_now_str());
     return exit_code;
 }
@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
             return exit_application(EXIT_SUCCESS);
         }
     } catch (const std::exception &ex) {
-        fmt::print(fg(fmt::color::red), "\nInvalid command line argument: {}\n", ex.what());
+        fmt::print(fmt::fg(fmt::color::red), "\nInvalid command line argument: {}\n", ex.what());
         fmt::print("\n{}\n", options.help());
         return exit_application(EXIT_FAILURE);
     }
@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
         config = get_configuration(cmd_args.config_source, cmd_args.output_folder, cmd_args.job_id,
                                    cmd_args.verbose);
     } catch (const std::exception &ex) {
-        fmt::print(fg(fmt::color::red), "\n\nInvalid configuration - {}.\n", ex.what());
+        fmt::print(fmt::fg(fmt::color::red), "\n\nInvalid configuration - {}.\n", ex.what());
         return exit_application(EXIT_FAILURE);
     }
 
@@ -118,7 +118,7 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
         // do one of these things!
         if (cmd_args.data_source.has_value() == (config.data_source != nullptr)) {
             fmt::print(
-                fg(fmt::color::red),
+                fmt::fg(fmt::color::red),
                 "Must provide a data source via config file or command line, but not both\n");
             return exit_application(EXIT_FAILURE);
         }
@@ -146,7 +146,7 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
         // Validate the configuration diseases list, must exists in back-end data store
         auto diseases = get_diseases_info(data_api, config);
         if (diseases.size() != config.diseases.size()) {
-            fmt::print(fg(fmt::color::red), "\nInvalid list of diseases in configuration.\n");
+            fmt::print(fmt::fg(fmt::color::red), "\nInvalid list of diseases in configuration.\n");
             return exit_application(EXIT_FAILURE);
         }
 
@@ -162,16 +162,16 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
 
         // If the user is just validating input files, abort here
         if (cmd_args.dry_run) {
-            fmt::print(fg(fmt::color::yellow), "Dry run completed successfully.\n");
+            fmt::print(fmt::fg(fmt::color::yellow), "Dry run completed successfully.\n");
             return exit_application(EXIT_SUCCESS);
         }
 
         // Create output folder
         if (!std::filesystem::exists(config.output.folder)) {
-            fmt::print(fg(fmt::color::dark_salmon), "\nCreating output folder: {} ...\n",
+            fmt::print(fmt::fg(fmt::color::dark_salmon), "\nCreating output folder: {} ...\n",
                        config.output.folder);
             if (!std::filesystem::create_directories(config.output.folder)) {
-                fmt::print(fg(fmt::color::red), "Failed to create output folder: {}\n",
+                fmt::print(fmt::fg(fmt::color::red), "Failed to create output folder: {}\n",
                            config.output.folder);
                 return exit_application(EXIT_FAILURE);
             }
@@ -194,11 +194,11 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
 
         // Create simulation engine for each scenario, baseline is always simulated.
         auto runtime = 0.0;
-        fmt::print(fg(fmt::color::cyan), "\nStarting baseline simulation with {} trials ...\n\n",
+        fmt::print(fmt::fg(fmt::color::cyan), "\nStarting baseline simulation with {} trials ...\n\n",
                    config.trial_runs);
         auto baseline_sim = create_baseline_simulation(channel, factory, event_bus, model_input);
         if (config.active_intervention.has_value()) {
-            fmt::print(fg(fmt::color::cyan),
+            fmt::print(fmt::fg(fmt::color::cyan),
                        "\nStarting intervention simulation with {} trials ...\n",
                        config.trial_runs);
             auto policy_sim = create_intervention_simulation(
@@ -210,12 +210,12 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
             runtime = runner.run(baseline_sim, config.trial_runs);
         }
 
-        fmt::print(fg(fmt::color::light_green), "\nCompleted, elapsed time : {}ms\n\n", runtime);
+        fmt::print(fmt::fg(fmt::color::light_green), "\nCompleted, elapsed time : {}ms\n\n", runtime);
         event_monitor.stop();
 
 #ifdef CATCH_EXCEPTIONS
     } catch (const std::exception &ex) {
-        fmt::print(fg(fmt::color::red), "\n\nFailed with message: {}.\n\n", ex.what());
+        fmt::print(fmt::fg(fmt::color::red), "\n\nFailed with message: {}.\n\n", ex.what());
 
         // Rethrow exception so it can be handled by OS's default handler
         throw;
