@@ -293,6 +293,34 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         std::cout << "\nSuccessfully loaded policy coefficients from CSV for "
                   << policy_csv_coefficients.size() << " risk factors";
 
+        // MAHIMA: Print the complete contents of the loaded policy CSV file
+        std::cout << "\n======= CONTENTS OF scenario2_food_policyeffect_model.csv =======";
+        for (const auto &[risk_factor_name, model_params] : policy_csv_coefficients) {
+            std::cout << "\n\nRisk Factor: " << risk_factor_name;
+            std::cout << "\n  Intercept: " << model_params.intercept;
+            
+            // Print all coefficients
+            std::cout << "\n  Coefficients:";
+            for (const auto &[coef_name, coef_value] : model_params.coefficients) {
+                std::cout << "\n    " << coef_name.to_string() << ": " << coef_value;
+            }
+            
+            // Print log coefficients if any
+            if (!model_params.log_coefficients.empty()) {
+                std::cout << "\n  Log Coefficients:";
+                for (const auto &[log_coef_name, log_coef_value] : model_params.log_coefficients) {
+                    std::cout << "\n    " << log_coef_name.to_string() << ": " << log_coef_value;
+                }
+            }
+            
+            // Print range if available
+            if (policy_ranges_map.find(risk_factor_name) != policy_ranges_map.end()) {
+                const auto &range = policy_ranges_map[risk_factor_name];
+                std::cout << "\n  Range: [" << range.lower() << ", " << range.upper() << "]";
+            }
+        }
+        std::cout << "\n================================================================\n";
+
         // Print a sample of the loaded policy coefficients for verification
         if (!policy_csv_coefficients.empty()) {
             auto first_rf = policy_csv_coefficients.begin()->first;

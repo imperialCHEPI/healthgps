@@ -1,4 +1,6 @@
 #include "runtime_context.h"
+#include "risk_factor_inspector.h"
+#include "HealthGPS.Core/exception.h"
 
 namespace hgps {
 
@@ -7,6 +9,11 @@ RuntimeContext::RuntimeContext(std::shared_ptr<const EventAggregator> bus,
                                std::unique_ptr<Scenario> scenario)
     : event_bus_{std::move(bus)}, inputs_{std::move(inputs)}, scenario_{std::move(scenario)},
       population_{0} {}
+
+// MAHIMA: Destructor implementation for RuntimeContext
+// This needs to be defined in the .cpp file where RiskFactorInspector complete type is available
+// This resolves the "incomplete type" error with std::unique_ptr<RiskFactorInspector>
+RuntimeContext::~RuntimeContext() = default;
 
 int RuntimeContext::time_now() const noexcept { return time_now_; }
 
@@ -77,6 +84,35 @@ double RuntimeContext::ensure_risk_factor_in_range(const core::Identifier &facto
         // If the factor is not found or any other error occurs, return the original value
         return value;
     }
+}
+
+void RuntimeContext::set_risk_factor_inspector(std::unique_ptr<RiskFactorInspector> inspector) {
+    risk_factor_inspector_ = std::move(inspector);
+    
+    if (risk_factor_inspector_) {
+        std::cout << "\nMAHIMA: Risk Factor Inspector successfully set in RuntimeContext";
+        std::cout << "\n  Scenario: " << scenario_->name();
+        std::cout << "\n  Ready for Year 3 data capture.\n";
+    } else {
+        std::cout << "\nMAHIMA: Warning - Null Risk Factor Inspector set in RuntimeContext\n";
+    }
+}
+
+bool RuntimeContext::has_risk_factor_inspector() const noexcept {
+    bool has_inspector = (risk_factor_inspector_ != nullptr);
+    
+    return has_inspector;
+}
+
+RiskFactorInspector& RuntimeContext::get_risk_factor_inspector() {
+    if (!risk_factor_inspector_) {
+        throw core::HgpsException(
+            "MAHIMA: RuntimeContext::get_risk_factor_inspector() called but no inspector is set! "
+            "Make sure to call has_risk_factor_inspector() first and set_risk_factor_inspector() "
+            "during simulation initialization.");
+    }
+    
+    return *risk_factor_inspector_;
 }
 
 } // namespace hgps

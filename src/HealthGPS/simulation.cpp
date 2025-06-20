@@ -7,6 +7,7 @@
 #include "mtrandom.h"
 #include "sync_message.h"
 #include "univariate_visitor.h"
+#include "risk_factor_inspector.h"
 
 #include <algorithm>
 #include <fmt/format.h>
@@ -14,6 +15,7 @@
 #include <memory>
 #include <oneapi/tbb/parallel_for_each.h>
 #include <stdexcept>
+#include <filesystem>
 
 namespace { // anonymous namespace
 
@@ -40,6 +42,40 @@ Simulation::Simulation(SimulationModuleFactory &factory, std::shared_ptr<const E
     risk_factor_ = std::static_pointer_cast<RiskFactorHostModule>(risk_base);
     disease_ = std::static_pointer_cast<DiseaseModule>(disease_base);
     analysis_ = std::static_pointer_cast<UpdatableModule>(analysis_base);
+
+    // MAHIMA: Initialize Risk Factor Inspector for Year 3 Policy Inspection
+    // This inspector will capture individual person risk factor values in Year 3
+    // (when policies are applied) to help debug weird/incorrect values and identify outliers
+    try {
+        // MAHIMA: Create output directory for the inspection files
+        // We'll use the current working directory as a fallback since we don't have
+        // direct access to the configuration output folder here
+        std::filesystem::path output_dir = std::filesystem::current_path();
+        
+        // MAHIMA: Try to create a "risk_factor_inspection" subdirectory
+        auto inspection_dir = output_dir / "risk_factor_inspection";
+        if (!std::filesystem::exists(inspection_dir)) {
+            std::filesystem::create_directories(inspection_dir);
+        }
+        
+        // MAHIMA: Create the risk factor inspector instance
+        auto inspector = std::make_unique<RiskFactorInspector>(inspection_dir);
+        
+        // MAHIMA: Set the inspector in the runtime context
+        context_.set_risk_factor_inspector(std::move(inspector));
+        
+        std::cout << "\nMAHIMA: Risk Factor Inspector initialized successfully in Simulation constructor";
+        std::cout << "\n  Output directory: " << inspection_dir.string();
+        std::cout << "\n  Scenario: " << context_.scenario().name();
+        std::cout << "\n  Ready to capture Year 3 individual person data for policy inspection.\n";
+        
+    } catch (const std::exception &e) {
+        // MAHIMA: If inspector initialization fails, log the error but don't crash the simulation
+        // The simulation can still run without the inspector, just without Year 3 data capture
+        std::cout << "\nMAHIMA: Warning - Failed to initialize Risk Factor Inspector: " << e.what();
+        std::cout << "\n  Simulation will continue without Year 3 policy inspection data capture.";
+        std::cout << "\n  This may be normal if inspection is not needed for this run.\n";
+    }
 }
 
 void Simulation::setup_run(unsigned int run_number, unsigned int run_seed) noexcept {

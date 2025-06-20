@@ -10,8 +10,13 @@
 
 #include <functional>
 #include <vector>
+#include <memory>
 
 namespace hgps {
+
+// MAHIMA: Forward declaration for RiskFactorInspector
+// This prevents circular dependencies while allowing the context to manage the inspector
+class RiskFactorInspector;
 
 /// @brief Defines the Simulation runtime context data type
 ///
@@ -19,6 +24,8 @@ namespace hgps {
 /// including the virtual population, and expose to all modules via
 /// the API calls. Only one context instance exists per simulation
 /// instance for internal use only by the engine algorithm.
+/// 
+/// MAHIMA: Extended to support Risk Factor Inspector for Year 3 policy inspection
 class RuntimeContext {
   public:
     RuntimeContext() = delete;
@@ -28,6 +35,10 @@ class RuntimeContext {
     /// @param scenario The scenario to simulate
     RuntimeContext(std::shared_ptr<const EventAggregator> bus,
                    std::shared_ptr<const ModelInput> inputs, std::unique_ptr<Scenario> scenario);
+
+    /// @brief MAHIMA: Destructor for RuntimeContext
+    /// @details Explicitly declared to handle std::unique_ptr<RiskFactorInspector> with forward declaration
+    ~RuntimeContext();
 
     /// @brief Gets the current simulation time
     /// @return Current simulation time
@@ -111,6 +122,34 @@ class RuntimeContext {
     /// @return The value clamped to the factor's range if one exists, or the original value
     double ensure_risk_factor_in_range(const core::Identifier &factor_key,
                                        double value) const noexcept;
+
+    // MAHIMA: Risk Factor Inspector methods for Year 3 policy inspection
+    // These methods allow the simulation to manage a risk factor inspector instance
+    // for capturing individual person data when policies are applied in Year 3
+
+    /// @brief MAHIMA: Set the risk factor inspector instance
+    /// @param inspector Unique pointer to the risk factor inspector
+    /// 
+    /// @details The inspector is used to capture individual person risk factor data
+    /// in Year 3 when policies are applied. This helps identify outliers and debug
+    /// any weird/incorrect values that appear after policy application.
+    void set_risk_factor_inspector(std::unique_ptr<RiskFactorInspector> inspector);
+
+    /// @brief MAHIMA: Check if a risk factor inspector is available
+    /// @return true if inspector is set, false otherwise
+    /// 
+    /// @details This allows risk factor models to check if they should trigger
+    /// data capture without causing null pointer exceptions.
+    bool has_risk_factor_inspector() const noexcept;
+
+    /// @brief MAHIMA: Get reference to the risk factor inspector
+    /// @return Reference to the risk factor inspector
+    /// @throws std::runtime_error if no inspector is set
+    /// 
+    /// @details This provides access to the inspector for triggering Year 3 data capture.
+    /// Always check has_risk_factor_inspector() first to avoid exceptions.
+    RiskFactorInspector& get_risk_factor_inspector();
+
     int NumberOfResultsCSVs = 4;
 
   private:
@@ -123,6 +162,11 @@ class RuntimeContext {
     unsigned int current_run_{};
     int model_start_time_{};
     int time_now_{};
+
+    // MAHIMA: Risk Factor Inspector for Year 3 policy analysis
+    // This inspector captures individual person risk factor values when policies
+    // are applied to help debug weird/incorrect values and identify outliers
+    std::unique_ptr<RiskFactorInspector> risk_factor_inspector_;
 };
 
 } // namespace hgps
