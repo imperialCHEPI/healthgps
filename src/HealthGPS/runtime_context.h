@@ -9,8 +9,8 @@
 #include "scenario.h"
 
 #include <functional>
-#include <vector>
 #include <memory>
+#include <vector>
 
 namespace hgps {
 
@@ -24,7 +24,7 @@ class RiskFactorInspector;
 /// including the virtual population, and expose to all modules via
 /// the API calls. Only one context instance exists per simulation
 /// instance for internal use only by the engine algorithm.
-/// 
+///
 /// MAHIMA: Extended to support Risk Factor Inspector for Year 3 policy inspection
 class RuntimeContext {
   public:
@@ -37,7 +37,8 @@ class RuntimeContext {
                    std::shared_ptr<const ModelInput> inputs, std::unique_ptr<Scenario> scenario);
 
     /// @brief MAHIMA: Destructor for RuntimeContext
-    /// @details Explicitly declared to handle std::unique_ptr<RiskFactorInspector> with forward declaration
+    /// @details Explicitly declared to handle std::unique_ptr<RiskFactorInspector> with forward
+    /// declaration
     ~RuntimeContext();
 
     /// @brief Gets the current simulation time
@@ -129,7 +130,7 @@ class RuntimeContext {
 
     /// @brief MAHIMA: Set the risk factor inspector instance
     /// @param inspector Unique pointer to the risk factor inspector
-    /// 
+    ///
     /// @details The inspector is used to capture individual person risk factor data
     /// in Year 3 when policies are applied. This helps identify outliers and debug
     /// any weird/incorrect values that appear after policy application.
@@ -137,7 +138,7 @@ class RuntimeContext {
 
     /// @brief MAHIMA: Check if a risk factor inspector is available
     /// @return true if inspector is set, false otherwise
-    /// 
+    ///
     /// @details This allows risk factor models to check if they should trigger
     /// data capture without causing null pointer exceptions.
     bool has_risk_factor_inspector() const noexcept;
@@ -145,10 +146,10 @@ class RuntimeContext {
     /// @brief MAHIMA: Get reference to the risk factor inspector
     /// @return Reference to the risk factor inspector
     /// @throws std::runtime_error if no inspector is set
-    /// 
+    ///
     /// @details This provides access to the inspector for triggering Year 3 data capture.
     /// Always check has_risk_factor_inspector() first to avoid exceptions.
-    RiskFactorInspector& get_risk_factor_inspector();
+    RiskFactorInspector &get_risk_factor_inspector();
 
     int NumberOfResultsCSVs = 4;
 

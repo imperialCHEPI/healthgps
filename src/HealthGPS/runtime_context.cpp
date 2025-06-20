@@ -1,6 +1,6 @@
 #include "runtime_context.h"
-#include "risk_factor_inspector.h"
 #include "HealthGPS.Core/exception.h"
+#include "risk_factor_inspector.h"
 
 namespace hgps {
 
@@ -88,7 +88,7 @@ double RuntimeContext::ensure_risk_factor_in_range(const core::Identifier &facto
 
 void RuntimeContext::set_risk_factor_inspector(std::unique_ptr<RiskFactorInspector> inspector) {
     risk_factor_inspector_ = std::move(inspector);
-    
+
     if (risk_factor_inspector_) {
         std::cout << "\nMAHIMA: Risk Factor Inspector successfully set in RuntimeContext";
         std::cout << "\n  Scenario: " << scenario_->name();
@@ -100,18 +100,18 @@ void RuntimeContext::set_risk_factor_inspector(std::unique_ptr<RiskFactorInspect
 
 bool RuntimeContext::has_risk_factor_inspector() const noexcept {
     bool has_inspector = (risk_factor_inspector_ != nullptr);
-    
+
     return has_inspector;
 }
 
-RiskFactorInspector& RuntimeContext::get_risk_factor_inspector() {
+RiskFactorInspector &RuntimeContext::get_risk_factor_inspector() {
     if (!risk_factor_inspector_) {
         throw core::HgpsException(
             "MAHIMA: RuntimeContext::get_risk_factor_inspector() called but no inspector is set! "
             "Make sure to call has_risk_factor_inspector() first and set_risk_factor_inspector() "
             "during simulation initialization.");
     }
-    
+
     return *risk_factor_inspector_;
 }
 

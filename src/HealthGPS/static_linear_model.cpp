@@ -110,19 +110,22 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
     // have been applied to help identify outliers and debug weird/incorrect values
     // that may appear as a result of policy application
     if (context.has_risk_factor_inspector()) {
-        auto& inspector = context.get_risk_factor_inspector();
-        
+        auto &inspector = context.get_risk_factor_inspector();
+
         // MAHIMA: Check if this is Year 3 and we should capture data
         if (inspector.should_capture_year_3(context)) {
             // MAHIMA: Log the capture attempt for debugging
-            std::cout << "\nMAHIMA: StaticLinearModel triggering Year 3 risk factor data capture...";
+            std::cout
+                << "\nMAHIMA: StaticLinearModel triggering Year 3 risk factor data capture...";
             std::cout << "\n  Intervention status: " << (intervene ? "Active" : "Inactive");
-            std::cout << "\n  Scenario type: " << (context.scenario().type() == ScenarioType::baseline ? "Baseline" : "Intervention");
+            std::cout << "\n  Scenario type: "
+                      << (context.scenario().type() == ScenarioType::baseline ? "Baseline"
+                                                                              : "Intervention");
             std::cout << "\n  Population size: " << context.population().size();
-            
+
             // MAHIMA: Trigger the actual data capture
             inspector.capture_year_3_data(context);
-            
+
             std::cout << "\nMAHIMA: Year 3 data capture completed from StaticLinearModel.";
         }
     } else {
@@ -130,7 +133,8 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
         // This helps diagnose setup issues during development
         static bool warning_shown = false;
         if (!warning_shown && (context.time_now() - context.start_time()) == 2) {
-            std::cout << "\nMAHIMA: Note - No Risk Factor Inspector available for Year 3 data capture.";
+            std::cout
+                << "\nMAHIMA: Note - No Risk Factor Inspector available for Year 3 data capture.";
             std::cout << "\n  This is normal if inspection is not enabled for this simulation.";
             warning_shown = true;
         }

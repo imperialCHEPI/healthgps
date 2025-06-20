@@ -298,13 +298,13 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         for (const auto &[risk_factor_name, model_params] : policy_csv_coefficients) {
             std::cout << "\n\nRisk Factor: " << risk_factor_name;
             std::cout << "\n  Intercept: " << model_params.intercept;
-            
+
             // Print all coefficients
             std::cout << "\n  Coefficients:";
             for (const auto &[coef_name, coef_value] : model_params.coefficients) {
                 std::cout << "\n    " << coef_name.to_string() << ": " << coef_value;
             }
-            
+
             // Print log coefficients if any
             if (!model_params.log_coefficients.empty()) {
                 std::cout << "\n  Log Coefficients:";
@@ -312,7 +312,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                     std::cout << "\n    " << log_coef_name.to_string() << ": " << log_coef_value;
                 }
             }
-            
+
             // Print range if available
             if (policy_ranges_map.find(risk_factor_name) != policy_ranges_map.end()) {
                 const auto &range = policy_ranges_map[risk_factor_name];
