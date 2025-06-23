@@ -1516,7 +1516,8 @@ load_logistic_regression_coefficients_from_csv(const std::filesystem::path &csv_
                 std::string rf_name = risk_factor_names[col_idx];
 
                 // Read the value from the CSV
-                auto value = doc.GetCell<double>(col_idx + 1, row_idx); // +1 because first column is row names
+                auto value = doc.GetCell<double>(col_idx + 1,
+                                                 row_idx); // +1 because first column is row names
 
                 // Set the appropriate value based on the row type
                 if (coef_name == "Intercept") {

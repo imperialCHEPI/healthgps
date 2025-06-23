@@ -138,7 +138,8 @@ void RiskFactorInspector::capture_year_3_data(RuntimeContext &context) {
         scenario_type = "Intervention";
         target_file = &intervention_file_;
         if constexpr (ENABLE_YEAR3_RISK_FACTOR_INSPECTION) {
-            std::cout << "\nMAHIMA: Capturing Year 3 INTERVENTION risk factor data (post-policy)...";
+            std::cout
+                << "\nMAHIMA: Capturing Year 3 INTERVENTION risk factor data (post-policy)...";
         }
     }
 
@@ -154,8 +155,8 @@ void RiskFactorInspector::capture_year_3_data(RuntimeContext &context) {
     }
 
     if constexpr (ENABLE_YEAR3_RISK_FACTOR_INSPECTION) {
-        std::cout << "\n  Population to process: " << active_count << " active out of " << total_count
-                  << " total";
+        std::cout << "\n  Population to process: " << active_count << " active out of "
+                  << total_count << " total";
     }
 
     // MAHIMA: Write individual person records to the appropriate file

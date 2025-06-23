@@ -114,8 +114,9 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
     // This captures individual person risk factor values immediately after policies
     // have been applied to help identify outliers and debug weird/incorrect values
     // that may appear as a result of policy application
-    // It is set to FALSE now, if needed, go to line 16 of this file and set it to TRUE (if ypu do only for static linear model is also fine, the others are for detailed print statements)
-    //Also set to TRUE in simulation.cpp line 31 and runtime_context.cpp line 9
+    // It is set to FALSE now, if needed, go to line 16 of this file and set it to TRUE (if ypu do
+    // only for static linear model is also fine, the others are for detailed print statements)
+    // Also set to TRUE in simulation.cpp line 31 and runtime_context.cpp line 9
     if constexpr (ENABLE_YEAR3_RISK_FACTOR_INSPECTION) {
         if (context.has_risk_factor_inspector()) {
             auto &inspector = context.get_risk_factor_inspector();
@@ -140,7 +141,8 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
                 // This helps diagnose setup issues during development
                 static bool warning_shown = false;
                 if (!warning_shown && (context.time_now() - context.start_time()) == 2) {
-                    std::cout << "\nMAHIMA: Note - Risk Factor Inspector for Year 3 data capture is turned off.";
+                    std::cout << "\nMAHIMA: Note - Risk Factor Inspector for Year 3 data capture "
+                                 "is turned off.";
                     warning_shown = true;
                 }
             }
@@ -431,8 +433,6 @@ void StaticLinearModel::update_policies(Person &person, bool intervene) const {
         // Save policy.
         person.risk_factors[policy_name] = policy;
     }
-
-
 }
 
 void StaticLinearModel::apply_policies(Person &person, bool intervene) const {
@@ -523,13 +523,14 @@ StaticLinearModel::compute_linear_models(Person &person,
             /* if (coefficient_name == "EnergyIntake"_id) {
                 static int print_count = 0;
                 if (print_count < 3) { // Only print first 3 times to avoid spam
-                    std::cout << "\nMAHIMA VERIFICATION: EnergyIntake log coefficient applied correctly!"
+                    std::cout << "\nMAHIMA VERIFICATION: EnergyIntake log coefficient applied
+            correctly!"
                               << "\n  Coefficient value: " << coefficient_value
-                              << "\n  EnergyIntake value: " << value  
+                              << "\n  EnergyIntake value: " << value
                               << "\n  log(EnergyIntake): " << log(value)
                               << "\n  Linear term contribution: " << coefficient_value * log(value)
-                              << "\n  (Previous bug would have been: " << coefficient_value * value << ")";
-                    print_count++;
+                              << "\n  (Previous bug would have been: " << coefficient_value * value
+            << ")"; print_count++;
                 }
             }*/
 
