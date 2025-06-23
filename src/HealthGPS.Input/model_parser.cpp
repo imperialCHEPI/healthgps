@@ -254,7 +254,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     // std::cout << "Finished loading PolicyCovarianceFile";
 
     // Check if boxcox_coefficients.csv for the risk factors boxcox data and the
-    // scenario2_food_policyeffect_model.csv for policy data exists in the same directory as the
+    // policyeffect_model.csv for policy data exists in the same directory as the
     // model JSON- Mahima
     // Basically they have to be in the same folder as the JSON files- so in case of FINCH it is
     // C://HealthGPS-examples/KevinHall_FINCH folder
@@ -262,7 +262,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     std::filesystem::path csv_path =
         model_dir / "boxcox_coefficients.csv"; // loading of boxcox for RF
     std::filesystem::path policy_csv_path =
-        model_dir / "scenario2_food_policyeffect_model.csv"; // loading of policy for RF
+        model_dir / "policyeffect_model.csv"; // loading of policy for RF
     std::filesystem::path logistic_csv_path =
         model_dir / "logistic_regression.csv"; // loading of logistic regression for 2 stage- risk
                                                // factor modelling
@@ -294,7 +294,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                   << policy_csv_coefficients.size() << " risk factors";
 
         // MAHIMA: Print the complete contents of the loaded policy CSV file
-        std::cout << "\n======= CONTENTS OF scenario2_food_policyeffect_model.csv =======";
+        std::cout << "\n======= CONTENTS OF policyeffect_model.csv =======";
         for (const auto &[risk_factor_name, model_params] : policy_csv_coefficients) {
             std::cout << "\n\nRisk Factor: " << risk_factor_name;
             std::cout << "\n  Intercept: " << model_params.intercept;
