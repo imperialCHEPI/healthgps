@@ -11,17 +11,17 @@
 namespace hgps {
 
 /// @brief MAHIMA: Risk Factor Inspector for Year 3 Policy Application Analysis
-/// 
-/// @details This class captures individual person risk factor values in Year 3 
-/// (when policies are applied) to help identify outliers and inspect any 
-/// incorrect/weird values after policy application. The class creates separate 
+///
+/// @details This class captures individual person risk factor values in Year 3
+/// (when policies are applied) to help identify outliers and inspect any
+/// incorrect/weird values after policy application. The class creates separate
 /// CSV files for baseline and intervention scenarios with individual person records.
-/// 
+///
 /// Purpose: Debug policy effects on specific nutrients/risk factors
 /// Target: Year 3 data capture (when policy application begins)
 /// Output: Individual person records with exact risk factor values
 class RiskFactorInspector {
-public:
+  public:
     /// @brief MAHIMA: Initialize the Risk Factor Inspector
     /// @param output_dir Directory where the inspection CSV files will be created
     /// @throws std::runtime_error if output files cannot be created
@@ -41,15 +41,15 @@ public:
 
     /// @brief MAHIMA: Capture Year 3 individual risk factor data
     /// @param context Runtime context containing population and scenario information
-    /// 
+    ///
     /// @details This method iterates through all active people in the population
     /// and writes their individual risk factor values to the appropriate CSV file
     /// (baseline or intervention). Called after policies have been applied.
     void capture_year_3_data(RuntimeContext &context);
 
-private:
+  private:
     /// @brief MAHIMA: Target risk factors to capture for inspection
-    /// 
+    ///
     /// @details These are the specific nutrients/risk factors that were identified
     /// as producing weird/incorrect values after policy application:
     /// - Added Sugar, Carbohydrate, Fat, Protein
@@ -68,7 +68,7 @@ private:
     bool year_3_captured_;
 
     /// @brief MAHIMA: Write CSV headers for both output files
-    /// 
+    ///
     /// @details Creates headers with: source, run, time, person_id, age, gender,
     /// region, ethnicity, income, followed by all target risk factor columns
     void write_headers();
@@ -79,7 +79,7 @@ private:
     /// @param source Scenario type ("Baseline" or "Intervention")
     /// @param run Current simulation run number
     /// @param time Current simulation time (should be Year 3)
-    /// 
+    ///
     /// @details Writes one row per person with all their risk factor values,
     /// handling missing values and NaN/infinite values gracefully
     void write_person_record(std::ofstream &file, const Person &person, const std::string &source,
@@ -102,4 +102,4 @@ private:
     std::string ethnicity_enum_to_string(core::Ethnicity ethnicity);
 };
 
-} // namespace hgps 
+} // namespace hgps
