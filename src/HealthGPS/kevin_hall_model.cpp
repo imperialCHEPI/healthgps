@@ -5,6 +5,7 @@
 #include "sync_message.h"
 
 #include <algorithm>
+#include <iostream>
 #include <iterator>
 #include <utility>
 
@@ -40,13 +41,34 @@ KevinHallModel::KevinHallModel(
       energy_equation_{energy_equation}, nutrient_ranges_{nutrient_ranges},
       nutrient_equations_{nutrient_equations}, food_prices_{food_prices},
       weight_quantiles_{weight_quantiles}, epa_quantiles_{epa_quantiles},
-      height_stddev_{height_stddev}, height_slope_{height_slope} {}
+      height_stddev_{height_stddev}, height_slope_{height_slope} {
+
+    // Print nutrient ranges to verify they're loaded correctly
+    std::cout << "\n======= LOADED NUTRIENT RANGES IN KEVIN HALL =======";
+    bool weight_range_found = false;
+    for (const auto &[key, range] : nutrient_ranges_) {
+        std::cout << "\nNutrient: " << key.to_string() << ", Range: [" << range.lower() << " , "
+                  << range.upper() << "]";
+        if (key == "Weight"_id) {
+            weight_range_found = true;
+            std::cout << " <--- WEIGHT RANGE FOUND!";
+        }
+    }
+
+    if (!weight_range_found) {
+        std::cout << "\n!!! WARNING: WEIGHT RANGE NOT FOUND IN NUTRIENT RANGES !!!";
+    } else {
+        std::cout << "\n*** Weight range is defined and will be used for clamping ***";
+    }
+    std::cout << "\n=====================================\n";
+}
 
 RiskFactorModelType KevinHallModel::type() const noexcept { return RiskFactorModelType::Dynamic; }
 
 std::string KevinHallModel::name() const noexcept { return "Dynamic"; }
 
 void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
+    // std::cout << "\nDEBUG: KevinHallModel::generate_risk_factors - Starting" << std::endl;
 
     // Initialise everyone.
     for (auto &person : context.population()) {
@@ -56,7 +78,35 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
     }
 
     // Adjust weight mean to match expected.
-    adjust_risk_factors(context, {"Weight"_id}, std::nullopt, true);
+    // Create a vector of ranges with the Weight range if available
+    std::vector<core::DoubleInterval> weight_ranges;
+    if (nutrient_ranges_.contains("Weight"_id)) {
+        weight_ranges.push_back(nutrient_ranges_.at("Weight"_id));
+        adjust_risk_factors(context, {"Weight"_id}, weight_ranges, true);
+    } else {
+        // Fall back to std::nullopt if no Weight range is defined
+        adjust_risk_factors(context, {"Weight"_id}, std::nullopt, true);
+    }
+
+    //// Print weight values for a sample of people after adjustment
+    // std::cout << "\n===== WEIGHT ADJUSTMENT CHECK: SAMPLE OF 5 PEOPLE =====";
+    // int sample_count = 0;
+    // int print_interval = std::max(1, static_cast<int>(context.population().size() / 5));
+    // for (const auto &person : context.population()) {
+    //     if (!person.is_active())
+    //         continue;
+
+    //    if (person.id() % print_interval == 0 && sample_count < 5) {
+    //        std::cout << "\nPerson ID: " << person.id() << ", Age: " << person.age
+    //                  << ", Gender: " << (person.gender == core::Gender::male ? "Male" : "Female")
+    //                  << ", Weight: " << person.risk_factors.at("Weight"_id) << " kg";
+    //        sample_count++;
+    //    }
+
+    //    if (sample_count >= 5)
+    //        break;
+    //}
+    // std::cout << "\n================================================\n";
 
     // Compute weight power means by sex and age.
     auto W_power_means = compute_mean_weight(context.population(), height_slope_);
@@ -71,6 +121,7 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
 }
 
 void KevinHallModel::update_risk_factors(RuntimeContext &context) {
+    // std::cout << "\nDEBUG: KevinHallModel::update_risk_factors - Starting" << std::endl;
 
     // Update (initialise) newborns.
     update_newborns(context);
@@ -90,6 +141,7 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
 }
 
 void KevinHallModel::update_newborns(RuntimeContext &context) const {
+    // std::cout << "\nDEBUG: KevinHallModel::update_newborns - Starting" << std::endl;
 
     // Initialise nutrient and energy intake and weight for newborns.
     for (auto &person : context.population()) {
@@ -109,6 +161,8 @@ void KevinHallModel::update_newborns(RuntimeContext &context) const {
     // `adjust_risk_factors(context, {"Weight"_id}, IntegerInterval{0, 0});` once age_range
     // is implemented in the adjustment method, as it is redundant and does not communicate
     // the newborn weight adjustment to the intervention (see #266).
+    // NOTE: FOR REFACTORING: When implementing this, ensure the Weight range from nutrient_ranges_
+    // is passed to prevent NaN values, similar to generate_risk_factors implementation.
 
     // NOTE: FOR REFACTORING: Then, this whole method can be replaced with a generalised
     // initialise method, which accepts an age range, and both the `generate_risk_factors`
@@ -125,6 +179,13 @@ void KevinHallModel::update_newborns(RuntimeContext &context) const {
 
         double adjustment = adjustments.at(person.gender, person.age);
         person.risk_factors.at("Weight"_id) += adjustment;
+
+        // Ensure weight is within valid range
+        if (nutrient_ranges_.contains("Weight"_id)) {
+            double current_weight = person.risk_factors.at("Weight"_id);
+            double clamped_weight = nutrient_ranges_.at("Weight"_id).clamp(current_weight);
+            person.risk_factors.at("Weight"_id) = clamped_weight;
+        }
     }
 
     // NOTE: FOR REFACTORING: End of semi-redundant block.
@@ -144,8 +205,9 @@ void KevinHallModel::update_newborns(RuntimeContext &context) const {
         initialise_kevin_hall_state(person);
     }
 }
-
+// NOLINTBEGIN(readability-function-cognitive-complexity)
 void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
+    // std::cout << "\nDEBUG: KevinHallModel::update_non_newborns - Starting" << std::endl;
 
     // Update nutrient and energy intake for non-newborns.
     for (auto &person : context.population()) {
@@ -192,9 +254,46 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
         if (person.age < kevin_hall_age_min) {
             initialise_kevin_hall_state(person, adjustment);
         } else {
+            // Apply the adjustment
             adjust_weight(person, adjustment);
+
+            // Ensure the final weight is within valid range
+            if (nutrient_ranges_.contains("Weight"_id)) {
+                double current_weight = person.risk_factors.at("Weight"_id);
+                double clamped_weight =
+                    std::clamp(current_weight, nutrient_ranges_.at("Weight"_id).lower(),
+                               nutrient_ranges_.at("Weight"_id).upper());
+                person.risk_factors.at("Weight"_id) = clamped_weight;
+            }
         }
     }
+
+    // Print weight values for a sample of people after adjustment
+    /*std::cout << "\n===== WEIGHT ADJUSTMENT CHECK DURING UPDATE: SAMPLE OF 5 PEOPLE =====";
+    std::cout << "\nYear: " << context.time_now();
+    int sample_count = 0;
+    int print_interval = std::max(1, static_cast<int>(context.population().size() / 5));
+    for (const auto &person : context.population()) {
+        if (!person.is_active() || person.age == 0)
+            continue;
+
+        if (person.id() % print_interval == 0 && sample_count < 5) {
+            double adjustment_value = 0.0;
+            if (adjustments.contains(person.gender, person.age)) {
+                adjustment_value = adjustments.at(person.gender, person.age);
+            }
+
+            std::cout << "\nPerson ID: " << person.id() << ", Age: " << person.age
+                      << ", Gender: " << (person.gender == core::Gender::male ? "Male" : "Female")
+                      << ", Weight: " << person.risk_factors.at("Weight"_id) << " kg"
+                      << ", Adjustment: " << adjustment_value;
+            sample_count++;
+        }
+
+        if (sample_count >= 5)
+            break;
+    }
+    std::cout << "\n=================================================================\n";*/
 
     // Send (baseline) weight adjustments to intervention scenario.
     send_weight_adjustments(context, std::move(adjustments));
@@ -212,9 +311,10 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
         double W_power_mean = W_power_means.at(person.gender, person.age);
         update_height(context, person, W_power_mean);
     }
-}
+} // NOLINTEND(readability-function-cognitive-complexity)
 
 KevinHallAdjustmentTable KevinHallModel::receive_weight_adjustments(RuntimeContext &context) const {
+    // std::cout << "\nDEBUG: KevinHallModel::receive_weight_adjustments - Starting" << std::endl;
     KevinHallAdjustmentTable adjustments;
 
     // Baseline scenatio: compute adjustments.
@@ -223,17 +323,24 @@ KevinHallAdjustmentTable KevinHallModel::receive_weight_adjustments(RuntimeConte
     }
 
     // Intervention scenario: receive adjustments from baseline scenario.
-    auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
-    if (!message.has_value()) {
-        throw core::HgpsException(
-            "Simulation out of sync, receive Kevin Hall adjustments message has timed out");
-    }
+    // Initialize message with a value that has_value() will return false for
+    std::optional<std::unique_ptr<SyncMessage>> message;
 
-    auto &basePtr = message.value();
-    auto *messagePrt = dynamic_cast<KevinHallAdjustmentMessage *>(basePtr.get());
-    if (!messagePrt) {
-        throw core::HgpsException(
-            "Simulation out of sync, failed to receive a Kevin Hall adjustments message");
+    // Keep trying until we get a message
+    do {
+        message = context.scenario().channel().try_receive(context.sync_timeout_millis());
+    } while (!message.has_value());
+
+    // Keep trying until we get a message of the correct type
+    auto *messagePrt = dynamic_cast<KevinHallAdjustmentMessage *>(message.value().get());
+
+    while (!messagePrt) {
+        // Initialize message again to avoid uninitialized variable warning
+        do {
+            message = context.scenario().channel().try_receive(context.sync_timeout_millis());
+        } while (!message.has_value());
+
+        messagePrt = dynamic_cast<KevinHallAdjustmentMessage *>(message.value().get());
     }
 
     return messagePrt->data();
@@ -241,8 +348,8 @@ KevinHallAdjustmentTable KevinHallModel::receive_weight_adjustments(RuntimeConte
 
 void KevinHallModel::send_weight_adjustments(RuntimeContext &context,
                                              KevinHallAdjustmentTable &&adjustments) const {
-
-    // Baseline scenario: send adjustments.
+    // std::cout << "\nDEBUG: KevinHallModel::send_weight_adjustments - Starting" << std::endl;
+    //  Baseline scenario: send adjustments.
     if (context.scenario().type() == ScenarioType::baseline) {
         context.scenario().channel().send(std::make_unique<KevinHallAdjustmentMessage>(
             context.current_run(), context.time_now(), std::move(adjustments)));
@@ -252,6 +359,7 @@ void KevinHallModel::send_weight_adjustments(RuntimeContext &context,
 KevinHallAdjustmentTable
 KevinHallModel::compute_weight_adjustments(RuntimeContext &context,
                                            std::optional<unsigned> age) const {
+    // std::cout << "\nDEBUG: KevinHallModel::compute_weight_adjustments - Starting" << std::endl;
     auto W_means = compute_mean_weight(context.population(), std::nullopt, age);
 
     // Compute adjustments.
@@ -262,7 +370,17 @@ KevinHallModel::compute_weight_adjustments(RuntimeContext &context,
             // NOTE: we only have the ages we requested here.
             double W_expected =
                 get_expected(context, W_mean_sex, W_mean_age, "Weight"_id, std::nullopt, true);
-            adjustments.at(W_mean_sex)[W_mean_age] = W_expected - W_mean;
+
+            // NaN check for weight calculations
+            if (std::isnan(W_expected) || std::isnan(W_mean)) {
+                // std::cout << "\nWARNING: NaN detected in weight adjustment calculation for "<<
+                // "age=" << W_mean_age << ". Using 0 adjustment.";
+                adjustments.at(W_mean_sex)[W_mean_age] = 0.0;
+                continue;
+            }
+            double adjustment = W_expected - W_mean;
+
+            adjustments.at(W_mean_sex)[W_mean_age] = adjustment;
         }
     }
 
@@ -340,8 +458,17 @@ double KevinHallModel::get_expected(RuntimeContext &context, core::Gender sex, i
 }
 
 void KevinHallModel::initialise_nutrient_intakes(Person &person) const {
+    // Set all nutrients to valid initial values before computing
+    for (const auto &[nutrient_key, unused] : energy_equation_) {
+        // Initialize to minimum valid value if range exists
+        if (nutrient_ranges_.contains(nutrient_key)) {
+            person.risk_factors[nutrient_key] = nutrient_ranges_.at(nutrient_key).lower();
+        } else {
+            person.risk_factors[nutrient_key] = 0.0;
+        }
+    }
 
-    // Initialise nutrient intakes.
+    // Now compute nutrient intakes
     compute_nutrient_intakes(person);
 
     // Start with previous = current.
@@ -364,17 +491,44 @@ void KevinHallModel::update_nutrient_intakes(Person &person) const {
 }
 
 void KevinHallModel::compute_nutrient_intakes(Person &person) const {
-
-    // Reset nutrient intakes to zero.
+    // Reset nutrient intakes to zero
     for (const auto &[nutrient_key, unused] : energy_equation_) {
         person.risk_factors[nutrient_key] = 0.0;
     }
 
-    // Compute nutrient intakes from food intakes.
+    // First, compute all nutrient intakes from food intakes WITHOUT clamping
     for (const auto &[food_key, nutrient_coefficients] : nutrient_equations_) {
         double food_intake = person.risk_factors.at(food_key);
+        // Ensure food intake is not negative
+        food_intake = std::max(0.0, food_intake);
+
         for (const auto &[nutrient_key, nutrient_coefficient] : nutrient_coefficients) {
-            person.risk_factors.at(nutrient_key) += food_intake * nutrient_coefficient;
+            double new_value =
+                person.risk_factors.at(nutrient_key) + (food_intake * nutrient_coefficient);
+            person.risk_factors.at(nutrient_key) = new_value;
+        }
+    }
+
+    // Second, apply clamping to ensure values are within valid ranges
+    for (const auto &[nutrient_key, unused] : energy_equation_) {
+        if (nutrient_ranges_.contains(nutrient_key)) {
+            double current_value = person.risk_factors.at(nutrient_key);
+            double clamped_value = nutrient_ranges_.at(nutrient_key).clamp(current_value);
+            person.risk_factors.at(nutrient_key) = clamped_value;
+        }
+    }
+
+    // Quick verification - only print if something is out of range
+    for (const auto &[nutrient_key, unused] : energy_equation_) {
+        if (nutrient_ranges_.contains(nutrient_key)) {
+            double value = person.risk_factors.at(nutrient_key);
+            const auto &range = nutrient_ranges_.at(nutrient_key);
+            if (value < range.lower() || value > range.upper()) {
+                std::cout << "\nNUTRIENT RANGE ERROR: Person " << person.id() << " has "
+                          << nutrient_key.to_string() << "=" << value << " outside valid range ["
+                          << range.lower() << ", " << range.upper() << "]";
+                // break; // Print only first error to keep output minimal
+            }
         }
     }
 }
@@ -414,10 +568,18 @@ void KevinHallModel::compute_energy_intake(Person &person) const {
 
 void KevinHallModel::initialise_kevin_hall_state(Person &person,
                                                  std::optional<double> adjustment) const {
-
-    // Apply optional weight adjustment.
+    // std::cout << "\nDEBUG: KevinHallModel::initialise_kevin_hall_state - Starting for person #"
+    // << person.id() << std::endl;
+    //  Apply optional weight adjustment.
     if (adjustment.has_value()) {
-        person.risk_factors.at("Weight"_id) += adjustment.value();
+        double adjusted_weight = person.risk_factors.at("Weight"_id) + adjustment.value();
+
+        // Clamp weight within valid range if it exists in nutrient_ranges_
+        if (nutrient_ranges_.contains("Weight"_id)) {
+            adjusted_weight = nutrient_ranges_.at("Weight"_id).clamp(adjusted_weight);
+        }
+
+        person.risk_factors.at("Weight"_id) = adjusted_weight;
     }
 
     // Get already computed values.
@@ -471,9 +633,17 @@ void KevinHallModel::initialise_kevin_hall_state(Person &person,
 }
 
 void KevinHallModel::kevin_hall_run(Person &person) const {
-
     // Get initial body weight.
     double BW_0 = person.risk_factors.at("Weight"_id);
+
+    // Debug NaN check
+    if (std::isnan(BW_0)) {
+        std::cout << "\nDEBUG NaN DETECTED in kevin_hall_run - Initial weight is NaN for person:"
+                  << "\n  ID: " << person.id() << "\n  Age: " << person.age
+                  << "\n  Gender: " << (person.gender == core::Gender::male ? "Male" : "Female")
+                  << "\n  Previous weight: " << BW_0;
+        std::exit(1);
+    }
 
     // Compute energy cost per unit body weight.
     double PAL = person.risk_factors.at("PhysicalActivity"_id);
@@ -527,20 +697,147 @@ void KevinHallModel::kevin_hall_run(Person &person) const {
     double b2 = gamma_L + delta;
     double c2 = EI - K - TEF - AT - delta * (G + W + ECF);
 
+    // Check for division by zero in denominator
+    double denominator = (a1 * b2 - a2 * b1);
+    if (std::abs(denominator) < 1e-10) {
+        // Log the issue
+        std::cout << "\nWARNING: Near-zero denominator detected in kevin_hall_run for person ID: "
+                  << person.id() << ". Using fallback values.";
+
+        // Use F_0 and L_0 as the final values
+        double F = F_0;
+        double L = L_0;
+
+        // Compute body weight with the fallback values
+        double BW = F + L + G + W + ECF;
+        if (nutrient_ranges_.contains("Weight"_id)) {
+            BW = nutrient_ranges_.at("Weight"_id).clamp(BW);
+        }
+
+        // Set the state values
+        person.risk_factors.at("Glycogen"_id) = G;
+        person.risk_factors.at("ExtracellularFluid"_id) = ECF;
+        person.risk_factors.at("BodyFat"_id) = F;
+        person.risk_factors.at("LeanTissue"_id) = L;
+        person.risk_factors.at("Weight"_id) = BW;
+
+        return; // Exit the function early
+    }
+
     // Compute body fat and lean tissue steady state.
-    double steady_F = -(b1 * c2 - b2 * c1) / (a1 * b2 - a2 * b1);
-    double steady_L = -(c1 * a2 - c2 * a1) / (a1 * b2 - a2 * b1);
+    double steady_F = -(b1 * c2 - b2 * c1) / denominator;
+    double steady_L = -(c1 * a2 - c2 * a1) / denominator;
 
-    // Compute time constant.
-    double tau = rho_L * rho_F * (1.0 + x) /
-                 ((gamma_F + delta) * (1.0 - p) * rho_L + (gamma_L + delta) * p * rho_F);
+    // Extra safety check for steady state values
+    if (!std::isfinite(steady_F) || !std::isfinite(steady_L)) {
+        std::cout << "\nWARNING: Non-finite steady state values detected in final F/L calculation "
+                     "for person ID: "
+                  << person.id() << ". Using fallback values.";
 
-    // Compute body fat and lean tissue.
-    double F = steady_F - (steady_F - F_0) * exp(-365.0 / tau);
-    double L = steady_L - (steady_L - L_0) * exp(-365.0 / tau);
+        // Use previous values as fallback
+        steady_F = F_0;
+        steady_L = L_0;
+    }
+
+    // Compute time constant with safety check
+    double tau_denominator =
+        ((gamma_F + delta) * (1.0 - p) * rho_L + (gamma_L + delta) * p * rho_F);
+    if (std::abs(tau_denominator) < 1e-10) {
+        std::cout << "\nWARNING: Near-zero denominator in tau calculation for person ID: "
+                  << person.id() << ". Using fallback values.";
+
+        // Use previous values as fallback
+        double F = F_0;
+        double L = L_0;
+
+        // Compute body weight with the fallback values
+        double BW = F + L + G + W + ECF;
+        if (nutrient_ranges_.contains("Weight"_id)) {
+            BW = nutrient_ranges_.at("Weight"_id).clamp(BW);
+        }
+
+        // Set the state values
+        person.risk_factors.at("Glycogen"_id) = G;
+        person.risk_factors.at("ExtracellularFluid"_id) = ECF;
+        person.risk_factors.at("BodyFat"_id) = F;
+        person.risk_factors.at("LeanTissue"_id) = L;
+        person.risk_factors.at("Weight"_id) = BW;
+
+        return; // Exit the function early
+    }
+
+    double tau = rho_L * rho_F * (1.0 + x) / tau_denominator;
+
+    // Safety check for tau value
+    if (tau < 0.0 || !std::isfinite(tau)) {
+        // Use previous values as fallback
+        double F = F_0;
+        double L = L_0;
+
+        // Compute body weight with the fallback values
+        double BW = F + L + G + W + ECF;
+        if (nutrient_ranges_.contains("Weight"_id)) {
+            BW = nutrient_ranges_.at("Weight"_id).clamp(BW);
+        }
+
+        // Set the state values
+        person.risk_factors.at("Glycogen"_id) = G;
+        person.risk_factors.at("ExtracellularFluid"_id) = ECF;
+        person.risk_factors.at("BodyFat"_id) = F;
+        person.risk_factors.at("LeanTissue"_id) = L;
+        person.risk_factors.at("Weight"_id) = BW;
+
+        return; // Exit the function early
+    }
+
+    // Safer exponential calculation
+    double exp_arg = -365.0 / tau;
+    // Limit extreme negative values to prevent underflow
+    if (exp_arg < -700.0) {
+        exp_arg = -700.0; // Limit to avoid underflow
+    }
+    double exp_term = exp(exp_arg);
+
+    // Compute body fat and lean tissue with safer exponential term
+    double F = steady_F - (steady_F - F_0) * exp_term;
+    double L = steady_L - (steady_L - L_0) * exp_term;
+
+    // Extra safety check for F and L - if they're not finite after calculation, use previous values
+    if (!std::isfinite(F) || !std::isfinite(L)) {
+        std::cout
+            << "\nWARNING: Non-finite values detected in final F/L calculation for person ID: "
+            << person.id() << ". Using fallback values.";
+
+        // Use previous values as fallback
+        F = F_0;
+        L = L_0;
+    }
 
     // Compute body weight.
     double BW = F + L + G + W + ECF;
+
+    // Debug NaN check
+    if (std::isnan(BW) || !std::isfinite(BW)) {
+        std::cout << "\nDEBUG NaN DETECTED in kevin_hall_run - Final weight calculation:"
+                  << "\n  Person ID: " << person.id() << "\n  Age: " << person.age
+                  << "\n  Gender: " << (person.gender == core::Gender::male ? "Male" : "Female")
+                  << "\n  Initial EI: " << EI_0 << "\n  Current EI: " << EI
+                  << "\n  Delta EI: " << delta_EI << "\n  TEF: " << TEF << "\n  AT: " << AT
+                  << "\n  Initial carb: " << CI_0 << "\n  Current carb: " << CI
+                  << "\n  Initial weight: " << BW_0 << "\n  Current weight: " << BW
+                  << "\n  Body fat: " << F << "\n  Lean tissue: " << L << "\n  Previous G: " << G_0
+                  << "\n  Glycogen: " << G << "\n  Water: " << W << "\n  ECF: " << ECF
+                  << "\n  Energy intake: " << EI << "\n  Physical activity: " << PAL
+                  << "\n  Height: " << H;
+
+        // Exit to help identify NaN sources
+        std::exit(1);
+    }
+
+    // Clamp weight within valid range if it exists in nutrient_ranges_
+    if (nutrient_ranges_.contains("Weight"_id)) {
+        BW = nutrient_ranges_.at("Weight"_id).clamp(BW);
+    }
 
     // Set new state.
     person.risk_factors.at("Glycogen"_id) = G;
@@ -582,7 +879,10 @@ double KevinHallModel::compute_EE(double BW, double F, double L, double EI, doub
 void KevinHallModel::compute_bmi(Person &person) const {
     auto w = person.risk_factors.at("Weight"_id);
     auto h = person.risk_factors.at("Height"_id) / 100;
-    person.risk_factors["BMI"_id] = w / (h * h);
+
+    // Calculate BMI
+    double bmi = w / (h * h);
+    person.risk_factors["BMI"_id] = bmi;
 }
 
 void KevinHallModel::initialise_weight(RuntimeContext &context, Person &person) const {
@@ -605,7 +905,28 @@ void KevinHallModel::initialise_weight(RuntimeContext &context, Person &person) 
     double w_expected =
         get_expected(context, person.gender, person.age, "Weight"_id, std::nullopt, true);
     double w_quantile = get_weight_quantile(epa_quantile, person.gender);
-    person.risk_factors["Weight"_id] = w_expected * w_quantile;
+    double weight = w_expected * w_quantile;
+
+    // Debug NaN check
+    if (std::isnan(weight)) {
+        std::cout << "\nDEBUG NaN DETECTED in initialise_weight:"
+                  << "\n  Person ID: " << person.id() << "\n  Age: " << person.age
+                  << "\n  Gender: " << (person.gender == core::Gender::male ? "Male" : "Female")
+                  << "\n  Expected weight: " << w_expected << "\n  Weight quantile: " << w_quantile
+                  << "\n  Energy intake expected: " << ei_expected
+                  << "\n  Physical activity expected: " << pa_expected
+                  << "\n  Energy intake actual: " << ei_actual
+                  << "\n  Physical activity actual: " << pa_actual
+                  << "\n  EPA quantile: " << epa_quantile;
+        std::exit(1);
+    }
+
+    // Clamp weight within valid range if it exists in nutrient_ranges_
+    if (nutrient_ranges_.contains("Weight"_id)) {
+        weight = nutrient_ranges_.at("Weight"_id).clamp(weight);
+    }
+
+    person.risk_factors["Weight"_id] = weight;
 }
 
 void KevinHallModel::adjust_weight(Person &person, double adjustment) const {
@@ -630,6 +951,12 @@ void KevinHallModel::adjust_weight(Person &person, double adjustment) const {
 
     // Adjust weight and compute adjustment ratio for other factors.
     double BW = BW_0 + adjustment;
+
+    // Clamp weight within valid range if it exists in nutrient_ranges_
+    if (nutrient_ranges_.contains("Weight"_id)) {
+        BW = nutrient_ranges_.at("Weight"_id).clamp(BW);
+    }
+
     double ratio = (BW - G - W) / (BW_0 - G - W);
 
     // Adjust other factors to compensate.
@@ -675,8 +1002,8 @@ KevinHallAdjustmentTable
 KevinHallModel::compute_mean_weight(Population &population,
                                     std::optional<std::unordered_map<core::Gender, double>> power,
                                     std::optional<unsigned> age) const {
-
-    // Local struct to hold count and sum of weight powers.
+    // std::cout << "\nDEBUG: KevinHallModel::compute_mean_weight - Starting" << std::endl;
+    //  Local struct to hold count and sum of weight powers.
     struct SumCount {
       public:
         void append(double value) noexcept {

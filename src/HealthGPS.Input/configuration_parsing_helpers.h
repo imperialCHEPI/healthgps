@@ -35,10 +35,10 @@ template <class T> bool get_to(const nlohmann::json &j, const std::string &key, 
         out = j.at(key).get<T>();
         return true;
     } catch (const nlohmann::json::out_of_range &) {
-        fmt::print(fg(fmt::color::red), "Missing key \"{}\"\n", key);
+        fmt::print(fmt::fg(fmt::color::red), "Missing key \"{}\"\n", key);
         return false;
     } catch (const nlohmann::json::type_error &) {
-        fmt::print(fg(fmt::color::red), "Key \"{}\" is of wrong type\n", key);
+        fmt::print(fmt::fg(fmt::color::red), "Key \"{}\" is of wrong type\n", key);
         return false;
     }
 }

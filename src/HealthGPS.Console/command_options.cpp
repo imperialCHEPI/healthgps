@@ -49,11 +49,11 @@ std::optional<CommandOptions> parse_arguments(cxxopts::Options &options, int arg
 
     cmd.verbose = result["verbose"].as<bool>();
     if (cmd.verbose) {
-        fmt::print(fg(fmt::color::dark_salmon), "Verbose output enabled\n");
+        fmt::print(fmt::fg(fmt::color::dark_salmon), "Verbose output enabled\n");
     }
 
     if (result.count("file")) {
-        fmt::print(fg(fmt::color::dark_salmon),
+        fmt::print(fmt::fg(fmt::color::dark_salmon),
                    "The -f/--file option is deprecated. Use -c/--config instead.\n");
         cmd.config_source = result["file"].as<std::string>();
     }
