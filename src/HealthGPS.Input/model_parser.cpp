@@ -1290,6 +1290,11 @@ load_risk_factor_coefficients_from_csv(const std::filesystem::path &csv_path, bo
                 // Set the appropriate value based on the row type
                 if (coef_name == "Intercept") {
                     result[rf_name].intercept = value;
+                } else if (coef_name == "EnergyIntake") {
+                    // MAHIMA: EnergyIntake should be treated as a log coefficient
+                    // This fixes the policy application bug where EnergyIntake coefficients
+                    // were being applied linearly instead of logarithmically
+                    result[rf_name].log_coefficients[hgps::core::Identifier(coef_name)] = value;
                 } else {
                     // Add to coefficients map using the mapped coefficient name
                     result[rf_name].coefficients[hgps::core::Identifier(coef_name)] = value;
@@ -1511,8 +1516,7 @@ load_logistic_regression_coefficients_from_csv(const std::filesystem::path &csv_
                 std::string rf_name = risk_factor_names[col_idx];
 
                 // Read the value from the CSV
-                double value = doc.GetCell<double>(col_idx + 1,
-                                                   row_idx); // +1 because first column is row names
+                auto value = doc.GetCell<double>(col_idx + 1, row_idx); // +1 because first column is row names
 
                 // Set the appropriate value based on the row type
                 if (coef_name == "Intercept") {

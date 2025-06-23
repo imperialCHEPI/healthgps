@@ -10,6 +10,11 @@
 
 namespace hgps {
 
+// MAHIMA: TOGGLE FOR YEAR 3 RISK FACTOR INSPECTION
+// Change this to 'true' to enable Year 3 policy inspection data capture
+// Change this to 'false' to disable it (default for normal simulations)
+static constexpr bool ENABLE_YEAR3_RISK_FACTOR_INSPECTION = false;
+
 RiskFactorModelType StaticLinearModel::type() const noexcept { return RiskFactorModelType::Static; }
 
 std::string StaticLinearModel::name() const noexcept { return "Static"; }
@@ -109,34 +114,36 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
     // This captures individual person risk factor values immediately after policies
     // have been applied to help identify outliers and debug weird/incorrect values
     // that may appear as a result of policy application
-    if (context.has_risk_factor_inspector()) {
-        auto &inspector = context.get_risk_factor_inspector();
+    // It is set to FALSE now, if needed, go to line 16 of this file and set it to TRUE (if ypu do only for static linear model is also fine, the others are for detailed print statements)
+    //Also set to TRUE in simulation.cpp line 31 and runtime_context.cpp line 9
+    if constexpr (ENABLE_YEAR3_RISK_FACTOR_INSPECTION) {
+        if (context.has_risk_factor_inspector()) {
+            auto &inspector = context.get_risk_factor_inspector();
 
-        // MAHIMA: Check if this is Year 3 and we should capture data
-        if (inspector.should_capture_year_3(context)) {
-            // MAHIMA: Log the capture attempt for debugging
-            std::cout
-                << "\nMAHIMA: StaticLinearModel triggering Year 3 risk factor data capture...";
-            std::cout << "\n  Intervention status: " << (intervene ? "Active" : "Inactive");
-            std::cout << "\n  Scenario type: "
-                      << (context.scenario().type() == ScenarioType::baseline ? "Baseline"
-                                                                              : "Intervention");
-            std::cout << "\n  Population size: " << context.population().size();
+            // MAHIMA: Check if this is Year 3 and we should capture data
+            if (inspector.should_capture_year_3(context)) {
+                // MAHIMA: Log the capture attempt for debugging
+                std::cout
+                    << "\nMAHIMA: StaticLinearModel triggering Year 3 risk factor data capture...";
+                std::cout << "\n  Intervention status: " << (intervene ? "Active" : "Inactive");
+                std::cout << "\n  Scenario type: "
+                          << (context.scenario().type() == ScenarioType::baseline ? "Baseline"
+                                                                                  : "Intervention");
+                std::cout << "\n  Population size: " << context.population().size();
 
-            // MAHIMA: Trigger the actual data capture
-            inspector.capture_year_3_data(context);
+                // MAHIMA: Trigger the actual data capture
+                inspector.capture_year_3_data(context);
 
-            std::cout << "\nMAHIMA: Year 3 data capture completed from StaticLinearModel.";
-        }
-    } else {
-        // MAHIMA: Optional debug message if no inspector is available
-        // This helps diagnose setup issues during development
-        static bool warning_shown = false;
-        if (!warning_shown && (context.time_now() - context.start_time()) == 2) {
-            std::cout
-                << "\nMAHIMA: Note - No Risk Factor Inspector available for Year 3 data capture.";
-            std::cout << "\n  This is normal if inspection is not enabled for this simulation.";
-            warning_shown = true;
+                std::cout << "\nMAHIMA: Year 3 data capture completed from StaticLinearModel.";
+            } else {
+                // MAHIMA: Optional debug message if no inspector is available
+                // This helps diagnose setup issues during development
+                static bool warning_shown = false;
+                if (!warning_shown && (context.time_now() - context.start_time()) == 2) {
+                    std::cout << "\nMAHIMA: Note - Risk Factor Inspector for Year 3 data capture is turned off.";
+                    warning_shown = true;
+                }
+            }
         }
     }
 }
@@ -424,6 +431,8 @@ void StaticLinearModel::update_policies(Person &person, bool intervene) const {
         // Save policy.
         person.risk_factors[policy_name] = policy;
     }
+
+
 }
 
 void StaticLinearModel::apply_policies(Person &person, bool intervene) const {
@@ -509,6 +518,20 @@ StaticLinearModel::compute_linear_models(Person &person,
             if (value <= 0) {
                 value = 1e-10; // Avoid log of zero or negative
             }
+
+            // MAHIMA: Verification print for EnergyIntake log coefficient fix
+            /* if (coefficient_name == "EnergyIntake"_id) {
+                static int print_count = 0;
+                if (print_count < 3) { // Only print first 3 times to avoid spam
+                    std::cout << "\nMAHIMA VERIFICATION: EnergyIntake log coefficient applied correctly!"
+                              << "\n  Coefficient value: " << coefficient_value
+                              << "\n  EnergyIntake value: " << value  
+                              << "\n  log(EnergyIntake): " << log(value)
+                              << "\n  Linear term contribution: " << coefficient_value * log(value)
+                              << "\n  (Previous bug would have been: " << coefficient_value * value << ")";
+                    print_count++;
+                }
+            }*/
 
             factor += coefficient_value * log(value);
         }

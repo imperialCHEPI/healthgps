@@ -26,6 +26,10 @@ using NetImmigrationMessage = hgps::SyncDataMessage<hgps::IntegerAgeGenderTable>
 
 namespace hgps {
 
+// MAHIMA: TOGGLE FOR YEAR 3 RISK FACTOR INSPECTION
+// Must match the toggle in static_linear_model.cpp
+static constexpr bool ENABLE_YEAR3_RISK_FACTOR_INSPECTION = false;
+
 Simulation::Simulation(SimulationModuleFactory &factory, std::shared_ptr<const EventAggregator> bus,
                        std::shared_ptr<const ModelInput> inputs, std::unique_ptr<Scenario> scenario)
     : context_{std::move(bus), std::move(inputs), std::move(scenario)} {
@@ -46,7 +50,8 @@ Simulation::Simulation(SimulationModuleFactory &factory, std::shared_ptr<const E
     // MAHIMA: Initialize Risk Factor Inspector for Year 3 Policy Inspection
     // This inspector will capture individual person risk factor values in Year 3
     // (when policies are applied) to help debug weird/incorrect values and identify outliers
-    try {
+    if constexpr (ENABLE_YEAR3_RISK_FACTOR_INSPECTION) {
+        try {
         // MAHIMA: Create output directory for the inspection files
         // We'll use the current working directory as a fallback since we don't have
         // direct access to the configuration output folder here
@@ -73,9 +78,12 @@ Simulation::Simulation(SimulationModuleFactory &factory, std::shared_ptr<const E
     } catch (const std::exception &e) {
         // MAHIMA: If inspector initialization fails, log the error but don't crash the simulation
         // The simulation can still run without the inspector, just without Year 3 data capture
-        std::cout << "\nMAHIMA: Warning - Failed to initialize Risk Factor Inspector: " << e.what();
-        std::cout << "\n  Simulation will continue without Year 3 policy inspection data capture.";
-        std::cout << "\n  This may be normal if inspection is not needed for this run.\n";
+        if constexpr (ENABLE_YEAR3_RISK_FACTOR_INSPECTION) {
+            std::cout << "\nMAHIMA: Warning - Failed to initialize Risk Factor Inspector: " << e.what();
+            std::cout << "\n  Simulation will continue without Year 3 policy inspection data capture.";
+            std::cout << "\n  This may be normal if inspection is not needed for this run.\n";
+        }
+        }
     }
 }
 

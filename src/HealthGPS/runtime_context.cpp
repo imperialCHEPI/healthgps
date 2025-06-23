@@ -4,6 +4,10 @@
 
 namespace hgps {
 
+// MAHIMA: TOGGLE FOR YEAR 3 RISK FACTOR INSPECTION
+// Must match the toggle in static_linear_model.cpp and simulation.cpp
+static constexpr bool ENABLE_YEAR3_RISK_FACTOR_INSPECTION = false;
+
 RuntimeContext::RuntimeContext(std::shared_ptr<const EventAggregator> bus,
                                std::shared_ptr<const ModelInput> inputs,
                                std::unique_ptr<Scenario> scenario)
@@ -89,12 +93,14 @@ double RuntimeContext::ensure_risk_factor_in_range(const core::Identifier &facto
 void RuntimeContext::set_risk_factor_inspector(std::unique_ptr<RiskFactorInspector> inspector) {
     risk_factor_inspector_ = std::move(inspector);
 
-    if (risk_factor_inspector_) {
-        std::cout << "\nMAHIMA: Risk Factor Inspector successfully set in RuntimeContext";
-        std::cout << "\n  Scenario: " << scenario_->name();
-        std::cout << "\n  Ready for Year 3 data capture.\n";
-    } else {
-        std::cout << "\nMAHIMA: Warning - Null Risk Factor Inspector set in RuntimeContext\n";
+    if constexpr (ENABLE_YEAR3_RISK_FACTOR_INSPECTION) {
+        if (risk_factor_inspector_) {
+            std::cout << "\nMAHIMA: Risk Factor Inspector successfully set in RuntimeContext";
+            std::cout << "\n  Scenario: " << scenario_->name();
+            std::cout << "\n  Ready for Year 3 data capture.\n";
+        } else {
+            std::cout << "\nMAHIMA: Warning - Null Risk Factor Inspector set in RuntimeContext\n";
+        }
     }
 }
 

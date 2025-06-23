@@ -9,6 +9,10 @@
 
 namespace hgps {
 
+// MAHIMA: TOGGLE FOR YEAR 3 RISK FACTOR INSPECTION
+// Must match the toggle in static_linear_model.cpp, simulation.cpp, and runtime_context.cpp
+static constexpr bool ENABLE_YEAR3_RISK_FACTOR_INSPECTION = false;
+
 RiskFactorInspector::RiskFactorInspector(const std::filesystem::path &output_dir)
     : year_3_captured_(false) {
 
@@ -70,11 +74,13 @@ RiskFactorInspector::RiskFactorInspector(const std::filesystem::path &output_dir
     write_headers();
 
     // MAHIMA: Print confirmation of file creation for debugging
-    std::cout << "\nMAHIMA: Risk Factor Inspector initialized successfully:";
-    std::cout << "\n  Baseline file: " << baseline_path.string();
-    std::cout << "\n  Intervention file: " << intervention_path.string();
-    std::cout << "\n  Target risk factors: " << target_factors_.size() << " factors";
-    std::cout << "\n  Waiting for Year 3 data capture...\n";
+    if constexpr (ENABLE_YEAR3_RISK_FACTOR_INSPECTION) {
+        std::cout << "\nMAHIMA: Risk Factor Inspector initialized successfully:";
+        std::cout << "\n  Baseline file: " << baseline_path.string();
+        std::cout << "\n  Intervention file: " << intervention_path.string();
+        std::cout << "\n  Target risk factors: " << target_factors_.size() << " factors";
+        std::cout << "\n  Waiting for Year 3 data capture...\n";
+    }
 }
 
 RiskFactorInspector::~RiskFactorInspector() {
@@ -89,7 +95,9 @@ RiskFactorInspector::~RiskFactorInspector() {
         intervention_file_.close();
     }
 
-    std::cout << "\nMAHIMA: Risk Factor Inspector cleanup completed.\n";
+    if constexpr (ENABLE_YEAR3_RISK_FACTOR_INSPECTION) {
+        std::cout << "\nMAHIMA: Risk Factor Inspector cleanup completed.\n";
+    }
 }
 
 bool RiskFactorInspector::should_capture_year_3(RuntimeContext &context) {
@@ -100,13 +108,15 @@ bool RiskFactorInspector::should_capture_year_3(RuntimeContext &context) {
 
     // MAHIMA: Only capture once per scenario to avoid duplicate data
     if (is_year_3 && !year_3_captured_) {
-        std::cout << "\nMAHIMA: Year 3 detected! Time to capture risk factor data.";
-        std::cout << "\n  Current time: " << context.time_now();
-        std::cout << "\n  Start time: " << context.start_time();
-        std::cout << "\n  Elapsed years: " << elapsed_years;
-        std::cout << "\n  Scenario type: "
-                  << (context.scenario().type() == ScenarioType::baseline ? "Baseline"
-                                                                          : "Intervention");
+        if constexpr (ENABLE_YEAR3_RISK_FACTOR_INSPECTION) {
+            std::cout << "\nMAHIMA: Year 3 detected! Time to capture risk factor data.";
+            std::cout << "\n  Current time: " << context.time_now();
+            std::cout << "\n  Start time: " << context.start_time();
+            std::cout << "\n  Elapsed years: " << elapsed_years;
+            std::cout << "\n  Scenario type: "
+                      << (context.scenario().type() == ScenarioType::baseline ? "Baseline"
+                                                                              : "Intervention");
+        }
         return true;
     }
 
@@ -121,11 +131,15 @@ void RiskFactorInspector::capture_year_3_data(RuntimeContext &context) {
     if (context.scenario().type() == ScenarioType::baseline) {
         scenario_type = "Baseline";
         target_file = &baseline_file_;
-        std::cout << "\nMAHIMA: Capturing Year 3 BASELINE risk factor data...";
+        if constexpr (ENABLE_YEAR3_RISK_FACTOR_INSPECTION) {
+            std::cout << "\nMAHIMA: Capturing Year 3 BASELINE risk factor data...";
+        }
     } else {
         scenario_type = "Intervention";
         target_file = &intervention_file_;
-        std::cout << "\nMAHIMA: Capturing Year 3 INTERVENTION risk factor data (post-policy)...";
+        if constexpr (ENABLE_YEAR3_RISK_FACTOR_INSPECTION) {
+            std::cout << "\nMAHIMA: Capturing Year 3 INTERVENTION risk factor data (post-policy)...";
+        }
     }
 
     // MAHIMA: Count active population for progress tracking
@@ -139,8 +153,10 @@ void RiskFactorInspector::capture_year_3_data(RuntimeContext &context) {
         }
     }
 
-    std::cout << "\n  Population to process: " << active_count << " active out of " << total_count
-              << " total";
+    if constexpr (ENABLE_YEAR3_RISK_FACTOR_INSPECTION) {
+        std::cout << "\n  Population to process: " << active_count << " active out of " << total_count
+                  << " total";
+    }
 
     // MAHIMA: Write individual person records to the appropriate file
     size_t records_written = 0;
@@ -162,9 +178,11 @@ void RiskFactorInspector::capture_year_3_data(RuntimeContext &context) {
     // MAHIMA: Mark as captured to prevent duplicate data
     year_3_captured_ = true;
 
-    std::cout << "\nMAHIMA: Year 3 " << scenario_type << " data capture completed!";
-    std::cout << "\n  Records written: " << records_written;
-    std::cout << "\n  File flushed and ready for inspection.\n";
+    if constexpr (ENABLE_YEAR3_RISK_FACTOR_INSPECTION) {
+        std::cout << "\nMAHIMA: Year 3 " << scenario_type << " data capture completed!";
+        std::cout << "\n  Records written: " << records_written;
+        std::cout << "\n  File flushed and ready for inspection.\n";
+    }
 }
 
 void RiskFactorInspector::write_headers() {
@@ -192,7 +210,9 @@ void RiskFactorInspector::write_headers() {
     baseline_file_.flush();
     intervention_file_.flush();
 
-    std::cout << "\nMAHIMA: CSV headers written to both inspection files.";
+    if constexpr (ENABLE_YEAR3_RISK_FACTOR_INSPECTION) {
+        std::cout << "\nMAHIMA: CSV headers written to both inspection files.";
+    }
 }
 
 void RiskFactorInspector::write_person_record(std::ofstream &file, const Person &person,

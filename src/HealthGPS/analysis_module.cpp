@@ -158,7 +158,7 @@ void AnalysisModule::publish_result_message(RuntimeContext &context) const {
     //// Make vector ModelResult objects, each with different IncomeCategory values
     auto VectorOfModelResults = std::vector<hgps::ModelResult>();
     for (int Entry = 0; Entry < context.NumberOfResultsCSVs; Entry++) {
-        VectorOfModelResults.emplace_back(ModelResult{sample_size});
+        VectorOfModelResults.emplace_back(sample_size);
         VectorOfModelResults[Entry].IncomeCategory = std::to_string(Entry);
     }
 

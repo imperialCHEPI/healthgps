@@ -698,7 +698,8 @@ void KevinHallModel::kevin_hall_run(Person &person) const {
     double c2 = EI - K - TEF - AT - delta * (G + W + ECF);
 
     // Check for division by zero in denominator
-    double denominator = (a1 * b2 - a2 * b1);
+    double denominator = (a1 * b2 - (a2 * b1));
+
     if (std::abs(denominator) < 1e-10) {
         // Log the issue
         std::cout << "\nWARNING: Near-zero denominator detected in kevin_hall_run for person ID: "
@@ -725,8 +726,8 @@ void KevinHallModel::kevin_hall_run(Person &person) const {
     }
 
     // Compute body fat and lean tissue steady state.
-    double steady_F = -(b1 * c2 - b2 * c1) / denominator;
-    double steady_L = -(c1 * a2 - c2 * a1) / denominator;
+    double steady_F = -((b1 * c2) - b2 * c1) / denominator;
+    double steady_L = -((c1 * a2) - c2 * a1) / denominator;
 
     // Extra safety check for steady state values
     if (!std::isfinite(steady_F) || !std::isfinite(steady_L)) {
