@@ -325,7 +325,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                 std::cout << "\n  Range: [" << range.lower() << ", " << range.upper() << "]";
             }
         }
-        std::cout << "\n================================================================\n";*/ 
+        std::cout << "\n================================================================\n";*/
 
         // Print a sample of the loaded policy coefficients for verification
         if (!policy_csv_coefficients.empty()) {
@@ -360,7 +360,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     // Load risk factor ranges from CSV if the file exists
     std::unordered_map<std::string, hgps::core::DoubleInterval> risk_factor_ranges_from_csv;
     if (std::filesystem::exists(risk_factor_ranges_csv_path)) {
-        std::cout << "\nFound CSV file for risk factor ranges: " << risk_factor_ranges_csv_path.string() << "\n";
+        std::cout << "\nFound CSV file for risk factor ranges: "
+                  << risk_factor_ranges_csv_path.string() << "\n";
         risk_factor_ranges_from_csv = load_risk_factor_ranges_from_csv(risk_factor_ranges_csv_path);
         std::cout << "\nSuccessfully loaded risk factor ranges from CSV for "
                   << risk_factor_ranges_from_csv.size() << " risk factors\n";
@@ -1562,8 +1563,8 @@ load_logistic_regression_coefficients_from_csv(const std::filesystem::path &csv_
                 // result[first_rf].intercept;
 
                 // Print a few coefficients
-                //for (const auto &coef_pair : result[first_rf].coefficients) {
-                   // std::cout << "\n  " << coef_pair.first.to_string() << ": " << coef_pair.second;
+                // for (const auto &coef_pair : result[first_rf].coefficients) {
+                // std::cout << "\n  " << coef_pair.first.to_string() << ": " << coef_pair.second;
                 //}
 
                 // Print total number of risk factors and coefficients loaded
@@ -1876,7 +1877,7 @@ load_income_model_from_csv(const std::filesystem::path &csv_path) {
                 continue;
             }
 
-            //std::cout << "\nLoaded " << key << " = " << value;
+            // std::cout << "\nLoaded " << key << " = " << value;
 
             // Apply value based on parameter name
             if (key == "Intercept") {
@@ -2083,7 +2084,8 @@ load_risk_factor_ranges_from_csv(const std::filesystem::path &csv_path) {
 
     // Check if the file exists
     if (!std::filesystem::exists(csv_path)) {
-        std::cout << "\nWARNING: CSV file for risk factor ranges not found: " << csv_path.string() << "\n";
+        std::cout << "\nWARNING: CSV file for risk factor ranges not found: " << csv_path.string()
+                  << "\n";
         return result;
     }
 
@@ -2093,7 +2095,7 @@ load_risk_factor_ranges_from_csv(const std::filesystem::path &csv_path) {
 
         // CSV format: first column = risk factor names, second column = min, third column = max
         for (size_t i = 0; i < doc.GetRowCount(); i++) {
-            std::string rf_name = doc.GetCell<std::string>(0, i);  // First column = risk factor name
+            std::string rf_name = doc.GetCell<std::string>(0, i); // First column = risk factor name
             double min_val = doc.GetCell<double>(1, i);           // Second column = min
             double max_val = doc.GetCell<double>(2, i);           // Third column = max
 
