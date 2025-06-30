@@ -459,14 +459,14 @@ double KevinHallModel::get_expected(RuntimeContext &context, core::Gender sex, i
 
 void KevinHallModel::initialise_nutrient_intakes(Person &person) const {
     // Set all nutrients to valid initial values before computing
-    for (const auto &[nutrient_key, unused] : energy_equation_) {
+    /*for (const auto &[nutrient_key, unused] : energy_equation_) {
         // Initialize to minimum valid value if range exists
         if (nutrient_ranges_.contains(nutrient_key)) {
             person.risk_factors[nutrient_key] = nutrient_ranges_.at(nutrient_key).lower();
         } else {
             person.risk_factors[nutrient_key] = 0.0;
         }
-    }
+    }*/ 
 
     // Now compute nutrient intakes
     compute_nutrient_intakes(person);
