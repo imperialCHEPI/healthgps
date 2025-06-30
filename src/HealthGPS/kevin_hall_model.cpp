@@ -466,7 +466,7 @@ void KevinHallModel::initialise_nutrient_intakes(Person &person) const {
         } else {
             person.risk_factors[nutrient_key] = 0.0;
         }
-    }*/ 
+    }*/
 
     // Now compute nutrient intakes
     compute_nutrient_intakes(person);
