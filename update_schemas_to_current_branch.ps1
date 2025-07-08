@@ -1,74 +1,69 @@
-# Update Schema Files to Current Branch
+# Update Schemas to Current Branch
 # Author: Mahima
-#
-# This script automatically updates all schema files to reference the current git branch
-# Usage: Run this script whenever you create a new branch or switch branches
-# Language: Powershell scripting language
+# This script updates all config files to use schemas from the current git branch
 
-# Get current branch name from GitHub or when you create a new branch
+# Get current branch name
 $currentBranch = git rev-parse --abbrev-ref HEAD
 Write-Host "Current branch: $currentBranch" -ForegroundColor Green
 
-# Should not be happening- just a check
 if (-not $currentBranch) {
     Write-Host "Error: Could not determine current branch" -ForegroundColor Red
     exit 1
 }
 
-# Function to update schema files in a directory
-function Update-SchemaFiles {
-    param(
-        [string]$Path,
-        [string]$BranchName
-    )
-    # keeps count of the number of files updated- in our case around 25
-    $updatedCount = 0
-    $schemaFiles = Get-ChildItem -Path $Path -Recurse -Filter "*.json"
+Write-Host "Updating schema URLs to branch: $currentBranch" -ForegroundColor Cyan
 
-    foreach ($file in $schemaFiles) {
-        $content = Get-Content $file.FullName -Raw
+# Function to update a single file
+function Update-SchemaFile {
+    param($FilePath)
+    
+    try {
+        $content = Get-Content $FilePath -Raw
         $originalContent = $content
-
-        # Update $id fields (in schema definition files)
-        $content = $content -replace 'https://raw\.githubusercontent\.com/imperialCHEPI/healthgps/[^/]+/schemas/', "https://raw.githubusercontent.com/imperialCHEPI/healthgps/$BranchName/schemas/"
-
-        # Update $schema fields (in data files)
-        $content = $content -replace '"\$schema":\s*"https://raw\.githubusercontent\.com/imperialCHEPI/healthgps/[^/]+/schemas/', "`"`$schema`": `"https://raw.githubusercontent.com/imperialCHEPI/healthgps/$BranchName/schemas/"
-
-        # If file was changed, overwrite and log it
+        
+        # Update schema references to current branch
+        $content = $content -replace 'https://raw\.githubusercontent\.com/imperialCHEPI/healthgps/[^/]+/schemas/', "https://raw.githubusercontent.com/imperialCHEPI/healthgps/$currentBranch/schemas/"
+        
         if ($content -ne $originalContent) {
-            Set-Content -Path $file.FullName -Value $content
-            Write-Host "Updated: $($file.FullName)" -ForegroundColor Yellow
+            Set-Content -Path $FilePath -Value $content
+            Write-Host "  ✓ Updated: $FilePath" -ForegroundColor Yellow
+            return $true
+        }
+        return $false
+    }
+    catch {
+        Write-Host "  ✗ Error updating $FilePath`: $_" -ForegroundColor Red
+        return $false
+    }
+}
+
+# Update files in input-data directory
+$updatedCount = 0
+if (Test-Path "input-data") {
+    Write-Host "Updating files in input-data..." -ForegroundColor Cyan
+    
+    $jsonFiles = Get-ChildItem -Path "input-data" -Recurse -Filter "*.json" -ErrorAction SilentlyContinue
+    foreach ($file in $jsonFiles) {
+        if (Update-SchemaFile $file.FullName) {
             $updatedCount++
         }
     }
-
-    return $updatedCount
 }
 
-Write-Host "Updating schema files to use branch: $currentBranch" -ForegroundColor Cyan
-
-# Update schema definition files
-Write-Host "`nUpdating schema definition files..." -ForegroundColor Blue
-$schemaCount = Update-SchemaFiles -Path "schemas" -BranchName $currentBranch
-
-# Update data files that reference schemas
-Write-Host "`nUpdating data files..." -ForegroundColor Blue
-$dataCount = 0
-if (Test-Path "input-data") {
-    $dataCount = Update-SchemaFiles -Path "input-data" -BranchName $currentBranch
+# Update any config files in current directory
+$configFiles = Get-ChildItem -Path "." -Filter "*.json" -ErrorAction SilentlyContinue
+foreach ($file in $configFiles) {
+    if (Update-SchemaFile $file.FullName) {
+        $updatedCount++
+    }
 }
 
-# Final count
-$totalUpdated = $schemaCount + $dataCount
-Write-Host "`nSummary:" -ForegroundColor Green
-Write-Host "- Schema files updated: $schemaCount"
-Write-Host "- Data files updated: $dataCount"
-Write-Host "- Total files updated: $totalUpdated"
+Write-Host "`nTotal files updated: $updatedCount" -ForegroundColor Green
 
-if ($totalUpdated -gt 0) {
-    Write-Host "`n✅ All schema files now reference branch: $currentBranch" -ForegroundColor Green
-    Write-Host "You can now commit these changes!" -ForegroundColor Green
+if ($updatedCount -gt 0) {
+    Write-Host "✅ Schema URLs now reference branch: $currentBranch" -ForegroundColor Green
 } else {
-    Write-Host "`n✅ All schema files were already up to date!" -ForegroundColor Green
+    Write-Host "✅ No files needed updating (already using correct branch)" -ForegroundColor Green
 }
+
+Write-Host "`nYou can now run HealthGPS with schemas from the $currentBranch branch!" -ForegroundColor Cyan
