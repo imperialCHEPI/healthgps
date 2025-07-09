@@ -406,7 +406,6 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         std::move(income_models), physical_activity_stddev);
 }
 
-
 // NOLINTBEGIN(readability-function-cognitive-complexity)
 std::unique_ptr<hgps::DynamicHierarchicalLinearModelDefinition>
 load_ebhlm_risk_model_definition(const nlohmann::json &opt, const Configuration &config) {
@@ -521,18 +520,18 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
     std::unordered_map<hgps::core::Identifier, std::optional<double>> food_prices;
     for (const auto &food : opt["Foods"]) {
         auto food_key = food["Name"].get<hgps::core::Identifier>();
-        
+
         // Handle ExpectedTrend and TrendSteps with default values for v1 compatibility
-        double expected_trend_value = 1.0;  // Default for v1 models
-        int trend_steps_value = 0;           // Default for v1 models
-        
+        double expected_trend_value = 1.0; // Default for v1 models
+        int trend_steps_value = 0;         // Default for v1 models
+
         if (food.contains("ExpectedTrend")) {
             expected_trend_value = food["ExpectedTrend"].get<double>();
         }
         if (food.contains("TrendSteps")) {
             trend_steps_value = food["TrendSteps"].get<int>();
         }
-        
+
         (*expected_trend)[food_key] = expected_trend_value;
         (*trend_steps)[food_key] = trend_steps_value;
         food_prices[food_key] = food["Price"].get<std::optional<double>>();

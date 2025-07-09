@@ -61,7 +61,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
         const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
             &rural_prevalence,
         const std::unordered_map<core::Income, LinearModelParams> &income_models,
-        double physical_activity_stddev); 
+        double physical_activity_stddev);
 
     RiskFactorModelType type() const noexcept override;
 
@@ -118,7 +118,6 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param random The random number generator from the runtime context
     void initialise_physical_activity(RuntimeContext &context, Person &person,
                                       Random &random) const;
-
 
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox_;
     const std::vector<core::Identifier> &names_;

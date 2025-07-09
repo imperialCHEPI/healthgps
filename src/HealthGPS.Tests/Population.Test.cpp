@@ -19,7 +19,7 @@ TEST(TestHealthGPS_Population, CreateDefaultPerson) {
     ASSERT_FALSE(p.has_emigrated());
     ASSERT_TRUE(p.is_active());
     ASSERT_EQ(0u, p.time_of_death());
-    ASSERT_EQ(0u, p.time_of_migration()); 
+    ASSERT_EQ(0u, p.time_of_migration());
     ASSERT_EQ(0, p.ses);
     ASSERT_EQ(0, p.risk_factors.size());
     ASSERT_EQ(0, p.diseases.size());
