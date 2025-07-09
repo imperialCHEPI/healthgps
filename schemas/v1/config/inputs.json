@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/india/final/schemas/v1/config/inputs.json",
+    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/config/inputs.json",
     "type": "object",
     "properties": {
         "dataset": {
@@ -19,17 +19,8 @@
                     "$ref": "../age_range.json"
                 }
             },
-            "required": [
-                "country_code",
-                "size_fraction",
-                "age_range"
-            ],
             "additionalProperties": false
         }
     },
-    "required": [
-        "dataset",
-        "settings"
-    ],
     "additionalProperties": false
 }

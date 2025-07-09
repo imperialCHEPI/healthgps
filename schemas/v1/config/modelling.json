@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/india/final/schemas/v1/config/modelling.json",
+    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/config/modelling.json",
     "type": "object",
     "properties": {
         "ses_model": {
@@ -16,10 +16,7 @@
                     }
                 }
             },
-            "required": [
-                "function_name",
-                "function_parameters"
-            ],
+
             "additionalProperties": false
         },
         "demographic_models": {
@@ -194,11 +191,7 @@
                         }
                     }
                 },
-                "required": [
-                    "name",
-                    "level",
-                    "range"
-                ],
+
                 "additionalProperties": false
             }
         },
@@ -247,12 +240,7 @@
                     "additionalProperties": false
                 }
             },
-            "required": [
-                "format",
-                "delimiter",
-                "encoding",
-                "file_names"
-            ],
+
             "additionalProperties": false
         }
     },

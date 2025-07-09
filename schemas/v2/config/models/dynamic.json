@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/india/final/schemas/v2/config/models/dynamic.json",
+    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v2/config/models/dynamic.json",
     "anyOf": [
         {
             "$ref": "../../../v1/config/models/dummy.json"

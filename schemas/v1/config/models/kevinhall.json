@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/india/final/schemas/v1/config/models/kevinhall.json",
+    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/config/models/kevinhall.json",
     "type": "object",
     "properties": {
         "$schema": {
@@ -31,11 +31,7 @@
                         "minimum": 0.0
                     }
                 },
-                "required": [
-                    "Name",
-                    "Range",
-                    "Energy"
-                ],
+
                 "additionalProperties": false
             },
             "minItems": 1
@@ -65,11 +61,7 @@
                         ]
                     }
                 },
-                "required": [
-                    "Name",
-                    "Nutrients",
-                    "Price"
-                ],
+
                 "additionalProperties": false
             }
         },
@@ -97,10 +89,6 @@
                     "type": "number"
                 }
             },
-            "required": [
-                "Male",
-                "Female"
-            ],
             "additionalProperties": false
         },
         "HeightSlope": {
@@ -113,21 +101,9 @@
                     "type": "number"
                 }
             },
-            "required": [
-                "Male",
-                "Female"
-            ],
             "additionalProperties": false
         }
     },
-    "required": [
-        "ModelName",
-        "Nutrients",
-        "Foods",
-        "WeightQuantiles",
-        "EnergyPhysicalActivityQuantiles",
-        "HeightStdDev",
-        "HeightSlope"
-    ],
+
     "additionalProperties": false
 }

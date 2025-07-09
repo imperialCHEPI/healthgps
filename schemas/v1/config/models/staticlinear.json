@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/india/final/schemas/v1/config/models/staticlinear.json",
+    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/config/models/staticlinear.json",
     "type": "object",
     "properties": {
         "$schema": {
@@ -30,24 +30,12 @@
                         "type": "number"
                     }
                 },
-                "required": [
-                    "Name",
-                    "Female",
-                    "Male"
-                ],
+
                 "additionalProperties": false
             }
         },
         "IncomeModels": {
             "type": "object",
-            "propertyNames": {
-                "enum": [
-                    "Low",
-                    "Middle",
-                    "High",
-                    "Unknown"
-                ]
-            },
             "additionalProperties": {
                 "type": "object",
                 "properties": {
@@ -61,10 +49,7 @@
                         }
                     }
                 },
-                "required": [
-                    "Intercept",
-                    "Coefficients"
-                ],
+
                 "additionalProperties": false
             }
         },
@@ -120,23 +105,11 @@
                                 }
                             }
                         },
-                        "required": [
-                            "Intercept",
-                            "Range",
-                            "Coefficients",
-                            "LogCoefficients"
-                        ],
+
                         "additionalProperties": false
                     }
                 },
-                "required": [
-                    "Lambda",
-                    "StdDev",
-                    "Intercept",
-                    "Range",
-                    "Coefficients",
-                    "Policy"
-                ],
+
                 "additionalProperties": false
             }
         },
@@ -147,15 +120,6 @@
             "$ref": "../csv_file.json"
         }
     },
-    "required": [
-        "ModelName",
-        "InformationSpeed",
-        "PhysicalActivityStdDev",
-        "RuralPrevalence",
-        "IncomeModels",
-        "RiskFactorModels",
-        "RiskFactorCorrelationFile",
-        "PolicyCovarianceFile"
-    ],
+
     "additionalProperties": false
 }

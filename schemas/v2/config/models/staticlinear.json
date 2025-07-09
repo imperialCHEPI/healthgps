@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/india/final/schemas/v2/config/models/staticlinear.json",
+    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v2/config/models/staticlinear.json",
     "type": "object",
     "properties": {
         "$schema": {
@@ -40,14 +40,6 @@
         },
         "IncomeModels": {
             "type": "object",
-            "propertyNames": {
-                "enum": [
-                    "Low",
-                    "Middle",
-                    "High",
-                    "Unknown"
-                ]
-            },
             "additionalProperties": {
                 "type": "object",
                 "properties": {
@@ -61,10 +53,7 @@
                         }
                     }
                 },
-                "required": [
-                    "Intercept",
-                    "Coefficients"
-                ],
+
                 "additionalProperties": false
             }
         },
@@ -91,11 +80,7 @@
                         "type": "number"
                     }
                 },
-                "required": [
-                    "Intercept",
-                    "Coefficients",
-                    "StandardDeviation"
-                ],
+
                 "additionalProperties": false
             }
         },
@@ -151,12 +136,7 @@
                                 }
                             }
                         },
-                        "required": [
-                            "Intercept",
-                            "Range",
-                            "Coefficients",
-                            "LogCoefficients"
-                        ],
+
                         "additionalProperties": false
                     },
                     "Trend": {
@@ -191,13 +171,7 @@
                                 "type": "number"
                             }
                         },
-                        "required": [
-                            "Intercept",
-                            "Coefficients",
-                            "LogCoefficients",
-                            "Range",
-                            "Lambda"
-                        ],
+
                         "additionalProperties": false
                     },
                     "ExpectedTrend": {
@@ -210,15 +184,7 @@
                         "type": "integer"
                     }
                 },
-                "required": [
-                    "Lambda",
-                    "StdDev",
-                    "Intercept",
-                    "Range",
-                    "Coefficients",
-                    "Policy",
-                    "Trend"
-                ],
+
                 "additionalProperties": false
             }
         },
@@ -233,9 +199,6 @@
         "ModelName",
         "InformationSpeed",
         "PhysicalActivityStdDev",
-        "RuralPrevalence",
-        "IncomeModels",
-        "PhysicalActivityModels",
         "RiskFactorModels",
         "RiskFactorCorrelationFile",
         "PolicyCovarianceFile"

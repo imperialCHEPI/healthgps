@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/india/final/schemas/v1/data_index/diseases.json",
+    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/data_index/diseases.json",
     "type": "object",
     "properties": {
         "format": {
@@ -56,21 +56,11 @@
                         "type": "string"
                     }
                 },
-                "required": [
-                    "group",
-                    "id",
-                    "name"
-                ],
+
                 "additionalProperties": false
             }
         }
     },
-    "required": [
-        "path",
-        "age_limits",
-        "time_year",
-        "disease",
-        "registry"
-    ],
+
     "additionalProperties": false
 }
