@@ -31,7 +31,6 @@
                         "minimum": 0.0
                     }
                 },
-
                 "additionalProperties": false
             },
             "minItems": 1
@@ -61,7 +60,6 @@
                         ]
                     }
                 },
-
                 "additionalProperties": false
             }
         },
@@ -104,6 +102,5 @@
             "additionalProperties": false
         }
     },
-
     "additionalProperties": false
 }

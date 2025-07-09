@@ -30,7 +30,6 @@
                         "type": "number"
                     }
                 },
-
                 "additionalProperties": false
             }
         },
@@ -49,7 +48,6 @@
                         }
                     }
                 },
-
                 "additionalProperties": false
             }
         },
@@ -105,11 +103,9 @@
                                 }
                             }
                         },
-
                         "additionalProperties": false
                     }
                 },
-
                 "additionalProperties": false
             }
         },
@@ -120,6 +116,5 @@
             "$ref": "../csv_file.json"
         }
     },
-
     "additionalProperties": false
 }
