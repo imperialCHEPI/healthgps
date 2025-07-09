@@ -80,10 +80,14 @@ float Person::income_to_value() const {
     switch (income) {
     case core::Income::low:
         return 1.0f;
-    case core::Income::middle:
+    case core::Income::lowermiddle:
         return 2.0f;
-    case core::Income::high:
+    case core::Income::middle:
+        return 2.0f;  // For 3-category models (India)
+    case core::Income::uppermiddle:
         return 3.0f;
+    case core::Income::high:
+        return 3.0f;  // For 3-category (India): high=3, For 4-category: high=4
     case core::Income::unknown:
     default:
         throw core::HgpsException("Unknown income category");

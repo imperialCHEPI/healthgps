@@ -48,6 +48,10 @@
                         }
                     }
                 },
+                "required": [
+                    "Intercept",
+                    "Coefficients"
+                ],
                 "additionalProperties": false
             }
         },
