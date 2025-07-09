@@ -43,11 +43,9 @@
             "propertyNames": {
                 "enum": [
                     "Low",
-                    "LowerMiddle",
-                    "UpperMiddle",
+                    "Middle",
                     "High",
-                    "Unknown",
-                    "continuous"
+                    "Unknown"
                 ]
             },
             "additionalProperties": {
@@ -219,10 +217,7 @@
                     "Range",
                     "Coefficients",
                     "Policy",
-                    "Trend",
-                    "ExpectedTrend",
-                    "ExpectedTrendBoxCox",
-                    "TrendSteps"
+                    "Trend"
                 ],
                 "additionalProperties": false
             }

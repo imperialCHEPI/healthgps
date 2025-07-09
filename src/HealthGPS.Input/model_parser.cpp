@@ -370,16 +370,14 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     for (const auto &[key, json_params] : opt["IncomeModels"].items()) {
 
         // Get income category.
-        // Added New income category (Low, LowerMiddle, UpperMiddle & High)
+        // Reversed to old income category (Low, Middle & High)
         core::Income category;
         if (core::case_insensitive::equals(key, "Unknown")) {
             category = core::Income::unknown;
         } else if (core::case_insensitive::equals(key, "Low")) {
             category = core::Income::low;
-        } else if (core::case_insensitive::equals(key, "LowerMiddle")) {
-            category = core::Income::lowermiddle;
-        } else if (core::case_insensitive::equals(key, "UpperMiddle")) {
-            category = core::Income::uppermiddle;
+        } else if (core::case_insensitive::equals(key, "Middle")) {
+            category = core::Income::middle;
         } else if (core::case_insensitive::equals(key, "High")) {
             category = core::Income::high;
         } else {
@@ -396,21 +394,6 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         income_models.emplace(category, std::move(model));
     }
 
-    // Region models for different region classifications.
-    std::unordered_map<core::Region, LinearModelParams> region_models;
-    for (const auto &model : opt["RegionModels"]) {
-        auto region = parse_region(model["Region"].get<std::string>());
-        auto params = LinearModelParams{};
-        params.intercept = model["Intercept"].get<double>();
-
-        for (const auto &coef : model["Coefficients"]) {
-            auto name = coef["Name"].get<core::Identifier>();
-            params.coefficients[name] = coef["Value"].get<double>();
-        }
-        // insert region model with try_emplace to avoid copying the params
-        region_models.try_emplace(region, std::move(params));
-    }
-
     // Standard deviation of physical activity.
     const double physical_activity_stddev = opt["PhysicalActivityStdDev"].get<double>();
 
@@ -420,29 +403,9 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         std::move(lambda), std::move(stddev), std::move(cholesky), std::move(policy_models),
         std::move(policy_ranges), std::move(policy_cholesky), std::move(trend_models),
         std::move(trend_ranges), std::move(trend_lambda), info_speed, std::move(rural_prevalence),
-        std::move(income_models), std::move(region_models), physical_activity_stddev);
+        std::move(income_models), physical_activity_stddev);
 }
 
-// Added to handle region parsing since income was made quartile, and region was added
-core::Region parse_region(const std::string &value) {
-    if (value == "England") {
-        return core::Region::England;
-    }
-    if (value == "Wales") {
-        return core::Region::Wales;
-    }
-    if (value == "Scotland") {
-        return core::Region::Scotland;
-    }
-    if (value == "NorthernIreland") {
-        return core::Region::NorthernIreland;
-    }
-    if (value == "unknown") {
-        return core::Region::unknown;
-    }
-
-    throw core::HgpsException(fmt::format("Unknown region value: {}", value));
-}
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
 std::unique_ptr<hgps::DynamicHierarchicalLinearModelDefinition>
@@ -558,8 +521,20 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
     std::unordered_map<hgps::core::Identifier, std::optional<double>> food_prices;
     for (const auto &food : opt["Foods"]) {
         auto food_key = food["Name"].get<hgps::core::Identifier>();
-        (*expected_trend)[food_key] = food["ExpectedTrend"].get<double>();
-        (*trend_steps)[food_key] = food["TrendSteps"].get<int>();
+        
+        // Handle ExpectedTrend and TrendSteps with default values for v1 compatibility
+        double expected_trend_value = 1.0;  // Default for v1 models
+        int trend_steps_value = 0;           // Default for v1 models
+        
+        if (food.contains("ExpectedTrend")) {
+            expected_trend_value = food["ExpectedTrend"].get<double>();
+        }
+        if (food.contains("TrendSteps")) {
+            trend_steps_value = food["TrendSteps"].get<int>();
+        }
+        
+        (*expected_trend)[food_key] = expected_trend_value;
+        (*trend_steps)[food_key] = trend_steps_value;
         food_prices[food_key] = food["Price"].get<std::optional<double>>();
         auto food_nutrients = food["Nutrients"].get<std::map<hgps::core::Identifier, double>>();
 
