@@ -30,24 +30,11 @@
                         "type": "number"
                     }
                 },
-                "required": [
-                    "Name",
-                    "Female",
-                    "Male"
-                ],
                 "additionalProperties": false
             }
         },
         "IncomeModels": {
             "type": "object",
-            "propertyNames": {
-                "enum": [
-                    "Low",
-                    "Middle",
-                    "High",
-                    "Unknown"
-                ]
-            },
             "additionalProperties": {
                 "type": "object",
                 "properties": {
@@ -61,10 +48,6 @@
                         }
                     }
                 },
-                "required": [
-                    "Intercept",
-                    "Coefficients"
-                ],
                 "additionalProperties": false
             }
         },
@@ -120,23 +103,9 @@
                                 }
                             }
                         },
-                        "required": [
-                            "Intercept",
-                            "Range",
-                            "Coefficients",
-                            "LogCoefficients"
-                        ],
                         "additionalProperties": false
                     }
                 },
-                "required": [
-                    "Lambda",
-                    "StdDev",
-                    "Intercept",
-                    "Range",
-                    "Coefficients",
-                    "Policy"
-                ],
                 "additionalProperties": false
             }
         },
@@ -147,15 +116,5 @@
             "$ref": "../csv_file.json"
         }
     },
-    "required": [
-        "ModelName",
-        "InformationSpeed",
-        "PhysicalActivityStdDev",
-        "RuralPrevalence",
-        "IncomeModels",
-        "RiskFactorModels",
-        "RiskFactorCorrelationFile",
-        "PolicyCovarianceFile"
-    ],
     "additionalProperties": false
 }

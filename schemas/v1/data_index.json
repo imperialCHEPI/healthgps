@@ -21,12 +21,5 @@
             "$ref": "data_index/analysis.json"
         }
     },
-    "required": [
-        "$schema",
-        "country",
-        "demographic",
-        "diseases",
-        "analysis"
-    ],
     "additionalProperties": false
 }

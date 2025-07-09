@@ -56,21 +56,9 @@
                         "type": "string"
                     }
                 },
-                "required": [
-                    "group",
-                    "id",
-                    "name"
-                ],
                 "additionalProperties": false
             }
         }
     },
-    "required": [
-        "path",
-        "age_limits",
-        "time_year",
-        "disease",
-        "registry"
-    ],
     "additionalProperties": false
 }
