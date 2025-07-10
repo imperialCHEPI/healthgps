@@ -16,10 +16,6 @@
                     }
                 }
             },
-            "required": [
-                "function_name",
-                "function_parameters"
-            ],
             "additionalProperties": false
         },
         "demographic_models": {
@@ -194,11 +190,6 @@
                         }
                     }
                 },
-                "required": [
-                    "name",
-                    "level",
-                    "range"
-                ],
                 "additionalProperties": false
             }
         },
@@ -247,12 +238,6 @@
                     "additionalProperties": false
                 }
             },
-            "required": [
-                "format",
-                "delimiter",
-                "encoding",
-                "file_names"
-            ],
             "additionalProperties": false
         }
     },

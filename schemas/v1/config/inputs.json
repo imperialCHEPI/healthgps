@@ -19,17 +19,8 @@
                     "$ref": "../age_range.json"
                 }
             },
-            "required": [
-                "country_code",
-                "size_fraction",
-                "age_range"
-            ],
             "additionalProperties": false
         }
     },
-    "required": [
-        "dataset",
-        "settings"
-    ],
     "additionalProperties": false
 }

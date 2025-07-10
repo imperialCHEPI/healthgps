@@ -31,11 +31,6 @@
                         "minimum": 0.0
                     }
                 },
-                "required": [
-                    "Name",
-                    "Range",
-                    "Energy"
-                ],
                 "additionalProperties": false
             },
             "minItems": 1
@@ -65,11 +60,6 @@
                         ]
                     }
                 },
-                "required": [
-                    "Name",
-                    "Nutrients",
-                    "Price"
-                ],
                 "additionalProperties": false
             }
         },
@@ -97,10 +87,6 @@
                     "type": "number"
                 }
             },
-            "required": [
-                "Male",
-                "Female"
-            ],
             "additionalProperties": false
         },
         "HeightSlope": {
@@ -113,21 +99,8 @@
                     "type": "number"
                 }
             },
-            "required": [
-                "Male",
-                "Female"
-            ],
             "additionalProperties": false
         }
     },
-    "required": [
-        "ModelName",
-        "Nutrients",
-        "Foods",
-        "WeightQuantiles",
-        "EnergyPhysicalActivityQuantiles",
-        "HeightStdDev",
-        "HeightSlope"
-    ],
     "additionalProperties": false
 }
