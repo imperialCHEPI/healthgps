@@ -293,24 +293,46 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                 std::any_cast<double>(policy_covariance_table.column(i).value(j));
         }
 
-        // Time trend model parameters.
-        const auto &trend_json_params = json_params["Trend"];
-        LinearModelParams trend_model;
-        trend_model.intercept = trend_json_params["Intercept"].get<double>();
-        trend_model.coefficients =
-            trend_json_params["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
-        trend_model.log_coefficients = trend_json_params["LogCoefficients"]
-                                           .get<std::unordered_map<core::Identifier, double>>();
+        // Time trend model parameters (use neutral values if trend data missing).
+        if (json_params.contains("Trend")) {
+            // Real trend data exists - use it
+            const auto &trend_json_params = json_params["Trend"];
+            LinearModelParams trend_model;
+            trend_model.intercept = trend_json_params["Intercept"].get<double>();
+            trend_model.coefficients =
+                trend_json_params["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
+            trend_model.log_coefficients = trend_json_params["LogCoefficients"]
+                                               .get<std::unordered_map<core::Identifier, double>>();
 
-        // Write time trend data structures.
-        trend_models->emplace_back(std::move(trend_model));
-        trend_ranges->emplace_back(trend_json_params["Range"].get<core::DoubleInterval>());
-        trend_lambda->emplace_back(trend_json_params["Lambda"].get<double>());
+            // Write real trend data structures.
+            trend_models->emplace_back(std::move(trend_model));
+            trend_ranges->emplace_back(trend_json_params["Range"].get<core::DoubleInterval>());
+            trend_lambda->emplace_back(trend_json_params["Lambda"].get<double>());
 
-        // Load expected value trends.
-        (*expected_trend)[key] = json_params["ExpectedTrend"].get<double>();
-        (*expected_trend_boxcox)[key] = json_params["ExpectedTrendBoxCox"].get<double>();
-        (*trend_steps)[key] = json_params["TrendSteps"].get<int>();
+            // Load expected value trends (only if trend data exists).
+            (*expected_trend)[key] = json_params.contains("ExpectedTrend") ? 
+                json_params["ExpectedTrend"].get<double>() : 1.0;
+            (*expected_trend_boxcox)[key] = json_params.contains("ExpectedTrendBoxCox") ? 
+                json_params["ExpectedTrendBoxCox"].get<double>() : 1.0;
+            (*trend_steps)[key] = json_params.contains("TrendSteps") ? 
+                json_params["TrendSteps"].get<int>() : 0;
+        } else {
+            // No trend data - use mathematically neutral values (no effect on simulation)
+            LinearModelParams neutral_trend_model;
+            neutral_trend_model.intercept = 0.0;           // No trend intercept
+            neutral_trend_model.coefficients = {};          // No coefficients = no trend effect
+            neutral_trend_model.log_coefficients = {};      // No log coefficients
+            
+            // Add neutral trend data to keep vector sizes consistent
+            trend_models->emplace_back(std::move(neutral_trend_model));
+            trend_ranges->emplace_back(core::DoubleInterval{0.0, 0.0});  // No range
+            trend_lambda->emplace_back(0.0);                             // No lambda transformation
+            
+            // Set neutral trend values in maps
+            (*expected_trend)[key] = 1.0;      // No trend change (multiplier of 1.0)
+            (*expected_trend_boxcox)[key] = 1.0; // No trend change  
+            (*trend_steps)[key] = 0;            // No trend steps
+        }
 
         // Increment table column index.
         i++;
