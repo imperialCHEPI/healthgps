@@ -107,10 +107,10 @@
                                 }
                             }
                         },
-                        "additionalProperties": false
+                        "additionalProperties": true
                     }
                 },
-                "additionalProperties": false
+                "additionalProperties": true
             }
         },
         "RiskFactorCorrelationFile": {
@@ -120,5 +120,5 @@
             "$ref": "../csv_file.json"
         }
     },
-    "additionalProperties": false
+    "additionalProperties": true
 }
