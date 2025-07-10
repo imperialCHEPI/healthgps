@@ -40,16 +40,6 @@
         },
         "IncomeModels": {
             "type": "object",
-            "propertyNames": {
-                "enum": [
-                    "Low",
-                    "LowerMiddle",
-                    "UpperMiddle",
-                    "High",
-                    "Unknown",
-                    "continuous"
-                ]
-            },
             "additionalProperties": {
                 "type": "object",
                 "properties": {
@@ -93,11 +83,6 @@
                         "type": "number"
                     }
                 },
-                "required": [
-                    "Intercept",
-                    "Coefficients",
-                    "StandardDeviation"
-                ],
                 "additionalProperties": false
             }
         },
@@ -153,13 +138,7 @@
                                 }
                             }
                         },
-                        "required": [
-                            "Intercept",
-                            "Range",
-                            "Coefficients",
-                            "LogCoefficients"
-                        ],
-                        "additionalProperties": false
+                        "additionalProperties": true
                     },
                     "Trend": {
                         "type": "object",
@@ -193,14 +172,7 @@
                                 "type": "number"
                             }
                         },
-                        "required": [
-                            "Intercept",
-                            "Coefficients",
-                            "LogCoefficients",
-                            "Range",
-                            "Lambda"
-                        ],
-                        "additionalProperties": false
+                        "additionalProperties": true
                     },
                     "ExpectedTrend": {
                         "type": "number"
@@ -212,19 +184,7 @@
                         "type": "integer"
                     }
                 },
-                "required": [
-                    "Lambda",
-                    "StdDev",
-                    "Intercept",
-                    "Range",
-                    "Coefficients",
-                    "Policy",
-                    "Trend",
-                    "ExpectedTrend",
-                    "ExpectedTrendBoxCox",
-                    "TrendSteps"
-                ],
-                "additionalProperties": false
+                "additionalProperties": true
             }
         },
         "RiskFactorCorrelationFile": {
@@ -238,9 +198,6 @@
         "ModelName",
         "InformationSpeed",
         "PhysicalActivityStdDev",
-        "RuralPrevalence",
-        "IncomeModels",
-        "PhysicalActivityModels",
         "RiskFactorModels",
         "RiskFactorCorrelationFile",
         "PolicyCovarianceFile"
