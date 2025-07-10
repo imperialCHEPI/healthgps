@@ -138,7 +138,7 @@
                                 }
                             }
                         },
-                        "additionalProperties": false
+                        "additionalProperties": true
                     },
                     "Trend": {
                         "type": "object",
@@ -172,7 +172,7 @@
                                 "type": "number"
                             }
                         },
-                        "additionalProperties": false
+                        "additionalProperties": true
                     },
                     "ExpectedTrend": {
                         "type": "number"
@@ -184,7 +184,7 @@
                         "type": "integer"
                     }
                 },
-                "additionalProperties": false
+                "additionalProperties": true
             }
         },
         "RiskFactorCorrelationFile": {
