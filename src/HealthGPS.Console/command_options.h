@@ -30,7 +30,8 @@ struct CommandOptions {
     int job_id{};
 
     /// @brief The maximum number of threads to use (0: no limit).
-    size_t num_threads{};
+    //size_t num_threads{};
+    size_t num_threads = 8;
 
     /// @brief Whether to check input files without actually running simulation
     bool dry_run{};
