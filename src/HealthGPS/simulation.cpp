@@ -5,10 +5,10 @@
 #include "finally.h"
 #include "info_message.h"
 #include "mtrandom.h"
+#include "performance_monitor.h"
 #include "risk_factor_inspector.h"
 #include "sync_message.h"
 #include "univariate_visitor.h"
-#include "performance_monitor.h"
 
 #include <algorithm>
 #include <filesystem>
@@ -216,19 +216,19 @@ void Simulation::initialise_population() {
 
 void Simulation::update_population() {
     PERF_TIMER(global_performance_monitor, "Total_Population_Update");
-    
+
     /* Note: order is very important */
 
     // update basic information: demographics + diseases
     {
         PERF_TIMER(global_performance_monitor, "Demographic_Update");
-    demographic_->update_population(context_, *disease_);
+        demographic_->update_population(context_, *disease_);
     }
 
     // Calculate the net immigration by gender and age, update the population accordingly
     {
         PERF_TIMER(global_performance_monitor, "Net_Immigration_Update");
-    update_net_immigration();
+        update_net_immigration();
     }
 
     // update population socio-economic status- Not using SES for FINCH- Mahima
@@ -240,19 +240,19 @@ void Simulation::update_population() {
     // Update population risk factors
     {
         PERF_TIMER(global_performance_monitor, "RiskFactor_Update");
-    risk_factor_->update_population(context_);
+        risk_factor_->update_population(context_);
     }
 
     // Update diseases status: remission and incidence
     {
         PERF_TIMER(global_performance_monitor, "Disease_Update");
-    disease_->update_population(context_);
+        disease_->update_population(context_);
     }
 
     // Publish results to data logger
     {
         PERF_TIMER(global_performance_monitor, "Analysis_Update");
-    analysis_->update_population(context_);
+        analysis_->update_population(context_);
     }
 }
 

@@ -11,9 +11,9 @@
 #include "model_info.h"
 #include "result_file_writer.h"
 
+#include <algorithm> // Ensure this header is included for std::max
 #include <fmt/chrono.h>
 #include <fmt/color.h>
-#include <algorithm> // Ensure this header is included for std::max
 
 #include <chrono>
 #include <cstdlib>
@@ -95,13 +95,13 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
     if (cmd_args.num_threads != 0) {
         // Ensure thread count is reasonable
         size_t safe_thread_count = cmd_args.num_threads;
-        
+
         // Clamp to reasonable range (avoid extreme values that might cause issues)
         safe_thread_count = std::max(size_t{1}, std::min(safe_thread_count, size_t{512}));
-        
-        fmt::print("Configuring TBB with {} threads (requested: {})\n", 
-                   safe_thread_count, cmd_args.num_threads);
-        
+
+        fmt::print("Configuring TBB with {} threads (requested: {})\n", safe_thread_count,
+                   cmd_args.num_threads);
+
         thread_control.emplace(tbb::global_control::max_allowed_parallelism, safe_thread_count);
     }
 
@@ -198,7 +198,7 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
         if (const auto seed = model_input->seed()) {
             seed_generator->seed(seed.value());
         }
-        
+
         // Use the original Runner (with thread safety improvements)
         auto runner = Runner(event_bus, std::move(seed_generator));
 
@@ -225,7 +225,7 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
 
         fmt::print(fmt::fg(fmt::color::light_green), "\nCompleted, elapsed time : {}ms\n\n",
                    runtime);
-        
+
         event_monitor.stop();
 
 #ifdef CATCH_EXCEPTIONS
