@@ -1,6 +1,5 @@
 #pragma once
 
-#include <execution>
 #include <future>
 #include <mutex>
 #include <numeric>

@@ -138,7 +138,11 @@ target_sources(
             "version.h"
             "weight_category.h"
             "weight_model.cpp"
-            "weight_model.h")
+            "weight_model.h"
+            "parallel_runner.h"
+            "parallel_runner.cpp"
+            "performance_monitor.h"
+            "performance_monitor.cpp")
 
 target_link_libraries(HealthGPS PRIVATE HealthGPS.Core fmt::fmt crossguid OpenSSL::Crypto
                                         sago::platform_folders)

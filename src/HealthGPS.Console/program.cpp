@@ -5,6 +5,7 @@
 #include "HealthGPS.Input/model_parser.h"
 #include "HealthGPS/api.h"
 #include "HealthGPS/event_bus.h"
+#include "HealthGPS/runner.h"
 #include "command_options.h"
 #include "event_monitor.h"
 #include "model_info.h"
@@ -12,6 +13,7 @@
 
 #include <fmt/chrono.h>
 #include <fmt/color.h>
+#include <algorithm> // Ensure this header is included for std::max
 
 #include <chrono>
 #include <cstdlib>
@@ -88,10 +90,19 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
 
     const auto &cmd_args = cmd_args_opt.value();
 
-    // Set maximum number of threads, if requested
+    // Set maximum number of threads with validation
     std::optional<tbb::global_control> thread_control;
     if (cmd_args.num_threads != 0) {
-        thread_control.emplace(tbb::global_control::max_allowed_parallelism, cmd_args.num_threads);
+        // Ensure thread count is reasonable
+        size_t safe_thread_count = cmd_args.num_threads;
+        
+        // Clamp to reasonable range (avoid extreme values that might cause issues)
+        safe_thread_count = std::max(size_t{1}, std::min(safe_thread_count, size_t{512}));
+        
+        fmt::print("Configuring TBB with {} threads (requested: {})\n", 
+                   safe_thread_count, cmd_args.num_threads);
+        
+        thread_control.emplace(tbb::global_control::max_allowed_parallelism, safe_thread_count);
     }
 
     // Print application title and parse command line arguments
@@ -182,11 +193,13 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
         auto json_file_logger = create_results_file_logger(config, *model_input);
         auto event_monitor = EventMonitor{*event_bus, json_file_logger};
 
-        // Create simulation executive instance with master seed generator
+        // Create optimized simulation executive instance with master seed generator
         auto seed_generator = std::make_unique<hgps::MTRandom32>();
         if (const auto seed = model_input->seed()) {
             seed_generator->seed(seed.value());
         }
+        
+        // Use the original Runner (with thread safety improvements)
         auto runner = Runner(event_bus, std::move(seed_generator));
 
         // Create communication channel, shared between the two scenarios.
@@ -212,6 +225,7 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
 
         fmt::print(fmt::fg(fmt::color::light_green), "\nCompleted, elapsed time : {}ms\n\n",
                    runtime);
+        
         event_monitor.stop();
 
 #ifdef CATCH_EXCEPTIONS

@@ -8,6 +8,7 @@
 #include "risk_factor_inspector.h"
 #include "sync_message.h"
 #include "univariate_visitor.h"
+#include "performance_monitor.h"
 
 #include <algorithm>
 #include <filesystem>
@@ -214,41 +215,45 @@ void Simulation::initialise_population() {
 }
 
 void Simulation::update_population() {
-    // std::cout << "\nDEBUG: Simulation::update_population - Starting";
+    PERF_TIMER(global_performance_monitor, "Total_Population_Update");
+    
     /* Note: order is very important */
 
     // update basic information: demographics + diseases
-    // std::cout << "\nDEBUG: Simulation::update_population - Updating demographic";
+    {
+        PERF_TIMER(global_performance_monitor, "Demographic_Update");
     demographic_->update_population(context_, *disease_);
-    // std::cout << "\nDEBUG: Simulation::update_population - Demographic updated";
+    }
 
     // Calculate the net immigration by gender and age, update the population accordingly
-    // std::cout << "\nDEBUG: Simulation::update_population - Updating net immigration";
+    {
+        PERF_TIMER(global_performance_monitor, "Net_Immigration_Update");
     update_net_immigration();
-    // std::cout << "\nDEBUG: Simulation::update_population - Net immigration updated";
+    }
 
     // update population socio-economic status- Not using SES for FINCH- Mahima
-    /*std::cout << "\nDEBUG: Simulation::update_population - Updating SES" << std::endl;
+    /*{
+        PERF_TIMER(global_performance_monitor, "SES_Update");
     ses_->update_population(context_);
-    std::cout << "\nDEBUG: Simulation::update_population - SES updated" << std::endl;*/
+    }*/
 
     // Update population risk factors
-    // std::cout << "\nDEBUG: Simulation::update_population - About to call
-    // risk_factor_->update_population";
+    {
+        PERF_TIMER(global_performance_monitor, "RiskFactor_Update");
     risk_factor_->update_population(context_);
-    // std::cout << "\nDEBUG: Simulation::update_population - Risk factors updated";
+    }
 
     // Update diseases status: remission and incidence
-    // std::cout << "\nDEBUG: Simulation::update_population - Updating diseases";
+    {
+        PERF_TIMER(global_performance_monitor, "Disease_Update");
     disease_->update_population(context_);
-    // std::cout << "\nDEBUG: Simulation::update_population - Diseases updated";
+    }
 
     // Publish results to data logger
-    // std::cout << "\nDEBUG: Simulation::update_population - Updating analysis";
+    {
+        PERF_TIMER(global_performance_monitor, "Analysis_Update");
     analysis_->update_population(context_);
-    // std::cout << "\nDEBUG: Simulation::update_population - Analysis updated";
-
-    // std::cout << "\nDEBUG: Simulation::update_population - Completed";
+    }
 }
 
 void Simulation::update_net_immigration() {
