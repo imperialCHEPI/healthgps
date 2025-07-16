@@ -13,7 +13,7 @@ nlohmann::json get(const json &j, const std::string &key) {
     try {
         return j.at(key);
     } catch (const std::exception &) {
-        fmt::print(fg(fmt::color::red), "Missing key \"{}\"\n", key);
+        fmt::print(fmt::fg(fmt::color::red), "Missing key \"{}\"\n", key);
         throw ConfigurationError{fmt::format("Missing key \"{}\"", key)};
     }
 }
@@ -40,7 +40,7 @@ bool rebase_valid_path_to(const json &j, const std::string &key, std::filesystem
     try {
         rebase_valid_path(out, base_dir);
     } catch (const ConfigurationError &) {
-        fmt::print(fg(fmt::color::red), "Could not find file {}\n", out.string());
+        fmt::print(fmt::fg(fmt::color::red), "Could not find file {}\n", out.string());
         return false;
     }
 
@@ -93,7 +93,7 @@ BaselineInfo get_baseline_info(const json &j, const std::filesystem::path &base_
                 rebase_valid_path(path, base_dir);
                 fmt::print("{:<14}, file: {}\n", name, path.string());
             } catch (const ConfigurationError &) {
-                fmt::print(fg(fmt::color::red), "Could not find file: {}\n", path.string());
+                fmt::print(fmt::fg(fmt::color::red), "Could not find file: {}\n", path.string());
                 success = false;
             }
         }
@@ -166,7 +166,7 @@ void load_input_info(const json &j, Configuration &config) {
         fmt::print("Input dataset file: {}\n", config.file.name.string());
     } catch (const std::exception &e) {
         success = false;
-        fmt::print(fg(fmt::color::red), "Could not load dataset file: {}\n", e.what());
+        fmt::print(fmt::fg(fmt::color::red), "Could not load dataset file: {}\n", e.what());
     }
 
     // Settings
@@ -174,7 +174,7 @@ void load_input_info(const json &j, Configuration &config) {
         config.settings = get_settings(inputs);
     } catch (const std::exception &) {
         success = false;
-        fmt::print(fg(fmt::color::red), "Could not load settings info");
+        fmt::print(fmt::fg(fmt::color::red), "Could not load settings info\n");
     }
 
     if (!success) {
@@ -197,8 +197,8 @@ void load_modelling_info(const json &j, Configuration &config) {
                 fmt::print("{:<14}, file: {}\n", type, path.string());
             } catch (const ConfigurationError &) {
                 success = false;
-                fmt::print(fg(fmt::color::red), "Adjustment type: {}, file: {} not found.\n", type,
-                           path.string());
+                fmt::print(fmt::fg(fmt::color::red), "Adjustment type: {}, file: {} not found.\n",
+                           type, path.string());
             }
         }
     }
@@ -216,7 +216,7 @@ void load_modelling_info(const json &j, Configuration &config) {
         config.ses = get(modelling, "ses_model").get<SESInfo>();
     } catch (const std::exception &) {
         success = false;
-        fmt::print(fmt::fg(fmt::color::red), "Could not load SES mappings");
+        fmt::print(fmt::fg(fmt::color::red), "Could not load SES mappings\n");
     }
 
     if (!success) {
