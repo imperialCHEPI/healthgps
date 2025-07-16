@@ -86,7 +86,7 @@ float Person::gender_to_value(core::Gender gender) {
     if (gender == core::Gender::unknown) {
         throw core::HgpsException("Gender is unknown.");
     }
-    return gender == core::Gender::male ? 1.0f : 0.0f;
+    return gender == core::Gender::male ? 0.0f : 1.0f;
 }
 
 std::string Person::gender_to_string() const {
