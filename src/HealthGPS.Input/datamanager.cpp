@@ -641,6 +641,6 @@ void DataManager::notify_warning(std::string_view message) const {
         return;
     }
 
-    fmt::print(fg(fmt::color::dark_salmon), "File-based store, {}\n", message);
+    fmt::print(fmt::fg(fmt::color::dark_salmon), "File-based store, {}\n", message);
 }
 } // namespace hgps::input

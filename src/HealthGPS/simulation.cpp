@@ -2,12 +2,16 @@
 #include "HealthGPS.Core/thread_util.h"
 #include "HealthGPS.Core/univariate_summary.h"
 #include "converter.h"
+#include "finally.h"
 #include "info_message.h"
 #include "mtrandom.h"
+#include "performance_monitor.h"
+#include "risk_factor_inspector.h"
 #include "sync_message.h"
 #include "univariate_visitor.h"
 
 #include <algorithm>
+#include <filesystem>
 #include <fmt/format.h>
 #include <iostream>
 #include <memory>
@@ -22,6 +26,10 @@ using NetImmigrationMessage = hgps::SyncDataMessage<hgps::IntegerAgeGenderTable>
 } // anonymous namespace
 
 namespace hgps {
+
+// MAHIMA: TOGGLE FOR YEAR 3 RISK FACTOR INSPECTION
+// Must match the toggle in static_linear_model.cpp
+static constexpr bool ENABLE_YEAR3_RISK_FACTOR_INSPECTION = false;
 
 Simulation::Simulation(SimulationModuleFactory &factory, std::shared_ptr<const EventAggregator> bus,
                        std::shared_ptr<const ModelInput> inputs, std::unique_ptr<Scenario> scenario)
@@ -39,14 +47,61 @@ Simulation::Simulation(SimulationModuleFactory &factory, std::shared_ptr<const E
     risk_factor_ = std::static_pointer_cast<RiskFactorHostModule>(risk_base);
     disease_ = std::static_pointer_cast<DiseaseModule>(disease_base);
     analysis_ = std::static_pointer_cast<UpdatableModule>(analysis_base);
+
+    // MAHIMA: Initialize Risk Factor Inspector for Year 3 Policy Inspection
+    // This inspector will capture individual person risk factor values in Year 3
+    // (when policies are applied) to help debug weird/incorrect values and identify outliers
+    if constexpr (ENABLE_YEAR3_RISK_FACTOR_INSPECTION) {
+        try {
+            // MAHIMA: Create output directory for the inspection files
+            // We'll use the current working directory as a fallback since we don't have
+            // direct access to the configuration output folder here
+            std::filesystem::path output_dir = std::filesystem::current_path();
+
+            // MAHIMA: Try to create a "risk_factor_inspection" subdirectory
+            auto inspection_dir = output_dir / "risk_factor_inspection";
+            if (!std::filesystem::exists(inspection_dir)) {
+                std::filesystem::create_directories(inspection_dir);
+            }
+
+            // MAHIMA: Create the risk factor inspector instance
+            auto inspector = std::make_unique<RiskFactorInspector>(inspection_dir);
+
+            // MAHIMA: Set the inspector in the runtime context
+            context_.set_risk_factor_inspector(std::move(inspector));
+
+            std::cout << "\nMAHIMA: Risk Factor Inspector initialized successfully in Simulation "
+                         "constructor";
+            std::cout << "\n  Output directory: " << inspection_dir.string();
+            std::cout << "\n  Scenario: " << context_.scenario().name();
+            std::cout
+                << "\n  Ready to capture Year 3 individual person data for policy inspection.\n";
+
+        } catch (const std::exception &e) {
+            // MAHIMA: If inspector initialization fails, log the error but don't crash the
+            // simulation The simulation can still run without the inspector, just without Year 3
+            // data capture
+            if constexpr (ENABLE_YEAR3_RISK_FACTOR_INSPECTION) {
+                std::cout << "\nMAHIMA: Warning - Failed to initialize Risk Factor Inspector: "
+                          << e.what();
+                std::cout << "\n  Simulation will continue without Year 3 policy inspection data "
+                             "capture.";
+                std::cout << "\n  This may be normal if inspection is not needed for this run.\n";
+            }
+        }
+    }
 }
 
 void Simulation::setup_run(unsigned int run_number, unsigned int run_seed) noexcept {
+    // std::cout << "\nDEBUG: Simulation::setup_run - Starting for run #" << run_number << " with
+    // seed " << run_seed << std::endl;
     context_.set_current_run(run_number);
     context_.random().seed(run_seed);
+    // std::cout << "\nDEBUG: Simulation::setup_run - Completed" << std::endl;
 }
 
 adevs::Time Simulation::init(adevs::SimEnv<int> *env) {
+    // std::cout << "\nDEBUG: Simulation::init - Starting" << std::endl;
     auto start = std::chrono::steady_clock::now();
     const auto &inputs = context_.inputs();
     auto world_time = inputs.start_time();
@@ -54,8 +109,9 @@ adevs::Time Simulation::init(adevs::SimEnv<int> *env) {
     context_.scenario().clear();
     context_.set_current_time(world_time);
     end_time_ = adevs::Time(inputs.stop_time(), 0);
-
+    // std::cout << "\nDEBUG: Simulation::init - Initializing population" << std::endl;
     initialise_population();
+    // std::cout << "\nDEBUG: Simulation::init - Population initialized" << std::endl;
 
     auto stop = std::chrono::steady_clock::now();
     auto elapsed = std::chrono::duration<double, std::milli>(stop - start);
@@ -66,10 +122,13 @@ adevs::Time Simulation::init(adevs::SimEnv<int> *env) {
     context_.publish(std::make_unique<InfoEventMessage>(
         name(), ModelAction::start, context_.current_run(), context_.time_now(), message));
 
+    // std::cout << "\nDEBUG: Simulation::init - Completed, next time: " << world_time << std::endl;
     return env->now() + adevs::Time(world_time, 0);
 }
 
 adevs::Time Simulation::update(adevs::SimEnv<int> *env) {
+    // std::cout << "\nDEBUG: Simulation::update - Starting at time " << env->now().real <<
+    // std::endl;
     if (env->now() < end_time_) {
         auto start = std::chrono::steady_clock::now();
         context_.metrics().reset();
@@ -78,8 +137,9 @@ adevs::Time Simulation::update(adevs::SimEnv<int> *env) {
         auto world_time = env->now() + adevs::Time(1, 0);
         auto time_year = world_time.real;
         context_.set_current_time(time_year);
-
+        // std::cout << "\nDEBUG: Simulation::update - Updating population for time " << time_year;
         update_population();
+        // std::cout << "\nDEBUG: Simulation::update - Population updated";
 
         auto stop = std::chrono::steady_clock::now();
         auto elapsed = std::chrono::duration<double, std::milli>(stop - start);
@@ -90,10 +150,12 @@ adevs::Time Simulation::update(adevs::SimEnv<int> *env) {
             name(), ModelAction::update, context_.current_run(), context_.time_now(), message));
 
         // Schedule next event time
+        // std::cout << "\nDEBUG: Simulation::update - Completed, next time: " << world_time.real;
         return world_time;
     }
 
     // We have reached the end, remove the model and return infinite time for next event.
+    // std::cout << "\nDEBUG: Simulation::update - End time reached, removing model";
     env->remove(this);
     return adevs_inf<adevs::Time>();
 }
@@ -111,6 +173,7 @@ void Simulation::fini(adevs::Time clock) {
 }
 
 void Simulation::initialise_population() {
+    // std::cout << "\nDEBUG: Simulation::initialise_population - Starting" << std::endl;
     /* Note: order is very important */
 
     // Create virtual population
@@ -120,53 +183,90 @@ void Simulation::initialise_population() {
     float size_fraction = inputs.settings().size_fraction();
     auto virtual_pop_size = static_cast<int>(size_fraction * total_year_pop_size);
     context_.reset_population(virtual_pop_size);
+    std::cout << "\nDEBUG: population with size " << virtual_pop_size;
 
     // Gender - Age, must be first
+    // std::cout << "\nDEBUG: Simulation::initialise_population - Initializing demographic";
     demographic_->initialise_population(context_);
+    // std::cout << "\nDEBUG: Simulation::initialise_population - Demographic completed";
 
-    // Social economics status
+    // Social economics status- NOT BEING USED FOR FINCH- Mahima
+    /*std::cout << "\nDEBUG: Simulation::initialise_population - Initializing SES" << std::endl;
     ses_->initialise_population(context_);
+    std::cout << "\nDEBUG: Simulation::initialise_population - SES completed" << std::endl;*/
 
     // Generate risk factors
+    // std::cout << "\nDEBUG: Simulation::initialise_population - Initializing risk factors";
     risk_factor_->initialise_population(context_);
+    // std::cout << "\nDEBUG: Simulation::initialise_population - Risk factors completed";
 
     // Initialise diseases
+    // std::cout << "\nDEBUG: Simulation::initialise_population - Initializing diseases";
     disease_->initialise_population(context_);
+    // std::cout << "\nDEBUG: Simulation::initialise_population - Diseases completed";
 
     // Initialise analysis
+    // std::cout << "\nDEBUG: Simulation::initialise_population - Initializing analysis";
     analysis_->initialise_population(context_);
+    // std::cout << "\nDEBUG: Simulation::initialise_population - Analysis completed";
 
     print_initial_population_statistics();
+    // std::cout << "\nDEBUG: Simulation::initialise_population - Completed";
 }
 
 void Simulation::update_population() {
+    PERF_TIMER(global_performance_monitor, "Total_Population_Update");
+
     /* Note: order is very important */
 
     // update basic information: demographics + diseases
-    demographic_->update_population(context_, *disease_);
+    {
+        PERF_TIMER(global_performance_monitor, "Demographic_Update");
+        demographic_->update_population(context_, *disease_);
+    }
 
     // Calculate the net immigration by gender and age, update the population accordingly
-    update_net_immigration();
+    {
+        PERF_TIMER(global_performance_monitor, "Net_Immigration_Update");
+        update_net_immigration();
+    }
 
-    // update population socio-economic status
+    // update population socio-economic status- Not using SES for FINCH- Mahima
+    /*{
+        PERF_TIMER(global_performance_monitor, "SES_Update");
     ses_->update_population(context_);
+    }*/
 
     // Update population risk factors
-    risk_factor_->update_population(context_);
+    {
+        PERF_TIMER(global_performance_monitor, "RiskFactor_Update");
+        risk_factor_->update_population(context_);
+    }
 
     // Update diseases status: remission and incidence
-    disease_->update_population(context_);
+    {
+        PERF_TIMER(global_performance_monitor, "Disease_Update");
+        disease_->update_population(context_);
+    }
 
     // Publish results to data logger
-    analysis_->update_population(context_);
+    {
+        PERF_TIMER(global_performance_monitor, "Analysis_Update");
+        analysis_->update_population(context_);
+    }
 }
 
 void Simulation::update_net_immigration() {
+    // std::cout << "\nDEBUG: Simulation::update_net_immigration - Starting to get net migration";
     auto net_immigration = get_net_migration();
+    // std::cout << "\nDEBUG: Simulation::update_net_immigration - Got net migration data";
 
     // Update population based on net immigration
     auto start_age = context_.age_range().lower();
     auto end_age = context_.age_range().upper();
+    // std::cout << "\nDEBUG: Simulation::update_net_immigration - Processing ages from " <<
+    // start_age << " to " << end_age;
+
     for (int age = start_age; age <= end_age; age++) {
         auto male_net_value = net_immigration.at(age, core::Gender::male);
         apply_net_migration(male_net_value, age, core::Gender::male);
@@ -174,11 +274,17 @@ void Simulation::update_net_immigration() {
         auto female_net_value = net_immigration.at(age, core::Gender::female);
         apply_net_migration(female_net_value, age, core::Gender::female);
     }
+    // std::cout << "\nDEBUG: Simulation::update_net_immigration - Finished processing all ages";
 
     if (context_.scenario().type() == ScenarioType::baseline) {
+        // std::cout << "\nDEBUG: Simulation::update_net_immigration - Sending data to baseline
+        // channel";
         context_.scenario().channel().send(std::make_unique<NetImmigrationMessage>(
             context_.current_run(), context_.time_now(), std::move(net_immigration)));
+        // std::cout << "\nDEBUG: Simulation::update_net_immigration - Data sent to baseline
+        // channel";
     }
+    // std::cout << "\nDEBUG: Simulation::update_net_immigration - Completed";
 }
 
 IntegerAgeGenderTable Simulation::get_current_expected_population() const {
@@ -194,12 +300,19 @@ IntegerAgeGenderTable Simulation::get_current_expected_population() const {
     auto start_age = context_.age_range().lower();
     auto end_age = context_.age_range().upper();
     for (int age = start_age; age <= end_age; age++) {
-        const auto &age_info = current_population_table.at(age);
-        expected_population.at(age, core::Gender::male) = static_cast<int>(
-            std::round(age_info.males * start_population_size / total_initial_population));
+        // Check if the age exists in the population table before accessing it
+        if (current_population_table.find(age) != current_population_table.end()) {
+            const auto &age_info = current_population_table.at(age);
+            expected_population.at(age, core::Gender::male) = static_cast<int>(
+                std::round(age_info.males * start_population_size / total_initial_population));
 
-        expected_population.at(age, core::Gender::female) = static_cast<int>(
-            std::round(age_info.females * start_population_size / total_initial_population));
+            expected_population.at(age, core::Gender::female) = static_cast<int>(
+                std::round(age_info.females * start_population_size / total_initial_population));
+        } else {
+            // Set population to 0 for ages not in the distribution table
+            expected_population.at(age, core::Gender::male) = 0;
+            expected_population.at(age, core::Gender::female) = 0;
+        }
     }
 
     return expected_population;
@@ -222,6 +335,7 @@ IntegerAgeGenderTable Simulation::get_current_simulated_population() {
 }
 
 void Simulation::apply_net_migration(int net_value, unsigned int age, const core::Gender &gender) {
+
     if (net_value > 0) {
         auto &pop = context_.population();
         auto similar_indices = core::find_index_of_all(pop, [&](const Person &entity) {
@@ -231,6 +345,8 @@ void Simulation::apply_net_migration(int net_value, unsigned int age, const core
         if (!similar_indices.empty()) {
             // Needed for repeatability in random selection
             std::sort(similar_indices.begin(), similar_indices.end());
+            // std::cout << "\nDEBUG: apply_net_migration - Found " << similar_indices.size() << "
+            // similar people for cloning";
 
             for (auto trial = 0; trial < net_value; trial++) {
                 auto index =
@@ -240,6 +356,8 @@ void Simulation::apply_net_migration(int net_value, unsigned int age, const core
             }
         }
     } else if (net_value < 0) {
+        // std::cout << "\nDEBUG: apply_net_migration - Looking for " << -net_value  << " people to
+        // emigrate";
         auto net_value_counter = net_value;
         for (auto &entity : context_.population()) {
             if (!entity.is_active()) {
@@ -258,34 +376,71 @@ void Simulation::apply_net_migration(int net_value, unsigned int age, const core
 }
 
 hgps::IntegerAgeGenderTable Simulation::get_net_migration() {
+    /*std::cout << "\nDEBUG: Simulation::get_net_migration - Starting for scenario type: "
+              << (context_.scenario().type() == ScenarioType::baseline ? "baseline"
+                                                                       : "intervention");*/
+
     if (context_.scenario().type() == ScenarioType::baseline) {
-        return create_net_migration();
+        // std::cout << "\nDEBUG: Simulation::get_net_migration - Creating net migration for
+        // baseline";
+        auto result = create_net_migration();
+        // std::cout << "\nDEBUG: Simulation::get_net_migration - Created net migration for
+        // baseline";
+        return result;
     }
 
     // Receive message with timeout
+    // std::cout << "\nDEBUG: Simulation::get_net_migration - Trying to receive message";
     auto message = context_.scenario().channel().try_receive(context_.sync_timeout_millis());
+    // std::cout << "\nDEBUG: Simulation::get_net_migration - Message received: " <<
+    // (message.has_value() ? "yes" : "no");
+
     if (message.has_value()) {
         auto &basePtr = message.value();
+        // std::cout << "\nDEBUG: Simulation::get_net_migration - Checking message type";
         auto *messagePrt = dynamic_cast<NetImmigrationMessage *>(basePtr.get());
         if (messagePrt) {
+            // std::cout << "\nDEBUG: Simulation::get_net_migration - Message is
+            // NetImmigrationMessage";
             return messagePrt->data();
         }
 
+        // std::cout << "\nERROR: Simulation::get_net_migration - Message is not
+        // NetImmigrationMessage";
         throw std::runtime_error(
             "Simulation out of sync, failed to receive a net immigration message");
     }
-    throw std::runtime_error(fmt::format(
-        "Simulation out of sync, receive net immigration message has timed out after {} ms.",
-        context_.sync_timeout_millis()));
+
+    std::cout << "\nERROR: Simulation::get_net_migration - Exceeded maximum retries";
+    // Last resort fallback - create empty migration table
+    auto fallback_empty = create_age_gender_table<int>(context_.age_range());
+    std::cout
+        << "\nWARNING: Simulation::get_net_migration - Using empty migration table as last resort";
+    return fallback_empty;
 }
 
 hgps::IntegerAgeGenderTable Simulation::create_net_migration() {
+    // std::cout << "\nDEBUG: Simulation::create_net_migration - Starting";
+
     auto expected_future = core::run_async(&Simulation::get_current_expected_population, this);
+    // std::cout << "\nDEBUG: Simulation::create_net_migration - Started future for expected
+    // population";
+
     auto simulated_population = get_current_simulated_population();
+    // std::cout << "\nDEBUG: Simulation::create_net_migration - Got simulated population";
+
     auto net_emigration = create_age_gender_table<int>(context_.age_range());
+    // std::cout << "\nDEBUG: Simulation::create_net_migration - Created empty net emigration
+    // table";
+
     auto start_age = context_.age_range().lower();
     auto end_age = context_.age_range().upper();
+
+    // std::cout << "\nDEBUG: Simulation::create_net_migration - Waiting for expected population
+    // future";
     auto expected_population = expected_future.get();
+    // std::cout << "\nDEBUG: Simulation::create_net_migration - Got expected population";
+
     auto net_value = 0;
     for (int age = start_age; age <= end_age; age++) {
         net_value = expected_population.at(age, core::Gender::male) -
@@ -296,6 +451,7 @@ hgps::IntegerAgeGenderTable Simulation::create_net_migration() {
                     simulated_population.at(age, core::Gender::female);
         net_emigration.at(age, core::Gender::female) = net_value;
     }
+    // std::cout << "\nDEBUG: Simulation::create_net_migration - Filled net emigration table";
 
     // Update statistics
     return net_emigration;
@@ -307,8 +463,12 @@ Person Simulation::partial_clone_entity(const Person &source) noexcept {
     clone.gender = source.gender;
     clone.ses = source.ses;
     clone.sector = source.sector;
-    clone.region = source.region; // added region for FINCH
+    clone.region = source.region; // added for FINCH
+    clone.ethnicity = source.ethnicity;
     clone.income = source.income;
+    clone.income_continuous = source.income_continuous;
+    clone.income_category = source.income_category;
+    clone.physical_activity = source.physical_activity;
     for (const auto &item : source.risk_factors) {
         clone.risk_factors.emplace(item.first, item.second);
     }
