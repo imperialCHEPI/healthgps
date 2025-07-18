@@ -73,6 +73,6 @@ if(WIN32)
         $<TARGET_FILE_DIR:HealthGPS.Console>)
 endif()
 
-install(DIRECTORY ../../schemas DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
+install(DIRECTORY ../../schemas/config DESTINATION "${CMAKE_INSTALL_PREFIX}/bin/schemas")
 
 set(ROOT_NAMESPACE hgps)
