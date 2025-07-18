@@ -34,6 +34,10 @@ class ResultFileWriter final : public ResultWriter {
   private:
     std::ofstream stream_;
     std::ofstream csvstream_;
+    std::ofstream csvstream_LowerInc_;
+    std::ofstream csvstream_LowerMiddleInc_;
+    std::ofstream csvstream_UpperMiddleInc_;
+    std::ofstream csvstream_upperInc_;
     std::mutex lock_mutex_;
     std::atomic<bool> first_row_{true};
     ExperimentInfo info_;
