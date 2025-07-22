@@ -73,9 +73,6 @@ if(WIN32)
         $<TARGET_FILE_DIR:HealthGPS.Console>)
 endif()
 
-# Install all schema versions for compatibility
-install(DIRECTORY ../../schemas/v1 DESTINATION "${CMAKE_INSTALL_PREFIX}/bin/schemas/v1")
-install(DIRECTORY ../../schemas/v2 DESTINATION "${CMAKE_INSTALL_PREFIX}/bin/schemas/v2")
-install(DIRECTORY ../../schemas/config DESTINATION "${CMAKE_INSTALL_PREFIX}/bin/schemas/config")
+install(DIRECTORY ../../schemas DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
 
 set(ROOT_NAMESPACE hgps)
