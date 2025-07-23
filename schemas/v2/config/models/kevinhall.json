@@ -17,6 +17,9 @@
                     "Name": {
                         "type": "string"
                     },
+                    "Unit": {
+                        "type": "string"
+                    },
                     "Range": {
                         "type": "array",
                         "items": {
@@ -64,6 +67,16 @@
                     },
                     "TrendSteps": {
                         "type": "integer"
+                    },
+                    "ExpectedIncomeTrend": {
+                        "type": "number"
+                    },
+                    "IncomeTrendSteps": {
+                        "type": "integer"
+                    },
+                    "IncomeDecayFactor": {
+                        "type": "number",
+                        "description": "Exponential decay factor 'b' for income trend calculation"
                     }
                 },
                 "additionalProperties": false
