@@ -11,7 +11,11 @@
         },
         "trend_type": {
             "type": "string",
-            "enum": ["null", "trend", "income_trend"],
+            "enum": [
+                "null",
+                "trend",
+                "income_trend"
+            ],
             "default": "null",
             "description": "Type of trend to apply to risk factors. 'null' = no trends, 'trend' = standard trends, 'income_trend' = income-based trends"
         },
