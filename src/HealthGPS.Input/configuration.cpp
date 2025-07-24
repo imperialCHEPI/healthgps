@@ -100,6 +100,15 @@ Configuration get_configuration(const std::string &config_source,
     // Base dir for relative paths
     config.root_path = config_file.parent_path();
 
+    // Read trend_type from JSON file (optional, defaults to "null")
+    if (opt.contains("trend_type")) {
+        config.trend_type = opt["trend_type"].get<std::string>();
+        // Validate trend_type value
+        if (config.trend_type != "null" && config.trend_type != "trend" && config.trend_type != "income_trend") {
+            throw ConfigurationError{fmt::format("Invalid trend_type: {}. Must be one of: null, trend, income_trend", config.trend_type)};
+        }
+    }
+
     // Read data source from JSON file. For now, this is optional, but in future it will be
     // mandatory.
     if (opt.contains("data")) {

@@ -23,15 +23,36 @@ StaticLinearModel::StaticLinearModel(
     const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         &rural_prevalence,
     const std::unordered_map<core::Income, LinearModelParams> &income_models,
-    double physical_activity_stddev)
+    double physical_activity_stddev,
+    TrendType trend_type = TrendType::Null,
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend,
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend_boxcox,
+    std::shared_ptr<std::unordered_map<core::Identifier, int>> income_trend_steps,
+    std::shared_ptr<std::vector<LinearModelParams>> income_trend_models,
+    std::shared_ptr<std::vector<core::DoubleInterval>> income_trend_ranges,
+    std::shared_ptr<std::vector<double>> income_trend_lambda,
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors)
     : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend),
                                 std::move(trend_steps)},
-      expected_trend_boxcox_{std::move(expected_trend_boxcox)}, names_{names}, models_{models},
-      ranges_{ranges}, lambda_{lambda}, stddev_{stddev}, cholesky_{cholesky},
-      policy_models_{policy_models}, policy_ranges_{policy_ranges},
-      policy_cholesky_{policy_cholesky}, trend_models_{std::move(trend_models)},
-      trend_ranges_{std::move(trend_ranges)}, trend_lambda_{std::move(trend_lambda)},
-      info_speed_{info_speed}, rural_prevalence_{rural_prevalence}, income_models_{income_models},
+      // Regular trend member variables
+      expected_trend_boxcox_{std::move(expected_trend_boxcox)},
+      trend_models_{std::move(trend_models)},
+      trend_ranges_{std::move(trend_ranges)},
+      trend_lambda_{std::move(trend_lambda)},
+      // Income trend member variables
+      trend_type_{trend_type},
+      expected_income_trend_{std::move(expected_income_trend)},
+      expected_income_trend_boxcox_{std::move(expected_income_trend_boxcox)},
+      income_trend_steps_{std::move(income_trend_steps)},
+      income_trend_models_{std::move(income_trend_models)},
+      income_trend_ranges_{std::move(income_trend_ranges)},
+      income_trend_lambda_{std::move(income_trend_lambda)},
+      income_trend_decay_factors_{std::move(income_trend_decay_factors)},
+      // Common member variables
+      names_{names}, models_{models}, ranges_{ranges}, lambda_{lambda}, stddev_{stddev},
+      cholesky_{cholesky}, policy_models_{policy_models}, policy_ranges_{policy_ranges},
+      policy_cholesky_{policy_cholesky}, info_speed_{info_speed},
+      rural_prevalence_{rural_prevalence}, income_models_{income_models},
       physical_activity_stddev_{physical_activity_stddev} {}
 
 RiskFactorModelType StaticLinearModel::type() const noexcept { return RiskFactorModelType::Static; }
@@ -51,14 +72,29 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     // Adjust such that risk factor means match expected values.
     adjust_risk_factors(context, names_, ranges_, false);
 
-    // Initialise everyone.
+    // Initialise everyone with appropriate trend type.
     for (auto &person : context.population()) {
         initialise_policies(person, context.random(), false);
-        initialise_trends(context, person);
+        
+        // Apply trend based on trend_type
+        switch (trend_type_) {
+            case TrendType::Null:
+                // No trends applied
+                break;
+            case TrendType::Trend:
+                initialise_trends(context, person);
+                break;
+            case TrendType::IncomeTrend:
+                initialise_income_trends(context, person);
+                break;
+        }
     }
 
     // Adjust such that trended risk factor means match trended expected values.
-    adjust_risk_factors(context, names_, ranges_, true);
+    // Only apply trend adjustment if we have a trend type
+    if (trend_type_ != TrendType::Null) {
+        adjust_risk_factors(context, names_, ranges_, true);
+    }
 }
 
 void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
@@ -88,7 +124,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
     // Adjust such that risk factor means match expected values.
     adjust_risk_factors(context, names_, ranges_, false);
 
-    // Initialise newborns and update others.
+    // Initialise newborns and update others with appropriate trend type.
     for (auto &person : context.population()) {
         if (!person.is_active()) {
             continue;
@@ -96,15 +132,42 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 
         if (person.age == 0) {
             initialise_policies(person, context.random(), intervene);
-            initialise_trends(context, person);
+            
+            // Apply trend based on trend_type
+            switch (trend_type_) {
+                case TrendType::Null:
+                    // No trends applied
+                    break;
+                case TrendType::Trend:
+                    initialise_trends(context, person);
+                    break;
+                case TrendType::IncomeTrend:
+                    initialise_income_trends(context, person);
+                    break;
+            }
         } else {
             update_policies(person, intervene);
-            update_trends(context, person);
+            
+            // Apply trend based on trend_type
+            switch (trend_type_) {
+                case TrendType::Null:
+                    // No trends applied
+                    break;
+                case TrendType::Trend:
+                    update_trends(context, person);
+                    break;
+                case TrendType::IncomeTrend:
+                    update_income_trends(context, person);
+                    break;
+            }
         }
     }
 
     // Adjust such that trended risk factor means match trended expected values.
-    adjust_risk_factors(context, names_, ranges_, true);
+    // Only apply trend adjustment if we have a trend type
+    if (trend_type_ != TrendType::Null) {
+        adjust_risk_factors(context, names_, ranges_, true);
+    }
 
     // Apply policies if intervening.
     for (auto &person : context.population()) {
@@ -222,6 +285,63 @@ void StaticLinearModel::update_trends(RuntimeContext &context, Person &person) c
         double factor = person.risk_factors.at(names_[i]);
         int t = std::min(elapsed_time, get_trend_steps(names_[i]));
         factor *= pow(trend, t);
+        factor = ranges_[i].clamp(factor);
+
+        // Save risk factor.
+        person.risk_factors.at(names_[i]) = factor;
+    }
+}
+
+void StaticLinearModel::initialise_income_trends(RuntimeContext &context, Person &person) const {
+
+    // Approximate income trends with linear models.
+    auto linear = compute_linear_models(person, *income_trend_models_);
+
+    // Initialise and apply income trends (do not exist yet).
+    for (size_t i = 0; i < names_.size(); i++) {
+
+        // Initialise income trend.
+        auto trend_name = core::Identifier{names_[i].to_string() + "_income_trend"};
+        double expected = expected_income_trend_boxcox_->at(names_[i]);
+        double trend = expected * inverse_box_cox(linear[i], (*income_trend_lambda_)[i]);
+        trend = (*income_trend_ranges_)[i].clamp(trend);
+
+        // Save income trend.
+        person.risk_factors[trend_name] = trend;
+    }
+
+    // Apply income trends.
+    update_income_trends(context, person);
+}
+
+void StaticLinearModel::update_income_trends(RuntimeContext &context, Person &person) const {
+
+    // Get elapsed time (years). This is the income_trend_steps.
+    int elapsed_time = context.time_now() - context.start_time();
+
+    // Apply income trends
+    for (size_t i = 0; i < names_.size(); i++) {
+
+        // Load income trend.
+        auto trend_name = core::Identifier{names_[i].to_string() + "_income_trend"};
+        double trend = person.risk_factors.at(trend_name);
+
+        // Apply income trend to risk factor.
+        double factor = person.risk_factors.at(names_[i]);
+        
+        // Income trend is applied from the second year (T > T0)
+        if (elapsed_time > 0) {
+            // Get the decay factor for this risk factor
+            double decay_factor = income_trend_decay_factors_->at(names_[i]);
+            
+            // Cap the trend application at income_trend_steps
+            int t = std::min(elapsed_time, income_trend_steps_->at(names_[i]));
+            
+            // Calculate income trend: trend_income_T = trend_income_T0 * e^(b*(T-T0))
+            double trend_income_T = trend * exp(decay_factor * t);
+            factor *= trend_income_T;
+        }
+        
         factor = ranges_[i].clamp(factor);
 
         // Save risk factor.
@@ -446,17 +566,37 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::unique_ptr<std::vector<double>> trend_lambda, double info_speed,
     std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>> rural_prevalence,
     std::unordered_map<core::Income, LinearModelParams> income_models,
-    double physical_activity_stddev)
+    double physical_activity_stddev,
+    TrendType trend_type,
+    std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend,
+    std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend_boxcox,
+    std::unique_ptr<std::unordered_map<core::Identifier, int>> income_trend_steps,
+    std::unique_ptr<std::vector<LinearModelParams>> income_trend_models,
+    std::unique_ptr<std::vector<core::DoubleInterval>> income_trend_ranges,
+    std::unique_ptr<std::vector<double>> income_trend_lambda,
+    std::unique_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors)
     : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend),
                                           std::move(trend_steps)},
-      expected_trend_boxcox_{std::move(expected_trend_boxcox)}, names_{std::move(names)},
-      models_{std::move(models)}, ranges_{std::move(ranges)}, lambda_{std::move(lambda)},
-      stddev_{std::move(stddev)}, cholesky_{std::move(cholesky)},
+      // Regular trend member variables
+      expected_trend_boxcox_{std::move(expected_trend_boxcox)},
+      trend_models_{std::move(trend_models)},
+      trend_ranges_{std::move(trend_ranges)},
+      trend_lambda_{std::move(trend_lambda)},
+      // Income trend member variables
+      trend_type_{trend_type},
+      expected_income_trend_{std::move(expected_income_trend)},
+      expected_income_trend_boxcox_{std::move(expected_income_trend_boxcox)},
+      income_trend_steps_{std::move(income_trend_steps)},
+      income_trend_models_{std::move(income_trend_models)},
+      income_trend_ranges_{std::move(income_trend_ranges)},
+      income_trend_lambda_{std::move(income_trend_lambda)},
+      income_trend_decay_factors_{std::move(income_trend_decay_factors)},
+      // Common member variables
+      names_{std::move(names)}, models_{std::move(models)}, ranges_{std::move(ranges)},
+      lambda_{std::move(lambda)}, stddev_{std::move(stddev)}, cholesky_{std::move(cholesky)},
       policy_models_{std::move(policy_models)}, policy_ranges_{std::move(policy_ranges)},
-      policy_cholesky_{std::move(policy_cholesky)}, trend_models_{std::move(trend_models)},
-      trend_ranges_{std::move(trend_ranges)}, trend_lambda_{std::move(trend_lambda)},
-      info_speed_{info_speed}, rural_prevalence_{std::move(rural_prevalence)},
-      income_models_{std::move(income_models)},
+      policy_cholesky_{std::move(policy_cholesky)}, info_speed_{info_speed},
+      rural_prevalence_{std::move(rural_prevalence)}, income_models_{std::move(income_models)},
       physical_activity_stddev_{physical_activity_stddev} {
 
     if (names_.empty()) {
@@ -486,27 +626,87 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     if (!policy_cholesky_.allFinite()) {
         throw core::HgpsException("Intervention policy Cholesky matrix contains non-finite values");
     }
-    if (trend_models_->empty()) {
-        throw core::HgpsException("Time trend model list is empty");
+    // Validate regular trend parameters only if trend type is Trend
+    if (trend_type_ == TrendType::Trend) {
+        if (trend_models_->empty()) {
+            throw core::HgpsException("Time trend model list is empty");
+        }
+        if (trend_ranges_->empty()) {
+            throw core::HgpsException("Time trend ranges list is empty");
+        }
+        if (trend_lambda_->empty()) {
+            throw core::HgpsException("Time trend lambda list is empty");
+        }
     }
-    if (trend_ranges_->empty()) {
-        throw core::HgpsException("Time trend ranges list is empty");
+    
+    // Validate income trend parameters if income trend is enabled
+    if (trend_type_ == TrendType::IncomeTrend) {
+        if (!expected_income_trend_) {
+            throw core::HgpsException("Income trend is enabled but expected_income_trend is missing");
+        }
+        if (!expected_income_trend_boxcox_) {
+            throw core::HgpsException("Income trend is enabled but expected_income_trend_boxcox is missing");
+        }
+        if (!income_trend_steps_) {
+            throw core::HgpsException("Income trend is enabled but income_trend_steps is missing");
+        }
+        if (!income_trend_models_) {
+            throw core::HgpsException("Income trend is enabled but income_trend_models is missing");
+        }
+        if (!income_trend_ranges_) {
+            throw core::HgpsException("Income trend is enabled but income_trend_ranges is missing");
+        }
+        if (!income_trend_lambda_) {
+            throw core::HgpsException("Income trend is enabled but income_trend_lambda is missing");
+        }
+        if (!income_trend_decay_factors_) {
+            throw core::HgpsException("Income trend is enabled but income_trend_decay_factors is missing");
+        }
+        
+        // Validate income trend data consistency
+        if (income_trend_models_->empty()) {
+            throw core::HgpsException("Income trend model list is empty");
+        }
+        if (income_trend_ranges_->empty()) {
+            throw core::HgpsException("Income trend ranges list is empty");
+        }
+        if (income_trend_lambda_->empty()) {
+            throw core::HgpsException("Income trend lambda list is empty");
+        }
+        
+        // Validate that all risk factors have income trend parameters
+        for (const auto &name : names_) {
+            if (!expected_income_trend_->contains(name)) {
+                throw core::HgpsException("One or more expected income trend value is missing for risk factor: " + name.to_string());
+            }
+            if (!expected_income_trend_boxcox_->contains(name)) {
+                throw core::HgpsException("One or more expected income trend BoxCox value is missing for risk factor: " + name.to_string());
+            }
+            if (!income_trend_steps_->contains(name)) {
+                throw core::HgpsException("One or more income trend steps value is missing for risk factor: " + name.to_string());
+            }
+            if (!income_trend_decay_factors_->contains(name)) {
+                throw core::HgpsException("One or more income trend decay factor is missing for risk factor: " + name.to_string());
+            }
+        }
     }
-    if (trend_lambda_->empty()) {
-        throw core::HgpsException("Time trend lambda list is empty");
-    }
+    
     if (rural_prevalence_.empty()) {
         throw core::HgpsException("Rural prevalence mapping is empty");
     }
     if (income_models_.empty()) {
         throw core::HgpsException("Income models mapping is empty");
     }
-    for (const auto &name : names_) {
-        if (!expected_trend_->contains(name)) {
-            throw core::HgpsException("One or more expected trend value is missing");
-        }
-        if (!expected_trend_boxcox_->contains(name)) {
-            throw core::HgpsException("One or more expected trend BoxCox value is missing");
+    
+    // Validate regular trend parameters for all risk factors only if trend type is Trend
+    if (trend_type_ == TrendType::Trend) {
+        for (const auto &name : names_) {
+            if (!expected_trend_->contains(name)) {
+                throw core::HgpsException("One or more expected trend value is missing");
+            }
+            if (!expected_trend_boxcox_->contains(name)) {
+                throw core::HgpsException("One or more expected trend BoxCox value is missing");
+            }
         }
     }
 }
@@ -516,7 +716,9 @@ std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() con
         expected_, expected_trend_, trend_steps_, expected_trend_boxcox_, names_, models_, ranges_,
         lambda_, stddev_, cholesky_, policy_models_, policy_ranges_, policy_cholesky_,
         trend_models_, trend_ranges_, trend_lambda_, info_speed_, rural_prevalence_, income_models_,
-        physical_activity_stddev_);
+        physical_activity_stddev_, trend_type_, expected_income_trend_, expected_income_trend_boxcox_,
+        income_trend_steps_, income_trend_models_, income_trend_ranges_, income_trend_lambda_,
+        income_trend_decay_factors_);
 }
 
 } // namespace hgps

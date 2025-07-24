@@ -17,6 +17,13 @@ struct LinearModelParams {
     std::unordered_map<core::Identifier, double> log_coefficients{};
 };
 
+/// @brief Defines the trend type enumeration
+enum class TrendType {
+    Null,           ///< No trends applied (null)
+    Trend,          ///< Standard trends (existing functionality)
+    IncomeTrend     ///< Income-based trends (new functionality)
+};
+
 /// @brief Implements the static linear model type
 /// @details The static model is used to initialise the virtual population.
 class StaticLinearModel final : public RiskFactorAdjustableModel {
@@ -41,8 +48,15 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param info_speed The information speed of risk factor updates
     /// @param rural_prevalence Rural sector prevalence for age groups and sex
     /// @param income_models The income models for each income category
-    /// @param phycical_activity_stddev The standard deviation of the physical activity
-    /// @param region_models The region models for each region
+    /// @param physical_activity_stddev The standard deviation of the physical activity
+    /// @param trend_type The type of trend to apply (None, Regular, or Income)
+    /// @param expected_income_trend The expected income trend of risk factor values
+    /// @param expected_income_trend_boxcox The expected income trend boxcox factor
+    /// @param income_trend_steps The number of time steps to apply the income trend
+    /// @param income_trend_models The linear models used to compute income trends
+    /// @param income_trend_ranges The value range of each income trend
+    /// @param income_trend_lambda The lambda values of the income trends
+    /// @param income_trend_decay_factors The exponential decay factors for income trends
     /// @throws HgpsException for invalid arguments
     StaticLinearModel(
         std::shared_ptr<RiskFactorSexAgeTable> expected,
@@ -61,7 +75,15 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
         const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
             &rural_prevalence,
         const std::unordered_map<core::Income, LinearModelParams> &income_models,
-        double physical_activity_stddev);
+        double physical_activity_stddev,
+        TrendType trend_type,
+        std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend = nullptr,
+        std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend_boxcox = nullptr,
+        std::shared_ptr<std::unordered_map<core::Identifier, int>> income_trend_steps = nullptr,
+        std::shared_ptr<std::vector<LinearModelParams>> income_trend_models = nullptr,
+        std::shared_ptr<std::vector<core::DoubleInterval>> income_trend_ranges = nullptr,
+        std::shared_ptr<std::vector<double>> income_trend_lambda = nullptr,
+        std::shared_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors = nullptr);
 
     RiskFactorModelType type() const noexcept override;
 
@@ -81,6 +103,16 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     void initialise_trends(RuntimeContext &context, Person &person) const;
 
     void update_trends(RuntimeContext &context, Person &person) const;
+
+    /// @brief Initialise income trends for a person
+    /// @param context The runtime context
+    /// @param person The person to initialise income trends for
+    void initialise_income_trends(RuntimeContext &context, Person &person) const;
+
+    /// @brief Update income trends for a person
+    /// @param context The runtime context
+    /// @param person The person to update income trends for
+    void update_income_trends(RuntimeContext &context, Person &person) const;
 
     void initialise_policies(Person &person, Random &random, bool intervene) const;
 
@@ -104,12 +136,12 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     void update_sector(Person &person, Random &random) const;
 
     /// @brief Initialise the income category of a person
-    /// @param person The person to initialise sector for
+    /// @param person The person to initialise income for
     /// @param random The random number generator from the runtime context
     void initialise_income(Person &person, Random &random) const;
 
     /// @brief Update the income category of a person
-    /// @param person The person to update sector for
+    /// @param person The person to update income for
     /// @param random The random number generator from the runtime context
     void update_income(Person &person, Random &random) const;
 
@@ -119,7 +151,23 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     void initialise_physical_activity(RuntimeContext &context, Person &person,
                                       Random &random) const;
 
+    // Regular trend member variables
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox_;
+    std::shared_ptr<std::vector<LinearModelParams>> trend_models_;
+    std::shared_ptr<std::vector<core::DoubleInterval>> trend_ranges_;
+    std::shared_ptr<std::vector<double>> trend_lambda_;
+
+    // Income trend member variables
+    TrendType trend_type_;
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend_;
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend_boxcox_;
+    std::shared_ptr<std::unordered_map<core::Identifier, int>> income_trend_steps_;
+    std::shared_ptr<std::vector<LinearModelParams>> income_trend_models_;
+    std::shared_ptr<std::vector<core::DoubleInterval>> income_trend_ranges_;
+    std::shared_ptr<std::vector<double>> income_trend_lambda_;
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors_;
+
+    // Common member variables
     const std::vector<core::Identifier> &names_;
     const std::vector<LinearModelParams> &models_;
     const std::vector<core::DoubleInterval> &ranges_;
@@ -129,9 +177,6 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     const std::vector<LinearModelParams> &policy_models_;
     const std::vector<core::DoubleInterval> &policy_ranges_;
     const Eigen::MatrixXd &policy_cholesky_;
-    std::shared_ptr<std::vector<LinearModelParams>> trend_models_;
-    std::shared_ptr<std::vector<core::DoubleInterval>> trend_ranges_;
-    std::shared_ptr<std::vector<double>> trend_lambda_;
     const double info_speed_;
     const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         &rural_prevalence_;
@@ -162,7 +207,15 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     /// @param info_speed The information speed of risk factor updates
     /// @param rural_prevalence Rural sector prevalence for age groups and sex
     /// @param income_models The income models for each income category
-    /// @param phycical_activity_stddev The standard deviation of the physical activity
+    /// @param physical_activity_stddev The standard deviation of the physical activity
+    /// @param trend_type The type of trend to apply (None, Regular, or Income)
+    /// @param expected_income_trend The expected income trend of risk factor values
+    /// @param expected_income_trend_boxcox The expected income trend boxcox factor
+    /// @param income_trend_steps The number of time steps to apply the income trend
+    /// @param income_trend_models The linear models used to compute income trends
+    /// @param income_trend_ranges The value range of each income trend
+    /// @param income_trend_lambda The lambda values of the income trends
+    /// @param income_trend_decay_factors The exponential decay factors for income trends
     /// @throws HgpsException for invalid arguments
     StaticLinearModelDefinition(
         std::unique_ptr<RiskFactorSexAgeTable> expected,
@@ -180,14 +233,38 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
         std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
             rural_prevalence,
         std::unordered_map<core::Income, LinearModelParams> income_models,
-        double physical_activity_stddev);
+        double physical_activity_stddev,
+        TrendType trend_type = TrendType::Null,
+        std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend = nullptr,
+        std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend_boxcox = nullptr,
+        std::unique_ptr<std::unordered_map<core::Identifier, int>> income_trend_steps = nullptr,
+        std::unique_ptr<std::vector<LinearModelParams>> income_trend_models = nullptr,
+        std::unique_ptr<std::vector<core::DoubleInterval>> income_trend_ranges = nullptr,
+        std::unique_ptr<std::vector<double>> income_trend_lambda = nullptr,
+        std::unique_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors = nullptr);
 
     /// @brief Construct a new StaticLinearModel from this definition
     /// @return A unique pointer to the new StaticLinearModel instance
     std::unique_ptr<RiskFactorModel> create_model() const override;
 
   private:
+    // Regular trend member variables
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox_;
+    std::shared_ptr<std::vector<LinearModelParams>> trend_models_;
+    std::shared_ptr<std::vector<core::DoubleInterval>> trend_ranges_;
+    std::shared_ptr<std::vector<double>> trend_lambda_;
+
+    // Income trend member variables
+    TrendType trend_type_;
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend_;
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend_boxcox_;
+    std::shared_ptr<std::unordered_map<core::Identifier, int>> income_trend_steps_;
+    std::shared_ptr<std::vector<LinearModelParams>> income_trend_models_;
+    std::shared_ptr<std::vector<core::DoubleInterval>> income_trend_ranges_;
+    std::shared_ptr<std::vector<double>> income_trend_lambda_;
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors_;
+
+    // Common member variables
     std::vector<core::Identifier> names_;
     std::vector<LinearModelParams> models_;
     std::vector<core::DoubleInterval> ranges_;
@@ -197,9 +274,6 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     std::vector<LinearModelParams> policy_models_;
     std::vector<core::DoubleInterval> policy_ranges_;
     Eigen::MatrixXd policy_cholesky_;
-    std::shared_ptr<std::vector<LinearModelParams>> trend_models_;
-    std::shared_ptr<std::vector<core::DoubleInterval>> trend_ranges_;
-    std::shared_ptr<std::vector<double>> trend_lambda_;
     double info_speed_;
     std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         rural_prevalence_;

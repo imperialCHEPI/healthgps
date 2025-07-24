@@ -212,6 +212,14 @@ std::unique_ptr<hgps::StaticLinearModelDefinition>
 load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configuration &config) {
     MEASURE_FUNCTION();
 
+    // Parse trend_type from config.json- Reda which trend type to use.
+    hgps::TrendType trend_type = hgps::TrendType::Null;
+    if (config.trend_type == "trend") {
+        trend_type = hgps::TrendType::Trend;
+    } else if (config.trend_type == "income_trend") {
+        trend_type = hgps::TrendType::IncomeTrend;
+    }
+
     // Risk factor correlation matrix.
     const auto correlation_file_info =
         input::get_file_info(opt["RiskFactorCorrelationFile"], config.root_path);
@@ -239,6 +247,16 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     auto expected_trend = std::make_unique<std::unordered_map<core::Identifier, double>>();
     auto expected_trend_boxcox = std::make_unique<std::unordered_map<core::Identifier, double>>();
     auto trend_steps = std::make_unique<std::unordered_map<core::Identifier, int>>();
+
+    // Income trend data structures: income trend models, ranges, lambda, decay factors, steps.
+    // These will be nullptr if income trend is not enabled
+    std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend = nullptr;
+    std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend_boxcox = nullptr;
+    std::unique_ptr<std::unordered_map<core::Identifier, int>> income_trend_steps = nullptr;
+    std::unique_ptr<std::vector<LinearModelParams>> income_trend_models = nullptr;
+    std::unique_ptr<std::vector<core::DoubleInterval>> income_trend_ranges = nullptr;
+    std::unique_ptr<std::vector<double>> income_trend_lambda = nullptr;
+    std::unique_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors = nullptr;
 
     size_t i = 0;
     for (const auto &[key, json_params] : opt["RiskFactorModels"].items()) {
@@ -293,47 +311,101 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                 std::any_cast<double>(policy_covariance_table.column(i).value(j));
         }
 
-        // Time trend model parameters (use neutral values if trend data missing).
-        if (json_params.contains("Trend")) {
-            // Real trend data exists - use it
-            const auto &trend_json_params = json_params["Trend"];
-            LinearModelParams trend_model;
-            trend_model.intercept = trend_json_params["Intercept"].get<double>();
-            trend_model.coefficients = trend_json_params["Coefficients"]
-                                           .get<std::unordered_map<core::Identifier, double>>();
-            trend_model.log_coefficients = trend_json_params["LogCoefficients"]
+        // Trend model parameters 
+        if (trend_type == hgps::TrendType::Trend) {
+            // Only require trend data if trend type is Trend
+            if (json_params.contains("Trend")) {
+                // Real trend data exists - use it
+                const auto &trend_json_params = json_params["Trend"];
+                LinearModelParams trend_model;
+                trend_model.intercept = trend_json_params["Intercept"].get<double>();
+                trend_model.coefficients = trend_json_params["Coefficients"]
                                                .get<std::unordered_map<core::Identifier, double>>();
+                trend_model.log_coefficients = trend_json_params["LogCoefficients"]
+                                                   .get<std::unordered_map<core::Identifier, double>>();
 
-            // Write real trend data structures.
-            trend_models->emplace_back(std::move(trend_model));
-            trend_ranges->emplace_back(trend_json_params["Range"].get<core::DoubleInterval>());
-            trend_lambda->emplace_back(trend_json_params["Lambda"].get<double>());
+                // Write real trend data structures.
+                trend_models->emplace_back(std::move(trend_model));
+                trend_ranges->emplace_back(trend_json_params["Range"].get<core::DoubleInterval>());
+                trend_lambda->emplace_back(trend_json_params["Lambda"].get<double>());
 
-            // Load expected value trends (only if trend data exists).
-            (*expected_trend)[key] = json_params.contains("ExpectedTrend")
-                                         ? json_params["ExpectedTrend"].get<double>()
-                                         : 1.0;
-            (*expected_trend_boxcox)[key] = json_params.contains("ExpectedTrendBoxCox")
-                                                ? json_params["ExpectedTrendBoxCox"].get<double>()
-                                                : 1.0;
-            (*trend_steps)[key] =
-                json_params.contains("TrendSteps") ? json_params["TrendSteps"].get<int>() : 0;
+                // Load expected value trends (only if trend data exists).
+                (*expected_trend)[key] = json_params.contains("ExpectedTrend")
+                                             ? json_params["ExpectedTrend"].get<double>()
+                                             : 1.0;
+                (*expected_trend_boxcox)[key] = json_params.contains("ExpectedTrendBoxCox")
+                                                    ? json_params["ExpectedTrendBoxCox"].get<double>()
+                                                    : 1.0;
+                (*trend_steps)[key] =
+                    json_params.contains("TrendSteps") ? json_params["TrendSteps"].get<int>() : 0;
+            } else {
+                throw core::HgpsException{fmt::format(
+                    "Trend is enabled but Trend data is missing for risk factor: {}",
+                    key)};
+            }
         } else {
-            // No trend data - use mathematically neutral values (no effect on simulation)
-            LinearModelParams neutral_trend_model;
-            neutral_trend_model.intercept = 0.0;       // No trend intercept
-            neutral_trend_model.coefficients = {};     // No coefficients = no trend effect
-            neutral_trend_model.log_coefficients = {}; // No log coefficients
+            // For Null or IncomeTrend types, we don't need regular trend data
+            // Add empty trend data structures to maintain consistency
+            LinearModelParams trend_model;
+            trend_models->emplace_back(std::move(trend_model));
+            trend_ranges->emplace_back(core::DoubleInterval{0.0, 1.0});
+            trend_lambda->emplace_back(1.0);
+            
+            // Set default values for expected trends
+            (*expected_trend)[key] = 1.0;
+            (*expected_trend_boxcox)[key] = 1.0;
+            (*trend_steps)[key] = 0;
+        }
 
-            // Add neutral trend data to keep vector sizes consistent
-            trend_models->emplace_back(std::move(neutral_trend_model));
-            trend_ranges->emplace_back(core::DoubleInterval{0.0, 0.0}); // No range
-            trend_lambda->emplace_back(0.0);                            // No lambda transformation
+        // Income trend model parameters (only if income trend is enabled in the config.json)
+        if (trend_type == hgps::TrendType::IncomeTrend) {
+            // Create income trend data structures only when income trend is enabled
+            if (!expected_income_trend) {
+                expected_income_trend = std::make_unique<std::unordered_map<core::Identifier, double>>();
+                expected_income_trend_boxcox = std::make_unique<std::unordered_map<core::Identifier, double>>();
+                income_trend_steps = std::make_unique<std::unordered_map<core::Identifier, int>>();
+                income_trend_models = std::make_unique<std::vector<LinearModelParams>>();
+                income_trend_ranges = std::make_unique<std::vector<core::DoubleInterval>>();
+                income_trend_lambda = std::make_unique<std::vector<double>>();
+                income_trend_decay_factors = std::make_unique<std::unordered_map<core::Identifier, double>>();
+            }
 
-            // Set neutral trend values in maps
-            (*expected_trend)[key] = 1.0;        // No trend change (multiplier of 1.0)
-            (*expected_trend_boxcox)[key] = 1.0; // No trend change
-            (*trend_steps)[key] = 0;             // No trend steps
+            if (json_params.contains("IncomeTrend")) {
+                // Read income trend data from static_model.json
+                const auto &income_trend_json_params = json_params["IncomeTrend"];
+                LinearModelParams income_trend_model;
+                income_trend_model.intercept = income_trend_json_params["Intercept"].get<double>();
+                income_trend_model.coefficients = income_trend_json_params["Coefficients"]
+                                                      .get<std::unordered_map<core::Identifier, double>>();
+                income_trend_model.log_coefficients = income_trend_json_params["LogCoefficients"]
+                                                          .get<std::unordered_map<core::Identifier, double>>();
+
+                // Write real income trend data structures.
+                income_trend_models->emplace_back(std::move(income_trend_model));
+                income_trend_ranges->emplace_back(income_trend_json_params["Range"].get<core::DoubleInterval>());
+                income_trend_lambda->emplace_back(income_trend_json_params["Lambda"].get<double>());
+
+                // Load expected income trend values (no defaults - throw error if missing)
+                if (!json_params.contains("ExpectedIncomeTrend")) {
+                    throw core::HgpsException{fmt::format("ExpectedIncomeTrend is missing for risk factor: {}", key)};
+                }
+                if (!json_params.contains("ExpectedIncomeTrendBoxCox")) {
+                    throw core::HgpsException{fmt::format("ExpectedIncomeTrendBoxCox is missing for risk factor: {}", key)};
+                }
+                if (!json_params.contains("IncomeTrendSteps")) {
+                    throw core::HgpsException{fmt::format("IncomeTrendSteps is missing for risk factor: {}", key)};
+                }
+                if (!json_params.contains("IncomeDecayFactor")) {
+                    throw core::HgpsException{fmt::format("IncomeDecayFactor is missing for risk factor: {}", key)};
+                }
+
+                (*expected_income_trend)[key] = json_params["ExpectedIncomeTrend"].get<double>();
+                (*expected_income_trend_boxcox)[key] = json_params["ExpectedIncomeTrendBoxCox"].get<double>();
+                (*income_trend_steps)[key] = json_params["IncomeTrendSteps"].get<int>();
+                (*income_trend_decay_factors)[key] = json_params["IncomeDecayFactor"].get<double>();
+            } else {
+                throw core::HgpsException{fmt::format("Income trend is enabled but IncomeTrend data is missing for risk factor: {}", key)};
+            }
         }
 
         // Increment table column index.
@@ -430,7 +502,9 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         std::move(lambda), std::move(stddev), std::move(cholesky), std::move(policy_models),
         std::move(policy_ranges), std::move(policy_cholesky), std::move(trend_models),
         std::move(trend_ranges), std::move(trend_lambda), info_speed, std::move(rural_prevalence),
-        std::move(income_models), physical_activity_stddev);
+        std::move(income_models), physical_activity_stddev, trend_type, std::move(expected_income_trend),
+        std::move(expected_income_trend_boxcox), std::move(income_trend_steps), std::move(income_trend_models),
+        std::move(income_trend_ranges), std::move(income_trend_lambda), std::move(income_trend_decay_factors));
 }
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
