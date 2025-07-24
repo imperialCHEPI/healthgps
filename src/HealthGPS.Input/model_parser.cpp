@@ -314,10 +314,18 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         }
 
         // Trend model parameters
+        if (trend_type == hgps::TrendType::Null) {
+            // No trend data needed for Null type - skip to next risk factor
+            std::cout << "\nTrend Type is NULL";
+            i++;
+            continue;
+        }
+
         if (trend_type == hgps::TrendType::Trend) {
             // Only require trend data if trend type is Trend
             if (json_params.contains("Trend")) {
-                // Real trend data exists - use it
+                // UPF trend data exists - use it
+                std::cout << "\nTrend Type is TREND or UPF TREND";
                 const auto &trend_json_params = json_params["Trend"];
                 LinearModelParams trend_model;
                 trend_model.intercept = trend_json_params["Intercept"].get<double>();
@@ -363,6 +371,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         // Income trend model parameters (only if income trend is enabled in the config.json)
         if (trend_type == hgps::TrendType::IncomeTrend) {
             // Create income trend data structures only when income trend is enabled
+            std::cout << "\nTrend Type is INCOME TREND";
             if (!expected_income_trend) {
                 expected_income_trend =
                     std::make_unique<std::unordered_map<core::Identifier, double>>();
