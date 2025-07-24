@@ -104,8 +104,11 @@ Configuration get_configuration(const std::string &config_source,
     if (opt.contains("trend_type")) {
         config.trend_type = opt["trend_type"].get<std::string>();
         // Validate trend_type value
-        if (config.trend_type != "null" && config.trend_type != "trend" && config.trend_type != "income_trend") {
-            throw ConfigurationError{fmt::format("Invalid trend_type: {}. Must be one of: null, trend, income_trend", config.trend_type)};
+        if (config.trend_type != "null" && config.trend_type != "trend" &&
+            config.trend_type != "income_trend") {
+            throw ConfigurationError{
+                fmt::format("Invalid trend_type: {}. Must be one of: null, trend, income_trend",
+                            config.trend_type)};
         }
     }
 

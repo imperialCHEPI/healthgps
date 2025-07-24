@@ -19,9 +19,9 @@ struct LinearModelParams {
 
 /// @brief Defines the trend type enumeration
 enum class TrendType {
-    Null,           ///< No trends applied (null)
-    Trend,          ///< Standard trends (existing functionality)
-    IncomeTrend     ///< Income-based trends (new functionality)
+    Null,       ///< No trends applied (null)
+    Trend,      ///< Standard trends (existing functionality)
+    IncomeTrend ///< Income-based trends (new functionality)
 };
 
 /// @brief Implements the static linear model type
@@ -75,15 +75,17 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
         const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
             &rural_prevalence,
         const std::unordered_map<core::Income, LinearModelParams> &income_models,
-        double physical_activity_stddev,
-        TrendType trend_type,
-        std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend = nullptr,
-        std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend_boxcox = nullptr,
+        double physical_activity_stddev, TrendType trend_type,
+        std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend =
+            nullptr,
+        std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend_boxcox =
+            nullptr,
         std::shared_ptr<std::unordered_map<core::Identifier, int>> income_trend_steps = nullptr,
         std::shared_ptr<std::vector<LinearModelParams>> income_trend_models = nullptr,
         std::shared_ptr<std::vector<core::DoubleInterval>> income_trend_ranges = nullptr,
         std::shared_ptr<std::vector<double>> income_trend_lambda = nullptr,
-        std::shared_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors = nullptr);
+        std::shared_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors =
+            nullptr);
 
     RiskFactorModelType type() const noexcept override;
 
@@ -233,15 +235,17 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
         std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
             rural_prevalence,
         std::unordered_map<core::Income, LinearModelParams> income_models,
-        double physical_activity_stddev,
-        TrendType trend_type = TrendType::Null,
-        std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend = nullptr,
-        std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend_boxcox = nullptr,
+        double physical_activity_stddev, TrendType trend_type = TrendType::Null,
+        std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend =
+            nullptr,
+        std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend_boxcox =
+            nullptr,
         std::unique_ptr<std::unordered_map<core::Identifier, int>> income_trend_steps = nullptr,
         std::unique_ptr<std::vector<LinearModelParams>> income_trend_models = nullptr,
         std::unique_ptr<std::vector<core::DoubleInterval>> income_trend_ranges = nullptr,
         std::unique_ptr<std::vector<double>> income_trend_lambda = nullptr,
-        std::unique_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors = nullptr);
+        std::unique_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors =
+            nullptr);
 
     /// @brief Construct a new StaticLinearModel from this definition
     /// @return A unique pointer to the new StaticLinearModel instance
