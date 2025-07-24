@@ -61,8 +61,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
         const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
             &rural_prevalence,
         const std::unordered_map<core::Income, LinearModelParams> &income_models,
-        std::shared_ptr<std::unordered_map<core::Region, LinearModelParams>> region_models,
-        double physical_activity_stddev); // added region as a shared pointer for FINCH
+        double physical_activity_stddev);
 
     RiskFactorModelType type() const noexcept override;
 
@@ -120,16 +119,6 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     void initialise_physical_activity(RuntimeContext &context, Person &person,
                                       Random &random) const;
 
-    // @brief Initialise the region of a person
-    /// @param person The person to initialise region for
-    /// @param random The random number generator from the runtime context
-    void initialise_region(Person &person, Random &random) const;
-
-    // @brief update the region of a person
-    /// @param person The person to update the region for
-    /// @param random The random number generator from the runtime context
-    void update_region(Person &person, Random &random) const;
-
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox_;
     const std::vector<core::Identifier> &names_;
     const std::vector<LinearModelParams> &models_;
@@ -147,8 +136,6 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         &rural_prevalence_;
     const std::unordered_map<core::Income, LinearModelParams> &income_models_;
-    std::shared_ptr<std::unordered_map<core::Region, LinearModelParams>>
-        region_models_; // made a shared pointer
     const double physical_activity_stddev_;
 };
 
@@ -176,7 +163,6 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     /// @param rural_prevalence Rural sector prevalence for age groups and sex
     /// @param income_models The income models for each income category
     /// @param phycical_activity_stddev The standard deviation of the physical activity
-    /// @param region_models The region models for each region
     /// @throws HgpsException for invalid arguments
     StaticLinearModelDefinition(
         std::unique_ptr<RiskFactorSexAgeTable> expected,
@@ -194,7 +180,6 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
         std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
             rural_prevalence,
         std::unordered_map<core::Income, LinearModelParams> income_models,
-        std::unordered_map<core::Region, LinearModelParams> region_models,
         double physical_activity_stddev);
 
     /// @brief Construct a new StaticLinearModel from this definition
@@ -219,7 +204,6 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         rural_prevalence_;
     std::unordered_map<core::Income, LinearModelParams> income_models_;
-    std::unordered_map<core::Region, LinearModelParams> region_models_;
     double physical_activity_stddev_;
 };
 

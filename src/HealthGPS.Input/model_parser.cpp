@@ -293,24 +293,48 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                 std::any_cast<double>(policy_covariance_table.column(i).value(j));
         }
 
-        // Time trend model parameters.
-        const auto &trend_json_params = json_params["Trend"];
-        LinearModelParams trend_model;
-        trend_model.intercept = trend_json_params["Intercept"].get<double>();
-        trend_model.coefficients =
-            trend_json_params["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
-        trend_model.log_coefficients = trend_json_params["LogCoefficients"]
+        // Time trend model parameters (use neutral values if trend data missing).
+        if (json_params.contains("Trend")) {
+            // Real trend data exists - use it
+            const auto &trend_json_params = json_params["Trend"];
+            LinearModelParams trend_model;
+            trend_model.intercept = trend_json_params["Intercept"].get<double>();
+            trend_model.coefficients = trend_json_params["Coefficients"]
                                            .get<std::unordered_map<core::Identifier, double>>();
+            trend_model.log_coefficients = trend_json_params["LogCoefficients"]
+                                               .get<std::unordered_map<core::Identifier, double>>();
 
-        // Write time trend data structures.
-        trend_models->emplace_back(std::move(trend_model));
-        trend_ranges->emplace_back(trend_json_params["Range"].get<core::DoubleInterval>());
-        trend_lambda->emplace_back(trend_json_params["Lambda"].get<double>());
+            // Write real trend data structures.
+            trend_models->emplace_back(std::move(trend_model));
+            trend_ranges->emplace_back(trend_json_params["Range"].get<core::DoubleInterval>());
+            trend_lambda->emplace_back(trend_json_params["Lambda"].get<double>());
 
-        // Load expected value trends.
-        (*expected_trend)[key] = json_params["ExpectedTrend"].get<double>();
-        (*expected_trend_boxcox)[key] = json_params["ExpectedTrendBoxCox"].get<double>();
-        (*trend_steps)[key] = json_params["TrendSteps"].get<int>();
+            // Load expected value trends (only if trend data exists).
+            (*expected_trend)[key] = json_params.contains("ExpectedTrend")
+                                         ? json_params["ExpectedTrend"].get<double>()
+                                         : 1.0;
+            (*expected_trend_boxcox)[key] = json_params.contains("ExpectedTrendBoxCox")
+                                                ? json_params["ExpectedTrendBoxCox"].get<double>()
+                                                : 1.0;
+            (*trend_steps)[key] =
+                json_params.contains("TrendSteps") ? json_params["TrendSteps"].get<int>() : 0;
+        } else {
+            // No trend data - use mathematically neutral values (no effect on simulation)
+            LinearModelParams neutral_trend_model;
+            neutral_trend_model.intercept = 0.0;       // No trend intercept
+            neutral_trend_model.coefficients = {};     // No coefficients = no trend effect
+            neutral_trend_model.log_coefficients = {}; // No log coefficients
+
+            // Add neutral trend data to keep vector sizes consistent
+            trend_models->emplace_back(std::move(neutral_trend_model));
+            trend_ranges->emplace_back(core::DoubleInterval{0.0, 0.0}); // No range
+            trend_lambda->emplace_back(0.0);                            // No lambda transformation
+
+            // Set neutral trend values in maps
+            (*expected_trend)[key] = 1.0;        // No trend change (multiplier of 1.0)
+            (*expected_trend_boxcox)[key] = 1.0; // No trend change
+            (*trend_steps)[key] = 0;             // No trend steps
+        }
 
         // Increment table column index.
         i++;
@@ -370,7 +394,6 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     for (const auto &[key, json_params] : opt["IncomeModels"].items()) {
 
         // Get income category.
-        // Added New income category (Low, LowerMiddle, UpperMiddle & High)
         core::Income category;
         if (core::case_insensitive::equals(key, "Unknown")) {
             category = core::Income::unknown;
@@ -378,6 +401,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             category = core::Income::low;
         } else if (core::case_insensitive::equals(key, "LowerMiddle")) {
             category = core::Income::lowermiddle;
+        } else if (core::case_insensitive::equals(key, "Middle")) {
+            category = core::Income::middle;
         } else if (core::case_insensitive::equals(key, "UpperMiddle")) {
             category = core::Income::uppermiddle;
         } else if (core::case_insensitive::equals(key, "High")) {
@@ -396,21 +421,6 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         income_models.emplace(category, std::move(model));
     }
 
-    // Region models for different region classifications.
-    std::unordered_map<core::Region, LinearModelParams> region_models;
-    for (const auto &model : opt["RegionModels"]) {
-        auto region = parse_region(model["Region"].get<std::string>());
-        auto params = LinearModelParams{};
-        params.intercept = model["Intercept"].get<double>();
-
-        for (const auto &coef : model["Coefficients"]) {
-            auto name = coef["Name"].get<core::Identifier>();
-            params.coefficients[name] = coef["Value"].get<double>();
-        }
-        // insert region model with try_emplace to avoid copying the params
-        region_models.try_emplace(region, std::move(params));
-    }
-
     // Standard deviation of physical activity.
     const double physical_activity_stddev = opt["PhysicalActivityStdDev"].get<double>();
 
@@ -420,28 +430,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         std::move(lambda), std::move(stddev), std::move(cholesky), std::move(policy_models),
         std::move(policy_ranges), std::move(policy_cholesky), std::move(trend_models),
         std::move(trend_ranges), std::move(trend_lambda), info_speed, std::move(rural_prevalence),
-        std::move(income_models), std::move(region_models), physical_activity_stddev);
-}
-
-// Added to handle region parsing since income was made quartile, and region was added
-core::Region parse_region(const std::string &value) {
-    if (value == "England") {
-        return core::Region::England;
-    }
-    if (value == "Wales") {
-        return core::Region::Wales;
-    }
-    if (value == "Scotland") {
-        return core::Region::Scotland;
-    }
-    if (value == "NorthernIreland") {
-        return core::Region::NorthernIreland;
-    }
-    if (value == "unknown") {
-        return core::Region::unknown;
-    }
-
-    throw core::HgpsException(fmt::format("Unknown region value: {}", value));
+        std::move(income_models), physical_activity_stddev);
 }
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
@@ -558,8 +547,20 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
     std::unordered_map<hgps::core::Identifier, std::optional<double>> food_prices;
     for (const auto &food : opt["Foods"]) {
         auto food_key = food["Name"].get<hgps::core::Identifier>();
-        (*expected_trend)[food_key] = food["ExpectedTrend"].get<double>();
-        (*trend_steps)[food_key] = food["TrendSteps"].get<int>();
+
+        // Handle ExpectedTrend and TrendSteps with default values for v1 compatibility
+        double expected_trend_value = 1.0; // Default for v1 models
+        int trend_steps_value = 0;         // Default for v1 models
+
+        if (food.contains("ExpectedTrend")) {
+            expected_trend_value = food["ExpectedTrend"].get<double>();
+        }
+        if (food.contains("TrendSteps")) {
+            trend_steps_value = food["TrendSteps"].get<int>();
+        }
+
+        (*expected_trend)[food_key] = expected_trend_value;
+        (*trend_steps)[food_key] = trend_steps_value;
         food_prices[food_key] = food["Price"].get<std::optional<double>>();
         auto food_nutrients = food["Nutrients"].get<std::map<hgps::core::Identifier, double>>();
 

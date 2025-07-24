@@ -79,32 +79,16 @@ float Person::sector_to_value() const {
 float Person::income_to_value() const {
     switch (income) {
     case core::Income::low:
-        return 1.0f;
+        return 1.0f; // Low income
     case core::Income::lowermiddle:
-        return 2.0f;
+    case core::Income::middle:
+        return 2.0f; // Middle income
     case core::Income::uppermiddle:
-        return 3.0f;
     case core::Income::high:
-        return 4.0f;
+        return 3.0f; // High income
     case core::Income::unknown:
     default:
         throw core::HgpsException("Unknown income category");
-    }
-}
-
-float Person::region_to_value() const {
-    switch (region) {
-    case core::Region::England:
-        return 1.0f;
-    case core::Region::Wales:
-        return 2.0f;
-    case core::Region::Scotland:
-        return 3.0f;
-    case core::Region::NorthernIreland:
-        return 4.0f;
-    case core::Region::unknown:
-    default:
-        throw core::HgpsException("Region is unknown.");
     }
 }
 

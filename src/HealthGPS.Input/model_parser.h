@@ -76,9 +76,4 @@ nlohmann::json load_json(const std::filesystem::path &filepath);
 void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
                                             const Configuration &config);
 
-/// @brief Parses a region from a string
-/// @param value The string representation of the region
-/// @return The parsed region
-core::Region parse_region(const std::string &value);
-
 } // namespace hgps::input

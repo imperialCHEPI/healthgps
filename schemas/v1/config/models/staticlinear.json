@@ -108,6 +108,92 @@
                             }
                         },
                         "additionalProperties": true
+                    },
+                    "Trend": {
+                        "type": "object",
+                        "properties": {
+                            "Intercept": {
+                                "type": "number"
+                            },
+                            "Coefficients": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "type": "number"
+                                }
+                            },
+                            "LogCoefficients": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "type": "number"
+                                }
+                            },
+                            "Range": {
+                                "type": "array",
+                                "items": {
+                                    "type": "number"
+                                },
+                                "minItems": 2,
+                                "maxItems": 2
+                            },
+                            "Lambda": {
+                                "type": "number"
+                            }
+                        },
+                        "additionalProperties": true
+                    },
+                    "IncomeTrend": {
+                        "type": "object",
+                        "properties": {
+                            "Intercept": {
+                                "type": "number"
+                            },
+                            "Coefficients": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "type": "number"
+                                }
+                            },
+                            "LogCoefficients": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "type": "number"
+                                }
+                            },
+                            "Range": {
+                                "type": "array",
+                                "items": {
+                                    "type": "number"
+                                },
+                                "minItems": 2,
+                                "maxItems": 2
+                            },
+                            "Lambda": {
+                                "type": "number"
+                            }
+                        },
+                        "additionalProperties": true
+                    },
+                    "ExpectedTrend": {
+                        "type": "number"
+                    },
+                    "ExpectedTrendBoxCox": {
+                        "type": "number"
+                    },
+                    "TrendSteps": {
+                        "type": "integer"
+                    },
+                    "ExpectedIncomeTrend": {
+                        "type": "number"
+                    },
+                    "ExpectedIncomeTrendBoxCox": {
+                        "type": "number"
+                    },
+                    "IncomeTrendSteps": {
+                        "type": "integer"
+                    },
+                    "IncomeDecayFactor": {
+                        "type": "number",
+                        "description": "Exponential decay factor 'b' for income trend calculation"
                     }
                 },
                 "additionalProperties": true

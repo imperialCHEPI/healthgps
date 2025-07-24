@@ -102,7 +102,7 @@ class DataTableColumnIterator {
 
     friend inline DataTableColumnIterator operator-(difference_type diff,
                                                     const DataTableColumnIterator &other) {
-        return DataTableColumnIterator(*other.array_, diff - other.index_);
+        return DataTableColumnIterator(*other.column_, diff - other.index_);
     }
 
     // Comparisons
