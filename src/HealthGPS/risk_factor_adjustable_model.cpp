@@ -3,6 +3,7 @@
 #include "risk_factor_adjustable_model.h"
 #include "sync_message.h"
 
+#include <cmath>
 #include <oneapi/tbb/parallel_for_each.h>
 #include <utility>
 

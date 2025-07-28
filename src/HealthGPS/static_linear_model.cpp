@@ -2,8 +2,10 @@
 #include "HealthGPS.Core/exception.h"
 #include "runtime_context.h"
 
+#include <cmath>
 #include <ranges>
 #include <utility>
+#include <iostream> // Added for print statements
 
 namespace hgps {
 
@@ -57,7 +59,6 @@ RiskFactorModelType StaticLinearModel::type() const noexcept { return RiskFactor
 std::string StaticLinearModel::name() const noexcept { return "Static"; }
 
 void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
-
     // Initialise everyone.
     for (auto &person : context.population()) {
         initialise_sector(person, context.random());
@@ -95,7 +96,6 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
 }
 
 void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
-
     // HACK: start intervening two years into the simulation.
     bool intervene = (context.scenario().type() == ScenarioType::intervention &&
                       (context.time_now() - context.start_time()) >= 2);
@@ -177,7 +177,9 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 }
 
 double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
-    return pow(lambda * factor + 1.0, 1.0 / lambda);
+    double base = lambda * factor + 1.0;
+    double result = pow(base, 1.0 / lambda);
+    return result;
 }
 
 void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &person,
@@ -244,6 +246,7 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
     }
 }
 
+// This function is for intialising UPF Trends
 void StaticLinearModel::initialise_trends(RuntimeContext &context, Person &person) const {
 
     // Approximate trends with linear models.
@@ -266,6 +269,7 @@ void StaticLinearModel::initialise_trends(RuntimeContext &context, Person &perso
     update_trends(context, person);
 }
 
+// This function is for updating UPF Trends
 void StaticLinearModel::update_trends(RuntimeContext &context, Person &person) const {
 
     // Get elapsed time (years).
@@ -289,18 +293,20 @@ void StaticLinearModel::update_trends(RuntimeContext &context, Person &person) c
     }
 }
 
+// This function is for intialising Income Trends
 void StaticLinearModel::initialise_income_trends(RuntimeContext &context, Person &person) const {
-
     // Approximate income trends with linear models.
     auto linear = compute_linear_models(person, *income_trend_models_);
 
-    // Initialise and apply income trends (do not exist yet).
+    // Initialise and apply income trends
     for (size_t i = 0; i < names_.size(); i++) {
 
         // Initialise income trend.
         auto trend_name = core::Identifier{names_[i].to_string() + "_income_trend"};
         double expected = expected_income_trend_boxcox_->at(names_[i]);
+        
         double trend = expected * inverse_box_cox(linear[i], (*income_trend_lambda_)[i]);
+        
         trend = (*income_trend_ranges_)[i].clamp(trend);
 
         // Save income trend.
@@ -311,8 +317,8 @@ void StaticLinearModel::initialise_income_trends(RuntimeContext &context, Person
     update_income_trends(context, person);
 }
 
+// This function is for updating Income Trends
 void StaticLinearModel::update_income_trends(RuntimeContext &context, Person &person) const {
-
     // Get elapsed time (years). This is the income_trend_steps.
     int elapsed_time = context.time_now() - context.start_time();
 
@@ -328,6 +334,7 @@ void StaticLinearModel::update_income_trends(RuntimeContext &context, Person &pe
 
         // Income trend is applied from the second year (T > T0)
         if (elapsed_time > 0) {
+            
             // Get the decay factor for this risk factor
             double decay_factor = income_trend_decay_factors_->at(names_[i]);
 
@@ -335,8 +342,11 @@ void StaticLinearModel::update_income_trends(RuntimeContext &context, Person &pe
             int t = std::min(elapsed_time, income_trend_steps_->at(names_[i]));
 
             // Calculate income trend: trend_income_T = trend_income_T0 * e^(b*(T-T0))
-            double trend_income_T = trend * exp(decay_factor * t);
+            double exponent = decay_factor * t;
+            double trend_income_T = trend * exp(exponent);
             factor *= trend_income_T;
+        } else {
+            // Skipping income trend (elapsed_time <= 0)
         }
 
         factor = ranges_[i].clamp(factor);
@@ -727,3 +737,4 @@ std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() con
 }
 
 } // namespace hgps
+
