@@ -3,9 +3,9 @@
 #include "runtime_context.h"
 
 #include <cmath>
+#include <iostream> // Added for print statements
 #include <ranges>
 #include <utility>
-#include <iostream> // Added for print statements
 
 namespace hgps {
 
@@ -304,9 +304,9 @@ void StaticLinearModel::initialise_income_trends(RuntimeContext &context, Person
         // Initialise income trend.
         auto trend_name = core::Identifier{names_[i].to_string() + "_income_trend"};
         double expected = expected_income_trend_boxcox_->at(names_[i]);
-        
+
         double trend = expected * inverse_box_cox(linear[i], (*income_trend_lambda_)[i]);
-        
+
         trend = (*income_trend_ranges_)[i].clamp(trend);
 
         // Save income trend.
@@ -334,7 +334,7 @@ void StaticLinearModel::update_income_trends(RuntimeContext &context, Person &pe
 
         // Income trend is applied from the second year (T > T0)
         if (elapsed_time > 0) {
-            
+
             // Get the decay factor for this risk factor
             double decay_factor = income_trend_decay_factors_->at(names_[i]);
 
@@ -737,4 +737,3 @@ std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() con
 }
 
 } // namespace hgps
-
