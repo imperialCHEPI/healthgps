@@ -177,7 +177,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 }
 
 double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
-    double base = (lambda * factor ) + 1.0;
+    double base = (lambda * factor) + 1.0;
     double result = pow(base, 1.0 / lambda);
     return result;
 }
