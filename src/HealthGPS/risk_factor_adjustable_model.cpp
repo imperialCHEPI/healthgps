@@ -35,20 +35,53 @@ namespace hgps {
 RiskFactorAdjustableModel::RiskFactorAdjustableModel(
     std::shared_ptr<RiskFactorSexAgeTable> expected,
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
-    std::shared_ptr<std::unordered_map<core::Identifier, int>> trend_steps)
+    std::shared_ptr<std::unordered_map<core::Identifier, int>> trend_steps,
+    TrendType trend_type,
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend,
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend_decay_factors)
     : expected_{std::move(expected)}, expected_trend_{std::move(expected_trend)},
-      trend_steps_{std::move(trend_steps)} {}
+      trend_steps_{std::move(trend_steps)}, trend_type_{trend_type},
+      expected_income_trend_{std::move(expected_income_trend)},
+      expected_income_trend_decay_factors_{std::move(expected_income_trend_decay_factors)} {}
 
 double RiskFactorAdjustableModel::get_expected(RuntimeContext &context, core::Gender sex, int age,
                                                const core::Identifier &factor, OptionalRange range,
                                                bool apply_trend) const noexcept {
     double expected = expected_->at(sex, factor).at(age);
 
-    // Apply optional trend to expected value.
+    // Apply trend to expected value based on trend type
     if (apply_trend) {
         int elapsed_time = context.time_now() - context.start_time();
-        int t = std::min(elapsed_time, get_trend_steps(factor));
-        expected *= pow(expected_trend_->at(factor), t);
+        
+        switch (trend_type_) {
+        case TrendType::Null:
+            // No trends applied to factors mean adjustment
+            break;
+            
+        case TrendType::Trend: {
+            // Apply regular UPF trend to factors mean adjustment
+            // Formula: factors_mean_T = factors_mean × ExpectedTrend^(T-T0)
+            int t = std::min(elapsed_time, get_trend_steps(factor));
+            expected *= pow(expected_trend_->at(factor), t);
+            break;
+        }
+            
+        case TrendType::IncomeTrend: {
+            // Apply income trend to factors mean adjustment
+            // Formula: factors_mean_T = factors_mean × ExpectedIncomeTrend × e^(b×(T-T0)) for T > T0
+            if (elapsed_time > 0) { // Only apply from second year (T > T0)
+                // Check if income trend data is available
+                if (expected_income_trend_ && expected_income_trend_decay_factors_) {
+                    double decay_factor = expected_income_trend_decay_factors_->at(factor);
+                    double expected_income_trend = expected_income_trend_->at(factor);
+                    expected *= expected_income_trend * exp(decay_factor * elapsed_time);
+                }
+                // If income trend data is not available, skip income trend application
+            }
+            // For T = T0 (first year), no income trend is applied (expected remains unchanged)
+            break;
+        }
+        }
     }
 
     // Clamp expected value to an optionally specified range.

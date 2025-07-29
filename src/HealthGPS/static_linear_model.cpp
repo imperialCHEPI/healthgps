@@ -25,7 +25,7 @@ StaticLinearModel::StaticLinearModel(
     const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         &rural_prevalence,
     const std::unordered_map<core::Income, LinearModelParams> &income_models,
-    double physical_activity_stddev, TrendType trend_type = TrendType::Null,
+    double physical_activity_stddev, TrendType trend_type,
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend,
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend_boxcox,
     std::shared_ptr<std::unordered_map<core::Identifier, int>> income_trend_steps,
@@ -34,7 +34,9 @@ StaticLinearModel::StaticLinearModel(
     std::shared_ptr<std::vector<double>> income_trend_lambda,
     std::shared_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors)
     : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend),
-                                std::move(trend_steps)},
+                                std::move(trend_steps), trend_type,
+                                expected_income_trend, // Pass by value, not moved
+                                income_trend_decay_factors}, // Pass by value, not moved
       // Regular trend member variables
       expected_trend_boxcox_{std::move(expected_trend_boxcox)},
       trend_models_{std::move(trend_models)}, trend_ranges_{std::move(trend_ranges)},
@@ -295,6 +297,14 @@ void StaticLinearModel::update_trends(RuntimeContext &context, Person &person) c
 
 // This function is for intialising Income Trends
 void StaticLinearModel::initialise_income_trends(RuntimeContext &context, Person &person) const {
+    // Check if income trend data is available
+    if (!income_trend_models_ || !expected_income_trend_boxcox_ || 
+        !income_trend_lambda_ || !income_trend_ranges_) {
+        // If income trend data is not available, skip initialization
+        std::cout << "Income trend data is not available, skipping initialization";
+        return;
+    }
+
     // Approximate income trends with linear models.
     auto linear = compute_linear_models(person, *income_trend_models_);
 
@@ -335,16 +345,20 @@ void StaticLinearModel::update_income_trends(RuntimeContext &context, Person &pe
         // Income trend is applied from the second year (T > T0)
         if (elapsed_time > 0) {
 
-            // Get the decay factor for this risk factor
-            double decay_factor = income_trend_decay_factors_->at(names_[i]);
+            // Check if income trend data is available
+            if (income_trend_decay_factors_ && income_trend_steps_) {
+                // Get the decay factor for this risk factor
+                double decay_factor = income_trend_decay_factors_->at(names_[i]);
 
-            // Cap the trend application at income_trend_steps
-            int t = std::min(elapsed_time, income_trend_steps_->at(names_[i]));
+                // Cap the trend application at income_trend_steps
+                int t = std::min(elapsed_time, income_trend_steps_->at(names_[i]));
 
-            // Calculate income trend: trend_income_T = trend_income_T0 * e^(b*(T-T0))
-            double exponent = decay_factor * t;
-            double trend_income_T = trend * exp(exponent);
-            factor *= trend_income_T;
+                // Calculate income trend: trend_income_T = trend_income_T0 * e^(b*(T-T0))
+                double exponent = decay_factor * t;
+                double trend_income_T = trend * exp(exponent);
+                factor *= trend_income_T;
+            }
+            // If income trend data is not available, skip income trend application
         } else {
             // Skipping income trend (elapsed_time <= 0)
         }

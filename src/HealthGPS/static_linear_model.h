@@ -17,13 +17,6 @@ struct LinearModelParams {
     std::unordered_map<core::Identifier, double> log_coefficients{};
 };
 
-/// @brief Defines the trend type enumeration
-enum class TrendType {
-    Null,       ///< No trends applied (null)
-    Trend,      ///< Standard trends (existing functionality)
-    IncomeTrend ///< Income-based trends (new functionality)
-};
-
 /// @brief Implements the static linear model type
 /// @details The static model is used to initialise the virtual population.
 class StaticLinearModel final : public RiskFactorAdjustableModel {
