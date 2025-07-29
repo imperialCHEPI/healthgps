@@ -47,6 +47,12 @@ void StaticLinearModel::trace_fat_calculation(const std::string& step_name,
             
             // Write to CSV file (in current working directory)
             std::ofstream csv_file("fat_calculation_trace.csv", std::ios::app);
+            
+            // Print the file location for debugging
+            if (!file_exists) {
+                std::cout << "\nDEBUG: Creating fat calculation trace file at: " 
+                          << std::filesystem::current_path() / "fat_calculation_trace.csv" << std::endl;
+            }
             if (csv_file.is_open()) {
                 // Write header if file is new
                 if (!file_exists) {
