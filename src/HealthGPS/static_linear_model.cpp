@@ -33,9 +33,9 @@ StaticLinearModel::StaticLinearModel(
     std::shared_ptr<std::vector<core::DoubleInterval>> income_trend_ranges,
     std::shared_ptr<std::vector<double>> income_trend_lambda,
     std::shared_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors)
-    : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend),
-                                std::move(trend_steps), trend_type,
-                                expected_income_trend, // Pass by value, not moved
+    : RiskFactorAdjustableModel{std::move(expected),       std::move(expected_trend),
+                                std::move(trend_steps),    trend_type,
+                                expected_income_trend,       // Pass by value, not moved
                                 income_trend_decay_factors}, // Pass by value, not moved
       // Regular trend member variables
       expected_trend_boxcox_{std::move(expected_trend_boxcox)},
@@ -298,8 +298,8 @@ void StaticLinearModel::update_trends(RuntimeContext &context, Person &person) c
 // This function is for intialising Income Trends
 void StaticLinearModel::initialise_income_trends(RuntimeContext &context, Person &person) const {
     // Check if income trend data is available
-    if (!income_trend_models_ || !expected_income_trend_boxcox_ || 
-        !income_trend_lambda_ || !income_trend_ranges_) {
+    if (!income_trend_models_ || !expected_income_trend_boxcox_ || !income_trend_lambda_ ||
+        !income_trend_ranges_) {
         // If income trend data is not available, skip initialization
         std::cout << "Income trend data is not available, skipping initialization";
         return;
