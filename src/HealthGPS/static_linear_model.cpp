@@ -45,7 +45,7 @@ void StaticLinearModel::trace_fat_calculation(const std::string& step_name,
             bool file_exists = check_file.good();
             check_file.close();
             
-            // Write to CSV file
+            // Write to CSV file (in current working directory)
             std::ofstream csv_file("fat_calculation_trace.csv", std::ios::app);
             if (csv_file.is_open()) {
                 // Write header if file is new
