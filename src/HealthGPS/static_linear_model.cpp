@@ -50,8 +50,10 @@ void StaticLinearModel::trace_fat_calculation(const std::string& step_name,
             
             // Print the file location for debugging
             if (!file_exists) {
-                std::cout << "\nDEBUG: Creating fat calculation trace file at: " 
+                std::cout << "\n" << std::string(80, '=') << std::endl;
+                std::cout << "🔍 FAT TRACING DEBUG: Creating fat calculation trace file at: " 
                           << std::filesystem::current_path() / "fat_calculation_trace.csv" << std::endl;
+                std::cout << std::string(80, '=') << std::endl;
             }
             if (csv_file.is_open()) {
                 // Write header if file is new
