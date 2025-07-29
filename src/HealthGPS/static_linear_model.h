@@ -10,6 +10,12 @@
 
 namespace hgps {
 
+// Tracing configuration - easily modifiable
+static constexpr bool ENABLE_FAT_TRACING = true;  // Toggle tracing on/off
+static constexpr int TARGET_AGE = 30;             // Target age
+static constexpr core::Gender TARGET_GENDER = core::Gender::female;  // Target gender
+static const core::Identifier TARGET_RISK_FACTOR = "FoodFat"_id;        // Target risk factor
+
 /// @brief Defines the linear model parameters used to initialise risk factors
 struct LinearModelParams {
     double intercept{};
@@ -140,6 +146,36 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
 
     /// Verify that all risk factors from the configuration are properly included
     void verify_risk_factors() const;
+
+    /// @brief Trace fat calculation steps for 30-year-old women in year 1 baseline
+    /// @param step_name The name of the calculation step
+    /// @param person The person being traced
+    /// @param fat_value The current fat value
+    /// @param expected_value The expected fat value
+    /// @param linear_result The linear model result (optional, for detailed tracing)
+    /// @param residual The residual value (optional, for detailed tracing)
+    /// @param stddev The standard deviation (optional, for detailed tracing)
+    /// @param combined The combined value (optional, for detailed tracing)
+    /// @param lambda The BoxCox lambda value (optional, for detailed tracing)
+    /// @param boxcox_result The BoxCox inverse result (optional, for detailed tracing)
+    /// @param factor_before_clamp The factor before clamping (optional, for detailed tracing)
+    /// @param range_lower The range lower bound (optional, for detailed tracing)
+    /// @param range_upper The range upper bound (optional, for detailed tracing)
+    /// @param final_clamped_factor The final clamped factor (optional, for detailed tracing)
+    void trace_fat_calculation(const std::string& step_name, 
+                              const Person& person, 
+                              double fat_value,
+                              double expected_value = 0.0,
+                              double linear_result = 0.0,
+                              double residual = 0.0,
+                              double stddev = 0.0,
+                              double combined = 0.0,
+                              double lambda = 0.0,
+                              double boxcox_result = 0.0,
+                              double factor_before_clamp = 0.0,
+                              double range_lower = 0.0,
+                              double range_upper = 0.0,
+                              double final_clamped_factor = 0.0) const;
 
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox_;
     const std::vector<core::Identifier> &names_;

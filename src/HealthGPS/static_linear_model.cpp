@@ -7,6 +7,8 @@
 #include <iostream>
 #include <ranges>
 #include <utility>
+#include <fstream>
+#include <cmath> // Added for std::isfinite
 
 namespace hgps {
 
@@ -18,6 +20,72 @@ static constexpr bool ENABLE_YEAR3_RISK_FACTOR_INSPECTION = false;
 RiskFactorModelType StaticLinearModel::type() const noexcept { return RiskFactorModelType::Static; }
 
 std::string StaticLinearModel::name() const noexcept { return "Static"; }
+
+void StaticLinearModel::trace_fat_calculation(const std::string& step_name, 
+                                             const Person& person, 
+                                             double fat_value,
+                                             double expected_value,
+                                             double linear_result,
+                                             double residual,
+                                             double stddev,
+                                             double combined,
+                                             double lambda,
+                                             double boxcox_result,
+                                             double factor_before_clamp,
+                                             double range_lower,
+                                             double range_upper,
+                                             double final_clamped_factor) const {
+    if constexpr (ENABLE_FAT_TRACING) {
+        // Only trace for target demographic in year 1 baseline
+        if (person.age == TARGET_AGE && 
+            person.gender == TARGET_GENDER) {
+            
+            // Check if file exists to determine if we need to write header
+            std::ifstream check_file("fat_calculation_trace.csv");
+            bool file_exists = check_file.good();
+            check_file.close();
+            
+            // Write to CSV file
+            std::ofstream csv_file("fat_calculation_trace.csv", std::ios::app);
+            if (csv_file.is_open()) {
+                // Write header if file is new
+                if (!file_exists) {
+                    csv_file << "person_id,step_name,fat_value,expected_value,linear_result,residual,stddev,combined,lambda,boxcox_result,factor_before_clamp,range_lower,range_upper,final_clamped_factor,gender,age,region,ethnicity,physical_activity,income_continuous,income_category\n";
+                }
+                
+                csv_file << person.id() << ","
+                         << step_name << ","
+                         << fat_value << ","
+                         << expected_value << ","
+                         << linear_result << ","
+                         << residual << ","
+                         << stddev << ","
+                         << combined << ","
+                         << lambda << ","
+                         << boxcox_result << ","
+                         << factor_before_clamp << ","
+                         << range_lower << ","
+                         << range_upper << ","
+                         << final_clamped_factor << ","
+                         << person.gender_to_value() << ","
+                         << person.age << ","
+                         << (person.region == core::Region::England ? "England" : 
+                             person.region == core::Region::Wales ? "Wales" :
+                             person.region == core::Region::Scotland ? "Scotland" :
+                             person.region == core::Region::NorthernIreland ? "NorthernIreland" : "Unknown") << ","
+                         << (person.ethnicity == core::Ethnicity::White ? "White" :
+                             person.ethnicity == core::Ethnicity::Black ? "Black" :
+                             person.ethnicity == core::Ethnicity::Asian ? "Asian" :
+                             person.ethnicity == core::Ethnicity::Mixed ? "Mixed" :
+                             person.ethnicity == core::Ethnicity::Other ? "Other" : "Unknown") << ","
+                         << person.get_risk_factor_value("PhysicalActivity") << ","
+                         << person.income_continuous << ","
+                         << person.income_to_value() << "\n";
+                csv_file.close();
+            }
+        }
+    }
+}
 
 void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
 
@@ -31,19 +99,71 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     for (auto &person : context.population()) {
         initialise_factors(context, person, context.random());
         initialise_physical_activity(context, person, context.random());
+        
+        // Trace initial BoxCox calculation after both factors and physical activity are set
+        if (person.age == TARGET_AGE && person.gender == TARGET_GENDER) {
+            double fat_value = person.get_risk_factor_value(TARGET_RISK_FACTOR);
+            double expected_value = get_expected(context, person.gender, person.age, TARGET_RISK_FACTOR, ranges_[0], false);
+            
+            // Get stored calculation parameters if available
+            double linear_result = person.get_risk_factor_value(core::Identifier("temp_linear_result"));
+            double residual = person.get_risk_factor_value(core::Identifier("temp_residual"));
+            double stddev = person.get_risk_factor_value(core::Identifier("temp_stddev"));
+            double combined = person.get_risk_factor_value(core::Identifier("temp_combined"));
+            double lambda = person.get_risk_factor_value(core::Identifier("temp_lambda"));
+            double boxcox_result = person.get_risk_factor_value(core::Identifier("temp_boxcox_result"));
+            double factor_before_clamp = person.get_risk_factor_value(core::Identifier("temp_factor_before_clamp"));
+            double range_lower = person.get_risk_factor_value(core::Identifier("temp_range_lower"));
+            double range_upper = person.get_risk_factor_value(core::Identifier("temp_range_upper"));
+            double final_clamped_factor = person.get_risk_factor_value(core::Identifier("temp_final_clamped_factor"));
+            
+            trace_fat_calculation("initial_boxcox_calculation", person, fat_value, expected_value, 
+                                 linear_result, residual, stddev, combined, lambda, 
+                                 boxcox_result, factor_before_clamp, range_lower, range_upper, final_clamped_factor);
+            
+            // Clean up temporary values
+            person.risk_factors.erase(core::Identifier("temp_linear_result"));
+            person.risk_factors.erase(core::Identifier("temp_residual"));
+            person.risk_factors.erase(core::Identifier("temp_stddev"));
+            person.risk_factors.erase(core::Identifier("temp_combined"));
+            person.risk_factors.erase(core::Identifier("temp_lambda"));
+            person.risk_factors.erase(core::Identifier("temp_boxcox_result"));
+            person.risk_factors.erase(core::Identifier("temp_factor_before_clamp"));
+            person.risk_factors.erase(core::Identifier("temp_range_lower"));
+            person.risk_factors.erase(core::Identifier("temp_range_upper"));
+            person.risk_factors.erase(core::Identifier("temp_final_clamped_factor"));
+        }
     }
 
     // Adjust such that risk factor means match expected values.
     adjust_risk_factors(context, names_, ranges_, false);
+
+    // Trace fat values after first adjustment
+    for (auto &person : context.population()) {
+        if (person.age == TARGET_AGE && person.gender == TARGET_GENDER) {
+            double fat_value = person.get_risk_factor_value(TARGET_RISK_FACTOR);
+            double expected_value = get_expected(context, person.gender, person.age, TARGET_RISK_FACTOR, ranges_[0], false);
+            trace_fat_calculation("after_1st_adjustment", person, fat_value, expected_value, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+        }
+    }
 
     // Initialise everyone with policies and trends.
     for (auto &person : context.population()) {
         initialise_policies(person, context.random(), false);
         initialise_trends(context, person);
     }
-
+    
     // Adjust such that trended risk factor means match trended expected values.
     adjust_risk_factors(context, names_, ranges_, true);
+        
+    // Trace fat values after second adjustment
+    for (auto &person : context.population()) {
+        if (person.age == TARGET_AGE && person.gender == TARGET_GENDER) {
+            double fat_value = person.get_risk_factor_value(TARGET_RISK_FACTOR);
+            double expected_value = get_expected(context, person.gender, person.age, TARGET_RISK_FACTOR, ranges_[0], true);
+            trace_fat_calculation("after_2nd_adjustment", person, fat_value, expected_value, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+        }
+    }
 
     // Print risk factor summary once at the end
     std::string risk_factor_list;
@@ -51,6 +171,15 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         if (i > 0)
             risk_factor_list += ", ";
         risk_factor_list += names_[i].to_string();
+    }
+    
+    // Trace final fat values
+    for (auto &person : context.population()) {
+        if (person.age == TARGET_AGE && person.gender == TARGET_GENDER) {
+            double fat_value = person.get_risk_factor_value(TARGET_RISK_FACTOR);
+            double expected_value = get_expected(context, person.gender, person.age, TARGET_RISK_FACTOR, ranges_[0], true);
+            trace_fat_calculation("final_value", person, fat_value, expected_value, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+        }
     }
 }
 
@@ -92,15 +221,15 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 
         if (person.age == 0) {
             initialise_policies(person, context.random(), intervene);
-            initialise_trends(context, person);
+                initialise_trends(context, person);
         } else {
             update_policies(person, intervene);
-            update_trends(context, person);
+                update_trends(context, person);
         }
     }
 
     // Adjust such that trended risk factor means match trended expected values.
-    adjust_risk_factors(context, names_, ranges_, true);
+        adjust_risk_factors(context, names_, ranges_, true);
 
     // Apply policies if intervening.
     for (auto &person : context.population()) {
@@ -260,11 +389,28 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
         // STAGE 2: Calculate non-zero risk factor value using BoxCox transformation
         // (This code runs whether we have a logistic model or not)
         double factor = linear[i] + residual * stddev_[i];
-        factor = expected * inverse_box_cox(factor, lambda_[i]);
-        factor = ranges_[i].clamp(factor);
+        double combined = factor;
+        double boxcox_result = inverse_box_cox(factor, lambda_[i]);
+        double factor_before_clamp = expected * boxcox_result;
+        factor = ranges_[i].clamp(factor_before_clamp);
 
         // Save risk factor
         person.risk_factors[names_[i]] = factor;
+        
+        // Store calculation parameters for tracing after physical activity is set
+        if (names_[i] == TARGET_RISK_FACTOR) {
+            // Store the calculation parameters for later tracing
+            person.risk_factors[core::Identifier("temp_linear_result")] = linear[i];
+            person.risk_factors[core::Identifier("temp_residual")] = residual;
+            person.risk_factors[core::Identifier("temp_stddev")] = stddev_[i];
+            person.risk_factors[core::Identifier("temp_combined")] = combined;
+            person.risk_factors[core::Identifier("temp_lambda")] = lambda_[i];
+            person.risk_factors[core::Identifier("temp_boxcox_result")] = boxcox_result;
+            person.risk_factors[core::Identifier("temp_factor_before_clamp")] = factor_before_clamp;
+            person.risk_factors[core::Identifier("temp_range_lower")] = ranges_[i].lower();
+            person.risk_factors[core::Identifier("temp_range_upper")] = ranges_[i].upper();
+            person.risk_factors[core::Identifier("temp_final_clamped_factor")] = factor;
+        }
     }
 }
 
@@ -800,26 +946,26 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     if (!policy_cholesky_.allFinite()) {
         throw core::HgpsException("Intervention policy Cholesky matrix contains non-finite values");
     }
-    if (trend_models_->empty()) {
-        throw core::HgpsException("Time trend model list is empty");
-    }
-    if (trend_ranges_->empty()) {
-        throw core::HgpsException("Time trend ranges list is empty");
-    }
-    if (trend_lambda_->empty()) {
-        throw core::HgpsException("Time trend lambda list is empty");
-    }
+        if (trend_models_->empty()) {
+            throw core::HgpsException("Time trend model list is empty");
+        }
+        if (trend_ranges_->empty()) {
+            throw core::HgpsException("Time trend ranges list is empty");
+        }
+        if (trend_lambda_->empty()) {
+            throw core::HgpsException("Time trend lambda list is empty");
+        }
     if (rural_prevalence_.empty()) {
         throw core::HgpsException("Rural prevalence mapping is empty");
     }
-    for (const auto &name : names_) {
-        if (!expected_trend_->contains(name)) {
-            throw core::HgpsException("One or more expected trend value is missing");
+        for (const auto &name : names_) {
+            if (!expected_trend_->contains(name)) {
+                throw core::HgpsException("One or more expected trend value is missing");
+            }
+            if (!expected_trend_boxcox_->contains(name)) {
+                throw core::HgpsException("One or more expected trend BoxCox value is missing");
+            }
         }
-        if (!expected_trend_boxcox_->contains(name)) {
-            throw core::HgpsException("One or more expected trend BoxCox value is missing");
-        }
-    }
 
     // If logistic models are empty, initialize them to be the same as the boxcox models
     // This is just a fallback in case logistic models were not provided
@@ -831,7 +977,7 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
 
     // Check if the number of logistic models matches the number of risk factors
     if (logistic_models_.size() != names_.size()) {
-        throw core::HgpsException(
+                throw core::HgpsException(
             fmt::format("Number of logistic models ({}) does not match number of risk factors ({})",
                         logistic_models_.size(), names_.size()));
     }
