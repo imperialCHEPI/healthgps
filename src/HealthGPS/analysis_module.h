@@ -78,6 +78,9 @@ class AnalysisModule final : public UpdatableModule {
     void calculate_income_based_population_statistics(RuntimeContext &context,
                                                       DataSeries &series) const;
 
+    void calculate_income_based_standard_deviation(RuntimeContext &context,
+                                                   DataSeries &series) const;
+
     void classify_weight(hgps::DataSeries &series, const hgps::Person &entity) const;
     void initialise_output_channels(RuntimeContext &context);
     void initialise_income_output_channels(RuntimeContext &context);

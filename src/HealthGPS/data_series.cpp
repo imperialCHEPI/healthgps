@@ -12,13 +12,13 @@ DataSeries::DataSeries(std::size_t sample_size) : sample_size_{sample_size} {
     data_.emplace(core::Gender::male, std::map<std::string, std::vector<double>>{});
     data_.emplace(core::Gender::female, std::map<std::string, std::vector<double>>{});
 
-    // Initialize income data structure
+    // Initialize income data structure for ALL possible income categories
     for (auto gender : {core::Gender::male, core::Gender::female}) {
         income_data_.emplace(gender,
                              std::map<core::Income, std::map<std::string, std::vector<double>>>{});
-        for (auto income :
-             {core::Income::low, core::Income::middle, core::Income::high,
-              core::Income::lowermiddle, core::Income::uppermiddle, core::Income::unknown}) {
+        // Initialize ALL possible income categories to ensure any enum value can be accessed
+        for (auto income : {core::Income::unknown, core::Income::low, core::Income::lowermiddle,
+                           core::Income::middle, core::Income::uppermiddle, core::Income::high}) {
             income_data_[gender].emplace(income, std::map<std::string, std::vector<double>>{});
         }
     }
@@ -38,7 +38,25 @@ const std::vector<double> &DataSeries::at(core::Gender gender, const std::string
 
 std::vector<double> &DataSeries::at(core::Gender gender, core::Income income,
                                     const std::string &key) {
-    return income_data_.at(gender).at(income).at(key);
+    // Check if gender exists
+    auto gender_it = income_data_.find(gender);
+    if (gender_it == income_data_.end()) {
+        throw std::out_of_range("Gender not found in income_data_");
+    }
+
+    // Check if income exists for this gender
+    auto income_it = gender_it->second.find(income);
+    if (income_it == gender_it->second.end()) {
+        throw std::out_of_range("Income not found in income_data_");
+    }
+
+    // Check if key exists for this gender/income combination
+    auto key_it = income_it->second.find(key);
+    if (key_it == income_it->second.end()) {
+        throw std::out_of_range("Key not found in income_data_");
+    }
+
+    return key_it->second;
 }
 
 const std::vector<double> &DataSeries::at(core::Gender gender, core::Income income,
@@ -66,10 +84,6 @@ void DataSeries::add_channels(const std::vector<std::string> &keys) {
 }
 
 void DataSeries::add_income_channels(const std::vector<std::string> &keys) {
-    std::cout << "DEBUG: DataSeries::add_income_channels() started with " << keys.size() << " keys"
-              << std::endl;
-    std::cout << "DEBUG: Sample size is: " << sample_size_ << std::endl;
-
     // Pre-allocate vectors to avoid repeated allocations
     std::vector<double> empty_vector(sample_size_);
 
@@ -79,11 +93,6 @@ void DataSeries::add_income_channels(const std::vector<std::string> &keys) {
 
     for (size_t i = 0; i < keys.size(); i++) {
         const auto &key = keys[i];
-        if (i % 20 == 0) { // Show progress every 20 keys to reduce output
-            std::cout << "DEBUG: Processing key " << i + 1 << "/" << keys.size() << ": " << key
-                      << std::endl;
-        }
-
         auto channel_key = core::to_lower(key);
 
         // Only add to income-based channels - don't add to regular channels here
@@ -99,27 +108,15 @@ void DataSeries::add_income_channels(const std::vector<std::string> &keys) {
             }
         }
     }
-
-    std::cout << "DEBUG: DataSeries::add_income_channels() completed" << std::endl;
 }
 
 void DataSeries::add_income_channels_for_categories(
     const std::vector<std::string> &keys, const std::vector<core::Income> &income_categories) {
-    std::cout << "DEBUG: DataSeries::add_income_channels_for_categories() started with "
-              << keys.size() << " keys and " << income_categories.size() << " income categories"
-              << std::endl;
-    std::cout << "DEBUG: Sample size is: " << sample_size_ << std::endl;
-
     // Pre-allocate vectors to avoid repeated allocations
     std::vector<double> empty_vector(sample_size_);
 
     for (size_t i = 0; i < keys.size(); i++) {
         const auto &key = keys[i];
-        if (i % 20 == 0) { // Show progress every 20 keys to reduce output
-            std::cout << "DEBUG: Processing key " << i + 1 << "/" << keys.size() << ": " << key
-                      << std::endl;
-        }
-
         auto channel_key = core::to_lower(key);
 
         // Only add to income-based channels for the specified income categories
@@ -134,8 +131,6 @@ void DataSeries::add_income_channels_for_categories(
             }
         }
     }
-
-    std::cout << "DEBUG: DataSeries::add_income_channels_for_categories() completed" << std::endl;
 }
 
 std::size_t DataSeries::size() const noexcept { return channels_.size(); }
@@ -167,5 +162,24 @@ bool DataSeries::has_income_category(core::Gender gender, core::Income income) c
 
     auto income_it = gender_it->second.find(income);
     return income_it != gender_it->second.end();
+}
+
+std::string DataSeries::income_category_to_string(core::Income income) const {
+    switch (income) {
+    case core::Income::unknown:
+        return "Unknown";
+    case core::Income::low:
+        return "LowIncome";
+    case core::Income::lowermiddle:
+        return "LowerMiddleIncome";
+    case core::Income::middle:
+        return "MiddleIncome";
+    case core::Income::uppermiddle:
+        return "UpperMiddleIncome";
+    case core::Income::high:
+        return "HighIncome";
+    default:
+        return "Unknown";
+    }
 }
 } // namespace hgps

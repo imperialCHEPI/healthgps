@@ -105,6 +105,11 @@ class DataSeries {
     /// @return true if the income category exists, false otherwise
     bool has_income_category(core::Gender gender, core::Income income) const;
 
+    /// @brief Converts income category enum to string representation
+    /// @param income The income enumeration
+    /// @return String representation of the income category
+    std::string income_category_to_string(core::Income income) const;
+
   private:
     std::size_t sample_size_;
     std::vector<std::string> channels_;

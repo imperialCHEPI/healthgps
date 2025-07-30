@@ -32,6 +32,8 @@ ResultFileWriter::ResultFileWriter(const std::filesystem::path &file_name, Exper
 
 ResultFileWriter::ResultFileWriter(ResultFileWriter &&other) noexcept
     : stream_{std::move(other.stream_)}, csvstream_{std::move(other.csvstream_)},
+      income_csvstreams_{std::move(other.income_csvstreams_)},
+      income_first_row_{std::move(other.income_first_row_)},
       info_{std::move(other.info_)}, base_filename_{std::move(other.base_filename_)} {}
 
 ResultFileWriter &ResultFileWriter::operator=(ResultFileWriter &&other) noexcept {
@@ -40,6 +42,15 @@ ResultFileWriter &ResultFileWriter::operator=(ResultFileWriter &&other) noexcept
 
     csvstream_.close();
     csvstream_ = std::move(other.csvstream_);
+
+    // Close all income streams
+    for (auto &[income, stream] : income_csvstreams_) {
+        if (stream.is_open()) {
+            stream.close();
+        }
+    }
+    income_csvstreams_ = std::move(other.income_csvstreams_);
+    income_first_row_ = std::move(other.income_first_row_);
 
     info_ = std::move(other.info_);
     base_filename_ = std::move(other.base_filename_);
@@ -57,6 +68,14 @@ ResultFileWriter::~ResultFileWriter() {
         csvstream_.flush();
         csvstream_.close();
     }
+
+    // Close all income streams
+    for (auto &[income, stream] : income_csvstreams_) {
+        if (stream.is_open()) {
+            stream.flush();
+            stream.close();
+        }
+    }
 }
 
 void ResultFileWriter::write(const hgps::ResultEventMessage &message) {
@@ -71,9 +90,12 @@ void ResultFileWriter::write(const hgps::ResultEventMessage &message) {
     stream_ << to_json_string(message);
     write_csv_channels(message);
 
-    // Write income-based CSV files if income analysis is enabled
+    // Initialize income streams on first use and write income-based CSV data
     if (message.content.population_by_income.has_value()) {
-        write_income_based_csv_files(message);
+        if (income_csvstreams_.empty()) {
+            initialize_income_streams(message);
+        }
+        write_income_csv_channels(message);
     }
 }
 
@@ -188,6 +210,39 @@ void ResultFileWriter::write_csv_channels(const hgps::ResultEventMessage &messag
     }
 }
 
+void ResultFileWriter::initialize_income_streams(const hgps::ResultEventMessage &message) {
+    auto available_income_categories = get_available_income_categories(message);
+
+    for (const auto &income : available_income_categories) {
+        auto income_filename = generate_income_filename(base_filename_.string(), income);
+        std::ofstream income_stream(income_filename, std::ofstream::out | std::ofstream::app);
+        
+        if (income_stream.fail() || !income_stream.is_open()) {
+            throw std::invalid_argument(
+                fmt::format("Cannot open income-based output file: {}", income_filename));
+        }
+
+        income_csvstreams_[income] = std::move(income_stream);
+        income_first_row_[income] = true;
+    }
+}
+
+void ResultFileWriter::write_income_csv_channels(const hgps::ResultEventMessage &message) {
+    auto available_income_categories = get_available_income_categories(message);
+
+    for (const auto &income : available_income_categories) {
+        auto &income_stream = income_csvstreams_[income];
+        auto &is_first_row = income_first_row_[income];
+
+        if (is_first_row) {
+            is_first_row = false;
+            write_income_csv_header(message, income_stream);
+        }
+
+        write_income_csv_data(message, income, income_stream);
+    }
+}
+
 void ResultFileWriter::write_income_based_csv_files(const hgps::ResultEventMessage &message) {
     auto available_income_categories = get_available_income_categories(message);
 
@@ -200,19 +255,30 @@ void ResultFileWriter::write_income_based_csv_files(const hgps::ResultEventMessa
                 fmt::format("Cannot open income-based output file: {}", income_filename));
         }
 
-        // Write header for this income category
-        income_csv << "source,run,time,gender_name,index_id";
-        for (const auto &chan : message.content.series.channels()) {
-            income_csv << "," << chan;
-        }
-        income_csv << '\n';
+        // Write header for this income category - same as main result CSV
+        write_income_csv_header(message, income_csv);
 
-        // Write data for this income category
-        write_income_csv_data(message, income, income_csv);
+        // Write aggregated data for this income category
+        write_income_aggregated_csv_data(message, income, income_csv);
 
         income_csv.flush();
         income_csv.close();
     }
+}
+
+void ResultFileWriter::write_income_csv_header(const hgps::ResultEventMessage &message, std::ofstream &income_csv) {
+    // Write the same header as the main result CSV file
+    income_csv << "source,run,time,gender_name,index_id";
+    for (const auto &chan : message.content.series.channels()) {
+        income_csv << "," << chan;
+    }
+    income_csv << '\n';
+}
+
+void ResultFileWriter::write_income_aggregated_csv_data(const hgps::ResultEventMessage &message,
+                                                        core::Income income, std::ofstream &income_csv) {
+    // Use the same implementation as write_income_csv_data since the user wants the same structure
+    write_income_csv_data(message, income, income_csv);
 }
 
 void ResultFileWriter::write_income_csv_data(const hgps::ResultEventMessage &message,
@@ -258,10 +324,10 @@ std::string ResultFileWriter::generate_income_filename(const std::string &base_f
     auto income_suffix = income_category_to_string(income);
     auto dot_pos = base_filename.find_last_of('.');
     if (dot_pos != std::string::npos) {
-        return base_filename.substr(0, dot_pos) + "_" + income_suffix +
-               base_filename.substr(dot_pos);
+        // Always generate CSV files for income-based results
+        return base_filename.substr(0, dot_pos) + "_" + income_suffix + ".csv";
     }
-    return base_filename + "_" + income_suffix;
+    return base_filename + "_" + income_suffix + ".csv";
 }
 
 std::string ResultFileWriter::income_category_to_string(core::Income income) const {

@@ -47,8 +47,6 @@ void Simulation::setup_run(unsigned int run_number, unsigned int run_seed) noexc
 }
 
 adevs::Time Simulation::init(adevs::SimEnv<int> *env) {
-    std::cout << "DEBUG: Simulation::init() called" << std::endl;
-
     auto start = std::chrono::steady_clock::now();
     const auto &inputs = context_.inputs();
     auto world_time = inputs.start_time();
@@ -57,7 +55,6 @@ adevs::Time Simulation::init(adevs::SimEnv<int> *env) {
     context_.set_current_time(world_time);
     end_time_ = adevs::Time(inputs.stop_time(), 0);
 
-    std::cout << "DEBUG: About to call initialise_population()" << std::endl;
     initialise_population();
 
     auto stop = std::chrono::steady_clock::now();
@@ -69,13 +66,10 @@ adevs::Time Simulation::init(adevs::SimEnv<int> *env) {
     context_.publish(std::make_unique<InfoEventMessage>(
         name(), ModelAction::start, context_.current_run(), context_.time_now(), message));
 
-    std::cout << "DEBUG: Simulation::init() completed" << std::endl;
     return env->now() + adevs::Time(world_time, 0);
 }
 
 adevs::Time Simulation::update(adevs::SimEnv<int> *env) {
-    std::cout << "DEBUG: Simulation::update() called at time: " << env->now().real << std::endl;
-
     if (env->now() < end_time_) {
         auto start = std::chrono::steady_clock::now();
         context_.metrics().reset();
@@ -85,7 +79,6 @@ adevs::Time Simulation::update(adevs::SimEnv<int> *env) {
         auto time_year = world_time.real;
         context_.set_current_time(time_year);
 
-        std::cout << "DEBUG: About to call update_population()" << std::endl;
         update_population();
 
         auto stop = std::chrono::steady_clock::now();
@@ -97,7 +90,6 @@ adevs::Time Simulation::update(adevs::SimEnv<int> *env) {
             name(), ModelAction::update, context_.current_run(), context_.time_now(), message));
 
         // Schedule next event time
-        std::cout << "DEBUG: Simulation::update() completed, scheduling next event" << std::endl;
         return world_time;
     }
 
@@ -132,63 +124,43 @@ void Simulation::initialise_population() {
     auto virtual_pop_size = static_cast<int>(size_fraction * total_year_pop_size);
     context_.reset_population(virtual_pop_size);
 
-    std::cout << "DEBUG: Created virtual population of size: " << virtual_pop_size << std::endl;
-
     // Gender - Age, must be first
-    std::cout << "DEBUG: Initialising demographic module..." << std::endl;
     demographic_->initialise_population(context_);
 
     // Social economics status
-    std::cout << "DEBUG: Initialising SES module..." << std::endl;
     ses_->initialise_population(context_);
 
     // Generate risk factors
-    std::cout << "DEBUG: Initialising risk factor module..." << std::endl;
     risk_factor_->initialise_population(context_);
 
     // Initialise diseases
-    std::cout << "DEBUG: Initialising disease module..." << std::endl;
     disease_->initialise_population(context_);
 
     // Initialise analysis
-    std::cout << "DEBUG: Initialising analysis module..." << std::endl;
     analysis_->initialise_population(context_);
-
-    std::cout << "DEBUG: Finished initialise_population()" << std::endl;
     print_initial_population_statistics();
 }
 
 void Simulation::update_population() {
-    std::cout << "DEBUG: Starting update_population() at time: " << context_.time_now()
-              << std::endl;
-
     /* Note: order is very important */
 
     // update basic information: demographics + diseases
-    std::cout << "DEBUG: Updating demographic module..." << std::endl;
     demographic_->update_population(context_, *disease_);
 
     // Calculate the net immigration by gender and age, update the population accordingly
-    std::cout << "DEBUG: Updating net immigration..." << std::endl;
     update_net_immigration();
 
     // update population socio-economic status
-    std::cout << "DEBUG: Updating SES module..." << std::endl;
     ses_->update_population(context_);
 
     // Update population risk factors
-    std::cout << "DEBUG: Updating risk factor module..." << std::endl;
     risk_factor_->update_population(context_);
 
     // Update diseases status: remission and incidence
-    std::cout << "DEBUG: Updating disease module..." << std::endl;
     disease_->update_population(context_);
 
     // Publish results to data logger
-    std::cout << "DEBUG: Updating analysis module..." << std::endl;
     analysis_->update_population(context_);
-
-    std::cout << "DEBUG: Finished update_population()" << std::endl;
 }
 
 void Simulation::update_net_immigration() {
