@@ -752,17 +752,7 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
 
     auto current_time = static_cast<unsigned int>(context.time_now());
 
-    std::size_t person_count = 0;
-    const std::size_t total_population = context.population().size();
-    const std::size_t debug_interval =
-        std::max<std::size_t>(1, total_population / 10); // Show progress every 10% to reduce output
-
     for (const auto &person : context.population()) {
-        if (person_count % debug_interval == 0) {
-            std::cout << "DEBUG: Processing person " << person_count << "/" << total_population
-                      << " (" << (person_count * 100 / total_population) << "%)" << std::endl;
-        }
-        person_count++;
 
         auto age = person.age;
         auto gender = person.gender;
