@@ -2,21 +2,23 @@
 #include "HealthGPS.Core/string_util.h"
 
 #include "fmt/core.h"
+#include <array>    // Added for std::array
+#include <iostream> // Added for debug prints
 #include <stdexcept>
 #include <unordered_set>
-#include <iostream> // Added for debug prints
-#include <array> // Added for std::array
 
 namespace hgps {
 DataSeries::DataSeries(std::size_t sample_size) : sample_size_{sample_size} {
     data_.emplace(core::Gender::male, std::map<std::string, std::vector<double>>{});
     data_.emplace(core::Gender::female, std::map<std::string, std::vector<double>>{});
-    
+
     // Initialize income data structure
     for (auto gender : {core::Gender::male, core::Gender::female}) {
-        income_data_.emplace(gender, std::map<core::Income, std::map<std::string, std::vector<double>>>{});
-        for (auto income : {core::Income::low, core::Income::middle, core::Income::high, 
-                           core::Income::lowermiddle, core::Income::uppermiddle, core::Income::unknown}) {
+        income_data_.emplace(gender,
+                             std::map<core::Income, std::map<std::string, std::vector<double>>>{});
+        for (auto income :
+             {core::Income::low, core::Income::middle, core::Income::high,
+              core::Income::lowermiddle, core::Income::uppermiddle, core::Income::unknown}) {
             income_data_[gender].emplace(income, std::map<std::string, std::vector<double>>{});
         }
     }
@@ -34,11 +36,13 @@ const std::vector<double> &DataSeries::at(core::Gender gender, const std::string
     return data_.at(gender).at(key);
 }
 
-std::vector<double> &DataSeries::at(core::Gender gender, core::Income income, const std::string &key) {
+std::vector<double> &DataSeries::at(core::Gender gender, core::Income income,
+                                    const std::string &key) {
     return income_data_.at(gender).at(income).at(key);
 }
 
-const std::vector<double> &DataSeries::at(core::Gender gender, core::Income income, const std::string &key) const {
+const std::vector<double> &DataSeries::at(core::Gender gender, core::Income income,
+                                          const std::string &key) const {
     return income_data_.at(gender).at(income).at(key);
 }
 
@@ -62,25 +66,26 @@ void DataSeries::add_channels(const std::vector<std::string> &keys) {
 }
 
 void DataSeries::add_income_channels(const std::vector<std::string> &keys) {
-    std::cout << "DEBUG: DataSeries::add_income_channels() started with " << keys.size() << " keys" << std::endl;
+    std::cout << "DEBUG: DataSeries::add_income_channels() started with " << keys.size() << " keys"
+              << std::endl;
     std::cout << "DEBUG: Sample size is: " << sample_size_ << std::endl;
-    
+
     // Pre-allocate vectors to avoid repeated allocations
     std::vector<double> empty_vector(sample_size_);
-    
+
     // Only create channels for the three main income categories that are actually used
-    const std::array<core::Income, 3> income_categories = {
-        core::Income::low, core::Income::middle, core::Income::high
-    };
-    
+    const std::array<core::Income, 3> income_categories = {core::Income::low, core::Income::middle,
+                                                           core::Income::high};
+
     for (size_t i = 0; i < keys.size(); i++) {
         const auto &key = keys[i];
         if (i % 20 == 0) { // Show progress every 20 keys to reduce output
-            std::cout << "DEBUG: Processing key " << i + 1 << "/" << keys.size() << ": " << key << std::endl;
+            std::cout << "DEBUG: Processing key " << i + 1 << "/" << keys.size() << ": " << key
+                      << std::endl;
         }
-        
+
         auto channel_key = core::to_lower(key);
-        
+
         // Only add to income-based channels - don't add to regular channels here
         // Regular channels are handled by add_channels() method
         for (auto gender : {core::Gender::male, core::Gender::female}) {
@@ -94,26 +99,29 @@ void DataSeries::add_income_channels(const std::vector<std::string> &keys) {
             }
         }
     }
-    
+
     std::cout << "DEBUG: DataSeries::add_income_channels() completed" << std::endl;
 }
 
-void DataSeries::add_income_channels_for_categories(const std::vector<std::string> &keys, 
-                                                   const std::vector<core::Income> &income_categories) {
-    std::cout << "DEBUG: DataSeries::add_income_channels_for_categories() started with " << keys.size() << " keys and " << income_categories.size() << " income categories" << std::endl;
+void DataSeries::add_income_channels_for_categories(
+    const std::vector<std::string> &keys, const std::vector<core::Income> &income_categories) {
+    std::cout << "DEBUG: DataSeries::add_income_channels_for_categories() started with "
+              << keys.size() << " keys and " << income_categories.size() << " income categories"
+              << std::endl;
     std::cout << "DEBUG: Sample size is: " << sample_size_ << std::endl;
-    
+
     // Pre-allocate vectors to avoid repeated allocations
     std::vector<double> empty_vector(sample_size_);
-    
+
     for (size_t i = 0; i < keys.size(); i++) {
         const auto &key = keys[i];
         if (i % 20 == 0) { // Show progress every 20 keys to reduce output
-            std::cout << "DEBUG: Processing key " << i + 1 << "/" << keys.size() << ": " << key << std::endl;
+            std::cout << "DEBUG: Processing key " << i + 1 << "/" << keys.size() << ": " << key
+                      << std::endl;
         }
-        
+
         auto channel_key = core::to_lower(key);
-        
+
         // Only add to income-based channels for the specified income categories
         for (auto gender : {core::Gender::male, core::Gender::female}) {
             auto &gender_income_data = income_data_.at(gender);
@@ -126,7 +134,7 @@ void DataSeries::add_income_channels_for_categories(const std::vector<std::strin
             }
         }
     }
-    
+
     std::cout << "DEBUG: DataSeries::add_income_channels_for_categories() completed" << std::endl;
 }
 
@@ -137,7 +145,7 @@ std::size_t DataSeries::sample_size() const noexcept { return sample_size_; }
 std::vector<core::Income> DataSeries::get_available_income_categories() const {
     std::vector<core::Income> categories;
     std::unordered_set<core::Income> seen;
-    
+
     // Check which income categories have data
     for (const auto &[gender, income_map] : income_data_) {
         for (const auto &[income, channel_map] : income_map) {
@@ -147,7 +155,7 @@ std::vector<core::Income> DataSeries::get_available_income_categories() const {
             }
         }
     }
-    
+
     return categories;
 }
 
@@ -156,7 +164,7 @@ bool DataSeries::has_income_category(core::Gender gender, core::Income income) c
     if (gender_it == income_data_.end()) {
         return false;
     }
-    
+
     auto income_it = gender_it->second.find(income);
     return income_it != gender_it->second.end();
 }

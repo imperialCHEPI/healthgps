@@ -61,7 +61,8 @@ class DataSeries {
     /// @return The channel data
     /// @throws std::out_of_range if the container does not have a
     /// channel with the specified gender, income and key
-    const std::vector<double> &at(core::Gender gender, core::Income income, const std::string &key) const;
+    const std::vector<double> &at(core::Gender gender, core::Income income,
+                                  const std::string &key) const;
 
     /// @brief Gets the collection of channel identifiers
     /// @return The collection of channel identifiers
@@ -83,8 +84,8 @@ class DataSeries {
     void add_income_channels(const std::vector<std::string> &keys);
 
     /// @brief Adds income-based channels for specific income categories
-    void add_income_channels_for_categories(const std::vector<std::string> &keys, 
-                                           const std::vector<core::Income> &income_categories);
+    void add_income_channels_for_categories(const std::vector<std::string> &keys,
+                                            const std::vector<core::Income> &income_categories);
 
     /// @brief Gets the size of the channels collection
     /// @return Number of channels in dataset
@@ -108,6 +109,7 @@ class DataSeries {
     std::size_t sample_size_;
     std::vector<std::string> channels_;
     std::map<core::Gender, std::map<std::string, std::vector<double>>> data_;
-    std::map<core::Gender, std::map<core::Income, std::map<std::string, std::vector<double>>>> income_data_;
+    std::map<core::Gender, std::map<core::Income, std::map<std::string, std::vector<double>>>>
+        income_data_;
 };
 } // namespace hgps

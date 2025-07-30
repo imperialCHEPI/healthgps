@@ -106,6 +106,7 @@ class ModelInput {
     SESDefinition ses_definition_;
     HierarchicalMapping risk_mapping_;
     std::vector<core::DiseaseInfo> diseases_;
-    bool enable_income_analysis_{true};  // This is to set if results be categorised by income or not. Set to TRUE for now.
+    bool enable_income_analysis_{
+        true}; // This is to set if results be categorised by income or not. Set to TRUE for now.
 };
 } // namespace hgps

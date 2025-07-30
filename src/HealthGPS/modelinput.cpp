@@ -31,9 +31,9 @@ const HierarchicalMapping &ModelInput::risk_mapping() const noexcept { return ri
 
 const std::vector<core::DiseaseInfo> &ModelInput::diseases() const noexcept { return diseases_; }
 
-bool ModelInput::enable_income_analysis() const noexcept { 
+bool ModelInput::enable_income_analysis() const noexcept {
     // Return income analysis flag - forces recompilation
-    return enable_income_analysis_; 
+    return enable_income_analysis_;
 }
 
 } // namespace hgps

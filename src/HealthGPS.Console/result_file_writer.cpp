@@ -8,8 +8,8 @@
 #include <fmt/core.h>
 #include <nlohmann/json.hpp>
 #include <sstream>
-#include <utility>
 #include <unordered_set>
+#include <utility>
 
 namespace hgps {
 ResultFileWriter::ResultFileWriter(const std::filesystem::path &file_name, ExperimentInfo info)
@@ -70,7 +70,7 @@ void ResultFileWriter::write(const hgps::ResultEventMessage &message) {
 
     stream_ << to_json_string(message);
     write_csv_channels(message);
-    
+
     // Write income-based CSV files if income analysis is enabled
     if (message.content.population_by_income.has_value()) {
         write_income_based_csv_files(message);
@@ -190,35 +190,35 @@ void ResultFileWriter::write_csv_channels(const hgps::ResultEventMessage &messag
 
 void ResultFileWriter::write_income_based_csv_files(const hgps::ResultEventMessage &message) {
     auto available_income_categories = get_available_income_categories(message);
-    
+
     for (const auto &income : available_income_categories) {
         auto income_filename = generate_income_filename(base_filename_.string(), income);
         std::ofstream income_csv(income_filename);
-        
+
         if (income_csv.fail() || !income_csv.is_open()) {
             throw std::invalid_argument(
                 fmt::format("Cannot open income-based output file: {}", income_filename));
         }
-        
+
         // Write header for this income category
         income_csv << "source,run,time,gender_name,index_id";
         for (const auto &chan : message.content.series.channels()) {
             income_csv << "," << chan;
         }
         income_csv << '\n';
-        
+
         // Write data for this income category
         write_income_csv_data(message, income, income_csv);
-        
+
         income_csv.flush();
         income_csv.close();
     }
 }
 
-void ResultFileWriter::write_income_csv_data(const hgps::ResultEventMessage &message, 
-                                            core::Income income, std::ofstream &income_csv) {
+void ResultFileWriter::write_income_csv_data(const hgps::ResultEventMessage &message,
+                                             core::Income income, std::ofstream &income_csv) {
     using namespace hgps::core;
-    
+
     const auto *sep = ",";
     const auto &series = message.content.series;
     std::stringstream mss;
@@ -229,7 +229,7 @@ void ResultFileWriter::write_income_csv_data(const hgps::ResultEventMessage &mes
             << "male" << sep << index;
         fss << message.source << sep << message.run_number << sep << message.model_time << sep
             << "female" << sep << index;
-        
+
         for (const auto &key : series.channels()) {
             // Use income-based data if available, otherwise use regular data
             try {
@@ -253,31 +253,41 @@ void ResultFileWriter::write_income_csv_data(const hgps::ResultEventMessage &mes
     }
 }
 
-std::string ResultFileWriter::generate_income_filename(const std::string &base_filename, core::Income income) const {
+std::string ResultFileWriter::generate_income_filename(const std::string &base_filename,
+                                                       core::Income income) const {
     auto income_suffix = income_category_to_string(income);
     auto dot_pos = base_filename.find_last_of('.');
     if (dot_pos != std::string::npos) {
-        return base_filename.substr(0, dot_pos) + "_" + income_suffix + base_filename.substr(dot_pos);
+        return base_filename.substr(0, dot_pos) + "_" + income_suffix +
+               base_filename.substr(dot_pos);
     }
     return base_filename + "_" + income_suffix;
 }
 
 std::string ResultFileWriter::income_category_to_string(core::Income income) const {
     switch (income) {
-        case core::Income::low: return "LowIncome";
-        case core::Income::middle: return "MiddleIncome";
-        case core::Income::high: return "HighIncome";
-        case core::Income::lowermiddle: return "LowerMiddleIncome";
-        case core::Income::uppermiddle: return "UpperMiddleIncome";
-        case core::Income::unknown: return "UnknownIncome";
-        default: return "UnknownIncome";
+    case core::Income::low:
+        return "LowIncome";
+    case core::Income::middle:
+        return "MiddleIncome";
+    case core::Income::high:
+        return "HighIncome";
+    case core::Income::lowermiddle:
+        return "LowerMiddleIncome";
+    case core::Income::uppermiddle:
+        return "UpperMiddleIncome";
+    case core::Income::unknown:
+        return "UnknownIncome";
+    default:
+        return "UnknownIncome";
     }
 }
 
-std::vector<core::Income> ResultFileWriter::get_available_income_categories(const hgps::ResultEventMessage &message) const {
+std::vector<core::Income>
+ResultFileWriter::get_available_income_categories(const hgps::ResultEventMessage &message) const {
     std::vector<core::Income> categories;
     std::unordered_set<core::Income> seen;
-    
+
     // Check which income categories have population data
     if (message.content.population_by_income.has_value()) {
         const auto &pop_by_income = message.content.population_by_income.value();
@@ -294,7 +304,7 @@ std::vector<core::Income> ResultFileWriter::get_available_income_categories(cons
             seen.insert(core::Income::high);
         }
     }
-    
+
     return categories;
 }
 } // namespace hgps

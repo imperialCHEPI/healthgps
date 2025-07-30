@@ -48,7 +48,7 @@ void Simulation::setup_run(unsigned int run_number, unsigned int run_seed) noexc
 
 adevs::Time Simulation::init(adevs::SimEnv<int> *env) {
     std::cout << "DEBUG: Simulation::init() called" << std::endl;
-    
+
     auto start = std::chrono::steady_clock::now();
     const auto &inputs = context_.inputs();
     auto world_time = inputs.start_time();
@@ -75,7 +75,7 @@ adevs::Time Simulation::init(adevs::SimEnv<int> *env) {
 
 adevs::Time Simulation::update(adevs::SimEnv<int> *env) {
     std::cout << "DEBUG: Simulation::update() called at time: " << env->now().real << std::endl;
-    
+
     if (env->now() < end_time_) {
         auto start = std::chrono::steady_clock::now();
         context_.metrics().reset();
@@ -121,7 +121,7 @@ void Simulation::fini(adevs::Time clock) {
 
 void Simulation::initialise_population() {
     std::cout << "DEBUG: Starting initialise_population()" << std::endl;
-    
+
     /* Note: order is very important */
 
     // Create virtual population
@@ -131,7 +131,7 @@ void Simulation::initialise_population() {
     float size_fraction = inputs.settings().size_fraction();
     auto virtual_pop_size = static_cast<int>(size_fraction * total_year_pop_size);
     context_.reset_population(virtual_pop_size);
-    
+
     std::cout << "DEBUG: Created virtual population of size: " << virtual_pop_size << std::endl;
 
     // Gender - Age, must be first
@@ -159,8 +159,9 @@ void Simulation::initialise_population() {
 }
 
 void Simulation::update_population() {
-    std::cout << "DEBUG: Starting update_population() at time: " << context_.time_now() << std::endl;
-    
+    std::cout << "DEBUG: Starting update_population() at time: " << context_.time_now()
+              << std::endl;
+
     /* Note: order is very important */
 
     // update basic information: demographics + diseases
@@ -186,7 +187,7 @@ void Simulation::update_population() {
     // Publish results to data logger
     std::cout << "DEBUG: Updating analysis module..." << std::endl;
     analysis_->update_population(context_);
-    
+
     std::cout << "DEBUG: Finished update_population()" << std::endl;
 }
 

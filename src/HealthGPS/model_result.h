@@ -3,9 +3,9 @@
 #include "gender_value.h"
 
 #include <map>
+#include <optional>
 #include <string>
 #include <vector>
-#include <optional>
 
 namespace hgps {
 
@@ -23,7 +23,7 @@ struct ResultByGender {
 struct ResultByIncome {
     /// @brief Low income value
     double low{};
-    /// @brief Middle income value  
+    /// @brief Middle income value
     double middle{};
     /// @brief High income value
     double high{};

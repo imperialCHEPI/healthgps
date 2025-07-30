@@ -57,7 +57,8 @@ class AnalysisModule final : public UpdatableModule {
     std::vector<size_t> factor_bins_;
     std::vector<double> factor_bin_widths_;
     std::vector<double> factor_min_values_;
-    bool enable_income_analysis_{true};  // This is to set if results be categorised by income or not. Set to TRUE for now.
+    bool enable_income_analysis_{
+        true}; // This is to set if results be categorised by income or not. Set to TRUE for now.
 
     void initialise_vector(RuntimeContext &context);
 
@@ -74,7 +75,8 @@ class AnalysisModule final : public UpdatableModule {
 
     void calculate_population_statistics(RuntimeContext &context);
     void calculate_population_statistics(RuntimeContext &context, DataSeries &series) const;
-    void calculate_income_based_population_statistics(RuntimeContext &context, DataSeries &series) const;
+    void calculate_income_based_population_statistics(RuntimeContext &context,
+                                                      DataSeries &series) const;
 
     void classify_weight(hgps::DataSeries &series, const hgps::Person &entity) const;
     void initialise_output_channels(RuntimeContext &context);
@@ -83,8 +85,7 @@ class AnalysisModule final : public UpdatableModule {
     /// @brief Calculates the standard deviation of factors given data series containing means
     /// @param context The runtime context
     /// @param series The data series containing factor means
-    void calculate_standard_deviation(RuntimeContext &context,
-                                      DataSeries &series) const;
+    void calculate_standard_deviation(RuntimeContext &context, DataSeries &series) const;
 
     /// @brief Gets available income categories from the runtime context
     /// @param context The runtime context
