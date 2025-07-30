@@ -458,8 +458,6 @@ void AnalysisModule::calculate_income_based_statistics(RuntimeContext &context,
         }
         result.comorbidity_by_income->emplace(comorbidity_count, result_by_income);
     }
-
-
 }
 
 std::vector<core::Income>
@@ -719,8 +717,6 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
     income_channels.push_back("std_yld");
     income_channels.push_back("std_daly");
 
-
-
     // Create income channels for the actual income categories found in the data
     std::vector<core::Income> actual_income_categories;
     for (const auto &person : context.population()) {
@@ -730,8 +726,6 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
         }
     }
 
-
-
     // Create income channels for the actual categories found
     series.add_income_channels_for_categories(income_channels, actual_income_categories);
 
@@ -740,8 +734,10 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
     for (const auto &income : actual_income_categories) {
         for (int age = age_range.lower(); age <= age_range.upper(); age++) {
             for (const auto &factor : context.mapping().entries()) {
-                series.at(core::Gender::female, income, "std_" + factor.key().to_string()).at(age) = 0.0;
-                series.at(core::Gender::male, income, "std_" + factor.key().to_string()).at(age) = 0.0;
+                series.at(core::Gender::female, income, "std_" + factor.key().to_string()).at(age) =
+                    0.0;
+                series.at(core::Gender::male, income, "std_" + factor.key().to_string()).at(age) =
+                    0.0;
             }
             for (const auto &column : {"std_yll", "std_yld", "std_daly"}) {
                 series.at(core::Gender::female, income, column).at(age) = 0.0;
@@ -758,8 +754,8 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
 
     std::size_t person_count = 0;
     const std::size_t total_population = context.population().size();
-    const std::size_t debug_interval = std::max<std::size_t>(
-        1, total_population / 10); // Show progress every 10% to reduce output
+    const std::size_t debug_interval =
+        std::max<std::size_t>(1, total_population / 10); // Show progress every 10% to reduce output
 
     for (const auto &person : context.population()) {
         if (person_count % debug_interval == 0) {
@@ -772,8 +768,6 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
         auto gender = person.gender;
         auto income = person.income;
 
-
-
         if (!person.is_active()) {
             if (!person.is_alive() && person.time_of_death() == current_time) {
                 try {
@@ -783,7 +777,7 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
                     double yll = std::max(expcted_life - age, 0.0f) * DALY_UNITS;
                     series.at(gender, income, "mean_yll").at(age) += yll;
                     series.at(gender, income, "mean_daly").at(age) += yll;
-                } catch (const std::exception&) {
+                } catch (const std::exception &) {
                     throw;
                 }
             }
@@ -791,7 +785,7 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
             if (person.has_emigrated() && person.time_of_migration() == current_time) {
                 try {
                     series.at(gender, income, "emigrations").at(age)++;
-                } catch (const std::exception&) {
+                } catch (const std::exception &) {
                     throw;
                 }
             }
@@ -801,7 +795,7 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
 
         try {
             series.at(gender, income, "count").at(age)++;
-        } catch (const std::exception&) {
+        } catch (const std::exception &) {
             throw;
         }
 
@@ -810,7 +804,7 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
             try {
                 series.at(gender, income, channel_name).at(age) +=
                     person.get_risk_factor_value(factor.key());
-            } catch (const std::exception&) {
+            } catch (const std::exception &) {
                 throw;
             }
         }
@@ -821,7 +815,7 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
             series.at(gender, income, "mean_gender").at(age) += static_cast<int>(person.gender);
             series.at(gender, income, "mean_income").at(age) += static_cast<int>(person.income);
             series.at(gender, income, "mean_sector").at(age) += static_cast<int>(person.sector);
-        } catch (const std::exception&) {
+        } catch (const std::exception &) {
             throw;
         }
 
@@ -928,14 +922,12 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
 
     // Calculate standard deviation for income-based data
     calculate_income_based_standard_deviation(context, series);
-
-
 }
 
 void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &context,
-                                                              DataSeries &series) const {
+                                                               DataSeries &series) const {
     // Accumulate squared deviations from mean for income-based data
-    auto accumulate_squared_diffs_income = [&series](const std::string &chan, core::Gender sex, 
+    auto accumulate_squared_diffs_income = [&series](const std::string &chan, core::Gender sex,
                                                      core::Income income, int age, double value) {
         const double mean = series.at(sex, income, "mean_" + chan).at(age);
         const double diff = value - mean;
@@ -970,13 +962,16 @@ void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &c
 
         // Accumulate squared deviations for demographic data
         accumulate_squared_diffs_income("age", sex, income, age, person.age);
-        accumulate_squared_diffs_income("gender", sex, income, age, static_cast<int>(person.gender));
-        accumulate_squared_diffs_income("income", sex, income, age, static_cast<int>(person.income));
-        accumulate_squared_diffs_income("sector", sex, income, age, static_cast<int>(person.sector));
+        accumulate_squared_diffs_income("gender", sex, income, age,
+                                        static_cast<int>(person.gender));
+        accumulate_squared_diffs_income("income", sex, income, age,
+                                        static_cast<int>(person.income));
+        accumulate_squared_diffs_income("sector", sex, income, age,
+                                        static_cast<int>(person.sector));
     }
 
     // Calculate in-place standard deviation for income-based data
-    auto divide_by_count_sqrt_income = [&series](const std::string &chan, core::Gender sex, 
+    auto divide_by_count_sqrt_income = [&series](const std::string &chan, core::Gender sex,
                                                  core::Income income, int age, double count) {
         const double sum = series.at(sex, income, "std_" + chan).at(age);
         const double std = std::sqrt(sum / count);
@@ -986,7 +981,7 @@ void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &c
     // For each income category and age group
     const auto age_range = context.age_range();
     auto available_income_categories = get_available_income_categories(context);
-    
+
     for (const auto &income : available_income_categories) {
         for (int age = age_range.lower(); age <= age_range.upper(); age++) {
             double count_F = series.at(core::Gender::female, income, "count").at(age);
@@ -996,8 +991,10 @@ void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &c
 
             // Calculate in-place factor standard deviation for this income category
             for (const auto &factor : context.mapping().entries()) {
-                divide_by_count_sqrt_income(factor.key().to_string(), core::Gender::female, income, age, count_F);
-                divide_by_count_sqrt_income(factor.key().to_string(), core::Gender::male, income, age, count_M);
+                divide_by_count_sqrt_income(factor.key().to_string(), core::Gender::female, income,
+                                            age, count_F);
+                divide_by_count_sqrt_income(factor.key().to_string(), core::Gender::male, income,
+                                            age, count_M);
             }
 
             // Calculate in-place demographic standard deviation for this income category
@@ -1012,8 +1009,10 @@ void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &c
 
             // Calculate in-place YLL/YLD/DALY standard deviation for this income category
             for (const auto &column : {"yll", "yld", "daly"}) {
-                divide_by_count_sqrt_income(column, core::Gender::female, income, age, (count_F + deaths_F));
-                divide_by_count_sqrt_income(column, core::Gender::male, income, age, (count_M + deaths_M));
+                divide_by_count_sqrt_income(column, core::Gender::female, income, age,
+                                            (count_F + deaths_F));
+                divide_by_count_sqrt_income(column, core::Gender::male, income, age,
+                                            (count_M + deaths_M));
             }
         }
     }

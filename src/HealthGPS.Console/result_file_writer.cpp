@@ -33,8 +33,8 @@ ResultFileWriter::ResultFileWriter(const std::filesystem::path &file_name, Exper
 ResultFileWriter::ResultFileWriter(ResultFileWriter &&other) noexcept
     : stream_{std::move(other.stream_)}, csvstream_{std::move(other.csvstream_)},
       income_csvstreams_{std::move(other.income_csvstreams_)},
-      income_first_row_{std::move(other.income_first_row_)},
-      info_{std::move(other.info_)}, base_filename_{std::move(other.base_filename_)} {}
+      income_first_row_{std::move(other.income_first_row_)}, info_{std::move(other.info_)},
+      base_filename_{std::move(other.base_filename_)} {}
 
 ResultFileWriter &ResultFileWriter::operator=(ResultFileWriter &&other) noexcept {
     stream_.close();
@@ -216,7 +216,7 @@ void ResultFileWriter::initialize_income_streams(const hgps::ResultEventMessage 
     for (const auto &income : available_income_categories) {
         auto income_filename = generate_income_filename(base_filename_.string(), income);
         std::ofstream income_stream(income_filename, std::ofstream::out | std::ofstream::app);
-        
+
         if (income_stream.fail() || !income_stream.is_open()) {
             throw std::invalid_argument(
                 fmt::format("Cannot open income-based output file: {}", income_filename));
@@ -266,7 +266,8 @@ void ResultFileWriter::write_income_based_csv_files(const hgps::ResultEventMessa
     }
 }
 
-void ResultFileWriter::write_income_csv_header(const hgps::ResultEventMessage &message, std::ofstream &income_csv) {
+void ResultFileWriter::write_income_csv_header(const hgps::ResultEventMessage &message,
+                                               std::ofstream &income_csv) {
     // Write the same header as the main result CSV file
     income_csv << "source,run,time,gender_name,index_id";
     for (const auto &chan : message.content.series.channels()) {
@@ -276,7 +277,8 @@ void ResultFileWriter::write_income_csv_header(const hgps::ResultEventMessage &m
 }
 
 void ResultFileWriter::write_income_aggregated_csv_data(const hgps::ResultEventMessage &message,
-                                                        core::Income income, std::ofstream &income_csv) {
+                                                        core::Income income,
+                                                        std::ofstream &income_csv) {
     // Use the same implementation as write_income_csv_data since the user wants the same structure
     write_income_csv_data(message, income, income_csv);
 }

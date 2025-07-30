@@ -18,7 +18,7 @@ DataSeries::DataSeries(std::size_t sample_size) : sample_size_{sample_size} {
                              std::map<core::Income, std::map<std::string, std::vector<double>>>{});
         // Initialize ALL possible income categories to ensure any enum value can be accessed
         for (auto income : {core::Income::unknown, core::Income::low, core::Income::lowermiddle,
-                           core::Income::middle, core::Income::uppermiddle, core::Income::high}) {
+                            core::Income::middle, core::Income::uppermiddle, core::Income::high}) {
             income_data_[gender].emplace(income, std::map<std::string, std::vector<double>>{});
         }
     }

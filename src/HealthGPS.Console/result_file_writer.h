@@ -54,14 +54,15 @@ class ResultFileWriter final : public ResultWriter {
     /// @brief Writes income-specific CSV header for a given income category
     /// @param message The result event message
     /// @param income_csv The output file stream for this income category
-    void write_income_csv_header(const hgps::ResultEventMessage &message, std::ofstream &income_csv);
+    void write_income_csv_header(const hgps::ResultEventMessage &message,
+                                 std::ofstream &income_csv);
 
     /// @brief Writes income-specific aggregated CSV data for a given income category
     /// @param message The result event message
     /// @param income The income category
     /// @param income_csv The output file stream for this income category
-    void write_income_aggregated_csv_data(const hgps::ResultEventMessage &message, core::Income income,
-                                          std::ofstream &income_csv);
+    void write_income_aggregated_csv_data(const hgps::ResultEventMessage &message,
+                                          core::Income income, std::ofstream &income_csv);
 
     /// @brief Writes income-specific time series CSV data for a given income category
     /// @param message The result event message
