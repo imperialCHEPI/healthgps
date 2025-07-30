@@ -95,6 +95,10 @@ class ModelInput {
     /// @return Diseases to include in experiment
     const std::vector<core::DiseaseInfo> &diseases() const noexcept;
 
+    /// @brief Gets whether income-based analysis is enabled
+    /// @return true if income analysis is enabled, false otherwise
+    bool enable_income_analysis() const noexcept;
+
   private:
     std::reference_wrapper<core::DataTable> input_data_;
     Settings settings_;
@@ -102,5 +106,6 @@ class ModelInput {
     SESDefinition ses_definition_;
     HierarchicalMapping risk_mapping_;
     std::vector<core::DiseaseInfo> diseases_;
+    bool enable_income_analysis_{true};  // This is to set if results be categorised by income or not. Set to TRUE for now.
 };
 } // namespace hgps

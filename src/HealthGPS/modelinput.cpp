@@ -30,4 +30,10 @@ const SESDefinition &ModelInput::ses_definition() const noexcept { return ses_de
 const HierarchicalMapping &ModelInput::risk_mapping() const noexcept { return risk_mapping_; }
 
 const std::vector<core::DiseaseInfo> &ModelInput::diseases() const noexcept { return diseases_; }
+
+bool ModelInput::enable_income_analysis() const noexcept { 
+    // Return income analysis flag - forces recompilation
+    return enable_income_analysis_; 
+}
+
 } // namespace hgps
