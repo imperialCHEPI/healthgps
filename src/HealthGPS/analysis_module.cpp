@@ -565,7 +565,8 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context) {
 
         // Now we can add the values of the factors that are not in factors_to_calculate_
         for (const auto &factor : context.mapping().entries()) {
-            if (std::ranges::find(factors_to_calculate_, factor.key()) == factors_to_calculate_.end()) {
+            if (std::ranges::find(factors_to_calculate_, factor.key()) ==
+                factors_to_calculate_.end()) {
                 calculated_stats_[index++] += person.get_risk_factor_value(factor.key());
             }
         }
@@ -719,7 +720,8 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
     // Create income channels for the actual income categories found in the data
     std::vector<core::Income> actual_income_categories;
     for (const auto &person : context.population()) {
-        if (std::ranges::find(actual_income_categories, person.income) == actual_income_categories.end()) {
+        if (std::ranges::find(actual_income_categories, person.income) ==
+            actual_income_categories.end()) {
             actual_income_categories.emplace_back(person.income);
         }
     }
@@ -1125,7 +1127,8 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
     channels_.emplace_back("std_daly");
 }
 
-void AnalysisModule::initialise_income_output_channels([[maybe_unused]] RuntimeContext &context) const {
+void AnalysisModule::initialise_income_output_channels(
+    [[maybe_unused]] RuntimeContext &context) const {
     if (!enable_income_analysis_) {
         return;
     }
