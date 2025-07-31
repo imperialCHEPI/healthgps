@@ -34,7 +34,9 @@ void StaticLinearModel::trace_fat_calculation(const std::string& step_name,
                                              double factor_before_clamp,
                                              double range_lower,
                                              double range_upper,
-                                             double final_clamped_factor) const {
+                                             double final_clamped_factor,
+                                             double random_residual_before_cholesky,
+                                             double residual_after_cholesky) const {
     if constexpr (ENABLE_FAT_TRACING) {
         // Only trace for target demographic in year 1 baseline
         if (person.age == TARGET_AGE && 
@@ -58,7 +60,7 @@ void StaticLinearModel::trace_fat_calculation(const std::string& step_name,
             if (csv_file.is_open()) {
                 // Write header if file is new
                 if (!file_exists) {
-                    csv_file << "person_id,step_name,fat_value,expected_value,linear_result,residual,stddev,combined,lambda,boxcox_result,factor_before_clamp,range_lower,range_upper,final_clamped_factor,gender,age,region,ethnicity,physical_activity,income_continuous,income_category\n";
+                    csv_file << "person_id,step_name,fat_value,expected_value,linear_result,residual,stddev,combined,lambda,boxcox_result,factor_before_clamp,range_lower,range_upper,final_clamped_factor,random_residual_before_cholesky,residual_after_cholesky,gender,age,region,ethnicity,physical_activity,income_continuous,income_category\n";
                 }
                 
                 csv_file << person.id() << ","
@@ -75,6 +77,8 @@ void StaticLinearModel::trace_fat_calculation(const std::string& step_name,
                          << range_lower << ","
                          << range_upper << ","
                          << final_clamped_factor << ","
+                         << random_residual_before_cholesky << ","
+                         << residual_after_cholesky << ","
                          << person.gender_to_value() << ","
                          << person.age << ","
                          << (person.region == core::Region::England ? "England" : 
@@ -124,10 +128,13 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
             double range_lower = person.get_risk_factor_value(core::Identifier("temp_range_lower"));
             double range_upper = person.get_risk_factor_value(core::Identifier("temp_range_upper"));
             double final_clamped_factor = person.get_risk_factor_value(core::Identifier("temp_final_clamped_factor"));
+            double random_residual_before_cholesky = person.get_risk_factor_value(core::Identifier("temp_random_residual_before_cholesky"));
+            double residual_after_cholesky = person.get_risk_factor_value(core::Identifier("temp_residual_after_cholesky"));
             
             trace_fat_calculation("initial_boxcox_calculation", person, fat_value, expected_value, 
                                  linear_result, residual, stddev, combined, lambda, 
-                                 boxcox_result, factor_before_clamp, range_lower, range_upper, final_clamped_factor);
+                                 boxcox_result, factor_before_clamp, range_lower, range_upper, final_clamped_factor, 
+                                 random_residual_before_cholesky, residual_after_cholesky);
             
             // Clean up temporary values
             person.risk_factors.erase(core::Identifier("temp_linear_result"));
@@ -140,6 +147,8 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
             person.risk_factors.erase(core::Identifier("temp_range_lower"));
             person.risk_factors.erase(core::Identifier("temp_range_upper"));
             person.risk_factors.erase(core::Identifier("temp_final_clamped_factor"));
+            person.risk_factors.erase(core::Identifier("temp_random_residual_before_cholesky"));
+            person.risk_factors.erase(core::Identifier("temp_residual_after_cholesky"));
         }
     }
 
@@ -151,7 +160,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         if (person.age == TARGET_AGE && person.gender == TARGET_GENDER) {
             double fat_value = person.get_risk_factor_value(TARGET_RISK_FACTOR);
             double expected_value = get_expected(context, person.gender, person.age, TARGET_RISK_FACTOR, ranges_[0], false);
-            trace_fat_calculation("after_1st_adjustment", person, fat_value, expected_value, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+            trace_fat_calculation("after_1st_adjustment", person, fat_value, expected_value, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
         }
     }
 
@@ -169,7 +178,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         if (person.age == TARGET_AGE && person.gender == TARGET_GENDER) {
             double fat_value = person.get_risk_factor_value(TARGET_RISK_FACTOR);
             double expected_value = get_expected(context, person.gender, person.age, TARGET_RISK_FACTOR, ranges_[0], true);
-            trace_fat_calculation("after_2nd_adjustment", person, fat_value, expected_value, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+            trace_fat_calculation("after_2nd_adjustment", person, fat_value, expected_value, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
         }
     }
 
@@ -186,7 +195,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         if (person.age == TARGET_AGE && person.gender == TARGET_GENDER) {
             double fat_value = person.get_risk_factor_value(TARGET_RISK_FACTOR);
             double expected_value = get_expected(context, person.gender, person.age, TARGET_RISK_FACTOR, ranges_[0], true);
-            trace_fat_calculation("final_value", person, fat_value, expected_value, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+            trace_fat_calculation("final_value", person, fat_value, expected_value, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
         }
     }
 }
@@ -349,7 +358,7 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
                                            Random &random) const {
 
     // Correlated residual sampling.
-    auto residuals = compute_residuals(random, cholesky_);
+    auto [random_residuals_before_cholesky, residuals] = compute_residuals(random, cholesky_, stddev_);
 
     // Approximate risk factors with linear models.
     auto linear = compute_linear_models(person, models_);
@@ -396,7 +405,7 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
 
         // STAGE 2: Calculate non-zero risk factor value using BoxCox transformation
         // (This code runs whether we have a logistic model or not)
-        double factor = linear[i] + residual * stddev_[i];
+        double factor = linear[i] + residual;
         double combined = factor;
         double boxcox_result = inverse_box_cox(factor, lambda_[i]);
         double factor_before_clamp = expected * boxcox_result;
@@ -418,6 +427,8 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
             person.risk_factors[core::Identifier("temp_range_lower")] = ranges_[i].lower();
             person.risk_factors[core::Identifier("temp_range_upper")] = ranges_[i].upper();
             person.risk_factors[core::Identifier("temp_final_clamped_factor")] = factor;
+            person.risk_factors[core::Identifier("temp_random_residual_before_cholesky")] = random_residuals_before_cholesky[i];
+            person.risk_factors[core::Identifier("temp_residual_after_cholesky")] = residual;
         }
     }
 }
@@ -426,7 +437,7 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
                                        Random &random) const {
 
     // Correlated residual sampling.
-    auto new_residuals = compute_residuals(random, cholesky_);
+    auto [new_random_residuals_before_cholesky, new_residuals] = compute_residuals(random, cholesky_, stddev_);
 
     // Approximate risk factors with linear models.
     auto linear = compute_linear_models(person, models_);
@@ -480,7 +491,7 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
 
         // STAGE 2: Calculate non-zero risk factor value using BoxCox transformation
         // (This code runs whether we have a logistic model or not)
-        double factor = linear[i] + residual * stddev_[i];
+        double factor = linear[i] + residual;
         factor = expected * inverse_box_cox(factor, lambda_[i]);
         factor = ranges_[i].clamp(factor);
 
@@ -539,7 +550,7 @@ void StaticLinearModel::initialise_policies(Person &person, Random &random, bool
     //       so we compute residuals even though they are not used in baseline.
 
     // Intervention policy residual components.
-    auto residuals = compute_residuals(random, policy_cholesky_);
+    auto [policy_random_residuals_before_cholesky, residuals] = compute_residuals(random, policy_cholesky_, stddev_);
 
     // Save residuals (never updated in lifetime).
     for (size_t i = 0; i < names_.size(); i++) {
@@ -697,14 +708,24 @@ StaticLinearModel::compute_linear_models(Person &person,
     return linear;
 }
 
-std::vector<double> StaticLinearModel::compute_residuals(Random &random,
-                                                         const Eigen::MatrixXd &cholesky) const {
+std::pair<std::vector<double>, std::vector<double>> StaticLinearModel::compute_residuals(Random &random,
+                                                                                         const Eigen::MatrixXd &cholesky,
+                                                                                         const std::vector<double> &stddev) const {
+    std::vector<double> random_residuals_before_cholesky{};
     std::vector<double> correlated_residuals{};
+    random_residuals_before_cholesky.reserve(names_.size());
     correlated_residuals.reserve(names_.size());
 
     // Correlated samples using Cholesky decomposition.
     Eigen::VectorXd residuals{names_.size()};
-    std::ranges::generate(residuals, [&random] { return random.next_normal(0.0, 1.0); });
+    
+    // Generate residuals with mean=0 and std=stddev[i] for each risk factor
+    for (size_t i = 0; i < names_.size(); i++) {
+        double random_residual = random.next_normal(0.0, stddev[i]);
+        residuals[i] = random_residual;
+        random_residuals_before_cholesky.emplace_back(random_residual);
+    }
+    
     residuals = cholesky * residuals;
 
     // Save correlated residuals.
@@ -712,7 +733,7 @@ std::vector<double> StaticLinearModel::compute_residuals(Random &random,
         correlated_residuals.emplace_back(residuals[i]);
     }
 
-    return correlated_residuals;
+    return {random_residuals_before_cholesky, correlated_residuals};
 }
 
 void StaticLinearModel::initialise_sector(Person &person, Random &random) const {

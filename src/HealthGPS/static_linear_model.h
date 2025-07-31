@@ -126,7 +126,9 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     std::vector<double> compute_linear_models(Person &person,
                                               const std::vector<LinearModelParams> &models) const;
 
-    std::vector<double> compute_residuals(Random &random, const Eigen::MatrixXd &cholesky) const;
+    std::pair<std::vector<double>, std::vector<double>> compute_residuals(Random &random,
+                                                                         const Eigen::MatrixXd &cholesky,
+                                                                         const std::vector<double> &stddev) const;
 
     /// @brief Initialise the sector of a person
     /// @param person The person to initialise sector for
@@ -162,6 +164,8 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param range_lower The range lower bound (optional, for detailed tracing)
     /// @param range_upper The range upper bound (optional, for detailed tracing)
     /// @param final_clamped_factor The final clamped factor (optional, for detailed tracing)
+    /// @param random_residual_before_cholesky The residual before Cholesky decomposition (optional, for detailed tracing)
+    /// @param residual_after_cholesky The residual after Cholesky decomposition (optional, for detailed tracing)
     void trace_fat_calculation(const std::string& step_name, 
                               const Person& person, 
                               double fat_value,
@@ -175,7 +179,9 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
                               double factor_before_clamp = 0.0,
                               double range_lower = 0.0,
                               double range_upper = 0.0,
-                              double final_clamped_factor = 0.0) const;
+                              double final_clamped_factor = 0.0,
+                              double random_residual_before_cholesky = 0.0,
+                              double residual_after_cholesky = 0.0) const;
 
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox_;
     const std::vector<core::Identifier> &names_;
