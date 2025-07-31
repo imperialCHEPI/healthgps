@@ -50,15 +50,15 @@ void AnalysisModule::initialise_vector(RuntimeContext &context) {
         double min_factor = min->get_risk_factor_value(factor);
         double max_factor = max->get_risk_factor_value(factor);
 
-        factor_min_values_.push_back(min_factor);
+        factor_min_values_.emplace_back(min_factor);
 
         // The number of bins to use for each factor is the number of integer values of the factor,
         // or 100 bins of equal size, whichever is smaller (100 is an arbitrary number, it could be
         // any other number depending on the desired resolution of the map)
-        factor_bins_.push_back(std::min(100, static_cast<int>(max_factor - min_factor)));
+        factor_bins_.emplace_back(std::min(100, static_cast<int>(max_factor - min_factor)));
 
         // The width of each bin is the range of the factor divided by the number of bins
-        factor_bin_widths_.push_back((max_factor - min_factor) / factor_bins_.back());
+        factor_bin_widths_.emplace_back((max_factor - min_factor) / factor_bins_.back());
     }
 
     // The number of factors to calculate stats for is the number of factors minus the length of the
@@ -467,7 +467,7 @@ AnalysisModule::get_available_income_categories(RuntimeContext &context) const {
 
     for (const auto &person : context.population()) {
         if (person.is_active() && !seen.contains(person.income)) {
-            categories.push_back(person.income);
+            categories.emplace_back(person.income);
             seen.insert(person.income);
         }
     }
@@ -550,7 +550,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context) {
             double factor_value = person.get_risk_factor_value(factors_to_calculate_[i]);
             auto bin_index =
                 static_cast<size_t>((factor_value - factor_min_values_[i]) / factor_bin_widths_[i]);
-            bin_indices.push_back(bin_index);
+            bin_indices.emplace_back(bin_index);
         }
 
         // Calculate the index in the calculated_stats_ vector
@@ -565,8 +565,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context) {
 
         // Now we can add the values of the factors that are not in factors_to_calculate_
         for (const auto &factor : context.mapping().entries()) {
-            if (std::find(factors_to_calculate_.cbegin(), factors_to_calculate_.cend(),
-                          factor.key()) == factors_to_calculate_.cend()) {
+            if (std::ranges::find(factors_to_calculate_, factor.key()) == factors_to_calculate_.end()) {
                 calculated_stats_[index++] += person.get_risk_factor_value(factor.key());
             }
         }
@@ -678,51 +677,50 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
     auto available_income_categories = get_available_income_categories(context);
 
     // Create a list of only the channels that are actually used in income-based analysis
-    std::vector<std::string> income_channels;
-    income_channels.push_back("count");
-    income_channels.push_back("deaths");
-    income_channels.push_back("emigrations");
-    income_channels.push_back("mean_yll");
-    income_channels.push_back("mean_yld");
-    income_channels.push_back("mean_daly");
-    income_channels.push_back("normal_weight");
-    income_channels.push_back("over_weight");
-    income_channels.push_back("obese_weight");
-    income_channels.push_back("above_weight");
+    auto income_channels = std::vector<std::string>();
+    income_channels.emplace_back("count");
+    income_channels.emplace_back("deaths");
+    income_channels.emplace_back("emigrations");
+    income_channels.emplace_back("mean_yll");
+    income_channels.emplace_back("mean_yld");
+    income_channels.emplace_back("mean_daly");
+    income_channels.emplace_back("normal_weight");
+    income_channels.emplace_back("over_weight");
+    income_channels.emplace_back("obese_weight");
+    income_channels.emplace_back("above_weight");
 
     // Add demographic channels
-    income_channels.push_back("mean_age");
-    income_channels.push_back("std_age");
-    income_channels.push_back("mean_gender");
-    income_channels.push_back("std_gender");
-    income_channels.push_back("mean_income");
-    income_channels.push_back("std_income");
-    income_channels.push_back("mean_sector");
-    income_channels.push_back("std_sector");
+    income_channels.emplace_back("mean_age");
+    income_channels.emplace_back("std_age");
+    income_channels.emplace_back("mean_gender");
+    income_channels.emplace_back("std_gender");
+    income_channels.emplace_back("mean_income");
+    income_channels.emplace_back("std_income");
+    income_channels.emplace_back("mean_sector");
+    income_channels.emplace_back("std_sector");
 
-    // Add risk factor mean and std channels
+    // Add risk factor channels
     for (const auto &factor : context.mapping().entries()) {
-        income_channels.push_back("mean_" + factor.key().to_string());
-        income_channels.push_back("std_" + factor.key().to_string());
+        income_channels.emplace_back("mean_" + factor.key().to_string());
+        income_channels.emplace_back("std_" + factor.key().to_string());
     }
 
     // Add disease prevalence and incidence channels
     for (const auto &disease : context.diseases()) {
-        income_channels.push_back("prevalence_" + disease.code.to_string());
-        income_channels.push_back("incidence_" + disease.code.to_string());
+        income_channels.emplace_back("prevalence_" + disease.code.to_string());
+        income_channels.emplace_back("incidence_" + disease.code.to_string());
     }
 
     // Add YLL/YLD/DALY std channels
-    income_channels.push_back("std_yll");
-    income_channels.push_back("std_yld");
-    income_channels.push_back("std_daly");
+    income_channels.emplace_back("std_yll");
+    income_channels.emplace_back("std_yld");
+    income_channels.emplace_back("std_daly");
 
     // Create income channels for the actual income categories found in the data
     std::vector<core::Income> actual_income_categories;
     for (const auto &person : context.population()) {
-        if (std::find(actual_income_categories.begin(), actual_income_categories.end(),
-                      person.income) == actual_income_categories.end()) {
-            actual_income_categories.push_back(person.income);
+        if (std::ranges::find(actual_income_categories, person.income) == actual_income_categories.end()) {
+            actual_income_categories.emplace_back(person.income);
         }
     }
 
@@ -1127,7 +1125,7 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
     channels_.emplace_back("std_daly");
 }
 
-void AnalysisModule::initialise_income_output_channels([[maybe_unused]] RuntimeContext &context) {
+void AnalysisModule::initialise_income_output_channels([[maybe_unused]] RuntimeContext &context) const {
     if (!enable_income_analysis_) {
         return;
     }

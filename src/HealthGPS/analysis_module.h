@@ -83,7 +83,7 @@ class AnalysisModule final : public UpdatableModule {
 
     void classify_weight(hgps::DataSeries &series, const hgps::Person &entity) const;
     void initialise_output_channels(RuntimeContext &context);
-    void initialise_income_output_channels(RuntimeContext &context);
+    void initialise_income_output_channels(RuntimeContext &context) const;
 
     /// @brief Calculates the standard deviation of factors given data series containing means
     /// @param context The runtime context
