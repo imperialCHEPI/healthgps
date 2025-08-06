@@ -64,7 +64,7 @@
             "properties": {
                 "file_name": {
                     "type": "string",
-                    "description": "Population Impact Fraction file name pattern. Use {COUNTRY_CODE} as placeholder for country code."
+                    "description": "Population Impact Fraction file name pattern. Use {COUNTRY_CODE} as placeholder for country code"
                 },
                 "description": {
                     "type": "string",
