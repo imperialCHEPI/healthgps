@@ -38,6 +38,23 @@
         "disease": {
             "$ref": "disease.json"
         },
+        "population_impact_fraction": {
+            "type": "object",
+            "properties": {
+                "file_name": {
+                    "type": "string",
+                    "description": "Population Impact Fraction file name pattern. Use {COUNTRY_CODE} as placeholder for country code"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "Description of the Population Impact Fraction data"
+                }
+            },
+            "required": [
+                "file_name"
+            ],
+            "additionalProperties": false
+        },
         "registry": {
             "type": "array",
             "items": {

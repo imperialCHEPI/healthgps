@@ -68,7 +68,7 @@ class ResultFileWriter final : public ResultWriter {
     /// @param message The result event message
     /// @param income The income category
     /// @param income_csv The output file stream for this income category
-    void write_income_csv_data(const hgps::ResultEventMessage &message, core::Income income,
+   static void write_income_csv_data(const hgps::ResultEventMessage &message, core::Income income,
                                std::ofstream &income_csv);
 
     /// @brief Generates filename for income-based CSV files
