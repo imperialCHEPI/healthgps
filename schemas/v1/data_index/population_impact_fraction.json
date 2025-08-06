@@ -18,26 +18,39 @@
             "properties": {
                 "Gender": {
                     "type": "string",
-                    "enum": ["integer"],
+                    "enum": [
+                        "integer"
+                    ],
                     "description": "Gender code: 0 = female, 1 = male"
                 },
                 "Age": {
                     "type": "string",
-                    "enum": ["integer"],
+                    "enum": [
+                        "integer"
+                    ],
                     "description": "Age group"
                 },
                 "YearPostInt": {
                     "type": "string",
-                    "enum": ["integer"],
+                    "enum": [
+                        "integer"
+                    ],
                     "description": "Years post intervention"
                 },
                 "IF_Mean": {
                     "type": "string",
-                    "enum": ["number"],
+                    "enum": [
+                        "number"
+                    ],
                     "description": "Population Impact Fraction value (0.0 to 1.0)"
                 }
             },
-            "required": ["Gender", "Age", "YearPostInt", "IF_Mean"],
+            "required": [
+                "Gender",
+                "Age",
+                "YearPostInt",
+                "IF_Mean"
+            ],
             "additionalProperties": false
         },
         "constraints": {
@@ -100,6 +113,10 @@
             }
         }
     },
-    "required": ["columns", "data_types", "constraints"],
+    "required": [
+        "columns",
+        "data_types",
+        "constraints"
+    ],
     "additionalProperties": false
 }
