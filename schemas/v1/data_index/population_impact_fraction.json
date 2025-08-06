@@ -18,39 +18,26 @@
             "properties": {
                 "Gender": {
                     "type": "string",
-                    "enum": [
-                        "integer"
-                    ],
+                    "enum": ["integer"],
                     "description": "Gender code: 0 = female, 1 = male"
                 },
                 "Age": {
                     "type": "string",
-                    "enum": [
-                        "integer"
-                    ],
+                    "enum": ["integer"],
                     "description": "Age group"
                 },
                 "YearPostInt": {
                     "type": "string",
-                    "enum": [
-                        "integer"
-                    ],
+                    "enum": ["integer"],
                     "description": "Years post intervention"
                 },
                 "IF_Mean": {
                     "type": "string",
-                    "enum": [
-                        "number"
-                    ],
+                    "enum": ["number"],
                     "description": "Population Impact Fraction value (0.0 to 1.0)"
                 }
             },
-            "required": [
-                "Gender",
-                "Age",
-                "YearPostInt",
-                "IF_Mean"
-            ],
+            "required": ["Gender", "Age", "YearPostInt", "IF_Mean"],
             "additionalProperties": false
         },
         "constraints": {
@@ -92,9 +79,9 @@
                         "minimum": {
                             "type": "integer",
                             "minimum": 0
-                        },
-                        "description": "Years since intervention start (0 = intervention year)"
-                    }
+                        }
+                    },
+                    "description": "Years since intervention start (0 = intervention year)"
                 },
                 "IF_Mean": {
                     "type": "object",
@@ -106,17 +93,13 @@
                         "maximum": {
                             "type": "number",
                             "maximum": 1.0
-                        },
-                        "description": "PIF values must be between 0.0 and 1.0"
-                    }
+                        }
+                    },
+                    "description": "PIF values must be between 0.0 and 1.0"
                 }
             }
         }
     },
-    "required": [
-        "columns",
-        "data_types",
-        "constraints"
-    ],
+    "required": ["columns", "data_types", "constraints"],
     "additionalProperties": false
 }
