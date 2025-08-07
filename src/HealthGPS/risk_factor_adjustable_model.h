@@ -22,6 +22,13 @@ using OptionalRanges =
 
 namespace hgps {
 
+/// @brief Defines the trend type enumeration for factors mean adjustment
+enum class TrendType {
+    Null,       ///< No trends applied to factors mean adjustment
+    Trend,      ///< Regular UPF trends applied to factors mean adjustment
+    IncomeTrend ///< Income-based trends applied to factors mean adjustment
+};
+
 /// @brief Defines a table type for double values by sex and age
 using RiskFactorSexAgeTable = UnorderedMap2d<core::Gender, core::Identifier, std::vector<double>>;
 
@@ -30,12 +37,20 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
   public:
     /// @brief Constructs a new RiskFactorAdjustableModel instance
     /// @param expected The risk factor expected values by sex and age
-    /// @param expected_trend The expected trend of risk factor values
-    /// @param trend_steps The number of time steps to apply the trend
+    /// @param expected_trend The expected trend of risk factor values (for UPF trends)
+    /// @param trend_steps The number of time steps to apply the trend (for UPF trends)
+    /// @param trend_type The type of trend to apply to factors mean adjustment
+    /// @param expected_income_trend The expected income trend of risk factor values
+    /// @param expected_income_trend_decay_factors The exponential decay factors for income trends
     RiskFactorAdjustableModel(
         std::shared_ptr<RiskFactorSexAgeTable> expected,
         std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
-        std::shared_ptr<std::unordered_map<core::Identifier, int>> trend_steps);
+        std::shared_ptr<std::unordered_map<core::Identifier, int>> trend_steps,
+        TrendType trend_type = TrendType::Null,
+        std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend =
+            nullptr,
+        std::shared_ptr<std::unordered_map<core::Identifier, double>>
+            expected_income_trend_decay_factors = nullptr);
 
     /// @brief Gets a person's expected risk factor value
     /// @param context The simulation run-time context
@@ -79,6 +94,14 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
     std::shared_ptr<RiskFactorSexAgeTable> expected_;
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_;
     std::shared_ptr<std::unordered_map<core::Identifier, int>> trend_steps_;
+
+    // Trend type for factors mean adjustment
+    TrendType trend_type_;
+
+    // Income trend data structures (optional, only used when trend_type_ == TrendType::IncomeTrend)
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend_;
+    std::shared_ptr<std::unordered_map<core::Identifier, double>>
+        expected_income_trend_decay_factors_;
 };
 
 /// @brief Risk factor adjustable model definition interface

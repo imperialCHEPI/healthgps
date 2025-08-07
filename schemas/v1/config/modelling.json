@@ -239,6 +239,25 @@
                 }
             },
             "additionalProperties": false
+        },
+        "population_impact_fraction": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Enable Population Impact Fraction calculations"
+                },
+                "intervention_start_year": {
+                    "type": "integer",
+                    "description": "Year when interventions start (used for time-based PIF calculations)"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "Description of the intervention scenario"
+                }
+            },
+            "additionalProperties": false
         }
     },
     "required": [

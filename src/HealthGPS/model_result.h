@@ -3,6 +3,7 @@
 #include "gender_value.h"
 
 #include <map>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -16,6 +17,26 @@ struct ResultByGender {
 
     /// @brief Female value
     double female{};
+};
+
+/// @brief Defines the measure by income result data type
+struct ResultByIncome {
+    /// @brief Low income value
+    double low{};
+    /// @brief Middle income value
+    double middle{};
+    /// @brief High income value
+    double high{};
+};
+
+/// @brief Defines the measure by income and gender result data type
+struct ResultByIncomeGender {
+    /// @brief Low income values by gender
+    ResultByGender low{};
+    /// @brief Middle income values by gender
+    ResultByGender middle{};
+    /// @brief High income values by gender
+    ResultByGender high{};
 };
 
 /// @brief Defines the DALYs indicator result data type
@@ -70,6 +91,12 @@ struct ModelResult {
 
     /// @brief The detailed time series data results
     DataSeries series;
+
+    /// @brief Income-based results (only populated if income analysis enabled in model_input.h)
+    std::optional<ResultByIncome> population_by_income{};
+    std::optional<std::map<std::string, ResultByIncomeGender>> risk_factor_average_by_income{};
+    std::optional<std::map<std::string, ResultByIncomeGender>> disease_prevalence_by_income{};
+    std::optional<std::map<unsigned int, ResultByIncomeGender>> comorbidity_by_income{};
 
     /// @brief Gets a string representation of this instance
     /// @return The string representation

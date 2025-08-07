@@ -1,0 +1,122 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/data_index/population_impact_fraction.json",
+    "type": "object",
+    "description": "Schema for Population Impact Fraction CSV data validation",
+    "properties": {
+        "columns": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "minItems": 4,
+            "maxItems": 4,
+            "description": "Expected CSV columns: Gender, Age, YearPostInt, IF_Mean"
+        },
+        "data_types": {
+            "type": "object",
+            "properties": {
+                "Gender": {
+                    "type": "string",
+                    "enum": [
+                        "integer"
+                    ],
+                    "description": "Gender code: 0 = female, 1 = male"
+                },
+                "Age": {
+                    "type": "string",
+                    "enum": [
+                        "integer"
+                    ],
+                    "description": "Age group"
+                },
+                "YearPostInt": {
+                    "type": "string",
+                    "enum": [
+                        "integer"
+                    ],
+                    "description": "Years post intervention"
+                },
+                "IF_Mean": {
+                    "type": "string",
+                    "enum": [
+                        "number"
+                    ],
+                    "description": "Population Impact Fraction value (0.0 to 1.0)"
+                }
+            },
+            "required": [
+                "Gender",
+                "Age",
+                "YearPostInt",
+                "IF_Mean"
+            ],
+            "additionalProperties": false
+        },
+        "constraints": {
+            "type": "object",
+            "properties": {
+                "Gender": {
+                    "type": "object",
+                    "properties": {
+                        "valid_values": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            },
+                            "contains": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 1
+                            },
+                            "description": "Valid gender codes: 0 (female), 1 (male)"
+                        }
+                    }
+                },
+                "Age": {
+                    "type": "object",
+                    "properties": {
+                        "minimum": {
+                            "type": "integer",
+                            "minimum": 0
+                        },
+                        "maximum": {
+                            "type": "integer",
+                            "maximum": 110
+                        }
+                    }
+                },
+                "YearPostInt": {
+                    "type": "object",
+                    "properties": {
+                        "minimum": {
+                            "type": "integer",
+                            "minimum": 0
+                        }
+                    },
+                    "description": "Years since intervention start (0 = intervention year)"
+                },
+                "IF_Mean": {
+                    "type": "object",
+                    "properties": {
+                        "minimum": {
+                            "type": "number",
+                            "minimum": 0.0
+                        },
+                        "maximum": {
+                            "type": "number",
+                            "maximum": 1.0
+                        }
+                    },
+                    "description": "PIF values must be between 0.0 and 1.0"
+                }
+            }
+        }
+    },
+    "required": [
+        "columns",
+        "data_types",
+        "constraints"
+    ],
+    "additionalProperties": false
+}

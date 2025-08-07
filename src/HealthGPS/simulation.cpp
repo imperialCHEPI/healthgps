@@ -94,6 +94,7 @@ adevs::Time Simulation::update(adevs::SimEnv<int> *env) {
     }
 
     // We have reached the end, remove the model and return infinite time for next event.
+    std::cout << "DEBUG: Simulation::update() - reached end time, removing model\n";
     env->remove(this);
     return adevs_inf<adevs::Time>();
 }
@@ -111,6 +112,8 @@ void Simulation::fini(adevs::Time clock) {
 }
 
 void Simulation::initialise_population() {
+    std::cout << "DEBUG: Starting initialise_population()\n";
+
     /* Note: order is very important */
 
     // Create virtual population
@@ -135,7 +138,6 @@ void Simulation::initialise_population() {
 
     // Initialise analysis
     analysis_->initialise_population(context_);
-
     print_initial_population_statistics();
 }
 

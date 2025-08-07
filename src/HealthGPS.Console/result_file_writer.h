@@ -34,15 +34,62 @@ class ResultFileWriter final : public ResultWriter {
   private:
     std::ofstream stream_;
     std::ofstream csvstream_;
-    std::mutex lock_mutex_;
-    std::atomic<bool> first_row_{true};
+    std::map<core::Income, std::ofstream> income_csvstreams_;
+    std::map<core::Income, bool> income_first_row_;
     ExperimentInfo info_;
+    std::filesystem::path base_filename_;
+    std::atomic<bool> first_row_{true};
+    std::mutex lock_mutex_;
 
     void write_json_begin(const std::filesystem::path &output);
     void write_json_end();
-
-    static std::string to_json_string(const hgps::ResultEventMessage &message);
-    void write_csv_channels(const hgps::ResultEventMessage &message);
+    std::string to_json_string(const hgps::ResultEventMessage &message);
     void write_csv_header(const hgps::ResultEventMessage &message);
+    void write_csv_channels(const hgps::ResultEventMessage &message);
+
+    /// @brief Writes income-based CSV files for each income category
+    /// @param message The result event message containing income-based data
+    void write_income_based_csv_files(const hgps::ResultEventMessage &message);
+
+    /// @brief Writes income-specific CSV header for a given income category
+    /// @param message The result event message
+    /// @param income_csv The output file stream for this income category
+    void write_income_csv_header(const hgps::ResultEventMessage &message,
+                                 std::ofstream &income_csv);
+
+    /// @brief Writes income-specific aggregated CSV data for a given income category
+    /// @param message The result event message
+    /// @param income The income category
+    /// @param income_csv The output file stream for this income category
+    void write_income_aggregated_csv_data(const hgps::ResultEventMessage &message,
+                                          core::Income income, std::ofstream &income_csv);
+
+    /// @brief Writes income-specific time series CSV data for a given income category
+    /// @param message The result event message
+    /// @param income The income category
+    /// @param income_csv The output file stream for this income category
+    static void write_income_csv_data(const hgps::ResultEventMessage &message, core::Income income,
+                                      std::ofstream &income_csv);
+
+    /// @brief Generates filename for income-based CSV files
+    /// @param base_filename The base filename
+    /// @param income The income category
+    /// @return The income-specific filename
+    std::string generate_income_filename(const std::string &base_filename,
+                                         core::Income income) const;
+
+    /// @brief Converts income category enum to string representation
+    /// @param income The income category
+    /// @return String representation of the income category
+    std::string income_category_to_string(core::Income income) const;
+
+    /// @brief Gets available income categories from the result message
+    /// @param message The result event message
+    /// @return Vector of available income categories
+    std::vector<core::Income>
+    get_available_income_categories(const hgps::ResultEventMessage &message) const;
+
+    void initialize_income_streams(const hgps::ResultEventMessage &message);
+    void write_income_csv_channels(const hgps::ResultEventMessage &message);
 };
 } // namespace hgps
