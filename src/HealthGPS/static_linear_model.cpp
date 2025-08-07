@@ -908,12 +908,13 @@ std::string StaticLinearModel::create_inspection_csv_line(
     double value_assigned, double expected_value, double linear_result, double residual,
     double stddev, double lambda, double boxcox_result, double factor_before_clamp,
     double range_lower, double range_upper, double final_clamped_factor,
-    double random_residual_before_cholesky, double residual_after_cholesky, double physical_activity) const {
+    double random_residual_before_cholesky, double residual_after_cholesky,
+    double physical_activity) const {
     std::ostringstream oss;
     oss << person_id << "," << static_cast<int>(gender) << "," << age << ","
         << static_cast<int>(region) << ","
-        << "N/A" << "," // ethnicity placeholder
-        << std::fixed << std::setprecision(6) << physical_activity << "," // physical_activity 
+        << "N/A" << ","                                                   // ethnicity placeholder
+        << std::fixed << std::setprecision(6) << physical_activity << "," // physical_activity
         << std::fixed << std::setprecision(6) << income_continuous << ","
         << static_cast<int>(income_category) << "," << step_name << "," << std::fixed
         << std::setprecision(6) << value_assigned << "," << expected_value << "," << linear_result

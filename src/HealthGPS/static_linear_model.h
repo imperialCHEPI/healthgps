@@ -256,13 +256,15 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param residual_after_cholesky The residual after Cholesky
     /// @param physical_activity The person's physical activity value
     /// @return CSV formatted string
-    std::string create_inspection_csv_line(
-        std::size_t person_id, core::Gender gender, unsigned int age, core::Sector region,
-        double income_continuous, core::Income income_category, const std::string &step_name,
-        double value_assigned, double expected_value, double linear_result, double residual,
-        double stddev, double lambda, double boxcox_result, double factor_before_clamp,
-        double range_lower, double range_upper, double final_clamped_factor,
-        double random_residual_before_cholesky, double residual_after_cholesky, double physical_activity) const;
+    std::string
+    create_inspection_csv_line(std::size_t person_id, core::Gender gender, unsigned int age,
+                               core::Sector region, double income_continuous,
+                               core::Income income_category, const std::string &step_name,
+                               double value_assigned, double expected_value, double linear_result,
+                               double residual, double stddev, double lambda, double boxcox_result,
+                               double factor_before_clamp, double range_lower, double range_upper,
+                               double final_clamped_factor, double random_residual_before_cholesky,
+                               double residual_after_cholesky, double physical_activity) const;
 
     /// @brief Get CSV header for inspection data
     /// @return CSV header string
