@@ -863,8 +863,8 @@ void StaticLinearModel::record_inspection_data(
     }
 
     std::string csv_line = create_inspection_csv_line(
-        person.id(), person.gender, person.age, person.sector, person.income, step_name, 
-        value_assigned, expected_value, linear_result, residual, stddev, lambda, boxcox_result, 
+        person.id(), person.gender, person.age, person.sector, person.income, step_name,
+        value_assigned, expected_value, linear_result, residual, stddev, lambda, boxcox_result,
         factor_before_clamp, range_lower, range_upper, final_clamped_factor,
         random_residual_before_cholesky, residual_after_cholesky, physical_activity);
 
@@ -904,15 +904,14 @@ void StaticLinearModel::write_inspection_data(
 
 std::string StaticLinearModel::create_inspection_csv_line(
     std::size_t person_id, core::Gender gender, unsigned int age, core::Sector sector,
-    core::Income income_category, const std::string &step_name,
-    double value_assigned, double expected_value, double linear_result, double residual,
-    double stddev, double lambda, double boxcox_result, double factor_before_clamp,
-    double range_lower, double range_upper, double final_clamped_factor,
-    double random_residual_before_cholesky, double residual_after_cholesky,
-    double physical_activity) const {
+    core::Income income_category, const std::string &step_name, double value_assigned,
+    double expected_value, double linear_result, double residual, double stddev, double lambda,
+    double boxcox_result, double factor_before_clamp, double range_lower, double range_upper,
+    double final_clamped_factor, double random_residual_before_cholesky,
+    double residual_after_cholesky, double physical_activity) const {
     std::ostringstream oss;
     oss << person_id << "," << static_cast<int>(gender) << "," << age << ","
-        << static_cast<int>(sector) << ","                               // sector (rural/urban)
+        << static_cast<int>(sector) << ","                                // sector (rural/urban)
         << std::fixed << std::setprecision(6) << physical_activity << "," // physical_activity
         << static_cast<int>(income_category) << "," << step_name << "," << std::fixed
         << std::setprecision(6) << value_assigned << "," << expected_value << "," << linear_result
