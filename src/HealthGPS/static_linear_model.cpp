@@ -789,21 +789,21 @@ std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() con
 
 void StaticLinearModel::initialize_inspection_settings() {
     // Set to true to enable inspection, false to disable
-    inspection_settings_.enabled = false; // CHANGE THIS TO TRUE TO ENABLE
+    inspection_settings_.enabled = true; // CHANGE THIS TO TRUE TO ENABLE
 
     // Configure which risk factor to inspect
     inspection_settings_.target_risk_factor = "Fat"_id; // CHANGE THIS TO DESIRED FACTOR
 
     // Optional filters - set to std::nullopt to disable filtering
-    inspection_settings_.target_age = std::nullopt;    // e.g., 30 for age 30 only
-    inspection_settings_.target_gender = std::nullopt; // e.g., core::Gender::male for males only
-    inspection_settings_.target_year = std::nullopt;   // e.g., 2025 for year 2025 only
+    inspection_settings_.target_age = 30;    // e.g., 30 for age 30 only
+    inspection_settings_.target_gender = core::Gender::female;   // e.g., core::Gender::male, for males only
+    inspection_settings_.target_year = 2022;   // e.g., 2025 for year 2025 only
 
     // Initialize inspection data if enabled
     if (inspection_settings_.enabled) {
         inspection_data_ = std::make_unique<std::vector<std::string>>();
-        std::cout << "Risk factor inspection enabled for: "
-                  << inspection_settings_.target_risk_factor.to_string() << std::endl;
+        std::cout << "\nRisk factor inspection enabled for: "
+                  << inspection_settings_.target_risk_factor.to_string() ;
     }
 }
 
@@ -820,7 +820,7 @@ bool StaticLinearModel::should_inspect(const Person &person, const core::Identif
 
     // Check age filter
     if (inspection_settings_.target_age.has_value() &&
-        person.age != inspection_settings_.target_age.value()) {
+        static_cast<int>(person.age) != inspection_settings_.target_age.value()) {
         return false;
     }
 
@@ -845,13 +845,12 @@ void StaticLinearModel::record_inspection_data(
     double linear_result, double residual, double stddev, double lambda, double boxcox_result,
     double factor_before_clamp, double range_lower, double range_upper, double final_clamped_factor,
     double random_residual_before_cholesky, double residual_after_cholesky) const {
+    (void)context; // Suppress unused parameter warning
+    (void)factor_name; // Suppress unused parameter warning
+    
     if (!inspection_data_) {
         return;
     }
-
-    // Note: Physical activity is not available during risk factor assignment
-    // It gets assigned later in the process, so we set it to 0.0
-    double physical_activity = 0.0;
 
     std::string csv_line = create_inspection_csv_line(
         person.id(), person.gender, person.age, person.sector, static_cast<double>(person.income),
@@ -862,7 +861,9 @@ void StaticLinearModel::record_inspection_data(
     inspection_data_->emplace_back(std::move(csv_line));
 }
 
-void StaticLinearModel::write_inspection_data(const RuntimeContext &context) const {
+void StaticLinearModel::write_inspection_data( [[maybe_unused]] const RuntimeContext &context) const {
+    (void)context; // Suppress unused parameter warning
+    
     if (!inspection_data_ || inspection_data_->empty()) {
         return;
     }
@@ -874,7 +875,7 @@ void StaticLinearModel::write_inspection_data(const RuntimeContext &context) con
     // Write to CSV file
     std::ofstream file(filename);
     if (!file.is_open()) {
-        std::cerr << "Cannot open file for writing: " << filename << std::endl;
+        std::cerr << "\nCannot open file for writing: " << filename;
         return;
     }
 
@@ -886,8 +887,8 @@ void StaticLinearModel::write_inspection_data(const RuntimeContext &context) con
         file << record << "\n";
     }
 
-    std::cout << "Risk factor inspection data written to: " << filename << " ("
-              << inspection_data_->size() << " records)" << std::endl;
+    std::cout << "\nRisk factor inspection data written to: " << filename << " ("
+              << inspection_data_->size() << " records)";
 }
 
 std::string StaticLinearModel::create_inspection_csv_line(
