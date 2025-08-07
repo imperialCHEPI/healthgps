@@ -181,7 +181,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     // ===== MAHIMA: Risk Factor Inspection Feature =====
     /// @brief Risk factor inspection data collector
     mutable std::unique_ptr<std::vector<std::string>> inspection_data_;
-    
+
     /// @brief Risk factor inspection settings
     struct InspectionSettings {
         bool enabled{false};
@@ -191,18 +191,18 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
         std::optional<int> target_year;
     };
     InspectionSettings inspection_settings_;
-    
+
     /// @brief Initialize inspection settings (called once)
     void initialize_inspection_settings();
-    
+
     /// @brief Check if inspection should be performed for this person and factor
     /// @param person The person to check
     /// @param factor_name The risk factor name
     /// @param context The runtime context
     /// @return true if inspection should be performed
-    bool should_inspect(const Person &person, const core::Identifier &factor_name, 
-                       const RuntimeContext &context) const;
-    
+    bool should_inspect(const Person &person, const core::Identifier &factor_name,
+                        const RuntimeContext &context) const;
+
     /// @brief Record inspection data for a risk factor calculation
     /// @param person The person being inspected
     /// @param factor_name The risk factor name
@@ -222,17 +222,17 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param random_residual_before_cholesky The random residual before Cholesky
     /// @param residual_after_cholesky The residual after Cholesky
     void record_inspection_data(const Person &person, const core::Identifier &factor_name,
-                               const RuntimeContext &context, const std::string &step_name,
-                               double value_assigned, double expected_value, double linear_result,
-                               double residual, double stddev, double lambda, double boxcox_result,
-                               double factor_before_clamp, double range_lower, double range_upper,
-                               double final_clamped_factor, double random_residual_before_cholesky,
-                               double residual_after_cholesky) const;
-    
+                                const RuntimeContext &context, const std::string &step_name,
+                                double value_assigned, double expected_value, double linear_result,
+                                double residual, double stddev, double lambda, double boxcox_result,
+                                double factor_before_clamp, double range_lower, double range_upper,
+                                double final_clamped_factor, double random_residual_before_cholesky,
+                                double residual_after_cholesky) const;
+
     /// @brief Write inspection data to CSV file
     /// @param context The runtime context
     void write_inspection_data(const RuntimeContext &context) const;
-    
+
     /// @brief Convert inspection record to CSV line
     /// @param person_id The person ID
     /// @param gender The person's gender
@@ -255,14 +255,14 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param random_residual_before_cholesky The random residual before Cholesky
     /// @param residual_after_cholesky The residual after Cholesky
     /// @return CSV formatted string
-    std::string create_inspection_csv_line(std::size_t person_id, core::Gender gender, unsigned int age,
-                                          core::Sector region, double income_continuous, core::Income income_category,
-                                          const std::string &step_name, double value_assigned, double expected_value,
-                                          double linear_result, double residual, double stddev, double lambda,
-                                          double boxcox_result, double factor_before_clamp, double range_lower,
-                                          double range_upper, double final_clamped_factor,
-                                          double random_residual_before_cholesky, double residual_after_cholesky) const;
-    
+    std::string create_inspection_csv_line(
+        std::size_t person_id, core::Gender gender, unsigned int age, core::Sector region,
+        double income_continuous, core::Income income_category, const std::string &step_name,
+        double value_assigned, double expected_value, double linear_result, double residual,
+        double stddev, double lambda, double boxcox_result, double factor_before_clamp,
+        double range_lower, double range_upper, double final_clamped_factor,
+        double random_residual_before_cholesky, double residual_after_cholesky) const;
+
     /// @brief Get CSV header for inspection data
     /// @return CSV header string
     static std::string get_inspection_csv_header();
