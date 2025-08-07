@@ -258,8 +258,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @return CSV formatted string
     std::string
     create_inspection_csv_line(std::size_t person_id, core::Gender gender, unsigned int age,
-                               core::Sector region, double income_continuous,
-                               core::Income income_category, const std::string &step_name,
+                               core::Sector sector, core::Income income_category, const std::string &step_name,
                                double value_assigned, double expected_value, double linear_result,
                                double residual, double stddev, double lambda, double boxcox_result,
                                double factor_before_clamp, double range_lower, double range_upper,

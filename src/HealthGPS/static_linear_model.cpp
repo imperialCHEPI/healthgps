@@ -794,7 +794,7 @@ void StaticLinearModel::initialize_inspection_settings() {
     inspection_settings_.enabled = true; // CHANGE THIS TO TRUE TO ENABLE
 
     // Configure which risk factor to inspect
-    inspection_settings_.target_risk_factor = "Fat"_id; // CHANGE THIS TO DESIRED FACTOR
+    inspection_settings_.target_risk_factor = "FoodFat"_id; // CHANGE THIS TO DESIRED FACTOR
 
     // Optional filters - set to std::nullopt to disable filtering
     inspection_settings_.target_age = 30; // e.g., 30 for age 30 only
@@ -863,9 +863,9 @@ void StaticLinearModel::record_inspection_data(
     }
 
     std::string csv_line = create_inspection_csv_line(
-        person.id(), person.gender, person.age, person.sector, static_cast<double>(person.income),
-        person.income, step_name, value_assigned, expected_value, linear_result, residual, stddev,
-        lambda, boxcox_result, factor_before_clamp, range_lower, range_upper, final_clamped_factor,
+        person.id(), person.gender, person.age, person.sector, person.income, step_name, 
+        value_assigned, expected_value, linear_result, residual, stddev, lambda, boxcox_result, 
+        factor_before_clamp, range_lower, range_upper, final_clamped_factor,
         random_residual_before_cholesky, residual_after_cholesky, physical_activity);
 
     inspection_data_->emplace_back(std::move(csv_line));
@@ -903,8 +903,8 @@ void StaticLinearModel::write_inspection_data(
 }
 
 std::string StaticLinearModel::create_inspection_csv_line(
-    std::size_t person_id, core::Gender gender, unsigned int age, core::Sector region,
-    double income_continuous, core::Income income_category, const std::string &step_name,
+    std::size_t person_id, core::Gender gender, unsigned int age, core::Sector sector,
+    core::Income income_category, const std::string &step_name,
     double value_assigned, double expected_value, double linear_result, double residual,
     double stddev, double lambda, double boxcox_result, double factor_before_clamp,
     double range_lower, double range_upper, double final_clamped_factor,
@@ -912,10 +912,8 @@ std::string StaticLinearModel::create_inspection_csv_line(
     double physical_activity) const {
     std::ostringstream oss;
     oss << person_id << "," << static_cast<int>(gender) << "," << age << ","
-        << static_cast<int>(region) << ","
-        << "N/A" << ","                                                   // ethnicity placeholder
+        << static_cast<int>(sector) << ","                               // sector (rural/urban)
         << std::fixed << std::setprecision(6) << physical_activity << "," // physical_activity
-        << std::fixed << std::setprecision(6) << income_continuous << ","
         << static_cast<int>(income_category) << "," << step_name << "," << std::fixed
         << std::setprecision(6) << value_assigned << "," << expected_value << "," << linear_result
         << "," << residual << "," << stddev << "," << lambda << "," << boxcox_result << ","
@@ -926,7 +924,7 @@ std::string StaticLinearModel::create_inspection_csv_line(
 }
 
 std::string StaticLinearModel::get_inspection_csv_header() {
-    return "person_id,gender,age,region,ethnicity,physical_activity,income_continuous,"
+    return "person_id,gender,age,sector,physical_activity,"
            "income_category,step_name,value_assigned,expected_value,linear_result,residual,"
            "stddev,lambda,boxcox_result,factor_before_clamp,range_lower,range_upper,"
            "final_clamped_factor,random_residual_before_cholesky,residual_after_cholesky";
