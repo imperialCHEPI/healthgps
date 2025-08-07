@@ -104,6 +104,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     }
 
     // ===== MAHIMA: Write inspection data if any was collected =====
+    // Note: Physical activity is assigned after risk factors, so we write here
     write_inspection_data(context);
 }
 
@@ -188,6 +189,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
     }
 
     // ===== MAHIMA: Write inspection data if any was collected (for newborns only) =====
+    // Note: Physical activity is assigned after risk factors, so we write here
     write_inspection_data(context);
 }
 
@@ -853,11 +855,18 @@ void StaticLinearModel::record_inspection_data(
         return;
     }
 
+    // Get physical activity value if available, otherwise use 0.0
+    double physical_activity = 0.0;
+    auto it = person.risk_factors.find("PhysicalActivity"_id);
+    if (it != person.risk_factors.end()) {
+        physical_activity = it->second;
+    }
+
     std::string csv_line = create_inspection_csv_line(
         person.id(), person.gender, person.age, person.sector, static_cast<double>(person.income),
         person.income, step_name, value_assigned, expected_value, linear_result, residual, stddev,
         lambda, boxcox_result, factor_before_clamp, range_lower, range_upper, final_clamped_factor,
-        random_residual_before_cholesky, residual_after_cholesky);
+        random_residual_before_cholesky, residual_after_cholesky, physical_activity);
 
     inspection_data_->emplace_back(std::move(csv_line));
 }
@@ -899,12 +908,12 @@ std::string StaticLinearModel::create_inspection_csv_line(
     double value_assigned, double expected_value, double linear_result, double residual,
     double stddev, double lambda, double boxcox_result, double factor_before_clamp,
     double range_lower, double range_upper, double final_clamped_factor,
-    double random_residual_before_cholesky, double residual_after_cholesky) const {
+    double random_residual_before_cholesky, double residual_after_cholesky, double physical_activity) const {
     std::ostringstream oss;
     oss << person_id << "," << static_cast<int>(gender) << "," << age << ","
         << static_cast<int>(region) << ","
         << "N/A" << "," // ethnicity placeholder
-        << "0.0" << "," // physical_activity (not available during risk factor assignment)
+        << std::fixed << std::setprecision(6) << physical_activity << "," // physical_activity 
         << std::fixed << std::setprecision(6) << income_continuous << ","
         << static_cast<int>(income_category) << "," << step_name << "," << std::fixed
         << std::setprecision(6) << value_assigned << "," << expected_value << "," << linear_result
