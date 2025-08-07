@@ -795,15 +795,16 @@ void StaticLinearModel::initialize_inspection_settings() {
     inspection_settings_.target_risk_factor = "Fat"_id; // CHANGE THIS TO DESIRED FACTOR
 
     // Optional filters - set to std::nullopt to disable filtering
-    inspection_settings_.target_age = 30;    // e.g., 30 for age 30 only
-    inspection_settings_.target_gender = core::Gender::female;   // e.g., core::Gender::male, for males only
-    inspection_settings_.target_year = 2022;   // e.g., 2025 for year 2025 only
+    inspection_settings_.target_age = 30; // e.g., 30 for age 30 only
+    inspection_settings_.target_gender =
+        core::Gender::female;                // e.g., core::Gender::male, for males only
+    inspection_settings_.target_year = 2022; // e.g., 2025 for year 2025 only
 
     // Initialize inspection data if enabled
     if (inspection_settings_.enabled) {
         inspection_data_ = std::make_unique<std::vector<std::string>>();
         std::cout << "\nRisk factor inspection enabled for: "
-                  << inspection_settings_.target_risk_factor.to_string() ;
+                  << inspection_settings_.target_risk_factor.to_string();
     }
 }
 
@@ -845,9 +846,9 @@ void StaticLinearModel::record_inspection_data(
     double linear_result, double residual, double stddev, double lambda, double boxcox_result,
     double factor_before_clamp, double range_lower, double range_upper, double final_clamped_factor,
     double random_residual_before_cholesky, double residual_after_cholesky) const {
-    (void)context; // Suppress unused parameter warning
+    (void)context;     // Suppress unused parameter warning
     (void)factor_name; // Suppress unused parameter warning
-    
+
     if (!inspection_data_) {
         return;
     }
@@ -861,9 +862,10 @@ void StaticLinearModel::record_inspection_data(
     inspection_data_->emplace_back(std::move(csv_line));
 }
 
-void StaticLinearModel::write_inspection_data( [[maybe_unused]] const RuntimeContext &context) const {
+void StaticLinearModel::write_inspection_data(
+    [[maybe_unused]] const RuntimeContext &context) const {
     (void)context; // Suppress unused parameter warning
-    
+
     if (!inspection_data_ || inspection_data_->empty()) {
         return;
     }
