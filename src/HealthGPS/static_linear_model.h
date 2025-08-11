@@ -167,7 +167,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     const std::vector<LinearModelParams> &models_;
     const std::vector<core::DoubleInterval> &ranges_;
     const std::vector<double> &lambda_;
-    const std::vector<double> &stddev_;
+    const std::vector<double> &stddev_; // Standard deviations of the risk factors
     const Eigen::MatrixXd &cholesky_;
     const std::vector<LinearModelParams> &policy_models_;
     const std::vector<core::DoubleInterval> &policy_ranges_;
