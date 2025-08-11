@@ -246,14 +246,15 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param random_residual_before_cholesky The random residual before Cholesky
     /// @param residual_after_cholesky The residual after Cholesky
     void store_inspection_data(const Person &person, const core::Identifier &factor_name,
-                                const RuntimeContext &context, const std::string &step_name,
-                                double value_assigned, double expected_value, double linear_result,
-                                double residual, double stddev, double lambda, double boxcox_result,
-                                double factor_before_clamp, double range_lower, double range_upper,
-                                double final_clamped_factor, double random_residual_before_cholesky,
-                                double residual_after_cholesky) const;
+                               const RuntimeContext &context, const std::string &step_name,
+                               double value_assigned, double expected_value, double linear_result,
+                               double residual, double stddev, double lambda, double boxcox_result,
+                               double factor_before_clamp, double range_lower, double range_upper,
+                               double final_clamped_factor, double random_residual_before_cholesky,
+                               double residual_after_cholesky) const;
 
-    /// @brief Record inspection data with physical activity (called after physical activity is assigned)
+    /// @brief Record inspection data with physical activity (called after physical activity is
+    /// assigned)
     /// @param person The person being inspected
     /// @param factor_name The risk factor name
     /// @param context The runtime context
@@ -306,7 +307,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param residual_after_cholesky The residual after Cholesky
     /// @param physical_activity The person's physical activity value
     /// @return CSV formatted string
-   std::string create_inspection_csv_line(
+    std::string create_inspection_csv_line(
         std::size_t person_id, core::Gender gender, unsigned int age, core::Sector sector,
         core::Income income_category, const std::string &step_name, double value_assigned,
         double expected_value, double linear_result, double residual, double stddev, double lambda,

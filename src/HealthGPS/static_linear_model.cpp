@@ -213,20 +213,21 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
     for (size_t i = 0; i < names_.size(); i++) {
         const auto &factor_name = names_[i];
 
-            // ===== MAHIMA: Check if we should inspect this factor for this person =====
-    bool should_inspect_this = should_inspect(person, factor_name, context);
+        // ===== MAHIMA: Check if we should inspect this factor for this person =====
+        bool should_inspect_this = should_inspect(person, factor_name, context);
 
-    // Initialise residual.
-    auto residual_name = core::Identifier{factor_name.to_string() + "_residual"};
-    double residual = residuals[i];
+        // Initialise residual.
+        auto residual_name = core::Identifier{factor_name.to_string() + "_residual"};
+        double residual = residuals[i];
 
-    // ===== MAHIMA: Store inspection data for later recording (after physical activity is assigned) =====
-    if (should_inspect_this) {
-        store_inspection_data(person, factor_name, context, "residual_initialization",
-                             residual, 0.0, 0.0, residual, stddev_[i], lambda_[i], 0.0, 0.0,
-                             ranges_[i].lower(), ranges_[i].upper(), 0.0, residuals[i],
-                             residual);
-    }
+        // ===== MAHIMA: Store inspection data for later recording (after physical activity is
+        // assigned) =====
+        if (should_inspect_this) {
+            store_inspection_data(person, factor_name, context, "residual_initialization", residual,
+                                  0.0, 0.0, residual, stddev_[i], lambda_[i], 0.0, 0.0,
+                                  ranges_[i].lower(), ranges_[i].upper(), 0.0, residuals[i],
+                                  residual);
+        }
 
         // Save residual.
         person.risk_factors[residual_name] = residual;
@@ -240,7 +241,8 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
         double factor_before_clamp = expected * boxcox_result;
         double final_factor = ranges_[i].clamp(factor_before_clamp);
 
-        // ===== MAHIMA: Store inspection data for later recording (after physical activity is assigned) =====
+        // ===== MAHIMA: Store inspection data for later recording (after physical activity is
+        // assigned) =====
         if (should_inspect_this) {
             store_inspection_data(
                 person, factor_name, context, "factor_initialization", final_factor, expected,
@@ -859,12 +861,25 @@ void StaticLinearModel::store_inspection_data(
     }
 
     // Store inspection data temporarily (without physical activity)
-    InspectionRecord record{
-        person.id(), person.gender, person.age, person.sector, person.income, step_name,
-        value_assigned, expected_value, linear_result, residual, stddev, lambda, boxcox_result,
-        factor_before_clamp, range_lower, range_upper, final_clamped_factor,
-        random_residual_before_cholesky, residual_after_cholesky
-    };
+    InspectionRecord record{person.id(),
+                            person.gender,
+                            person.age,
+                            person.sector,
+                            person.income,
+                            step_name,
+                            value_assigned,
+                            expected_value,
+                            linear_result,
+                            residual,
+                            stddev,
+                            lambda,
+                            boxcox_result,
+                            factor_before_clamp,
+                            range_lower,
+                            range_upper,
+                            final_clamped_factor,
+                            random_residual_before_cholesky,
+                            residual_after_cholesky};
     temp_inspection_data_->emplace_back(std::move(record));
 }
 
@@ -913,7 +928,7 @@ void StaticLinearModel::write_inspection_data(const RuntimeContext &context) con
     for (const auto &temp_record : *temp_inspection_data_) {
         // Get physical activity value from the person's risk factors
         double physical_activity = 0.0;
-        
+
         // Find the person in the current population to get their physical activity
         for (const auto &person : context.population()) {
             if (person.id() == temp_record.person_id) {
@@ -924,7 +939,7 @@ void StaticLinearModel::write_inspection_data(const RuntimeContext &context) con
                 break;
             }
         }
-        
+
         std::string csv_line = create_inspection_csv_line(
             temp_record.person_id, temp_record.gender, temp_record.age, temp_record.sector,
             temp_record.income_category, temp_record.step_name, temp_record.value_assigned,
@@ -973,8 +988,8 @@ std::string StaticLinearModel::create_inspection_csv_line(
     std::ostringstream oss;
     // Gender values: 1=male, 0=female (matching Person::gender_to_value())
     int gender_value = (gender == core::Gender::male) ? 1 : 0;
-    oss << person_id << "," << gender_value << "," << age << ","
-        << static_cast<int>(sector) << ","                                // sector (rural/urban)
+    oss << person_id << "," << gender_value << "," << age << "," << static_cast<int>(sector)
+        << ","                                                            // sector (rural/urban)
         << std::fixed << std::setprecision(6) << physical_activity << "," // physical_activity
         << static_cast<int>(income_category) << "," << step_name << "," << std::fixed
         << std::setprecision(6) << value_assigned << "," << expected_value << "," << linear_result
