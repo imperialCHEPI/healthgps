@@ -182,6 +182,30 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @brief Risk factor inspection data collector
     mutable std::unique_ptr<std::vector<std::string>> inspection_data_;
 
+    /// @brief Temporary storage for inspection data before physical activity is assigned
+    struct InspectionRecord {
+        std::size_t person_id;
+        core::Gender gender;
+        unsigned int age;
+        core::Sector sector;
+        core::Income income_category;
+        std::string step_name;
+        double value_assigned;
+        double expected_value;
+        double linear_result;
+        double residual;
+        double stddev;
+        double lambda;
+        double boxcox_result;
+        double factor_before_clamp;
+        double range_lower;
+        double range_upper;
+        double final_clamped_factor;
+        double random_residual_before_cholesky;
+        double residual_after_cholesky;
+    };
+    mutable std::unique_ptr<std::vector<InspectionRecord>> temp_inspection_data_;
+
     /// @brief Risk factor inspection settings
     struct InspectionSettings {
         bool enabled{false};
@@ -203,7 +227,33 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     bool should_inspect(const Person &person, const core::Identifier &factor_name,
                         const RuntimeContext &context) const;
 
-    /// @brief Record inspection data for a risk factor calculation
+    /// @brief Store inspection data for later recording (after physical activity is assigned)
+    /// @param person The person being inspected
+    /// @param factor_name The risk factor name
+    /// @param context The runtime context
+    /// @param step_name The calculation step name
+    /// @param value_assigned The assigned value
+    /// @param expected_value The expected value
+    /// @param linear_result The linear model result
+    /// @param residual The residual value
+    /// @param stddev The standard deviation
+    /// @param lambda The lambda parameter
+    /// @param boxcox_result The Box-Cox transformation result
+    /// @param factor_before_clamp The factor before clamping
+    /// @param range_lower The range lower bound
+    /// @param range_upper The range upper bound
+    /// @param final_clamped_factor The final clamped factor
+    /// @param random_residual_before_cholesky The random residual before Cholesky
+    /// @param residual_after_cholesky The residual after Cholesky
+    void store_inspection_data(const Person &person, const core::Identifier &factor_name,
+                                const RuntimeContext &context, const std::string &step_name,
+                                double value_assigned, double expected_value, double linear_result,
+                                double residual, double stddev, double lambda, double boxcox_result,
+                                double factor_before_clamp, double range_lower, double range_upper,
+                                double final_clamped_factor, double random_residual_before_cholesky,
+                                double residual_after_cholesky) const;
+
+    /// @brief Record inspection data with physical activity (called after physical activity is assigned)
     /// @param person The person being inspected
     /// @param factor_name The risk factor name
     /// @param context The runtime context
@@ -256,7 +306,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param residual_after_cholesky The residual after Cholesky
     /// @param physical_activity The person's physical activity value
     /// @return CSV formatted string
-    std::string create_inspection_csv_line(
+   std::string create_inspection_csv_line(
         std::size_t person_id, core::Gender gender, unsigned int age, core::Sector sector,
         core::Income income_category, const std::string &step_name, double value_assigned,
         double expected_value, double linear_result, double residual, double stddev, double lambda,
