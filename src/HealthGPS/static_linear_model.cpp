@@ -204,6 +204,9 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
                                            Random &random) const {
 
     // Correlated residual sampling.
+    // compute_residuals now returns a pair: {independent_residuals, correlated_residuals}
+    // - independent_residuals: N(0,1) random variables BEFORE Cholesky transformation
+    // - correlated_residuals: correlated residuals AFTER Cholesky transformation
     auto residuals = compute_residuals(random, cholesky_);
 
     // Approximate risk factors with linear models.
@@ -218,15 +221,15 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
 
         // Initialise residual.
         auto residual_name = core::Identifier{factor_name.to_string() + "_residual"};
-        double residual = residuals[i];
+        double residual = residuals.second[i]; // Use correlated residual
 
         // ===== MAHIMA: Store inspection data for later recording (after physical activity is
         // assigned) =====
         if (should_inspect_this) {
             store_inspection_data(person, factor_name, context, "residual_initialization", residual,
                                   0.0, 0.0, residual, stddev_[i], lambda_[i], 0.0, 0.0,
-                                  ranges_[i].lower(), ranges_[i].upper(), 0.0, residuals[i],
-                                  residual);
+                                  ranges_[i].lower(), ranges_[i].upper(), 0.0, residuals.first[i],  // Independent residual BEFORE Cholesky
+                                  residual);  // Correlated residual AFTER Cholesky
         }
 
         // Save residual.
@@ -239,19 +242,20 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
         double factor_before_boxcox = linear_result + (residual * stddev_[i]);
         double boxcox_result = inverse_box_cox(factor_before_boxcox, lambda_[i]);
         double factor_before_clamp = expected * boxcox_result;
-        double final_factor = ranges_[i].clamp(factor_before_clamp);
+        double final_clamped_factor = ranges_[i].clamp(factor_before_clamp);
 
         // ===== MAHIMA: Store inspection data for later recording (after physical activity is
         // assigned) =====
         if (should_inspect_this) {
             store_inspection_data(
-                person, factor_name, context, "factor_initialization", final_factor, expected,
+                person, factor_name, context, "factor_initialization", final_clamped_factor, expected,
                 linear_result, residual, stddev_[i], lambda_[i], boxcox_result, factor_before_clamp,
-                ranges_[i].lower(), ranges_[i].upper(), final_factor, residuals[i], residual);
+                ranges_[i].lower(), ranges_[i].upper(), final_clamped_factor, residuals.first[i],  // Independent residual BEFORE Cholesky
+                residual);  // Correlated residual AFTER Cholesky
         }
 
         // Save risk factor.
-        person.risk_factors[factor_name] = final_factor;
+        person.risk_factors[factor_name] = final_clamped_factor;
     }
 }
 
@@ -259,6 +263,9 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
                                        Random &random) const {
 
     // Correlated residual sampling.
+    // compute_residuals now returns a pair: {independent_residuals, correlated_residuals}
+    // - independent_residuals: N(0,1) random variables BEFORE Cholesky transformation
+    // - correlated_residuals: correlated residuals AFTER Cholesky transformation
     auto residuals = compute_residuals(random, cholesky_);
 
     // Approximate risk factors with linear models.
@@ -270,7 +277,7 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
         // Update residual.
         auto residual_name = core::Identifier{names_[i].to_string() + "_residual"};
         double residual_old = person.risk_factors.at(residual_name);
-        double residual = residuals[i] * info_speed_;
+        double residual = residuals.second[i] * info_speed_; // Use correlated residual
         residual += sqrt(1.0 - info_speed_ * info_speed_) * residual_old;
 
         // Save residual.
@@ -415,12 +422,15 @@ void StaticLinearModel::initialise_policies(Person &person, Random &random, bool
     //       so we compute residuals even though they are not used in baseline.
 
     // Intervention policy residual components.
+    // compute_residuals now returns a pair: {independent_residuals, correlated_residuals}
+    // - independent_residuals: N(0,1) random variables BEFORE Cholesky transformation
+    // - correlated_residuals: correlated residuals AFTER Cholesky transformation
     auto residuals = compute_residuals(random, policy_cholesky_);
 
     // Save residuals (never updated in lifetime).
     for (size_t i = 0; i < names_.size(); i++) {
         auto residual_name = core::Identifier{names_[i].to_string() + "_policy_residual"};
-        person.risk_factors[residual_name] = residuals[i];
+        person.risk_factors[residual_name] = residuals.second[i]; // Use correlated residual
     }
 
     // Compute policies.
@@ -505,22 +515,44 @@ StaticLinearModel::compute_linear_models(Person &person,
     return linear;
 }
 
-std::vector<double> StaticLinearModel::compute_residuals(Random &random,
-                                                         const Eigen::MatrixXd &cholesky) const {
-    std::vector<double> correlated_residuals{};
-    correlated_residuals.reserve(names_.size());
-
-    // Correlated samples using Cholesky decomposition.
+std::pair<std::vector<double>, std::vector<double>> 
+StaticLinearModel::compute_residuals(Random &random, const Eigen::MatrixXd &cholesky) const {
+    // Generate independent N(0,1) residuals
     Eigen::VectorXd residuals{names_.size()};
     std::ranges::generate(residuals, [&random] { return random.next_normal(0.0, 1.0); });
+    
+    // Store independent residuals BEFORE Cholesky transformation
+    // These are standard normal N(0,1) random variables that are uncorrelated
+    std::vector<double> independent_residuals{};
+    independent_residuals.reserve(names_.size());
+    for (size_t i = 0; i < names_.size(); i++) {
+        independent_residuals.emplace_back(residuals[i]);
+    }
+    
+    // Apply Cholesky transformation: z = L * x
+    // This transforms independent N(0,1) variables into correlated multivariate normal variables
+    // The correlation structure is determined by the Cholesky factor L
     residuals = cholesky * residuals;
-
-    // Save correlated residuals.
+    
+    // Store correlated residuals AFTER Cholesky transformation
+    // These now have the desired correlation structure while maintaining normal distribution
+    std::vector<double> correlated_residuals{};
+    correlated_residuals.reserve(names_.size());
     for (size_t i = 0; i < names_.size(); i++) {
         correlated_residuals.emplace_back(residuals[i]);
     }
-
-    return correlated_residuals;
+    
+    // Return pair: {independent_residuals, correlated_residuals}
+    // 
+    // VERIFICATION: This ensures that:
+    // - residuals.first[i] contains the independent N(0,1) random variables BEFORE Cholesky
+    // - residuals.second[i] contains the correlated residuals AFTER Cholesky transformation
+    // 
+    // The Cholesky transformation: z = L * x where:
+    // - x = independent N(0,1) variables (residuals.first)
+    // - L = lower triangular Cholesky factor
+    // - z = correlated multivariate normal variables (residuals.second)
+    return {std::move(independent_residuals), std::move(correlated_residuals)};
 }
 
 void StaticLinearModel::initialise_sector(Person &person, Random &random) const {
@@ -797,7 +829,7 @@ void StaticLinearModel::initialize_inspection_settings() {
     inspection_settings_.enabled = true; // CHANGE THIS TO TRUE TO ENABLE
 
     // Configure which risk factor to inspect
-    inspection_settings_.target_risk_factor = "FoodFat"_id; // CHANGE THIS TO DESIRED FACTOR
+    inspection_settings_.target_risk_factor = "FoodSodium"_id; // CHANGE THIS TO DESIRED FACTOR
 
     // Optional filters - set to std::nullopt to disable filtering
     inspection_settings_.target_age = 30; // e.g., 30 for age 30 only

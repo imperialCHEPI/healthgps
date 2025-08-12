@@ -118,7 +118,8 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     std::vector<double> compute_linear_models(Person &person,
                                               const std::vector<LinearModelParams> &models) const;
 
-    std::vector<double> compute_residuals(Random &random, const Eigen::MatrixXd &cholesky) const;
+    std::pair<std::vector<double>, std::vector<double>>
+    compute_residuals(Random &random, const Eigen::MatrixXd &cholesky) const;
 
     /// @brief Initialise the sector of a person
     /// @param person The person to initialise sector for
