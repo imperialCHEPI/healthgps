@@ -215,6 +215,10 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
 
 #ifdef CATCH_EXCEPTIONS
     } catch (const std::exception &ex) {
+        std::cout << "\n[ERROR] ===== APPLICATION CRASHED =====" << std::endl;
+        std::cout << "[ERROR] Error message: " << ex.what() << std::endl;
+        std::cout << "[ERROR] Exception type: " << typeid(ex).name() << std::endl;
+        std::cout << "[ERROR] ===== END ERROR CONTEXT =====" << std::endl;
         fmt::print(fg(fmt::color::red), "\n\nFailed with message: {}.\n\n", ex.what());
 
         // Rethrow exception so it can be handled by OS's default handler
