@@ -247,17 +247,36 @@ DiseaseEntity DataManager::get_disease(const DiseaseInfo &info, const Country &c
         auto gender = static_cast<core::Gender>(std::stoi(row[mapping["gender_id"]]));
         auto measure_id = std::stoi(row[mapping["measure_id"]]);
         auto measure_name = core::to_lower(row[mapping["measure"]]);
-        auto measure_value = std::stod(row[mapping["mean"]]);
 
-        if (!result.measures.contains(measure_name)) {
-            result.measures.emplace(measure_name, measure_id);
+        try {
+            auto measure_value = std::stod(row[mapping["mean"]]);
+
+            if (!result.measures.contains(measure_name)) {
+                result.measures.emplace(measure_name, measure_id);
+            }
+
+            if (!table[age].contains(gender)) {
+                table[age].emplace(gender, std::map<int, double>{});
+            }
+
+            table[age][gender][measure_id] = measure_value;
+        } catch (const std::exception &e) {
+            std::cout << "\n[DEBUG] ===== CRASH DETECTED IN DATAMANAGER =====" << std::endl;
+            std::cout << "[DEBUG] Function: get_disease_info" << std::endl;
+            std::cout << "[DEBUG] File: " << filename << std::endl;
+            std::cout << "[DEBUG] Row: " << i << std::endl;
+            std::cout << "[DEBUG] Column: 'mean' (index " << mapping["mean"] << ")" << std::endl;
+            std::cout << "[DEBUG] Failed value: '" << row[mapping["mean"]] << "'" << std::endl;
+            std::cout << "[DEBUG] Error: " << e.what() << std::endl;
+            std::cout << "[DEBUG] Exception type: " << typeid(e).name() << std::endl;
+            std::cout << "[DEBUG] ===== END CRASH CONTEXT =====" << std::endl;
+
+            std::string detailed_error = "Failed to parse disease info file: " + filename +
+                                         ". Cannot convert value '" + row[mapping["mean"]] +
+                                         "' to double in 'mean' column at row " +
+                                         std::to_string(i) + ". Error: " + e.what();
+            throw std::runtime_error(detailed_error);
         }
-
-        if (!table[age].contains(gender)) {
-            table[age].emplace(gender, std::map<int, double>{});
-        }
-
-        table[age][gender][measure_id] = measure_value;
     }
 
     for (auto &pair : table) {
@@ -418,11 +437,30 @@ CancerParameterEntity DataManager::get_disease_parameter(const DiseaseInfo &info
             create_fields_index_mapping(doc.GetColumnNames(), {"Time", "Male", "Female"});
         for (size_t i = 0; i < doc.GetRowCount(); i++) {
             auto row = doc.GetRow<std::string>(i);
-            lookup.emplace_back(LookupGenderValue{
-                .value = std::stoi(row[mapping["Time"]]),
-                .male = std::stod(row[mapping["Male"]]),
-                .female = std::stod(row[mapping["Female"]]),
-            });
+            try {
+                lookup.emplace_back(LookupGenderValue{
+                    .value = std::stoi(row[mapping["Time"]]),
+                    .male = std::stod(row[mapping["Male"]]),
+                    .female = std::stod(row[mapping["Female"]]),
+                });
+            } catch (const std::exception &e) {
+                std::cout << "\n[DEBUG] ===== CRASH DETECTED IN DATAMANAGER =====" << std::endl;
+                std::cout << "[DEBUG] Function: get_disease_info (lookup values)" << std::endl;
+                std::cout << "[DEBUG] File: " << file_name.string() << std::endl;
+                std::cout << "[DEBUG] Row: " << i << std::endl;
+                std::cout << "[DEBUG] Time value: '" << row[mapping["Time"]] << "'" << std::endl;
+                std::cout << "[DEBUG] Male value: '" << row[mapping["Male"]] << "'" << std::endl;
+                std::cout << "[DEBUG] Female value: '" << row[mapping["Female"]] << "'"
+                          << std::endl;
+                std::cout << "[DEBUG] Error: " << e.what() << std::endl;
+                std::cout << "[DEBUG] Exception type: " << typeid(e).name() << std::endl;
+                std::cout << "[DEBUG] ===== END CRASH CONTEXT =====" << std::endl;
+
+                std::string detailed_error =
+                    "Failed to parse disease lookup file: " + file_name.string() +
+                    ". Cannot convert values at row " + std::to_string(i) + ". Error: " + e.what();
+                throw std::runtime_error(detailed_error);
+            }
         }
 
         if (file.key() == "distribution") {
@@ -498,12 +536,32 @@ std::vector<LmsDataRow> DataManager::get_lms_parameters() const {
             continue;
         }
 
-        parameters.emplace_back(
-            LmsDataRow{.age = std::stoi(row[mapping["age"]]),
-                       .gender = static_cast<core::Gender>(std::stoi(row[mapping["gender_id"]])),
-                       .lambda = std::stod(row[mapping["lambda"]]),
-                       .mu = std::stod(row[mapping["mu"]]),
-                       .sigma = std::stod(row[mapping["sigma"]])});
+        try {
+            parameters.emplace_back(LmsDataRow{
+                .age = std::stoi(row[mapping["age"]]),
+                .gender = static_cast<core::Gender>(std::stoi(row[mapping["gender_id"]])),
+                .lambda = std::stod(row[mapping["lambda"]]),
+                .mu = std::stod(row[mapping["mu"]]),
+                .sigma = std::stod(row[mapping["sigma"]])});
+        } catch (const std::exception &e) {
+            std::cout << "\n[DEBUG] ===== CRASH DETECTED IN DATAMANAGER =====" << std::endl;
+            std::cout << "[DEBUG] Function: get_lms_parameters" << std::endl;
+            std::cout << "[DEBUG] File: " << full_filename.string() << std::endl;
+            std::cout << "[DEBUG] Row: " << i << std::endl;
+            std::cout << "[DEBUG] Column: 'lambda' (index " << mapping["lambda"] << ")"
+                      << std::endl;
+            std::cout << "[DEBUG] Failed value: '" << row[mapping["lambda"]] << "'" << std::endl;
+            std::cout << "[DEBUG] Error: " << e.what() << std::endl;
+            std::cout << "[DEBUG] Exception type: " << typeid(e).name() << std::endl;
+            std::cout << "[DEBUG] ===== END CRASH CONTEXT =====" << std::endl;
+
+            std::string detailed_error =
+                "Failed to parse LMS parameters file: " + full_filename.string() +
+                ". Cannot convert value '" + row[mapping["lambda"]] +
+                "' to double in 'lambda' column at row " + std::to_string(i) +
+                ". Error: " + e.what();
+            throw std::runtime_error(detailed_error);
+        }
     }
 
     return parameters;
@@ -562,7 +620,27 @@ DataManager::load_cost_of_diseases(const Country &country, const nlohmann::json 
 
         auto age = std::stoi(row[6]);
         auto gender = static_cast<core::Gender>(std::stoi(row[8]));
-        result[age][gender] = std::stod(row[12]);
+        try {
+            result[age][gender] = std::stod(row[12]);
+        } catch (const std::exception &e) {
+            std::cout << "\n[DEBUG] ===== CRASH DETECTED IN DATAMANAGER =====" << std::endl;
+            std::cout << "[DEBUG] Function: get_cost_of_disease" << std::endl;
+            std::cout << "[DEBUG] File: " << filename << std::endl;
+            std::cout << "[DEBUG] Row: " << i << std::endl;
+            std::cout << "[DEBUG] Column: 12 (cost value)" << std::endl;
+            std::cout << "[DEBUG] Failed value: '" << row[12] << "'" << std::endl;
+            std::cout << "[DEBUG] Age value: '" << row[6] << "'" << std::endl;
+            std::cout << "[DEBUG] Gender value: '" << row[8] << "'" << std::endl;
+            std::cout << "[DEBUG] Error: " << e.what() << std::endl;
+            std::cout << "[DEBUG] Exception type: " << typeid(e).name() << std::endl;
+            std::cout << "[DEBUG] ===== END CRASH CONTEXT =====" << std::endl;
+
+            std::string detailed_error = "Failed to parse cost of disease file: " + filename +
+                                         ". Cannot convert value '" + row[12] +
+                                         "' to double in cost column at row " + std::to_string(i) +
+                                         ". Error: " + e.what();
+            throw std::runtime_error(detailed_error);
+        }
     }
 
     return result;

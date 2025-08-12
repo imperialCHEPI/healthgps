@@ -212,326 +212,455 @@ std::unique_ptr<hgps::StaticLinearModelDefinition>
 load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configuration &config) {
     MEASURE_FUNCTION();
 
-    // Parse trend_type from config.json- Reda which trend type to use.
-    hgps::TrendType trend_type = hgps::TrendType::Null;
-    if (config.trend_type == "trend") {
-        trend_type = hgps::TrendType::Trend;
-    } else if (config.trend_type == "income_trend") {
-        trend_type = hgps::TrendType::IncomeTrend;
-    }
+    try {
+        std::cout << "\n[DEBUG] ===== Starting load_staticlinear_risk_model_definition ====="
+                  << std::endl;
+        std::cout << "[DEBUG] Config trend_type: " << config.trend_type << std::endl;
 
-    // Risk factor correlation matrix.
-    const auto correlation_file_info =
-        input::get_file_info(opt["RiskFactorCorrelationFile"], config.root_path);
-    const auto correlation_table = load_datatable_from_csv(correlation_file_info);
-    Eigen::MatrixXd correlation{correlation_table.num_rows(), correlation_table.num_columns()};
+        // Parse trend_type from config.json- Reda which trend type to use.
+        hgps::TrendType trend_type = hgps::TrendType::Null;
+        if (config.trend_type == "trend") {
+            trend_type = hgps::TrendType::Trend;
+        } else if (config.trend_type == "income_trend") {
+            trend_type = hgps::TrendType::IncomeTrend;
+        }
+        std::cout << "[DEBUG] Parsed trend_type enum: " << (int)trend_type << std::endl;
 
-    // Policy covariance matrix.
-    const auto policy_covariance_file_info =
-        input::get_file_info(opt["PolicyCovarianceFile"], config.root_path);
-    const auto policy_covariance_table = load_datatable_from_csv(policy_covariance_file_info);
-    Eigen::MatrixXd policy_covariance{policy_covariance_table.num_rows(),
-                                      policy_covariance_table.num_columns()};
+        // Risk factor correlation matrix.
+        std::cout << "\n[DEBUG] ===== LOADING CORRELATION MATRIX =====" << std::endl;
+        std::cout << "[DEBUG] About to load correlation matrix file..." << std::endl;
+        const auto correlation_file_info =
+            input::get_file_info(opt["RiskFactorCorrelationFile"], config.root_path);
+        std::cout << "[DEBUG] Correlation file info loaded, path: "
+                  << correlation_file_info.name.string() << std::endl;
+        std::cout << "[DEBUG] Correlation file format: " << correlation_file_info.format
+                  << std::endl;
+        std::cout << "[DEBUG] Correlation file delimiter: '" << correlation_file_info.delimiter
+                  << "'" << std::endl;
 
-    // Risk factor and intervention policy: names, models, parameters and correlation/covariance.
-    std::vector<core::Identifier> names;
-    std::vector<LinearModelParams> models;
-    std::vector<core::DoubleInterval> ranges;
-    std::vector<double> lambda;
-    std::vector<double> stddev;
-    std::vector<LinearModelParams> policy_models;
-    std::vector<core::DoubleInterval> policy_ranges;
-    auto trend_models = std::make_unique<std::vector<LinearModelParams>>();
-    auto trend_ranges = std::make_unique<std::vector<core::DoubleInterval>>();
-    auto trend_lambda = std::make_unique<std::vector<double>>();
-    auto expected_trend = std::make_unique<std::unordered_map<core::Identifier, double>>();
-    auto expected_trend_boxcox = std::make_unique<std::unordered_map<core::Identifier, double>>();
-    auto trend_steps = std::make_unique<std::unordered_map<core::Identifier, int>>();
-
-    // Income trend data structures: income trend models, ranges, lambda, decay factors, steps.
-    // These will be nullptr if income trend is not enabled
-    std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend = nullptr;
-    std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend_boxcox =
-        nullptr;
-    std::unique_ptr<std::unordered_map<core::Identifier, int>> income_trend_steps = nullptr;
-    std::unique_ptr<std::vector<LinearModelParams>> income_trend_models = nullptr;
-    std::unique_ptr<std::vector<core::DoubleInterval>> income_trend_ranges = nullptr;
-    std::unique_ptr<std::vector<double>> income_trend_lambda = nullptr;
-    std::unique_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors =
-        nullptr;
-
-    size_t i = 0;
-    for (const auto &[key, json_params] : opt["RiskFactorModels"].items()) {
-        names.emplace_back(key);
-
-        // Risk factor model parameters.
-        LinearModelParams model;
-        model.intercept = json_params["Intercept"].get<double>();
-        model.coefficients =
-            json_params["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
-
-        // Check risk factor correlation matrix column name matches risk factor name.
-        auto column_name = correlation_table.column(i).name();
-        if (!core::case_insensitive::equals(key, column_name)) {
-            throw core::HgpsException{fmt::format("Risk factor {} name ({}) does not match risk "
-                                                  "factor correlation matrix column {} name ({})",
-                                                  i, key, i, column_name)};
+        std::cout << "[DEBUG] About to call load_datatable_from_csv for correlation..."
+                  << std::endl;
+        hgps::core::DataTable correlation_table;
+        try {
+            correlation_table = load_datatable_from_csv(correlation_file_info);
+            std::cout << "[DEBUG] Correlation table loaded successfully, rows: "
+                      << correlation_table.num_rows()
+                      << ", cols: " << correlation_table.num_columns() << std::endl;
+        } catch (const std::exception &e) {
+            std::cout << "[DEBUG] ERROR loading correlation table: " << e.what() << std::endl;
+            std::cout << "[DEBUG] Exception type: " << typeid(e).name() << std::endl;
+            std::string detailed_error = "Failed to load correlation matrix from file: " +
+                                         correlation_file_info.name.string() +
+                                         ". Error: " + e.what();
+            throw std::runtime_error(detailed_error);
         }
 
-        // Write risk factor data structures.
-        models.emplace_back(std::move(model));
-        ranges.emplace_back(json_params["Range"].get<core::DoubleInterval>());
-        lambda.emplace_back(json_params["Lambda"].get<double>());
-        stddev.emplace_back(json_params["StdDev"].get<double>());
-        for (size_t j = 0; j < correlation_table.num_rows(); j++) {
-            correlation(i, j) = std::any_cast<double>(correlation_table.column(i).value(j));
+        std::cout << "[DEBUG] Creating Eigen correlation matrix..." << std::endl;
+        Eigen::MatrixXd correlation{correlation_table.num_rows(), correlation_table.num_columns()};
+        std::cout << "[DEBUG] Eigen correlation matrix created, size: " << correlation.rows() << "x"
+                  << correlation.cols() << std::endl;
+
+        // Policy covariance matrix.
+        std::cout << "\n[DEBUG] ===== LOADING POLICY COVARIANCE MATRIX =====" << std::endl;
+        std::cout << "[DEBUG] About to load policy covariance matrix file..." << std::endl;
+        const auto policy_covariance_file_info =
+            input::get_file_info(opt["PolicyCovarianceFile"], config.root_path);
+        std::cout << "[DEBUG] Policy covariance file info loaded, path: "
+                  << policy_covariance_file_info.name.string() << std::endl;
+        std::cout << "[DEBUG] Policy covariance file format: " << policy_covariance_file_info.format
+                  << std::endl;
+        std::cout << "[DEBUG] Policy covariance file delimiter: '"
+                  << policy_covariance_file_info.delimiter << "'" << std::endl;
+
+        std::cout << "[DEBUG] About to call load_datatable_from_csv for policy covariance..."
+                  << std::endl;
+        hgps::core::DataTable policy_covariance_table;
+        try {
+            policy_covariance_table = load_datatable_from_csv(policy_covariance_file_info);
+            std::cout << "[DEBUG] Policy covariance table loaded successfully, rows: "
+                      << policy_covariance_table.num_rows()
+                      << ", cols: " << policy_covariance_table.num_columns() << std::endl;
+        } catch (const std::exception &e) {
+            std::cout << "[DEBUG] ERROR loading policy covariance table: " << e.what() << std::endl;
+            std::cout << "[DEBUG] Exception type: " << typeid(e).name() << std::endl;
+            std::string detailed_error = "Failed to load policy covariance matrix from file: " +
+                                         policy_covariance_file_info.name.string() +
+                                         ". Error: " + e.what();
+            throw std::runtime_error(detailed_error);
         }
 
-        // Intervention policy model parameters.
-        const auto &policy_json_params = json_params["Policy"];
-        LinearModelParams policy_model;
-        policy_model.intercept = policy_json_params["Intercept"].get<double>();
-        policy_model.coefficients =
-            policy_json_params["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
-        policy_model.log_coefficients = policy_json_params["LogCoefficients"]
+        std::cout << "[DEBUG] Creating Eigen policy covariance matrix..." << std::endl;
+        Eigen::MatrixXd policy_covariance{policy_covariance_table.num_rows(),
+                                          policy_covariance_table.num_columns()};
+        std::cout << "[DEBUG] Eigen policy covariance matrix created, size: "
+                  << policy_covariance.rows() << "x" << policy_covariance.cols() << std::endl;
+
+        // Risk factor and intervention policy: names, models, parameters and
+        // correlation/covariance.
+        std::vector<core::Identifier> names;
+        std::vector<LinearModelParams> models;
+        std::vector<core::DoubleInterval> ranges;
+        std::vector<double> lambda;
+        std::vector<double> stddev;
+        std::vector<LinearModelParams> policy_models;
+        std::vector<core::DoubleInterval> policy_ranges;
+        auto trend_models = std::make_unique<std::vector<LinearModelParams>>();
+        auto trend_ranges = std::make_unique<std::vector<core::DoubleInterval>>();
+        auto trend_lambda = std::make_unique<std::vector<double>>();
+        auto expected_trend = std::make_unique<std::unordered_map<core::Identifier, double>>();
+        auto expected_trend_boxcox =
+            std::make_unique<std::unordered_map<core::Identifier, double>>();
+        auto trend_steps = std::make_unique<std::unordered_map<core::Identifier, int>>();
+
+        // Income trend data structures: income trend models, ranges, lambda, decay factors, steps.
+        // These will be nullptr if income trend is not enabled
+        std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend =
+            nullptr;
+        std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend_boxcox =
+            nullptr;
+        std::unique_ptr<std::unordered_map<core::Identifier, int>> income_trend_steps = nullptr;
+        std::unique_ptr<std::vector<LinearModelParams>> income_trend_models = nullptr;
+        std::unique_ptr<std::vector<core::DoubleInterval>> income_trend_ranges = nullptr;
+        std::unique_ptr<std::vector<double>> income_trend_lambda = nullptr;
+        std::unique_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors =
+            nullptr;
+
+        size_t i = 0;
+        for (const auto &[key, json_params] : opt["RiskFactorModels"].items()) {
+            names.emplace_back(key);
+
+            // Risk factor model parameters.
+            LinearModelParams model;
+            model.intercept = json_params["Intercept"].get<double>();
+            model.coefficients =
+                json_params["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
+
+            // Check risk factor correlation matrix column name matches risk factor name.
+            std::cout << "[DEBUG] Processing risk factor: " << key << std::endl;
+            auto column_name = correlation_table.column(i).name();
+            std::cout << "[DEBUG] Column " << i << " name: '" << column_name << "'" << std::endl;
+
+            if (!core::case_insensitive::equals(key, column_name)) {
+                throw core::HgpsException{
+                    fmt::format("Risk factor {} name ({}) does not match risk "
+                                "factor correlation matrix column {} name ({})",
+                                i, key, i, column_name)};
+            }
+
+            // Write risk factor data structures.
+            models.emplace_back(std::move(model));
+            ranges.emplace_back(json_params["Range"].get<core::DoubleInterval>());
+            lambda.emplace_back(json_params["Lambda"].get<double>());
+            stddev.emplace_back(json_params["StdDev"].get<double>());
+
+            std::cout << "[DEBUG] About to parse correlation values for column " << i << std::endl;
+            for (size_t j = 0; j < correlation_table.num_rows(); j++) {
+                std::cout << "[DEBUG] Parsing correlation(" << i << "," << j << ") - raw value: '"
+                          << correlation_table.column(i).value(j).type().name() << "'" << std::endl;
+
+                try {
+                    double value = std::any_cast<double>(correlation_table.column(i).value(j));
+                    correlation(i, j) = value;
+                    std::cout << "[DEBUG] Successfully parsed correlation(" << i << "," << j
+                              << ") = " << value << std::endl;
+                } catch (const std::bad_any_cast &e) {
+                    std::cout << "[DEBUG] ERROR: Failed to cast correlation(" << i << "," << j
+                              << ") to double: " << e.what() << std::endl;
+                    std::cout << "[DEBUG] Raw value type: "
+                              << correlation_table.column(i).value(j).type().name() << std::endl;
+                    std::cout << "[DEBUG] Raw value: "
+                              << correlation_table.column(i).value(j).has_value() << std::endl;
+                    throw;
+                }
+            }
+
+            // Intervention policy model parameters.
+            const auto &policy_json_params = json_params["Policy"];
+            LinearModelParams policy_model;
+            policy_model.intercept = policy_json_params["Intercept"].get<double>();
+            policy_model.coefficients = policy_json_params["Coefficients"]
                                             .get<std::unordered_map<core::Identifier, double>>();
+            policy_model.log_coefficients =
+                policy_json_params["LogCoefficients"]
+                    .get<std::unordered_map<core::Identifier, double>>();
 
-        // Check intervention policy covariance matrix column name matches risk factor name.
-        auto policy_column_name = policy_covariance_table.column(i).name();
-        if (!core::case_insensitive::equals(key, policy_column_name)) {
-            throw core::HgpsException{
-                fmt::format("Risk factor {} name ({}) does not match intervention "
-                            "policy covariance matrix column {} name ({})",
-                            i, key, i, policy_column_name)};
-        }
+            // Check intervention policy covariance matrix column name matches risk factor name.
+            auto policy_column_name = policy_covariance_table.column(i).name();
+            std::cout << "[DEBUG] Policy column " << i << " name: '" << policy_column_name << "'"
+                      << std::endl;
 
-        // Write intervention policy data structures.
-        policy_models.emplace_back(std::move(policy_model));
-        policy_ranges.emplace_back(policy_json_params["Range"].get<core::DoubleInterval>());
-        for (size_t j = 0; j < policy_covariance_table.num_rows(); j++) {
-            policy_covariance(i, j) =
-                std::any_cast<double>(policy_covariance_table.column(i).value(j));
-        }
-
-        // Trend model parameters
-        if (trend_type == hgps::TrendType::Null) {
-            // No trend data needed for Null type - skip to next risk factor
-            std::cout << "\nTrend Type is NULL";
-            i++;
-            continue;
-        }
-
-        if (trend_type == hgps::TrendType::Trend) {
-            // Only require trend data if trend type is Trend
-            if (json_params.contains("Trend")) {
-                // UPF trend data exists - use it
-                std::cout << "\nTrend Type is TREND or UPF TREND";
-                const auto &trend_json_params = json_params["Trend"];
-                LinearModelParams trend_model;
-                trend_model.intercept = trend_json_params["Intercept"].get<double>();
-                trend_model.coefficients = trend_json_params["Coefficients"]
-                                               .get<std::unordered_map<core::Identifier, double>>();
-                trend_model.log_coefficients =
-                    trend_json_params["LogCoefficients"]
-                        .get<std::unordered_map<core::Identifier, double>>();
-
-                // Write real trend data structures.
-                trend_models->emplace_back(std::move(trend_model));
-                trend_ranges->emplace_back(trend_json_params["Range"].get<core::DoubleInterval>());
-                trend_lambda->emplace_back(trend_json_params["Lambda"].get<double>());
-
-                // Load expected value trends (only if trend data exists).
-                (*expected_trend)[key] = json_params.contains("ExpectedTrend")
-                                             ? json_params["ExpectedTrend"].get<double>()
-                                             : 1.0;
-                (*expected_trend_boxcox)[key] =
-                    json_params.contains("ExpectedTrendBoxCox")
-                        ? json_params["ExpectedTrendBoxCox"].get<double>()
-                        : 1.0;
-                (*trend_steps)[key] =
-                    json_params.contains("TrendSteps") ? json_params["TrendSteps"].get<int>() : 0;
-            } else {
-                throw core::HgpsException{fmt::format(
-                    "Trend is enabled but Trend data is missing for risk factor: {}", key)};
-            }
-        } else {
-            // For Null or IncomeTrend types, we don't need regular trend data
-            // Add empty trend data structures to maintain consistency
-            LinearModelParams trend_model;
-            trend_models->emplace_back(std::move(trend_model));
-            trend_ranges->emplace_back(core::DoubleInterval{0.0, 1.0});
-            trend_lambda->emplace_back(1.0);
-
-            // Set default values for expected trends
-            (*expected_trend)[key] = 1.0;
-            (*expected_trend_boxcox)[key] = 1.0;
-            (*trend_steps)[key] = 0;
-        }
-
-        // Income trend model parameters (only if income trend is enabled in the config.json)
-        if (trend_type == hgps::TrendType::IncomeTrend) {
-            // Create income trend data structures only when income trend is enabled
-            std::cout << "\nTrend Type is INCOME TREND";
-            if (!expected_income_trend) {
-                expected_income_trend =
-                    std::make_unique<std::unordered_map<core::Identifier, double>>();
-                expected_income_trend_boxcox =
-                    std::make_unique<std::unordered_map<core::Identifier, double>>();
-                income_trend_steps = std::make_unique<std::unordered_map<core::Identifier, int>>();
-                income_trend_models = std::make_unique<std::vector<LinearModelParams>>();
-                income_trend_ranges = std::make_unique<std::vector<core::DoubleInterval>>();
-                income_trend_lambda = std::make_unique<std::vector<double>>();
-                income_trend_decay_factors =
-                    std::make_unique<std::unordered_map<core::Identifier, double>>();
+            if (!core::case_insensitive::equals(key, policy_column_name)) {
+                throw core::HgpsException{
+                    fmt::format("Risk factor {} name ({}) does not match intervention "
+                                "policy covariance matrix column {} name ({})",
+                                i, key, i, policy_column_name)};
             }
 
-            if (json_params.contains("IncomeTrend")) {
-                // Read income trend data from static_model.json
-                const auto &income_trend_json_params = json_params["IncomeTrend"];
-                LinearModelParams income_trend_model;
-                income_trend_model.intercept = income_trend_json_params["Intercept"].get<double>();
-                income_trend_model.coefficients =
-                    income_trend_json_params["Coefficients"]
-                        .get<std::unordered_map<core::Identifier, double>>();
-                income_trend_model.log_coefficients =
-                    income_trend_json_params["LogCoefficients"]
-                        .get<std::unordered_map<core::Identifier, double>>();
+            // Write intervention policy data structures.
+            policy_models.emplace_back(std::move(policy_model));
+            policy_ranges.emplace_back(policy_json_params["Range"].get<core::DoubleInterval>());
 
-                // Write real income trend data structures.
-                income_trend_models->emplace_back(std::move(income_trend_model));
-                income_trend_ranges->emplace_back(
-                    income_trend_json_params["Range"].get<core::DoubleInterval>());
-                income_trend_lambda->emplace_back(income_trend_json_params["Lambda"].get<double>());
+            std::cout << "[DEBUG] About to parse policy covariance values for column " << i
+                      << std::endl;
+            for (size_t j = 0; j < policy_covariance_table.num_rows(); j++) {
+                std::cout << "[DEBUG] Parsing policy_covariance(" << i << "," << j
+                          << ") - raw value: '"
+                          << policy_covariance_table.column(i).value(j).type().name() << "'"
+                          << std::endl;
 
-                // Load expected income trend values (no defaults - throw error if missing)
-                if (!json_params.contains("ExpectedIncomeTrend")) {
-                    throw core::HgpsException{
-                        fmt::format("ExpectedIncomeTrend is missing for risk factor: {}", key)};
+                try {
+                    double value =
+                        std::any_cast<double>(policy_covariance_table.column(i).value(j));
+                    policy_covariance(i, j) = value;
+                    std::cout << "[DEBUG] Successfully parsed policy_covariance(" << i << "," << j
+                              << ") = " << value << std::endl;
+                } catch (const std::bad_any_cast &e) {
+                    std::cout << "[DEBUG] ERROR: Failed to cast policy_covariance(" << i << "," << j
+                              << ") to double: " << e.what() << std::endl;
+                    std::cout << "[DEBUG] Raw value type: "
+                              << policy_covariance_table.column(i).value(j).type().name()
+                              << std::endl;
+                    std::cout << "[DEBUG] Raw value: "
+                              << policy_covariance_table.column(i).value(j).has_value()
+                              << std::endl;
+                    throw;
                 }
-                if (!json_params.contains("ExpectedIncomeTrendBoxCox")) {
+            }
+
+            // Trend model parameters
+            if (trend_type == hgps::TrendType::Null) {
+                // No trend data needed for Null type - skip to next risk factor
+                std::cout << "\nTrend Type is NULL";
+                i++;
+                continue;
+            }
+
+            if (trend_type == hgps::TrendType::Trend) {
+                // Only require trend data if trend type is Trend
+                if (json_params.contains("Trend")) {
+                    // UPF trend data exists - use it
+                    std::cout << "\nTrend Type is TREND or UPF TREND";
+                    const auto &trend_json_params = json_params["Trend"];
+                    LinearModelParams trend_model;
+                    trend_model.intercept = trend_json_params["Intercept"].get<double>();
+                    trend_model.coefficients =
+                        trend_json_params["Coefficients"]
+                            .get<std::unordered_map<core::Identifier, double>>();
+                    trend_model.log_coefficients =
+                        trend_json_params["LogCoefficients"]
+                            .get<std::unordered_map<core::Identifier, double>>();
+
+                    // Write real trend data structures.
+                    trend_models->emplace_back(std::move(trend_model));
+                    trend_ranges->emplace_back(
+                        trend_json_params["Range"].get<core::DoubleInterval>());
+                    trend_lambda->emplace_back(trend_json_params["Lambda"].get<double>());
+
+                    // Load expected value trends (only if trend data exists).
+                    (*expected_trend)[key] = json_params.contains("ExpectedTrend")
+                                                 ? json_params["ExpectedTrend"].get<double>()
+                                                 : 1.0;
+                    (*expected_trend_boxcox)[key] =
+                        json_params.contains("ExpectedTrendBoxCox")
+                            ? json_params["ExpectedTrendBoxCox"].get<double>()
+                            : 1.0;
+                    (*trend_steps)[key] = json_params.contains("TrendSteps")
+                                              ? json_params["TrendSteps"].get<int>()
+                                              : 0;
+                } else {
                     throw core::HgpsException{fmt::format(
-                        "ExpectedIncomeTrendBoxCox is missing for risk factor: {}", key)};
+                        "Trend is enabled but Trend data is missing for risk factor: {}", key)};
                 }
-                if (!json_params.contains("IncomeTrendSteps")) {
-                    throw core::HgpsException{
-                        fmt::format("IncomeTrendSteps is missing for risk factor: {}", key)};
-                }
-                if (!json_params.contains("IncomeDecayFactor")) {
-                    throw core::HgpsException{
-                        fmt::format("IncomeDecayFactor is missing for risk factor: {}", key)};
+            } else {
+                // For Null or IncomeTrend types, we don't need regular trend data
+                // Add empty trend data structures to maintain consistency
+                LinearModelParams trend_model;
+                trend_models->emplace_back(std::move(trend_model));
+                trend_ranges->emplace_back(core::DoubleInterval{0.0, 1.0});
+                trend_lambda->emplace_back(1.0);
+
+                // Set default values for expected trends
+                (*expected_trend)[key] = 1.0;
+                (*expected_trend_boxcox)[key] = 1.0;
+                (*trend_steps)[key] = 0;
+            }
+
+            // Income trend model parameters (only if income trend is enabled in the config.json)
+            if (trend_type == hgps::TrendType::IncomeTrend) {
+                // Create income trend data structures only when income trend is enabled
+                std::cout << "\nTrend Type is INCOME TREND";
+                if (!expected_income_trend) {
+                    expected_income_trend =
+                        std::make_unique<std::unordered_map<core::Identifier, double>>();
+                    expected_income_trend_boxcox =
+                        std::make_unique<std::unordered_map<core::Identifier, double>>();
+                    income_trend_steps =
+                        std::make_unique<std::unordered_map<core::Identifier, int>>();
+                    income_trend_models = std::make_unique<std::vector<LinearModelParams>>();
+                    income_trend_ranges = std::make_unique<std::vector<core::DoubleInterval>>();
+                    income_trend_lambda = std::make_unique<std::vector<double>>();
+                    income_trend_decay_factors =
+                        std::make_unique<std::unordered_map<core::Identifier, double>>();
                 }
 
-                (*expected_income_trend)[key] = json_params["ExpectedIncomeTrend"].get<double>();
-                (*expected_income_trend_boxcox)[key] =
-                    json_params["ExpectedIncomeTrendBoxCox"].get<double>();
-                (*income_trend_steps)[key] = json_params["IncomeTrendSteps"].get<int>();
-                (*income_trend_decay_factors)[key] = json_params["IncomeDecayFactor"].get<double>();
-            } else {
+                if (json_params.contains("IncomeTrend")) {
+                    // Read income trend data from static_model.json
+                    const auto &income_trend_json_params = json_params["IncomeTrend"];
+                    LinearModelParams income_trend_model;
+                    income_trend_model.intercept =
+                        income_trend_json_params["Intercept"].get<double>();
+                    income_trend_model.coefficients =
+                        income_trend_json_params["Coefficients"]
+                            .get<std::unordered_map<core::Identifier, double>>();
+                    income_trend_model.log_coefficients =
+                        income_trend_json_params["LogCoefficients"]
+                            .get<std::unordered_map<core::Identifier, double>>();
+
+                    // Write real income trend data structures.
+                    income_trend_models->emplace_back(std::move(income_trend_model));
+                    income_trend_ranges->emplace_back(
+                        income_trend_json_params["Range"].get<core::DoubleInterval>());
+                    income_trend_lambda->emplace_back(
+                        income_trend_json_params["Lambda"].get<double>());
+
+                    // Load expected income trend values (no defaults - throw error if missing)
+                    if (!json_params.contains("ExpectedIncomeTrend")) {
+                        throw core::HgpsException{
+                            fmt::format("ExpectedIncomeTrend is missing for risk factor: {}", key)};
+                    }
+                    if (!json_params.contains("ExpectedIncomeTrendBoxCox")) {
+                        throw core::HgpsException{fmt::format(
+                            "ExpectedIncomeTrendBoxCox is missing for risk factor: {}", key)};
+                    }
+                    if (!json_params.contains("IncomeTrendSteps")) {
+                        throw core::HgpsException{
+                            fmt::format("IncomeTrendSteps is missing for risk factor: {}", key)};
+                    }
+                    if (!json_params.contains("IncomeDecayFactor")) {
+                        throw core::HgpsException{
+                            fmt::format("IncomeDecayFactor is missing for risk factor: {}", key)};
+                    }
+
+                    (*expected_income_trend)[key] =
+                        json_params["ExpectedIncomeTrend"].get<double>();
+                    (*expected_income_trend_boxcox)[key] =
+                        json_params["ExpectedIncomeTrendBoxCox"].get<double>();
+                    (*income_trend_steps)[key] = json_params["IncomeTrendSteps"].get<int>();
+                    (*income_trend_decay_factors)[key] =
+                        json_params["IncomeDecayFactor"].get<double>();
+                } else {
+                    throw core::HgpsException{fmt::format("Income trend is enabled but IncomeTrend "
+                                                          "data is missing for risk factor: {}",
+                                                          key)};
+                }
+            }
+
+            // Increment table column index.
+            i++;
+        }
+
+        // Check risk factor correlation matrix column count matches risk factor count.
+        if (opt["RiskFactorModels"].size() != correlation_table.num_columns()) {
+            throw core::HgpsException{fmt::format("Risk factor count ({}) does not match risk "
+                                                  "factor correlation matrix column count ({})",
+                                                  opt["RiskFactorModels"].size(),
+                                                  correlation_table.num_columns())};
+        }
+
+        // Compute Cholesky decomposition of the risk factor correlation matrix.
+        auto cholesky = Eigen::MatrixXd{Eigen::LLT<Eigen::MatrixXd>{correlation}.matrixL()};
+
+        // Check intervention policy covariance matrix column count matches risk factor count.
+        if (opt["RiskFactorModels"].size() != policy_covariance_table.num_columns()) {
+            throw core::HgpsException{
+                fmt::format("Risk factor count ({}) does not match intervention "
+                            "policy covariance matrix column count ({})",
+                            opt["RiskFactorModels"].size(), policy_covariance_table.num_columns())};
+        }
+
+        // Compute Cholesky decomposition of the intervention policy covariance matrix.
+        auto policy_cholesky =
+            Eigen::MatrixXd{Eigen::LLT<Eigen::MatrixXd>{policy_covariance}.matrixL()};
+
+        // Risk factor expected values by sex and age.
+        auto expected = load_risk_factor_expected(config);
+
+        // Check expected values are defined for all risk factors.
+        for (const auto &name : names) {
+            if (!expected->at(core::Gender::male).contains(name)) {
                 throw core::HgpsException{fmt::format(
-                    "Income trend is enabled but IncomeTrend data is missing for risk factor: {}",
-                    key)};
+                    "'{}' is not defined in male risk factor expected values.", name.to_string())};
+            }
+            if (!expected->at(core::Gender::female).contains(name)) {
+                throw core::HgpsException{
+                    fmt::format("'{}' is not defined in female risk factor expected values.",
+                                name.to_string())};
             }
         }
 
-        // Increment table column index.
-        i++;
-    }
+        // Information speed of risk factor update.
+        const double info_speed = opt["InformationSpeed"].get<double>();
 
-    // Check risk factor correlation matrix column count matches risk factor count.
-    if (opt["RiskFactorModels"].size() != correlation_table.num_columns()) {
-        throw core::HgpsException{fmt::format("Risk factor count ({}) does not match risk "
-                                              "factor correlation matrix column count ({})",
-                                              opt["RiskFactorModels"].size(),
-                                              correlation_table.num_columns())};
-    }
-
-    // Compute Cholesky decomposition of the risk factor correlation matrix.
-    auto cholesky = Eigen::MatrixXd{Eigen::LLT<Eigen::MatrixXd>{correlation}.matrixL()};
-
-    // Check intervention policy covariance matrix column count matches risk factor count.
-    if (opt["RiskFactorModels"].size() != policy_covariance_table.num_columns()) {
-        throw core::HgpsException{fmt::format("Risk factor count ({}) does not match intervention "
-                                              "policy covariance matrix column count ({})",
-                                              opt["RiskFactorModels"].size(),
-                                              policy_covariance_table.num_columns())};
-    }
-
-    // Compute Cholesky decomposition of the intervention policy covariance matrix.
-    auto policy_cholesky =
-        Eigen::MatrixXd{Eigen::LLT<Eigen::MatrixXd>{policy_covariance}.matrixL()};
-
-    // Risk factor expected values by sex and age.
-    auto expected = load_risk_factor_expected(config);
-
-    // Check expected values are defined for all risk factors.
-    for (const auto &name : names) {
-        if (!expected->at(core::Gender::male).contains(name)) {
-            throw core::HgpsException{fmt::format(
-                "'{}' is not defined in male risk factor expected values.", name.to_string())};
-        }
-        if (!expected->at(core::Gender::female).contains(name)) {
-            throw core::HgpsException{fmt::format(
-                "'{}' is not defined in female risk factor expected values.", name.to_string())};
-        }
-    }
-
-    // Information speed of risk factor update.
-    const double info_speed = opt["InformationSpeed"].get<double>();
-
-    // Rural sector prevalence for age groups and sex.
-    std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>> rural_prevalence;
-    for (const auto &age_group : opt["RuralPrevalence"]) {
-        auto age_group_name = age_group["Name"].get<core::Identifier>();
-        rural_prevalence[age_group_name] = {{core::Gender::female, age_group["Female"]},
-                                            {core::Gender::male, age_group["Male"]}};
-    }
-
-    // Income models for different income classifications.
-    std::unordered_map<core::Income, LinearModelParams> income_models;
-    for (const auto &[key, json_params] : opt["IncomeModels"].items()) {
-
-        // Get income category.
-        core::Income category;
-        if (core::case_insensitive::equals(key, "Unknown")) {
-            category = core::Income::unknown;
-        } else if (core::case_insensitive::equals(key, "Low")) {
-            category = core::Income::low;
-        } else if (core::case_insensitive::equals(key, "LowerMiddle")) {
-            category = core::Income::lowermiddle;
-        } else if (core::case_insensitive::equals(key, "Middle")) {
-            category = core::Income::middle;
-        } else if (core::case_insensitive::equals(key, "UpperMiddle")) {
-            category = core::Income::uppermiddle;
-        } else if (core::case_insensitive::equals(key, "High")) {
-            category = core::Income::high;
-        } else {
-            throw core::HgpsException(fmt::format("Income category {} is unrecognised.", key));
+        // Rural sector prevalence for age groups and sex.
+        std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
+            rural_prevalence;
+        for (const auto &age_group : opt["RuralPrevalence"]) {
+            auto age_group_name = age_group["Name"].get<core::Identifier>();
+            rural_prevalence[age_group_name] = {{core::Gender::female, age_group["Female"]},
+                                                {core::Gender::male, age_group["Male"]}};
         }
 
-        // Get income model parameters.
-        LinearModelParams model;
-        model.intercept = json_params["Intercept"].get<double>();
-        model.coefficients =
-            json_params["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
+        // Income models for different income classifications.
+        std::unordered_map<core::Income, LinearModelParams> income_models;
+        for (const auto &[key, json_params] : opt["IncomeModels"].items()) {
 
-        // Insert income model.
-        income_models.emplace(category, std::move(model));
+            // Get income category.
+            core::Income category;
+            if (core::case_insensitive::equals(key, "Unknown")) {
+                category = core::Income::unknown;
+            } else if (core::case_insensitive::equals(key, "Low")) {
+                category = core::Income::low;
+            } else if (core::case_insensitive::equals(key, "LowerMiddle")) {
+                category = core::Income::lowermiddle;
+            } else if (core::case_insensitive::equals(key, "Middle")) {
+                category = core::Income::middle;
+            } else if (core::case_insensitive::equals(key, "UpperMiddle")) {
+                category = core::Income::uppermiddle;
+            } else if (core::case_insensitive::equals(key, "High")) {
+                category = core::Income::high;
+            } else {
+                throw core::HgpsException(fmt::format("Income category {} is unrecognised.", key));
+            }
+
+            // Get income model parameters.
+            LinearModelParams model;
+            model.intercept = json_params["Intercept"].get<double>();
+            model.coefficients =
+                json_params["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
+
+            // Insert income model.
+            income_models.emplace(category, std::move(model));
+        }
+
+        // Standard deviation of physical activity.
+        const double physical_activity_stddev = opt["PhysicalActivityStdDev"].get<double>();
+
+        return std::make_unique<StaticLinearModelDefinition>(
+            std::move(expected), std::move(expected_trend), std::move(trend_steps),
+            std::move(expected_trend_boxcox), std::move(names), std::move(models),
+            std::move(ranges), std::move(lambda), std::move(stddev), std::move(cholesky),
+            std::move(policy_models), std::move(policy_ranges), std::move(policy_cholesky),
+            std::move(trend_models), std::move(trend_ranges), std::move(trend_lambda), info_speed,
+            std::move(rural_prevalence), std::move(income_models), physical_activity_stddev,
+            trend_type, std::move(expected_income_trend), std::move(expected_income_trend_boxcox),
+            std::move(income_trend_steps), std::move(income_trend_models),
+            std::move(income_trend_ranges), std::move(income_trend_lambda),
+            std::move(income_trend_decay_factors));
+    } catch (const std::exception &e) {
+        std::string detailed_error =
+            "Failed to load static linear risk model definition. Error: " + std::string(e.what());
+        throw std::runtime_error(detailed_error);
     }
-
-    // Standard deviation of physical activity.
-    const double physical_activity_stddev = opt["PhysicalActivityStdDev"].get<double>();
-
-    return std::make_unique<StaticLinearModelDefinition>(
-        std::move(expected), std::move(expected_trend), std::move(trend_steps),
-        std::move(expected_trend_boxcox), std::move(names), std::move(models), std::move(ranges),
-        std::move(lambda), std::move(stddev), std::move(cholesky), std::move(policy_models),
-        std::move(policy_ranges), std::move(policy_cholesky), std::move(trend_models),
-        std::move(trend_ranges), std::move(trend_lambda), info_speed, std::move(rural_prevalence),
-        std::move(income_models), physical_activity_stddev, trend_type,
-        std::move(expected_income_trend), std::move(expected_income_trend_boxcox),
-        std::move(income_trend_steps), std::move(income_trend_models),
-        std::move(income_trend_ranges), std::move(income_trend_lambda),
-        std::move(income_trend_decay_factors));
 }
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
