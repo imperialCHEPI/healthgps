@@ -95,9 +95,9 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
 
     void update_factors(RuntimeContext &context, Person &person, Random &random) const;
 
-    void initialise_trends(RuntimeContext &context, Person &person) const;
+    void initialise_UPF_trends(RuntimeContext &context, Person &person) const;
 
-    void update_trends(RuntimeContext &context, Person &person) const;
+    void update_UPF_trends(RuntimeContext &context, Person &person) const;
 
     /// @brief Initialise income trends for a person
     /// @param context The runtime context
