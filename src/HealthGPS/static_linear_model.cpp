@@ -89,7 +89,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
             // No trends applied
             break;
         case TrendType::Trend:
-            initialise_trends(context, person);
+            initialise_UPF_trends(context, person);
             break;
         case TrendType::IncomeTrend:
             initialise_income_trends(context, person);
@@ -150,7 +150,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
                 // No trends applied
                 break;
             case TrendType::Trend:
-                initialise_trends(context, person);
+                initialise_UPF_trends(context, person);
                 break;
             case TrendType::IncomeTrend:
                 initialise_income_trends(context, person);
@@ -165,7 +165,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
                 // No trends applied
                 break;
             case TrendType::Trend:
-                update_trends(context, person);
+                update_UPF_trends(context, person);
                 break;
             case TrendType::IncomeTrend:
                 update_income_trends(context, person);
@@ -289,7 +289,7 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
 }
 
 // This function is for intialising UPF Trends
-void StaticLinearModel::initialise_trends(RuntimeContext &context, Person &person) const {
+void StaticLinearModel::initialise_UPF_trends(RuntimeContext &context, Person &person) const {
 
     // Approximate trends with linear models.
     auto linear = compute_linear_models(person, *trend_models_);
@@ -308,11 +308,11 @@ void StaticLinearModel::initialise_trends(RuntimeContext &context, Person &perso
     }
 
     // Apply trends.
-    update_trends(context, person);
+    update_UPF_trends(context, person);
 }
 
 // This function is for updating UPF Trends
-void StaticLinearModel::update_trends(RuntimeContext &context, Person &person) const {
+void StaticLinearModel::update_UPF_trends(RuntimeContext &context, Person &person) const {
 
     // Get elapsed time (years).
     int elapsed_time = context.time_now() - context.start_time();
