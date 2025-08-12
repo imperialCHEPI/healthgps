@@ -67,48 +67,57 @@ hc::FloatDataTableColumnBuilder parse_float_column(const std::string &name,
 }
 
 hc::DoubleDataTableColumnBuilder parse_double_column(const std::string &name,
-                                                   const std::vector<std::string> &data) {
-    std::cout << "[DEBUG] parse_double_column: Parsing column '" << name << "' with " << data.size() << " rows" << std::endl;
+                                                     const std::vector<std::string> &data) {
+    std::cout << "[DEBUG] parse_double_column: Parsing column '" << name << "' with " << data.size()
+              << " rows" << std::endl;
     auto builder = hc::DoubleDataTableColumnBuilder(name);
     for (size_t i = 0; i < data.size(); i++) {
         const auto &value = data[i];
-        
+
         if (value.length() > 0) {
             try {
                 double parsed_value = std::stod(value);
                 builder.append(parsed_value);
                 // Only print every 1000th row to avoid flooding the screen
                 if (i % 10000 == 0) {
-                    std::cout << "[DEBUG] parse_double_column: Progress - row " << i << "/" << data.size() << std::endl;
+                    std::cout << "[DEBUG] parse_double_column: Progress - row " << i << "/"
+                              << data.size() << std::endl;
                 }
-            } catch (const std::exception& e) {
+            } catch (const std::exception &e) {
                 std::cout << "\n[DEBUG] ===== CRASH DETECTED =====" << std::endl;
-                std::cout << "[DEBUG] parse_double_column: CRASH at row " << i << " in column '" << name << "'" << std::endl;
-                std::cout << "[DEBUG] parse_double_column: Failed value: '" << value << "'" << std::endl;
+                std::cout << "[DEBUG] parse_double_column: CRASH at row " << i << " in column '"
+                          << name << "'" << std::endl;
+                std::cout << "[DEBUG] parse_double_column: Failed value: '" << value << "'"
+                          << std::endl;
                 std::cout << "[DEBUG] parse_double_column: Error: " << e.what() << std::endl;
-                std::cout << "[DEBUG] parse_double_column: Exception type: " << typeid(e).name() << std::endl;
-                
+                std::cout << "[DEBUG] parse_double_column: Exception type: " << typeid(e).name()
+                          << std::endl;
+
                 // Show a few rows before and after the crash for context
                 std::cout << "[DEBUG] Context - Previous successful values:" << std::endl;
-                for (int j = std::max(0, (int)i-3); j < i; j++) {
+                for (int j = std::max(0, (int)i - 3); j < i; j++) {
                     if (j < data.size() && data[j].length() > 0) {
                         try {
                             double prev_value = std::stod(data[j]);
-                            std::cout << "[DEBUG]   Row " << j << ": '" << data[j] << "' -> " << prev_value << std::endl;
+                            std::cout << "[DEBUG]   Row " << j << ": '" << data[j] << "' -> "
+                                      << prev_value << std::endl;
                         } catch (...) {
-                            std::cout << "[DEBUG]   Row " << j << ": '" << data[j] << "' -> FAILED" << std::endl;
+                            std::cout << "[DEBUG]   Row " << j << ": '" << data[j] << "' -> FAILED"
+                                      << std::endl;
                         }
                     }
                 }
-                
+
                 std::cout << "[DEBUG] Context - Next few values:" << std::endl;
-                for (int j = i; j < std::min((int)data.size(), (int)i+3); j++) {
+                for (int j = i; j < std::min((int)data.size(), (int)i + 3); j++) {
                     std::cout << "[DEBUG]   Row " << j << ": '" << data[j] << "'" << std::endl;
                 }
                 std::cout << "[DEBUG] ===== END CRASH CONTEXT =====" << std::endl;
-                
+
                 // Create a more specific error message
-                std::string specific_error = "CSV parsing failed: Cannot convert value '" + value + "' to double in column '" + name + "' at row " + std::to_string(i) + ". Error: " + e.what();
+                std::string specific_error = "CSV parsing failed: Cannot convert value '" + value +
+                                             "' to double in column '" + name + "' at row " +
+                                             std::to_string(i) + ". Error: " + e.what();
                 throw std::runtime_error(specific_error);
             }
             continue;
@@ -117,11 +126,13 @@ hc::DoubleDataTableColumnBuilder parse_double_column(const std::string &name,
         builder.append_null();
         // Only print empty rows occasionally
         if (i % 1000 == 0) {
-            std::cout << "[DEBUG] parse_double_column: Row " << i << " is empty, appended null" << std::endl;
+            std::cout << "[DEBUG] parse_double_column: Row " << i << " is empty, appended null"
+                      << std::endl;
         }
     }
 
-    std::cout << "[DEBUG] parse_double_column: Successfully completed parsing column '" << name << "'" << std::endl;
+    std::cout << "[DEBUG] parse_double_column: Successfully completed parsing column '" << name
+              << "'" << std::endl;
     return builder;
 }
 
@@ -146,11 +157,11 @@ hgps::core::DataTable load_datatable_from_csv(const FileInfo &file_info) {
     // Validate columns and create file columns map
     auto headers = doc.GetColumnNames();
     std::cout << "[DEBUG] CSV headers found: ";
-    for (const auto& header : headers) {
+    for (const auto &header : headers) {
         std::cout << "'" << header << "' ";
     }
     std::cout << std::endl;
-    
+
     std::map<std::string, std::string, hc::case_insensitive::comparator> csv_column_map;
     for (const auto &pair : file_info.columns) {
         // HACK: replace pair with structured bindings once clang allows it.
@@ -163,7 +174,8 @@ hgps::core::DataTable load_datatable_from_csv(const FileInfo &file_info) {
         auto it = std::find_if(headers.begin(), headers.end(), is_match);
         if (it != headers.end()) {
             csv_column_map[col_name] = *it;
-            std::cout << "[DEBUG] Column '" << col_name << "' mapped to CSV column '" << *it << "'" << std::endl;
+            std::cout << "[DEBUG] Column '" << col_name << "' mapped to CSV column '" << *it << "'"
+                      << std::endl;
         } else {
             success = false;
             fmt::print(fg(fmt::color::dark_salmon), "Column: {} not found in dataset.\n", col_name);
@@ -177,7 +189,8 @@ hgps::core::DataTable load_datatable_from_csv(const FileInfo &file_info) {
     hgps::core::DataTable out_table;
     for (const auto &[col_name, csv_col_name] : csv_column_map) {
         std::string col_type = hc::to_lower(file_info.columns.at(col_name));
-        std::cout << "[DEBUG] Processing column '" << col_name << "' (type: " << col_type << ") from CSV column '" << csv_col_name << "'" << std::endl;
+        std::cout << "[DEBUG] Processing column '" << col_name << "' (type: " << col_type
+                  << ") from CSV column '" << csv_col_name << "'" << std::endl;
 
         // Get raw data
         auto data = doc.GetColumn<std::string>(csv_col_name);
@@ -197,7 +210,8 @@ hgps::core::DataTable load_datatable_from_csv(const FileInfo &file_info) {
                 success = false;
             }
         } catch (const std::exception &ex) {
-            std::cout << "[DEBUG] ERROR parsing column '" << col_name << "': " << ex.what() << std::endl;
+            std::cout << "[DEBUG] ERROR parsing column '" << col_name << "': " << ex.what()
+                      << std::endl;
             fmt::print(fg(fmt::color::red), "Error passing column: {}, cause: {}\n", col_name,
                        ex.what());
             success = false;
@@ -205,7 +219,8 @@ hgps::core::DataTable load_datatable_from_csv(const FileInfo &file_info) {
     }
 
     if (!success) {
-        std::string error_msg = "Error parsing CSV file: " + file_info.name.string() + ". Check the debug output above for specific details.";
+        std::string error_msg = "Error parsing CSV file: " + file_info.name.string() +
+                                ". Check the debug output above for specific details.";
         throw std::runtime_error(error_msg);
     }
 

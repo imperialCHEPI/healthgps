@@ -212,7 +212,8 @@ std::unique_ptr<hgps::StaticLinearModelDefinition>
 load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configuration &config) {
     MEASURE_FUNCTION();
 
-    std::cout << "\n[DEBUG] ===== Starting load_staticlinear_risk_model_definition =====" << std::endl;
+    std::cout << "\n[DEBUG] ===== Starting load_staticlinear_risk_model_definition ====="
+              << std::endl;
     std::cout << "[DEBUG] Config trend_type: " << config.trend_type << std::endl;
 
     // Parse trend_type from config.json- Reda which trend type to use.
@@ -228,48 +229,53 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     std::cout << "\n[DEBUG] About to load correlation matrix file..." << std::endl;
     const auto correlation_file_info =
         input::get_file_info(opt["RiskFactorCorrelationFile"], config.root_path);
-    std::cout << "[DEBUG] Correlation file info loaded, path: " << correlation_file_info.name.string() << std::endl;
-    
+    std::cout << "[DEBUG] Correlation file info loaded, path: "
+              << correlation_file_info.name.string() << std::endl;
+
     std::cout << "[DEBUG] About to call load_datatable_from_csv for correlation..." << std::endl;
     hgps::core::DataTable correlation_table;
     try {
         correlation_table = load_datatable_from_csv(correlation_file_info);
-        std::cout << "[DEBUG] Correlation table loaded successfully, rows: " << correlation_table.num_rows() 
-                  << ", cols: " << correlation_table.num_columns() << std::endl;
-    } catch (const std::exception& e) {
+        std::cout << "[DEBUG] Correlation table loaded successfully, rows: "
+                  << correlation_table.num_rows() << ", cols: " << correlation_table.num_columns()
+                  << std::endl;
+    } catch (const std::exception &e) {
         std::cout << "[DEBUG] ERROR loading correlation table: " << e.what() << std::endl;
         std::cout << "[DEBUG] Exception type: " << typeid(e).name() << std::endl;
         throw;
     }
-    
+
     std::cout << "[DEBUG] Creating Eigen correlation matrix..." << std::endl;
     Eigen::MatrixXd correlation{correlation_table.num_rows(), correlation_table.num_columns()};
-    std::cout << "[DEBUG] Eigen correlation matrix created, size: " << correlation.rows() 
-              << "x" << correlation.cols() << std::endl;
+    std::cout << "[DEBUG] Eigen correlation matrix created, size: " << correlation.rows() << "x"
+              << correlation.cols() << std::endl;
 
     // Policy covariance matrix.
     std::cout << "\n[DEBUG] About to load policy covariance matrix file..." << std::endl;
     const auto policy_covariance_file_info =
         input::get_file_info(opt["PolicyCovarianceFile"], config.root_path);
-    std::cout << "[DEBUG] Policy covariance file info loaded, path: " << policy_covariance_file_info.name.string() << std::endl;
-    
-    std::cout << "[DEBUG] About to call load_datatable_from_csv for policy covariance..." << std::endl;
+    std::cout << "[DEBUG] Policy covariance file info loaded, path: "
+              << policy_covariance_file_info.name.string() << std::endl;
+
+    std::cout << "[DEBUG] About to call load_datatable_from_csv for policy covariance..."
+              << std::endl;
     hgps::core::DataTable policy_covariance_table;
     try {
         policy_covariance_table = load_datatable_from_csv(policy_covariance_file_info);
-        std::cout << "[DEBUG] Policy covariance table loaded successfully, rows: " << policy_covariance_table.num_rows() 
+        std::cout << "[DEBUG] Policy covariance table loaded successfully, rows: "
+                  << policy_covariance_table.num_rows()
                   << ", cols: " << policy_covariance_table.num_columns() << std::endl;
-    } catch (const std::exception& e) {
+    } catch (const std::exception &e) {
         std::cout << "[DEBUG] ERROR loading policy covariance table: " << e.what() << std::endl;
         std::cout << "[DEBUG] Exception type: " << typeid(e).name() << std::endl;
         throw;
     }
-    
+
     std::cout << "[DEBUG] Creating Eigen policy covariance matrix..." << std::endl;
     Eigen::MatrixXd policy_covariance{policy_covariance_table.num_rows(),
                                       policy_covariance_table.num_columns()};
-    std::cout << "[DEBUG] Eigen policy covariance matrix created, size: " << policy_covariance.rows() 
-              << "x" << policy_covariance.cols() << std::endl;
+    std::cout << "[DEBUG] Eigen policy covariance matrix created, size: "
+              << policy_covariance.rows() << "x" << policy_covariance.cols() << std::endl;
 
     // Risk factor and intervention policy: names, models, parameters and correlation/covariance.
     std::vector<core::Identifier> names;
@@ -312,7 +318,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         std::cout << "[DEBUG] Processing risk factor: " << key << std::endl;
         auto column_name = correlation_table.column(i).name();
         std::cout << "[DEBUG] Column " << i << " name: '" << column_name << "'" << std::endl;
-        
+
         if (!core::case_insensitive::equals(key, column_name)) {
             throw core::HgpsException{fmt::format("Risk factor {} name ({}) does not match risk "
                                                   "factor correlation matrix column {} name ({})",
@@ -324,20 +330,24 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         ranges.emplace_back(json_params["Range"].get<core::DoubleInterval>());
         lambda.emplace_back(json_params["Lambda"].get<double>());
         stddev.emplace_back(json_params["StdDev"].get<double>());
-        
+
         std::cout << "[DEBUG] About to parse correlation values for column " << i << std::endl;
         for (size_t j = 0; j < correlation_table.num_rows(); j++) {
-            std::cout << "[DEBUG] Parsing correlation(" << i << "," << j << ") - raw value: '" 
+            std::cout << "[DEBUG] Parsing correlation(" << i << "," << j << ") - raw value: '"
                       << correlation_table.column(i).value(j).type().name() << "'" << std::endl;
-            
+
             try {
                 double value = std::any_cast<double>(correlation_table.column(i).value(j));
                 correlation(i, j) = value;
-                std::cout << "[DEBUG] Successfully parsed correlation(" << i << "," << j << ") = " << value << std::endl;
-            } catch (const std::bad_any_cast& e) {
-                std::cout << "[DEBUG] ERROR: Failed to cast correlation(" << i << "," << j << ") to double: " << e.what() << std::endl;
-                std::cout << "[DEBUG] Raw value type: " << correlation_table.column(i).value(j).type().name() << std::endl;
-                std::cout << "[DEBUG] Raw value: " << correlation_table.column(i).value(j).has_value() << std::endl;
+                std::cout << "[DEBUG] Successfully parsed correlation(" << i << "," << j
+                          << ") = " << value << std::endl;
+            } catch (const std::bad_any_cast &e) {
+                std::cout << "[DEBUG] ERROR: Failed to cast correlation(" << i << "," << j
+                          << ") to double: " << e.what() << std::endl;
+                std::cout << "[DEBUG] Raw value type: "
+                          << correlation_table.column(i).value(j).type().name() << std::endl;
+                std::cout << "[DEBUG] Raw value: "
+                          << correlation_table.column(i).value(j).has_value() << std::endl;
                 throw;
             }
         }
@@ -353,8 +363,9 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
         // Check intervention policy covariance matrix column name matches risk factor name.
         auto policy_column_name = policy_covariance_table.column(i).name();
-        std::cout << "[DEBUG] Policy column " << i << " name: '" << policy_column_name << "'" << std::endl;
-        
+        std::cout << "[DEBUG] Policy column " << i << " name: '" << policy_column_name << "'"
+                  << std::endl;
+
         if (!core::case_insensitive::equals(key, policy_column_name)) {
             throw core::HgpsException{
                 fmt::format("Risk factor {} name ({}) does not match intervention "
@@ -365,20 +376,26 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         // Write intervention policy data structures.
         policy_models.emplace_back(std::move(policy_model));
         policy_ranges.emplace_back(policy_json_params["Range"].get<core::DoubleInterval>());
-        
-        std::cout << "[DEBUG] About to parse policy covariance values for column " << i << std::endl;
+
+        std::cout << "[DEBUG] About to parse policy covariance values for column " << i
+                  << std::endl;
         for (size_t j = 0; j < policy_covariance_table.num_rows(); j++) {
-            std::cout << "[DEBUG] Parsing policy_covariance(" << i << "," << j << ") - raw value: '" 
-                      << policy_covariance_table.column(i).value(j).type().name() << "'" << std::endl;
-            
+            std::cout << "[DEBUG] Parsing policy_covariance(" << i << "," << j << ") - raw value: '"
+                      << policy_covariance_table.column(i).value(j).type().name() << "'"
+                      << std::endl;
+
             try {
                 double value = std::any_cast<double>(policy_covariance_table.column(i).value(j));
                 policy_covariance(i, j) = value;
-                std::cout << "[DEBUG] Successfully parsed policy_covariance(" << i << "," << j << ") = " << value << std::endl;
-            } catch (const std::bad_any_cast& e) {
-                std::cout << "[DEBUG] ERROR: Failed to cast policy_covariance(" << i << "," << j << ") to double: " << e.what() << std::endl;
-                std::cout << "[DEBUG] Raw value type: " << policy_covariance_table.column(i).value(j).type().name() << std::endl;
-                std::cout << "[DEBUG] Raw value: " << policy_covariance_table.column(i).value(j).has_value() << std::endl;
+                std::cout << "[DEBUG] Successfully parsed policy_covariance(" << i << "," << j
+                          << ") = " << value << std::endl;
+            } catch (const std::bad_any_cast &e) {
+                std::cout << "[DEBUG] ERROR: Failed to cast policy_covariance(" << i << "," << j
+                          << ") to double: " << e.what() << std::endl;
+                std::cout << "[DEBUG] Raw value type: "
+                          << policy_covariance_table.column(i).value(j).type().name() << std::endl;
+                std::cout << "[DEBUG] Raw value: "
+                          << policy_covariance_table.column(i).value(j).has_value() << std::endl;
                 throw;
             }
         }
