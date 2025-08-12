@@ -213,7 +213,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     MEASURE_FUNCTION();
 
     try {
-        std::cout << "\n[DEBUG] ===== Starting load_staticlinear_risk_model_definition =====" << std::endl;
+        std::cout << "\n[DEBUG] ===== Starting load_staticlinear_risk_model_definition ====="
+                  << std::endl;
         std::cout << "[DEBUG] Config trend_type: " << config.trend_type << std::endl;
 
         // Parse trend_type from config.json- Reda which trend type to use.
@@ -230,59 +231,72 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         std::cout << "[DEBUG] About to load correlation matrix file..." << std::endl;
         const auto correlation_file_info =
             input::get_file_info(opt["RiskFactorCorrelationFile"], config.root_path);
-        std::cout << "[DEBUG] Correlation file info loaded, path: " << correlation_file_info.name.string() << std::endl;
-        std::cout << "[DEBUG] Correlation file format: " << correlation_file_info.format << std::endl;
-        std::cout << "[DEBUG] Correlation file delimiter: '" << correlation_file_info.delimiter << "'" << std::endl;
+        std::cout << "[DEBUG] Correlation file info loaded, path: "
+                  << correlation_file_info.name.string() << std::endl;
+        std::cout << "[DEBUG] Correlation file format: " << correlation_file_info.format
+                  << std::endl;
+        std::cout << "[DEBUG] Correlation file delimiter: '" << correlation_file_info.delimiter
+                  << "'" << std::endl;
 
-        std::cout << "[DEBUG] About to call load_datatable_from_csv for correlation..." << std::endl;
+        std::cout << "[DEBUG] About to call load_datatable_from_csv for correlation..."
+                  << std::endl;
         hgps::core::DataTable correlation_table;
         try {
             correlation_table = load_datatable_from_csv(correlation_file_info);
-            std::cout << "[DEBUG] Correlation table loaded successfully, rows: " << correlation_table.num_rows()
+            std::cout << "[DEBUG] Correlation table loaded successfully, rows: "
+                      << correlation_table.num_rows()
                       << ", cols: " << correlation_table.num_columns() << std::endl;
-        } catch (const std::exception& e) {
+        } catch (const std::exception &e) {
             std::cout << "[DEBUG] ERROR loading correlation table: " << e.what() << std::endl;
             std::cout << "[DEBUG] Exception type: " << typeid(e).name() << std::endl;
-            std::string detailed_error = "Failed to load correlation matrix from file: " + correlation_file_info.name.string() + 
-                                       ". Error: " + e.what();
+            std::string detailed_error = "Failed to load correlation matrix from file: " +
+                                         correlation_file_info.name.string() +
+                                         ". Error: " + e.what();
             throw std::runtime_error(detailed_error);
         }
 
         std::cout << "[DEBUG] Creating Eigen correlation matrix..." << std::endl;
         Eigen::MatrixXd correlation{correlation_table.num_rows(), correlation_table.num_columns()};
-        std::cout << "[DEBUG] Eigen correlation matrix created, size: " << correlation.rows()
-                  << "x" << correlation.cols() << std::endl;
+        std::cout << "[DEBUG] Eigen correlation matrix created, size: " << correlation.rows() << "x"
+                  << correlation.cols() << std::endl;
 
         // Policy covariance matrix.
         std::cout << "\n[DEBUG] ===== LOADING POLICY COVARIANCE MATRIX =====" << std::endl;
         std::cout << "[DEBUG] About to load policy covariance matrix file..." << std::endl;
         const auto policy_covariance_file_info =
             input::get_file_info(opt["PolicyCovarianceFile"], config.root_path);
-        std::cout << "[DEBUG] Policy covariance file info loaded, path: " << policy_covariance_file_info.name.string() << std::endl;
-        std::cout << "[DEBUG] Policy covariance file format: " << policy_covariance_file_info.format << std::endl;
-        std::cout << "[DEBUG] Policy covariance file delimiter: '" << policy_covariance_file_info.delimiter << "'" << std::endl;
+        std::cout << "[DEBUG] Policy covariance file info loaded, path: "
+                  << policy_covariance_file_info.name.string() << std::endl;
+        std::cout << "[DEBUG] Policy covariance file format: " << policy_covariance_file_info.format
+                  << std::endl;
+        std::cout << "[DEBUG] Policy covariance file delimiter: '"
+                  << policy_covariance_file_info.delimiter << "'" << std::endl;
 
-        std::cout << "[DEBUG] About to call load_datatable_from_csv for policy covariance..." << std::endl;
+        std::cout << "[DEBUG] About to call load_datatable_from_csv for policy covariance..."
+                  << std::endl;
         hgps::core::DataTable policy_covariance_table;
         try {
             policy_covariance_table = load_datatable_from_csv(policy_covariance_file_info);
-            std::cout << "[DEBUG] Policy covariance table loaded successfully, rows: " << policy_covariance_table.num_rows()
+            std::cout << "[DEBUG] Policy covariance table loaded successfully, rows: "
+                      << policy_covariance_table.num_rows()
                       << ", cols: " << policy_covariance_table.num_columns() << std::endl;
-        } catch (const std::exception& e) {
+        } catch (const std::exception &e) {
             std::cout << "[DEBUG] ERROR loading policy covariance table: " << e.what() << std::endl;
             std::cout << "[DEBUG] Exception type: " << typeid(e).name() << std::endl;
-            std::string detailed_error = "Failed to load policy covariance matrix from file: " + policy_covariance_file_info.name.string() + 
-                                       ". Error: " + e.what();
+            std::string detailed_error = "Failed to load policy covariance matrix from file: " +
+                                         policy_covariance_file_info.name.string() +
+                                         ". Error: " + e.what();
             throw std::runtime_error(detailed_error);
         }
 
         std::cout << "[DEBUG] Creating Eigen policy covariance matrix..." << std::endl;
         Eigen::MatrixXd policy_covariance{policy_covariance_table.num_rows(),
                                           policy_covariance_table.num_columns()};
-        std::cout << "[DEBUG] Eigen policy covariance matrix created, size: " << policy_covariance.rows()
-                  << "x" << policy_covariance.cols() << std::endl;
+        std::cout << "[DEBUG] Eigen policy covariance matrix created, size: "
+                  << policy_covariance.rows() << "x" << policy_covariance.cols() << std::endl;
 
-        // Risk factor and intervention policy: names, models, parameters and correlation/covariance.
+        // Risk factor and intervention policy: names, models, parameters and
+        // correlation/covariance.
         std::vector<core::Identifier> names;
         std::vector<LinearModelParams> models;
         std::vector<core::DoubleInterval> ranges;
@@ -294,12 +308,14 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         auto trend_ranges = std::make_unique<std::vector<core::DoubleInterval>>();
         auto trend_lambda = std::make_unique<std::vector<double>>();
         auto expected_trend = std::make_unique<std::unordered_map<core::Identifier, double>>();
-        auto expected_trend_boxcox = std::make_unique<std::unordered_map<core::Identifier, double>>();
+        auto expected_trend_boxcox =
+            std::make_unique<std::unordered_map<core::Identifier, double>>();
         auto trend_steps = std::make_unique<std::unordered_map<core::Identifier, int>>();
 
         // Income trend data structures: income trend models, ranges, lambda, decay factors, steps.
         // These will be nullptr if income trend is not enabled
-        std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend = nullptr;
+        std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend =
+            nullptr;
         std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend_boxcox =
             nullptr;
         std::unique_ptr<std::unordered_map<core::Identifier, int>> income_trend_steps = nullptr;
@@ -325,9 +341,10 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             std::cout << "[DEBUG] Column " << i << " name: '" << column_name << "'" << std::endl;
 
             if (!core::case_insensitive::equals(key, column_name)) {
-                throw core::HgpsException{fmt::format("Risk factor {} name ({}) does not match risk "
-                                                      "factor correlation matrix column {} name ({})",
-                                                      i, key, i, column_name)};
+                throw core::HgpsException{
+                    fmt::format("Risk factor {} name ({}) does not match risk "
+                                "factor correlation matrix column {} name ({})",
+                                i, key, i, column_name)};
             }
 
             // Write risk factor data structures.
@@ -344,11 +361,15 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                 try {
                     double value = std::any_cast<double>(correlation_table.column(i).value(j));
                     correlation(i, j) = value;
-                    std::cout << "[DEBUG] Successfully parsed correlation(" << i << "," << j << ") = " << value << std::endl;
-                } catch (const std::bad_any_cast& e) {
-                    std::cout << "[DEBUG] ERROR: Failed to cast correlation(" << i << "," << j << ") to double: " << e.what() << std::endl;
-                    std::cout << "[DEBUG] Raw value type: " << correlation_table.column(i).value(j).type().name() << std::endl;
-                    std::cout << "[DEBUG] Raw value: " << correlation_table.column(i).value(j).has_value() << std::endl;
+                    std::cout << "[DEBUG] Successfully parsed correlation(" << i << "," << j
+                              << ") = " << value << std::endl;
+                } catch (const std::bad_any_cast &e) {
+                    std::cout << "[DEBUG] ERROR: Failed to cast correlation(" << i << "," << j
+                              << ") to double: " << e.what() << std::endl;
+                    std::cout << "[DEBUG] Raw value type: "
+                              << correlation_table.column(i).value(j).type().name() << std::endl;
+                    std::cout << "[DEBUG] Raw value: "
+                              << correlation_table.column(i).value(j).has_value() << std::endl;
                     throw;
                 }
             }
@@ -357,14 +378,16 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             const auto &policy_json_params = json_params["Policy"];
             LinearModelParams policy_model;
             policy_model.intercept = policy_json_params["Intercept"].get<double>();
-            policy_model.coefficients =
-                policy_json_params["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
-            policy_model.log_coefficients = policy_json_params["LogCoefficients"]
-                                                .get<std::unordered_map<core::Identifier, double>>();
+            policy_model.coefficients = policy_json_params["Coefficients"]
+                                            .get<std::unordered_map<core::Identifier, double>>();
+            policy_model.log_coefficients =
+                policy_json_params["LogCoefficients"]
+                    .get<std::unordered_map<core::Identifier, double>>();
 
             // Check intervention policy covariance matrix column name matches risk factor name.
             auto policy_column_name = policy_covariance_table.column(i).name();
-            std::cout << "[DEBUG] Policy column " << i << " name: '" << policy_column_name << "'" << std::endl;
+            std::cout << "[DEBUG] Policy column " << i << " name: '" << policy_column_name << "'"
+                      << std::endl;
 
             if (!core::case_insensitive::equals(key, policy_column_name)) {
                 throw core::HgpsException{
@@ -377,19 +400,29 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             policy_models.emplace_back(std::move(policy_model));
             policy_ranges.emplace_back(policy_json_params["Range"].get<core::DoubleInterval>());
 
-            std::cout << "[DEBUG] About to parse policy covariance values for column " << i << std::endl;
+            std::cout << "[DEBUG] About to parse policy covariance values for column " << i
+                      << std::endl;
             for (size_t j = 0; j < policy_covariance_table.num_rows(); j++) {
-                std::cout << "[DEBUG] Parsing policy_covariance(" << i << "," << j << ") - raw value: '"
-                          << policy_covariance_table.column(i).value(j).type().name() << "'" << std::endl;
+                std::cout << "[DEBUG] Parsing policy_covariance(" << i << "," << j
+                          << ") - raw value: '"
+                          << policy_covariance_table.column(i).value(j).type().name() << "'"
+                          << std::endl;
 
                 try {
-                    double value = std::any_cast<double>(policy_covariance_table.column(i).value(j));
+                    double value =
+                        std::any_cast<double>(policy_covariance_table.column(i).value(j));
                     policy_covariance(i, j) = value;
-                    std::cout << "[DEBUG] Successfully parsed policy_covariance(" << i << "," << j << ") = " << value << std::endl;
-                } catch (const std::bad_any_cast& e) {
-                    std::cout << "[DEBUG] ERROR: Failed to cast policy_covariance(" << i << "," << j << ") to double: " << e.what() << std::endl;
-                    std::cout << "[DEBUG] Raw value type: " << policy_covariance_table.column(i).value(j).type().name() << std::endl;
-                    std::cout << "[DEBUG] Raw value: " << policy_covariance_table.column(i).value(j).has_value() << std::endl;
+                    std::cout << "[DEBUG] Successfully parsed policy_covariance(" << i << "," << j
+                              << ") = " << value << std::endl;
+                } catch (const std::bad_any_cast &e) {
+                    std::cout << "[DEBUG] ERROR: Failed to cast policy_covariance(" << i << "," << j
+                              << ") to double: " << e.what() << std::endl;
+                    std::cout << "[DEBUG] Raw value type: "
+                              << policy_covariance_table.column(i).value(j).type().name()
+                              << std::endl;
+                    std::cout << "[DEBUG] Raw value: "
+                              << policy_covariance_table.column(i).value(j).has_value()
+                              << std::endl;
                     throw;
                 }
             }
@@ -410,15 +443,17 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                     const auto &trend_json_params = json_params["Trend"];
                     LinearModelParams trend_model;
                     trend_model.intercept = trend_json_params["Intercept"].get<double>();
-                    trend_model.coefficients = trend_json_params["Coefficients"]
-                                                   .get<std::unordered_map<core::Identifier, double>>();
+                    trend_model.coefficients =
+                        trend_json_params["Coefficients"]
+                            .get<std::unordered_map<core::Identifier, double>>();
                     trend_model.log_coefficients =
                         trend_json_params["LogCoefficients"]
                             .get<std::unordered_map<core::Identifier, double>>();
 
                     // Write real trend data structures.
                     trend_models->emplace_back(std::move(trend_model));
-                    trend_ranges->emplace_back(trend_json_params["Range"].get<core::DoubleInterval>());
+                    trend_ranges->emplace_back(
+                        trend_json_params["Range"].get<core::DoubleInterval>());
                     trend_lambda->emplace_back(trend_json_params["Lambda"].get<double>());
 
                     // Load expected value trends (only if trend data exists).
@@ -429,8 +464,9 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                         json_params.contains("ExpectedTrendBoxCox")
                             ? json_params["ExpectedTrendBoxCox"].get<double>()
                             : 1.0;
-                    (*trend_steps)[key] =
-                        json_params.contains("TrendSteps") ? json_params["TrendSteps"].get<int>() : 0;
+                    (*trend_steps)[key] = json_params.contains("TrendSteps")
+                                              ? json_params["TrendSteps"].get<int>()
+                                              : 0;
                 } else {
                     throw core::HgpsException{fmt::format(
                         "Trend is enabled but Trend data is missing for risk factor: {}", key)};
@@ -458,7 +494,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                         std::make_unique<std::unordered_map<core::Identifier, double>>();
                     expected_income_trend_boxcox =
                         std::make_unique<std::unordered_map<core::Identifier, double>>();
-                    income_trend_steps = std::make_unique<std::unordered_map<core::Identifier, int>>();
+                    income_trend_steps =
+                        std::make_unique<std::unordered_map<core::Identifier, int>>();
                     income_trend_models = std::make_unique<std::vector<LinearModelParams>>();
                     income_trend_ranges = std::make_unique<std::vector<core::DoubleInterval>>();
                     income_trend_lambda = std::make_unique<std::vector<double>>();
@@ -470,7 +507,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                     // Read income trend data from static_model.json
                     const auto &income_trend_json_params = json_params["IncomeTrend"];
                     LinearModelParams income_trend_model;
-                    income_trend_model.intercept = income_trend_json_params["Intercept"].get<double>();
+                    income_trend_model.intercept =
+                        income_trend_json_params["Intercept"].get<double>();
                     income_trend_model.coefficients =
                         income_trend_json_params["Coefficients"]
                             .get<std::unordered_map<core::Identifier, double>>();
@@ -482,7 +520,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                     income_trend_models->emplace_back(std::move(income_trend_model));
                     income_trend_ranges->emplace_back(
                         income_trend_json_params["Range"].get<core::DoubleInterval>());
-                    income_trend_lambda->emplace_back(income_trend_json_params["Lambda"].get<double>());
+                    income_trend_lambda->emplace_back(
+                        income_trend_json_params["Lambda"].get<double>());
 
                     // Load expected income trend values (no defaults - throw error if missing)
                     if (!json_params.contains("ExpectedIncomeTrend")) {
@@ -502,15 +541,17 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                             fmt::format("IncomeDecayFactor is missing for risk factor: {}", key)};
                     }
 
-                    (*expected_income_trend)[key] = json_params["ExpectedIncomeTrend"].get<double>();
+                    (*expected_income_trend)[key] =
+                        json_params["ExpectedIncomeTrend"].get<double>();
                     (*expected_income_trend_boxcox)[key] =
                         json_params["ExpectedIncomeTrendBoxCox"].get<double>();
                     (*income_trend_steps)[key] = json_params["IncomeTrendSteps"].get<int>();
-                    (*income_trend_decay_factors)[key] = json_params["IncomeDecayFactor"].get<double>();
+                    (*income_trend_decay_factors)[key] =
+                        json_params["IncomeDecayFactor"].get<double>();
                 } else {
-                    throw core::HgpsException{fmt::format(
-                        "Income trend is enabled but IncomeTrend data is missing for risk factor: {}",
-                        key)};
+                    throw core::HgpsException{fmt::format("Income trend is enabled but IncomeTrend "
+                                                          "data is missing for risk factor: {}",
+                                                          key)};
                 }
             }
 
@@ -531,10 +572,10 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
         // Check intervention policy covariance matrix column count matches risk factor count.
         if (opt["RiskFactorModels"].size() != policy_covariance_table.num_columns()) {
-            throw core::HgpsException{fmt::format("Risk factor count ({}) does not match intervention "
-                                                  "policy covariance matrix column count ({})",
-                                                  opt["RiskFactorModels"].size(),
-                                                  policy_covariance_table.num_columns())};
+            throw core::HgpsException{
+                fmt::format("Risk factor count ({}) does not match intervention "
+                            "policy covariance matrix column count ({})",
+                            opt["RiskFactorModels"].size(), policy_covariance_table.num_columns())};
         }
 
         // Compute Cholesky decomposition of the intervention policy covariance matrix.
@@ -551,8 +592,9 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                     "'{}' is not defined in male risk factor expected values.", name.to_string())};
             }
             if (!expected->at(core::Gender::female).contains(name)) {
-                throw core::HgpsException{fmt::format(
-                    "'{}' is not defined in female risk factor expected values.", name.to_string())};
+                throw core::HgpsException{
+                    fmt::format("'{}' is not defined in female risk factor expected values.",
+                                name.to_string())};
             }
         }
 
@@ -560,7 +602,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         const double info_speed = opt["InformationSpeed"].get<double>();
 
         // Rural sector prevalence for age groups and sex.
-        std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>> rural_prevalence;
+        std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
+            rural_prevalence;
         for (const auto &age_group : opt["RuralPrevalence"]) {
             auto age_group_name = age_group["Name"].get<core::Identifier>();
             rural_prevalence[age_group_name] = {{core::Gender::female, age_group["Female"]},
@@ -604,17 +647,18 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
         return std::make_unique<StaticLinearModelDefinition>(
             std::move(expected), std::move(expected_trend), std::move(trend_steps),
-            std::move(expected_trend_boxcox), std::move(names), std::move(models), std::move(ranges),
-            std::move(lambda), std::move(stddev), std::move(cholesky), std::move(policy_models),
-            std::move(policy_ranges), std::move(policy_cholesky), std::move(trend_models),
-            std::move(trend_ranges), std::move(trend_lambda), info_speed, std::move(rural_prevalence),
-            std::move(income_models), physical_activity_stddev, trend_type,
-            std::move(expected_income_trend), std::move(expected_income_trend_boxcox),
+            std::move(expected_trend_boxcox), std::move(names), std::move(models),
+            std::move(ranges), std::move(lambda), std::move(stddev), std::move(cholesky),
+            std::move(policy_models), std::move(policy_ranges), std::move(policy_cholesky),
+            std::move(trend_models), std::move(trend_ranges), std::move(trend_lambda), info_speed,
+            std::move(rural_prevalence), std::move(income_models), physical_activity_stddev,
+            trend_type, std::move(expected_income_trend), std::move(expected_income_trend_boxcox),
             std::move(income_trend_steps), std::move(income_trend_models),
             std::move(income_trend_ranges), std::move(income_trend_lambda),
             std::move(income_trend_decay_factors));
     } catch (const std::exception &e) {
-        std::string detailed_error = "Failed to load static linear risk model definition. Error: " + std::string(e.what());
+        std::string detailed_error =
+            "Failed to load static linear risk model definition. Error: " + std::string(e.what());
         throw std::runtime_error(detailed_error);
     }
 }

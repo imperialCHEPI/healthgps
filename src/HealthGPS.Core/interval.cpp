@@ -11,7 +11,7 @@ IntegerInterval parse_integer_interval(const std::string_view &value,
             int start = std::stoi(parts[0].data());
             int end = std::stoi(parts[1].data());
             return IntegerInterval(start, end);
-        } catch (const std::exception& e) {
+        } catch (const std::exception &e) {
             std::cout << "\n[DEBUG] ===== CRASH DETECTED IN INTERVAL PARSING =====" << std::endl;
             std::cout << "[DEBUG] Function: parse_integer_interval" << std::endl;
             std::cout << "[DEBUG] Input value: '" << value << "'" << std::endl;
@@ -22,9 +22,10 @@ IntegerInterval parse_integer_interval(const std::string_view &value,
             std::cout << "[DEBUG] Error: " << e.what() << std::endl;
             std::cout << "[DEBUG] Exception type: " << typeid(e).name() << std::endl;
             std::cout << "[DEBUG] ===== END CRASH CONTEXT =====" << std::endl;
-            
-            std::string detailed_error = "Failed to parse integer interval from value: '" + std::string(value) + 
-                                       "'. Cannot convert parts to integer. Error: " + e.what();
+
+            std::string detailed_error = "Failed to parse integer interval from value: '" +
+                                         std::string(value) +
+                                         "'. Cannot convert parts to integer. Error: " + e.what();
             throw std::runtime_error(detailed_error);
         }
     }
@@ -40,7 +41,7 @@ FloatInterval parse_float_interval(const std::string_view &value, const std::str
             float start = std::stof(parts[0].data());
             float end = std::stof(parts[1].data());
             return FloatInterval(start, end);
-        } catch (const std::exception& e) {
+        } catch (const std::exception &e) {
             std::cout << "\n[DEBUG] ===== CRASH DETECTED IN INTERVAL PARSING =====" << std::endl;
             std::cout << "[DEBUG] Function: parse_float_interval" << std::endl;
             std::cout << "[DEBUG] Input value: '" << value << "'" << std::endl;
@@ -51,9 +52,10 @@ FloatInterval parse_float_interval(const std::string_view &value, const std::str
             std::cout << "[DEBUG] Error: " << e.what() << std::endl;
             std::cout << "[DEBUG] Exception type: " << typeid(e).name() << std::endl;
             std::cout << "[DEBUG] ===== END CRASH CONTEXT =====" << std::endl;
-            
-            std::string detailed_error = "Failed to parse float interval from value: '" + std::string(value) + 
-                                       "'. Cannot convert parts to float. Error: " + e.what();
+
+            std::string detailed_error = "Failed to parse float interval from value: '" +
+                                         std::string(value) +
+                                         "'. Cannot convert parts to float. Error: " + e.what();
             throw std::runtime_error(detailed_error);
         }
     }
@@ -69,7 +71,7 @@ DoubleInterval parse_double_interval(const std::string_view &value, const std::s
             double start = std::stod(parts[0].data());
             double end = std::stod(parts[1].data());
             return DoubleInterval(start, end);
-        } catch (const std::exception& e) {
+        } catch (const std::exception &e) {
             std::cout << "\n[DEBUG] ===== CRASH DETECTED IN INTERVAL PARSING =====" << std::endl;
             std::cout << "[DEBUG] Function: parse_double_interval" << std::endl;
             std::cout << "[DEBUG] Input value: '" << value << "'" << std::endl;
@@ -80,9 +82,10 @@ DoubleInterval parse_double_interval(const std::string_view &value, const std::s
             std::cout << "[DEBUG] Error: " << e.what() << std::endl;
             std::cout << "[DEBUG] Exception type: " << typeid(e).name() << std::endl;
             std::cout << "[DEBUG] ===== END CRASH CONTEXT =====" << std::endl;
-            
-            std::string detailed_error = "Failed to parse double interval from value: '" + std::string(value) + 
-                                       "'. Cannot convert parts to double. Error: " + e.what();
+
+            std::string detailed_error = "Failed to parse double interval from value: '" +
+                                         std::string(value) +
+                                         "'. Cannot convert parts to double. Error: " + e.what();
             throw std::runtime_error(detailed_error);
         }
     }
