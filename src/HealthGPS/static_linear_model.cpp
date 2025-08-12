@@ -228,8 +228,9 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
         if (should_inspect_this) {
             store_inspection_data(person, factor_name, context, "residual_initialization", residual,
                                   0.0, 0.0, residual, stddev_[i], lambda_[i], 0.0, 0.0,
-                                  ranges_[i].lower(), ranges_[i].upper(), 0.0, residuals.first[i],  // Independent residual BEFORE Cholesky
-                                  residual);  // Correlated residual AFTER Cholesky
+                                  ranges_[i].lower(), ranges_[i].upper(), 0.0,
+                                  residuals.first[i], // Independent residual BEFORE Cholesky
+                                  residual);          // Correlated residual AFTER Cholesky
         }
 
         // Save residual.
@@ -247,11 +248,12 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
         // ===== MAHIMA: Store inspection data for later recording (after physical activity is
         // assigned) =====
         if (should_inspect_this) {
-            store_inspection_data(
-                person, factor_name, context, "factor_initialization", final_clamped_factor, expected,
-                linear_result, residual, stddev_[i], lambda_[i], boxcox_result, factor_before_clamp,
-                ranges_[i].lower(), ranges_[i].upper(), final_clamped_factor, residuals.first[i],  // Independent residual BEFORE Cholesky
-                residual);  // Correlated residual AFTER Cholesky
+            store_inspection_data(person, factor_name, context, "factor_initialization",
+                                  final_clamped_factor, expected, linear_result, residual,
+                                  stddev_[i], lambda_[i], boxcox_result, factor_before_clamp,
+                                  ranges_[i].lower(), ranges_[i].upper(), final_clamped_factor,
+                                  residuals.first[i], // Independent residual BEFORE Cholesky
+                                  residual);          // Correlated residual AFTER Cholesky
         }
 
         // Save risk factor.
@@ -515,12 +517,12 @@ StaticLinearModel::compute_linear_models(Person &person,
     return linear;
 }
 
-std::pair<std::vector<double>, std::vector<double>> 
+std::pair<std::vector<double>, std::vector<double>>
 StaticLinearModel::compute_residuals(Random &random, const Eigen::MatrixXd &cholesky) const {
     // Generate independent N(0,1) residuals
     Eigen::VectorXd residuals{names_.size()};
     std::ranges::generate(residuals, [&random] { return random.next_normal(0.0, 1.0); });
-    
+
     // Store independent residuals BEFORE Cholesky transformation
     // These are standard normal N(0,1) random variables that are uncorrelated
     std::vector<double> independent_residuals{};
@@ -528,12 +530,12 @@ StaticLinearModel::compute_residuals(Random &random, const Eigen::MatrixXd &chol
     for (size_t i = 0; i < names_.size(); i++) {
         independent_residuals.emplace_back(residuals[i]);
     }
-    
+
     // Apply Cholesky transformation: z = L * x
     // This transforms independent N(0,1) variables into correlated multivariate normal variables
     // The correlation structure is determined by the Cholesky factor L
     residuals = cholesky * residuals;
-    
+
     // Store correlated residuals AFTER Cholesky transformation
     // These now have the desired correlation structure while maintaining normal distribution
     std::vector<double> correlated_residuals{};
@@ -541,13 +543,13 @@ StaticLinearModel::compute_residuals(Random &random, const Eigen::MatrixXd &chol
     for (size_t i = 0; i < names_.size(); i++) {
         correlated_residuals.emplace_back(residuals[i]);
     }
-    
+
     // Return pair: {independent_residuals, correlated_residuals}
-    // 
+    //
     // VERIFICATION: This ensures that:
     // - residuals.first[i] contains the independent N(0,1) random variables BEFORE Cholesky
     // - residuals.second[i] contains the correlated residuals AFTER Cholesky transformation
-    // 
+    //
     // The Cholesky transformation: z = L * x where:
     // - x = independent N(0,1) variables (residuals.first)
     // - L = lower triangular Cholesky factor
