@@ -496,12 +496,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             category = core::Income::unknown;
         } else if (core::case_insensitive::equals(key, "Low")) {
             category = core::Income::low;
-        } else if (core::case_insensitive::equals(key, "LowerMiddle")) {
-            category = core::Income::lowermiddle;
         } else if (core::case_insensitive::equals(key, "Middle")) {
             category = core::Income::middle;
-        } else if (core::case_insensitive::equals(key, "UpperMiddle")) {
-            category = core::Income::uppermiddle;
         } else if (core::case_insensitive::equals(key, "High")) {
             category = core::Income::high;
         } else {
