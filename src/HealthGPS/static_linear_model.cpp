@@ -831,7 +831,8 @@ void StaticLinearModel::initialize_inspection_settings() {
     inspection_settings_.enabled = true; // CHANGE THIS TO TRUE TO ENABLE
 
     // Configure which risk factor to inspect
-    inspection_settings_.target_risk_factor = "FoodCarbohydrate"_id; // CHANGE THIS TO DESIRED FACTOR
+    inspection_settings_.target_risk_factor =
+        "FoodCarbohydrate"_id; // CHANGE THIS TO DESIRED FACTOR
 
     // Optional filters - set to std::nullopt to disable filtering
     inspection_settings_.target_age = 30; // e.g., 30 for age 30 only
