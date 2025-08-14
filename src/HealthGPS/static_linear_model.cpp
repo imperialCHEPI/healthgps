@@ -519,6 +519,16 @@ StaticLinearModel::compute_linear_models(Person &person,
 
 std::pair<std::vector<double>, std::vector<double>>
 StaticLinearModel::compute_residuals(Random &random, const Eigen::MatrixXd &cholesky) const {
+    // DEBUG: Print the Cholesky matrix to see what's happening
+    std::cout << "\n[DEBUG] Cholesky matrix (L):" << std::endl;
+    for (size_t i = 0; i < cholesky.rows(); i++) {
+        std::cout << "  Row [" << i << "]: ";
+        for (size_t j = 0; j < cholesky.cols(); j++) {
+            std::cout << std::fixed << std::setprecision(6) << cholesky(i, j) << " ";
+        }
+        std::cout << std::endl;
+    }
+
     // Generate independent N(0,1) residuals
     Eigen::VectorXd residuals{names_.size()};
     std::ranges::generate(residuals, [&random] { return random.next_normal(0.0, 1.0); });
