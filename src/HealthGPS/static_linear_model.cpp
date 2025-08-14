@@ -220,11 +220,18 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
         if (i == 0) { // Food Carbohydrate is at index 0
             static int debug_counter = 0;
             if (debug_counter < 3) {
-                std::cout << "\n[DEBUG] compute_residuals returned for Food Carbohydrate:" << std::endl;
+                std::cout << "\n[DEBUG] compute_residuals returned for Food Carbohydrate:"
+                          << std::endl;
                 std::cout << "  Call " << debug_counter << ":" << std::endl;
-                std::cout << "    residuals.first[0] = " << std::fixed << std::setprecision(6) << residuals.first[0] << std::endl;
-                std::cout << "    residuals.second[0] = " << std::fixed << std::setprecision(6) << residuals.second[0] << std::endl;
-                std::cout << "    Are they equal? " << (residuals.first[0] == residuals.second[0] ? "YES - BUG IN compute_residuals!" : "NO - OK") << std::endl;
+                std::cout << "    residuals.first[0] = " << std::fixed << std::setprecision(6)
+                          << residuals.first[0] << std::endl;
+                std::cout << "    residuals.second[0] = " << std::fixed << std::setprecision(6)
+                          << residuals.second[0] << std::endl;
+                std::cout << "    Are they equal? "
+                          << (residuals.first[0] == residuals.second[0]
+                                  ? "YES - BUG IN compute_residuals!"
+                                  : "NO - OK")
+                          << std::endl;
                 debug_counter++;
             }
         }
@@ -243,20 +250,25 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
             if (i == 0) { // Food Carbohydrate
                 static int debug_counter = 0;
                 if (debug_counter < 3) {
-                    std::cout << "\n[DEBUG] Before calling store_inspection_data for Food Carbohydrate:" << std::endl;
+                    std::cout
+                        << "\n[DEBUG] Before calling store_inspection_data for Food Carbohydrate:"
+                        << std::endl;
                     std::cout << "  Call " << debug_counter << ":" << std::endl;
-                    std::cout << "    residuals.first[0] = " << std::fixed << std::setprecision(6) << residuals.first[0] << std::endl;
-                    std::cout << "    residuals.second[0] = " << std::fixed << std::setprecision(6) << residuals.second[0] << std::endl;
-                    std::cout << "    Will pass to CSV: " << residuals.first[0] << " and " << residuals.second[0] << std::endl;
+                    std::cout << "    residuals.first[0] = " << std::fixed << std::setprecision(6)
+                              << residuals.first[0] << std::endl;
+                    std::cout << "    residuals.second[0] = " << std::fixed << std::setprecision(6)
+                              << residuals.second[0] << std::endl;
+                    std::cout << "    Will pass to CSV: " << residuals.first[0] << " and "
+                              << residuals.second[0] << std::endl;
                     debug_counter++;
                 }
             }
-            
+
             store_inspection_data(person, factor_name, context, "residual_initialization", residual,
                                   0.0, 0.0, residual, stddev_[i], lambda_[i], 0.0, 0.0,
                                   ranges_[i].lower(), ranges_[i].upper(), 0.0,
-                                  residuals.first[i],        // Independent residual BEFORE Cholesky
-                                  residuals.second[i]);      // Correlated residual AFTER Cholesky
+                                  residuals.first[i],   // Independent residual BEFORE Cholesky
+                                  residuals.second[i]); // Correlated residual AFTER Cholesky
         }
 
         // Save residual.
@@ -278,8 +290,8 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
                                   final_clamped_factor, expected, linear_result, residual,
                                   stddev_[i], lambda_[i], boxcox_result, factor_before_clamp,
                                   ranges_[i].lower(), ranges_[i].upper(), final_clamped_factor,
-                                  residuals.first[i],        // Independent residual BEFORE Cholesky
-                                  residuals.second[i]);      // Correlated residual AFTER Cholesky
+                                  residuals.first[i],   // Independent residual BEFORE Cholesky
+                                  residuals.second[i]); // Correlated residual AFTER Cholesky
         }
 
         // Save risk factor.
@@ -923,9 +935,14 @@ void StaticLinearModel::store_inspection_data(
         if (debug_counter < 3) { // Only show first 3 calls
             std::cout << "\n[DEBUG] CSV Recording for Food Carbohydrate:" << std::endl;
             std::cout << "  Call " << debug_counter << ":" << std::endl;
-            std::cout << "    random_residual_before_cholesky = " << std::fixed << std::setprecision(6) << random_residual_before_cholesky << std::endl;
-            std::cout << "    residual_after_cholesky = " << std::fixed << std::setprecision(6) << residual_after_cholesky << std::endl;
-            std::cout << "    Are they equal? " << (random_residual_before_cholesky == residual_after_cholesky ? "YES - BUG!" : "NO - OK") << std::endl;
+            std::cout << "    random_residual_before_cholesky = " << std::fixed
+                      << std::setprecision(6) << random_residual_before_cholesky << std::endl;
+            std::cout << "    residual_after_cholesky = " << std::fixed << std::setprecision(6)
+                      << residual_after_cholesky << std::endl;
+            std::cout << "    Are they equal? "
+                      << (random_residual_before_cholesky == residual_after_cholesky ? "YES - BUG!"
+                                                                                     : "NO - OK")
+                      << std::endl;
             debug_counter++;
         }
     }
