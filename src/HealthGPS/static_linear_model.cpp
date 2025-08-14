@@ -216,26 +216,6 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
     for (size_t i = 0; i < names_.size(); i++) {
         const auto &factor_name = names_[i];
 
-        // DEBUG: Show what compute_residuals actually returned for Food Carbohydrate
-        if (i == 0) { // Food Carbohydrate is at index 0
-            static int debug_counter = 0;
-            if (debug_counter < 3) {
-                std::cout << "\n[DEBUG] compute_residuals returned for Food Carbohydrate:"
-                          << std::endl;
-                std::cout << "  Call " << debug_counter << ":" << std::endl;
-                std::cout << "    residuals.first[0] = " << std::fixed << std::setprecision(6)
-                          << residuals.first[0] << std::endl;
-                std::cout << "    residuals.second[0] = " << std::fixed << std::setprecision(6)
-                          << residuals.second[0] << std::endl;
-                std::cout << "    Are they equal? "
-                          << (residuals.first[0] == residuals.second[0]
-                                  ? "YES - BUG IN compute_residuals!"
-                                  : "NO - OK")
-                          << std::endl;
-                debug_counter++;
-            }
-        }
-
         // ===== MAHIMA: Check if we should inspect this factor for this person =====
         bool should_inspect_this = should_inspect(person, factor_name, context);
 
@@ -246,24 +226,6 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
         // ===== MAHIMA: Store inspection data for later recording (after physical activity is
         // assigned) =====
         if (should_inspect_this) {
-            // DEBUG: Show the actual values being passed to store_inspection_data
-            if (i == 0) { // Food Carbohydrate
-                static int debug_counter = 0;
-                if (debug_counter < 3) {
-                    std::cout
-                        << "\n[DEBUG] Before calling store_inspection_data for Food Carbohydrate:"
-                        << std::endl;
-                    std::cout << "  Call " << debug_counter << ":" << std::endl;
-                    std::cout << "    residuals.first[0] = " << std::fixed << std::setprecision(6)
-                              << residuals.first[0] << std::endl;
-                    std::cout << "    residuals.second[0] = " << std::fixed << std::setprecision(6)
-                              << residuals.second[0] << std::endl;
-                    std::cout << "    Will pass to CSV: " << residuals.first[0] << " and "
-                              << residuals.second[0] << std::endl;
-                    debug_counter++;
-                }
-            }
-
             store_inspection_data(person, factor_name, context, "residual_initialization", residual,
                                   0.0, 0.0, residual, stddev_[i], lambda_[i], 0.0, 0.0,
                                   ranges_[i].lower(), ranges_[i].upper(), 0.0,
@@ -928,24 +890,6 @@ void StaticLinearModel::store_inspection_data(
     double random_residual_before_cholesky, double residual_after_cholesky) const {
     (void)context;     // Suppress unused parameter warning
     (void)factor_name; // Suppress unused parameter warning
-
-    // DEBUG: Show what's being stored for Food Carbohydrate
-    if (factor_name == "FoodCarbohydrate"_id) {
-        static int debug_counter = 0;
-        if (debug_counter < 3) { // Only show first 3 calls
-            std::cout << "\n[DEBUG] CSV Recording for Food Carbohydrate:" << std::endl;
-            std::cout << "  Call " << debug_counter << ":" << std::endl;
-            std::cout << "    random_residual_before_cholesky = " << std::fixed
-                      << std::setprecision(6) << random_residual_before_cholesky << std::endl;
-            std::cout << "    residual_after_cholesky = " << std::fixed << std::setprecision(6)
-                      << residual_after_cholesky << std::endl;
-            std::cout << "    Are they equal? "
-                      << (random_residual_before_cholesky == residual_after_cholesky ? "YES - BUG!"
-                                                                                     : "NO - OK")
-                      << std::endl;
-            debug_counter++;
-        }
-    }
 
     if (!temp_inspection_data_) {
         temp_inspection_data_ = std::make_unique<std::vector<InspectionRecord>>();
