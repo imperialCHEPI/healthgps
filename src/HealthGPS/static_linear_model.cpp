@@ -3,8 +3,11 @@
 #include "runtime_context.h"
 
 #include <cmath>
+#include <fstream>  // MAHIMA: For file operations
+#include <iomanip>  // MAHIMA: For precision formatting
 #include <iostream> // Added for print statements
 #include <ranges>
+#include <sstream> // MAHIMA: For string streams
 #include <utility>
 
 namespace hgps {
@@ -54,7 +57,11 @@ StaticLinearModel::StaticLinearModel(
       cholesky_{cholesky}, policy_models_{policy_models}, policy_ranges_{policy_ranges},
       policy_cholesky_{policy_cholesky}, info_speed_{info_speed},
       rural_prevalence_{rural_prevalence}, income_models_{income_models},
-      physical_activity_stddev_{physical_activity_stddev} {}
+      physical_activity_stddev_{physical_activity_stddev} {
+
+    // ===== MAHIMA: Initialize risk factor inspection settings =====
+    initialize_inspection_settings();
+}
 
 RiskFactorModelType StaticLinearModel::type() const noexcept { return RiskFactorModelType::Static; }
 
@@ -95,6 +102,11 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     if (trend_type_ != TrendType::Null) {
         adjust_risk_factors(context, names_, ranges_, true);
     }
+
+    // ===== MAHIMA: Write inspection data if any was collected =====
+    // Note: Physical activity is assigned after risk factors, so we write here
+    // This ensures physical activity values are available when writing to CSV
+    write_inspection_data(context);
 }
 
 void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
@@ -176,6 +188,10 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 
         apply_policies(person, intervene);
     }
+
+    // ===== MAHIMA: Write inspection data if any was collected (for newborns only) =====
+    // Note: Physical activity is assigned after risk factors, so we write here
+    write_inspection_data(context);
 }
 
 double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
@@ -188,6 +204,9 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
                                            Random &random) const {
 
     // Correlated residual sampling.
+    // compute_residuals now returns a pair: {independent_residuals, correlated_residuals}
+    // - independent_residuals: N(0,1) random variables BEFORE Cholesky transformation
+    // - correlated_residuals: correlated residuals AFTER Cholesky transformation
     auto residuals = compute_residuals(random, cholesky_);
 
     // Approximate risk factors with linear models.
@@ -195,23 +214,50 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
 
     // Initialise residuals and risk factors (do not exist yet).
     for (size_t i = 0; i < names_.size(); i++) {
+        const auto &factor_name = names_[i];
+
+        // ===== MAHIMA: Check if we should inspect this factor for this person =====
+        bool should_inspect_this = should_inspect(person, factor_name, context);
 
         // Initialise residual.
-        auto residual_name = core::Identifier{names_[i].to_string() + "_residual"};
-        double residual = residuals[i];
+        auto residual_name = core::Identifier{factor_name.to_string() + "_residual"};
+        double residual = residuals.second[i]; // Use correlated residual
+
+        // ===== MAHIMA: Store inspection data for later recording (after physical activity is
+        // assigned) =====
+        if (should_inspect_this) {
+            store_inspection_data(person, factor_name, context, "residual_initialization", residual,
+                                  0.0, 0.0, residual, stddev_[i], lambda_[i], 0.0, 0.0,
+                                  ranges_[i].lower(), ranges_[i].upper(), 0.0,
+                                  residuals.first[i],   // Independent residual BEFORE Cholesky
+                                  residuals.second[i]); // Correlated residual AFTER Cholesky
+        }
 
         // Save residual.
         person.risk_factors[residual_name] = residual;
 
         // Initialise risk factor.
         double expected =
-            get_expected(context, person.gender, person.age, names_[i], ranges_[i], false);
-        double factor = linear[i] + residual * stddev_[i];
-        factor = expected * inverse_box_cox(factor, lambda_[i]);
-        factor = ranges_[i].clamp(factor);
+            get_expected(context, person.gender, person.age, factor_name, ranges_[i], false);
+        double linear_result = linear[i];
+        double factor_before_boxcox = linear_result + (residual * stddev_[i]);
+        double boxcox_result = inverse_box_cox(factor_before_boxcox, lambda_[i]);
+        double factor_before_clamp = expected * boxcox_result;
+        double final_clamped_factor = ranges_[i].clamp(factor_before_clamp);
+
+        // ===== MAHIMA: Store inspection data for later recording (after physical activity is
+        // assigned) =====
+        if (should_inspect_this) {
+            store_inspection_data(person, factor_name, context, "factor_initialization",
+                                  final_clamped_factor, expected, linear_result, residual,
+                                  stddev_[i], lambda_[i], boxcox_result, factor_before_clamp,
+                                  ranges_[i].lower(), ranges_[i].upper(), final_clamped_factor,
+                                  residuals.first[i],   // Independent residual BEFORE Cholesky
+                                  residuals.second[i]); // Correlated residual AFTER Cholesky
+        }
 
         // Save risk factor.
-        person.risk_factors[names_[i]] = factor;
+        person.risk_factors[factor_name] = final_clamped_factor;
     }
 }
 
@@ -219,6 +265,9 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
                                        Random &random) const {
 
     // Correlated residual sampling.
+    // compute_residuals now returns a pair: {independent_residuals, correlated_residuals}
+    // - independent_residuals: N(0,1) random variables BEFORE Cholesky transformation
+    // - correlated_residuals: correlated residuals AFTER Cholesky transformation
     auto residuals = compute_residuals(random, cholesky_);
 
     // Approximate risk factors with linear models.
@@ -230,7 +279,7 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
         // Update residual.
         auto residual_name = core::Identifier{names_[i].to_string() + "_residual"};
         double residual_old = person.risk_factors.at(residual_name);
-        double residual = residuals[i] * info_speed_;
+        double residual = residuals.second[i] * info_speed_; // Use correlated residual
         residual += sqrt(1.0 - info_speed_ * info_speed_) * residual_old;
 
         // Save residual.
@@ -375,12 +424,15 @@ void StaticLinearModel::initialise_policies(Person &person, Random &random, bool
     //       so we compute residuals even though they are not used in baseline.
 
     // Intervention policy residual components.
+    // compute_residuals now returns a pair: {independent_residuals, correlated_residuals}
+    // - independent_residuals: N(0,1) random variables BEFORE Cholesky transformation
+    // - correlated_residuals: correlated residuals AFTER Cholesky transformation
     auto residuals = compute_residuals(random, policy_cholesky_);
 
     // Save residuals (never updated in lifetime).
     for (size_t i = 0; i < names_.size(); i++) {
         auto residual_name = core::Identifier{names_[i].to_string() + "_policy_residual"};
-        person.risk_factors[residual_name] = residuals[i];
+        person.risk_factors[residual_name] = residuals.second[i]; // Use correlated residual
     }
 
     // Compute policies.
@@ -465,22 +517,44 @@ StaticLinearModel::compute_linear_models(Person &person,
     return linear;
 }
 
-std::vector<double> StaticLinearModel::compute_residuals(Random &random,
-                                                         const Eigen::MatrixXd &cholesky) const {
-    std::vector<double> correlated_residuals{};
-    correlated_residuals.reserve(names_.size());
-
-    // Correlated samples using Cholesky decomposition.
+std::pair<std::vector<double>, std::vector<double>>
+StaticLinearModel::compute_residuals(Random &random, const Eigen::MatrixXd &cholesky) const {
+    // Generate independent N(0,1) residuals
     Eigen::VectorXd residuals{names_.size()};
     std::ranges::generate(residuals, [&random] { return random.next_normal(0.0, 1.0); });
+
+    // Store independent residuals BEFORE Cholesky transformation
+    // These are standard normal N(0,1) random variables that are uncorrelated
+    std::vector<double> independent_residuals{};
+    independent_residuals.reserve(names_.size());
+    for (size_t i = 0; i < names_.size(); i++) {
+        independent_residuals.emplace_back(residuals[i]);
+    }
+
+    // Apply Cholesky transformation: z = L * x
+    // This transforms independent N(0,1) variables into correlated multivariate normal variables
+    // The correlation structure is determined by the Cholesky factor L
     residuals = cholesky * residuals;
 
-    // Save correlated residuals.
+    // Store correlated residuals AFTER Cholesky transformation
+    // These now have the desired correlation structure while maintaining normal distribution
+    std::vector<double> correlated_residuals{};
+    correlated_residuals.reserve(names_.size());
     for (size_t i = 0; i < names_.size(); i++) {
         correlated_residuals.emplace_back(residuals[i]);
     }
 
-    return correlated_residuals;
+    // Return pair: {independent_residuals, correlated_residuals}
+    //
+    // VERIFICATION: This ensures that:
+    // - residuals.first[i] contains the independent N(0,1) random variables BEFORE Cholesky
+    // - residuals.second[i] contains the correlated residuals AFTER Cholesky transformation
+    //
+    // The Cholesky transformation: z = L * x where:
+    // - x = independent N(0,1) variables (residuals.first)
+    // - L = lower triangular Cholesky factor
+    // - z = correlated multivariate normal variables (residuals.second)
+    return {std::move(independent_residuals), std::move(correlated_residuals)};
 }
 
 void StaticLinearModel::initialise_sector(Person &person, Random &random) const {
@@ -749,5 +823,226 @@ std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() con
         expected_income_trend_boxcox_, income_trend_steps_, income_trend_models_,
         income_trend_ranges_, income_trend_lambda_, income_trend_decay_factors_);
 }
+
+// ===== MAHIMA: Risk Factor Inspection Implementation =====
+
+void StaticLinearModel::initialize_inspection_settings() {
+    // Set to true to enable inspection, false to disable
+    inspection_settings_.enabled = true; // CHANGE THIS TO TRUE TO ENABLE
+
+    // Configure which risk factor to inspect
+    inspection_settings_.target_risk_factor =
+        "FoodCarbohydrate"_id; // CHANGE THIS TO DESIRED FACTOR
+
+    // Optional filters - set to std::nullopt to disable filtering
+    inspection_settings_.target_age = 30; // e.g., 30 for age 30 only
+    inspection_settings_.target_gender =
+        core::Gender::female;                // e.g., core::Gender::male, for males only
+    inspection_settings_.target_year = 2022; // e.g., 2025 for year 2025 only
+
+    // Initialize inspection data if enabled
+    if (inspection_settings_.enabled) {
+        inspection_data_ = std::make_unique<std::vector<std::string>>();
+        temp_inspection_data_ = std::make_unique<std::vector<InspectionRecord>>();
+        std::cout << "\nRisk factor inspection enabled for: "
+                  << inspection_settings_.target_risk_factor.to_string();
+    }
+}
+
+bool StaticLinearModel::should_inspect(const Person &person, const core::Identifier &factor_name,
+                                       const RuntimeContext &context) const {
+    if (!inspection_settings_.enabled) {
+        return false;
+    }
+
+    // Check if this is the target risk factor
+    if (factor_name != inspection_settings_.target_risk_factor) {
+        return false;
+    }
+
+    // Check age filter
+    if (inspection_settings_.target_age.has_value() &&
+        static_cast<int>(person.age) != inspection_settings_.target_age.value()) {
+        return false;
+    }
+
+    // Check gender filter
+    // Note: core::Gender::male = 1, core::Gender::female = 0
+    if (inspection_settings_.target_gender.has_value() &&
+        person.gender != inspection_settings_.target_gender.value()) {
+        return false;
+    }
+
+    // Check year filter
+    if (inspection_settings_.target_year.has_value() &&
+        context.time_now() != inspection_settings_.target_year.value()) {
+        return false;
+    }
+
+    return true;
+}
+
+void StaticLinearModel::store_inspection_data(
+    const Person &person, const core::Identifier &factor_name, const RuntimeContext &context,
+    const std::string &step_name, double value_assigned, double expected_value,
+    double linear_result, double residual, double stddev, double lambda, double boxcox_result,
+    double factor_before_clamp, double range_lower, double range_upper, double final_clamped_factor,
+    double random_residual_before_cholesky, double residual_after_cholesky) const {
+    (void)context;     // Suppress unused parameter warning
+    (void)factor_name; // Suppress unused parameter warning
+
+    if (!temp_inspection_data_) {
+        temp_inspection_data_ = std::make_unique<std::vector<InspectionRecord>>();
+    }
+
+    // Store inspection data temporarily (without physical activity)
+    InspectionRecord record{person.id(),
+                            person.gender,
+                            person.age,
+                            person.sector,
+                            person.income,
+                            step_name,
+                            value_assigned,
+                            expected_value,
+                            linear_result,
+                            residual,
+                            stddev,
+                            lambda,
+                            boxcox_result,
+                            factor_before_clamp,
+                            range_lower,
+                            range_upper,
+                            final_clamped_factor,
+                            random_residual_before_cholesky,
+                            residual_after_cholesky};
+    temp_inspection_data_->emplace_back(std::move(record));
+}
+
+void StaticLinearModel::record_inspection_data(
+    const Person &person, const core::Identifier &factor_name, const RuntimeContext &context,
+    const std::string &step_name, double value_assigned, double expected_value,
+    double linear_result, double residual, double stddev, double lambda, double boxcox_result,
+    double factor_before_clamp, double range_lower, double range_upper, double final_clamped_factor,
+    double random_residual_before_cholesky, double residual_after_cholesky) const {
+    (void)context;     // Suppress unused parameter warning
+    (void)factor_name; // Suppress unused parameter warning
+
+    if (!inspection_data_) {
+        return;
+    }
+
+    // Get physical activity value if available, otherwise use 0.0
+    // Note: Physical activity is initialized AFTER risk factors, so it might not be available yet
+    double physical_activity = 0.0;
+    auto it = person.risk_factors.find("PhysicalActivity"_id);
+    if (it != person.risk_factors.end()) {
+        physical_activity = it->second;
+    }
+
+    std::string csv_line = create_inspection_csv_line(
+        person.id(), person.gender, person.age, person.sector, person.income, step_name,
+        value_assigned, expected_value, linear_result, residual, stddev, lambda, boxcox_result,
+        factor_before_clamp, range_lower, range_upper, final_clamped_factor,
+        random_residual_before_cholesky, residual_after_cholesky, physical_activity);
+
+    inspection_data_->emplace_back(std::move(csv_line));
+}
+
+void StaticLinearModel::write_inspection_data(const RuntimeContext &context) const {
+
+    if (!temp_inspection_data_ || temp_inspection_data_->empty()) {
+        return;
+    }
+
+    // Initialize inspection_data_ if not already done
+    if (!inspection_data_) {
+        inspection_data_ = std::make_unique<std::vector<std::string>>();
+    }
+
+    // Process temporary inspection data and get physical activity values
+    for (const auto &temp_record : *temp_inspection_data_) {
+        // Get physical activity value from the person's risk factors
+        double physical_activity = 0.0;
+
+        // Find the person in the current population to get their physical activity
+        for (const auto &person : context.population()) {
+            if (person.id() == temp_record.person_id) {
+                auto it = person.risk_factors.find("PhysicalActivity"_id);
+                if (it != person.risk_factors.end()) {
+                    physical_activity = it->second;
+                }
+                break;
+            }
+        }
+
+        std::string csv_line = create_inspection_csv_line(
+            temp_record.person_id, temp_record.gender, temp_record.age, temp_record.sector,
+            temp_record.income_category, temp_record.step_name, temp_record.value_assigned,
+            temp_record.expected_value, temp_record.linear_result, temp_record.residual,
+            temp_record.stddev, temp_record.lambda, temp_record.boxcox_result,
+            temp_record.factor_before_clamp, temp_record.range_lower, temp_record.range_upper,
+            temp_record.final_clamped_factor, temp_record.random_residual_before_cholesky,
+            temp_record.residual_after_cholesky, physical_activity);
+
+        inspection_data_->emplace_back(std::move(csv_line));
+    }
+
+    // Generate filename with risk factor name
+    std::string factor_name = inspection_settings_.target_risk_factor.to_string();
+    std::string filename = factor_name + "_inspection.csv";
+
+    // Write to CSV file
+    std::ofstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "\nCannot open file for writing: " << filename;
+        return;
+    }
+
+    // Write header
+    file << get_inspection_csv_header() << "\n";
+
+    // Write records
+    for (const auto &record : *inspection_data_) {
+        file << record << "\n";
+    }
+
+    std::cout << "\nRisk factor inspection data written to: " << filename << " ("
+              << inspection_data_->size() << " records)";
+
+    // Clear temporary data after writing
+    temp_inspection_data_->clear();
+}
+
+std::string StaticLinearModel::create_inspection_csv_line(
+    std::size_t person_id, core::Gender gender, unsigned int age, core::Sector sector,
+    core::Income income_category, const std::string &step_name, double value_assigned,
+    double expected_value, double linear_result, double residual, double stddev, double lambda,
+    double boxcox_result, double factor_before_clamp, double range_lower, double range_upper,
+    double final_clamped_factor, double random_residual_before_cholesky,
+    double residual_after_cholesky, double physical_activity) const {
+    std::ostringstream oss;
+    // Gender values: 1=male, 0=female (matching Person::gender_to_value())
+    int gender_value = (gender == core::Gender::male) ? 1 : 0;
+    oss << person_id << "," << gender_value << "," << age << "," << static_cast<int>(sector)
+        << ","                                                            // sector (rural/urban)
+        << std::fixed << std::setprecision(6) << physical_activity << "," // physical_activity
+        << static_cast<int>(income_category) << "," << step_name << "," << std::fixed
+        << std::setprecision(6) << value_assigned << "," << expected_value << "," << linear_result
+        << "," << residual << "," << stddev << "," << lambda << "," << boxcox_result << ","
+        << factor_before_clamp << "," << range_lower << "," << range_upper << ","
+        << final_clamped_factor << "," << random_residual_before_cholesky << ","
+        << residual_after_cholesky;
+    return oss.str();
+}
+
+std::string StaticLinearModel::get_inspection_csv_header() {
+    // Gender values: 1=male, 0=female (matching Person::gender_to_value())
+    return "person_id,gender,age,sector,physical_activity,"
+           "income_category,step_name,value_assigned,expected_value,linear_result,residual,"
+           "stddev,lambda,boxcox_result,factor_before_clamp,range_lower,range_upper,"
+           "final_clamped_factor,random_residual_before_cholesky,residual_after_cholesky";
+}
+
+// ===== END MAHIMA: Risk Factor Inspection Implementation =====
 
 } // namespace hgps
