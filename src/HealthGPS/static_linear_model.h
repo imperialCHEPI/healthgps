@@ -14,7 +14,7 @@ namespace hgps {
 static constexpr bool ENABLE_FAT_TRACING = true;  // Toggle tracing on/off
 static constexpr int TARGET_AGE = 30;             // Target age
 static constexpr core::Gender TARGET_GENDER = core::Gender::female;  // Target gender
-static const core::Identifier TARGET_RISK_FACTOR = "FoodFat"_id;        // Target risk factor
+  static const core::Identifier TARGET_RISK_FACTOR = "FoodFat"_id;        // Target risk factor
 
 /// @brief Defines the linear model parameters used to initialise risk factors
 struct LinearModelParams {
