@@ -98,7 +98,7 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
     // Trend type for factors mean adjustment
     TrendType trend_type_;
 
-    // Income trend data structures (optional, only used when trend_type_ == TrendType::IncomeTrend)
+    // Income trend data structures (only used when trend_type_ == TrendType::IncomeTrend)
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend_;
     std::shared_ptr<std::unordered_map<core::Identifier, double>>
         expected_income_trend_decay_factors_;
@@ -111,16 +111,19 @@ class RiskFactorAdjustableModelDefinition : public RiskFactorModelDefinition {
     /// @param expected The expected risk factor values by sex and age
     /// @param expected_trend The expected trend of risk factor values
     /// @param trend_steps The number of time steps to apply the trend
+    /// @param trend_type The type of trend to apply (optional, defaults to Null)
     /// @throws HgpsException for invalid arguments
     RiskFactorAdjustableModelDefinition(
         std::unique_ptr<RiskFactorSexAgeTable> expected,
         std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
-        std::unique_ptr<std::unordered_map<core::Identifier, int>> trend_steps);
+        std::unique_ptr<std::unordered_map<core::Identifier, int>> trend_steps,
+        TrendType trend_type = TrendType::Null);
 
   protected:
     std::shared_ptr<RiskFactorSexAgeTable> expected_;
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_;
     std::shared_ptr<std::unordered_map<core::Identifier, int>> trend_steps_;
+    TrendType trend_type_;
 };
 
 } // namespace hgps

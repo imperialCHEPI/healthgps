@@ -596,7 +596,7 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::unique_ptr<std::vector<double>> income_trend_lambda,
     std::unique_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors)
     : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend),
-                                          std::move(trend_steps)},
+                                          std::move(trend_steps), trend_type},
       // Regular trend member variables
       expected_trend_boxcox_{std::move(expected_trend_boxcox)},
       trend_models_{std::move(trend_models)}, trend_ranges_{std::move(trend_ranges)},
