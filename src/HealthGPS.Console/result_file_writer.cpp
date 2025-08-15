@@ -340,10 +340,6 @@ std::string ResultFileWriter::income_category_to_string(core::Income income) con
         return "MiddleIncome";
     case core::Income::high:
         return "HighIncome";
-    case core::Income::lowermiddle:
-        return "LowerMiddleIncome";
-    case core::Income::uppermiddle:
-        return "UpperMiddleIncome";
     case core::Income::unknown:
         return "UnknownIncome";
     default:
