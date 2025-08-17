@@ -50,7 +50,7 @@ double RiskFactorAdjustableModel::get_expected(RuntimeContext &context, core::Ge
     double expected = expected_->at(sex, factor).at(age);
 
     // Apply trend to expected value based on trend type
-    if (apply_trend) {
+    if (apply_trend && trend_type_ != TrendType::Null) {
         int elapsed_time = context.time_now() - context.start_time();
 
         switch (trend_type_) {
@@ -61,8 +61,10 @@ double RiskFactorAdjustableModel::get_expected(RuntimeContext &context, core::Ge
         case TrendType::Trend: {
             // Apply regular UPF trend to factors mean adjustment
             // Formula: factors_mean_T = factors_mean × ExpectedTrend^(T-T0)
-            int t = std::min(elapsed_time, get_trend_steps(factor));
-            expected *= pow(expected_trend_->at(factor), t);
+            if (expected_trend_) {
+                int t = std::min(elapsed_time, get_trend_steps(factor));
+                expected *= pow(expected_trend_->at(factor), t);
+            }
             break;
         }
 
@@ -151,7 +153,10 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
 }
 
 int RiskFactorAdjustableModel::get_trend_steps(const core::Identifier &factor) const {
-    return trend_steps_->at(factor);
+    if (trend_steps_) {
+        return trend_steps_->at(factor);
+    }
+    return 0; // Default to no trend steps if trend data is not available
 }
 
 RiskFactorSexAgeTable
@@ -236,18 +241,22 @@ RiskFactorAdjustableModel::calculate_simulated_mean(Population &population,
 RiskFactorAdjustableModelDefinition::RiskFactorAdjustableModelDefinition(
     std::unique_ptr<RiskFactorSexAgeTable> expected,
     std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
-    std::unique_ptr<std::unordered_map<core::Identifier, int>> trend_steps)
+    std::unique_ptr<std::unordered_map<core::Identifier, int>> trend_steps, TrendType trend_type)
     : expected_{std::move(expected)}, expected_trend_{std::move(expected_trend)},
-      trend_steps_{std::move(trend_steps)} {
+      trend_steps_{std::move(trend_steps)}, trend_type_{trend_type} {
 
     if (expected_->empty()) {
         throw core::HgpsException("Risk factor expected value mapping is empty");
     }
-    if (expected_trend_->empty()) {
-        throw core::HgpsException("Risk factor expected trend mapping is empty");
-    }
-    if (trend_steps_->empty()) {
-        throw core::HgpsException("Risk factor trend steps mapping is empty");
+
+    // Only validate trend data if trends are actually being used
+    if (trend_type_ != TrendType::Null) {
+        if (expected_trend_->empty()) {
+            throw core::HgpsException("Risk factor expected trend mapping is empty");
+        }
+        if (trend_steps_->empty()) {
+            throw core::HgpsException("Risk factor trend steps mapping is empty");
+        }
     }
 }
 
