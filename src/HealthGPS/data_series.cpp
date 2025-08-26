@@ -18,7 +18,7 @@ DataSeries::DataSeries(std::size_t sample_size) : sample_size_{sample_size} {
                              std::map<core::Income, std::map<std::string, std::vector<double>>>{});
         // Initialize ALL possible income categories to ensure any enum value can be accessed
         for (auto income : {core::Income::unknown, core::Income::low, core::Income::lowermiddle,
-                           core::Income::middle, core::Income::uppermiddle, core::Income::high}) {
+                            core::Income::middle, core::Income::uppermiddle, core::Income::high}) {
             income_data_[gender].emplace(income, std::map<std::string, std::vector<double>>{});
         }
     }
@@ -88,9 +88,9 @@ void DataSeries::add_income_channels(const std::vector<std::string> &keys) {
     std::vector<double> empty_vector(sample_size_);
 
     // Only create channels for the main income categories that are actually used
-    const std::array<core::Income, 5> income_categories = {core::Income::low, core::Income::lowermiddle,
-                                                           core::Income::middle, core::Income::uppermiddle,
-                                                           core::Income::high};
+    const std::array<core::Income, 5> income_categories = {
+        core::Income::low, core::Income::lowermiddle, core::Income::middle,
+        core::Income::uppermiddle, core::Income::high};
 
     for (size_t i = 0; i < keys.size(); i++) {
         const auto &key = keys[i];

@@ -62,15 +62,15 @@ hgps::core::Income map_income_category(const std::string &key, const std::string
     if (hgps::core::case_insensitive::equals(key, "unknown")) {
         return hgps::core::Income::unknown;
     }
-    
+
     if (hgps::core::case_insensitive::equals(key, "low")) {
         return hgps::core::Income::low;
     }
-    
+
     if (hgps::core::case_insensitive::equals(key, "high")) {
         return hgps::core::Income::high;
     }
-    
+
     // Handle middle categories based on count
     if (category_count == "3") {
         // 3-category system: low, middle, high
@@ -86,10 +86,9 @@ hgps::core::Income map_income_category(const std::string &key, const std::string
             return hgps::core::Income::uppermiddle;
         }
     }
-    
-    throw hgps::core::HgpsException(
-        fmt::format("Income category '{}' is unrecognized for {} category system", 
-                    key, category_count));
+
+    throw hgps::core::HgpsException(fmt::format(
+        "Income category '{}' is unrecognized for {} category system", key, category_count));
 }
 
 /// @brief Load the model's JSON config file and validate with the appropriate schema
@@ -527,21 +526,21 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
     // Income models for different income classifications.
     std::unordered_map<core::Income, LinearModelParams> income_models;
-    
+
     // Read income_categories from config.json to determine which system to use
     std::string income_categories = "3"; // Default to 3-category system
     if (config.config_data.contains("income_categories")) {
         income_categories = config.config_data["income_categories"].get<std::string>();
         // Validate income_categories value
         if (income_categories != "3" && income_categories != "4") {
-            throw core::HgpsException{
-                fmt::format("Invalid income_categories: {}. Must be one of: 3, 4", income_categories)};
+            throw core::HgpsException{fmt::format(
+                "Invalid income_categories: {}. Must be one of: 3, 4", income_categories)};
         }
     }
-    
+
     // Print which income category system is being used
     std::cout << "Using " << income_categories << " income categories system" << std::endl;
-    
+
     for (const auto &[key, json_params] : opt["IncomeModels"].items()) {
 
         // Get income category using the helper function

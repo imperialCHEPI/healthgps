@@ -430,13 +430,15 @@ void AnalysisModule::calculate_income_based_statistics(RuntimeContext &context,
                     result_by_income.low = ResultByGender{male_prevalence, female_prevalence};
                     break;
                 case core::Income::lowermiddle:
-                    result_by_income.lowermiddle = ResultByGender{male_prevalence, female_prevalence};
+                    result_by_income.lowermiddle =
+                        ResultByGender{male_prevalence, female_prevalence};
                     break;
                 case core::Income::middle:
                     result_by_income.middle = ResultByGender{male_prevalence, female_prevalence};
                     break;
                 case core::Income::uppermiddle:
-                    result_by_income.uppermiddle = ResultByGender{male_prevalence, female_prevalence};
+                    result_by_income.uppermiddle =
+                        ResultByGender{male_prevalence, female_prevalence};
                     break;
                 case core::Income::high:
                     result_by_income.high = ResultByGender{male_prevalence, female_prevalence};
@@ -464,13 +466,15 @@ void AnalysisModule::calculate_income_based_statistics(RuntimeContext &context,
                     result_by_income.low = ResultByGender{male_comorbidity, female_comorbidity};
                     break;
                 case core::Income::lowermiddle:
-                    result_by_income.lowermiddle = ResultByGender{male_comorbidity, female_comorbidity};
+                    result_by_income.lowermiddle =
+                        ResultByGender{male_comorbidity, female_comorbidity};
                     break;
                 case core::Income::middle:
                     result_by_income.middle = ResultByGender{male_comorbidity, female_comorbidity};
                     break;
                 case core::Income::uppermiddle:
-                    result_by_income.uppermiddle = ResultByGender{male_comorbidity, female_comorbidity};
+                    result_by_income.uppermiddle =
+                        ResultByGender{male_comorbidity, female_comorbidity};
                     break;
                 case core::Income::high:
                     result_by_income.high = ResultByGender{male_comorbidity, female_comorbidity};
