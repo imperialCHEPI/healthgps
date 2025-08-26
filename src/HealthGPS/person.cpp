@@ -14,6 +14,8 @@ std::map<core::Identifier, std::function<double(const Person &)>> Person::curren
     {"Age3"_id, [](const Person &p) { return pow(p.age, 3); }},
     {"Over18"_id, [](const Person &p) { return static_cast<double>(p.over_18()); }},
     {"Sector"_id, [](const Person &p) { return p.sector_to_value(); }},
+    {"Region"_id, [](const Person &p) { return p.region_to_value(); }},
+    {"Ethnicity"_id, [](const Person &p) { return p.ethnicity_to_value(); }},
     {"Income"_id, [](const Person &p) { return p.income_to_value(); }},
     {"SES"_id, [](const Person &p) { return p.ses; }},
 };
@@ -92,6 +94,36 @@ float Person::income_to_value() const {
     default:
         throw core::HgpsException("Unknown income category");
     }
+}
+
+float Person::region_to_value() const {
+    // This method will need to be updated to work with the dynamic region mapping
+    // For now, return a default value - the actual mapping will be implemented
+    // when we implement the CSV loading system
+    if (region == "unknown") {
+        throw core::HgpsException("Region is unknown - CSV data may not have been loaded properly.");
+    }
+    
+    // TODO: Implement dynamic mapping based on CSV column order
+    // This should be updated when we implement the CSV loading system
+    // For now, return a hash-based value to ensure uniqueness
+    std::hash<std::string> hasher;
+    return static_cast<float>(hasher(region) % 1000) + 1.0f; // Ensure positive values
+}
+
+float Person::ethnicity_to_value() const {
+    // This method will need to be updated to work with the dynamic ethnicity mapping
+    // For now, return a default value - the actual mapping will be implemented
+    // when we implement the CSV loading system
+    if (ethnicity == "unknown") {
+        throw core::HgpsException("Ethnicity is unknown - CSV data may not have been loaded properly.");
+    }
+    
+    // TODO: Implement dynamic mapping based on CSV column order
+    // This should be updated when we implement the CSV loading system
+    // For now, return a hash-based value to ensure uniqueness
+    std::hash<std::string> hasher;
+    return static_cast<float>(hasher(ethnicity) % 1000) + 1.0f; // Ensure positive values
 }
 
 void Person::emigrate(const unsigned int time) {

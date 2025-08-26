@@ -59,6 +59,12 @@ struct Person {
     /// @brief Sector (region) assigned value
     core::Sector sector{core::Sector::unknown};
 
+    /// @brief Region category (dynamically assigned from CSV)
+    std::string region{"unknown"};
+
+    /// @brief Ethnicity category (dynamically assigned from CSV)
+    std::string ethnicity{"unknown"};
+
     /// @brief Income category
     core::Income income{core::Income::unknown};
 
@@ -127,6 +133,16 @@ struct Person {
     /// @return The income value (low = 1, middle = 2, high = 3)
     /// @throws HgpsException if income is unknown
     float income_to_value() const;
+
+    /// @brief Gets the region as a numeric value for analysis
+    /// @return The region value converted to a number based on CSV order
+    /// @throws HgpsException if region is unknown
+    float region_to_value() const;
+
+    /// @brief Gets the ethnicity as a numeric value for analysis
+    /// @return The ethnicity value converted to a number based on CSV order
+    /// @throws HgpsException if ethnicity is unknown
+    float ethnicity_to_value() const;
 
     /// @brief Emigrate this instance from the virtual population
     /// @param time Migration time

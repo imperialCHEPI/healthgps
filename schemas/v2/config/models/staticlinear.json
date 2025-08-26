@@ -38,6 +38,14 @@
                 "additionalProperties": false
             }
         },
+        "RegionFile": {
+            "$ref": "../../../v1/config/csv_file.json",
+            "description": "CSV file containing region assignment probabilities by age and gender"
+        },
+        "EthnicityFile": {
+            "$ref": "../../../v1/config/csv_file.json",
+            "description": "CSV file containing ethnicity assignment probabilities by age group, gender, and region"
+        },
         "IncomeModels": {
             "type": "object",
             "additionalProperties": {
@@ -141,40 +149,6 @@
                         "additionalProperties": true
                     },
                     "Trend": {
-                        "type": "object",
-                        "properties": {
-                            "Intercept": {
-                                "type": "number"
-                            },
-                            "Coefficients": {
-                                "type": "object",
-                                "additionalProperties": {
-                                    "type": "number"
-                                },
-                                "minItems": 1
-                            },
-                            "LogCoefficients": {
-                                "type": "object",
-                                "additionalProperties": {
-                                    "type": "number"
-                                },
-                                "minItems": 1
-                            },
-                            "Range": {
-                                "type": "array",
-                                "items": {
-                                    "type": "number"
-                                },
-                                "minItems": 2,
-                                "maxItems": 2
-                            },
-                            "Lambda": {
-                                "type": "number"
-                            }
-                        },
-                        "additionalProperties": true
-                    },
-                    "IncomeTrend": {
                         "type": "object",
                         "properties": {
                             "Intercept": {

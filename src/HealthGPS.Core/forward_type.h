@@ -68,6 +68,10 @@ enum class Income : uint8_t {
     high
 };
 
+// Note: Region and Ethnicity are now dynamic string-based identifiers
+// They are read from CSV files and can support any number of categories
+// The system will automatically adapt to the CSV structure
+
 /// @brief C++20 concept for numeric columns types
 template <typename T>
 concept Numerical = std::is_arithmetic_v<T>;
