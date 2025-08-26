@@ -390,7 +390,8 @@ int DemographicModule::update_age_and_death_events(RuntimeContext &context,
     return number_of_deaths;
 }
 
-void DemographicModule::initialise_region( [[maybe_unused]] RuntimeContext &context, Person &person, Random &random) {
+void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &context, Person &person,
+                                          Random &random) {
     // Create an age-specific identifier in the format used in the CSV loading
     core::Identifier age_id("age_" + std::to_string(person.age));
 
@@ -455,8 +456,7 @@ void DemographicModule::initialise_region( [[maybe_unused]] RuntimeContext &cont
 }
 
 void DemographicModule::initialise_ethnicity([[maybe_unused]] RuntimeContext &context,
-                                             Person &person,
-                                             Random &random) {
+                                             Person &person, Random &random) {
     // Determine the age group for this person
     // In the loading I'm assigning 0-under18 and 1-over18
     core::Identifier age_group = person.age < 18 ? "Under18"_id : "Over18"_id;
