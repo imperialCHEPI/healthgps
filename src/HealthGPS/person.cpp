@@ -80,10 +80,14 @@ float Person::income_to_value() const {
     switch (income) {
     case core::Income::low:
         return 1.0f; // Low income
+    case core::Income::lowermiddle:
+        return 2.0f; // Lower middle income
     case core::Income::middle:
-        return 2.0f; // Middle income
+        return 2.0f; // Middle income (maps to same value as lowermiddle for consistency)
+    case core::Income::uppermiddle:
+        return 3.0f; // Upper middle income
     case core::Income::high:
-        return 3.0f; // High income
+        return 4.0f; // High income
     case core::Income::unknown:
     default:
         throw core::HgpsException("Unknown income category");

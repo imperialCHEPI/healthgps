@@ -52,6 +52,45 @@ int get_model_schema_version(const std::string &model_name) {
 
     throw std::invalid_argument(fmt::format("Unknown model: {}", model_name));
 }
+// MAHIMA- Dynamic income category mapping from config.json to codebase
+/// @brief Maps income category name to enum value based on category count
+/// @param key The income category name from JSON
+/// @param category_count The number of income categories (3 or 4)
+/// @return The corresponding Income enum value
+/// @throws core::HgpsException if the category name is unrecognized
+hgps::core::Income map_income_category(const std::string &key, const std::string &category_count) {
+    if (hgps::core::case_insensitive::equals(key, "unknown")) {
+        return hgps::core::Income::unknown;
+    }
+    
+    if (hgps::core::case_insensitive::equals(key, "low")) {
+        return hgps::core::Income::low;
+    }
+    
+    if (hgps::core::case_insensitive::equals(key, "high")) {
+        return hgps::core::Income::high;
+    }
+    
+    // Handle middle categories based on count
+    if (category_count == "3") {
+        // 3-category system: low, middle, high
+        if (hgps::core::case_insensitive::equals(key, "middle")) {
+            return hgps::core::Income::middle;
+        }
+    } else if (category_count == "4") {
+        // 4-category system: low, lowermiddle, uppermiddle, high
+        if (hgps::core::case_insensitive::equals(key, "lowermiddle")) {
+            return hgps::core::Income::lowermiddle;
+        }
+        if (hgps::core::case_insensitive::equals(key, "uppermiddle")) {
+            return hgps::core::Income::uppermiddle;
+        }
+    }
+    
+    throw hgps::core::HgpsException(
+        fmt::format("Income category '{}' is unrecognized for {} category system", 
+                    key, category_count));
+}
 
 /// @brief Load the model's JSON config file and validate with the appropriate schema
 /// @param model_path The path to the model config file
@@ -488,21 +527,25 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
     // Income models for different income classifications.
     std::unordered_map<core::Income, LinearModelParams> income_models;
+    
+    // Read income_categories from config.json to determine which system to use
+    std::string income_categories = "3"; // Default to 3-category system
+    if (config.config_data.contains("income_categories")) {
+        income_categories = config.config_data["income_categories"].get<std::string>();
+        // Validate income_categories value
+        if (income_categories != "3" && income_categories != "4") {
+            throw core::HgpsException{
+                fmt::format("Invalid income_categories: {}. Must be one of: 3, 4", income_categories)};
+        }
+    }
+    
+    // Print which income category system is being used
+    std::cout << "Using " << income_categories << " income categories system" << std::endl;
+    
     for (const auto &[key, json_params] : opt["IncomeModels"].items()) {
 
-        // Get income category.
-        core::Income category;
-        if (core::case_insensitive::equals(key, "Unknown")) {
-            category = core::Income::unknown;
-        } else if (core::case_insensitive::equals(key, "Low")) {
-            category = core::Income::low;
-        } else if (core::case_insensitive::equals(key, "Middle")) {
-            category = core::Income::middle;
-        } else if (core::case_insensitive::equals(key, "High")) {
-            category = core::Income::high;
-        } else {
-            throw core::HgpsException(fmt::format("Income category {} is unrecognised.", key));
-        }
+        // Get income category using the helper function
+        core::Income category = map_income_category(key, income_categories);
 
         // Get income model parameters.
         LinearModelParams model;
