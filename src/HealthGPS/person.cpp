@@ -101,9 +101,10 @@ float Person::region_to_value() const {
     // For now, return a default value - the actual mapping will be implemented
     // when we implement the CSV loading system
     if (region == "unknown") {
-        throw core::HgpsException("Region is unknown - CSV data may not have been loaded properly.");
+        throw core::HgpsException(
+            "Region is unknown - CSV data may not have been loaded properly.");
     }
-    
+
     // TODO: Implement dynamic mapping based on CSV column order
     // This should be updated when we implement the CSV loading system
     // For now, return a hash-based value to ensure uniqueness
@@ -116,9 +117,10 @@ float Person::ethnicity_to_value() const {
     // For now, return a default value - the actual mapping will be implemented
     // when we implement the CSV loading system
     if (ethnicity == "unknown") {
-        throw core::HgpsException("Ethnicity is unknown - CSV data may not have been loaded properly.");
+        throw core::HgpsException(
+            "Ethnicity is unknown - CSV data may not have been loaded properly.");
     }
-    
+
     // TODO: Implement dynamic mapping based on CSV column order
     // This should be updated when we implement the CSV loading system
     // For now, return a hash-based value to ensure uniqueness
