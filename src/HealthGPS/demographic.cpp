@@ -403,11 +403,11 @@ void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &conte
             throw core::HgpsException(fmt::format(
                 "Gender '{}' not found in region_prevalence_ for age: {}. Available genders: {}",
                 gender_str, age_id.to_string(), [this, &age_id]() {
-                    std::vector<std::string> genders;
-                    for (const auto &[g, _] : region_prevalence_.at(age_id)) {
-                        genders.push_back((g == core::Gender::male) ? "male" : "female");
-                    }
-                    return fmt::format("[{}]", fmt::join(genders, ", "));
+                                    std::vector<std::string> genders;
+                for (const auto &[g, _] : region_prevalence_.at(age_id)) {
+                    genders.emplace_back((g == core::Gender::male) ? "male" : "female");
+                }
+                return fmt::format("[{}]", fmt::join(genders, ", "));
                 }()));
         }
 

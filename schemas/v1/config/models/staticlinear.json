@@ -47,26 +47,64 @@
             "description": "CSV file containing ethnicity assignment probabilities by age group, gender, and region"
         },
         "IncomeModels": {
-            "type": "object",
-            "additionalProperties": {
-                "type": "object",
-                "properties": {
-                    "Intercept": {
-                        "type": "number"
-                    },
-                    "Coefficients": {
-                        "type": "object",
-                        "additionalProperties": {
-                            "type": "number"
+            "oneOf": [
+                {
+                    "type": "object",
+                    "description": "Continuous income model (FINCH approach) - calculates continuous income then converts to categories",
+                    "properties": {
+                        "continuous": {
+                            "type": "object",
+                            "properties": {
+                                "Intercept": {
+                                    "type": "number"
+                                },
+                                "Coefficients": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "type": "number"
+                                    }
+                                },
+                                "IncomeContinuousStdDev": {
+                                    "type": "number",
+                                    "description": "Standard deviation for continuous income calculation"
+                                }
+                            },
+                            "required": [
+                                "Intercept",
+                                "Coefficients",
+                                "IncomeContinuousStdDev"
+                            ],
+                            "additionalProperties": false
                         }
-                    }
+                    },
+                    "required": ["continuous"],
+                    "additionalProperties": false
                 },
-                "required": [
-                    "Intercept",
-                    "Coefficients"
-                ],
-                "additionalProperties": false
-            }
+                {
+                    "type": "object",
+                    "description": "Categorical income model (India approach) - directly assigns income categories",
+                    "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                            "Intercept": {
+                                "type": "number"
+                            },
+                            "Coefficients": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "type": "number"
+                                }
+                            }
+                        },
+                        "required": [
+                            "Intercept",
+                            "Coefficients"
+                        ],
+                        "additionalProperties": false
+                    },
+                    "minProperties": 1
+                }
+            ]
         },
         "RiskFactorModels": {
             "type": "object",

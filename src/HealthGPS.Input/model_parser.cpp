@@ -541,19 +541,49 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     // Print which income category system is being used
     std::cout << "Using " << income_categories << " income categories system" << std::endl;
 
-    for (const auto &[key, json_params] : opt["IncomeModels"].items()) {
+    // Check if this is a continuous income model (FINCH approach) or categorical (India approach)
+    bool is_continuous_model = false;
+    if (opt["IncomeModels"].contains("continuous")) {
+        is_continuous_model = true;
+        std::cout << "Detected FINCH continuous income model - will calculate continuous income then convert to categories" << std::endl;
+        
+        // For continuous models, we don't need to process IncomeModels here
+        // The continuous income calculation will be handled separately
+        // We just need to ensure the continuous model exists
+        if (!opt["IncomeModels"]["continuous"].contains("Intercept") || 
+            !opt["IncomeModels"]["continuous"].contains("Coefficients") ||
+            !opt["IncomeModels"]["continuous"].contains("IncomeContinuousStdDev")) {
+            throw core::HgpsException("Continuous income model missing required fields: Intercept, Coefficients, or IncomeContinuousStdDev");
+        }
+        
+        // Create placeholder income models for the categories (these will be filled by the continuous calculation)
+        // For now, create empty models - they'll be populated when continuous income is calculated
+        income_models.emplace(core::Income::low, LinearModelParams{});
+        if (income_categories == "4") {
+            income_models.emplace(core::Income::lowermiddle, LinearModelParams{});
+            income_models.emplace(core::Income::uppermiddle, LinearModelParams{});
+        } else {
+            income_models.emplace(core::Income::middle, LinearModelParams{});
+        }
+        income_models.emplace(core::Income::high, LinearModelParams{});
+        
+    } else {
+        // This is a categorical income model (India approach)
+        std::cout << "Detected India categorical income model - directly assigning income categories" << std::endl;
+        
+        for (const auto &[key, json_params] : opt["IncomeModels"].items()) {
+            // Get income category using the helper function
+            core::Income category = map_income_category(key, income_categories);
 
-        // Get income category using the helper function
-        core::Income category = map_income_category(key, income_categories);
+            // Get income model parameters.
+            LinearModelParams model;
+            model.intercept = json_params["Intercept"].get<double>();
+            model.coefficients =
+                json_params["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
 
-        // Get income model parameters.
-        LinearModelParams model;
-        model.intercept = json_params["Intercept"].get<double>();
-        model.coefficients =
-            json_params["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
-
-        // Insert income model.
-        income_models.emplace(category, std::move(model));
+            // Insert income model.
+            income_models.emplace(category, std::move(model));
+        }
     }
 
     // Standard deviation of physical activity.
@@ -569,7 +599,16 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         std::move(expected_income_trend), std::move(expected_income_trend_boxcox),
         std::move(income_trend_steps), std::move(income_trend_models),
         std::move(income_trend_ranges), std::move(income_trend_lambda),
-        std::move(income_trend_decay_factors));
+        std::move(income_trend_decay_factors), is_continuous_model,
+        is_continuous_model ? [&opt]() {
+            // Parse the continuous income model from JSON
+            LinearModelParams params;
+            const auto &continuous_json = opt["IncomeModels"]["continuous"];
+            params.intercept = continuous_json["Intercept"].get<double>();
+            params.coefficients = continuous_json["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
+            return params;
+        }() : LinearModelParams{},
+        income_categories);
 }
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
