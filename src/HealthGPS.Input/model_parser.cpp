@@ -247,7 +247,6 @@ load_hlm_risk_model_definition(const nlohmann::json &opt) {
 }
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
-// NOLINTBEGIN(readability-function-cognitive-complexity)
 std::unique_ptr<hgps::StaticLinearModelDefinition>
 load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configuration &config) {
     MEASURE_FUNCTION();
@@ -475,7 +474,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
         // Increment table column index.
         i++;
-    }
+    }// NOLINTEND(readability-function-cognitive-complexity)
 
     // Check risk factor correlation matrix column count matches risk factor count.
     if (opt["RiskFactorModels"].size() != correlation_table.num_columns()) {
@@ -541,15 +540,14 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     }
 
     // Print which income category system is being used
-    std::cout << "Using " << income_categories << " income categories system" << std::endl;
+    std::cout << "Using " << income_categories << " income categories system \n";
 
     // Check if this is a continuous income model (FINCH approach) or categorical (India approach)
     bool is_continuous_model = false;
     if (opt["IncomeModels"].contains("continuous")) {
         is_continuous_model = true;
         std::cout << "Detected FINCH continuous income model - will calculate continuous income "
-                     "then convert to categories"
-                  << std::endl;
+                     "then convert to categories\n";
 
         // For continuous models, we don't need to process IncomeModels here
         // The continuous income calculation will be handled separately
@@ -576,8 +574,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     } else {
         // This is a categorical income model (India approach)
         std::cout
-            << "Detected India categorical income model - directly assigning income categories"
-            << std::endl;
+            << "Detected India categorical income model - directly assigning income categories\n";
 
         for (const auto &[key, json_params] : opt["IncomeModels"].items()) {
             // Get income category using the helper function
@@ -616,11 +613,11 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             params.coefficients = continuous_json["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
 
             // Print debug info about the continuous income model
-            std::cout << "Continuous income model loaded:" << std::endl;
-            std::cout << "  Intercept: " << params.intercept << std::endl;
-            std::cout << "  Coefficients count: " << params.coefficients.size() << std::endl;
+            std::cout << "Continuous income model loaded:" << '\n';
+            std::cout << "  Intercept: " << params.intercept << '\n';
+            std::cout << "  Coefficients count: " << params.coefficients.size() << '\n';
             for (const auto &[coef_name, coef_value] : params.coefficients) {
-                std::cout << "    " << coef_name.to_string() << ": " << coef_value << std::endl;
+                std::cout << "    " << coef_name.to_string() << ": " << coef_value << '\n';
             }
 
             return params;

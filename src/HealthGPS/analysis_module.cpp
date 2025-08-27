@@ -384,17 +384,19 @@ void AnalysisModule::calculate_income_based_statistics(RuntimeContext &context,
                     result_by_income.low = ResultByGender{male_avg, female_avg};
                     break;
                 case core::Income::lowermiddle:
-                    result_by_income.lowermiddle = ResultByGender{male_avg, female_avg};
+                    result_by_income.lowermiddle =
+                        ResultByGender{.male = male_avg, .female = female_avg};
                     break;
                 case core::Income::middle:
-                    result_by_income.middle = ResultByGender{male_avg, female_avg};
+                    result_by_income.middle =
+                        ResultByGender{.male = male_avg, .female = female_avg};
                     break;
-                case core::Income::uppermiddle:
-                    result_by_income.uppermiddle = ResultByGender{male_avg, female_avg};
-                    break;
-                case core::Income::high:
-                    result_by_income.high = ResultByGender{male_avg, female_avg};
-                    break;
+                                 case core::Income::uppermiddle:
+                     result_by_income.uppermiddle = ResultByGender{male_avg, female_avg};
+                     break;
+                 case core::Income::high:
+                     result_by_income.high = ResultByGender{male_avg, female_avg};
+                     break;
                 default:
                     break;
                 }
@@ -462,23 +464,21 @@ void AnalysisModule::calculate_income_based_statistics(RuntimeContext &context,
                 double female_comorbidity = gender_data.female * 100.0 / count;
 
                 switch (income) {
-                case core::Income::low:
-                    result_by_income.low = ResultByGender{male_comorbidity, female_comorbidity};
-                    break;
-                case core::Income::lowermiddle:
-                    result_by_income.lowermiddle =
-                        ResultByGender{male_comorbidity, female_comorbidity};
-                    break;
-                case core::Income::middle:
-                    result_by_income.middle = ResultByGender{male_comorbidity, female_comorbidity};
-                    break;
-                case core::Income::uppermiddle:
-                    result_by_income.uppermiddle =
-                        ResultByGender{male_comorbidity, female_comorbidity};
-                    break;
-                case core::Income::high:
-                    result_by_income.high = ResultByGender{male_comorbidity, female_comorbidity};
-                    break;
+                                 case core::Income::low:
+                     result_by_income.low = ResultByGender{male_comorbidity, female_comorbidity};
+                     break;
+                 case core::Income::lowermiddle:
+                     result_by_income.lowermiddle = ResultByGender{male_comorbidity, female_comorbidity};
+                     break;
+                 case core::Income::middle:
+                     result_by_income.middle = ResultByGender{male_comorbidity, female_comorbidity};
+                     break;
+                 case core::Income::uppermiddle:
+                     result_by_income.uppermiddle = ResultByGender{male_comorbidity, female_comorbidity};
+                     break;
+                 case core::Income::high:
+                     result_by_income.high = ResultByGender{male_comorbidity, female_comorbidity};
+                     break;
                 default:
                     break;
                 }
@@ -725,42 +725,54 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
             series(core::Gender::male, "mean_age3").at(age) /= count_M;
         }
 
-        // NEW: Calculate in-place demographic averages (only if data exists)
+        // MAHIMA: Calculate in-place demographic averages (only if data exists)
         // Region averages
-        if (count_F > 0)
+        if (count_F > 0) {
             series(core::Gender::female, "mean_region").at(age) /= count_F;
-        if (count_M > 0)
+        }
+        if (count_M > 0) {
             series(core::Gender::male, "mean_region").at(age) /= count_M;
+        }
 
         // Ethnicity averages
-        if (count_F > 0)
+        if (count_F > 0) {
             series(core::Gender::female, "mean_ethnicity").at(age) /= count_F;
-        if (count_M > 0)
+        }
+        if (count_M > 0) {
             series(core::Gender::male, "mean_ethnicity").at(age) /= count_M;
+        }
 
         // Sector averages
-        if (count_F > 0)
+        if (count_F > 0) {
             series(core::Gender::female, "mean_sector").at(age) /= count_F;
-        if (count_M > 0)
+        }
+        if (count_M > 0) {
             series(core::Gender::male, "mean_sector").at(age) /= count_M;
+        }
 
         // Income category averages
-        if (count_F > 0)
+        if (count_F > 0) {
             series(core::Gender::female, "mean_income_category").at(age) /= count_F;
-        if (count_M > 0)
+        }
+        if (count_M > 0) {
             series(core::Gender::male, "mean_income_category").at(age) /= count_M;
+        }
 
         // Income continuous averages
-        if (count_F > 0)
+        if (count_F > 0) {
             series(core::Gender::female, "mean_income_continuous").at(age) /= count_F;
-        if (count_M > 0)
+        }
+        if (count_M > 0) {
             series(core::Gender::male, "mean_income_continuous").at(age) /= count_M;
+        }
 
         // Physical activity averages
-        if (count_F > 0)
+        if (count_F > 0) {
             series(core::Gender::female, "mean_physical_activity").at(age) /= count_F;
-        if (count_M > 0)
+        }
+        if (count_M > 0) {
             series(core::Gender::male, "mean_physical_activity").at(age) /= count_M;
+        }
 
         // Calculate in-place disease prevalence and incidence rates.
         for (const auto &disease : context.diseases()) {
