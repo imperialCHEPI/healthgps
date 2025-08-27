@@ -1,6 +1,8 @@
 #include "demographic.h"
 #include "HealthGPS.Core/thread_util.h"
 #include "converter.h"
+#include "person.h"
+#include "runtime_context.h"
 #include "sync_message.h"
 #include <algorithm>
 #include <cassert>
