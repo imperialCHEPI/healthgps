@@ -52,6 +52,44 @@ int get_model_schema_version(const std::string &model_name) {
 
     throw std::invalid_argument(fmt::format("Unknown model: {}", model_name));
 }
+// MAHIMA- Dynamic income category mapping from config.json to codebase
+/// @brief Maps income category name to enum value based on category count
+/// @param key The income category name from JSON
+/// @param category_count The number of income categories (3 or 4)
+/// @return The corresponding Income enum value
+/// @throws core::HgpsException if the category name is unrecognized
+hgps::core::Income map_income_category(const std::string &key, const std::string &category_count) {
+    if (hgps::core::case_insensitive::equals(key, "unknown")) {
+        return hgps::core::Income::unknown;
+    }
+
+    if (hgps::core::case_insensitive::equals(key, "low")) {
+        return hgps::core::Income::low;
+    }
+
+    if (hgps::core::case_insensitive::equals(key, "high")) {
+        return hgps::core::Income::high;
+    }
+
+    // Handle middle categories based on count
+    if (category_count == "3") {
+        // 3-category system: low, middle, high
+        if (hgps::core::case_insensitive::equals(key, "middle")) {
+            return hgps::core::Income::middle;
+        }
+    } else if (category_count == "4") {
+        // 4-category system: low, lowermiddle, uppermiddle, high
+        if (hgps::core::case_insensitive::equals(key, "lowermiddle")) {
+            return hgps::core::Income::lowermiddle;
+        }
+        if (hgps::core::case_insensitive::equals(key, "uppermiddle")) {
+            return hgps::core::Income::uppermiddle;
+        }
+    }
+
+    throw hgps::core::HgpsException(fmt::format(
+        "Income category '{}' is unrecognized for {} category system", key, category_count));
+}
 
 /// @brief Load the model's JSON config file and validate with the appropriate schema
 /// @param model_path The path to the model config file
@@ -208,6 +246,8 @@ load_hlm_risk_model_definition(const nlohmann::json &opt) {
                                                                            std::move(levels));
 }
 
+// NOLINTBEGIN(readability-function-cognitive-complexity)
+// NOLINTBEGIN(readability-function-cognitive-complexity)
 std::unique_ptr<hgps::StaticLinearModelDefinition>
 load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configuration &config) {
     MEASURE_FUNCTION();
@@ -488,30 +528,70 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
     // Income models for different income classifications.
     std::unordered_map<core::Income, LinearModelParams> income_models;
-    for (const auto &[key, json_params] : opt["IncomeModels"].items()) {
 
-        // Get income category.
-        core::Income category;
-        if (core::case_insensitive::equals(key, "Unknown")) {
-            category = core::Income::unknown;
-        } else if (core::case_insensitive::equals(key, "Low")) {
-            category = core::Income::low;
-        } else if (core::case_insensitive::equals(key, "Middle")) {
-            category = core::Income::middle;
-        } else if (core::case_insensitive::equals(key, "High")) {
-            category = core::Income::high;
-        } else {
-            throw core::HgpsException(fmt::format("Income category {} is unrecognised.", key));
+    // Read income_categories from config.json to determine which system to use
+    std::string income_categories = "3"; // Default to 3-category system
+    if (config.config_data.contains("income_categories")) {
+        income_categories = config.config_data["income_categories"].get<std::string>();
+        // Validate income_categories value
+        if (income_categories != "3" && income_categories != "4") {
+            throw core::HgpsException{fmt::format(
+                "Invalid income_categories: {}. Must be one of: 3, 4", income_categories)};
+        }
+    }
+
+    // Print which income category system is being used
+    std::cout << "Using " << income_categories << " income categories system" << std::endl;
+
+    // Check if this is a continuous income model (FINCH approach) or categorical (India approach)
+    bool is_continuous_model = false;
+    if (opt["IncomeModels"].contains("continuous")) {
+        is_continuous_model = true;
+        std::cout << "Detected FINCH continuous income model - will calculate continuous income "
+                     "then convert to categories"
+                  << std::endl;
+
+        // For continuous models, we don't need to process IncomeModels here
+        // The continuous income calculation will be handled separately
+        // We just need to ensure the continuous model exists
+        if (!opt["IncomeModels"]["continuous"].contains("Intercept") ||
+            !opt["IncomeModels"]["continuous"].contains("Coefficients")) {
+            throw core::HgpsException(
+                "Continuous income model missing required fields: Intercept or "
+                "Coefficients");
         }
 
-        // Get income model parameters.
-        LinearModelParams model;
-        model.intercept = json_params["Intercept"].get<double>();
-        model.coefficients =
-            json_params["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
+        // Create placeholder income models for the categories (these will be filled by the
+        // continuous calculation) For now, create empty models - they'll be populated when
+        // continuous income is calculated
+        income_models.emplace(core::Income::low, LinearModelParams{});
+        if (income_categories == "4") {
+            income_models.emplace(core::Income::lowermiddle, LinearModelParams{});
+            income_models.emplace(core::Income::uppermiddle, LinearModelParams{});
+        } else {
+            income_models.emplace(core::Income::middle, LinearModelParams{});
+        }
+        income_models.emplace(core::Income::high, LinearModelParams{});
 
-        // Insert income model.
-        income_models.emplace(category, std::move(model));
+    } else {
+        // This is a categorical income model (India approach)
+        std::cout
+            << "Detected India categorical income model - directly assigning income categories"
+            << std::endl;
+
+        for (const auto &[key, json_params] : opt["IncomeModels"].items()) {
+            // Get income category using the helper function
+            core::Income category = map_income_category(key, income_categories);
+
+            // Get income model parameters.
+            LinearModelParams model;
+            model.intercept = json_params["Intercept"].get<double>();
+            model.coefficients =
+                json_params["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
+
+            // Insert income model.
+            income_models.emplace(category, std::move(model));
+        }
     }
 
     // Standard deviation of physical activity.
@@ -527,8 +607,27 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         std::move(expected_income_trend), std::move(expected_income_trend_boxcox),
         std::move(income_trend_steps), std::move(income_trend_models),
         std::move(income_trend_ranges), std::move(income_trend_lambda),
-        std::move(income_trend_decay_factors));
+        std::move(income_trend_decay_factors), is_continuous_model,
+        is_continuous_model ? [&opt]() {
+            // Parse the continuous income model from JSON
+            LinearModelParams params;
+            const auto &continuous_json = opt["IncomeModels"]["continuous"];
+            params.intercept = continuous_json["Intercept"].get<double>();
+            params.coefficients = continuous_json["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
+
+            // Print debug info about the continuous income model
+            std::cout << "Continuous income model loaded:" << std::endl;
+            std::cout << "  Intercept: " << params.intercept << std::endl;
+            std::cout << "  Coefficients count: " << params.coefficients.size() << std::endl;
+            for (const auto &[coef_name, coef_value] : params.coefficients) {
+                std::cout << "    " << coef_name.to_string() << ": " << coef_value << std::endl;
+            }
+
+            return params;
+        }() : LinearModelParams{},
+        income_categories);
 }
+// NOLINTEND(readability-function-cognitive-complexity)
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
 std::unique_ptr<hgps::DynamicHierarchicalLinearModelDefinition>
@@ -618,6 +717,7 @@ load_ebhlm_risk_model_definition(const nlohmann::json &opt, const Configuration 
 }
 // NOLINTEND(readability-function-cognitive-complexity)
 
+// NOLINTBEGIN(readability-function-cognitive-complexity)
 std::unique_ptr<hgps::KevinHallModelDefinition>
 load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configuration &config) {
     MEASURE_FUNCTION();
@@ -716,6 +816,7 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
         std::move(food_prices), std::move(weight_quantiles), std::move(epa_quantiles),
         std::move(height_stddev), std::move(height_slope));
 }
+// NOLINTEND(readability-function-cognitive-complexity)
 
 std::unique_ptr<hgps::RiskFactorModelDefinition>
 load_risk_model_definition(hgps::RiskFactorModelType model_type,

@@ -340,8 +340,14 @@ void AnalysisModule::calculate_income_based_statistics(RuntimeContext &context,
         case core::Income::low:
             result.population_by_income->low = count;
             break;
+        case core::Income::lowermiddle:
+            result.population_by_income->lowermiddle = count;
+            break;
         case core::Income::middle:
             result.population_by_income->middle = count;
+            break;
+        case core::Income::uppermiddle:
+            result.population_by_income->uppermiddle = count;
             break;
         case core::Income::high:
             result.population_by_income->high = count;
@@ -377,8 +383,14 @@ void AnalysisModule::calculate_income_based_statistics(RuntimeContext &context,
                 case core::Income::low:
                     result_by_income.low = ResultByGender{male_avg, female_avg};
                     break;
+                case core::Income::lowermiddle:
+                    result_by_income.lowermiddle = ResultByGender{male_avg, female_avg};
+                    break;
                 case core::Income::middle:
                     result_by_income.middle = ResultByGender{male_avg, female_avg};
+                    break;
+                case core::Income::uppermiddle:
+                    result_by_income.uppermiddle = ResultByGender{male_avg, female_avg};
                     break;
                 case core::Income::high:
                     result_by_income.high = ResultByGender{male_avg, female_avg};
@@ -417,8 +429,16 @@ void AnalysisModule::calculate_income_based_statistics(RuntimeContext &context,
                 case core::Income::low:
                     result_by_income.low = ResultByGender{male_prevalence, female_prevalence};
                     break;
+                case core::Income::lowermiddle:
+                    result_by_income.lowermiddle =
+                        ResultByGender{male_prevalence, female_prevalence};
+                    break;
                 case core::Income::middle:
                     result_by_income.middle = ResultByGender{male_prevalence, female_prevalence};
+                    break;
+                case core::Income::uppermiddle:
+                    result_by_income.uppermiddle =
+                        ResultByGender{male_prevalence, female_prevalence};
                     break;
                 case core::Income::high:
                     result_by_income.high = ResultByGender{male_prevalence, female_prevalence};
@@ -445,8 +465,16 @@ void AnalysisModule::calculate_income_based_statistics(RuntimeContext &context,
                 case core::Income::low:
                     result_by_income.low = ResultByGender{male_comorbidity, female_comorbidity};
                     break;
+                case core::Income::lowermiddle:
+                    result_by_income.lowermiddle =
+                        ResultByGender{male_comorbidity, female_comorbidity};
+                    break;
                 case core::Income::middle:
                     result_by_income.middle = ResultByGender{male_comorbidity, female_comorbidity};
+                    break;
+                case core::Income::uppermiddle:
+                    result_by_income.uppermiddle =
+                        ResultByGender{male_comorbidity, female_comorbidity};
                     break;
                 case core::Income::high:
                     result_by_income.high = ResultByGender{male_comorbidity, female_comorbidity};
@@ -478,8 +506,12 @@ std::string AnalysisModule::income_category_to_string(core::Income income) const
     switch (income) {
     case core::Income::low:
         return "LowIncome";
+    case core::Income::lowermiddle:
+        return "LowerMiddleIncome";
     case core::Income::middle:
         return "MiddleIncome";
+    case core::Income::uppermiddle:
+        return "UpperMiddleIncome";
     case core::Income::high:
         return "HighIncome";
     case core::Income::unknown:

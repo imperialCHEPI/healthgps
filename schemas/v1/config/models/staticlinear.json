@@ -30,30 +30,83 @@
                         "type": "number"
                     }
                 },
-                "additionalProperties": false
-            }
-        },
-        "IncomeModels": {
-            "type": "object",
-            "additionalProperties": {
-                "type": "object",
-                "properties": {
-                    "Intercept": {
-                        "type": "number"
-                    },
-                    "Coefficients": {
-                        "type": "object",
-                        "additionalProperties": {
-                            "type": "number"
-                        }
-                    }
-                },
                 "required": [
-                    "Intercept",
-                    "Coefficients"
+                    "Name",
+                    "Female",
+                    "Male"
                 ],
                 "additionalProperties": false
             }
+        },
+        "RegionFile": {
+            "$ref": "../csv_file.json",
+            "description": "CSV file containing region assignment probabilities by age and gender"
+        },
+        "EthnicityFile": {
+            "$ref": "../csv_file.json",
+            "description": "CSV file containing ethnicity assignment probabilities by age group, gender, and region"
+        },
+        "IncomeModels": {
+            "oneOf": [
+                {
+                    "type": "object",
+                    "description": "Continuous income model (FINCH approach) - calculates continuous income then converts to categories",
+                    "properties": {
+                        "continuous": {
+                            "type": "object",
+                            "properties": {
+                                "Intercept": {
+                                    "type": "number"
+                                },
+                                "Coefficients": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "type": "number"
+                                    }
+                                },
+                                "IncomeContinuousStdDev": {
+                                    "type": "number",
+                                    "description": "Standard deviation for continuous income calculation"
+                                }
+                            },
+                            "required": [
+                                "Intercept",
+                                "Coefficients",
+                                "IncomeContinuousStdDev"
+                            ],
+                            "additionalProperties": false
+                        }
+                    },
+                    "required": [
+                        "continuous"
+                    ],
+                    "additionalProperties": false
+                },
+                {
+                    "type": "object",
+                    "description": "Categorical income model (India approach) - directly assigns income categories",
+                    "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                            "Intercept": {
+                                "type": "number"
+                            },
+                            "Coefficients": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "type": "number"
+                                }
+                            }
+                        },
+                        "required": [
+                            "Intercept",
+                            "Coefficients"
+                        ],
+                        "additionalProperties": false
+                    },
+                    "minProperties": 1
+                }
+            ]
         },
         "RiskFactorModels": {
             "type": "object",
@@ -141,38 +194,6 @@
                         },
                         "additionalProperties": true
                     },
-                    "IncomeTrend": {
-                        "type": "object",
-                        "properties": {
-                            "Intercept": {
-                                "type": "number"
-                            },
-                            "Coefficients": {
-                                "type": "object",
-                                "additionalProperties": {
-                                    "type": "number"
-                                }
-                            },
-                            "LogCoefficients": {
-                                "type": "object",
-                                "additionalProperties": {
-                                    "type": "number"
-                                }
-                            },
-                            "Range": {
-                                "type": "array",
-                                "items": {
-                                    "type": "number"
-                                },
-                                "minItems": 2,
-                                "maxItems": 2
-                            },
-                            "Lambda": {
-                                "type": "number"
-                            }
-                        },
-                        "additionalProperties": true
-                    },
                     "ExpectedTrend": {
                         "type": "number"
                     },
@@ -181,19 +202,6 @@
                     },
                     "TrendSteps": {
                         "type": "integer"
-                    },
-                    "ExpectedIncomeTrend": {
-                        "type": "number"
-                    },
-                    "ExpectedIncomeTrendBoxCox": {
-                        "type": "number"
-                    },
-                    "IncomeTrendSteps": {
-                        "type": "integer"
-                    },
-                    "IncomeDecayFactor": {
-                        "type": "number",
-                        "description": "Exponential decay factor 'b' for income trend calculation"
                     }
                 },
                 "additionalProperties": true

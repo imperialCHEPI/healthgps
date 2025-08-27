@@ -1,9 +1,13 @@
 #include "demographic.h"
 #include "HealthGPS.Core/thread_util.h"
 #include "converter.h"
+#include "person.h"
+#include "runtime_context.h"
 #include "sync_message.h"
 #include <algorithm>
 #include <cassert>
+#include <fmt/format.h>
+#include <iostream>
 #include <mutex>
 
 #include <oneapi/tbb/parallel_for_each.h>
@@ -169,6 +173,11 @@ void DemographicModule::initialise_population(RuntimeContext &context) {
         for (auto i = 0; i < num_males; i++) {
             context.population()[index].age = entry.first;
             context.population()[index].gender = core::Gender::male;
+
+            // Initialize region and ethnicity in correct order
+            initialise_region(context, context.population()[index], context.random());
+            initialise_ethnicity(context, context.population()[index], context.random());
+
             index++;
         }
 
@@ -176,6 +185,11 @@ void DemographicModule::initialise_population(RuntimeContext &context) {
         for (auto i = 0; i < num_females; i++) {
             context.population()[index].age = entry.first;
             context.population()[index].gender = core::Gender::female;
+
+            // Initialize region and ethnicity in correct order
+            initialise_region(context, context.population()[index], context.random());
+            initialise_ethnicity(context, context.population()[index], context.random());
+
             index++;
         }
 
@@ -376,6 +390,215 @@ int DemographicModule::update_age_and_death_events(RuntimeContext &context,
     }
 
     return number_of_deaths;
+}
+
+void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &context, Person &person,
+                                          Random &random) {
+    // Create an age-specific identifier in the format used in the CSV loading
+    core::Identifier age_id("age_" + std::to_string(person.age));
+
+    // Check if this specific age exists in region_prevalence_ map
+    if (region_prevalence_.contains(age_id)) {
+        // Check if the gender exists for this age
+        if (!region_prevalence_.at(age_id).contains(person.gender)) {
+            std::string gender_str = (person.gender == core::Gender::male) ? "male" : "female";
+            throw core::HgpsException(fmt::format(
+                "Gender '{}' not found in region_prevalence_ for age: {}. Available genders: {}",
+                gender_str, age_id.to_string(), [this, &age_id]() {
+                    std::vector<std::string> genders;
+                    for (const auto &[g, _] : region_prevalence_.at(age_id)) {
+                        genders.emplace_back((g == core::Gender::male) ? "male" : "female");
+                    }
+                    return fmt::format("[{}]", fmt::join(genders, ", "));
+                }()));
+        }
+
+        // Get region probabilities directly from the stored data for this specific age
+        const auto &region_probs = region_prevalence_.at(age_id).at(person.gender);
+
+        // Use CDF for assignment
+        double rand_value = random.next_double(); // next_double is always between 0 and 1
+        double cumulative_prob = 0.0;
+
+        for (const auto &[region_name, prob] : region_probs) {
+            cumulative_prob += prob;
+            if (rand_value < cumulative_prob) {
+                person.region = region_name;
+                return;
+            }
+        }
+
+        // If we reach here, no region was assigned - this indicates an error in probability
+        // distribution
+        std::vector<std::string> region_names;
+        std::vector<double> probs;
+        for (const auto &[name, prob] : region_probs) {
+            region_names.push_back(name);
+            probs.push_back(prob);
+        }
+
+        throw core::HgpsException(fmt::format(
+            "Failed to assign region: cumulative probabilities do not sum to 1.0. "
+            "Age: {}, Gender: {}, Regions: {}, Probabilities: {}, Cumulative sum: {}",
+            age_id.to_string(), (person.gender == core::Gender::male) ? "male" : "female",
+            fmt::format("[{}]", fmt::join(region_names, ", ")),
+            fmt::format("[{}]", fmt::join(probs, ", ")), cumulative_prob));
+    } else {
+        // If no region data for this age, throw detailed error
+        std::vector<std::string> available_ages;
+        for (const auto &[age, _] : region_prevalence_) {
+            available_ages.push_back(age.to_string());
+        }
+
+        throw core::HgpsException(
+            fmt::format("No region data found for age: {}. Available ages: [{}]. "
+                        "Please ensure region CSV file contains data for all required ages.",
+                        person.age, fmt::join(available_ages, ", ")));
+    }
+}
+
+void DemographicModule::initialise_ethnicity([[maybe_unused]] RuntimeContext &context,
+                                             Person &person, Random &random) {
+    // Determine the age group for this person
+    // In the loading I'm assigning 0-under18 and 1-over18
+    core::Identifier age_group = person.age < 18 ? "Under18"_id : "Over18"_id;
+
+    // Check if the age_group exists in ethnicity_prevalence_
+    if (!ethnicity_prevalence_.contains(age_group)) {
+        std::vector<std::string> available_age_groups;
+        for (const auto &[ag, _] : ethnicity_prevalence_) {
+            available_age_groups.push_back(ag.to_string());
+        }
+
+        throw core::HgpsException(fmt::format(
+            "Age group '{}' not found in ethnicity_prevalence_ map. Available age groups: [{}]. "
+            "Please ensure ethnicity CSV file contains data for all required age groups.",
+            age_group.to_string(), fmt::join(available_age_groups, ", ")));
+    }
+
+    // Check if the gender exists for this age_group
+    if (!ethnicity_prevalence_.at(age_group).contains(person.gender)) {
+        std::string gender_str = (person.gender == core::Gender::male) ? "male" : "female";
+        std::vector<std::string> available_genders;
+        for (const auto &[g, _] : ethnicity_prevalence_.at(age_group)) {
+            available_genders.push_back((g == core::Gender::male) ? "male" : "female");
+        }
+
+        throw core::HgpsException(fmt::format("Gender '{}' not found in ethnicity_prevalence_ for "
+                                              "age group: {}. Available genders: [{}].",
+                                              gender_str, age_group.to_string(),
+                                              fmt::join(available_genders, ", ")));
+    }
+
+    // Check if the region exists for this age_group and gender
+    if (!ethnicity_prevalence_.at(age_group).at(person.gender).contains(person.region)) {
+        std::vector<std::string> available_regions;
+        for (const auto &[r, _] : ethnicity_prevalence_.at(age_group).at(person.gender)) {
+            available_regions.push_back(r);
+        }
+
+        throw core::HgpsException(fmt::format(
+            "Region '{}' not found in ethnicity_prevalence_ for age group: {} and gender: {}. "
+            "Available regions: [{}]. Please ensure ethnicity CSV file contains data for all "
+            "regions.",
+            person.region, age_group.to_string(),
+            (person.gender == core::Gender::male) ? "male" : "female",
+            fmt::join(available_regions, ", ")));
+    }
+
+    // Get ethnicity probabilities directly from the stored data
+    const auto &ethnicity_probs =
+        ethnicity_prevalence_.at(age_group).at(person.gender).at(person.region);
+
+    double rand_value = random.next_double(); // next_double is between 0,1
+    double cumulative_prob = 0.0;
+
+    for (const auto &[ethnicity_name, prob] : ethnicity_probs) {
+        cumulative_prob += prob;
+        if (rand_value < cumulative_prob) {
+            person.ethnicity = ethnicity_name;
+            return;
+        }
+    }
+
+    // If we reach here, no ethnicity was assigned - this indicates an error in probability
+    // distribution
+    std::vector<std::string> ethnicity_names;
+    std::vector<double> probs;
+    for (const auto &[name, prob] : ethnicity_probs) {
+        ethnicity_names.push_back(name);
+        probs.push_back(prob);
+    }
+
+    throw core::HgpsException(fmt::format(
+        "Failed to assign ethnicity: cumulative probabilities do not sum to 1.0. "
+        "Age group: {}, Gender: {}, Region: {}, Ethnicities: {}, Probabilities: {}, Cumulative "
+        "sum: {}",
+        age_group.to_string(), (person.gender == core::Gender::male) ? "male" : "female",
+        person.region, fmt::format("[{}]", fmt::join(ethnicity_names, ", ")),
+        fmt::format("[{}]", fmt::join(probs, ", ")), cumulative_prob));
+}
+
+void DemographicModule::set_region_prevalence(
+    const std::map<core::Identifier, std::map<core::Gender, std::map<std::string, double>>>
+        &region_data) {
+    region_prevalence_ = region_data;
+
+    // Print summary of loaded region data
+    if (!region_data.empty()) {
+        std::cout << "\n=== REGION DATA LOADED ===" << std::endl;
+
+        // Get unique region names from the first age entry
+        auto first_age = region_data.begin();
+        if (first_age != region_data.end()) {
+            auto first_gender = first_age->second.begin();
+            if (first_gender != first_age->second.end()) {
+                std::vector<std::string> region_names;
+                for (const auto &[region, _] : first_gender->second) {
+                    region_names.push_back(region);
+                }
+                std::cout << "Regions found: " << fmt::format("[{}]", fmt::join(region_names, ", "))
+                          << std::endl;
+            }
+        }
+
+        std::cout << "Age groups: " << region_data.size() << std::endl;
+        std::cout << "Sample age: " << region_data.begin()->first.to_string() << std::endl;
+        std::cout << "=========================" << std::endl;
+    }
+}
+
+void DemographicModule::set_ethnicity_prevalence(
+    const std::map<core::Identifier,
+                   std::map<core::Gender, std::map<std::string, std::map<std::string, double>>>>
+        &ethnicity_data) {
+    ethnicity_prevalence_ = ethnicity_data;
+
+    // Print summary of loaded ethnicity data
+    if (!ethnicity_data.empty()) {
+        std::cout << "\n=== ETHNICITY DATA LOADED ===" << std::endl;
+
+        // Get unique ethnicity names from the first entry
+        auto first_age_group = ethnicity_data.begin();
+        if (first_age_group != ethnicity_data.end()) {
+            auto first_gender = first_age_group->second.begin();
+            if (first_gender != first_age_group->second.end()) {
+                auto first_region = first_gender->second.begin();
+                if (first_region != first_gender->second.end()) {
+                    std::vector<std::string> ethnicity_names;
+                    for (const auto &[ethnicity, _] : first_region->second) {
+                        ethnicity_names.push_back(ethnicity);
+                    }
+                    std::cout << "Ethnicities found: "
+                              << fmt::format("[{}]", fmt::join(ethnicity_names, ", ")) << std::endl;
+                }
+            }
+        }
+
+        std::cout << "Age groups: " << ethnicity_data.size() << std::endl;
+        std::cout << "Sample age group: " << ethnicity_data.begin()->first.to_string() << std::endl;
+        std::cout << "=============================" << std::endl;
+    }
 }
 
 std::unique_ptr<DemographicModule> build_population_module(Repository &repository,

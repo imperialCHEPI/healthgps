@@ -336,8 +336,12 @@ std::string ResultFileWriter::income_category_to_string(core::Income income) con
     switch (income) {
     case core::Income::low:
         return "LowIncome";
+    case core::Income::lowermiddle:
+        return "LowerMiddleIncome";
     case core::Income::middle:
         return "MiddleIncome";
+    case core::Income::uppermiddle:
+        return "UpperMiddleIncome";
     case core::Income::high:
         return "HighIncome";
     case core::Income::unknown:
@@ -359,9 +363,17 @@ ResultFileWriter::get_available_income_categories(const hgps::ResultEventMessage
             categories.push_back(core::Income::low);
             seen.insert(core::Income::low);
         }
+        if (pop_by_income.lowermiddle > 0 && !seen.contains(core::Income::lowermiddle)) {
+            categories.push_back(core::Income::lowermiddle);
+            seen.insert(core::Income::lowermiddle);
+        }
         if (pop_by_income.middle > 0 && !seen.contains(core::Income::middle)) {
             categories.push_back(core::Income::middle);
             seen.insert(core::Income::middle);
+        }
+        if (pop_by_income.uppermiddle > 0 && !seen.contains(core::Income::uppermiddle)) {
+            categories.push_back(core::Income::uppermiddle);
+            seen.insert(core::Income::uppermiddle);
         }
         if (pop_by_income.high > 0 && !seen.contains(core::Income::high)) {
             categories.push_back(core::Income::high);

@@ -50,6 +50,11 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param income_trend_ranges The value range of each income trend
     /// @param income_trend_lambda The lambda values of the income trends
     /// @param income_trend_decay_factors The exponential decay factors for income trends
+    /// @param is_continuous_income_model Whether this model uses continuous income calculation
+    /// (FINCH approach)
+    /// @param continuous_income_model The continuous income model parameters (if using FINCH
+    /// approach)
+    /// @param income_categories The number of income categories (3 or 4)
     /// @throws HgpsException for invalid arguments
     StaticLinearModel(
         std::shared_ptr<RiskFactorSexAgeTable> expected,
@@ -78,7 +83,10 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
         std::shared_ptr<std::vector<core::DoubleInterval>> income_trend_ranges = nullptr,
         std::shared_ptr<std::vector<double>> income_trend_lambda = nullptr,
         std::shared_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors =
-            nullptr);
+            nullptr,
+        bool is_continuous_income_model = false,
+        const LinearModelParams &continuous_income_model = LinearModelParams{},
+        const std::string &income_categories = "3");
 
     RiskFactorModelType type() const noexcept override;
 
@@ -99,15 +107,27 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
 
     void update_UPF_trends(RuntimeContext &context, Person &person) const;
 
-    /// @brief Initialise income trends for a person
+    /// @brief Initialise income for a person using the appropriate method
     /// @param context The runtime context
-    /// @param person The person to initialise income trends for
-    void initialise_income_trends(RuntimeContext &context, Person &person) const;
+    /// @param person The person to initialise income for
+    /// @param random Random number generator
+    void initialise_income(RuntimeContext &context, Person &person, Random &random);
+
+    /// @brief Update income for a person (only for 18-year-olds)
+    /// @param context The runtime context
+    /// @param person The person to update income for
+    /// @param random Random number generator
+    void update_income(RuntimeContext &context, Person &person, Random &random);
 
     /// @brief Update income trends for a person
     /// @param context The runtime context
     /// @param person The person to update income trends for
     void update_income_trends(RuntimeContext &context, Person &person) const;
+
+    /// @brief Initialise income trends for a person
+    /// @param context The runtime context
+    /// @param person The person to initialise income trends for
+    void initialise_income_trends(RuntimeContext &context, Person &person) const;
 
     void initialise_policies(Person &person, Random &random, bool intervene) const;
 
@@ -130,15 +150,41 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param random The random number generator from the runtime context
     void update_sector(Person &person, Random &random) const;
 
-    /// @brief Initialise the income category of a person
-    /// @param person The person to initialise income for
-    /// @param random The random number generator from the runtime context
-    void initialise_income(Person &person, Random &random) const;
+    // Continuous income model support (FINCH approach)
+    bool is_continuous_income_model_;
+    LinearModelParams continuous_income_model_;
+    std::string income_categories_;
 
-    /// @brief Update the income category of a person
-    /// @param person The person to update income for
-    /// @param random The random number generator from the runtime context
-    void update_income(Person &person, Random &random) const;
+    /// @brief Calculate continuous income using FINCH approach
+    /// @param person The person to calculate income for
+    /// @param random Random number generator
+    /// @return The calculated continuous income value
+    double calculate_continuous_income(Person &person, Random &random);
+
+    /// @brief Convert continuous income to income category based on population quartiles
+    /// @param continuous_income The continuous income value
+    /// @param population The population to calculate quartiles from
+    /// @param random Random number generator
+    /// @return The assigned income category
+    core::Income convert_income_continuous_to_category(double continuous_income,
+                                                       const Population &population,
+                                                       Random &random) const;
+
+    /// @brief Calculate income quartiles from population data
+    /// @param population The population to calculate quartiles from
+    /// @return Vector of quartile thresholds [Q1, Q2, Q3]
+    std::vector<double> calculate_income_quartiles(const Population &population) const;
+
+    /// @brief Initialise income using categorical approach (India method)
+    /// @param person The person to initialise income for
+    /// @param random Random number generator
+    void initialise_categorical_income(Person &person, Random &random);
+
+    /// @brief Initialise income using continuous approach (FINCH method)
+    /// @param context The runtime context
+    /// @param person The person to initialise income for
+    /// @param random Random number generator
+    void initialise_continuous_income(RuntimeContext &context, Person &person, Random &random);
 
     /// @brief Initialise the physical activity of a person
     /// @param person The person to initialise PAL for
@@ -211,6 +257,11 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     /// @param income_trend_ranges The value range of each income trend
     /// @param income_trend_lambda The lambda values of the income trends
     /// @param income_trend_decay_factors The exponential decay factors for income trends
+    /// @param is_continuous_income_model Whether this model uses continuous income calculation
+    /// (FINCH approach)
+    /// @param continuous_income_model The continuous income model parameters (if using FINCH
+    /// approach)
+    /// @param income_categories The number of income categories (3 or 4)
     /// @throws HgpsException for invalid arguments
     StaticLinearModelDefinition(
         std::unique_ptr<RiskFactorSexAgeTable> expected,
@@ -238,7 +289,10 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
         std::unique_ptr<std::vector<core::DoubleInterval>> income_trend_ranges = nullptr,
         std::unique_ptr<std::vector<double>> income_trend_lambda = nullptr,
         std::unique_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors =
-            nullptr);
+            nullptr,
+        bool is_continuous_income_model = false,
+        const LinearModelParams &continuous_income_model = LinearModelParams{},
+        const std::string &income_categories = "3");
 
     /// @brief Construct a new StaticLinearModel from this definition
     /// @return A unique pointer to the new StaticLinearModel instance
@@ -276,6 +330,11 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
         rural_prevalence_;
     std::unordered_map<core::Income, LinearModelParams> income_models_;
     double physical_activity_stddev_;
+
+    // Continuous income model support (FINCH approach)
+    bool is_continuous_income_model_;
+    LinearModelParams continuous_income_model_;
+    std::string income_categories_;
 };
 
 } // namespace hgps
