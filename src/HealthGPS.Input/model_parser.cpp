@@ -246,6 +246,8 @@ load_hlm_risk_model_definition(const nlohmann::json &opt) {
                                                                            std::move(levels));
 }
 
+// NOLINTBEGIN(readability-function-cognitive-complexity)
+// NOLINTBEGIN(readability-function-cognitive-complexity)
 std::unique_ptr<hgps::StaticLinearModelDefinition>
 load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configuration &config) {
     MEASURE_FUNCTION();
@@ -553,10 +555,9 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         // The continuous income calculation will be handled separately
         // We just need to ensure the continuous model exists
         if (!opt["IncomeModels"]["continuous"].contains("Intercept") ||
-            !opt["IncomeModels"]["continuous"].contains("Coefficients") ||
-            !opt["IncomeModels"]["continuous"].contains("IncomeContinuousStdDev")) {
-            throw core::HgpsException("Continuous income model missing required fields: Intercept, "
-                                      "Coefficients, or IncomeContinuousStdDev");
+            !opt["IncomeModels"]["continuous"].contains("Coefficients")) {
+            throw core::HgpsException("Continuous income model missing required fields: Intercept or "
+                                      "Coefficients");
         }
 
         // Create placeholder income models for the categories (these will be filled by the
@@ -612,10 +613,20 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             const auto &continuous_json = opt["IncomeModels"]["continuous"];
             params.intercept = continuous_json["Intercept"].get<double>();
             params.coefficients = continuous_json["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
+            
+            // Print debug info about the continuous income model
+            std::cout << "Continuous income model loaded:" << std::endl;
+            std::cout << "  Intercept: " << params.intercept << std::endl;
+            std::cout << "  Coefficients count: " << params.coefficients.size() << std::endl;
+            for (const auto &[coef_name, coef_value] : params.coefficients) {
+                std::cout << "    " << coef_name.to_string() << ": " << coef_value << std::endl;
+            }
+            
             return params;
         }() : LinearModelParams{},
         income_categories);
 }
+// NOLINTEND(readability-function-cognitive-complexity)
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
 std::unique_ptr<hgps::DynamicHierarchicalLinearModelDefinition>
@@ -705,6 +716,7 @@ load_ebhlm_risk_model_definition(const nlohmann::json &opt, const Configuration 
 }
 // NOLINTEND(readability-function-cognitive-complexity)
 
+// NOLINTBEGIN(readability-function-cognitive-complexity)
 std::unique_ptr<hgps::KevinHallModelDefinition>
 load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configuration &config) {
     MEASURE_FUNCTION();
@@ -803,6 +815,7 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
         std::move(food_prices), std::move(weight_quantiles), std::move(epa_quantiles),
         std::move(height_stddev), std::move(height_slope));
 }
+// NOLINTEND(readability-function-cognitive-complexity)
 
 std::unique_ptr<hgps::RiskFactorModelDefinition>
 load_risk_model_definition(hgps::RiskFactorModelType model_type,

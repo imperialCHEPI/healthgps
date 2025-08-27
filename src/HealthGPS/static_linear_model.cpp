@@ -3,6 +3,7 @@
 #include "population.h"
 #include "runtime_context.h"
 
+#include <algorithm>
 #include <cmath>
 #include <iostream> // Added for print statements
 #include <ranges>
@@ -40,6 +41,9 @@ StaticLinearModel::StaticLinearModel(
                                 std::move(trend_steps),    trend_type,
                                 expected_income_trend,       // Pass by value, not moved
                                 income_trend_decay_factors}, // Pass by value, not moved
+      // Continuous income model support (FINCH approach) - must come first
+      is_continuous_income_model_{is_continuous_income_model},
+      continuous_income_model_{continuous_income_model}, income_categories_{income_categories},
       // Regular trend member variables
       expected_trend_boxcox_{std::move(expected_trend_boxcox)},
       trend_models_{std::move(trend_models)}, trend_ranges_{std::move(trend_ranges)},
@@ -57,10 +61,7 @@ StaticLinearModel::StaticLinearModel(
       cholesky_{cholesky}, policy_models_{policy_models}, policy_ranges_{policy_ranges},
       policy_cholesky_{policy_cholesky}, info_speed_{info_speed},
       rural_prevalence_{rural_prevalence}, income_models_{income_models},
-      physical_activity_stddev_{physical_activity_stddev},
-      // Continuous income model support (FINCH approach)
-      is_continuous_income_model_{is_continuous_income_model},
-      continuous_income_model_{continuous_income_model}, income_categories_{income_categories} {}
+      physical_activity_stddev_{physical_activity_stddev} {}
 
 RiskFactorModelType StaticLinearModel::type() const noexcept { return RiskFactorModelType::Static; }
 
@@ -694,7 +695,7 @@ StaticLinearModel::calculate_income_quartiles(const Population &population) cons
     }
 
     // Sort to find quartile thresholds
-    std::sort(sorted_incomes.begin(), sorted_incomes.end());
+    std::ranges::sort(sorted_incomes);
 
     size_t n = sorted_incomes.size();
     std::vector<double> quartile_thresholds(3);
@@ -791,6 +792,9 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     const std::string &income_categories)
     : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend),
                                           std::move(trend_steps), trend_type},
+      // Continuous income model support (FINCH approach) - must come first
+      is_continuous_income_model_{is_continuous_income_model},
+      continuous_income_model_{continuous_income_model}, income_categories_{income_categories},
       // Regular trend member variables
       expected_trend_boxcox_{std::move(expected_trend_boxcox)},
       trend_models_{std::move(trend_models)}, trend_ranges_{std::move(trend_ranges)},
@@ -809,10 +813,7 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
       policy_models_{std::move(policy_models)}, policy_ranges_{std::move(policy_ranges)},
       policy_cholesky_{std::move(policy_cholesky)}, info_speed_{info_speed},
       rural_prevalence_{std::move(rural_prevalence)}, income_models_{std::move(income_models)},
-      physical_activity_stddev_{physical_activity_stddev},
-      // Continuous income model support (FINCH approach)
-      is_continuous_income_model_{is_continuous_income_model},
-      continuous_income_model_{continuous_income_model}, income_categories_{income_categories} {
+      physical_activity_stddev_{physical_activity_stddev} {
 
     if (names_.empty()) {
         throw core::HgpsException("Risk factor names list is empty");
