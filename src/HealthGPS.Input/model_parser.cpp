@@ -545,19 +545,23 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     bool is_continuous_model = false;
     if (opt["IncomeModels"].contains("continuous")) {
         is_continuous_model = true;
-        std::cout << "Detected FINCH continuous income model - will calculate continuous income then convert to categories" << std::endl;
-        
+        std::cout << "Detected FINCH continuous income model - will calculate continuous income "
+                     "then convert to categories"
+                  << std::endl;
+
         // For continuous models, we don't need to process IncomeModels here
         // The continuous income calculation will be handled separately
         // We just need to ensure the continuous model exists
-        if (!opt["IncomeModels"]["continuous"].contains("Intercept") || 
+        if (!opt["IncomeModels"]["continuous"].contains("Intercept") ||
             !opt["IncomeModels"]["continuous"].contains("Coefficients") ||
             !opt["IncomeModels"]["continuous"].contains("IncomeContinuousStdDev")) {
-            throw core::HgpsException("Continuous income model missing required fields: Intercept, Coefficients, or IncomeContinuousStdDev");
+            throw core::HgpsException("Continuous income model missing required fields: Intercept, "
+                                      "Coefficients, or IncomeContinuousStdDev");
         }
-        
-        // Create placeholder income models for the categories (these will be filled by the continuous calculation)
-        // For now, create empty models - they'll be populated when continuous income is calculated
+
+        // Create placeholder income models for the categories (these will be filled by the
+        // continuous calculation) For now, create empty models - they'll be populated when
+        // continuous income is calculated
         income_models.emplace(core::Income::low, LinearModelParams{});
         if (income_categories == "4") {
             income_models.emplace(core::Income::lowermiddle, LinearModelParams{});
@@ -566,11 +570,13 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             income_models.emplace(core::Income::middle, LinearModelParams{});
         }
         income_models.emplace(core::Income::high, LinearModelParams{});
-        
+
     } else {
         // This is a categorical income model (India approach)
-        std::cout << "Detected India categorical income model - directly assigning income categories" << std::endl;
-        
+        std::cout
+            << "Detected India categorical income model - directly assigning income categories"
+            << std::endl;
+
         for (const auto &[key, json_params] : opt["IncomeModels"].items()) {
             // Get income category using the helper function
             core::Income category = map_income_category(key, income_categories);

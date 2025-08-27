@@ -1,7 +1,7 @@
 #include "static_linear_model.h"
 #include "HealthGPS.Core/exception.h"
-#include "runtime_context.h"
 #include "population.h"
+#include "runtime_context.h"
 
 #include <cmath>
 #include <iostream> // Added for print statements
@@ -19,8 +19,7 @@ StaticLinearModel::StaticLinearModel(
     const std::vector<core::DoubleInterval> &ranges, const std::vector<double> &lambda,
     const std::vector<double> &stddev, const Eigen::MatrixXd &cholesky,
     const std::vector<LinearModelParams> &policy_models,
-    const std::vector<core::DoubleInterval> &policy_ranges,
-    const Eigen::MatrixXd &policy_cholesky,
+    const std::vector<core::DoubleInterval> &policy_ranges, const Eigen::MatrixXd &policy_cholesky,
     std::shared_ptr<std::vector<LinearModelParams>> trend_models,
     std::shared_ptr<std::vector<core::DoubleInterval>> trend_ranges,
     std::shared_ptr<std::vector<double>> trend_lambda, double info_speed,
@@ -35,8 +34,7 @@ StaticLinearModel::StaticLinearModel(
     std::shared_ptr<std::vector<core::DoubleInterval>> income_trend_ranges,
     std::shared_ptr<std::vector<double>> income_trend_lambda,
     std::shared_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors,
-    bool is_continuous_income_model,
-    const LinearModelParams &continuous_income_model,
+    bool is_continuous_income_model, const LinearModelParams &continuous_income_model,
     const std::string &income_categories)
     : RiskFactorAdjustableModel{std::move(expected),       std::move(expected_trend),
                                 std::move(trend_steps),    trend_type,
@@ -62,8 +60,7 @@ StaticLinearModel::StaticLinearModel(
       physical_activity_stddev_{physical_activity_stddev},
       // Continuous income model support (FINCH approach)
       is_continuous_income_model_{is_continuous_income_model},
-      continuous_income_model_{continuous_income_model},
-      income_categories_{income_categories} {}
+      continuous_income_model_{continuous_income_model}, income_categories_{income_categories} {}
 
 RiskFactorModelType StaticLinearModel::type() const noexcept { return RiskFactorModelType::Static; }
 
@@ -546,7 +543,7 @@ void StaticLinearModel::update_income(RuntimeContext &context, Person &person, R
 
 void StaticLinearModel::initialise_categorical_income(Person &person, Random &random) {
     // India approach: Direct categorical assignment using logits and softmax
-    
+
     // Compute logits for each income category
     auto logits = std::unordered_map<core::Income, double>{};
     for (const auto &[income, params] : income_models_) {
@@ -584,62 +581,56 @@ void StaticLinearModel::initialise_categorical_income(Person &person, Random &ra
     throw core::HgpsException("Logic Error: failed to initialise categorical income category");
 }
 
-void StaticLinearModel::initialise_continuous_income(RuntimeContext &context, Person &person, Random &random) {
+void StaticLinearModel::initialise_continuous_income(RuntimeContext &context, Person &person,
+                                                     Random &random) {
     // FINCH approach: Calculate continuous income, then convert to category
-    
+
     // Step 1: Calculate continuous income
     double continuous_income = calculate_continuous_income(person, random);
-    
+
     // Store continuous income in risk factors for potential future use
     person.risk_factors["income_continuous"_id] = continuous_income;
-    
+
     // Step 2: Convert to income category based on population quartiles
-    person.income = convert_income_continuous_to_category(continuous_income, context.population(), random);
+    person.income =
+        convert_income_continuous_to_category(continuous_income, context.population(), random);
 }
 
 double StaticLinearModel::calculate_continuous_income(Person &person, Random &random) {
     // Calculate continuous income using the continuous income model
     double income = continuous_income_model_.intercept;
-    
+
     // Add coefficient contributions for each person attribute
     for (const auto &[factor, coefficient] : continuous_income_model_.coefficients) {
         std::string factor_name = factor.to_string();
-        
+
         if (factor_name == "IncomeContinuousStdDev") {
             // Skip - this is used for standard deviation, not as a coefficient
             continue;
         }
-        
+
         if (factor_name == "Gender") {
             // Male = 1, Female = 0
             income += coefficient * (person.gender == core::Gender::male ? 1.0 : 0.0);
-        }
-        else if (factor_name == "Age") {
+        } else if (factor_name == "Age") {
             income += coefficient * person.age;
-        }
-        else if (factor_name == "Age2") {
+        } else if (factor_name == "Age2") {
             income += coefficient * (person.age * person.age);
-        }
-        else if (factor_name == "Age3") {
+        } else if (factor_name == "Age3") {
             income += coefficient * (person.age * person.age * person.age);
-        }
-        else if (factor_name == "Sector") {
+        } else if (factor_name == "Sector") {
             // Rural = 1, Urban = 0
             income += coefficient * (person.sector == core::Sector::rural ? 1.0 : 0.0);
-        }
-        else if (factor_name == person.region) {
+        } else if (factor_name == person.region) {
             // Region effect - only apply if the region matches
             income += coefficient;
-        }
-        else if (factor_name == person.ethnicity) {
+        } else if (factor_name == person.ethnicity) {
             // Ethnicity effect - only apply if the ethnicity matches
             income += coefficient;
-        }
-        else if (factor_name == "min" || factor_name == "max") {
+        } else if (factor_name == "min" || factor_name == "max") {
             // Skip min/max bounds - they're handled separately
             continue;
-        }
-        else {
+        } else {
             // For any other factors, try to get from risk factors
             try {
                 income += coefficient * person.get_risk_factor_value(factor);
@@ -649,14 +640,14 @@ double StaticLinearModel::calculate_continuous_income(Person &person, Random &ra
             }
         }
     }
-    
+
     // Add random noise based on standard deviation
     double stddev = 0.0;
     auto stddev_it = continuous_income_model_.coefficients.find("IncomeContinuousStdDev"_id);
     if (stddev_it != continuous_income_model_.coefficients.end()) {
         stddev = stddev_it->second;
     }
-    
+
     if (stddev > 0.0) {
         double noise = random.next_normal(0.0, stddev);
         // Store the noise as a residual for potential future updates
@@ -667,26 +658,27 @@ double StaticLinearModel::calculate_continuous_income(Person &person, Random &ra
         }
         income += noise;
     }
-    
+
     // Apply min/max bounds if they exist
     auto min_it = continuous_income_model_.coefficients.find("min"_id);
     auto max_it = continuous_income_model_.coefficients.find("max"_id);
-    
+
     if (min_it != continuous_income_model_.coefficients.end()) {
         income = std::max(income, min_it->second);
     }
     if (max_it != continuous_income_model_.coefficients.end()) {
         income = std::min(income, max_it->second);
     }
-    
+
     return income;
 }
 
-std::vector<double> StaticLinearModel::calculate_income_quartiles(const Population &population) const {
+std::vector<double>
+StaticLinearModel::calculate_income_quartiles(const Population &population) const {
     // Collect all valid continuous income values from the population
     std::vector<double> sorted_incomes;
     sorted_incomes.reserve(population.size());
-    
+
     for (const auto &person : population) {
         if (person.is_active()) {
             auto it = person.risk_factors.find("income_continuous"_id);
@@ -695,50 +687,51 @@ std::vector<double> StaticLinearModel::calculate_income_quartiles(const Populati
             }
         }
     }
-    
+
     if (sorted_incomes.empty()) {
-        throw core::HgpsException("No continuous income values found in population for quartile calculation");
+        throw core::HgpsException(
+            "No continuous income values found in population for quartile calculation");
     }
-    
+
     // Sort to find quartile thresholds
     std::sort(sorted_incomes.begin(), sorted_incomes.end());
-    
+
     size_t n = sorted_incomes.size();
     std::vector<double> quartile_thresholds(3);
-    
+
     // Calculate exact quartile boundaries for 25%, 50%, 75%
     size_t q1_index = n / 4;
     size_t q2_index = n / 2;
     size_t q3_index = (3 * n) / 4;
-    
+
     // Ensure proper boundaries and avoid out-of-bounds access
     if (q1_index > 0 && q1_index < n) {
         quartile_thresholds[0] = sorted_incomes[q1_index - 1]; // 25th percentile
     } else {
         quartile_thresholds[0] = sorted_incomes.front();
     }
-    
+
     if (q2_index > 0 && q2_index < n) {
         quartile_thresholds[1] = sorted_incomes[q2_index - 1]; // 50th percentile
     } else {
-        quartile_thresholds[1] = sorted_incomes[n/2];
+        quartile_thresholds[1] = sorted_incomes[n / 2];
     }
-    
+
     if (q3_index > 0 && q3_index < n) {
         quartile_thresholds[2] = sorted_incomes[q3_index - 1]; // 75th percentile
     } else {
         quartile_thresholds[2] = sorted_incomes.back();
     }
-    
+
     return quartile_thresholds;
 }
 
-core::Income StaticLinearModel::convert_income_continuous_to_category(double continuous_income, 
-                                                               const Population &population, 
-                                                               Random &/*random*/) const {
+core::Income StaticLinearModel::convert_income_continuous_to_category(double continuous_income,
+                                                                      const Population &population,
+                                                                      Random & /*random*/) const {
     // Calculate quartiles from the current population
     std::vector<double> quartile_thresholds = calculate_income_quartiles(population);
-    
+
     if (income_categories_ == "4") {
         // 4-category system: low, lowermiddle, uppermiddle, high
         if (continuous_income <= quartile_thresholds[0]) {
@@ -794,8 +787,7 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::unique_ptr<std::vector<core::DoubleInterval>> income_trend_ranges,
     std::unique_ptr<std::vector<double>> income_trend_lambda,
     std::unique_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors,
-    bool is_continuous_income_model,
-    const LinearModelParams &continuous_income_model,
+    bool is_continuous_income_model, const LinearModelParams &continuous_income_model,
     const std::string &income_categories)
     : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend),
                                           std::move(trend_steps), trend_type},
@@ -820,8 +812,7 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
       physical_activity_stddev_{physical_activity_stddev},
       // Continuous income model support (FINCH approach)
       is_continuous_income_model_{is_continuous_income_model},
-      continuous_income_model_{continuous_income_model},
-      income_categories_{income_categories} {
+      continuous_income_model_{continuous_income_model}, income_categories_{income_categories} {
 
     if (names_.empty()) {
         throw core::HgpsException("Risk factor names list is empty");

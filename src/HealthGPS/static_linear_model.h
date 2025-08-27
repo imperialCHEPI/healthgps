@@ -50,8 +50,10 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param income_trend_ranges The value range of each income trend
     /// @param income_trend_lambda The lambda values of the income trends
     /// @param income_trend_decay_factors The exponential decay factors for income trends
-    /// @param is_continuous_income_model Whether this model uses continuous income calculation (FINCH approach)
-    /// @param continuous_income_model The continuous income model parameters (if using FINCH approach)
+    /// @param is_continuous_income_model Whether this model uses continuous income calculation
+    /// (FINCH approach)
+    /// @param continuous_income_model The continuous income model parameters (if using FINCH
+    /// approach)
     /// @param income_categories The number of income categories (3 or 4)
     /// @throws HgpsException for invalid arguments
     StaticLinearModel(
@@ -164,9 +166,9 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param population The population to calculate quartiles from
     /// @param random Random number generator
     /// @return The assigned income category
-    core::Income convert_income_continuous_to_category(double continuous_income, 
-                                              const Population &population, 
-                                              Random &random) const;
+    core::Income convert_income_continuous_to_category(double continuous_income,
+                                                       const Population &population,
+                                                       Random &random) const;
 
     /// @brief Calculate income quartiles from population data
     /// @param population The population to calculate quartiles from
@@ -255,8 +257,10 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     /// @param income_trend_ranges The value range of each income trend
     /// @param income_trend_lambda The lambda values of the income trends
     /// @param income_trend_decay_factors The exponential decay factors for income trends
-    /// @param is_continuous_income_model Whether this model uses continuous income calculation (FINCH approach)
-    /// @param continuous_income_model The continuous income model parameters (if using FINCH approach)
+    /// @param is_continuous_income_model Whether this model uses continuous income calculation
+    /// (FINCH approach)
+    /// @param continuous_income_model The continuous income model parameters (if using FINCH
+    /// approach)
     /// @param income_categories The number of income categories (3 or 4)
     /// @throws HgpsException for invalid arguments
     StaticLinearModelDefinition(
@@ -326,7 +330,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
         rural_prevalence_;
     std::unordered_map<core::Income, LinearModelParams> income_models_;
     double physical_activity_stddev_;
-    
+
     // Continuous income model support (FINCH approach)
     bool is_continuous_income_model_;
     LinearModelParams continuous_income_model_;
