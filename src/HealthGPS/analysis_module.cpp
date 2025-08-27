@@ -633,6 +633,49 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
 
         series(gender, "count").at(age)++;
 
+        // NEW: Collect age data (always available)
+        series(gender, "mean_age").at(age) += person.age;
+        series(gender, "mean_age2").at(age) += (person.age * person.age);
+        series(gender, "mean_age3").at(age) += (person.age * person.age * person.age);
+
+        // NEW: Collect demographic data (only if available)
+        // Region data - check if person has region assigned
+        if (!person.region.empty() && person.region != "unknown") {
+            series(gender, "mean_region").at(age) += person.region_to_value();
+        }
+        
+        // Ethnicity data - check if person has ethnicity assigned
+        if (!person.ethnicity.empty() && person.ethnicity != "unknown") {
+            series(gender, "mean_ethnicity").at(age) += person.ethnicity_to_value();
+        }
+        
+        // Sector data - check if person has sector assigned
+        if (person.sector != core::Sector::unknown) {
+            series(gender, "mean_sector").at(age) += person.sector_to_value();
+        }
+        
+        // NEW: Collect income data (only if available)
+        // Income category - check if person has income assigned
+        if (person.income != core::Income::unknown) {
+            series(gender, "mean_income_category").at(age) += person.income_to_value();
+        }
+        
+        // Continuous income - check if available in risk factors
+        auto income_continuous = 0.0;
+        auto it = person.risk_factors.find("income_continuous"_id);
+        if (it != person.risk_factors.end()) {
+            income_continuous = it->second;
+            series(gender, "mean_income_continuous").at(age) += income_continuous;
+        }
+        
+        // NEW: Collect physical activity data (only if available)
+        auto physical_activity = 0.0;
+        auto pa_it = person.risk_factors.find("PhysicalActivity"_id);
+        if (pa_it != person.risk_factors.end()) {
+            physical_activity = pa_it->second;
+            series(gender, "mean_physical_activity").at(age) += physical_activity;
+        }
+
         for (const auto &factor : context.mapping().entries()) {
             series(gender, "mean_" + factor.key().to_string()).at(age) +=
                 person.get_risk_factor_value(factor.key());
@@ -669,6 +712,43 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
             series(core::Gender::female, column).at(age) /= count_F;
             series(core::Gender::male, column).at(age) /= count_M;
         }
+
+        // NEW: Calculate in-place age averages (always available)
+        if (count_F > 0) {
+            series(core::Gender::female, "mean_age").at(age) /= count_F;
+            series(core::Gender::female, "mean_age2").at(age) /= count_F;
+            series(core::Gender::female, "mean_age3").at(age) /= count_F;
+        }
+        if (count_M > 0) {
+            series(core::Gender::male, "mean_age").at(age) /= count_M;
+            series(core::Gender::male, "mean_age2").at(age) /= count_M;
+            series(core::Gender::male, "mean_age3").at(age) /= count_M;
+        }
+
+        // NEW: Calculate in-place demographic averages (only if data exists)
+        // Region averages
+        if (count_F > 0) series(core::Gender::female, "mean_region").at(age) /= count_F;
+        if (count_M > 0) series(core::Gender::male, "mean_region").at(age) /= count_M;
+        
+        // Ethnicity averages
+        if (count_F > 0) series(core::Gender::female, "mean_ethnicity").at(age) /= count_F;
+        if (count_M > 0) series(core::Gender::male, "mean_ethnicity").at(age) /= count_M;
+        
+        // Sector averages
+        if (count_F > 0) series(core::Gender::female, "mean_sector").at(age) /= count_F;
+        if (count_M > 0) series(core::Gender::male, "mean_sector").at(age) /= count_M;
+        
+        // Income category averages
+        if (count_F > 0) series(core::Gender::female, "mean_income_category").at(age) /= count_F;
+        if (count_M > 0) series(core::Gender::male, "mean_income_category").at(age) /= count_M;
+        
+        // Income continuous averages
+        if (count_F > 0) series(core::Gender::female, "mean_income_continuous").at(age) /= count_F;
+        if (count_M > 0) series(core::Gender::male, "mean_income_continuous").at(age) /= count_M;
+        
+        // Physical activity averages
+        if (count_F > 0) series(core::Gender::female, "mean_physical_activity").at(age) /= count_F;
+        if (count_M > 0) series(core::Gender::male, "mean_physical_activity").at(age) /= count_M;
 
         // Calculate in-place disease prevalence and incidence rates.
         for (const auto &disease : context.diseases()) {
@@ -721,12 +801,35 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
     // Add demographic channels
     income_channels.emplace_back("mean_age");
     income_channels.emplace_back("std_age");
+    income_channels.emplace_back("mean_age2");
+    income_channels.emplace_back("std_age2");
+    income_channels.emplace_back("mean_age3");
+    income_channels.emplace_back("std_age3");
     income_channels.emplace_back("mean_gender");
     income_channels.emplace_back("std_gender");
     income_channels.emplace_back("mean_income");
     income_channels.emplace_back("std_income");
     income_channels.emplace_back("mean_sector");
     income_channels.emplace_back("std_sector");
+
+    // NEW: Add enhanced demographic channels for income analysis (only if data exists)
+    // These will be populated if region, ethnicity data is available
+    income_channels.emplace_back("mean_region");
+    income_channels.emplace_back("std_region");
+    income_channels.emplace_back("mean_ethnicity");
+    income_channels.emplace_back("std_ethnicity");
+
+    // NEW: Add enhanced income channels for income analysis (only if data exists)
+    // These will be populated if income data is available
+    income_channels.emplace_back("mean_income_category");
+    income_channels.emplace_back("std_income_category");
+    income_channels.emplace_back("mean_income_continuous");
+    income_channels.emplace_back("std_income_continuous");
+
+    // NEW: Add physical activity channels for income analysis (only if data exists)
+    // These will be populated if physical activity data is available
+    income_channels.emplace_back("mean_physical_activity");
+    income_channels.emplace_back("std_physical_activity");
 
     // Add risk factor channels
     for (const auto &factor : context.mapping().entries()) {
@@ -772,6 +875,18 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
                 series.at(core::Gender::male, income, column).at(age) = 0.0;
             }
             for (const auto &column : {"std_age", "std_gender", "std_income", "std_sector"}) {
+                series.at(core::Gender::female, income, column).at(age) = 0.0;
+                series.at(core::Gender::male, income, column).at(age) = 0.0;
+            }
+
+            // NEW: Initialize age standard deviation channels with zeros (always available)
+            for (const auto &column : {"std_age2", "std_age3"}) {
+                series.at(core::Gender::female, income, column).at(age) = 0.0;
+                series.at(core::Gender::male, income, column).at(age) = 0.0;
+            }
+
+            // NEW: Initialize enhanced demographic standard deviation channels with zeros (only if data exists)
+            for (const auto &column : {"std_region", "std_ethnicity", "std_income_category", "std_income_continuous", "std_physical_activity"}) {
                 series.at(core::Gender::female, income, column).at(age) = 0.0;
                 series.at(core::Gender::male, income, column).at(age) = 0.0;
             }
@@ -830,9 +945,47 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
         // Collect demographic data
         try {
             series.at(gender, income, "mean_age").at(age) += person.age;
+            series.at(gender, income, "mean_age2").at(age) += (person.age * person.age);
+            series.at(gender, income, "mean_age3").at(age) += (person.age * person.age * person.age);
             series.at(gender, income, "mean_gender").at(age) += static_cast<int>(person.gender);
             series.at(gender, income, "mean_income").at(age) += static_cast<int>(person.income);
             series.at(gender, income, "mean_sector").at(age) += static_cast<int>(person.sector);
+        } catch (const std::exception &) {
+            throw;
+        }
+
+        // NEW: Collect enhanced demographic data by income (only if available)
+        try {
+            // Region data - check if person has region assigned
+            if (!person.region.empty() && person.region != "unknown") {
+                series.at(gender, income, "mean_region").at(age) += person.region_to_value();
+            }
+            
+            // Ethnicity data - check if person has ethnicity assigned
+            if (!person.ethnicity.empty() && person.ethnicity != "unknown") {
+                series.at(gender, income, "mean_ethnicity").at(age) += person.ethnicity_to_value();
+            }
+            
+            // Income category - check if person has income assigned
+            if (person.income != core::Income::unknown) {
+                series.at(gender, income, "mean_income_category").at(age) += person.income_to_value();
+            }
+            
+            // Continuous income - check if available in risk factors
+            auto income_continuous = 0.0;
+            auto it = person.risk_factors.find("income_continuous"_id);
+            if (it != person.risk_factors.end()) {
+                income_continuous = it->second;
+                series.at(gender, income, "mean_income_continuous").at(age) += income_continuous;
+            }
+            
+            // Physical activity - check if available in risk factors
+            auto physical_activity = 0.0;
+            auto pa_it = person.risk_factors.find("PhysicalActivity"_id);
+            if (pa_it != person.risk_factors.end()) {
+                physical_activity = pa_it->second;
+                series.at(gender, income, "mean_physical_activity").at(age) += physical_activity;
+            }
         } catch (const std::exception &) {
             throw;
         }
@@ -896,15 +1049,45 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
             // Calculate in-place demographic averages for this income category
             if (count_F > 0) {
                 series.at(core::Gender::female, income, "mean_age").at(age) /= count_F;
+                series.at(core::Gender::female, income, "mean_age2").at(age) /= count_F;
+                series.at(core::Gender::female, income, "mean_age3").at(age) /= count_F;
                 series.at(core::Gender::female, income, "mean_gender").at(age) /= count_F;
                 series.at(core::Gender::female, income, "mean_income").at(age) /= count_F;
                 series.at(core::Gender::female, income, "mean_sector").at(age) /= count_F;
             }
             if (count_M > 0) {
                 series.at(core::Gender::male, income, "mean_age").at(age) /= count_M;
+                series.at(core::Gender::male, income, "mean_age2").at(age) /= count_M;
+                series.at(core::Gender::male, income, "mean_age3").at(age) /= count_M;
                 series.at(core::Gender::male, income, "mean_gender").at(age) /= count_M;
                 series.at(core::Gender::male, income, "mean_income").at(age) /= count_M;
                 series.at(core::Gender::male, income, "mean_sector").at(age) /= count_M;
+            }
+
+            // NEW: Calculate in-place enhanced demographic averages for this income category (only if data exists)
+            if (count_F > 0) {
+                // Region averages
+                series.at(core::Gender::female, income, "mean_region").at(age) /= count_F;
+                // Ethnicity averages
+                series.at(core::Gender::female, income, "mean_ethnicity").at(age) /= count_F;
+                // Income category averages
+                series.at(core::Gender::female, income, "mean_income_category").at(age) /= count_F;
+                // Income continuous averages
+                series.at(core::Gender::female, income, "mean_income_continuous").at(age) /= count_F;
+                // Physical activity averages
+                series.at(core::Gender::female, income, "mean_physical_activity").at(age) /= count_F;
+            }
+            if (count_M > 0) {
+                // Region averages
+                series.at(core::Gender::male, income, "mean_region").at(age) /= count_M;
+                // Ethnicity averages
+                series.at(core::Gender::male, income, "mean_ethnicity").at(age) /= count_M;
+                // Income category averages
+                series.at(core::Gender::male, income, "mean_income_category").at(age) /= count_M;
+                // Income continuous averages
+                series.at(core::Gender::male, income, "mean_income_continuous").at(age) /= count_M;
+                // Physical activity averages
+                series.at(core::Gender::male, income, "mean_physical_activity").at(age) /= count_M;
             }
 
             // Calculate in-place disease prevalence and incidence rates for this income category
@@ -980,12 +1163,47 @@ void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &c
 
         // Accumulate squared deviations for demographic data
         accumulate_squared_diffs_income("age", sex, income, age, person.age);
+        accumulate_squared_diffs_income("age2", sex, income, age, (person.age * person.age));
+        accumulate_squared_diffs_income("age3", sex, income, age, (person.age * person.age * person.age));
         accumulate_squared_diffs_income("gender", sex, income, age,
                                         static_cast<int>(person.gender));
         accumulate_squared_diffs_income("income", sex, income, age,
                                         static_cast<int>(person.income));
         accumulate_squared_diffs_income("sector", sex, income, age,
                                         static_cast<int>(person.sector));
+
+        // NEW: Accumulate squared deviations for enhanced demographic data (only if available)
+        // Region standard deviation
+        if (!person.region.empty() && person.region != "unknown") {
+            const double value = person.region_to_value();
+            accumulate_squared_diffs_income("region", sex, income, age, value);
+        }
+        
+        // Ethnicity standard deviation
+        if (!person.ethnicity.empty() && person.ethnicity != "unknown") {
+            const double value = person.ethnicity_to_value();
+            accumulate_squared_diffs_income("ethnicity", sex, income, age, value);
+        }
+        
+        // Income category standard deviation
+        if (person.income != core::Income::unknown) {
+            const double value = person.income_to_value();
+            accumulate_squared_diffs_income("income_category", sex, income, age, value);
+        }
+        
+        // Income continuous standard deviation
+        auto it = person.risk_factors.find("income_continuous"_id);
+        if (it != person.risk_factors.end()) {
+            const double value = it->second;
+            accumulate_squared_diffs_income("income_continuous", sex, income, age, value);
+        }
+        
+        // Physical activity standard deviation
+        auto pa_it = person.risk_factors.find("PhysicalActivity"_id);
+        if (pa_it != person.risk_factors.end()) {
+            const double value = pa_it->second;
+            accumulate_squared_diffs_income("physical_activity", sex, income, age, value);
+        }
     }
 
     // Calculate in-place standard deviation for income-based data
@@ -1018,12 +1236,37 @@ void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &c
             // Calculate in-place demographic standard deviation for this income category
             divide_by_count_sqrt_income("age", core::Gender::female, income, age, count_F);
             divide_by_count_sqrt_income("age", core::Gender::male, income, age, count_M);
+            divide_by_count_sqrt_income("age2", core::Gender::female, income, age, count_F);
+            divide_by_count_sqrt_income("age2", core::Gender::male, income, age, count_M);
+            divide_by_count_sqrt_income("age3", core::Gender::female, income, age, count_F);
+            divide_by_count_sqrt_income("age3", core::Gender::male, income, age, count_M);
             divide_by_count_sqrt_income("gender", core::Gender::female, income, age, count_F);
             divide_by_count_sqrt_income("gender", core::Gender::male, income, age, count_M);
             divide_by_count_sqrt_income("income", core::Gender::female, income, age, count_F);
             divide_by_count_sqrt_income("income", core::Gender::male, income, age, count_M);
             divide_by_count_sqrt_income("sector", core::Gender::female, income, age, count_F);
             divide_by_count_sqrt_income("sector", core::Gender::male, income, age, count_M);
+
+            // NEW: Calculate in-place enhanced demographic standard deviation for this income category (only if data exists)
+            // Region standard deviation
+            divide_by_count_sqrt_income("region", core::Gender::female, income, age, count_F);
+            divide_by_count_sqrt_income("region", core::Gender::male, income, age, count_M);
+            
+            // Ethnicity standard deviation
+            divide_by_count_sqrt_income("ethnicity", core::Gender::female, income, age, count_F);
+            divide_by_count_sqrt_income("ethnicity", core::Gender::male, income, age, count_M);
+            
+            // Income category standard deviation
+            divide_by_count_sqrt_income("income_category", core::Gender::female, income, age, count_F);
+            divide_by_count_sqrt_income("income_category", core::Gender::male, income, age, count_M);
+            
+            // Income continuous standard deviation
+            divide_by_count_sqrt_income("income_continuous", core::Gender::female, income, age, count_F);
+            divide_by_count_sqrt_income("income_continuous", core::Gender::male, income, age, count_M);
+            
+            // Physical activity standard deviation
+            divide_by_count_sqrt_income("physical_activity", core::Gender::female, income, age, count_F);
+            divide_by_count_sqrt_income("physical_activity", core::Gender::male, income, age, count_M);
 
             // Calculate in-place YLL/YLD/DALY standard deviation for this income category
             for (const auto &column : {"yll", "yld", "daly"}) {
@@ -1068,9 +1311,53 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
         accumulate_squared_diffs("yld", sex, age, yld);
         accumulate_squared_diffs("daly", sex, age, yld);
 
+        // NEW: Calculate standard deviation for age factors (always available)
+        accumulate_squared_diffs("age", sex, age, person.age);
+        accumulate_squared_diffs("age2", sex, age, (person.age * person.age));
+        accumulate_squared_diffs("age3", sex, age, (person.age * person.age * person.age));
+
         for (const auto &factor : context.mapping().entries()) {
             const double value = person.get_risk_factor_value(factor.key());
             accumulate_squared_diffs(factor.key().to_string(), sex, age, value);
+        }
+
+        // NEW: Calculate standard deviation for demographic factors (only if data exists)
+        // Region standard deviation
+        if (!person.region.empty() && person.region != "unknown") {
+            const double value = person.region_to_value();
+            accumulate_squared_diffs("region", sex, age, value);
+        }
+        
+        // Ethnicity standard deviation
+        if (!person.ethnicity.empty() && person.ethnicity != "unknown") {
+            const double value = person.ethnicity_to_value();
+            accumulate_squared_diffs("ethnicity", sex, age, value);
+        }
+        
+        // Sector standard deviation
+        if (person.sector != core::Sector::unknown) {
+            const double value = person.sector_to_value();
+            accumulate_squared_diffs("sector", sex, age, value);
+        }
+        
+        // Income category standard deviation
+        if (person.income != core::Income::unknown) {
+            const double value = person.income_to_value();
+            accumulate_squared_diffs("income_category", sex, age, value);
+        }
+        
+        // Income continuous standard deviation
+        auto it = person.risk_factors.find("income_continuous"_id);
+        if (it != person.risk_factors.end()) {
+            const double value = it->second;
+            accumulate_squared_diffs("income_continuous", sex, age, value);
+        }
+        
+        // Physical activity standard deviation
+        auto pa_it = person.risk_factors.find("PhysicalActivity"_id);
+        if (pa_it != person.risk_factors.end()) {
+            const double value = pa_it->second;
+            accumulate_squared_diffs("physical_activity", sex, age, value);
         }
     }
 
@@ -1096,11 +1383,44 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
             divide_by_count_sqrt(factor.key().to_string(), core::Gender::male, age, count_M);
         }
 
+        // NEW: Calculate in-place age standard deviation (always available)
+        divide_by_count_sqrt("age", core::Gender::female, age, count_F);
+        divide_by_count_sqrt("age", core::Gender::male, age, count_M);
+        divide_by_count_sqrt("age2", core::Gender::female, age, count_F);
+        divide_by_count_sqrt("age2", core::Gender::male, age, count_M);
+        divide_by_count_sqrt("age3", core::Gender::female, age, count_F);
+        divide_by_count_sqrt("age3", core::Gender::male, age, count_M);
+
         // Calculate in-place YLL/YLD/DALY standard deviation.
         for (const auto &column : {"yll", "yld", "daly"}) {
             divide_by_count_sqrt(column, core::Gender::female, age, (count_F + deaths_F));
             divide_by_count_sqrt(column, core::Gender::male, age, (count_M + deaths_M));
         }
+
+        // NEW: Calculate in-place demographic standard deviation (only if data exists)
+        // Region standard deviation
+        divide_by_count_sqrt("region", core::Gender::female, age, count_F);
+        divide_by_count_sqrt("region", core::Gender::male, age, count_M);
+        
+        // Ethnicity standard deviation
+        divide_by_count_sqrt("ethnicity", core::Gender::female, age, count_F);
+        divide_by_count_sqrt("ethnicity", core::Gender::male, age, count_M);
+        
+        // Sector standard deviation
+        divide_by_count_sqrt("sector", core::Gender::female, age, count_F);
+        divide_by_count_sqrt("sector", core::Gender::male, age, count_M);
+        
+        // Income category standard deviation
+        divide_by_count_sqrt("income_category", core::Gender::female, age, count_F);
+        divide_by_count_sqrt("income_category", core::Gender::male, age, count_M);
+        
+        // Income continuous standard deviation
+        divide_by_count_sqrt("income_continuous", core::Gender::female, age, count_F);
+        divide_by_count_sqrt("income_continuous", core::Gender::male, age, count_M);
+        
+        // Physical activity standard deviation
+        divide_by_count_sqrt("physical_activity", core::Gender::female, age, count_F);
+        divide_by_count_sqrt("physical_activity", core::Gender::male, age, count_M);
     }
 }
 
@@ -1132,6 +1452,35 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
     channels_.emplace_back("count");
     channels_.emplace_back("deaths");
     channels_.emplace_back("emigrations");
+
+    // NEW: Add age channels (always available)
+    channels_.emplace_back("mean_age");
+    channels_.emplace_back("std_age");
+    channels_.emplace_back("mean_age2");
+    channels_.emplace_back("std_age2");
+    channels_.emplace_back("mean_age3");
+    channels_.emplace_back("std_age3");
+
+    // NEW: Add demographic channels (only if data exists)
+    // These will be populated if region, ethnicity, sector data is available
+    channels_.emplace_back("mean_region");
+    channels_.emplace_back("std_region");
+    channels_.emplace_back("mean_ethnicity");
+    channels_.emplace_back("std_ethnicity");
+    channels_.emplace_back("mean_sector");
+    channels_.emplace_back("std_sector");
+
+    // NEW: Add income channels (only if data exists)
+    // These will be populated if income data is available
+    channels_.emplace_back("mean_income_category");
+    channels_.emplace_back("std_income_category");
+    channels_.emplace_back("mean_income_continuous");
+    channels_.emplace_back("std_income_continuous");
+
+    // NEW: Add physical activity channels (only if data exists)
+    // These will be populated if physical activity data is available
+    channels_.emplace_back("mean_physical_activity");
+    channels_.emplace_back("std_physical_activity");
 
     for (const auto &factor : context.mapping().entries()) {
         channels_.emplace_back("mean_" + factor.key().to_string());
