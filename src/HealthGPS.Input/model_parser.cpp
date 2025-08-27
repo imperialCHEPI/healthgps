@@ -556,8 +556,9 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         // We just need to ensure the continuous model exists
         if (!opt["IncomeModels"]["continuous"].contains("Intercept") ||
             !opt["IncomeModels"]["continuous"].contains("Coefficients")) {
-            throw core::HgpsException("Continuous income model missing required fields: Intercept or "
-                                      "Coefficients");
+            throw core::HgpsException(
+                "Continuous income model missing required fields: Intercept or "
+                "Coefficients");
         }
 
         // Create placeholder income models for the categories (these will be filled by the
@@ -613,7 +614,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             const auto &continuous_json = opt["IncomeModels"]["continuous"];
             params.intercept = continuous_json["Intercept"].get<double>();
             params.coefficients = continuous_json["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
-            
+
             // Print debug info about the continuous income model
             std::cout << "Continuous income model loaded:" << std::endl;
             std::cout << "  Intercept: " << params.intercept << std::endl;
@@ -621,7 +622,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             for (const auto &[coef_name, coef_value] : params.coefficients) {
                 std::cout << "    " << coef_name.to_string() << ": " << coef_value << std::endl;
             }
-            
+
             return params;
         }() : LinearModelParams{},
         income_categories);
