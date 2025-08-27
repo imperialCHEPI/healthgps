@@ -474,7 +474,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
         // Increment table column index.
         i++;
-    }// NOLINTEND(readability-function-cognitive-complexity)
+    } // NOLINTEND(readability-function-cognitive-complexity)
 
     // Check risk factor correlation matrix column count matches risk factor count.
     if (opt["RiskFactorModels"].size() != correlation_table.num_columns()) {
