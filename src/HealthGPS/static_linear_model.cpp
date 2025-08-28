@@ -1,7 +1,7 @@
 #include "static_linear_model.h"
 #include "HealthGPS.Core/exception.h"
-#include "risk_factor_adjustable_model.h"
 #include "population.h"
+#include "risk_factor_adjustable_model.h"
 #include "runtime_context.h"
 
 #include <algorithm>
@@ -895,11 +895,12 @@ void StaticLinearModel::initialise_physical_activity(RuntimeContext &context, Pe
     }
 }
 
-void StaticLinearModel::initialise_continuous_physical_activity([[maybe_unused]] RuntimeContext &context, Person &person,
-                                                                Random &random) const {
+void StaticLinearModel::initialise_continuous_physical_activity(
+    [[maybe_unused]] RuntimeContext &context, Person &person, Random &random) const {
     // Check if we have any models before proceeding
     if (physical_activity_models_.empty()) {
-        std::cout << "\nERROR: physical_activity_models_ is empty! Cannot initialize physical activity.";
+        std::cout
+            << "\nERROR: physical_activity_models_ is empty! Cannot initialize physical activity.";
         std::cout << "\nERROR: Please check that PhysicalActivityModels are properly defined in "
                      "the configuration.";
         // Don't set a default value - let the error surface so it can be diagnosed
@@ -979,7 +980,8 @@ void StaticLinearModel::initialise_continuous_physical_activity([[maybe_unused]]
         if (stddev_it != model.coefficients.end()) {
             stddev = stddev_it->second;
         } else {
-            std::cout << "\nWARNING: No 'stddev' coefficient found for physical activity model, using 0.0";
+            std::cout << "\nWARNING: No 'stddev' coefficient found for physical activity model, "
+                         "using 0.0";
         }
 
         double rand_noise = random.next_normal(0.0, stddev);
@@ -994,8 +996,9 @@ void StaticLinearModel::initialise_continuous_physical_activity([[maybe_unused]]
     person.physical_activity = final_value;
 }
 
-void StaticLinearModel::initialise_categorical_physical_activity(RuntimeContext &context, Person &person,
-                                                                  Random &random) const {
+void StaticLinearModel::initialise_categorical_physical_activity(RuntimeContext &context,
+                                                                 Person &person,
+                                                                 Random &random) const {
     // Simple approach: use expected value with random noise
     double expected = get_expected(context, person.gender, person.age, "PhysicalActivity"_id,
                                    std::nullopt, false);
@@ -1012,9 +1015,8 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::vector<core::Identifier> names, std::vector<LinearModelParams> models,
     std::vector<core::DoubleInterval> ranges, std::vector<double> lambda,
     std::vector<double> stddev, Eigen::MatrixXd cholesky,
-    std::vector<LinearModelParams> policy_models,
-    std::vector<core::DoubleInterval> policy_ranges, Eigen::MatrixXd policy_cholesky,
-    std::unique_ptr<std::vector<LinearModelParams>> trend_models,
+    std::vector<LinearModelParams> policy_models, std::vector<core::DoubleInterval> policy_ranges,
+    Eigen::MatrixXd policy_cholesky, std::unique_ptr<std::vector<LinearModelParams>> trend_models,
     std::unique_ptr<std::vector<core::DoubleInterval>> trend_ranges,
     std::unique_ptr<std::vector<double>> trend_lambda, double info_speed,
     std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>> rural_prevalence,
@@ -1033,19 +1035,41 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend),
                                           std::move(trend_steps), trend_type},
       // Regular trend member variables - convert unique_ptr to shared_ptr
-      expected_trend_boxcox_{std::make_shared<std::unordered_map<core::Identifier, double>>(std::move(*expected_trend_boxcox))},
+      expected_trend_boxcox_{std::make_shared<std::unordered_map<core::Identifier, double>>(
+          std::move(*expected_trend_boxcox))},
       trend_models_{std::make_shared<std::vector<LinearModelParams>>(std::move(*trend_models))},
       trend_ranges_{std::make_shared<std::vector<core::DoubleInterval>>(std::move(*trend_ranges))},
       trend_lambda_{std::make_shared<std::vector<double>>(std::move(*trend_lambda))},
       // Income trend member variables
       trend_type_{trend_type},
-      expected_income_trend_{expected_income_trend ? std::make_shared<std::unordered_map<core::Identifier, double>>(std::move(*expected_income_trend)) : nullptr},
-      expected_income_trend_boxcox_{expected_income_trend_boxcox ? std::make_shared<std::unordered_map<core::Identifier, double>>(std::move(*expected_income_trend_boxcox)) : nullptr},
-      income_trend_steps_{income_trend_steps ? std::make_shared<std::unordered_map<core::Identifier, int>>(std::move(*income_trend_steps)) : nullptr},
-      income_trend_models_{income_trend_models ? std::make_shared<std::vector<LinearModelParams>>(std::move(*income_trend_models)) : nullptr},
-      income_trend_ranges_{income_trend_ranges ? std::make_shared<std::vector<core::DoubleInterval>>(std::move(*income_trend_ranges)) : nullptr},
-      income_trend_lambda_{income_trend_lambda ? std::make_shared<std::vector<double>>(std::move(*income_trend_lambda)) : nullptr},
-      income_trend_decay_factors_{income_trend_decay_factors ? std::make_shared<std::unordered_map<core::Identifier, double>>(std::move(*income_trend_decay_factors)) : nullptr},
+      expected_income_trend_{expected_income_trend
+                                 ? std::make_shared<std::unordered_map<core::Identifier, double>>(
+                                       std::move(*expected_income_trend))
+                                 : nullptr},
+      expected_income_trend_boxcox_{
+          expected_income_trend_boxcox
+              ? std::make_shared<std::unordered_map<core::Identifier, double>>(
+                    std::move(*expected_income_trend_boxcox))
+              : nullptr},
+      income_trend_steps_{income_trend_steps
+                              ? std::make_shared<std::unordered_map<core::Identifier, int>>(
+                                    std::move(*income_trend_steps))
+                              : nullptr},
+      income_trend_models_{income_trend_models ? std::make_shared<std::vector<LinearModelParams>>(
+                                                     std::move(*income_trend_models))
+                                               : nullptr},
+      income_trend_ranges_{
+          income_trend_ranges
+              ? std::make_shared<std::vector<core::DoubleInterval>>(std::move(*income_trend_ranges))
+              : nullptr},
+      income_trend_lambda_{income_trend_lambda ? std::make_shared<std::vector<double>>(
+                                                     std::move(*income_trend_lambda))
+                                               : nullptr},
+      income_trend_decay_factors_{
+          income_trend_decay_factors
+              ? std::make_shared<std::unordered_map<core::Identifier, double>>(
+                    std::move(*income_trend_decay_factors))
+              : nullptr},
       // Common member variables
       names_{std::move(names)}, models_{std::move(models)}, ranges_{std::move(ranges)},
       lambda_{std::move(lambda)}, stddev_{std::move(stddev)}, cholesky_{std::move(cholesky)},
@@ -1193,7 +1217,8 @@ std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() con
         physical_activity_stddev_, trend_type_, expected_income_trend_,
         expected_income_trend_boxcox_, income_trend_steps_, income_trend_models_,
         income_trend_ranges_, income_trend_lambda_, income_trend_decay_factors_,
-        is_continuous_income_model_, continuous_income_model_, income_categories_, physical_activity_models_);
+        is_continuous_income_model_, continuous_income_model_, income_categories_,
+        physical_activity_models_);
 }
 
 } // namespace hgps
