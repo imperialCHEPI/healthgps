@@ -705,7 +705,6 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         }() : LinearModelParams{},
         income_categories, std::move(physical_activity_models));
 }
-// NOLINTEND(readability-function-cognitive-complexity)
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
 std::unique_ptr<hgps::DynamicHierarchicalLinearModelDefinition>
