@@ -197,7 +197,7 @@ std::string StaticLinearModel::name() const noexcept { return "Static"; }
 
 void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     // MAHIMA: Initialise everyone. Order is important here.
-    //STEP 1: Age and gender initalized in demographic.cpp
+    // STEP 1: Age and gender initalized in demographic.cpp
     // STEP 2: Region and ethnicity in demographic.cpp (if available)
     // STEP 3: Sector and income in static_linear_model.cpp (below)
     // STEP 4: Risk factors in static_linear_model.cpp (below)
@@ -721,7 +721,8 @@ void StaticLinearModel::initialise_categorical_income(Person &person, Random &ra
 }
 
 // MAHIMA: This is the FINCH approach for continuous income calculation
-// In the static_model.json, we have a IncomeModel with intercept, regression values (age, gender, region, ethnicity etc) If is_continuous_income_model_ is true, we use this approach- the order
+// In the static_model.json, we have a IncomeModel with intercept, regression values (age, gender,
+// region, ethnicity etc) If is_continuous_income_model_ is true, we use this approach- the order
 // for this is- calculate continuous income, calculate quartiles, assign category
 void StaticLinearModel::initialise_continuous_income(RuntimeContext &context, Person &person,
                                                      Random &random) {
@@ -904,17 +905,19 @@ void StaticLinearModel::initialise_physical_activity(RuntimeContext &context, Pe
         // Check which type of model we have
         auto simple_model = physical_activity_models_.find(core::Identifier("simple"));
         auto continuous_model = physical_activity_models_.find(core::Identifier("continuous"));
-        
+
         if (simple_model != physical_activity_models_.end()) {
             // India approach: Simple model with standard deviation
             initialise_simple_physical_activity(context, person, random, simple_model->second);
         } else if (continuous_model != physical_activity_models_.end()) {
             // FINCH approach: Continuous model with CSV file loading
-            initialise_continuous_physical_activity(context, person, random, continuous_model->second);
-        } 
-      } else {
+            initialise_continuous_physical_activity(context, person, random,
+                                                    continuous_model->second);
+        }
+    } else {
         // No physical activity models configured - use simple approach with global stddev
-        std::cout << "\nWARNING: No 'simple' or 'continuous' model found, using simple model as default";
+        std::cout
+            << "\nWARNING: No 'simple' or 'continuous' model found, using simple model as default";
         PhysicalActivityModel simple_model;
         simple_model.model_type = "simple";
         simple_model.stddev = physical_activity_stddev_;
@@ -922,88 +925,87 @@ void StaticLinearModel::initialise_physical_activity(RuntimeContext &context, Pe
     }
 }
 
-// MAHIMA: Function to insatialise continuous physical activity model using regression. 
+// MAHIMA: Function to insatialise continuous physical activity model using regression.
 // This is for Finch or any project that has region, ethncity, income continuous etc in the CSV
 // file.
 void StaticLinearModel::initialise_continuous_physical_activity(
     [[maybe_unused]] RuntimeContext &context, Person &person, Random &random,
     const PhysicalActivityModel &model) const {
-        // Start with the intercept
+    // Start with the intercept
     double value = model.intercept;
 
-        // Process coefficients dynamically from CSV file
-        for (const auto &[factor_name, coefficient] : model.coefficients) {
-            // Skip the standard deviation entry as it's not a factor
-            if (factor_name == "stddev"_id) {
-                continue;
-            }
-
-            // Apply coefficient based on its name - dynamically handle any factor names from CSV
-            double factor_value = 0.0;
-
-            // Age effects
-            if (factor_name == "age"_id) {
-                factor_value = static_cast<double>(person.age);
-            } else if (factor_name == "age2"_id) {
-                factor_value = std::pow(person.age, 2);
-            } else if (factor_name == "age3"_id) {
-                factor_value = std::pow(person.age, 3);
-            }
-            // Gender effect
-            else if (factor_name == "gender"_id) {
-                factor_value = person.gender_to_value();
-            }
-            // Sector effect
-            else if (factor_name == "sector"_id) {
-                factor_value = person.sector_to_value();
-            }
-            // Region effects - dynamically handle any region names from CSV
-            else if (factor_name.to_string() == person.region) {
-                factor_value = 1.0;
-            }
-            // Ethnicity effects - dynamically handle any ethnicity names from CSV
-            else if (factor_name.to_string() == person.ethnicity) {
-                factor_value = 1.0;
-            }
-            // Income effects
-            else if (factor_name == "income"_id) {
-                factor_value = static_cast<double>(person.income);
-            } else if (factor_name == "income_continuous"_id) {
-                factor_value = person.income_continuous;
-            }
-            // Risk factor effects
-            else {
-                // Check if it's a risk factor
-                factor_value = person.get_risk_factor_value(factor_name);
-            }
-
-            value += coefficient * factor_value;
+    // Process coefficients dynamically from CSV file
+    for (const auto &[factor_name, coefficient] : model.coefficients) {
+        // Skip the standard deviation entry as it's not a factor
+        if (factor_name == "stddev"_id) {
+            continue;
         }
 
-        // Add random noise using the model's standard deviation
-        double rand_noise = random.next_normal(0.0, model.stddev);
-        double final_value = value + rand_noise;
+        // Apply coefficient based on its name - dynamically handle any factor names from CSV
+        double factor_value = 0.0;
 
-        // Apply min/max constraints
-        final_value = std::max(model.min_value, std::min(final_value, model.max_value));
+        // Age effects
+        if (factor_name == "age"_id) {
+            factor_value = static_cast<double>(person.age);
+        } else if (factor_name == "age2"_id) {
+            factor_value = std::pow(person.age, 2);
+        } else if (factor_name == "age3"_id) {
+            factor_value = std::pow(person.age, 3);
+        }
+        // Gender effect
+        else if (factor_name == "gender"_id) {
+            factor_value = person.gender_to_value();
+        }
+        // Sector effect
+        else if (factor_name == "sector"_id) {
+            factor_value = person.sector_to_value();
+        }
+        // Region effects - dynamically handle any region names from CSV
+        else if (factor_name.to_string() == person.region) {
+            factor_value = 1.0;
+        }
+        // Ethnicity effects - dynamically handle any ethnicity names from CSV
+        else if (factor_name.to_string() == person.ethnicity) {
+            factor_value = 1.0;
+        }
+        // Income effects
+        else if (factor_name == "income"_id) {
+            factor_value = static_cast<double>(person.income);
+        } else if (factor_name == "income_continuous"_id) {
+            factor_value = person.income_continuous;
+        }
+        // Risk factor effects
+        else {
+            // Check if it's a risk factor
+            factor_value = person.get_risk_factor_value(factor_name);
+        }
 
-        // Set the physical activity value
-        person.physical_activity = final_value;
+        value += coefficient * factor_value;
+    }
+
+    // Add random noise using the model's standard deviation
+    double rand_noise = random.next_normal(0.0, model.stddev);
+    double final_value = value + rand_noise;
+
+    // Apply min/max constraints
+    final_value = std::max(model.min_value, std::min(final_value, model.max_value));
+
+    // Set the physical activity value
+    person.physical_activity = final_value;
 }
 
 // MAHIMA: Function to initialise simple physical activity model using log-normal distribution
 // This is for India or any project that does not have region, ethncity, income continuous etc in
 // the CSV
-void StaticLinearModel::initialise_simple_physical_activity(RuntimeContext &context,
-                                                            Person &person,
-                                                            Random &random,
-                                                            const PhysicalActivityModel &model) const {
+void StaticLinearModel::initialise_simple_physical_activity(
+    RuntimeContext &context, Person &person, Random &random,
+    const PhysicalActivityModel &model) const {
     // India approach: Simple model with standard deviation from the model
     double expected = get_expected(context, person.gender, person.age, "PhysicalActivity"_id,
                                    std::nullopt, false);
     double rand = random.next_normal(0.0, model.stddev);
     double factor = expected * exp(rand - 0.5 * pow(model.stddev, 2));
-    
+
     // Store in both physical_activity and risk_factors for compatibility
     person.physical_activity = factor;
     person.risk_factors["PhysicalActivity"_id] = factor;

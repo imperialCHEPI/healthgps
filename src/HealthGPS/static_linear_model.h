@@ -22,19 +22,19 @@ struct LinearModelParams {
 struct PhysicalActivityModel {
     /// @brief Model type: "simple" for India approach, "continuous" for FINCH approach
     std::string model_type{"simple"};
-    
+
     /// @brief Intercept value for the linear model
     double intercept{};
-    
+
     /// @brief Coefficients for each factor (age, gender, region, ethnicity, etc.)
     std::unordered_map<core::Identifier, double> coefficients{};
-    
+
     /// @brief Minimum allowed value for physical activity
     double min_value = 0.0;
-    
+
     /// @brief Maximum allowed value for physical activity
     double max_value = std::numeric_limits<double>::max();
-    
+
     /// @brief Standard deviation for simple models (India approach)
     double stddev = 0.06;
 };
@@ -109,7 +109,8 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
         bool is_continuous_income_model = false,
         const LinearModelParams &continuous_income_model = LinearModelParams{},
         const std::string &income_categories = "3",
-        /// @param physical_activity_models Physical activity models for both India (simple) and FINCH (continuous) approaches
+        /// @param physical_activity_models Physical activity models for both India (simple) and
+        /// FINCH (continuous) approaches
         const std::unordered_map<core::Identifier, PhysicalActivityModel>
             &physical_activity_models = {});
 
@@ -223,7 +224,8 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param random Random number generator
     /// @param model The physical activity model to use
     void initialise_continuous_physical_activity(RuntimeContext &context, Person &person,
-                                                 Random &random, const PhysicalActivityModel &model) const;
+                                                 Random &random,
+                                                 const PhysicalActivityModel &model) const;
 
     /// @brief Initialise physical activity using simple model approach (India method)
     /// @param context The runtime context
@@ -231,9 +233,8 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param random Random number generator
     /// @param model The physical activity model to use
     void initialise_simple_physical_activity(RuntimeContext &context, Person &person,
-                                             Random &random, const PhysicalActivityModel &model) const;
-
-
+                                             Random &random,
+                                             const PhysicalActivityModel &model) const;
 
     // Regular trend member variables
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_;

@@ -18,8 +18,8 @@
 #include <optional>
 
 #if USE_TIMER
-#define MEASURE_FUNCTION()                                                                         
-    hgps::core::ScopedTimer timer { __func__ }
+#define MEASURE_FUNCTION()
+hgps::core::ScopedTimer timer { __func__ }
 #else
 #define MEASURE_FUNCTION()
 #endif
@@ -272,7 +272,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     Eigen::MatrixXd policy_covariance{policy_covariance_table.num_rows(),
                                       policy_covariance_table.num_columns()};
 
-    // MAHIMA: Risk factor and intervention policy: names, models, parameters and correlation/covariance.
+    // MAHIMA: Risk factor and intervention policy: names, models, parameters and
+    // correlation/covariance.
     std::vector<core::Identifier> names;
     std::vector<LinearModelParams> models;
     std::vector<core::DoubleInterval> ranges;
@@ -287,8 +288,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     auto expected_trend_boxcox = std::make_unique<std::unordered_map<core::Identifier, double>>();
     auto trend_steps = std::make_unique<std::unordered_map<core::Identifier, int>>();
 
-    // MAHIMA: Income trend data structures: income trend models, ranges, lambda, decay factors, steps.
-    // These will be nullptr if income trend is not enabled
+    // MAHIMA: Income trend data structures: income trend models, ranges, lambda, decay factors,
+    // steps. These will be nullptr if income trend is not enabled
     std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend = nullptr;
     std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend_boxcox =
         nullptr;
@@ -605,11 +606,11 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         for (const auto &[model_name, model_config] : opt["PhysicalActivityModels"].items()) {
             PhysicalActivityModel model;
             model.model_type = model_name; // "simple" or "continuous"
-            
+
             if (model_name == "simple") {
                 // India approach: Simple model with standard deviation
                 std::cout << "\n  Loading simple model '" << model_name << "' (India approach)";
-                
+
                 if (model_config.contains("PhysicalActivityStdDev")) {
                     model.stddev = model_config["PhysicalActivityStdDev"].get<double>();
                     std::cout << "\n    Standard deviation: " << model.stddev;
@@ -618,91 +619,92 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                     model.stddev = physical_activity_stddev;
                     std::cout << "\n    Using global standard deviation: " << model.stddev;
                 }
-                
+
             } else if (model_name == "continuous") {
                 // FINCH approach: Continuous model with CSV file loading
                 std::cout << "\n  Loading continuous model '" << model_name << "' (FINCH approach)";
-                
+
                 if (model_config.contains("csv_file")) {
-                std::string csv_filename = model_config["csv_file"].get<std::string>();
-                std::cout << "\n  Loading model '" << model_name << "' from file: " << csv_filename;
+                    std::string csv_filename = model_config["csv_file"].get<std::string>();
+                    std::cout << "\n  Loading model '" << model_name
+                              << "' from file: " << csv_filename;
 
-                // Construct full path to CSV file (same directory as JSON config)
-                std::filesystem::path csv_path = config.root_path / csv_filename;
+                    // Construct full path to CSV file (same directory as JSON config)
+                    std::filesystem::path csv_path = config.root_path / csv_filename;
 
-                // Load CSV data
-                const auto csv_file_info = input::get_file_info({{"name", csv_filename},
-                                                                 {"format", "csv"},
-                                                                 {"delimiter", ","},
-                                                                 {"encoding", "ASCII"}},
-                                                                config.root_path);
-                const auto csv_table = load_datatable_from_csv(csv_file_info);
+                    // Load CSV data
+                    const auto csv_file_info = input::get_file_info({{"name", csv_filename},
+                                                                     {"format", "csv"},
+                                                                     {"delimiter", ","},
+                                                                     {"encoding", "ASCII"}},
+                                                                    config.root_path);
+                    const auto csv_table = load_datatable_from_csv(csv_file_info);
 
-                // Parse CSV into PhysicalActivityModel (using existing model variable)
+                    // Parse CSV into PhysicalActivityModel (using existing model variable)
 
-                // Find the Factor and Coefficient columns
-                int factor_col = -1;
-                int coefficient_col = -1;
+                    // Find the Factor and Coefficient columns
+                    int factor_col = -1;
+                    int coefficient_col = -1;
 
-                for (size_t col_idx = 0; col_idx < csv_table.num_columns(); col_idx++) {
-                    std::string col_name = csv_table.column(col_idx).name();
-                    if (col_name == "Factor" || col_name == "factor") {
-                        factor_col = static_cast<int>(col_idx);
-                    } else if (col_name == "Coefficient" || col_name == "coefficient") {
-                        coefficient_col = static_cast<int>(col_idx);
+                    for (size_t col_idx = 0; col_idx < csv_table.num_columns(); col_idx++) {
+                        std::string col_name = csv_table.column(col_idx).name();
+                        if (col_name == "Factor" || col_name == "factor") {
+                            factor_col = static_cast<int>(col_idx);
+                        } else if (col_name == "Coefficient" || col_name == "coefficient") {
+                            coefficient_col = static_cast<int>(col_idx);
+                        }
                     }
-                }
 
-                if (factor_col == -1 || coefficient_col == -1) {
-                    throw core::HgpsException{
-                        fmt::format("Physical activity CSV file {} must have 'Factor' and "
-                                    "'Coefficient' columns. "
-                                    "Found columns: {}",
-                                    csv_filename, [&csv_table]() {
-                                        std::string cols;
-                                        for (size_t i = 0; i < csv_table.num_columns(); i++) {
-                                            if (i > 0)
-                                                cols += ", ";
-                                            cols += csv_table.column(i).name();
-                                        }
-                                        return cols;
-                                    }())};
-                }
-
-                // Parse each row
-                for (size_t row_idx = 0; row_idx < csv_table.num_rows(); row_idx++) {
-                    std::string factor_name =
-                        std::any_cast<std::string>(csv_table.column(factor_col).value(row_idx));
-                    double coefficient_value =
-                        std::any_cast<double>(csv_table.column(coefficient_col).value(row_idx));
-
-                    if (factor_name == "Intercept") {
-                        model.intercept = coefficient_value;
-                    } else if (factor_name == "min") {
-                        model.min_value = coefficient_value;
-                    } else if (factor_name == "max") {
-                        model.max_value = coefficient_value;
-                    } else if (factor_name == "stddev") {
-                        model.stddev = coefficient_value;
-                    } else {
-                        // All other rows are coefficients
-                        model.coefficients[core::Identifier(factor_name)] = coefficient_value;
+                    if (factor_col == -1 || coefficient_col == -1) {
+                        throw core::HgpsException{
+                            fmt::format("Physical activity CSV file {} must have 'Factor' and "
+                                        "'Coefficient' columns. "
+                                        "Found columns: {}",
+                                        csv_filename, [&csv_table]() {
+                                            std::string cols;
+                                            for (size_t i = 0; i < csv_table.num_columns(); i++) {
+                                                if (i > 0)
+                                                    cols += ", ";
+                                                cols += csv_table.column(i).name();
+                                            }
+                                            return cols;
+                                        }())};
                     }
-                }
+
+                    // Parse each row
+                    for (size_t row_idx = 0; row_idx < csv_table.num_rows(); row_idx++) {
+                        std::string factor_name =
+                            std::any_cast<std::string>(csv_table.column(factor_col).value(row_idx));
+                        double coefficient_value =
+                            std::any_cast<double>(csv_table.column(coefficient_col).value(row_idx));
+
+                        if (factor_name == "Intercept") {
+                            model.intercept = coefficient_value;
+                        } else if (factor_name == "min") {
+                            model.min_value = coefficient_value;
+                        } else if (factor_name == "max") {
+                            model.max_value = coefficient_value;
+                        } else if (factor_name == "stddev") {
+                            model.stddev = coefficient_value;
+                        } else {
+                            // All other rows are coefficients
+                            model.coefficients[core::Identifier(factor_name)] = coefficient_value;
+                        }
+                    }
 
                     std::cout << "\n      Intercept: " << model.intercept;
                     std::cout << "\n      Coefficients: " << model.coefficients.size();
                     std::cout << "\n      Min: " << model.min_value << ", Max: " << model.max_value;
                     std::cout << "\n      Standard deviation: " << model.stddev;
                 } else {
-                    throw core::HgpsException{
-                        fmt::format("Continuous physical activity model '{}' must specify 'csv_file'", 
-                                    model_name)};
+                    throw core::HgpsException{fmt::format(
+                        "Continuous physical activity model '{}' must specify 'csv_file'",
+                        model_name)};
                 }
             } else {
-                throw core::HgpsException{
-                    fmt::format("Unknown physical activity model type: '{}'. Must be 'simple' or 'continuous'", 
-                                model_name)};
+                throw core::HgpsException{fmt::format(
+                    "Unknown physical activity model type: '{}'. Must be 'simple' or 'continuous'",
+                    model_name)};
             }
 
             physical_activity_models[core::Identifier(model_name)] = std::move(model);
