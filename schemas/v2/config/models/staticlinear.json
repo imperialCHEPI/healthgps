@@ -124,7 +124,9 @@
                     },
                     "format": {
                         "type": "string",
-                        "enum": ["csv"],
+                        "enum": [
+                            "csv"
+                        ],
                         "default": "csv"
                     },
                     "delimiter": {
@@ -148,7 +150,10 @@
                                 "description": "Coefficient value column"
                             }
                         },
-                        "required": ["Factor", "Coefficient"],
+                        "required": [
+                            "Factor",
+                            "Coefficient"
+                        ],
                         "additionalProperties": false
                     }
                 },
@@ -290,11 +295,15 @@
         {
             "if": {
                 "not": {
-                    "required": ["PhysicalActivityModels"]
+                    "required": [
+                        "PhysicalActivityModels"
+                    ]
                 }
             },
             "then": {
-                "required": ["PhysicalActivityStdDev"]
+                "required": [
+                    "PhysicalActivityStdDev"
+                ]
             }
         }
     ],

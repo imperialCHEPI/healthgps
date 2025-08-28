@@ -79,7 +79,8 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
 
     /// @brief Gets the expected trend values
     /// @returns The expected trend values
-    const std::shared_ptr<std::unordered_map<core::Identifier, double>>& get_expected_trend() const noexcept {
+    const std::shared_ptr<std::unordered_map<core::Identifier, double>> &
+    get_expected_trend() const noexcept {
         return expected_trend_;
     }
 
