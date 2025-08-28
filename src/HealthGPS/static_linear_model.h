@@ -17,12 +17,26 @@ struct LinearModelParams {
     std::unordered_map<core::Identifier, double> log_coefficients{};
 };
 
-/// @brief Defines the physical activity model parameters loaded from CSV
+/// @brief Defines the physical activity model parameters
+/// @details Supports both simple (India) and continuous (FINCH) approaches
 struct PhysicalActivityModel {
+    /// @brief Model type: "simple" for India approach, "continuous" for FINCH approach
+    std::string model_type{"simple"};
+    
+    /// @brief Intercept value for the linear model
     double intercept{};
+    
+    /// @brief Coefficients for each factor (age, gender, region, ethnicity, etc.)
     std::unordered_map<core::Identifier, double> coefficients{};
+    
+    /// @brief Minimum allowed value for physical activity
     double min_value = 0.0;
+    
+    /// @brief Maximum allowed value for physical activity
     double max_value = std::numeric_limits<double>::max();
+    
+    /// @brief Standard deviation for simple models (India approach)
+    double stddev = 0.06;
 };
 
 /// @brief Implements the static linear model type
@@ -95,6 +109,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
         bool is_continuous_income_model = false,
         const LinearModelParams &continuous_income_model = LinearModelParams{},
         const std::string &income_categories = "3",
+        /// @param physical_activity_models Physical activity models for both India (simple) and FINCH (continuous) approaches
         const std::unordered_map<core::Identifier, PhysicalActivityModel>
             &physical_activity_models = {});
 
@@ -206,15 +221,19 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param context The runtime context
     /// @param person The person to initialise physical activity for
     /// @param random Random number generator
+    /// @param model The physical activity model to use
     void initialise_continuous_physical_activity(RuntimeContext &context, Person &person,
-                                                 Random &random) const;
+                                                 Random &random, const PhysicalActivityModel &model) const;
 
-    /// @brief Initialise physical activity using categorical approach (India method)
+    /// @brief Initialise physical activity using simple model approach (India method)
     /// @param context The runtime context
     /// @param person The person to initialise physical activity for
     /// @param random Random number generator
-    void initialise_categorical_physical_activity(RuntimeContext &context, Person &person,
-                                                  Random &random) const;
+    /// @param model The physical activity model to use
+    void initialise_simple_physical_activity(RuntimeContext &context, Person &person,
+                                             Random &random, const PhysicalActivityModel &model) const;
+
+
 
     // Regular trend member variables
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_;
@@ -249,7 +268,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     const std::unordered_map<core::Income, LinearModelParams> &income_models_;
     const double physical_activity_stddev_;
 
-    // Physical activity model support (FINCH approach)
+    // Physical activity model support (both India and FINCH approaches)
     std::unordered_map<core::Identifier, PhysicalActivityModel> physical_activity_models_;
     bool has_physical_activity_models_ = false;
 };

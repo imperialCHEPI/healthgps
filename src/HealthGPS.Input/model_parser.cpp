@@ -18,7 +18,7 @@
 #include <optional>
 
 #if USE_TIMER
-#define MEASURE_FUNCTION()                                                                         \
+#define MEASURE_FUNCTION()                                                                         
     hgps::core::ScopedTimer timer { __func__ }
 #else
 #define MEASURE_FUNCTION()
@@ -272,7 +272,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     Eigen::MatrixXd policy_covariance{policy_covariance_table.num_rows(),
                                       policy_covariance_table.num_columns()};
 
-    // Risk factor and intervention policy: names, models, parameters and correlation/covariance.
+    // MAHIMA: Risk factor and intervention policy: names, models, parameters and correlation/covariance.
     std::vector<core::Identifier> names;
     std::vector<LinearModelParams> models;
     std::vector<core::DoubleInterval> ranges;
@@ -287,7 +287,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     auto expected_trend_boxcox = std::make_unique<std::unordered_map<core::Identifier, double>>();
     auto trend_steps = std::make_unique<std::unordered_map<core::Identifier, int>>();
 
-    // Income trend data structures: income trend models, ranges, lambda, decay factors, steps.
+    // MAHIMA: Income trend data structures: income trend models, ranges, lambda, decay factors, steps.
     // These will be nullptr if income trend is not enabled
     std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend = nullptr;
     std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend_boxcox =
@@ -354,14 +354,13 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                 std::any_cast<double>(policy_covariance_table.column(risk_factor_index).value(j));
         }
 
-        // Trend model parameters
+        // MAHIMA: Trend model parameters
         if (trend_type == hgps::TrendType::Null) {
             // No trend data needed for Null type - skip to next risk factor
             std::cout << "\nTrend Type is NULL";
             risk_factor_index++;
             continue;
         }
-
         if (trend_type == hgps::TrendType::Trend) {
             // Only require trend data if trend type is Trend
             if (json_params.contains("Trend")) {
@@ -597,13 +596,34 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     // Standard deviation of physical activity.
     const double physical_activity_stddev = opt["PhysicalActivityStdDev"].get<double>();
 
-    // Load physical activity models if present (FINCH approach)
+    // MAHIMA: Load physical activity models if present
+    // These can be either simple (India approach) or continuous (FINCH approach) or vice versa
     std::unordered_map<core::Identifier, PhysicalActivityModel> physical_activity_models;
     if (opt.contains("PhysicalActivityModels")) {
-        std::cout << "\nLoading PhysicalActivityModels from CSV files...";
+        std::cout << "\nLoading PhysicalActivityModels...";
 
         for (const auto &[model_name, model_config] : opt["PhysicalActivityModels"].items()) {
-            if (model_config.contains("csv_file")) {
+            PhysicalActivityModel model;
+            model.model_type = model_name; // "simple" or "continuous"
+            
+            if (model_name == "simple") {
+                // India approach: Simple model with standard deviation
+                std::cout << "\n  Loading simple model '" << model_name << "' (India approach)";
+                
+                if (model_config.contains("PhysicalActivityStdDev")) {
+                    model.stddev = model_config["PhysicalActivityStdDev"].get<double>();
+                    std::cout << "\n    Standard deviation: " << model.stddev;
+                } else {
+                    // Use the global PhysicalActivityStdDev as fallback
+                    model.stddev = physical_activity_stddev;
+                    std::cout << "\n    Using global standard deviation: " << model.stddev;
+                }
+                
+            } else if (model_name == "continuous") {
+                // FINCH approach: Continuous model with CSV file loading
+                std::cout << "\n  Loading continuous model '" << model_name << "' (FINCH approach)";
+                
+                if (model_config.contains("csv_file")) {
                 std::string csv_filename = model_config["csv_file"].get<std::string>();
                 std::cout << "\n  Loading model '" << model_name << "' from file: " << csv_filename;
 
@@ -618,19 +638,18 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                                                                 config.root_path);
                 const auto csv_table = load_datatable_from_csv(csv_file_info);
 
-                // Parse CSV into PhysicalActivityModel
-                PhysicalActivityModel model;
+                // Parse CSV into PhysicalActivityModel (using existing model variable)
 
                 // Find the Factor and Coefficient columns
                 int factor_col = -1;
                 int coefficient_col = -1;
 
-                for (size_t i = 0; i < csv_table.num_columns(); i++) {
-                    std::string col_name = csv_table.column(i).name();
+                for (size_t col_idx = 0; col_idx < csv_table.num_columns(); col_idx++) {
+                    std::string col_name = csv_table.column(col_idx).name();
                     if (col_name == "Factor" || col_name == "factor") {
-                        factor_col = static_cast<int>(i);
+                        factor_col = static_cast<int>(col_idx);
                     } else if (col_name == "Coefficient" || col_name == "coefficient") {
-                        coefficient_col = static_cast<int>(i);
+                        coefficient_col = static_cast<int>(col_idx);
                     }
                 }
 
@@ -651,11 +670,11 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                 }
 
                 // Parse each row
-                for (size_t i = 0; i < csv_table.num_rows(); i++) {
+                for (size_t row_idx = 0; row_idx < csv_table.num_rows(); row_idx++) {
                     std::string factor_name =
-                        std::any_cast<std::string>(csv_table.column(factor_col).value(i));
+                        std::any_cast<std::string>(csv_table.column(factor_col).value(row_idx));
                     double coefficient_value =
-                        std::any_cast<double>(csv_table.column(coefficient_col).value(i));
+                        std::any_cast<double>(csv_table.column(coefficient_col).value(row_idx));
 
                     if (factor_name == "Intercept") {
                         model.intercept = coefficient_value;
@@ -663,18 +682,30 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                         model.min_value = coefficient_value;
                     } else if (factor_name == "max") {
                         model.max_value = coefficient_value;
+                    } else if (factor_name == "stddev") {
+                        model.stddev = coefficient_value;
                     } else {
                         // All other rows are coefficients
                         model.coefficients[core::Identifier(factor_name)] = coefficient_value;
                     }
                 }
 
-                std::cout << "\n    Intercept: " << model.intercept;
-                std::cout << "\n    Coefficients: " << model.coefficients.size();
-                std::cout << "\n    Min: " << model.min_value << ", Max: " << model.max_value;
-
-                physical_activity_models[core::Identifier(model_name)] = std::move(model);
+                    std::cout << "\n      Intercept: " << model.intercept;
+                    std::cout << "\n      Coefficients: " << model.coefficients.size();
+                    std::cout << "\n      Min: " << model.min_value << ", Max: " << model.max_value;
+                    std::cout << "\n      Standard deviation: " << model.stddev;
+                } else {
+                    throw core::HgpsException{
+                        fmt::format("Continuous physical activity model '{}' must specify 'csv_file'", 
+                                    model_name)};
+                }
+            } else {
+                throw core::HgpsException{
+                    fmt::format("Unknown physical activity model type: '{}'. Must be 'simple' or 'continuous'", 
+                                model_name)};
             }
+
+            physical_activity_models[core::Identifier(model_name)] = std::move(model);
         }
 
         if (!physical_activity_models.empty()) {

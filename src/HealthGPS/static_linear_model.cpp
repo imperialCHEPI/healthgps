@@ -196,7 +196,15 @@ RiskFactorModelType StaticLinearModel::type() const noexcept { return RiskFactor
 std::string StaticLinearModel::name() const noexcept { return "Static"; }
 
 void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
-    // Initialise everyone.
+    // MAHIMA: Initialise everyone. Order is important here.
+    //STEP 1: Age and gender initalized in demographic.cpp
+    // STEP 2: Region and ethnicity in demographic.cpp (if available)
+    // STEP 3: Sector and income in static_linear_model.cpp (below)
+    // STEP 4: Risk factors in static_linear_model.cpp (below)
+    // STEP 5: Risk factors adjusted to expected means in static_linear_model.cpp (below)
+    // STEP 6: Policies in static_linear_model.cpp (below)
+    // STEP 7: Trends in static_linear_model.cpp (below) depnds on whether trends are enabled
+    // STEP 8: Risk factors adjusted to trended expected means in static_linear_model.cpp (below)
     for (auto &person : context.population()) {
         initialise_sector(person, context.random());
         initialise_income(context, person, context.random());
@@ -255,7 +263,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
         }
     }
 
-    // Adjust such that risk factor means match expected values.
+    // Adjust such that risk factor means match expected values(factor mean).
     adjust_risk_factors(context, names_, ranges_, false);
 
     // Initialise newborns and update others with appropriate trend type.
@@ -670,6 +678,8 @@ void StaticLinearModel::update_income(RuntimeContext &context, Person &person, R
     }
 }
 
+// MAHIMA: This is the India approach for categorical income assignment
+// In the static_model.json, we have a set of IncomeModels as categories (e.g., low, medium, high)
 void StaticLinearModel::initialise_categorical_income(Person &person, Random &random) {
     // India approach: Direct categorical assignment using logits and softmax
 
@@ -710,6 +720,9 @@ void StaticLinearModel::initialise_categorical_income(Person &person, Random &ra
     throw core::HgpsException("Logic Error: failed to initialise categorical income category");
 }
 
+// MAHIMA: This is the FINCH approach for continuous income calculation
+// In the static_model.json, we have a IncomeModel with intercept, regression values (age, gender, region, ethnicity etc) If is_continuous_income_model_ is true, we use this approach- the order
+// for this is- calculate continuous income, calculate quartiles, assign category
 void StaticLinearModel::initialise_continuous_income(RuntimeContext &context, Person &person,
                                                      Random &random) {
     // FINCH approach: Calculate continuous income, then convert to category
@@ -717,7 +730,7 @@ void StaticLinearModel::initialise_continuous_income(RuntimeContext &context, Pe
     // Step 1: Calculate continuous income
     double continuous_income = calculate_continuous_income(person, random);
 
-    // Store continuous income in risk factors for potential future use
+    // Store continuous income in risk factors for future use
     person.risk_factors["income_continuous"_id] = continuous_income;
 
     // Step 2: Convert to income category based on population quartiles
@@ -747,9 +760,6 @@ double StaticLinearModel::calculate_continuous_income(Person &person, Random &ra
             income += coefficient * (person.age * person.age);
         } else if (factor_name == "Age3") {
             income += coefficient * (person.age * person.age * person.age);
-        } else if (factor_name == "Sector") {
-            // Rural = 1, Urban = 0
-            income += coefficient * (person.sector == core::Sector::rural ? 1.0 : 0.0);
         } else if (factor_name == person.region) {
             // Region effect - only apply if the region matches
             income += coefficient;
@@ -765,7 +775,9 @@ double StaticLinearModel::calculate_continuous_income(Person &person, Random &ra
                 income += coefficient * person.get_risk_factor_value(factor);
             } catch (...) {
                 // Factor not found, skip it
-                continue;
+                std::cout << "Warning: Factor " << factor_name
+                          << " not found for continuous income calculation, stopping.\n";
+                break;
             }
         }
     }
@@ -887,44 +899,37 @@ core::Income StaticLinearModel::convert_income_continuous_to_category(double con
 
 void StaticLinearModel::initialise_physical_activity(RuntimeContext &context, Person &person,
                                                      Random &random) const {
-    // Check if we have physical activity models (FINCH approach)
+    // Check if we have physical activity models
     if (has_physical_activity_models_) {
-        initialise_continuous_physical_activity(context, person, random);
-    } else {
-        // Use simple approach (India method)
-        initialise_categorical_physical_activity(context, person, random);
+        // Check which type of model we have
+        auto simple_model = physical_activity_models_.find(core::Identifier("simple"));
+        auto continuous_model = physical_activity_models_.find(core::Identifier("continuous"));
+        
+        if (simple_model != physical_activity_models_.end()) {
+            // India approach: Simple model with standard deviation
+            initialise_simple_physical_activity(context, person, random, simple_model->second);
+        } else if (continuous_model != physical_activity_models_.end()) {
+            // FINCH approach: Continuous model with CSV file loading
+            initialise_continuous_physical_activity(context, person, random, continuous_model->second);
+        } 
+      } else {
+        // No physical activity models configured - use simple approach with global stddev
+        std::cout << "\nWARNING: No 'simple' or 'continuous' model found, using simple model as default";
+        PhysicalActivityModel simple_model;
+        simple_model.model_type = "simple";
+        simple_model.stddev = physical_activity_stddev_;
+        initialise_simple_physical_activity(context, person, random, simple_model);
     }
 }
 
+// MAHIMA: Function to insatialise continuous physical activity model using regression. 
+// This is for Finch or any project that has region, ethncity, income continuous etc in the CSV
+// file.
 void StaticLinearModel::initialise_continuous_physical_activity(
-    [[maybe_unused]] RuntimeContext &context, Person &person, Random &random) const {
-    // Check if we have any models before proceeding
-    if (physical_activity_models_.empty()) {
-        std::cout
-            << "\nERROR: physical_activity_models_ is empty! Cannot initialize physical activity.";
-        std::cout << "\nERROR: Please check that PhysicalActivityModels are properly defined in "
-                     "the configuration.";
-        // Don't set a default value - let the error surface so it can be diagnosed
-        return;
-    }
-
-    // Continue only if models are available
-    double final_value = 0.0;
-
-    // Look for the continuous model first
-    auto model_it = physical_activity_models_.find(core::Identifier("continuous"));
-    // If continuous model not found, use the first available model
-    if (model_it == physical_activity_models_.end()) {
-        std::cout << "\nERROR: No 'continuous' model found, using first available model";
-        model_it = physical_activity_models_.begin();
-    }
-
-    // Check again that we have a valid iterator
-    if (model_it != physical_activity_models_.end()) {
-        const auto &model = model_it->second;
-
+    [[maybe_unused]] RuntimeContext &context, Person &person, Random &random,
+    const PhysicalActivityModel &model) const {
         // Start with the intercept
-        double value = model.intercept;
+    double value = model.intercept;
 
         // Process coefficients dynamically from CSV file
         for (const auto &[factor_name, coefficient] : model.coefficients) {
@@ -975,36 +980,32 @@ void StaticLinearModel::initialise_continuous_physical_activity(
             value += coefficient * factor_value;
         }
 
-        // Add random noise
-        double stddev = 0.0;
-        auto stddev_it = model.coefficients.find("stddev"_id);
-        if (stddev_it != model.coefficients.end()) {
-            stddev = stddev_it->second;
-        } else {
-            std::cout << "\nWARNING: No 'stddev' coefficient found for physical activity model, "
-                         "using 0.0";
-        }
-
-        double rand_noise = random.next_normal(0.0, stddev);
-        final_value = value + rand_noise;
+        // Add random noise using the model's standard deviation
+        double rand_noise = random.next_normal(0.0, model.stddev);
+        double final_value = value + rand_noise;
 
         // Apply min/max constraints
         final_value = std::max(model.min_value, std::min(final_value, model.max_value));
-    } else {
-        std::cout << "\nERROR: No valid physical activity model found after all attempts.";
-    }
 
-    person.physical_activity = final_value;
+        // Set the physical activity value
+        person.physical_activity = final_value;
 }
 
-void StaticLinearModel::initialise_categorical_physical_activity(RuntimeContext &context,
-                                                                 Person &person,
-                                                                 Random &random) const {
-    // Simple approach: use expected value with random noise
+// MAHIMA: Function to initialise simple physical activity model using log-normal distribution
+// This is for India or any project that does not have region, ethncity, income continuous etc in
+// the CSV
+void StaticLinearModel::initialise_simple_physical_activity(RuntimeContext &context,
+                                                            Person &person,
+                                                            Random &random,
+                                                            const PhysicalActivityModel &model) const {
+    // India approach: Simple model with standard deviation from the model
     double expected = get_expected(context, person.gender, person.age, "PhysicalActivity"_id,
                                    std::nullopt, false);
-    double rand = random.next_normal(0.0, physical_activity_stddev_);
-    double factor = expected * exp(rand - 0.5 * pow(physical_activity_stddev_, 2));
+    double rand = random.next_normal(0.0, model.stddev);
+    double factor = expected * exp(rand - 0.5 * pow(model.stddev, 2));
+    
+    // Store in both physical_activity and risk_factors for compatibility
+    person.physical_activity = factor;
     person.risk_factors["PhysicalActivity"_id] = factor;
 }
 
