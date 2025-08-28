@@ -77,6 +77,12 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
     /// @returns The number of time steps to apply the trend
     int get_trend_steps(const core::Identifier &factor) const;
 
+    /// @brief Gets the expected trend values
+    /// @returns The expected trend values
+    const std::shared_ptr<std::unordered_map<core::Identifier, double>>& get_expected_trend() const noexcept {
+        return expected_trend_;
+    }
+
   private:
     /// @brief Adjust risk factors such that mean sim value matches expected value
     /// @param context The simulation run-time context

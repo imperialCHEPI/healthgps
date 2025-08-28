@@ -594,6 +594,87 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     // Standard deviation of physical activity.
     const double physical_activity_stddev = opt["PhysicalActivityStdDev"].get<double>();
 
+    // Load physical activity models if present (FINCH approach)
+    std::unordered_map<core::Identifier, PhysicalActivityModel> physical_activity_models;
+    if (opt.contains("PhysicalActivityModels")) {
+        std::cout << "\nLoading PhysicalActivityModels from CSV files...";
+        
+        for (const auto &[model_name, model_config] : opt["PhysicalActivityModels"].items()) {
+            if (model_config.contains("csv_file")) {
+                std::string csv_filename = model_config["csv_file"].get<std::string>();
+                std::cout << "\n  Loading model '" << model_name << "' from file: " << csv_filename;
+                
+                // Construct full path to CSV file (same directory as JSON config)
+                std::filesystem::path csv_path = config.root_path / csv_filename;
+                
+                // Load CSV data
+                const auto csv_file_info = input::get_file_info(
+                    {{"name", csv_filename}, {"format", "csv"}, {"delimiter", ","}, {"encoding", "ASCII"}},
+                    config.root_path);
+                const auto csv_table = load_datatable_from_csv(csv_file_info);
+                
+                // Parse CSV into PhysicalActivityModel
+                PhysicalActivityModel model;
+                
+                // Find the Factor and Coefficient columns
+                int factor_col = -1;
+                int coefficient_col = -1;
+                
+                for (size_t i = 0; i < csv_table.num_columns(); i++) {
+                    std::string col_name = csv_table.column(i).name();
+                    if (col_name == "Factor" || col_name == "factor") {
+                        factor_col = static_cast<int>(i);
+                    } else if (col_name == "Coefficient" || col_name == "coefficient") {
+                        coefficient_col = static_cast<int>(i);
+                    }
+                }
+                
+                if (factor_col == -1 || coefficient_col == -1) {
+                    throw core::HgpsException{fmt::format(
+                        "Physical activity CSV file {} must have 'Factor' and 'Coefficient' columns. "
+                        "Found columns: {}", csv_filename, 
+                        [&csv_table]() {
+                            std::string cols;
+                            for (size_t i = 0; i < csv_table.num_columns(); i++) {
+                                if (i > 0) cols += ", ";
+                                cols += csv_table.column(i).name();
+                            }
+                            return cols;
+                        }())};
+                }
+                
+                // Parse each row
+                for (size_t i = 0; i < csv_table.num_rows(); i++) {
+                    std::string factor_name = std::any_cast<std::string>(csv_table.column(factor_col).value(i));
+                    double coefficient_value = std::any_cast<double>(csv_table.column(coefficient_col).value(i));
+                    
+                    if (factor_name == "Intercept") {
+                        model.intercept = coefficient_value;
+                    } else if (factor_name == "min") {
+                        model.min_value = coefficient_value;
+                    } else if (factor_name == "max") {
+                        model.max_value = coefficient_value;
+                    } else {
+                        // All other rows are coefficients
+                        model.coefficients[core::Identifier(factor_name)] = coefficient_value;
+                    }
+                }
+                
+                std::cout << "\n    Intercept: " << model.intercept;
+                std::cout << "\n    Coefficients: " << model.coefficients.size();
+                std::cout << "\n    Min: " << model.min_value << ", Max: " << model.max_value;
+                
+                physical_activity_models[core::Identifier(model_name)] = std::move(model);
+            }
+        }
+        
+        if (!physical_activity_models.empty()) {
+            std::cout << "\n  Successfully loaded " << physical_activity_models.size() << " physical activity models";
+        }
+    } else {
+        std::cout << "\nNo PhysicalActivityModels found, using PhysicalActivityStdDev approach";
+    }
+
     return std::make_unique<StaticLinearModelDefinition>(
         std::move(expected), std::move(expected_trend), std::move(trend_steps),
         std::move(expected_trend_boxcox), std::move(names), std::move(models), std::move(ranges),
@@ -622,7 +703,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
             return params;
         }() : LinearModelParams{},
-        income_categories);
+        income_categories, std::move(physical_activity_models));
 }
 // NOLINTEND(readability-function-cognitive-complexity)
 

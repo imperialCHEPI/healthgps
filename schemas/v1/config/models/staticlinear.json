@@ -2,6 +2,18 @@
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/config/models/staticlinear.json",
     "type": "object",
+    "allOf": [
+        {
+            "if": {
+                "not": {
+                    "required": ["PhysicalActivityModels"]
+                }
+            },
+            "then": {
+                "required": ["PhysicalActivityStdDev"]
+            }
+        }
+    ],
     "properties": {
         "$schema": {
             "type": "string"
@@ -14,6 +26,56 @@
         },
         "PhysicalActivityStdDev": {
             "type": "number"
+        },
+        "PhysicalActivityModels": {
+            "type": "object",
+            "propertyNames": {
+                "enum": [
+                    "continuous"
+                ]
+            },
+            "additionalProperties": {
+                "type": "object",
+                "properties": {
+                    "csv_file": {
+                        "type": "string",
+                        "description": "CSV file containing physical activity model coefficients"
+                    },
+                    "format": {
+                        "type": "string",
+                        "enum": ["csv"],
+                        "default": "csv"
+                    },
+                    "delimiter": {
+                        "type": "string",
+                        "default": ","
+                    },
+                    "encoding": {
+                        "type": "string",
+                        "default": "ASCII"
+                    },
+                    "columns": {
+                        "type": "object",
+                        "description": "Column definitions for the physical activity model CSV",
+                        "properties": {
+                            "Factor": {
+                                "type": "string",
+                                "description": "Factor name column (e.g., Intercept, age, gender, region names, ethnicity names, etc.)"
+                            },
+                            "Coefficient": {
+                                "type": "string",
+                                "description": "Coefficient value column"
+                            }
+                        },
+                        "required": ["Factor", "Coefficient"],
+                        "additionalProperties": false
+                    }
+                },
+                "required": [
+                    "csv_file"
+                ],
+                "additionalProperties": false
+            }
         },
         "RuralPrevalence": {
             "type": "array",

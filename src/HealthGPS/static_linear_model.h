@@ -17,6 +17,14 @@ struct LinearModelParams {
     std::unordered_map<core::Identifier, double> log_coefficients{};
 };
 
+/// @brief Defines the physical activity model parameters loaded from CSV
+struct PhysicalActivityModel {
+    double intercept{};
+    std::unordered_map<core::Identifier, double> coefficients{};
+    double min_value = 0.0;
+    double max_value = std::numeric_limits<double>::max();
+};
+
 /// @brief Implements the static linear model type
 /// @details The static model is used to initialise the virtual population.
 class StaticLinearModel final : public RiskFactorAdjustableModel {
@@ -86,7 +94,8 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
             nullptr,
         bool is_continuous_income_model = false,
         const LinearModelParams &continuous_income_model = LinearModelParams{},
-        const std::string &income_categories = "3");
+        const std::string &income_categories = "3",
+        const std::unordered_map<core::Identifier, PhysicalActivityModel> &physical_activity_models = {});
 
     RiskFactorModelType type() const noexcept override;
 
@@ -192,6 +201,20 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     void initialise_physical_activity(RuntimeContext &context, Person &person,
                                       Random &random) const;
 
+    /// @brief Initialise physical activity using continuous model approach (FINCH method)
+    /// @param context The runtime context
+    /// @param person The person to initialise physical activity for
+    /// @param random Random number generator
+    void initialise_continuous_physical_activity(RuntimeContext &context, Person &person,
+                                                Random &random) const;
+
+    /// @brief Initialise physical activity using categorical approach (India method)
+    /// @param context The runtime context
+    /// @param person The person to initialise physical activity for
+    /// @param random Random number generator
+    void initialise_categorical_physical_activity(RuntimeContext &context, Person &person,
+                                                  Random &random) const;
+
     // Regular trend member variables
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox_;
     std::shared_ptr<std::vector<LinearModelParams>> trend_models_;
@@ -223,6 +246,10 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
         &rural_prevalence_;
     const std::unordered_map<core::Income, LinearModelParams> &income_models_;
     const double physical_activity_stddev_;
+    
+    // Physical activity model support (FINCH approach)
+    std::unordered_map<core::Identifier, PhysicalActivityModel> physical_activity_models_;
+    bool has_physical_activity_models_ = false;
 };
 
 /// @brief Defines the static linear model data type
@@ -292,7 +319,8 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
             nullptr,
         bool is_continuous_income_model = false,
         const LinearModelParams &continuous_income_model = LinearModelParams{},
-        const std::string &income_categories = "3");
+        const std::string &income_categories = "3",
+        std::unordered_map<core::Identifier, PhysicalActivityModel> physical_activity_models = {});
 
     /// @brief Construct a new StaticLinearModel from this definition
     /// @return A unique pointer to the new StaticLinearModel instance
@@ -330,6 +358,10 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
         rural_prevalence_;
     std::unordered_map<core::Income, LinearModelParams> income_models_;
     double physical_activity_stddev_;
+    
+    // Physical activity model support (FINCH approach)
+    std::unordered_map<core::Identifier, PhysicalActivityModel> physical_activity_models_;
+    bool has_physical_activity_models_ = false;
 
     // Continuous income model support (FINCH approach)
     bool is_continuous_income_model_;
