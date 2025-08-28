@@ -314,7 +314,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         if (!core::case_insensitive::equals(key, column_name)) {
             throw core::HgpsException{fmt::format("Risk factor {} name ({}) does not match risk "
                                                   "factor correlation matrix column {} name ({})",
-                                                  risk_factor_index, key, risk_factor_index, column_name)};
+                                                  risk_factor_index, key, risk_factor_index,
+                                                  column_name)};
         }
 
         // Write risk factor data structures.
@@ -323,7 +324,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         lambda.emplace_back(json_params["Lambda"].get<double>());
         stddev.emplace_back(json_params["StdDev"].get<double>());
         for (size_t j = 0; j < correlation_table.num_rows(); j++) {
-            correlation(risk_factor_index, j) = std::any_cast<double>(correlation_table.column(risk_factor_index).value(j));
+            correlation(risk_factor_index, j) =
+                std::any_cast<double>(correlation_table.column(risk_factor_index).value(j));
         }
 
         // Intervention policy model parameters.
