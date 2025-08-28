@@ -299,7 +299,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     std::unique_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors =
         nullptr;
 
-    size_t i = 0;
+    size_t risk_factor_index = 0;
     for (const auto &[key, json_params] : opt["RiskFactorModels"].items()) {
         names.emplace_back(key);
 
@@ -310,11 +310,11 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             json_params["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
 
         // Check risk factor correlation matrix column name matches risk factor name.
-        auto column_name = correlation_table.column(i).name();
+        auto column_name = correlation_table.column(risk_factor_index).name();
         if (!core::case_insensitive::equals(key, column_name)) {
             throw core::HgpsException{fmt::format("Risk factor {} name ({}) does not match risk "
                                                   "factor correlation matrix column {} name ({})",
-                                                  i, key, i, column_name)};
+                                                  risk_factor_index, key, risk_factor_index, column_name)};
         }
 
         // Write risk factor data structures.
@@ -323,7 +323,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         lambda.emplace_back(json_params["Lambda"].get<double>());
         stddev.emplace_back(json_params["StdDev"].get<double>());
         for (size_t j = 0; j < correlation_table.num_rows(); j++) {
-            correlation(i, j) = std::any_cast<double>(correlation_table.column(i).value(j));
+            correlation(risk_factor_index, j) = std::any_cast<double>(correlation_table.column(risk_factor_index).value(j));
         }
 
         // Intervention policy model parameters.
@@ -336,27 +336,27 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                                             .get<std::unordered_map<core::Identifier, double>>();
 
         // Check intervention policy covariance matrix column name matches risk factor name.
-        auto policy_column_name = policy_covariance_table.column(i).name();
+        auto policy_column_name = policy_covariance_table.column(risk_factor_index).name();
         if (!core::case_insensitive::equals(key, policy_column_name)) {
             throw core::HgpsException{
                 fmt::format("Risk factor {} name ({}) does not match intervention "
                             "policy covariance matrix column {} name ({})",
-                            i, key, i, policy_column_name)};
+                            risk_factor_index, key, risk_factor_index, policy_column_name)};
         }
 
         // Write intervention policy data structures.
         policy_models.emplace_back(std::move(policy_model));
         policy_ranges.emplace_back(policy_json_params["Range"].get<core::DoubleInterval>());
         for (size_t j = 0; j < policy_covariance_table.num_rows(); j++) {
-            policy_covariance(i, j) =
-                std::any_cast<double>(policy_covariance_table.column(i).value(j));
+            policy_covariance(risk_factor_index, j) =
+                std::any_cast<double>(policy_covariance_table.column(risk_factor_index).value(j));
         }
 
         // Trend model parameters
         if (trend_type == hgps::TrendType::Null) {
             // No trend data needed for Null type - skip to next risk factor
             std::cout << "\nTrend Type is NULL";
-            i++;
+            risk_factor_index++;
             continue;
         }
 
@@ -429,6 +429,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                 const auto &income_trend_json_params = json_params["IncomeTrend"];
                 LinearModelParams income_trend_model;
                 income_trend_model.intercept = income_trend_json_params["Intercept"].get<double>();
+                income_trend_model.intercept = income_trend_json_params["Intercept"].get<double>();
                 income_trend_model.coefficients =
                     income_trend_json_params["Coefficients"]
                         .get<std::unordered_map<core::Identifier, double>>();
@@ -473,7 +474,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         }
 
         // Increment table column index.
-        i++;
+        risk_factor_index++;
     } // NOLINTEND(readability-function-cognitive-complexity)
 
     // Check risk factor correlation matrix column count matches risk factor count.

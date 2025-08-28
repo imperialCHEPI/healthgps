@@ -47,6 +47,7 @@ StaticLinearModel::StaticLinearModel(
       is_continuous_income_model_{is_continuous_income_model},
       continuous_income_model_{continuous_income_model}, income_categories_{income_categories},
       // Regular trend member variables
+      expected_trend_{std::move(expected_trend)},
       expected_trend_boxcox_{std::move(expected_trend_boxcox)},
       trend_models_{std::move(trend_models)}, trend_ranges_{std::move(trend_ranges)},
       trend_lambda_{std::move(trend_lambda)},
@@ -180,7 +181,7 @@ StaticLinearModel::StaticLinearModel(
     // Validate regular trend parameters for all risk factors only if trend type is Trend
     if (trend_type_ == TrendType::Trend) {
         for (const auto &name : names_) {
-            if (!get_expected_trend()->contains(name)) {
+            if (!expected_trend_->contains(name)) {
                 throw core::HgpsException("One or more expected trend value is missing");
             }
             if (!expected_trend_boxcox_->contains(name)) {
@@ -1035,6 +1036,8 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend),
                                           std::move(trend_steps), trend_type},
       // Regular trend member variables - convert unique_ptr to shared_ptr
+      expected_trend_{std::make_shared<std::unordered_map<core::Identifier, double>>(
+          std::move(*expected_trend))},
       expected_trend_boxcox_{std::make_shared<std::unordered_map<core::Identifier, double>>(
           std::move(*expected_trend_boxcox))},
       trend_models_{std::make_shared<std::vector<LinearModelParams>>(std::move(*trend_models))},
@@ -1199,7 +1202,7 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     // Validate regular trend parameters for all risk factors only if trend type is Trend
     if (trend_type_ == hgps::TrendType::Trend) {
         for (const auto &name : names_) {
-            if (!get_expected_trend()->contains(name)) {
+            if (!expected_trend_->contains(name)) {
                 throw core::HgpsException("One or more expected trend value is missing");
             }
             if (!expected_trend_boxcox_->contains(name)) {

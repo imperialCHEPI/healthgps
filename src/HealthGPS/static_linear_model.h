@@ -217,6 +217,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
                                                   Random &random) const;
 
     // Regular trend member variables
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_;
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox_;
     std::shared_ptr<std::vector<LinearModelParams>> trend_models_;
     std::shared_ptr<std::vector<core::DoubleInterval>> trend_ranges_;
@@ -329,6 +330,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
 
   private:
     // Regular trend member variables
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_;
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox_;
     std::shared_ptr<std::vector<LinearModelParams>> trend_models_;
     std::shared_ptr<std::vector<core::DoubleInterval>> trend_ranges_;
