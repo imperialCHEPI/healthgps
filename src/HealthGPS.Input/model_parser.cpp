@@ -16,6 +16,7 @@
 #include <algorithm>
 #include <filesystem>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <optional>
 #include <rapidcsv.h>
@@ -247,6 +248,17 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         input::get_file_info(opt["RiskFactorCorrelationFile"], config.root_path);
     const auto correlation_table = load_datatable_from_csv(correlation_file_info);
     Eigen::MatrixXd correlation{correlation_table.num_rows(), correlation_table.num_columns()};
+    
+    // DEBUG: Show correlation matrix column names
+    std::cout << "\nCorrelation matrix loaded from: " << correlation_file_info.name.string();
+    std::cout << "\nCorrelation matrix has " << correlation_table.num_columns() << " columns and " << correlation_table.num_rows() << " rows";
+    std::cout << "\nCorrelation matrix column names:";
+    for (size_t i = 0; i < correlation_table.num_columns(); i++) {
+        if (i % 5 == 0) std::cout << "\n  ";
+        std::cout << correlation_table.column(i).name() << " ";
+    }
+    std::cout << "\n";
+    
     // std::cout << "Finished loading RiskFactorCorrelationFile";
 
     // Policy covariance matrix.
@@ -518,6 +530,57 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
     // Compute Cholesky decomposition of the risk factor correlation matrix.
     auto cholesky = Eigen::MatrixXd{Eigen::LLT<Eigen::MatrixXd>{correlation}.matrixL()};
+    
+    // DEBUG: Print correlation matrix and Cholesky matrix for FoodFat analysis
+    std::cout << "\n" << std::string(80, '=');
+    std::cout << "\nDEBUG: CORRELATION MATRIX AND CHOLESKY ANALYSIS FOR FOODFAT";
+    std::cout << "\n" << std::string(80, '=');
+    
+    // Show what risk factor names are actually loaded
+    std::cout << "\nLoaded risk factor names (" << names.size() << " total):";
+    for (size_t idx = 0; idx < names.size(); idx++) {
+        if (idx % 5 == 0) std::cout << "\n  ";
+        std::cout << names[idx].to_string() << " ";
+    }
+    std::cout << "\n";
+    
+    // Find FoodFat index
+    size_t foodfat_index = 0;
+    bool foodfat_found = false;
+    for (size_t idx = 0; idx < names.size(); idx++) {
+        if (names[idx].to_string() == "FoodFat") {
+            foodfat_index = idx;
+            foodfat_found = true;
+            break;
+        }
+    }
+    
+    if (foodfat_found) {
+        std::cout << "\nFoodFat found at index: " << foodfat_index;
+        std::cout << "\n\nCORRELATION MATRIX (showing FoodFat row and column):";
+        std::cout << "\nRow " << foodfat_index << " (FoodFat correlations with others):";
+        for (size_t j = 0; j < correlation.cols(); j++) {
+            if (j % 5 == 0) std::cout << "\n  ";
+            std::cout << std::fixed << std::setprecision(3) << correlation(foodfat_index, j) << " ";
+        }
+        
+        std::cout << "\n\nCHOLESKY MATRIX (showing FoodFat row):";
+        std::cout << "\nRow " << foodfat_index << " (FoodFat Cholesky row):";
+        for (size_t j = 0; j < cholesky.cols(); j++) {
+            if (j % 5 == 0) std::cout << "\n  ";
+            std::cout << std::fixed << std::setprecision(3) << cholesky(foodfat_index, j) << " ";
+        }
+        
+        std::cout << "\n\nFoodFat standard deviation: " << stddev[foodfat_index];
+        std::cout << "\nFoodFat lambda: " << lambda[foodfat_index];
+        std::cout << "\nFoodFat range: [" << ranges[foodfat_index].lower() << ", " << ranges[foodfat_index].upper() << "]";
+    } else {
+        std::cout << "\nWARNING: FoodFat not found in risk factor names!";
+        std::cout << "\nThis means FoodFat is not defined in the static_model.json configuration file.";
+        std::cout << "\nCheck that the JSON file contains a 'FoodFat' entry in the RiskFactorModels section.";
+    }
+    
+    std::cout << "\n" << std::string(80, '=') << "\n";
 
     // Check intervention policy covariance matrix column count matches risk factor count.
     if (opt["RiskFactorModels"].size() != policy_covariance_table.num_columns()) {
