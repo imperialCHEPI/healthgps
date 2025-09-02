@@ -728,7 +728,7 @@ std::pair<std::vector<double>, std::vector<double>> StaticLinearModel::compute_r
         random_residuals_before_cholesky.emplace_back(random_residual);
     }
     
-    // DEBUG: Print FoodFat residuals for first 3 calls only
+    // DEBUG: Print FoodFat residuals for first 5 calls only
     static int debug_call_count = 0;
     
     // Find FoodFat index (case-insensitive search)
@@ -744,7 +744,7 @@ std::pair<std::vector<double>, std::vector<double>> StaticLinearModel::compute_r
         }
     }
     
-    if (debug_call_count < 3) {
+    if (debug_call_count < 5) {
         if (foodfat_found) {
             std::cout << "\n" << std::string(60, '-');
             std::cout << "\nDEBUG: CHOLESKY MULTIPLICATION FOR FOODFAT (Call #" << (debug_call_count + 1) << ")";
@@ -753,20 +753,36 @@ std::pair<std::vector<double>, std::vector<double>> StaticLinearModel::compute_r
             std::cout << "\nFoodFat stddev: " << stddev[foodfat_index];
             std::cout << "\nRandom residual before Cholesky: " << std::fixed << std::setprecision(6) << random_residuals_before_cholesky[foodfat_index];
             
-            // Show the Cholesky row for FoodFat
-            std::cout << "\nCholesky row for FoodFat:";
-            for (size_t j = 0; j < cholesky.cols(); j++) {
-                if (j % 5 == 0) std::cout << "\n  ";
-                std::cout << std::fixed << std::setprecision(3) << cholesky(foodfat_index, j) << " ";
+            // Show the Cholesky row for FoodFat with risk factor names
+            std::cout << "\nCholesky row for FoodFat (with risk factor names):";
+            for (size_t j = 0; j < cholesky.cols() && j < names_.size(); j++) {
+                if (j % 3 == 0) std::cout << "\n  ";
+                std::cout << std::fixed << std::setprecision(3) << cholesky(foodfat_index, j) 
+                         << "(" << names_[j].to_string() << ") ";
             }
+            
+            // Show which Cholesky values are contributing most to the final result
+            std::cout << "\n\nCholesky contributions (value * residual):";
+            double total_contribution = 0.0;
+            for (size_t j = 0; j < cholesky.cols() && j < names_.size(); j++) {
+                double contribution = cholesky(foodfat_index, j) * random_residuals_before_cholesky[j];
+                total_contribution += contribution;
+                if (std::abs(contribution) > 0.1) { // Only show significant contributions
+                    std::cout << "\n  " << names_[j].to_string() << ": " 
+                             << std::fixed << std::setprecision(3) << cholesky(foodfat_index, j) 
+                             << " * " << std::fixed << std::setprecision(6) << random_residuals_before_cholesky[j]
+                             << " = " << std::fixed << std::setprecision(6) << contribution;
+                }
+            }
+            std::cout << "\n  Total contribution: " << std::fixed << std::setprecision(6) << total_contribution;
         }
         debug_call_count++;
     }
     
     residuals = cholesky * residuals;
 
-    // DEBUG: Print FoodFat correlated residual for first 3 calls only
-    if (debug_call_count <= 3 && foodfat_found) {
+    // DEBUG: Print FoodFat correlated residual for first 5 calls only
+    if (debug_call_count <= 5 && foodfat_found) {
         std::cout << "\nCorrelated residual after Cholesky: " << std::fixed << std::setprecision(6) << residuals[foodfat_index];
         std::cout << "\nAmplification factor: " << std::fixed << std::setprecision(2) 
                   << (std::abs(residuals[foodfat_index]) / std::abs(random_residuals_before_cholesky[foodfat_index]));

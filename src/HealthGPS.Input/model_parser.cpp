@@ -6,7 +6,6 @@
 
 #include "HealthGPS.Core/exception.h"
 #include "HealthGPS.Core/scoped_timer.h"
-#include "HealthGPS/static_linear_model.h"
 
 #include <Eigen/Cholesky>
 #include <Eigen/Dense>
@@ -520,6 +519,41 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         i++;
     }
 
+    // DEBUG: Show the exact order of risk factors in names_ vector
+    std::cout << "\nRisk factor names in StaticLinear::names_ (in order):";
+    for (size_t i = 0; i < names.size(); i++) {
+        if (i % 5 == 0) std::cout << "\n  ";
+        std::cout << names[i].to_string() << " ";
+    }
+    
+    // DEBUG: Check if the ordering matches
+    std::cout << "\n\nORDERING COMPARISON:";
+    bool ordering_matches = true;
+    for (size_t i = 0; i < names.size() && i < correlation_table.num_columns(); i++) {
+        std::string correlation_name = correlation_table.column(i).name();
+        std::string names_name = names[i].to_string();
+        
+        // Convert to lowercase for comparison
+        std::string correlation_lower = correlation_name;
+        std::string names_lower = names_name;
+        std::transform(correlation_lower.begin(), correlation_lower.end(), correlation_lower.begin(), ::tolower);
+        std::transform(names_lower.begin(), names_lower.end(), names_lower.begin(), ::tolower);
+        
+        if (correlation_lower != names_lower) {
+            ordering_matches = false;
+            std::cout << "\n  MISMATCH at index " << i << ":";
+            std::cout << "\n    Correlation matrix: '" << correlation_name << "'";
+            std::cout << "\n    StaticLinear names_: '" << names_name << "'";
+        }
+    }
+    
+    if (ordering_matches) {
+        std::cout << "\n  ✓ Ordering matches perfectly!";
+    } else {
+        std::cout << "\n  ✗ ORDERING MISMATCH DETECTED!";
+    }
+    std::cout << "\n";
+
     // Check risk factor correlation matrix column count matches risk factor count.
     if (opt["RiskFactorModels"].size() != correlation_table.num_columns()) {
         throw core::HgpsException{fmt::format("Risk factor count ({}) does not match risk "
@@ -530,6 +564,40 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
     // Compute Cholesky decomposition of the risk factor correlation matrix.
     auto cholesky = Eigen::MatrixXd{Eigen::LLT<Eigen::MatrixXd>{correlation}.matrixL()};
+    
+    // DEBUG: Print the entire Cholesky matrix
+    std::cout << "\n" << std::string(80, '=');
+    std::cout << "\nDEBUG: FULL CHOLESKY MATRIX";
+    std::cout << "\n" << std::string(80, '=');
+    std::cout << "\nCholesky matrix size: " << cholesky.rows() << " x " << cholesky.cols();
+    std::cout << "\n\nCholesky matrix (lower triangular):";
+    std::cout << "\nRow format: [row_index] risk_factor_name: cholesky_values";
+    std::cout << "\n";
+    
+    for (size_t i = 0; i < cholesky.rows() && i < names.size(); i++) {
+        std::cout << "\n[" << std::setw(2) << i << "] " << std::setw(20) << names[i].to_string() << ": ";
+        for (size_t j = 0; j <= i && j < cholesky.cols(); j++) {
+            std::cout << std::fixed << std::setprecision(3) << std::setw(8) << cholesky(i, j) << " ";
+        }
+        std::cout << " (zeros: ";
+        for (size_t j = i + 1; j < cholesky.cols(); j++) {
+            std::cout << "0.000 ";
+        }
+        std::cout << ")";
+    }
+    
+    // Highlight the FoodFat row specifically
+    std::cout << "\n\n" << std::string(60, '-');
+    std::cout << "\nFOODFAT ROW ANALYSIS (Row 5):";
+    std::cout << "\n" << std::string(60, '-');
+    for (size_t j = 0; j < cholesky.cols() && j < names.size(); j++) {
+        std::cout << "\n  [" << j << "] " << std::setw(20) << names[j].to_string() 
+                 << ": " << std::fixed << std::setprecision(6) << cholesky(5, j);
+        if (std::abs(cholesky(5, j)) > 1.0) {
+            std::cout << " ← LARGE VALUE!";
+        }
+    }
+    std::cout << "\n" << std::string(60, '-');
     
     // DEBUG: Print correlation matrix and Cholesky matrix for FoodFat analysis
     std::cout << "\n" << std::string(80, '=');
