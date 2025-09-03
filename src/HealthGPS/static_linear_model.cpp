@@ -744,6 +744,22 @@ std::pair<std::vector<double>, std::vector<double>> StaticLinearModel::compute_r
         }
     }
     
+    // DEBUG: Verify that StaticLinear::names_ order matches CSV order
+    if (debug_call_count < 3) {
+        std::cout << "\n" << std::string(80, '=');
+        std::cout << "\nVERIFYING RESIDUAL-CHOLESKY MULTIPLICATION ORDER";
+        std::cout << "\n" << std::string(80, '=');
+        std::cout << "\nStaticLinear::names_ order (used for residuals):";
+        for (size_t idx = 0; idx < names_.size(); idx++) {
+            if (idx % 5 == 0) std::cout << "\n  ";
+            std::cout << "[" << idx << "]" << names_[idx].to_string() << " ";
+        }
+        std::cout << "\n";
+        std::cout << "\nIMPORTANT: Residuals are in StaticLinear::names_ order, but Cholesky is in CSV order!";
+        std::cout << "\nThis means residual[i] is multiplied by cholesky(csv_row_for_names_[i], j)";
+        std::cout << "\n" << std::string(80, '=');
+    }
+    
     if (debug_call_count < 5) {
         if (foodfat_found) {
             std::cout << "\n" << std::string(60, '-');

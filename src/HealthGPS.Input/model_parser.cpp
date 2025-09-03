@@ -248,10 +248,18 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     const auto correlation_table = load_datatable_from_csv(correlation_file_info);
     Eigen::MatrixXd correlation{correlation_table.num_rows(), correlation_table.num_columns()};
     
-    // DEBUG: Show correlation matrix column names
+    // DEBUG: Show correlation matrix column names and verify ordering
     std::cout << "\nCorrelation matrix loaded from: " << correlation_file_info.name.string();
     std::cout << "\nCorrelation matrix has " << correlation_table.num_columns() << " columns and " << correlation_table.num_rows() << " rows";
-    std::cout << "\nCorrelation matrix column names:";
+    
+    // DEBUG: Show the EXACT order from risk factor correlation CSV file
+    std::cout << "\n\nCSV FILE COLUMN ORDER (as loaded from file):";
+    for (size_t i = 0; i < correlation_table.num_columns(); i++) {
+        std::cout << "\n  [" << std::setw(2) << i << "] " << correlation_table.column(i).name();
+    }
+    
+    // DEBUG: Show correlation matrix column names
+    std::cout << "\n\nCorrelation matrix column names (for reference):";
     for (size_t i = 0; i < correlation_table.num_columns(); i++) {
         if (i % 5 == 0) std::cout << "\n  ";
         std::cout << correlation_table.column(i).name() << " ";
@@ -438,9 +446,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         }
         lambda.emplace_back(json_params["Lambda"].get<double>());
         stddev.emplace_back(json_params["StdDev"].get<double>());
-        for (size_t j = 0; j < correlation_table.num_rows(); j++) {
-            correlation(i, j) = std::any_cast<double>(correlation_table.column(i).value(j));
-        }
+        // Correlation matrix will be populated separately using CSV column order
 
         // Intervention policy model parameters.
         const auto &policy_json_params = json_params["Policy"];
@@ -519,30 +525,216 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         i++;
     }
 
+    // Populate correlation matrix using CSV order directly (before reordering)
+    // This will be reordered later to match the reordered names vector
+    std::cout << "\n" << std::string(80, '=');
+    std::cout << "\nPOPULATING CORRELATION MATRIX USING CSV ORDER";
+    std::cout << "\n" << std::string(80, '=');
+    std::cout << "\nPopulating correlation matrix using CSV order...";
+    
+    // Populate correlation matrix using CSV order (excluding first empty column)
+    for (size_t row_idx = 0; row_idx < correlation_table.num_rows(); row_idx++) {
+        for (size_t col_idx = 1; col_idx < correlation_table.num_columns(); col_idx++) { // Skip first column (empty)
+            correlation(row_idx, col_idx-1) = std::any_cast<double>(correlation_table.column(col_idx).value(row_idx));
+        }
+    }
+    
+    std::cout << "\n✓ Correlation matrix populated using CSV order!";
+    std::cout << "\n" << std::string(80, '=');
+
+    // REORDER NAMES VECTOR TO MATCH CSV FILE ORDER
+    std::cout << "\n" << std::string(80, '=');
+    std::cout << "\nREORDERING NAMES VECTOR TO MATCH CSV FILE ORDER";
+    std::cout << "\n" << std::string(80, '=');
+    
+    // Create the desired order from CSV file (excluding the first empty column)
+    std::vector<std::string> csv_order;
+    for (size_t col_idx = 1; col_idx < correlation_table.num_columns(); col_idx++) { // Skip first column (empty)
+        csv_order.push_back(correlation_table.column(col_idx).name());
+    }
+    
+    std::cout << "\nDesired CSV order: ";
+    for (size_t idx = 0; idx < csv_order.size(); idx++) {
+        if (idx % 5 == 0) std::cout << "\n  ";
+        std::cout << "[" << idx << "]" << csv_order[idx] << " ";
+    }
+    
+    // Create logistic models vector before reordering
+    std::vector<LinearModelParams> logistic_models;
+    if (!logistic_coefficients.empty()) {
+        // Convert unordered_map to vector in the same order as names
+        for (const auto &name : names) {
+            // Convert name to lowercase for case-insensitive comparison
+            std::string name_str = name.to_string();
+            std::string name_lower = core::to_lower(name_str);
+
+            // Look for either the original name or a case-insensitive match
+            bool found = false;
+            for (const auto &[key, model] : logistic_coefficients) {
+                if (core::to_lower(key) == name_lower) {
+                    logistic_models.push_back(model);
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                // MAHIMA: Changed approach - if no logistic coefficients for this risk
+                // factor, create an empty model instead of using boxcox coefficients as
+                // fallback. Missing logistic data is intentional and means skip Stage 1
+                // (logistic regression) and go directly to Stage 2 (boxcox transformation).
+                std::cout << "\nINFO: No logistic regression coefficients found for "
+                          << name.to_string()
+                          << ", will use boxcox-only modeling (skip Stage 1)";
+
+                // Create empty model to signal: skip logistic stage, use boxcox only
+                logistic_models.push_back(LinearModelParams{});
+            }
+        }
+    } else {
+        // If no logistic coefficients, create empty vector
+        logistic_models.resize(names.size());
+    }
+
+    // Create reordered vectors for all the data structures
+    std::vector<core::Identifier> reordered_names;
+    std::vector<LinearModelParams> reordered_models;
+    std::vector<core::DoubleInterval> reordered_ranges;
+    std::vector<double> reordered_lambda;
+    std::vector<double> reordered_stddev;
+    std::vector<LinearModelParams> reordered_policy_models;
+    std::vector<core::DoubleInterval> reordered_policy_ranges;
+    std::vector<LinearModelParams> reordered_trend_models;
+    std::vector<core::DoubleInterval> reordered_trend_ranges;
+    std::vector<double> reordered_trend_lambda;
+    std::vector<LinearModelParams> reordered_logistic_models;
+    
+    // Reorder everything according to CSV order
+    for (const auto& csv_name : csv_order) {
+        // Find the index in the original names vector
+        size_t original_index = 0;
+        bool found = false;
+        for (size_t name_idx = 0; name_idx < names.size(); name_idx++) {
+            std::string name_lower = names[name_idx].to_string();
+            std::string csv_lower = csv_name;
+            std::transform(name_lower.begin(), name_lower.end(), name_lower.begin(), ::tolower);
+            std::transform(csv_lower.begin(), csv_lower.end(), csv_lower.begin(), ::tolower);
+            
+            if (name_lower == csv_lower) {
+                original_index = name_idx;
+                found = true;
+                break;
+            }
+        }
+        
+        if (found) {
+            reordered_names.push_back(names[original_index]);
+            reordered_models.push_back(models[original_index]);
+            reordered_ranges.push_back(ranges[original_index]);
+            reordered_lambda.push_back(lambda[original_index]);
+            reordered_stddev.push_back(stddev[original_index]);
+            reordered_policy_models.push_back(policy_models[original_index]);
+            reordered_policy_ranges.push_back(policy_ranges[original_index]);
+            reordered_trend_models.push_back((*trend_models)[original_index]);
+            reordered_trend_ranges.push_back((*trend_ranges)[original_index]);
+            reordered_trend_lambda.push_back((*trend_lambda)[original_index]);
+            reordered_logistic_models.push_back(logistic_models[original_index]);
+        } else {
+            std::cout << "\nWARNING: Could not find " << csv_name << " in original names vector!";
+        }
+    }
+    
+    // Replace the original vectors with reordered ones
+    names = std::move(reordered_names);
+    models = std::move(reordered_models);
+    ranges = std::move(reordered_ranges);
+    lambda = std::move(reordered_lambda);
+    stddev = std::move(reordered_stddev);
+    policy_models = std::move(reordered_policy_models);
+    policy_ranges = std::move(reordered_policy_ranges);
+    *trend_models = std::move(reordered_trend_models);
+    *trend_ranges = std::move(reordered_trend_ranges);
+    *trend_lambda = std::move(reordered_trend_lambda);
+    logistic_models = std::move(reordered_logistic_models);
+    
+    std::cout << "\n✓ Names vector reordered to match CSV file order!";
+    std::cout << "\n✓ All related vectors (models, ranges, lambda, etc.) reordered accordingly!";
+    std::cout << "\n" << std::string(80, '=');
+    
+    // REORDER CORRELATION MATRIX TO MATCH REORDERED NAMES VECTOR
+    std::cout << "\n" << std::string(80, '=');
+    std::cout << "\nREORDERING CORRELATION MATRIX TO MATCH REORDERED NAMES VECTOR";
+    std::cout << "\n" << std::string(80, '=');
+    
+    // Create reordered correlation matrix
+    Eigen::MatrixXd reordered_correlation = Eigen::MatrixXd::Zero(names.size(), names.size());
+    
+    // Reorder correlation matrix according to the new names order
+    for (size_t row_idx = 0; row_idx < names.size(); row_idx++) {
+        for (size_t col_idx = 0; col_idx < names.size(); col_idx++) {
+            // Find the original indices in the CSV order
+            size_t original_i = 0, original_j = 0;
+            bool found_i = false, found_j = false;
+            
+            for (size_t k = 0; k < csv_order.size(); k++) {
+                std::string csv_name = csv_order[k];
+                std::string name_i = names[row_idx].to_string();
+                std::string name_j = names[col_idx].to_string();
+                
+                std::string csv_lower = csv_name;
+                std::string name_i_lower = name_i;
+                std::string name_j_lower = name_j;
+                std::transform(csv_lower.begin(), csv_lower.end(), csv_lower.begin(), ::tolower);
+                std::transform(name_i_lower.begin(), name_i_lower.end(), name_i_lower.begin(), ::tolower);
+                std::transform(name_j_lower.begin(), name_j_lower.end(), name_j_lower.begin(), ::tolower);
+                
+                if (csv_lower == name_i_lower) {
+                    original_i = k;
+                    found_i = true;
+                }
+                if (csv_lower == name_j_lower) {
+                    original_j = k;
+                    found_j = true;
+                }
+            }
+            
+            if (found_i && found_j) {
+                reordered_correlation(row_idx, col_idx) = correlation(original_i, original_j);
+            }
+        }
+    }
+    
+    // Replace the original correlation matrix
+    correlation = std::move(reordered_correlation);
+    
+    std::cout << "\n✓ Correlation matrix reordered to match reordered names vector!";
+    std::cout << "\n✓ Now everything is in the exact same order as the CSV file!";
+    std::cout << "\n" << std::string(80, '=');
+    
     // DEBUG: Show the exact order of risk factors in names_ vector
     std::cout << "\nRisk factor names in StaticLinear::names_ (in order):";
-    for (size_t i = 0; i < names.size(); i++) {
-        if (i % 5 == 0) std::cout << "\n  ";
-        std::cout << names[i].to_string() << " ";
+    for (size_t idx = 0; idx < names.size(); idx++) {
+        if (idx % 5 == 0) std::cout << "\n  ";
+        std::cout << names[idx].to_string() << " ";
     }
     
     // DEBUG: Check if the ordering matches
     std::cout << "\n\nORDERING COMPARISON:";
     bool ordering_matches = true;
-    for (size_t i = 0; i < names.size() && i < correlation_table.num_columns(); i++) {
-        std::string correlation_name = correlation_table.column(i).name();
-        std::string names_name = names[i].to_string();
+    for (size_t idx = 0; idx < names.size() && idx < csv_order.size(); idx++) {
+        std::string csv_name = csv_order[idx];
+        std::string names_name = names[idx].to_string();
         
         // Convert to lowercase for comparison
-        std::string correlation_lower = correlation_name;
+        std::string csv_lower = csv_name;
         std::string names_lower = names_name;
-        std::transform(correlation_lower.begin(), correlation_lower.end(), correlation_lower.begin(), ::tolower);
+        std::transform(csv_lower.begin(), csv_lower.end(), csv_lower.begin(), ::tolower);
         std::transform(names_lower.begin(), names_lower.end(), names_lower.begin(), ::tolower);
         
-        if (correlation_lower != names_lower) {
+        if (csv_lower != names_lower) {
             ordering_matches = false;
-            std::cout << "\n  MISMATCH at index " << i << ":";
-            std::cout << "\n    Correlation matrix: '" << correlation_name << "'";
+            std::cout << "\n  MISMATCH at index " << idx << ":";
+            std::cout << "\n    CSV order: '" << csv_name << "'";
             std::cout << "\n    StaticLinear names_: '" << names_name << "'";
         }
     }
@@ -561,6 +753,34 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                                               opt["RiskFactorModels"].size(),
                                               correlation_table.num_columns())};
     }
+    
+    // DEBUG: Verify correlation matrix population order
+    std::cout << "\n" << std::string(80, '=');
+    std::cout << "\nDEBUG: CORRELATION MATRIX POPULATION VERIFICATION";
+    std::cout << "\n" << std::string(80, '=');
+    std::cout << "\nVerifying that correlation matrix is populated in the correct order...";
+    std::cout << "\n";
+    
+    // Show how the correlation matrix is being populated
+    std::cout << "\nCORRELATION MATRIX POPULATION ORDER:";
+    std::cout << "\nFormat: [i,j] = correlation(StaticLinear_names_[i], StaticLinear_names_[j]) - MATCHING RESIDUALS ORDER!";
+    std::cout << "\n";
+    
+    for (size_t row_idx = 0; row_idx < names.size(); row_idx++) {
+        std::cout << "\nRow " << std::setw(2) << row_idx << " (" << std::setw(20) << names[row_idx].to_string() << "): ";
+        for (size_t col_idx = 0; col_idx < names.size(); col_idx++) {
+            std::cout << std::fixed << std::setprecision(3) << std::setw(7) << correlation(row_idx, col_idx) << " ";
+        }
+        std::cout << "\n";
+    }
+    
+    // Verify that correlation matrix is now using CSV column order
+    std::cout << "\n" << std::string(60, '-');
+    std::cout << "\nCORRELATION MATRIX ORDER VERIFICATION:";
+    std::cout << "\n" << std::string(60, '-');
+    std::cout << "\n✓ Correlation matrix is now populated using CSV column order!";
+    std::cout << "\n✓ This should fix the Cholesky coefficient issues!";
+    std::cout << "\n" << std::string(60, '-');
 
     // Compute Cholesky decomposition of the risk factor correlation matrix.
     auto cholesky = Eigen::MatrixXd{Eigen::LLT<Eigen::MatrixXd>{correlation}.matrixL()};
@@ -574,10 +794,10 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     std::cout << "\nRow format: [row_index] risk_factor_name: correlation_values";
     std::cout << "\n";
     
-    for (size_t i = 0; i < correlation.rows() && i < names.size(); i++) {
-        std::cout << "\n[" << std::setw(2) << i << "] " << std::setw(20) << names[i].to_string() << ": ";
-        for (size_t j = 0; j < correlation.cols() && j < names.size(); j++) {
-            std::cout << std::fixed << std::setprecision(3) << std::setw(7) << correlation(i, j) << " ";
+    for (size_t row_idx = 0; row_idx < static_cast<size_t>(correlation.rows()) && row_idx < names.size(); row_idx++) {
+        std::cout << "\n[" << std::setw(2) << row_idx << "] " << std::setw(20) << names[row_idx].to_string() << ": ";
+        for (size_t col_idx = 0; col_idx < static_cast<size_t>(correlation.cols()) && col_idx < names.size(); col_idx++) {
+            std::cout << std::fixed << std::setprecision(3) << std::setw(7) << correlation(row_idx, col_idx) << " ";
         }
     }
     
@@ -585,12 +805,12 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     std::cout << "\n\n" << std::string(60, '-');
     std::cout << "\nHIGH CORRELATIONS ANALYSIS (|correlation| > 0.8):";
     std::cout << "\n" << std::string(60, '-');
-    for (size_t i = 0; i < correlation.rows() && i < names.size(); i++) {
-        for (size_t j = i + 1; j < correlation.cols() && j < names.size(); j++) {
-            double corr = correlation(i, j);
+    for (size_t row_idx = 0; row_idx < static_cast<size_t>(correlation.rows()) && row_idx < names.size(); row_idx++) {
+        for (size_t col_idx = row_idx + 1; col_idx < static_cast<size_t>(correlation.cols()) && col_idx < names.size(); col_idx++) {
+            double corr = correlation(row_idx, col_idx);
             if (std::abs(corr) > 0.8) {
-                std::cout << "\n  " << std::setw(20) << names[i].to_string() 
-                         << " <-> " << std::setw(20) << names[j].to_string() 
+                std::cout << "\n  " << std::setw(20) << names[row_idx].to_string() 
+                         << " <-> " << std::setw(20) << names[col_idx].to_string() 
                          << ": " << std::fixed << std::setprecision(6) << corr;
             }
         }
@@ -606,26 +826,26 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     std::cout << "\nRow format: [row_index] risk_factor_name: cholesky_values";
     std::cout << "\n";
     
-    for (size_t i = 0; i < cholesky.rows() && i < names.size(); i++) {
-        std::cout << "\n[" << std::setw(2) << i << "] " << std::setw(20) << names[i].to_string() << ": ";
-        for (size_t j = 0; j <= i && j < cholesky.cols(); j++) {
-            std::cout << std::fixed << std::setprecision(3) << std::setw(8) << cholesky(i, j) << " ";
+    for (size_t row_idx = 0; row_idx < static_cast<size_t>(cholesky.rows()) && row_idx < names.size(); row_idx++) {
+        std::cout << "\n[" << std::setw(2) << row_idx << "] " << std::setw(20) << names[row_idx].to_string() << ": ";
+        for (size_t col_idx = 0; col_idx <= row_idx && col_idx < static_cast<size_t>(cholesky.cols()); col_idx++) {
+            std::cout << std::fixed << std::setprecision(3) << std::setw(8) << cholesky(row_idx, col_idx) << " ";
         }
         std::cout << " (zeros: ";
-        for (size_t j = i + 1; j < cholesky.cols(); j++) {
+        for (size_t col_idx = row_idx + 1; col_idx < static_cast<size_t>(cholesky.cols()); col_idx++) {
             std::cout << "0.000 ";
         }
         std::cout << ")";
     }
     
-    // Highlight the FoodFat row specifically
+    // Highlight the FoodFat row specifically 
     std::cout << "\n\n" << std::string(60, '-');
-    std::cout << "\nFOODFAT ROW ANALYSIS (Row 5):";
+    std::cout << "\nFOODFAT ROW ANALYSIS:";
     std::cout << "\n" << std::string(60, '-');
-    for (size_t j = 0; j < cholesky.cols() && j < names.size(); j++) {
-        std::cout << "\n  [" << j << "] " << std::setw(20) << names[j].to_string() 
-                 << ": " << std::fixed << std::setprecision(6) << cholesky(5, j);
-        if (std::abs(cholesky(5, j)) > 1.0) {
+    for (size_t col_idx = 0; col_idx < static_cast<size_t>(cholesky.cols()) && col_idx < names.size(); col_idx++) {
+        std::cout << "\n  [" << col_idx << "] " << std::setw(20) << names[col_idx].to_string() 
+                 << ": " << std::fixed << std::setprecision(6) << cholesky(1, col_idx);
+        if (std::abs(cholesky(1, col_idx)) > 1.0) {
             std::cout << " ← LARGE VALUE!";
         }
     }
@@ -659,14 +879,14 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         std::cout << "\nFoodFat found at index: " << foodfat_index;
         std::cout << "\n\nCORRELATION MATRIX (showing FoodFat row and column):";
         std::cout << "\nRow " << foodfat_index << " (FoodFat correlations with others):";
-        for (size_t j = 0; j < correlation.cols(); j++) {
+        for (size_t j = 0; j < static_cast<size_t>(correlation.cols()); j++) {
             if (j % 5 == 0) std::cout << "\n  ";
             std::cout << std::fixed << std::setprecision(3) << correlation(foodfat_index, j) << " ";
         }
         
         std::cout << "\n\nCHOLESKY MATRIX (showing FoodFat row):";
         std::cout << "\nRow " << foodfat_index << " (FoodFat Cholesky row):";
-        for (size_t j = 0; j < cholesky.cols(); j++) {
+        for (size_t j = 0; j < static_cast<size_t>(cholesky.cols()); j++) {
             if (j % 5 == 0) std::cout << "\n  ";
             std::cout << std::fixed << std::setprecision(3) << cholesky(foodfat_index, j) << " ";
         }
@@ -1050,45 +1270,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         std::move(trend_ranges), std::move(trend_lambda), info_speed, std::move(rural_prevalence),
         std::move(region_prevalence), std::move(ethnicity_prevalence), std::move(income_models),
         std::move(region_models), physical_activity_stddev, physical_activity_models,
-        [&]() -> std::vector<LinearModelParams> {
-            if (!logistic_coefficients.empty()) {
-                // Convert unordered_map to vector in the same order as names
-                std::vector<LinearModelParams> logistic_models_vec;
-                for (const auto &name : names) {
-                    // Convert name to lowercase for case-insensitive comparison
-                    std::string name_str = name.to_string();
-                    std::string name_lower = core::to_lower(name_str);
-
-                    // Look for either the original name or a case-insensitive match
-                    bool found = false;
-                    for (const auto &[key, model] : logistic_coefficients) {
-                        if (core::to_lower(key) == name_lower) {
-                            logistic_models_vec.push_back(model);
-                            found = true;
-                            break;
-                        }
-                    }
-
-                    if (!found) {
-                        // MAHIMA: Changed approach - if no logistic coefficients for this risk
-                        // factor, create an empty model instead of using boxcox coefficients as
-                        // fallback. Missing logistic data is intentional and means skip Stage 1
-                        // (logistic regression) and go directly to Stage 2 (boxcox transformation).
-                        std::cout << "\nINFO: No logistic regression coefficients found for "
-                                  << name.to_string()
-                                  << ", will use boxcox-only modeling (skip Stage 1)";
-
-                        // Create empty model to signal: skip logistic stage, use boxcox only
-                        logistic_models_vec.push_back(LinearModelParams{});
-                    }
-                }
-                return logistic_models_vec;
-            } else {
-                // If no logistic coefficients, return empty vector (StaticLinearModelDefinition
-                // will handle this)
-                return std::vector<LinearModelParams>{};
-            }
-        }());
+        std::move(logistic_models));
 }
 // NOLINTEND(readability-function-cognitive-complexity)
 

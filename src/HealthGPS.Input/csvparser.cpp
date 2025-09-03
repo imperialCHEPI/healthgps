@@ -95,7 +95,7 @@ hgps::core::DataTable load_datatable_from_csv(const FileInfo &file_info) {
 
     // Validate columns and create file columns map
     auto headers = doc.GetColumnNames();
-    std::map<std::string, std::string, hc::case_insensitive::comparator> csv_column_map;
+    std::vector<std::pair<std::string, std::string>> csv_column_map; // Use vector to preserve order
     for (const auto &pair : file_info.columns) {
         // HACK: replace pair with structured bindings once clang allows it.
         const std::string &col_name = pair.first;
@@ -106,7 +106,7 @@ hgps::core::DataTable load_datatable_from_csv(const FileInfo &file_info) {
 
         auto it = std::find_if(headers.begin(), headers.end(), is_match);
         if (it != headers.end()) {
-            csv_column_map[col_name] = *it;
+            csv_column_map.emplace_back(col_name, *it);
         } else {
             success = false;
             fmt::print(fmt::fg(fmt::color::dark_salmon), "Column: {} not found in dataset.\n",
