@@ -565,6 +565,38 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     // Compute Cholesky decomposition of the risk factor correlation matrix.
     auto cholesky = Eigen::MatrixXd{Eigen::LLT<Eigen::MatrixXd>{correlation}.matrixL()};
     
+    // DEBUG: Print the risk factor correlation matrix
+    std::cout << "\n" << std::string(80, '=');
+    std::cout << "\nDEBUG: RISK FACTOR CORRELATION MATRIX";
+    std::cout << "\n" << std::string(80, '=');
+    std::cout << "\nCorrelation matrix size: " << correlation.rows() << " x " << correlation.cols();
+    std::cout << "\n\nCorrelation matrix (symmetric):";
+    std::cout << "\nRow format: [row_index] risk_factor_name: correlation_values";
+    std::cout << "\n";
+    
+    for (size_t i = 0; i < correlation.rows() && i < names.size(); i++) {
+        std::cout << "\n[" << std::setw(2) << i << "] " << std::setw(20) << names[i].to_string() << ": ";
+        for (size_t j = 0; j < correlation.cols() && j < names.size(); j++) {
+            std::cout << std::fixed << std::setprecision(3) << std::setw(7) << correlation(i, j) << " ";
+        }
+    }
+    
+    // Highlight high correlations
+    std::cout << "\n\n" << std::string(60, '-');
+    std::cout << "\nHIGH CORRELATIONS ANALYSIS (|correlation| > 0.8):";
+    std::cout << "\n" << std::string(60, '-');
+    for (size_t i = 0; i < correlation.rows() && i < names.size(); i++) {
+        for (size_t j = i + 1; j < correlation.cols() && j < names.size(); j++) {
+            double corr = correlation(i, j);
+            if (std::abs(corr) > 0.8) {
+                std::cout << "\n  " << std::setw(20) << names[i].to_string() 
+                         << " <-> " << std::setw(20) << names[j].to_string() 
+                         << ": " << std::fixed << std::setprecision(6) << corr;
+            }
+        }
+    }
+    std::cout << "\n" << std::string(60, '-');
+    
     // DEBUG: Print the entire Cholesky matrix
     std::cout << "\n" << std::string(80, '=');
     std::cout << "\nDEBUG: FULL CHOLESKY MATRIX";
