@@ -637,8 +637,12 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                     file_info_json["name"] = csv_filename;
                     file_info_json["format"] =
                         model_config.contains("format") ? model_config["format"] : "csv";
-                    file_info_json["delimiter"] =
-                        model_config.contains("delimiter") ? model_config["delimiter"] : ",";
+                    // Handle tab delimiter properly
+                    std::string delimiter = model_config.contains("delimiter") ? model_config["delimiter"] : ",";
+                    if (delimiter == "\\t") {
+                        delimiter = "\t";  // Convert escaped tab to actual tab character
+                    }
+                    file_info_json["delimiter"] = delimiter;
                     file_info_json["encoding"] =
                         model_config.contains("encoding") ? model_config["encoding"] : "ASCII";
                     file_info_json["columns"] = model_config.contains("columns")
@@ -671,12 +675,12 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                     int factor_col = 0;
                     int coefficient_col = 1;
 
-                    // Parse each row
-                    for (size_t row_idx = 0; row_idx < csv_table.num_rows(); row_idx++) {
-                        std::string factor_name =
-                            std::any_cast<std::string>(csv_table.column(factor_col).value(row_idx));
-                        double coefficient_value =
-                            std::any_cast<double>(csv_table.column(coefficient_col).value(row_idx));
+                    // Parse each row (skip header row)
+                    for (size_t row_idx = 1; row_idx < csv_table.num_rows(); row_idx++) {
+                        // Get factor name and coefficient value as strings, then parse
+                        std::string factor_name = std::any_cast<std::string>(csv_table.column(factor_col).value(row_idx));
+                        std::string coefficient_str = std::any_cast<std::string>(csv_table.column(coefficient_col).value(row_idx));
+                        double coefficient_value = std::stod(coefficient_str);
 
                         if (factor_name == "Intercept") {
                             model.intercept = coefficient_value;
