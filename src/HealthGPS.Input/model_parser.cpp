@@ -654,6 +654,19 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                         input::get_file_info(file_info_json, config.root_path);
                     const auto csv_table = load_datatable_from_csv(csv_file_info);
 
+                    // Debug: Print CSV table info
+                    std::cout << "\n      CSV table loaded: " << csv_table.num_rows() << " rows, " << csv_table.num_columns() << " columns";
+                    for (size_t i = 0; i < csv_table.num_columns(); i++) {
+                        std::cout << "\n        Column " << i << ": " << csv_table.column(i).name();
+                    }
+                    if (csv_table.num_rows() > 0) {
+                        std::cout << "\n        First row data:";
+                        for (size_t i = 0; i < csv_table.num_columns(); i++) {
+                            auto value = csv_table.column(i).value(0);
+                            std::cout << "\n          Column " << i << " type: " << value.type().name();
+                        }
+                    }
+
                     // Parse CSV into PhysicalActivityModel (using existing model variable)
 
                     // For the existing CSV format, we expect 2 columns: factor names and values
@@ -678,12 +691,30 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
                     // Parse each row (skip header row)
                     for (size_t row_idx = 1; row_idx < csv_table.num_rows(); row_idx++) {
-                        // Get factor name and coefficient value as strings, then parse
-                        std::string factor_name =
-                            std::any_cast<std::string>(csv_table.column(factor_col).value(row_idx));
-                        std::string coefficient_str = std::any_cast<std::string>(
-                            csv_table.column(coefficient_col).value(row_idx));
-                        double coefficient_value = std::stod(coefficient_str);
+                        // Get factor name and coefficient value - handle any type
+                        auto factor_value = csv_table.column(factor_col).value(row_idx);
+                        auto coeff_value = csv_table.column(coefficient_col).value(row_idx);
+                        
+                        std::string factor_name;
+                        double coefficient_value;
+                        
+                        // Convert factor name to string
+                        if (factor_value.type() == typeid(std::string)) {
+                            factor_name = std::any_cast<std::string>(factor_value);
+                        } else {
+                            throw core::HgpsException("Factor name must be a string");
+                        }
+                        
+                        // Convert coefficient to double
+                        if (coeff_value.type() == typeid(std::string)) {
+                            coefficient_value = std::stod(std::any_cast<std::string>(coeff_value));
+                        } else if (coeff_value.type() == typeid(double)) {
+                            coefficient_value = std::any_cast<double>(coeff_value);
+                        } else if (coeff_value.type() == typeid(int)) {
+                            coefficient_value = static_cast<double>(std::any_cast<int>(coeff_value));
+                        } else {
+                            throw core::HgpsException("Cannot convert coefficient to double");
+                        }
 
                         if (factor_name == "Intercept") {
                             model.intercept = coefficient_value;
