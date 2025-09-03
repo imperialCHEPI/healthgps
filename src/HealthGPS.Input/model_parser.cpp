@@ -632,35 +632,25 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                     // Construct full path to CSV file (same directory as JSON config)
                     std::filesystem::path csv_path = config.root_path / csv_filename;
 
-                    // Load CSV data
-                    const auto csv_file_info = input::get_file_info({{"name", csv_filename},
-                                                                     {"format", "csv"},
-                                                                     {"delimiter", ","},
-                                                                     {"encoding", "ASCII"}},
-                                                                    config.root_path);
+                    // Load CSV data - create proper file info structure
+                    nlohmann::json file_info_json;
+                    file_info_json["name"] = csv_filename;
+                    file_info_json["format"] = model_config.contains("format") ? model_config["format"] : "csv";
+                    file_info_json["delimiter"] = model_config.contains("delimiter") ? model_config["delimiter"] : ",";
+                    file_info_json["encoding"] = model_config.contains("encoding") ? model_config["encoding"] : "ASCII";
+                    file_info_json["columns"] = model_config.contains("columns") ? model_config["columns"] : nlohmann::json::object();
+                    
+                    const auto csv_file_info = input::get_file_info(file_info_json, config.root_path);
                     const auto csv_table = load_datatable_from_csv(csv_file_info);
 
                     // Parse CSV into PhysicalActivityModel (using existing model variable)
 
-                    // Find the Factor and Coefficient columns
-                    int factor_col = -1;
-                    int coefficient_col = -1;
-
-                    for (size_t col_idx = 0; col_idx < csv_table.num_columns(); col_idx++) {
-                        std::string col_name = csv_table.column(col_idx).name();
-                        if (col_name == "Factor" || col_name == "factor") {
-                            factor_col = static_cast<int>(col_idx);
-                        } else if (col_name == "Coefficient" || col_name == "coefficient") {
-                            coefficient_col = static_cast<int>(col_idx);
-                        }
-                    }
-
-                    if (factor_col == -1 || coefficient_col == -1) {
+                    // For the existing CSV format, we expect 2 columns: factor names and values
+                    if (csv_table.num_columns() != 2) {
                         throw core::HgpsException{
-                            fmt::format("Physical activity CSV file {} must have 'Factor' and "
-                                        "'Coefficient' columns. "
-                                        "Found columns: {}",
-                                        csv_filename, [&csv_table]() {
+                            fmt::format("Physical activity CSV file {} must have exactly 2 columns. "
+                                        "Found {} columns: {}",
+                                        csv_filename, csv_table.num_columns(), [&csv_table]() {
                                             std::string cols;
                                             for (size_t i = 0; i < csv_table.num_columns(); i++) {
                                                 if (i > 0)
@@ -670,6 +660,10 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                                             return cols;
                                         }())};
                     }
+
+                    // First column contains factor names, second column contains values
+                    int factor_col = 0;
+                    int coefficient_col = 1;
 
                     // Parse each row
                     for (size_t row_idx = 0; row_idx < csv_table.num_rows(); row_idx++) {
