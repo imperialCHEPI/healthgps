@@ -635,30 +635,36 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                     // Load CSV data - create proper file info structure
                     nlohmann::json file_info_json;
                     file_info_json["name"] = csv_filename;
-                    file_info_json["format"] = model_config.contains("format") ? model_config["format"] : "csv";
-                    file_info_json["delimiter"] = model_config.contains("delimiter") ? model_config["delimiter"] : ",";
-                    file_info_json["encoding"] = model_config.contains("encoding") ? model_config["encoding"] : "ASCII";
-                    file_info_json["columns"] = model_config.contains("columns") ? model_config["columns"] : nlohmann::json::object();
-                    
-                    const auto csv_file_info = input::get_file_info(file_info_json, config.root_path);
+                    file_info_json["format"] =
+                        model_config.contains("format") ? model_config["format"] : "csv";
+                    file_info_json["delimiter"] =
+                        model_config.contains("delimiter") ? model_config["delimiter"] : ",";
+                    file_info_json["encoding"] =
+                        model_config.contains("encoding") ? model_config["encoding"] : "ASCII";
+                    file_info_json["columns"] = model_config.contains("columns")
+                                                    ? model_config["columns"]
+                                                    : nlohmann::json::object();
+
+                    const auto csv_file_info =
+                        input::get_file_info(file_info_json, config.root_path);
                     const auto csv_table = load_datatable_from_csv(csv_file_info);
 
                     // Parse CSV into PhysicalActivityModel (using existing model variable)
 
                     // For the existing CSV format, we expect 2 columns: factor names and values
                     if (csv_table.num_columns() != 2) {
-                        throw core::HgpsException{
-                            fmt::format("Physical activity CSV file {} must have exactly 2 columns. "
-                                        "Found {} columns: {}",
-                                        csv_filename, csv_table.num_columns(), [&csv_table]() {
-                                            std::string cols;
-                                            for (size_t i = 0; i < csv_table.num_columns(); i++) {
-                                                if (i > 0)
-                                                    cols += ", ";
-                                                cols += csv_table.column(i).name();
-                                            }
-                                            return cols;
-                                        }())};
+                        throw core::HgpsException{fmt::format(
+                            "Physical activity CSV file {} must have exactly 2 columns. "
+                            "Found {} columns: {}",
+                            csv_filename, csv_table.num_columns(), [&csv_table]() {
+                                std::string cols;
+                                for (size_t i = 0; i < csv_table.num_columns(); i++) {
+                                    if (i > 0)
+                                        cols += ", ";
+                                    cols += csv_table.column(i).name();
+                                }
+                                return cols;
+                            }())};
                     }
 
                     // First column contains factor names, second column contains values
