@@ -247,6 +247,20 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         input::get_file_info(opt["RiskFactorCorrelationFile"], config.root_path);
     const auto correlation_table = load_datatable_from_csv(correlation_file_info);
     Eigen::MatrixXd correlation{correlation_table.num_rows(), correlation_table.num_columns()};
+    
+    // MAHIMA: Extract risk factor names in the EXACT order from correlation matrix CSV
+    // This ensures that the order is consistent throughout the entire system
+    std::vector<core::Identifier> csv_ordered_names;
+    for (size_t i = 0; i < correlation_table.num_columns(); ++i) {
+        csv_ordered_names.emplace_back(correlation_table.column(i).name());
+    }
+    
+    std::cout << "\n=== RISK FACTOR ORDER FROM CORRELATION MATRIX CSV ===";
+    for (size_t i = 0; i < csv_ordered_names.size(); ++i) {
+        std::cout << "\n" << i << ": " << csv_ordered_names[i].to_string();
+    }
+    std::cout << "\n====================================================\n";
+    
     // std::cout << "Finished loading RiskFactorCorrelationFile";
 
     // Policy covariance matrix.
@@ -382,17 +396,19 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     auto expected_trend_boxcox = std::make_unique<std::unordered_map<core::Identifier, double>>();
     auto trend_steps = std::make_unique<std::unordered_map<core::Identifier, int>>();
 
-    size_t i = 0;
-    for (const auto &[key, json_params] : opt["RiskFactorModels"].items()) {
+    // MAHIMA: Use CSV order instead of JSON iteration order to ensure consistency
+    // This is the critical fix that ensures residuals map correctly to risk factors
+    for (size_t i = 0; i < csv_ordered_names.size(); ++i) {
+        const auto& key = csv_ordered_names[i];
         names.emplace_back(key);
 
         // Risk factor model parameters - check if we have it in CSV first
         LinearModelParams model;
 
-        if (csv_coefficients.find(key) != csv_coefficients.end()) {
+        if (csv_coefficients.find(key.to_string()) != csv_coefficients.end()) {
             // std::cout << "\nLoading risk factors using .csv YAY!!!";
             //  Use coefficients from CSV file
-            model = csv_coefficients[key];
+            model = csv_coefficients[key.to_string()];
 
             // Print a sample of the key coefficients for verification
             // std::cout << "\n  Intercept: " << model.intercept;
@@ -403,7 +419,14 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             }*/
         } else {
             // Fall back to JSON if not found in CSV
-            std::cout << "\nLoading risk factors using JSON NOOOOOOOOOOO!!!";
+            std::cout << "\nLoading risk factors using JSON NOOOOOOOOOOO!!! for: " << key.to_string();
+            
+            // Find the JSON parameters for this risk factor
+            if (!opt["RiskFactorModels"].contains(key.to_string())) {
+                throw core::HgpsException{fmt::format("Risk factor '{}' not found in JSON RiskFactorModels", key.to_string())};
+            }
+            
+            const auto& json_params = opt["RiskFactorModels"][key.to_string()];
             model.intercept = json_params["Intercept"].get<double>();
             model.coefficients =
                 json_params["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
@@ -411,17 +434,21 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
         // Check risk factor correlation matrix column name matches risk factor name.
         auto column_name = correlation_table.column(i).name();
-        if (!core::case_insensitive::equals(key, column_name)) {
+        if (!core::case_insensitive::equals(key.to_string(), column_name)) {
             throw core::HgpsException{fmt::format("Risk factor {} name ({}) does not match risk "
                                                   "factor correlation matrix column {} name ({})",
-                                                  i, key, i, column_name)};
+                                                  i, key.to_string(), i, column_name)};
         }
 
         // Write risk factor data structures.
         models.emplace_back(std::move(model));
+        
+        // Get JSON parameters for this risk factor (needed for ranges, lambda, stddev)
+        const auto& json_params = opt["RiskFactorModels"][key.to_string()];
+        
         // Load range from CSV if available, otherwise use JSON
-        if (risk_factor_ranges_from_csv.find(key) != risk_factor_ranges_from_csv.end()) {
-            ranges.emplace_back(risk_factor_ranges_from_csv[key]);
+        if (risk_factor_ranges_from_csv.find(key.to_string()) != risk_factor_ranges_from_csv.end()) {
+            ranges.emplace_back(risk_factor_ranges_from_csv[key.to_string()]);
         } else {
             ranges.emplace_back(json_params["Range"].get<core::DoubleInterval>());
         }
@@ -432,14 +459,13 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         }
 
         // Intervention policy model parameters.
-        const auto &policy_json_params = json_params["Policy"];
         LinearModelParams policy_model;
 
         // Check if we have policy coefficients in CSV
-        if (policy_csv_coefficients.find(key) != policy_csv_coefficients.end()) {
+        if (policy_csv_coefficients.find(key.to_string()) != policy_csv_coefficients.end()) {
             // Use coefficients from CSV file
-            policy_model = policy_csv_coefficients[key];
-            // std::cout << "\nLoading policy coefficients using CSV for: " << key;
+            policy_model = policy_csv_coefficients[key.to_string()];
+            // std::cout << "\nLoading policy coefficients using CSV for: " << key.to_string();
 
             // Print a sample of the key coefficients for verification
             // std::cout << "\n  Policy Intercept: " << policy_model.intercept;
@@ -450,7 +476,14 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             }*/
         } else {
             // Fall back to JSON if not found in CSV- worst case
-            std::cout << "\nLoading policy coefficients using JSON NOOOOOOO!!! for: " << key;
+            std::cout << "\nLoading policy coefficients using JSON NOOOOOOO!!! for: " << key.to_string();
+            
+            // Find the JSON parameters for this risk factor
+            if (!opt["RiskFactorModels"].contains(key.to_string())) {
+                throw core::HgpsException{fmt::format("Risk factor '{}' not found in JSON RiskFactorModels for policy", key.to_string())};
+            }
+            
+            const auto &policy_json_params = json_params["Policy"];
             policy_model.intercept = policy_json_params["Intercept"].get<double>();
             policy_model.coefficients = policy_json_params["Coefficients"]
                                             .get<std::unordered_map<core::Identifier, double>>();
@@ -461,23 +494,24 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
         // Check intervention policy covariance matrix column name matches risk factor name.
         auto policy_column_name = policy_covariance_table.column(i).name();
-        if (!core::case_insensitive::equals(key, policy_column_name)) {
+        if (!core::case_insensitive::equals(key.to_string(), policy_column_name)) {
             throw core::HgpsException{
                 fmt::format("Risk factor {} name ({}) does not match intervention "
                             "policy covariance matrix column {} name ({})",
-                            i, key, i, policy_column_name)};
+                            i, key.to_string(), i, policy_column_name)};
         }
 
         // Write intervention policy data structures.
         policy_models.emplace_back(std::move(policy_model));
-        if (policy_csv_coefficients.find(key) != policy_csv_coefficients.end() &&
-            policy_ranges_map.find(key) != policy_ranges_map.end()) {
+        if (policy_csv_coefficients.find(key.to_string()) != policy_csv_coefficients.end() &&
+            policy_ranges_map.find(key.to_string()) != policy_ranges_map.end()) {
             // Use ranges from CSV
-            policy_ranges.emplace_back(policy_ranges_map[key]);
-            // std::cout << "\n  Using policy range from CSV: [" << policy_ranges_map[key].lower()
-            // << ", " << policy_ranges_map[key].upper() << "]";
+            policy_ranges.emplace_back(policy_ranges_map[key.to_string()]);
+            // std::cout << "\n  Using policy range from CSV: [" << policy_ranges_map[key.to_string()].lower()
+            // << ", " << policy_ranges_map[key.to_string()].upper() << "]";
         } else {
             // Fall back to JSON ranges
+            const auto &policy_json_params = json_params["Policy"];
             policy_ranges.emplace_back(policy_json_params["Range"].get<core::DoubleInterval>());
         }
         for (size_t j = 0; j < policy_covariance_table.num_rows(); j++) {
@@ -503,16 +537,13 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         (*expected_trend)[key] = json_params["ExpectedTrend"].get<double>();
         (*expected_trend_boxcox)[key] = json_params["ExpectedTrendBoxCox"].get<double>();
         (*trend_steps)[key] = json_params["TrendSteps"].get<int>();
-
-        // Increment table column index.
-        i++;
     }
 
     // Check risk factor correlation matrix column count matches risk factor count.
-    if (opt["RiskFactorModels"].size() != correlation_table.num_columns()) {
+    if (csv_ordered_names.size() != correlation_table.num_columns()) {
         throw core::HgpsException{fmt::format("Risk factor count ({}) does not match risk "
                                               "factor correlation matrix column count ({})",
-                                              opt["RiskFactorModels"].size(),
+                                              csv_ordered_names.size(),
                                               correlation_table.num_columns())};
     }
 
@@ -520,10 +551,10 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     auto cholesky = Eigen::MatrixXd{Eigen::LLT<Eigen::MatrixXd>{correlation}.matrixL()};
 
     // Check intervention policy covariance matrix column count matches risk factor count.
-    if (opt["RiskFactorModels"].size() != policy_covariance_table.num_columns()) {
+    if (csv_ordered_names.size() != policy_covariance_table.num_columns()) {
         throw core::HgpsException{fmt::format("Risk factor count ({}) does not match intervention "
                                               "policy covariance matrix column count ({})",
-                                              opt["RiskFactorModels"].size(),
+                                              csv_ordered_names.size(),
                                               policy_covariance_table.num_columns())};
     }
 
