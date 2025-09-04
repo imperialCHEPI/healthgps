@@ -245,14 +245,41 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     // Risk factor correlation matrix.
     const auto correlation_file_info =
         input::get_file_info(opt["RiskFactorCorrelationFile"], config.root_path);
-    const auto correlation_table = load_datatable_from_csv(correlation_file_info);
-    Eigen::MatrixXd correlation{correlation_table.num_rows(), correlation_table.num_columns()};
     
-    // MAHIMA: Extract risk factor names in the EXACT order from correlation matrix CSV
-    // This ensures that the order is consistent throughout the entire system
+    // MAHIMA: Get column names directly from rapidcsv to preserve original order
+    // The load_datatable_from_csv function uses std::map which sorts alphabetically
+    rapidcsv::Document correlation_doc{correlation_file_info.name.string(), rapidcsv::LabelParams{},
+                                      rapidcsv::SeparatorParams{correlation_file_info.delimiter.front()}};
+    auto correlation_headers = correlation_doc.GetColumnNames();
+    
+    // Skip the first column which is the row identifier
     std::vector<core::Identifier> csv_ordered_names;
-    for (size_t i = 0; i < correlation_table.num_columns(); ++i) {
-        csv_ordered_names.emplace_back(correlation_table.column(i).name());
+    for (size_t i = 1; i < correlation_headers.size(); ++i) {
+        csv_ordered_names.emplace_back(correlation_headers[i]);
+    }
+    
+    // MAHIMA: Load correlation matrix data directly from rapidcsv to preserve order
+    Eigen::MatrixXd correlation{csv_ordered_names.size(), csv_ordered_names.size()};
+    
+    std::cout << "\nDEBUG: Loading correlation matrix with dimensions " << csv_ordered_names.size() << "x" << csv_ordered_names.size();
+    std::cout << "\nDEBUG: CSV has " << correlation_headers.size() << " columns total";
+    
+    // Load the correlation matrix data using the correct order
+    for (size_t i = 0; i < csv_ordered_names.size(); ++i) {
+        for (size_t j = 0; j < csv_ordered_names.size(); ++j) {
+            try {
+                // Get the value from rapidcsv using the correct row and column indices
+                // rapidcsv uses 0-based indexing for both rows and columns
+                // Column j+1 because we skip the first column (row identifier)
+                // Row i because we skip the header row (row 0), so data starts at row 0
+                correlation(i, j) = correlation_doc.GetCell<double>(j + 1, i);
+            } catch (const std::exception& e) {
+                std::cout << "\nERROR: Failed to get correlation value at (" << i << "," << j << "): " << e.what();
+                std::cout << "\n  Trying to access column " << (j + 1) << ", row " << i;
+                std::cout << "\n  CSV has " << correlation_doc.GetColumnCount() << " columns, " << correlation_doc.GetRowCount() << " rows";
+                throw;
+            }
+        }
     }
     
     std::cout << "\n=== RISK FACTOR ORDER FROM CORRELATION MATRIX CSV ===";
@@ -266,9 +293,57 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     // Policy covariance matrix.
     const auto policy_covariance_file_info =
         input::get_file_info(opt["PolicyCovarianceFile"], config.root_path);
-    const auto policy_covariance_table = load_datatable_from_csv(policy_covariance_file_info);
-    Eigen::MatrixXd policy_covariance{policy_covariance_table.num_rows(),
-                                      policy_covariance_table.num_columns()};
+    
+    // MAHIMA: Load policy covariance matrix directly from rapidcsv to preserve order
+    rapidcsv::Document policy_covariance_doc{policy_covariance_file_info.name.string(), rapidcsv::LabelParams{},
+                                            rapidcsv::SeparatorParams{policy_covariance_file_info.delimiter.front()}};
+    auto policy_covariance_headers = policy_covariance_doc.GetColumnNames();
+    
+    // MAHIMA: Policy covariance matrix doesn't have a row identifier column like correlation matrix
+    // It has 21 columns total, all of which are risk factor names
+    // So we use all columns as risk factor names
+    std::vector<core::Identifier> policy_csv_ordered_names;
+    for (size_t i = 0; i < policy_covariance_headers.size(); ++i) {
+        policy_csv_ordered_names.emplace_back(policy_covariance_headers[i]);
+    }
+    
+    // MAHIMA: Load policy covariance matrix data directly from rapidcsv to preserve order
+    Eigen::MatrixXd policy_covariance{policy_csv_ordered_names.size(), policy_csv_ordered_names.size()};
+    
+    std::cout << "\nDEBUG: Policy covariance matrix dimensions: " << policy_csv_ordered_names.size() << "x" << policy_csv_ordered_names.size();
+    std::cout << "\nDEBUG: Expected dimensions based on risk factors: " << csv_ordered_names.size() << "x" << csv_ordered_names.size();
+    
+    // Validate that policy covariance matrix has the right dimensions
+    if (policy_csv_ordered_names.size() != csv_ordered_names.size()) {
+        throw core::HgpsException{fmt::format("Policy covariance matrix dimensions ({}, {}) do not match risk factor count ({})",
+                                              policy_csv_ordered_names.size(), 
+                                              policy_csv_ordered_names.size(),
+                                              csv_ordered_names.size())};
+    }
+    
+    // Load the policy covariance matrix data using the correct order
+    for (size_t i = 0; i < policy_csv_ordered_names.size(); ++i) {
+        for (size_t j = 0; j < policy_csv_ordered_names.size(); ++j) {
+            try {
+                // Get the value from rapidcsv using the correct row and column indices
+                // rapidcsv uses 0-based indexing for both rows and columns
+                // Column j because policy covariance matrix doesn't have a row identifier column
+                // Row i because we skip the header row (row 0), so data starts at row 0
+                policy_covariance(i, j) = policy_covariance_doc.GetCell<double>(j, i);
+            } catch (const std::exception& e) {
+                std::cout << "\nERROR: Failed to get policy covariance value at (" << i << "," << j << "): " << e.what();
+                std::cout << "\n  Trying to access column " << j << ", row " << i;
+                std::cout << "\n  Policy covariance CSV has " << policy_covariance_doc.GetColumnCount() << " columns, " << policy_covariance_doc.GetRowCount() << " rows";
+                throw;
+            }
+        }
+    }
+    
+    std::cout << "\n=== POLICY COVARIANCE ORDER FROM CSV ===";
+    for (size_t i = 0; i < policy_csv_ordered_names.size(); ++i) {
+        std::cout << "\n" << i << ": " << policy_csv_ordered_names[i].to_string();
+    }
+    std::cout << "\n========================================\n";
     // std::cout << "Finished loading PolicyCovarianceFile";
 
     // Check if boxcox_coefficients.csv for the risk factors boxcox data and the
@@ -421,30 +496,55 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             // Fall back to JSON if not found in CSV
             std::cout << "\nLoading risk factors using JSON NOOOOOOOOOOO!!! for: " << key.to_string();
             
-            // Find the JSON parameters for this risk factor
-            if (!opt["RiskFactorModels"].contains(key.to_string())) {
+            // Find the JSON parameters for this risk factor using case-insensitive search
+            std::string json_key;
+            bool found = false;
+            for (const auto& [json_name, json_value] : opt["RiskFactorModels"].items()) {
+                if (core::case_insensitive::equals(json_name, key.to_string())) {
+                    json_key = json_name;
+                    found = true;
+                    break;
+                }
+            }
+            
+            if (!found) {
                 throw core::HgpsException{fmt::format("Risk factor '{}' not found in JSON RiskFactorModels", key.to_string())};
             }
             
-            const auto& json_params = opt["RiskFactorModels"][key.to_string()];
+            const auto& json_params = opt["RiskFactorModels"][json_key];
             model.intercept = json_params["Intercept"].get<double>();
             model.coefficients =
                 json_params["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
         }
 
-        // Check risk factor correlation matrix column name matches risk factor name.
-        auto column_name = correlation_table.column(i).name();
-        if (!core::case_insensitive::equals(key.to_string(), column_name)) {
-            throw core::HgpsException{fmt::format("Risk factor {} name ({}) does not match risk "
-                                                  "factor correlation matrix column {} name ({})",
-                                                  i, key.to_string(), i, column_name)};
+        // MAHIMA: Validation is now implicit since we're using the same order
+        // The csv_ordered_names[i] should match key.to_string() by construction
+        if (!core::case_insensitive::equals(key.to_string(), csv_ordered_names[i].to_string())) {
+            throw core::HgpsException{fmt::format("Risk factor {} name ({}) does not match expected "
+                                                  "correlation matrix column {} name ({})",
+                                                  i, key.to_string(), i, csv_ordered_names[i].to_string())};
         }
 
         // Write risk factor data structures.
         models.emplace_back(std::move(model));
         
         // Get JSON parameters for this risk factor (needed for ranges, lambda, stddev)
-        const auto& json_params = opt["RiskFactorModels"][key.to_string()];
+        // Use case-insensitive search to find the correct JSON key
+        std::string json_key;
+        bool found = false;
+        for (const auto& [json_name, json_value] : opt["RiskFactorModels"].items()) {
+            if (core::case_insensitive::equals(json_name, key.to_string())) {
+                json_key = json_name;
+                found = true;
+                break;
+            }
+        }
+        
+        if (!found) {
+            throw core::HgpsException{fmt::format("Risk factor '{}' not found in JSON RiskFactorModels for metadata", key.to_string())};
+        }
+        
+        const auto& json_params = opt["RiskFactorModels"][json_key];
         
         // Load range from CSV if available, otherwise use JSON
         if (risk_factor_ranges_from_csv.find(key.to_string()) != risk_factor_ranges_from_csv.end()) {
@@ -454,9 +554,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         }
         lambda.emplace_back(json_params["Lambda"].get<double>());
         stddev.emplace_back(json_params["StdDev"].get<double>());
-        for (size_t j = 0; j < correlation_table.num_rows(); j++) {
-            correlation(i, j) = std::any_cast<double>(correlation_table.column(i).value(j));
-        }
+        // MAHIMA: Correlation matrix data is already loaded above using the correct order
 
         // Intervention policy model parameters.
         LinearModelParams policy_model;
@@ -478,11 +576,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             // Fall back to JSON if not found in CSV- worst case
             std::cout << "\nLoading policy coefficients using JSON NOOOOOOO!!! for: " << key.to_string();
             
-            // Find the JSON parameters for this risk factor
-            if (!opt["RiskFactorModels"].contains(key.to_string())) {
-                throw core::HgpsException{fmt::format("Risk factor '{}' not found in JSON RiskFactorModels for policy", key.to_string())};
-            }
-            
+            // Use the same json_key that was found earlier for case-insensitive lookup
             const auto &policy_json_params = json_params["Policy"];
             policy_model.intercept = policy_json_params["Intercept"].get<double>();
             policy_model.coefficients = policy_json_params["Coefficients"]
@@ -492,13 +586,13 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                     .get<std::unordered_map<core::Identifier, double>>();
         }
 
-        // Check intervention policy covariance matrix column name matches risk factor name.
-        auto policy_column_name = policy_covariance_table.column(i).name();
-        if (!core::case_insensitive::equals(key.to_string(), policy_column_name)) {
+        // MAHIMA: Validation is now implicit since we're using the same order
+        // The policy_csv_ordered_names[i] should match key.to_string() by construction
+        if (!core::case_insensitive::equals(key.to_string(), policy_csv_ordered_names[i].to_string())) {
             throw core::HgpsException{
                 fmt::format("Risk factor {} name ({}) does not match intervention "
                             "policy covariance matrix column {} name ({})",
-                            i, key.to_string(), i, policy_column_name)};
+                            i, key.to_string(), i, policy_csv_ordered_names[i].to_string())};
         }
 
         // Write intervention policy data structures.
@@ -514,10 +608,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             const auto &policy_json_params = json_params["Policy"];
             policy_ranges.emplace_back(policy_json_params["Range"].get<core::DoubleInterval>());
         }
-        for (size_t j = 0; j < policy_covariance_table.num_rows(); j++) {
-            policy_covariance(i, j) =
-                std::any_cast<double>(policy_covariance_table.column(i).value(j));
-        }
+        // MAHIMA: Policy covariance matrix is already loaded above using the correct order
+        // No need to populate it again here since we're using the same order
 
         // Time trend model parameters.
         const auto &trend_json_params = json_params["Trend"];
@@ -539,24 +631,14 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         (*trend_steps)[key] = json_params["TrendSteps"].get<int>();
     }
 
-    // Check risk factor correlation matrix column count matches risk factor count.
-    if (csv_ordered_names.size() != correlation_table.num_columns()) {
-        throw core::HgpsException{fmt::format("Risk factor count ({}) does not match risk "
-                                              "factor correlation matrix column count ({})",
-                                              csv_ordered_names.size(),
-                                              correlation_table.num_columns())};
-    }
+    // MAHIMA: Validation is now implicit since we're using the same source for both
+    // The correlation matrix size matches csv_ordered_names.size() by construction
 
     // Compute Cholesky decomposition of the risk factor correlation matrix.
     auto cholesky = Eigen::MatrixXd{Eigen::LLT<Eigen::MatrixXd>{correlation}.matrixL()};
 
-    // Check intervention policy covariance matrix column count matches risk factor count.
-    if (csv_ordered_names.size() != policy_covariance_table.num_columns()) {
-        throw core::HgpsException{fmt::format("Risk factor count ({}) does not match intervention "
-                                              "policy covariance matrix column count ({})",
-                                              csv_ordered_names.size(),
-                                              policy_covariance_table.num_columns())};
-    }
+    // MAHIMA: Validation is now implicit since we're using the same source for both
+    // The policy covariance matrix size matches csv_ordered_names.size() by construction
 
     // Compute Cholesky decomposition of the intervention policy covariance matrix.
     auto policy_cholesky =
