@@ -307,43 +307,54 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         policy_csv_ordered_names.emplace_back(policy_covariance_headers[i]);
     }
     
-    // MAHIMA: Load policy covariance matrix data directly from rapidcsv to preserve order
-    Eigen::MatrixXd policy_covariance{policy_csv_ordered_names.size(), policy_csv_ordered_names.size()};
-    
-    std::cout << "\nDEBUG: Policy covariance matrix dimensions: " << policy_csv_ordered_names.size() << "x" << policy_csv_ordered_names.size();
-    std::cout << "\nDEBUG: Expected dimensions based on risk factors: " << csv_ordered_names.size() << "x" << csv_ordered_names.size();
-    
-    // Validate that policy covariance matrix has the right dimensions
-    if (policy_csv_ordered_names.size() != csv_ordered_names.size()) {
-        throw core::HgpsException{fmt::format("Policy covariance matrix dimensions ({}, {}) do not match risk factor count ({})",
-                                              policy_csv_ordered_names.size(), 
-                                              policy_csv_ordered_names.size(),
-                                              csv_ordered_names.size())};
+    // MAHIMA: Create mapping from correlation matrix order to policy covariance matrix order
+    // This ensures we use the correlation matrix as the canonical order
+    std::vector<size_t> policy_column_mapping;
+    for (size_t i = 0; i < csv_ordered_names.size(); ++i) {
+        const auto& correlation_name = csv_ordered_names[i].to_string();
+        bool found = false;
+        for (size_t j = 0; j < policy_csv_ordered_names.size(); ++j) {
+            if (core::case_insensitive::equals(correlation_name, policy_csv_ordered_names[j].to_string())) {
+                policy_column_mapping.push_back(j);
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            throw core::HgpsException{fmt::format("Risk factor '{}' from correlation matrix not found in policy covariance matrix", correlation_name)};
+        }
     }
     
-    // Load the policy covariance matrix data using the correct order
-    for (size_t i = 0; i < policy_csv_ordered_names.size(); ++i) {
-        for (size_t j = 0; j < policy_csv_ordered_names.size(); ++j) {
+    // MAHIMA: Load policy covariance matrix data using correlation matrix order
+    Eigen::MatrixXd policy_covariance{csv_ordered_names.size(), csv_ordered_names.size()};
+    
+    std::cout << "\nDEBUG: Policy covariance matrix dimensions: " << csv_ordered_names.size() << "x" << csv_ordered_names.size();
+    std::cout << "\nDEBUG: Expected dimensions based on risk factors: " << csv_ordered_names.size() << "x" << csv_ordered_names.size();
+    
+    // Load the policy covariance matrix data using the correlation matrix order
+    for (size_t i = 0; i < csv_ordered_names.size(); ++i) {
+        for (size_t j = 0; j < csv_ordered_names.size(); ++j) {
             try {
-                // Get the value from rapidcsv using the correct row and column indices
-                // rapidcsv uses 0-based indexing for both rows and columns
-                // Column j because policy covariance matrix doesn't have a row identifier column
-                // Row i because we skip the header row (row 0), so data starts at row 0
-                policy_covariance(i, j) = policy_covariance_doc.GetCell<double>(j, i);
+                // Map correlation matrix indices to policy covariance matrix indices
+                size_t policy_row = policy_column_mapping[i];
+                size_t policy_col = policy_column_mapping[j];
+                
+                // Get the value from rapidcsv using the mapped indices
+                policy_covariance(i, j) = policy_covariance_doc.GetCell<double>(policy_col, policy_row);
             } catch (const std::exception& e) {
                 std::cout << "\nERROR: Failed to get policy covariance value at (" << i << "," << j << "): " << e.what();
-                std::cout << "\n  Trying to access column " << j << ", row " << i;
+                std::cout << "\n  Trying to access policy matrix at row " << policy_column_mapping[i] << ", col " << policy_column_mapping[j];
                 std::cout << "\n  Policy covariance CSV has " << policy_covariance_doc.GetColumnCount() << " columns, " << policy_covariance_doc.GetRowCount() << " rows";
                 throw;
             }
         }
     }
     
-    std::cout << "\n=== POLICY COVARIANCE ORDER FROM CSV ===";
-    for (size_t i = 0; i < policy_csv_ordered_names.size(); ++i) {
-        std::cout << "\n" << i << ": " << policy_csv_ordered_names[i].to_string();
+    std::cout << "\n=== POLICY COVARIANCE MAPPING (Correlation Order -> Policy Order) ===";
+    for (size_t i = 0; i < csv_ordered_names.size(); ++i) {
+        std::cout << "\n" << i << ": " << csv_ordered_names[i].to_string() << " -> " << policy_csv_ordered_names[policy_column_mapping[i]].to_string();
     }
-    std::cout << "\n========================================\n";
+    std::cout << "\n==============================================================\n";
     // std::cout << "Finished loading PolicyCovarianceFile";
 
     // Check if boxcox_coefficients.csv for the risk factors boxcox data and the
@@ -586,14 +597,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                     .get<std::unordered_map<core::Identifier, double>>();
         }
 
-        // MAHIMA: Validation is now implicit since we're using the same order
-        // The policy_csv_ordered_names[i] should match key.to_string() by construction
-        if (!core::case_insensitive::equals(key.to_string(), policy_csv_ordered_names[i].to_string())) {
-            throw core::HgpsException{
-                fmt::format("Risk factor {} name ({}) does not match intervention "
-                            "policy covariance matrix column {} name ({})",
-                            i, key.to_string(), i, policy_csv_ordered_names[i].to_string())};
-        }
+        // MAHIMA: Validation is now implicit since we're using dynamic mapping
+        // The policy covariance matrix is mapped to match the correlation matrix order
 
         // Write intervention policy data structures.
         policy_models.emplace_back(std::move(policy_model));
@@ -1394,8 +1399,9 @@ load_risk_factor_coefficients_from_csv(const std::filesystem::path &csv_path, bo
         }
 
         // Initialize a LinearModelParams object for each risk factor
+        // Convert to lowercase to match correlation matrix naming
         for (const auto &rf_name : risk_factor_names) {
-            result[rf_name] = hgps::LinearModelParams();
+            result[core::to_lower(rf_name)] = hgps::LinearModelParams();
         }
 
         // Read values for each risk factor and coefficient
@@ -1415,7 +1421,7 @@ load_risk_factor_coefficients_from_csv(const std::filesystem::path &csv_path, bo
 
             // For each risk factor column
             for (size_t col_idx = 0; col_idx < risk_factor_names.size(); col_idx++) {
-                std::string rf_name = risk_factor_names[col_idx];
+                std::string rf_name = core::to_lower(risk_factor_names[col_idx]);
 
                 // Read the value from the CSV
                 double value = doc.GetCell<double>(col_idx + 1,
@@ -1512,7 +1518,7 @@ load_policy_ranges_from_csv(const std::filesystem::path &csv_path) {
 
             if (row_name == "min" || row_name == "max") {
                 for (size_t col_idx = 0; col_idx < risk_factor_names.size(); col_idx++) {
-                    std::string rf_name = risk_factor_names[col_idx];
+                    std::string rf_name = core::to_lower(risk_factor_names[col_idx]);
                     double value = doc.GetCell<double>(col_idx + 1, row_idx);
 
                     if (row_name == "min") {
@@ -1530,15 +1536,16 @@ load_policy_ranges_from_csv(const std::filesystem::path &csv_path) {
         for (const auto &rf_name : risk_factor_names) {
             // Use the values directly without validation
             // This ensures we take exactly what's in the CSV
+            std::string rf_name_lower = core::to_lower(rf_name);
             double min_val = 0.0;
             double max_val = 0.0;
 
-            if (min_values.find(rf_name) != min_values.end()) {
-                min_val = min_values[rf_name];
+            if (min_values.find(rf_name_lower) != min_values.end()) {
+                min_val = min_values[rf_name_lower];
             }
 
-            if (max_values.find(rf_name) != max_values.end()) {
-                max_val = max_values[rf_name];
+            if (max_values.find(rf_name_lower) != max_values.end()) {
+                max_val = max_values[rf_name_lower];
             }
 
             // If min > max, swap them to prevent exceptions
@@ -1549,7 +1556,7 @@ load_policy_ranges_from_csv(const std::filesystem::path &csv_path) {
             }
 
             // Create interval with correct values
-            result[rf_name] = hgps::core::DoubleInterval(min_val, max_val);
+            result[rf_name_lower] = hgps::core::DoubleInterval(min_val, max_val);
         }
 
         std::cout << "\nSuccessfully loaded policy ranges from CSV";
@@ -1626,8 +1633,9 @@ load_logistic_regression_coefficients_from_csv(const std::filesystem::path &csv_
         }
 
         // Initialize a LinearModelParams object for each risk factor
+        // Convert to lowercase to match correlation matrix naming
         for (const auto &rf_name : risk_factor_names) {
-            result[rf_name] = hgps::LinearModelParams();
+            result[core::to_lower(rf_name)] = hgps::LinearModelParams();
         }
 
         // Read values for each risk factor and coefficient
@@ -1647,11 +1655,11 @@ load_logistic_regression_coefficients_from_csv(const std::filesystem::path &csv_
 
             // For each risk factor column
             for (size_t col_idx = 0; col_idx < risk_factor_names.size(); col_idx++) {
-                std::string rf_name = risk_factor_names[col_idx];
+                std::string rf_name = core::to_lower(risk_factor_names[col_idx]);
 
                 // Read the value from the CSV
                 auto value = doc.GetCell<double>(col_idx + 1,
-                                                 row_idx); // +1 because first column is row names
+                                                  row_idx); // +1 because first column is row names
 
                 // Set the appropriate value based on the row type
                 if (coef_name == "Intercept") {
