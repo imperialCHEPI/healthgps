@@ -111,8 +111,11 @@
                                         "description": "Factor name column (e.g., Intercept, gender2, age1, age2, ethnicity2-4, region2-4, min, max, etc.)"
                                     },
                                     "Coefficient": {
-                                        "type": "string",
-                                        "description": "Coefficient value column"
+                                        "oneOf": [
+                                            {"type": "string"},
+                                            {"type": "number"}
+                                        ],
+                                        "description": "Coefficient value column data type"
                                     }
                                 },
                                 "required": [

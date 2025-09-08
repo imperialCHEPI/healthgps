@@ -798,7 +798,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
                 std::cout << "\n      Intercept: " << params.intercept;
                 std::cout << "\n      Coefficients: " << params.coefficients.size();
-                for (const auto &[coef_name, coef_value] : params.coefficients) {
+            for (const auto &[coef_name, coef_value] : params.coefficients) {
                     std::cout << "\n        " << coef_name.to_string() << ": " << coef_value;
                 }
             } else {
