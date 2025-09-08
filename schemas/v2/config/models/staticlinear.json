@@ -65,7 +65,9 @@
                                             "type": "number"
                                         }
                                     },
-                                    "required": ["IncomeContinuousStdDev"],
+                                    "required": [
+                                        "IncomeContinuousStdDev"
+                                    ],
                                     "additionalProperties": {
                                         "type": "number"
                                     }

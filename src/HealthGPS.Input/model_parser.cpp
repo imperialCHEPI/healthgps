@@ -261,7 +261,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     } else if (config.trend_type == "income_trend") {
         trend_type = hgps::TrendType::IncomeTrend;
     }
-    
+
     // Auto-detect income trend data if present in static_model.json
     // This overrides the config.json setting if income trend data is found
     bool has_income_trend_data = false;
@@ -271,7 +271,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             break;
         }
     }
-    
+
     if (has_income_trend_data && trend_type == hgps::TrendType::Null) {
         trend_type = hgps::TrendType::IncomeTrend;
         std::cout << "\nAuto-detected income trend data, setting trend_type to IncomeTrend";
@@ -620,7 +620,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     // These can be either simple (India approach) or continuous (FINCH approach) or vice versa
     std::unordered_map<core::Identifier, PhysicalActivityModel> physical_activity_models;
     double physical_activity_stddev = 0.0; // Default value
-    
+
     if (opt.contains("PhysicalActivityModels")) {
         std::cout << "\nLoading PhysicalActivityModels...";
 
