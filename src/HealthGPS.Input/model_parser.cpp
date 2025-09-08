@@ -726,7 +726,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     std::cout << "\nDEBUG: Physical activity models loading completed successfully";
     std::cout << "\nDEBUG: About to create StaticLinearModelDefinition...";
 
-    return std::make_unique<StaticLinearModelDefinition>(
+    auto result = std::make_unique<StaticLinearModelDefinition>(
         std::move(expected), std::move(expected_trend), std::move(trend_steps),
         std::move(expected_trend_boxcox), std::move(names), std::move(models), std::move(ranges),
         std::move(lambda), std::move(stddev), std::move(cholesky), std::move(policy_models),
@@ -742,24 +742,24 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             // Parse the continuous income model from CSV file
             LinearModelParams params;
             const auto &continuous_json = opt["IncomeModels"]["continuous"];
-
+            
             if (continuous_json.contains("csv_file")) {
                 std::string csv_filename = continuous_json["csv_file"].get<std::string>();
                 std::cout << "\n  Loading continuous income model from file: " << csv_filename;
 
                 // Load CSV file directly using rapidcsv
                 std::filesystem::path csv_path = config.root_path / csv_filename;
-
+                
                 // Handle tab delimiter properly
                 std::string delimiter = continuous_json.contains("delimiter") ? continuous_json["delimiter"] : ",";
                 if (delimiter == "\\t") {
                     delimiter = "\t"; // Convert escaped tab to actual tab character
                 }
-
+                
                 // Use rapidcsv directly to load the CSV file
-                rapidcsv::Document doc(csv_path.string(), rapidcsv::LabelParams{},
+                rapidcsv::Document doc(csv_path.string(), rapidcsv::LabelParams{}, 
                                      rapidcsv::SeparatorParams(delimiter.front()));
-
+                
                 // Get column names and data
                 auto headers = doc.GetColumnNames();
                 if (headers.size() != 2) {
@@ -776,7 +776,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                             return cols;
                         }())};
                 }
-
+                
                 std::cout << "\n      CSV file loaded: " << doc.GetRowCount() << " rows, "
                           << headers.size() << " columns";
                 std::cout << "\n        Column 0: " << headers[0];
@@ -805,13 +805,14 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                 throw core::HgpsException{fmt::format(
                     "Continuous income model must specify 'csv_file'")};
             }
-
+            
             std::cout << "\nDEBUG: Continuous income model parsing completed";
             return params;
         }() : LinearModelParams{},
         income_categories, std::move(physical_activity_models));
 
     std::cout << "\nDEBUG: StaticLinearModelDefinition created successfully";
+    return result;
 }
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
