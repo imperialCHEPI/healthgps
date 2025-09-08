@@ -48,114 +48,167 @@
         },
         "IncomeModels": {
             "type": "object",
-            "propertyNames": {
-                "enum": [
-                    "simple",
-                    "continuous",
-                    "Low",
-                    "Middle",
-                    "High"
-                ]
-            },
-            "additionalProperties": {
-                "oneOf": [
-                    {
-                        "type": "object",
-                        "description": "Simple income model (India approach) - directly assigns income categories",
-                        "properties": {
-                            "Intercept": {
-                                "type": "number"
-                            },
-                            "Coefficients": {
-                                "type": "object",
-                                "additionalProperties": {
+            "properties": {
+                "continuous": {
+                    "oneOf": [
+                        {
+                            "type": "object",
+                            "description": "JSON-based continuous income model (FINCH approach) - uses direct coefficients",
+                            "properties": {
+                                "Intercept": {
                                     "type": "number"
-                                }
-                            }
-                        },
-                        "required": [
-                            "Intercept",
-                            "Coefficients"
-                        ],
-                        "additionalProperties": false
-                    },
-                    {
-                        "type": "object",
-                        "description": "Continuous income model (FINCH approach) - uses CSV file with coefficients",
-                        "properties": {
-                            "csv_file": {
-                                "type": "string",
-                                "description": "CSV file containing income model coefficients"
-                            },
-                            "format": {
-                                "type": "string",
-                                "enum": [
-                                    "csv"
-                                ],
-                                "default": "csv"
-                            },
-                            "delimiter": {
-                                "type": "string",
-                                "default": ","
-                            },
-                            "encoding": {
-                                "type": "string",
-                                "default": "ASCII"
-                            },
-                            "columns": {
-                                "type": "object",
-                                "description": "Column definitions for the income model CSV",
-                                "properties": {
-                                    "Factor": {
-                                        "type": "string",
-                                        "description": "Factor name column (e.g., Intercept, gender2, age1, age2, ethnicity2-4, region2-4, min, max, etc.)"
-                                    },
-                                    "Coefficient": {
-                                        "oneOf": [
-                                            {
-                                                "type": "string"
-                                            },
-                                            {
-                                                "type": "number"
-                                            }
-                                        ],
-                                        "description": "Coefficient value column data type"
-                                    }
                                 },
-                                "required": [
-                                    "Factor",
-                                    "Coefficient"
-                                ],
-                                "additionalProperties": false
-                            }
-                        },
-                        "required": [
-                            "csv_file"
-                        ],
-                        "additionalProperties": false
-                    },
-                    {
-                        "type": "object",
-                        "description": "Direct income category model (India approach) - individual income categories with coefficients",
-                        "properties": {
-                            "Intercept": {
-                                "type": "number"
-                            },
-                            "Coefficients": {
-                                "type": "object",
-                                "additionalProperties": {
-                                    "type": "number"
+                                "Coefficients": {
+                                    "type": "object",
+                                    "properties": {
+                                        "IncomeContinuousStdDev": {
+                                            "type": "number"
+                                        }
+                                    },
+                                    "required": ["IncomeContinuousStdDev"],
+                                    "additionalProperties": {
+                                        "type": "number"
+                                    }
                                 }
-                            }
+                            },
+                            "required": [
+                                "Intercept",
+                                "Coefficients"
+                            ],
+                            "additionalProperties": false
                         },
-                        "required": [
-                            "Intercept",
-                            "Coefficients"
-                        ],
-                        "additionalProperties": false
-                    }
-                ]
-            }
+                        {
+                            "type": "object",
+                            "description": "CSV-based continuous income model (FINCH approach) - uses CSV file with coefficients",
+                            "properties": {
+                                "csv_file": {
+                                    "type": "string",
+                                    "description": "CSV file containing income model coefficients"
+                                },
+                                "format": {
+                                    "type": "string",
+                                    "enum": [
+                                        "csv"
+                                    ],
+                                    "default": "csv"
+                                },
+                                "delimiter": {
+                                    "type": "string",
+                                    "default": ","
+                                },
+                                "encoding": {
+                                    "type": "string",
+                                    "default": "ASCII"
+                                },
+                                "columns": {
+                                    "type": "object",
+                                    "description": "Column definitions for the income model CSV",
+                                    "properties": {
+                                        "Factor": {
+                                            "type": "string",
+                                            "description": "Factor name column (e.g., Intercept, age, gender, region names, ethnicity names, etc.)"
+                                        },
+                                        "Coefficient": {
+                                            "type": "string",
+                                            "description": "Coefficient value column"
+                                        }
+                                    },
+                                    "required": [
+                                        "Factor",
+                                        "Coefficient"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            },
+                            "required": [
+                                "csv_file"
+                            ],
+                            "additionalProperties": false
+                        }
+                    ]
+                },
+                "simple": {
+                    "type": "object",
+                    "description": "Simple income model (India approach) - directly assigns income categories",
+                    "properties": {
+                        "Intercept": {
+                            "type": "number"
+                        },
+                        "Coefficients": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "number"
+                            }
+                        }
+                    },
+                    "required": [
+                        "Intercept",
+                        "Coefficients"
+                    ],
+                    "additionalProperties": false
+                },
+                "Low": {
+                    "type": "object",
+                    "description": "Low income category model (India approach) - individual income categories with coefficients",
+                    "properties": {
+                        "Intercept": {
+                            "type": "number"
+                        },
+                        "Coefficients": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "number"
+                            }
+                        }
+                    },
+                    "required": [
+                        "Intercept",
+                        "Coefficients"
+                    ],
+                    "additionalProperties": false
+                },
+                "Middle": {
+                    "type": "object",
+                    "description": "Middle income category model (India approach) - individual income categories with coefficients",
+                    "properties": {
+                        "Intercept": {
+                            "type": "number"
+                        },
+                        "Coefficients": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "number"
+                            }
+                        }
+                    },
+                    "required": [
+                        "Intercept",
+                        "Coefficients"
+                    ],
+                    "additionalProperties": false
+                },
+                "High": {
+                    "type": "object",
+                    "description": "High income category model (India approach) - individual income categories with coefficients",
+                    "properties": {
+                        "Intercept": {
+                            "type": "number"
+                        },
+                        "Coefficients": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "number"
+                            }
+                        }
+                    },
+                    "required": [
+                        "Intercept",
+                        "Coefficients"
+                    ],
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false
         },
         "PhysicalActivityModels": {
             "type": "object",
@@ -341,6 +394,38 @@
                     "IncomeDecayFactor": {
                         "type": "number",
                         "description": "Exponential decay factor 'b' for income trend calculation"
+                    },
+                    "IncomeTrend": {
+                        "type": "object",
+                        "properties": {
+                            "Intercept": {
+                                "type": "number"
+                            },
+                            "Range": {
+                                "type": "array",
+                                "items": {
+                                    "type": "number"
+                                },
+                                "minItems": 2,
+                                "maxItems": 2
+                            },
+                            "Lambda": {
+                                "type": "number"
+                            },
+                            "Coefficients": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "type": "number"
+                                }
+                            },
+                            "LogCoefficients": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "type": "number"
+                                }
+                            }
+                        },
+                        "additionalProperties": true
                     }
                 },
                 "additionalProperties": true
