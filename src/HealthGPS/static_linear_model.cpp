@@ -752,21 +752,41 @@ double StaticLinearModel::calculate_continuous_income(Person &person, Random &ra
             continue;
         }
 
-        if (factor_name == "Gender") {
+        if (factor_name == "gender2") {
             // Male = 1, Female = 0
             income += coefficient * (person.gender == core::Gender::male ? 1.0 : 0.0);
-        } else if (factor_name == "Age") {
+        } else if (factor_name == "age1") {
             income += coefficient * person.age;
-        } else if (factor_name == "Age2") {
+        } else if (factor_name == "age2") {
             income += coefficient * (person.age * person.age);
-        } else if (factor_name == "Age3") {
+        } else if (factor_name == "age3") {
             income += coefficient * (person.age * person.age * person.age);
-        } else if (factor_name == person.region) {
+        } else if (factor_name == "region2") {
             // Region effect - only apply if the region matches
-            income += coefficient;
-        } else if (factor_name == person.ethnicity) {
+            if (person.region == "region2") {
+                income += coefficient;
+            }
+        } else if (factor_name == "region3") {
+            if (person.region == "region3") {
+                income += coefficient;
+            }
+        } else if (factor_name == "region4") {
+            if (person.region == "region4") {
+                income += coefficient;
+            }
+        } else if (factor_name == "ethnicity2") {
             // Ethnicity effect - only apply if the ethnicity matches
-            income += coefficient;
+            if (person.ethnicity == "ethnicity2") {
+                income += coefficient;
+            }
+        } else if (factor_name == "ethnicity3") {
+            if (person.ethnicity == "ethnicity3") {
+                income += coefficient;
+            }
+        } else if (factor_name == "ethnicity4") {
+            if (person.ethnicity == "ethnicity4") {
+                income += coefficient;
+            }
         } else if (factor_name == "min" || factor_name == "max") {
             // Skip min/max bounds - they're handled separately
             continue;
@@ -777,8 +797,8 @@ double StaticLinearModel::calculate_continuous_income(Person &person, Random &ra
             } catch (...) {
                 // Factor not found, skip it
                 std::cout << "Warning: Factor " << factor_name
-                          << " not found for continuous income calculation, stopping.\n";
-                break;
+                          << " not found for continuous income calculation, skipping.\n";
+                continue;
             }
         }
     }

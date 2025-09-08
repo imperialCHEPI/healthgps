@@ -11,6 +11,7 @@
 #include <Eigen/Dense>
 #include <fmt/color.h>
 #include <fmt/core.h>
+#include <rapidcsv.h>
 
 #include <algorithm>
 #include <filesystem>
@@ -250,6 +251,8 @@ load_hlm_risk_model_definition(const nlohmann::json &opt) {
 std::unique_ptr<hgps::StaticLinearModelDefinition>
 load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configuration &config) {
     MEASURE_FUNCTION();
+    
+    std::cout << "\nDEBUG: Starting load_staticlinear_risk_model_definition";
 
     // Parse trend_type from config.json- Reda which trend type to use.
     hgps::TrendType trend_type = hgps::TrendType::Null;
@@ -555,11 +558,10 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         // For continuous models, we don't need to process IncomeModels here
         // The continuous income calculation will be handled separately
         // We just need to ensure the continuous model exists
-        if (!opt["IncomeModels"]["continuous"].contains("Intercept") ||
-            !opt["IncomeModels"]["continuous"].contains("Coefficients")) {
+        if (!opt["IncomeModels"]["continuous"].contains("Intercept") &&
+            !opt["IncomeModels"]["continuous"].contains("csv_file")) {
             throw core::HgpsException(
-                "Continuous income model missing required fields: Intercept or "
-                "Coefficients");
+                "Continuous income model missing required fields: Intercept/Coefficients or csv_file");
         }
 
         // Create placeholder income models for the categories (these will be filled by the
@@ -580,6 +582,11 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             << "Detected India categorical income model - directly assigning income categories\n";
 
         for (const auto &[key, json_params] : opt["IncomeModels"].items()) {
+            // Skip if this is a simple/continuous model (already handled above)
+            if (key == "simple" || key == "continuous") {
+                continue;
+            }
+
             // Get income category using the helper function
             core::Income category = map_income_category(key, income_categories);
 
@@ -629,95 +636,50 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                     std::cout << "\n  Loading model '" << model_name
                               << "' from file: " << csv_filename;
 
-                    // Construct full path to CSV file (same directory as JSON config)
+                    // For physical activity models, load CSV directly without column mapping
+                    // This avoids the column mapping requirement of the CSV parser
                     std::filesystem::path csv_path = config.root_path / csv_filename;
-
-                    // Load CSV data - create proper file info structure
-                    nlohmann::json file_info_json;
-                    file_info_json["name"] = csv_filename;
-                    file_info_json["format"] =
-                        model_config.contains("format") ? model_config["format"] : "csv";
+                    
                     // Handle tab delimiter properly
                     std::string delimiter =
                         model_config.contains("delimiter") ? model_config["delimiter"] : ",";
                     if (delimiter == "\\t") {
                         delimiter = "\t"; // Convert escaped tab to actual tab character
                     }
-                    file_info_json["delimiter"] = delimiter;
-                    file_info_json["encoding"] =
-                        model_config.contains("encoding") ? model_config["encoding"] : "ASCII";
-                    file_info_json["columns"] = model_config.contains("columns")
-                                                    ? model_config["columns"]
-                                                    : nlohmann::json::object();
-
-                    const auto csv_file_info =
-                        input::get_file_info(file_info_json, config.root_path);
-                    const auto csv_table = load_datatable_from_csv(csv_file_info);
-
-                    // Debug: Print CSV table info
-                    std::cout << "\n      CSV table loaded: " << csv_table.num_rows() << " rows, "
-                              << csv_table.num_columns() << " columns";
-                    for (size_t i = 0; i < csv_table.num_columns(); i++) {
-                        std::cout << "\n        Column " << i << ": " << csv_table.column(i).name();
-                    }
-                    if (csv_table.num_rows() > 0) {
-                        std::cout << "\n        First row data:";
-                        for (size_t i = 0; i < csv_table.num_columns(); i++) {
-                            auto value = csv_table.column(i).value(0);
-                            std::cout << "\n          Column " << i
-                                      << " type: " << value.type().name();
-                        }
-                    }
-
-                    // Parse CSV into PhysicalActivityModel (using existing model variable)
-
-                    // For the existing CSV format, we expect 2 columns: factor names and values
-                    if (csv_table.num_columns() != 2) {
+                    
+                    // Use rapidcsv directly to load the CSV file
+                    rapidcsv::Document doc(csv_path.string(), rapidcsv::LabelParams{}, 
+                                         rapidcsv::SeparatorParams(delimiter.front()));
+                    
+                    // Get column names and data
+                    auto headers = doc.GetColumnNames();
+                    if (headers.size() != 2) {
                         throw core::HgpsException{fmt::format(
                             "Physical activity CSV file {} must have exactly 2 columns. "
                             "Found {} columns: {}",
-                            csv_filename, csv_table.num_columns(), [&csv_table]() {
+                            csv_filename, headers.size(), [&headers]() {
                                 std::string cols;
-                                for (size_t i = 0; i < csv_table.num_columns(); i++) {
+                                for (size_t i = 0; i < headers.size(); i++) {
                                     if (i > 0)
                                         cols += ", ";
-                                    cols += csv_table.column(i).name();
+                                    cols += headers[i];
                                 }
                                 return cols;
                             }())};
                     }
+                    
+                    std::cout << "\n      CSV file loaded: " << doc.GetRowCount() << " rows, "
+                              << headers.size() << " columns";
+                    std::cout << "\n        Column 0: " << headers[0];
+                    std::cout << "\n        Column 1: " << headers[1];
 
-                    // First column contains factor names, second column contains values
-                    int factor_col = 0;
-                    int coefficient_col = 1;
+                    // Parse CSV into PhysicalActivityModel (using existing model variable)
 
                     // Parse each row (skip header row)
-                    for (size_t row_idx = 1; row_idx < csv_table.num_rows(); row_idx++) {
-                        // Get factor name and coefficient value - handle any type
-                        auto factor_value = csv_table.column(factor_col).value(row_idx);
-                        auto coeff_value = csv_table.column(coefficient_col).value(row_idx);
-
-                        std::string factor_name;
-                        double coefficient_value;
-
-                        // Convert factor name to string
-                        if (factor_value.type() == typeid(std::string)) {
-                            factor_name = std::any_cast<std::string>(factor_value);
-                        } else {
-                            throw core::HgpsException("Factor name must be a string");
-                        }
-
-                        // Convert coefficient to double
-                        if (coeff_value.type() == typeid(std::string)) {
-                            coefficient_value = std::stod(std::any_cast<std::string>(coeff_value));
-                        } else if (coeff_value.type() == typeid(double)) {
-                            coefficient_value = std::any_cast<double>(coeff_value);
-                        } else if (coeff_value.type() == typeid(int)) {
-                            coefficient_value =
-                                static_cast<double>(std::any_cast<int>(coeff_value));
-                        } else {
-                            throw core::HgpsException("Cannot convert coefficient to double");
-                        }
+                    for (size_t row_idx = 0; row_idx < doc.GetRowCount(); row_idx++) {
+                        // Get factor name and coefficient value directly from rapidcsv
+                        std::string factor_name = doc.GetCell<std::string>(0, row_idx);
+                        double coefficient_value = doc.GetCell<double>(1, row_idx);
 
                         if (factor_name == "Intercept") {
                             model.intercept = coefficient_value;
@@ -749,6 +711,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             }
 
             physical_activity_models[core::Identifier(model_name)] = std::move(model);
+            std::cout << "\n  DEBUG: Physical activity model '" << model_name << "' stored successfully";
         }
 
         if (!physical_activity_models.empty()) {
@@ -758,6 +721,9 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     } else {
         std::cout << "\nNo PhysicalActivityModels found, using PhysicalActivityStdDev approach";
     }
+    
+    std::cout << "\nDEBUG: Physical activity models loading completed successfully";
+    std::cout << "\nDEBUG: About to create StaticLinearModelDefinition...";
 
     return std::make_unique<StaticLinearModelDefinition>(
         std::move(expected), std::move(expected_trend), std::move(trend_steps),
@@ -770,24 +736,81 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         std::move(income_trend_steps), std::move(income_trend_models),
         std::move(income_trend_ranges), std::move(income_trend_lambda),
         std::move(income_trend_decay_factors), is_continuous_model,
-        is_continuous_model ? [&opt]() {
-            // Parse the continuous income model from JSON
+        is_continuous_model ? [&opt, &config]() {
+            std::cout << "\nDEBUG: Parsing continuous income model...";
+            // Parse the continuous income model from CSV file
             LinearModelParams params;
             const auto &continuous_json = opt["IncomeModels"]["continuous"];
-            params.intercept = continuous_json["Intercept"].get<double>();
-            params.coefficients = continuous_json["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
+            
+            if (continuous_json.contains("csv_file")) {
+                std::string csv_filename = continuous_json["csv_file"].get<std::string>();
+                std::cout << "\n  Loading continuous income model from file: " << csv_filename;
 
-            // Print debug info about the continuous income model
-            std::cout << "Continuous income model loaded:" << '\n';
-            std::cout << "  Intercept: " << params.intercept << '\n';
-            std::cout << "  Coefficients count: " << params.coefficients.size() << '\n';
-            for (const auto &[coef_name, coef_value] : params.coefficients) {
-                std::cout << "    " << coef_name.to_string() << ": " << coef_value << '\n';
+                // Load CSV file directly using rapidcsv
+                std::filesystem::path csv_path = config.root_path / csv_filename;
+                
+                // Handle tab delimiter properly
+                std::string delimiter = continuous_json.contains("delimiter") ? continuous_json["delimiter"] : ",";
+                if (delimiter == "\\t") {
+                    delimiter = "\t"; // Convert escaped tab to actual tab character
+                }
+                
+                // Use rapidcsv directly to load the CSV file
+                rapidcsv::Document doc(csv_path.string(), rapidcsv::LabelParams{}, 
+                                     rapidcsv::SeparatorParams(delimiter.front()));
+                
+                // Get column names and data
+                auto headers = doc.GetColumnNames();
+                if (headers.size() != 2) {
+                    throw core::HgpsException{fmt::format(
+                        "Continuous income CSV file {} must have exactly 2 columns. "
+                        "Found {} columns: {}",
+                        csv_filename, headers.size(), [&headers]() {
+                            std::string cols;
+                            for (size_t i = 0; i < headers.size(); i++) {
+                                if (i > 0)
+                                    cols += ", ";
+                                cols += headers[i];
+                            }
+                            return cols;
+                        }())};
+                }
+                
+                std::cout << "\n      CSV file loaded: " << doc.GetRowCount() << " rows, "
+                          << headers.size() << " columns";
+                std::cout << "\n        Column 0: " << headers[0];
+                std::cout << "\n        Column 1: " << headers[1];
+
+                // Parse CSV into LinearModelParams
+                for (size_t row_idx = 0; row_idx < doc.GetRowCount(); row_idx++) {
+                    // Get factor name and coefficient value directly from rapidcsv
+                    std::string factor_name = doc.GetCell<std::string>(0, row_idx);
+                    double coefficient_value = doc.GetCell<double>(1, row_idx);
+
+                    if (factor_name == "Intercept") {
+                        params.intercept = coefficient_value;
+                    } else {
+                        // All other rows are coefficients
+                        params.coefficients[core::Identifier(factor_name)] = coefficient_value;
+                    }
+                }
+
+                std::cout << "\n      Intercept: " << params.intercept;
+                std::cout << "\n      Coefficients: " << params.coefficients.size();
+                for (const auto &[coef_name, coef_value] : params.coefficients) {
+                    std::cout << "\n        " << coef_name.to_string() << ": " << coef_value;
+                }
+            } else {
+                throw core::HgpsException{fmt::format(
+                    "Continuous income model must specify 'csv_file'")};
             }
-
+            
+            std::cout << "\nDEBUG: Continuous income model parsing completed";
             return params;
         }() : LinearModelParams{},
         income_categories, std::move(physical_activity_models));
+    
+    std::cout << "\nDEBUG: StaticLinearModelDefinition created successfully";
 }
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
