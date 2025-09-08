@@ -112,8 +112,12 @@
                                     },
                                     "Coefficient": {
                                         "oneOf": [
-                                            {"type": "string"},
-                                            {"type": "number"}
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "number"
+                                            }
                                         ],
                                         "description": "Coefficient value column data type"
                                     }
