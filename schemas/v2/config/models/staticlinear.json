@@ -50,84 +50,52 @@
             "type": "object",
             "properties": {
                 "continuous": {
-                    "oneOf": [
-                        {
-                            "type": "object",
-                            "description": "JSON-based continuous income model (FINCH approach) - uses direct coefficients",
-                            "properties": {
-                                "Intercept": {
-                                    "type": "number"
-                                },
-                                "Coefficients": {
-                                    "type": "object",
-                                    "properties": {
-                                        "IncomeContinuousStdDev": {
-                                            "type": "number"
-                                        }
-                                    },
-                                    "required": [
-                                        "IncomeContinuousStdDev"
-                                    ],
-                                    "additionalProperties": {
-                                        "type": "number"
-                                    }
-                                }
-                            },
-                            "required": [
-                                "Intercept",
-                                "Coefficients"
-                            ],
-                            "additionalProperties": false
+                    "type": "object",
+                    "description": "CSV-based continuous income model (FINCH approach) - uses CSV file with coefficients",
+                    "properties": {
+                        "csv_file": {
+                            "type": "string",
+                            "description": "CSV file containing income model coefficients"
                         },
-                        {
+                        "format": {
+                            "type": "string",
+                            "enum": [
+                                "csv"
+                            ],
+                            "default": "csv"
+                        },
+                        "delimiter": {
+                            "type": "string",
+                            "default": ","
+                        },
+                        "encoding": {
+                            "type": "string",
+                            "default": "ASCII"
+                        },
+                        "columns": {
                             "type": "object",
-                            "description": "CSV-based continuous income model (FINCH approach) - uses CSV file with coefficients",
+                            "description": "Column definitions for the income model CSV",
                             "properties": {
-                                "csv_file": {
+                                "Factor": {
                                     "type": "string",
-                                    "description": "CSV file containing income model coefficients"
+                                    "description": "Factor name column (e.g., Intercept, age, gender, region names, ethnicity names, etc.)"
                                 },
-                                "format": {
+                                "Coefficient": {
                                     "type": "string",
-                                    "enum": [
-                                        "csv"
-                                    ],
-                                    "default": "csv"
-                                },
-                                "delimiter": {
-                                    "type": "string",
-                                    "default": ","
-                                },
-                                "encoding": {
-                                    "type": "string",
-                                    "default": "ASCII"
-                                },
-                                "columns": {
-                                    "type": "object",
-                                    "description": "Column definitions for the income model CSV",
-                                    "properties": {
-                                        "Factor": {
-                                            "type": "string",
-                                            "description": "Factor name column (e.g., Intercept, age, gender, region names, ethnicity names, etc.)"
-                                        },
-                                        "Coefficient": {
-                                            "type": "string",
-                                            "description": "Coefficient value column"
-                                        }
-                                    },
-                                    "required": [
-                                        "Factor",
-                                        "Coefficient"
-                                    ],
-                                    "additionalProperties": false
+                                    "description": "Coefficient value column"
                                 }
                             },
                             "required": [
-                                "csv_file"
+                                "Factor",
+                                "Coefficient"
                             ],
                             "additionalProperties": false
                         }
-                    ]
+                    },
+                    "required": [
+                        "csv_file"
+                    ],
+                    "additionalProperties": false
                 },
                 "simple": {
                     "type": "object",
