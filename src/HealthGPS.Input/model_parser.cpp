@@ -685,8 +685,9 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                         // Get factor name and coefficient value directly from rapidcsv
                         std::string factor_name = doc.GetCell<std::string>(0, row_idx);
                         double coefficient_value = doc.GetCell<double>(1, row_idx);
-                        
-                        std::cout << "\n        Row " << row_idx << ": " << factor_name << " = " << coefficient_value;
+
+                        std::cout << "\n        Row " << row_idx << ": " << factor_name << " = "
+                                  << coefficient_value;
 
                         if (factor_name == "Intercept") {
                             model.intercept = coefficient_value;
@@ -705,7 +706,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                     std::cout << "\n      Parsed values:";
                     std::cout << "\n        Intercept: " << model.intercept;
                     std::cout << "\n        Coefficients: " << model.coefficients.size();
-                    std::cout << "\n        Min: " << model.min_value << ", Max: " << model.max_value;
+                    std::cout << "\n        Min: " << model.min_value
+                              << ", Max: " << model.max_value;
                     std::cout << "\n        Standard deviation: " << model.stddev;
                 } else {
                     throw core::HgpsException{fmt::format(
@@ -789,7 +791,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                     // Get factor name and coefficient value directly from rapidcsv
                     std::string factor_name = doc.GetCell<std::string>(0, row_idx);
                     double coefficient_value = doc.GetCell<double>(1, row_idx);
-                    
+
                     std::cout << "\n        Row " << row_idx << ": " << factor_name << " = " << coefficient_value;
 
                     if (factor_name == "Intercept") {
