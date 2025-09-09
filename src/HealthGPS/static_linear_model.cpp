@@ -39,14 +39,14 @@ StaticLinearModel::StaticLinearModel(
     bool is_continuous_income_model, const LinearModelParams &continuous_income_model,
     const std::string &income_categories,
     const std::unordered_map<core::Identifier, PhysicalActivityModel> &physical_activity_models)
-    : RiskFactorAdjustableModel{std::move(expected),       std::move(expected_trend),
-                                std::move(trend_steps),    trend_type,
+    : RiskFactorAdjustableModel{std::move(expected),       expected_trend,
+                                trend_steps,    trend_type,
                                 expected_income_trend,       // Pass by value, not moved
                                 income_trend_decay_factors}, // Pass by value, not moved
       // Continuous income model support (FINCH approach) - must come first
       is_continuous_income_model_{is_continuous_income_model},
       continuous_income_model_{continuous_income_model}, income_categories_{income_categories},
-      // Regular trend member variables
+      // Regular trend member variables - these are shared_ptr, so we can move them
       expected_trend_{std::move(expected_trend)},
       expected_trend_boxcox_{std::move(expected_trend_boxcox)},
       trend_models_{std::move(trend_models)}, trend_ranges_{std::move(trend_ranges)},
@@ -1031,6 +1031,12 @@ void StaticLinearModel::initialise_simple_physical_activity(
     person.risk_factors["PhysicalActivity"_id] = factor;
 }
 
+// Helper function to create shared_ptr from unique_ptr before moving
+template<typename T>
+std::shared_ptr<T> create_shared_from_unique(std::unique_ptr<T>& ptr) {
+    return ptr ? std::make_shared<T>(*ptr) : nullptr;
+}
+
 StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::unique_ptr<RiskFactorSexAgeTable> expected,
     std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
@@ -1056,16 +1062,14 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     bool is_continuous_income_model, const LinearModelParams &continuous_income_model,
     const std::string &income_categories,
     std::unordered_map<core::Identifier, PhysicalActivityModel> physical_activity_models)
+    // FIXED: Create copies of data before moving unique_ptrs to avoid use-after-move warnings
     : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend),
                                           std::move(trend_steps), trend_type},
-      // Regular trend member variables - convert unique_ptr to shared_ptr
-      expected_trend_{std::make_shared<std::unordered_map<core::Identifier, double>>(
-          std::move(*expected_trend))},
-      expected_trend_boxcox_{std::make_shared<std::unordered_map<core::Identifier, double>>(
-          std::move(*expected_trend_boxcox))},
-      trend_models_{std::make_shared<std::vector<LinearModelParams>>(std::move(*trend_models))},
-      trend_ranges_{std::make_shared<std::vector<core::DoubleInterval>>(std::move(*trend_ranges))},
-      trend_lambda_{std::make_shared<std::vector<double>>(std::move(*trend_lambda))},
+      expected_trend_{create_shared_from_unique(expected_trend)},
+      expected_trend_boxcox_{create_shared_from_unique(expected_trend_boxcox)},
+      trend_models_{create_shared_from_unique(trend_models)},
+      trend_ranges_{create_shared_from_unique(trend_ranges)},
+      trend_lambda_{create_shared_from_unique(trend_lambda)},
       // Income trend member variables
       trend_type_{trend_type},
       expected_income_trend_{expected_income_trend
@@ -1108,6 +1112,7 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
       // Continuous income model support (FINCH approach)
       is_continuous_income_model_{is_continuous_income_model},
       continuous_income_model_{continuous_income_model}, income_categories_{income_categories} {
+
 
     if (names_.empty()) {
         throw core::HgpsException("Risk factor names list is empty");
