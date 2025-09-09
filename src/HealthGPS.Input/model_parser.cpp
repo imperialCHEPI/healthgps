@@ -661,39 +661,32 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                         delimiter = "\t"; // Convert escaped tab to actual tab character
                     }
 
-                    // Use rapidcsv directly to load the CSV file
-                    rapidcsv::Document doc(csv_path.string(), rapidcsv::LabelParams{},
+                    // Use rapidcsv directly to load the CSV file (no headers)
+                    rapidcsv::Document doc(csv_path.string(), rapidcsv::LabelParams(-1, -1),
                                            rapidcsv::SeparatorParams(delimiter.front()));
 
-                    // Get column names and data
-                    auto headers = doc.GetColumnNames();
-                    if (headers.size() != 2) {
+                    // Check that we have exactly 2 columns
+                    if (doc.GetColumnCount() != 2) {
                         throw core::HgpsException{fmt::format(
                             "Physical activity CSV file {} must have exactly 2 columns. "
-                            "Found {} columns: {}",
-                            csv_filename, headers.size(), [&headers]() {
-                                std::string cols;
-                                for (size_t i = 0; i < headers.size(); i++) {
-                                    if (i > 0)
-                                        cols += ", ";
-                                    cols += headers[i];
-                                }
-                                return cols;
-                            }())};
+                            "Found {} columns",
+                            csv_filename, doc.GetColumnCount())};
                     }
 
                     std::cout << "\n      CSV file loaded: " << doc.GetRowCount() << " rows, "
-                              << headers.size() << " columns";
-                    std::cout << "\n        Column 0: " << headers[0];
-                    std::cout << "\n        Column 1: " << headers[1];
+                              << doc.GetColumnCount() << " columns";
+                    std::cout << "\n        Column 0: Factor names";
+                    std::cout << "\n        Column 1: Coefficient values";
 
                     // Parse CSV into PhysicalActivityModel (using existing model variable)
-
-                    // Parse each row (skip header row)
+                    // Parse each row (all rows are data, no headers)
+                    std::cout << "\n      Parsing CSV data:";
                     for (size_t row_idx = 0; row_idx < doc.GetRowCount(); row_idx++) {
                         // Get factor name and coefficient value directly from rapidcsv
                         std::string factor_name = doc.GetCell<std::string>(0, row_idx);
                         double coefficient_value = doc.GetCell<double>(1, row_idx);
+                        
+                        std::cout << "\n        Row " << row_idx << ": " << factor_name << " = " << coefficient_value;
 
                         if (factor_name == "Intercept") {
                             model.intercept = coefficient_value;
@@ -709,10 +702,11 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                         }
                     }
 
-                    std::cout << "\n      Intercept: " << model.intercept;
-                    std::cout << "\n      Coefficients: " << model.coefficients.size();
-                    std::cout << "\n      Min: " << model.min_value << ", Max: " << model.max_value;
-                    std::cout << "\n      Standard deviation: " << model.stddev;
+                    std::cout << "\n      Parsed values:";
+                    std::cout << "\n        Intercept: " << model.intercept;
+                    std::cout << "\n        Coefficients: " << model.coefficients.size();
+                    std::cout << "\n        Min: " << model.min_value << ", Max: " << model.max_value;
+                    std::cout << "\n        Standard deviation: " << model.stddev;
                 } else {
                     throw core::HgpsException{fmt::format(
                         "Continuous physical activity model '{}' must specify 'csv_file'",
@@ -771,37 +765,32 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                     delimiter = "\t"; // Convert escaped tab to actual tab character
                 }
 
-                // Use rapidcsv directly to load the CSV file
-                rapidcsv::Document doc(csv_path.string(), rapidcsv::LabelParams{},
+                // Use rapidcsv directly to load the CSV file (no headers)
+                rapidcsv::Document doc(csv_path.string(), rapidcsv::LabelParams(-1, -1),
                                      rapidcsv::SeparatorParams(delimiter.front()));
 
-                // Get column names and data
-                auto headers = doc.GetColumnNames();
-                if (headers.size() != 2) {
+                // Check that we have exactly 2 columns
+                if (doc.GetColumnCount() != 2) {
                     throw core::HgpsException{fmt::format(
                         "Continuous income CSV file {} must have exactly 2 columns. "
-                        "Found {} columns: {}",
-                        csv_filename, headers.size(), [&headers]() {
-                            std::string cols;
-                            for (size_t i = 0; i < headers.size(); i++) {
-                                if (i > 0)
-                                    cols += ", ";
-                                cols += headers[i];
-                            }
-                            return cols;
-                        }())};
+                        "Found {} columns",
+                        csv_filename, doc.GetColumnCount())};
                 }
 
                 std::cout << "\n      CSV file loaded: " << doc.GetRowCount() << " rows, "
-                          << headers.size() << " columns";
-                std::cout << "\n        Column 0: " << headers[0];
-                std::cout << "\n        Column 1: " << headers[1];
+                          << doc.GetColumnCount() << " columns";
+                std::cout << "\n        Column 0: Factor names";
+                std::cout << "\n        Column 1: Coefficient values";
 
                 // Parse CSV into LinearModelParams
+                // Parse each row (all rows are data, no headers)
+                std::cout << "\n      Parsing CSV data:";
                 for (size_t row_idx = 0; row_idx < doc.GetRowCount(); row_idx++) {
                     // Get factor name and coefficient value directly from rapidcsv
                     std::string factor_name = doc.GetCell<std::string>(0, row_idx);
                     double coefficient_value = doc.GetCell<double>(1, row_idx);
+                    
+                    std::cout << "\n        Row " << row_idx << ": " << factor_name << " = " << coefficient_value;
 
                     if (factor_name == "Intercept") {
                         params.intercept = coefficient_value;
@@ -811,10 +800,11 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                     }
                 }
 
-                std::cout << "\n      Intercept: " << params.intercept;
-                std::cout << "\n      Coefficients: " << params.coefficients.size();
-            for (const auto &[coef_name, coef_value] : params.coefficients) {
-                    std::cout << "\n        " << coef_name.to_string() << ": " << coef_value;
+                std::cout << "\n      Parsed values:";
+                std::cout << "\n        Intercept: " << params.intercept;
+                std::cout << "\n        Coefficients: " << params.coefficients.size();
+                for (const auto &[coef_name, coef_value] : params.coefficients) {
+                    std::cout << "\n          " << coef_name.to_string() << ": " << coef_value;
                 }
             } else {
                 throw core::HgpsException{fmt::format(
