@@ -735,17 +735,19 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     }
 
     std::cout << "\nDEBUG: Physical activity models loading completed successfully";
-    
+
     // Load region and ethnicity data if present
     std::cout << "\nDEBUG: Loading region and ethnicity data...";
     if (opt.contains("RegionFile")) {
         std::string region_filename = opt["RegionFile"]["name"].get<std::string>();
         std::cout << "\n  Loading region file: " << region_filename;
-        
+
         // Load region data using the existing CSV parser
-        auto region_table = load_datatable_from_csv(input::get_file_info(opt["RegionFile"], config.root_path));
-        std::cout << "\n    Region data loaded: " << region_table.num_rows() << " rows, " << region_table.num_columns() << " columns";
-        
+        auto region_table =
+            load_datatable_from_csv(input::get_file_info(opt["RegionFile"], config.root_path));
+        std::cout << "\n    Region data loaded: " << region_table.num_rows() << " rows, "
+                  << region_table.num_columns() << " columns";
+
         // Print column names for debugging
         for (size_t i = 0; i < region_table.num_columns(); i++) {
             std::cout << "\n      Column " << i << ": " << region_table.column(i).name();
@@ -754,28 +756,33 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     if (opt.contains("EthnicityFile")) {
         std::string ethnicity_filename = opt["EthnicityFile"]["name"].get<std::string>();
         std::cout << "\n  Loading ethnicity file: " << ethnicity_filename;
-        
+
         // Load ethnicity data using the existing CSV parser
-        auto ethnicity_table = load_datatable_from_csv(input::get_file_info(opt["EthnicityFile"], config.root_path));
-        std::cout << "\n    Ethnicity data loaded: " << ethnicity_table.num_rows() << " rows, " << ethnicity_table.num_columns() << " columns";
-        
+        auto ethnicity_table =
+            load_datatable_from_csv(input::get_file_info(opt["EthnicityFile"], config.root_path));
+        std::cout << "\n    Ethnicity data loaded: " << ethnicity_table.num_rows() << " rows, "
+                  << ethnicity_table.num_columns() << " columns";
+
         // Print column names for debugging
         for (size_t i = 0; i < ethnicity_table.num_columns(); i++) {
             std::cout << "\n      Column " << i << ": " << ethnicity_table.column(i).name();
         }
     }
-    
+
     std::cout << "\nDEBUG: About to create StaticLinearModelDefinition...";
     std::cout << "\nDEBUG: trend_type = " << static_cast<int>(trend_type);
-    std::cout << "\nDEBUG: expected_income_trend = " << (expected_income_trend ? "not null" : "null");
+    std::cout << "\nDEBUG: expected_income_trend = "
+              << (expected_income_trend ? "not null" : "null");
     std::cout << "\nDEBUG: income_trend_models = " << (income_trend_models ? "not null" : "null");
     std::cout << "\nDEBUG: names.size() = " << names.size();
     std::cout << "\nDEBUG: models.size() = " << models.size();
     std::cout << "\nDEBUG: expected = " << (expected ? "not null" : "null");
     std::cout << "\nDEBUG: expected_trend = " << (expected_trend ? "not null" : "null");
     std::cout << "\nDEBUG: trend_models = " << (trend_models ? "not null" : "null");
-    std::cout << "\nDEBUG: cholesky.rows() = " << cholesky.rows() << ", cholesky.cols() = " << cholesky.cols();
-    std::cout << "\nDEBUG: policy_cholesky.rows() = " << policy_cholesky.rows() << ", policy_cholesky.cols() = " << policy_cholesky.cols();
+    std::cout << "\nDEBUG: cholesky.rows() = " << cholesky.rows()
+              << ", cholesky.cols() = " << cholesky.cols();
+    std::cout << "\nDEBUG: policy_cholesky.rows() = " << policy_cholesky.rows()
+              << ", policy_cholesky.cols() = " << policy_cholesky.cols();
 
     // Parse continuous income model outside constructor to avoid issues
     LinearModelParams continuous_income_model;
@@ -791,21 +798,22 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             std::filesystem::path csv_path = config.root_path / csv_filename;
 
             // Handle tab delimiter properly
-            std::string delimiter = continuous_json.contains("delimiter") ? continuous_json["delimiter"] : ",";
+            std::string delimiter =
+                continuous_json.contains("delimiter") ? continuous_json["delimiter"] : ",";
             if (delimiter == "\\t") {
                 delimiter = "\t"; // Convert escaped tab to actual tab character
             }
 
             // Use rapidcsv directly to load the CSV file (no headers)
             rapidcsv::Document doc(csv_path.string(), rapidcsv::LabelParams(-1, -1),
-                                 rapidcsv::SeparatorParams(delimiter.front()));
+                                   rapidcsv::SeparatorParams(delimiter.front()));
 
             // Check that we have exactly 2 columns
             if (doc.GetColumnCount() != 2) {
-                throw core::HgpsException{fmt::format(
-                    "Continuous income CSV file {} must have exactly 2 columns. "
-                    "Found {} columns",
-                    csv_filename, doc.GetColumnCount())};
+                throw core::HgpsException{
+                    fmt::format("Continuous income CSV file {} must have exactly 2 columns. "
+                                "Found {} columns",
+                                csv_filename, doc.GetColumnCount())};
             }
 
             std::cout << "\n      CSV file loaded: " << doc.GetRowCount() << " rows, "
@@ -821,13 +829,15 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                 std::string factor_name = doc.GetCell<std::string>(0, row_idx);
                 double coefficient_value = doc.GetCell<double>(1, row_idx);
 
-                std::cout << "\n        Row " << row_idx << ": " << factor_name << " = " << coefficient_value;
+                std::cout << "\n        Row " << row_idx << ": " << factor_name << " = "
+                          << coefficient_value;
 
                 if (factor_name == "Intercept") {
                     continuous_income_model.intercept = coefficient_value;
                 } else {
                     // All other rows are coefficients
-                    continuous_income_model.coefficients[core::Identifier(factor_name)] = coefficient_value;
+                    continuous_income_model.coefficients[core::Identifier(factor_name)] =
+                        coefficient_value;
                 }
             }
 
@@ -838,8 +848,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                 std::cout << "\n          " << coef_name.to_string() << ": " << coef_value;
             }
         } else {
-            throw core::HgpsException{fmt::format(
-                "Continuous income model must specify 'csv_file'")};
+            throw core::HgpsException{
+                fmt::format("Continuous income model must specify 'csv_file'")};
         }
 
         std::cout << "\nDEBUG: Continuous income model parsing completed";
@@ -848,30 +858,31 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     std::cout << "\nDEBUG: About to call StaticLinearModelDefinition constructor...";
     std::cout << "\nDEBUG: Checking for null pointers...";
     std::cout << "\nDEBUG: expected_trend = " << (expected_trend ? "not null" : "null");
-    std::cout << "\nDEBUG: expected_trend_boxcox = " << (expected_trend_boxcox ? "not null" : "null");
+    std::cout << "\nDEBUG: expected_trend_boxcox = "
+              << (expected_trend_boxcox ? "not null" : "null");
     std::cout << "\nDEBUG: trend_models = " << (trend_models ? "not null" : "null");
     std::cout << "\nDEBUG: trend_ranges = " << (trend_ranges ? "not null" : "null");
     std::cout << "\nDEBUG: trend_lambda = " << (trend_lambda ? "not null" : "null");
-    
+
     try {
         std::cout << "\nDEBUG: About to call constructor with all parameters...";
         auto result = std::make_unique<StaticLinearModelDefinition>(
             std::move(expected), std::move(expected_trend), std::move(trend_steps),
-            std::move(expected_trend_boxcox), std::move(names), std::move(models), std::move(ranges),
-            std::move(lambda), std::move(stddev), std::move(cholesky), std::move(policy_models),
-            std::move(policy_ranges), std::move(policy_cholesky), std::move(trend_models),
-            std::move(trend_ranges), std::move(trend_lambda), info_speed, std::move(rural_prevalence),
-            std::move(income_models), physical_activity_stddev, trend_type,
-            std::move(expected_income_trend), std::move(expected_income_trend_boxcox),
+            std::move(expected_trend_boxcox), std::move(names), std::move(models),
+            std::move(ranges), std::move(lambda), std::move(stddev), std::move(cholesky),
+            std::move(policy_models), std::move(policy_ranges), std::move(policy_cholesky),
+            std::move(trend_models), std::move(trend_ranges), std::move(trend_lambda), info_speed,
+            std::move(rural_prevalence), std::move(income_models), physical_activity_stddev,
+            trend_type, std::move(expected_income_trend), std::move(expected_income_trend_boxcox),
             std::move(income_trend_steps), std::move(income_trend_models),
             std::move(income_trend_ranges), std::move(income_trend_lambda),
             std::move(income_trend_decay_factors), is_continuous_model, continuous_income_model,
             income_categories, std::move(physical_activity_models));
         std::cout << "\nDEBUG: Constructor call completed successfully";
-        
+
         std::cout << "\nDEBUG: StaticLinearModelDefinition created successfully";
         return result;
-    } catch (const std::exception& e) {
+    } catch (const std::exception &e) {
         std::cout << "\nDEBUG: Exception in StaticLinearModelDefinition constructor: " << e.what();
         throw;
     } catch (...) {

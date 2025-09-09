@@ -39,8 +39,7 @@ StaticLinearModel::StaticLinearModel(
     bool is_continuous_income_model, const LinearModelParams &continuous_income_model,
     const std::string &income_categories,
     const std::unordered_map<core::Identifier, PhysicalActivityModel> &physical_activity_models)
-    : RiskFactorAdjustableModel{std::move(expected),       expected_trend,
-                                trend_steps,    trend_type,
+    : RiskFactorAdjustableModel{std::move(expected),       expected_trend, trend_steps, trend_type,
                                 expected_income_trend,       // Pass by value, not moved
                                 income_trend_decay_factors}, // Pass by value, not moved
       // Continuous income model support (FINCH approach) - must come first
@@ -1032,8 +1031,7 @@ void StaticLinearModel::initialise_simple_physical_activity(
 }
 
 // Helper function to create shared_ptr from unique_ptr before moving
-template<typename T>
-std::shared_ptr<T> create_shared_from_unique(std::unique_ptr<T>& ptr) {
+template <typename T> std::shared_ptr<T> create_shared_from_unique(std::unique_ptr<T> &ptr) {
     return ptr ? std::make_shared<T>(*ptr) : nullptr;
 }
 
@@ -1112,7 +1110,6 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
       // Continuous income model support (FINCH approach)
       is_continuous_income_model_{is_continuous_income_model},
       continuous_income_model_{continuous_income_model}, income_categories_{income_categories} {
-
 
     if (names_.empty()) {
         throw core::HgpsException("Risk factor names list is empty");
