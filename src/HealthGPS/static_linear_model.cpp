@@ -198,8 +198,9 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     std::cout << "\nDEBUG: generate_risk_factors called - START";
     std::cout << "\nDEBUG: Population size: " << context.population().size();
     std::cout << "\nDEBUG: Trend type: " << static_cast<int>(trend_type_);
-    std::cout << "\nDEBUG: Is continuous income model: " << (is_continuous_income_model_ ? "true" : "false");
-    
+    std::cout << "\nDEBUG: Is continuous income model: "
+              << (is_continuous_income_model_ ? "true" : "false");
+
     // MAHIMA: Initialise everyone. Order is important here.
     // STEP 1: Age and gender initalized in demographic.cpp
     // STEP 2: Region and ethnicity in demographic.cpp (if available)
@@ -209,33 +210,35 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     // STEP 6: Policies in static_linear_model.cpp (below)
     // STEP 7: Trends in static_linear_model.cpp (below) depnds on whether trends are enabled
     // STEP 8: Risk factors adjusted to trended expected means in static_linear_model.cpp (below)
-    std::cout << "\nDEBUG: Starting person initialization loop for " << context.population().size() << " people...";
+    std::cout << "\nDEBUG: Starting person initialization loop for " << context.population().size()
+              << " people...";
     size_t person_count = 0;
     for (auto &person : context.population()) {
         std::cout << "\nDEBUG: Initializing person " << person_count << "...";
-        
+
         std::cout << "\n  DEBUG: Calling initialise_sector...";
         initialise_sector(person, context.random());
         std::cout << " OK";
-        
+
         std::cout << "\n  DEBUG: Calling initialise_income...";
         initialise_income(context, person, context.random());
         std::cout << " OK";
-        
+
         std::cout << "\n  DEBUG: Calling initialise_factors...";
         initialise_factors(context, person, context.random());
         std::cout << " OK";
-        
+
         std::cout << "\n  DEBUG: Calling initialise_physical_activity...";
         initialise_physical_activity(context, person, context.random());
         std::cout << " OK";
-        
+
         person_count++;
         if (person_count % 100 == 0) {
             std::cout << "\nDEBUG: Processed " << person_count << " people so far...";
         }
     }
-    std::cout << "\nDEBUG: Person initialization loop completed successfully for " << person_count << " people";
+    std::cout << "\nDEBUG: Person initialization loop completed successfully for " << person_count
+              << " people";
 
     // Adjust such that risk factor means match expected values.
     adjust_risk_factors(context, names_, ranges_, false);
@@ -687,7 +690,8 @@ void StaticLinearModel::update_sector(Person &person, Random &random) const {
 }
 
 void StaticLinearModel::initialise_income(RuntimeContext &context, Person &person, Random &random) {
-    std::cout << "\n    DEBUG: initialise_income called for person age=" << person.age << ", gender=" << (person.gender == core::Gender::male ? "male" : "female");
+    std::cout << "\n    DEBUG: initialise_income called for person age=" << person.age
+              << ", gender=" << (person.gender == core::Gender::male ? "male" : "female");
     if (is_continuous_income_model_) {
         // FINCH approach: Use continuous income calculation
         std::cout << "\n    DEBUG: Using continuous income model (FINCH approach)";
@@ -1149,9 +1153,12 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
       continuous_income_model_{continuous_income_model}, income_categories_{income_categories} {
 
     std::cout << "\nDEBUG: StaticLinearModelDefinition constructor - member variables initialized";
-    std::cout << "\nDEBUG: is_continuous_income_model_ = " << (is_continuous_income_model_ ? "true" : "false");
-    std::cout << "\nDEBUG: continuous_income_model_.intercept = " << continuous_income_model_.intercept;
-    std::cout << "\nDEBUG: continuous_income_model_.coefficients.size() = " << continuous_income_model_.coefficients.size();
+    std::cout << "\nDEBUG: is_continuous_income_model_ = "
+              << (is_continuous_income_model_ ? "true" : "false");
+    std::cout << "\nDEBUG: continuous_income_model_.intercept = "
+              << continuous_income_model_.intercept;
+    std::cout << "\nDEBUG: continuous_income_model_.coefficients.size() = "
+              << continuous_income_model_.coefficients.size();
     std::cout << "\nDEBUG: income_categories_ = " << income_categories_;
 
     if (names_.empty()) {
@@ -1282,9 +1289,11 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
 
 std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() const {
     std::cout << "\nDEBUG: StaticLinearModelDefinition::create_model called";
-    std::cout << "\nDEBUG: Creating StaticLinearModel with continuous_income_model_.intercept = " << continuous_income_model_.intercept;
-    std::cout << "\nDEBUG: continuous_income_model_.coefficients.size() = " << continuous_income_model_.coefficients.size();
-    
+    std::cout << "\nDEBUG: Creating StaticLinearModel with continuous_income_model_.intercept = "
+              << continuous_income_model_.intercept;
+    std::cout << "\nDEBUG: continuous_income_model_.coefficients.size() = "
+              << continuous_income_model_.coefficients.size();
+
     return std::make_unique<StaticLinearModel>(
         expected_, expected_trend_, trend_steps_, expected_trend_boxcox_, names_, models_, ranges_,
         lambda_, stddev_, cholesky_, policy_models_, policy_ranges_, policy_cholesky_,
