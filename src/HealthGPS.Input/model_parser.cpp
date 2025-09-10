@@ -186,7 +186,7 @@ load_dummy_risk_model_definition(hgps::RiskFactorModelType type, const nlohmann:
                                                         std::move(policy), std::move(policy_start));
 }
 
-//Loading of HLM model
+// Loading of HLM model
 std::unique_ptr<hgps::StaticHierarchicalLinearModelDefinition>
 load_hlm_risk_model_definition(const nlohmann::json &opt) {
     MEASURE_FUNCTION();

@@ -1094,8 +1094,8 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
                 series.at(core::Gender::male, income, "mean_sector").at(age) /= count_M;
             }
 
-            // MAHIMA: Calculate in-place enhanced demographic averages for this income category (only
-            // if data exists)
+            // MAHIMA: Calculate in-place enhanced demographic averages for this income category
+            // (only if data exists)
             if (count_F > 0) {
                 // Region averages
                 series.at(core::Gender::female, income, "mean_region").at(age) /= count_F;
