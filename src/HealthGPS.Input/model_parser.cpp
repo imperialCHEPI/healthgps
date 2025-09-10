@@ -280,18 +280,120 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     // Risk factor correlation matrix.
     const auto correlation_file_info =
         input::get_file_info(opt["RiskFactorCorrelationFile"], config.root_path);
-    const auto correlation_table = load_datatable_from_csv(correlation_file_info);
-    Eigen::MatrixXd correlation{correlation_table.num_rows(), correlation_table.num_columns()};
+    
+    // MAHIMA: Get column names directly from rapidcsv to preserve original order
+    // The load_datatable_from_csv function uses std::map which sorts alphabetically
+    rapidcsv::Document correlation_doc{correlation_file_info.name.string(), rapidcsv::LabelParams{},
+                                      rapidcsv::SeparatorParams{correlation_file_info.delimiter.front()}};
+    auto correlation_headers = correlation_doc.GetColumnNames();
+    
+    // Skip the first column which is the row identifier
+    std::vector<core::Identifier> csv_ordered_names;
+    for (size_t i = 1; i < correlation_headers.size(); ++i) {
+        csv_ordered_names.emplace_back(correlation_headers[i]);
+    }
+    
+    // MAHIMA: Load correlation matrix data directly from rapidcsv to preserve order
+    Eigen::MatrixXd correlation{csv_ordered_names.size(), csv_ordered_names.size()};
+    
+    std::cout << "\nDEBUG: Loading correlation matrix with dimensions " << csv_ordered_names.size() << "x" << csv_ordered_names.size();
+    std::cout << "\nDEBUG: CSV has " << correlation_headers.size() << " columns total";
+    
+    // Load the correlation matrix data using the correct order
+    for (size_t i = 0; i < csv_ordered_names.size(); ++i) {
+        for (size_t j = 0; j < csv_ordered_names.size(); ++j) {
+            try {
+                // Get the value from rapidcsv using the correct row and column indices
+                // rapidcsv uses 0-based indexing for both rows and columns
+                // Column j+1 because we skip the first column (row identifier)
+                // Row i because we skip the header row (row 0), so data starts at row 0
+                correlation(i, j) = correlation_doc.GetCell<double>(j + 1, i);
+            } catch (const std::exception& e) {
+                std::cout << "\nERROR: Failed to get correlation value at (" << i << "," << j << "): " << e.what();
+                std::cout << "\n  Trying to access column " << (j + 1) << ", row " << i;
+                std::cout << "\n  CSV has " << correlation_doc.GetColumnCount() << " columns, " << correlation_doc.GetRowCount() << " rows";
+                throw;
+            }
+        }
+    }
+    
+    std::cout << "\n=== RISK FACTOR ORDER FROM CORRELATION MATRIX CSV ===";
+    std::cout << "\nThis order is used throughout the entire codebase for consistency";
+    for (size_t i = 0; i < csv_ordered_names.size(); ++i) {
+        std::cout << "\n" << i << ": " << csv_ordered_names[i].to_string();
+    }
+    std::cout << "\n====================================================\n";
 
     // Policy covariance matrix.
     const auto policy_covariance_file_info =
         input::get_file_info(opt["PolicyCovarianceFile"], config.root_path);
-    const auto policy_covariance_table = load_datatable_from_csv(policy_covariance_file_info);
-    Eigen::MatrixXd policy_covariance{policy_covariance_table.num_rows(),
-                                      policy_covariance_table.num_columns()};
+    
+    // MAHIMA: Load policy covariance matrix directly from rapidcsv to preserve order
+    rapidcsv::Document policy_covariance_doc{policy_covariance_file_info.name.string(), rapidcsv::LabelParams{},
+                                            rapidcsv::SeparatorParams{policy_covariance_file_info.delimiter.front()}};
+    auto policy_covariance_headers = policy_covariance_doc.GetColumnNames();
+    
+    // MAHIMA: Policy covariance matrix doesn't have a row identifier column like correlation matrix
+    // It has 21 columns total, all of which are risk factor names
+    // So we use all columns as risk factor names
+    std::vector<core::Identifier> policy_csv_ordered_names;
+    for (size_t i = 0; i < policy_covariance_headers.size(); ++i) {
+        policy_csv_ordered_names.emplace_back(policy_covariance_headers[i]);
+    }
+    
+    // MAHIMA: Create mapping from correlation matrix order to policy covariance matrix order
+    // This ensures we use the correlation matrix as the canonical order
+    std::vector<size_t> policy_column_mapping;
+    for (size_t i = 0; i < csv_ordered_names.size(); ++i) {
+        const auto& correlation_name = csv_ordered_names[i].to_string();
+        bool found = false;
+        for (size_t j = 0; j < policy_csv_ordered_names.size(); ++j) {
+            if (core::case_insensitive::equals(correlation_name, policy_csv_ordered_names[j].to_string())) {
+                policy_column_mapping.push_back(j);
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            throw core::HgpsException{fmt::format("Risk factor '{}' from correlation matrix not found in policy covariance matrix", correlation_name)};
+        }
+    }
+    
+    // MAHIMA: Load policy covariance matrix data using correlation matrix order
+    Eigen::MatrixXd policy_covariance{csv_ordered_names.size(), csv_ordered_names.size()};
+    
+    std::cout << "\nDEBUG: Policy covariance matrix dimensions: " << csv_ordered_names.size() << "x" << csv_ordered_names.size();
+    std::cout << "\nDEBUG: Expected dimensions based on risk factors: " << csv_ordered_names.size() << "x" << csv_ordered_names.size();
+    
+    // Load the policy covariance matrix data using the correlation matrix order
+    for (size_t i = 0; i < csv_ordered_names.size(); ++i) {
+        for (size_t j = 0; j < csv_ordered_names.size(); ++j) {
+            try {
+                // Map correlation matrix indices to policy covariance matrix indices
+                size_t policy_row = policy_column_mapping[i];
+                size_t policy_col = policy_column_mapping[j];
+                
+                // Get the value from rapidcsv using the mapped indices
+                policy_covariance(i, j) = policy_covariance_doc.GetCell<double>(policy_col, policy_row);
+            } catch (const std::exception& e) {
+                std::cout << "\nERROR: Failed to get policy covariance value at (" << i << "," << j << "): " << e.what();
+                std::cout << "\n  Trying to access policy matrix at row " << policy_column_mapping[i] << ", col " << policy_column_mapping[j];
+                std::cout << "\n  Policy covariance CSV has " << policy_covariance_doc.GetColumnCount() << " columns, " << policy_covariance_doc.GetRowCount() << " rows";
+                throw;
+            }
+        }
+    }
+    
+    std::cout << "\n=== POLICY COVARIANCE MAPPING (Correlation Order -> Policy Order) ===";
+    for (size_t i = 0; i < csv_ordered_names.size(); ++i) {
+        std::cout << "\n" << i << ": " << csv_ordered_names[i].to_string() << " -> " << policy_csv_ordered_names[policy_column_mapping[i]].to_string();
+    }
+    std::cout << "\n==============================================================\n";
 
     // MAHIMA: Risk factor and intervention policy: names, models, parameters and
     // correlation/covariance.
+    // CRITICAL: All risk factor processing follows CSV correlation matrix order
+    // This ensures Cholesky decomposition and residual calculations are mathematically matched and correct
     std::vector<core::Identifier> names;
     std::vector<LinearModelParams> models;
     std::vector<core::DoubleInterval> ranges;
@@ -318,9 +420,44 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     std::unique_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors =
         nullptr;
 
-    size_t risk_factor_index = 0;
-    for (const auto &[key, json_params] : opt["RiskFactorModels"].items()) {
-        names.emplace_back(key);
+    // MAHIMA: Use CSV order instead of JSON iteration order to ensure consistency
+    // This is the critical fix that ensures residuals map correctly to risk factors
+    // We use CSV names directly throughout the codebase for consistency
+    for (size_t i = 0; i < csv_ordered_names.size(); ++i) {
+        const auto& csv_name = csv_ordered_names[i];
+        names.emplace_back(csv_name);
+
+        // MAHIMA: Use CSV name for consistent ordering, but find matching JSON key
+        // This ensures consistent naming throughout the entire codebase
+        // CSV names: foodcarbohydrate, foodprotein, foodfat, etc.
+        // JSON keys: FoodCarbohydrate, FoodProtein, FoodFat, etc. (PascalCase)
+        std::cout << "\n  DEBUG: Processing risk factor[" << i << "] = " << csv_name.to_string() << " (CSV name for ordering)";
+
+        // Find the corresponding JSON parameters using case-insensitive lookup
+        std::string json_key;
+        bool found = false;
+        for (const auto& [key, value] : opt["RiskFactorModels"].items()) {
+            if (core::case_insensitive::equals(csv_name.to_string(), key)) {
+                json_key = key;
+                found = true;
+                break;
+            }
+        }
+        
+        if (!found) {
+            throw core::HgpsException{fmt::format("Risk factor '{}' not found in RiskFactorModels. Available keys: {}", 
+                csv_name.to_string(), [&]() {
+                    std::string keys;
+                    for (const auto& [key, value] : opt["RiskFactorModels"].items()) {
+                        if (!keys.empty()) keys += ", ";
+                        keys += key;
+                    }
+                    return keys;
+                }())};
+        }
+        
+        std::cout << "\n  DEBUG: Found JSON key '" << json_key << "' for CSV name '" << csv_name.to_string() << "'";
+        const auto &json_params = opt["RiskFactorModels"][json_key];
 
         // Risk factor model parameters.
         LinearModelParams model;
@@ -328,13 +465,12 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         model.coefficients =
             json_params["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
 
-        // Check risk factor correlation matrix column name matches risk factor name.
-        auto column_name = correlation_table.column(risk_factor_index).name();
-        if (!core::case_insensitive::equals(key, column_name)) {
+        // Verify the correlation matrix column name matches the risk factor name
+        auto column_name = csv_ordered_names[i].to_string();
+        if (!core::case_insensitive::equals(csv_name.to_string(), column_name)) {
             throw core::HgpsException{fmt::format("Risk factor {} name ({}) does not match risk "
                                                   "factor correlation matrix column {} name ({})",
-                                                  risk_factor_index, key, risk_factor_index,
-                                                  column_name)};
+                                                  i, csv_name.to_string(), i, column_name)};
         }
 
         // Write risk factor data structures.
@@ -342,10 +478,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         ranges.emplace_back(json_params["Range"].get<core::DoubleInterval>());
         lambda.emplace_back(json_params["Lambda"].get<double>());
         stddev.emplace_back(json_params["StdDev"].get<double>());
-        for (size_t j = 0; j < correlation_table.num_rows(); j++) {
-            correlation(risk_factor_index, j) =
-                std::any_cast<double>(correlation_table.column(risk_factor_index).value(j));
-        }
+        // Correlation matrix already loaded from rapidcsv above
 
         // Intervention policy model parameters.
         const auto &policy_json_params = json_params["Policy"];
@@ -357,27 +490,23 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                                             .get<std::unordered_map<core::Identifier, double>>();
 
         // Check intervention policy covariance matrix column name matches risk factor name.
-        auto policy_column_name = policy_covariance_table.column(risk_factor_index).name();
-        if (!core::case_insensitive::equals(key, policy_column_name)) {
+        auto policy_column_name = policy_csv_ordered_names[policy_column_mapping[i]].to_string();
+        if (!core::case_insensitive::equals(csv_name.to_string(), policy_column_name)) {
             throw core::HgpsException{
                 fmt::format("Risk factor {} name ({}) does not match intervention "
                             "policy covariance matrix column {} name ({})",
-                            risk_factor_index, key, risk_factor_index, policy_column_name)};
+                            i, csv_name.to_string(), i, policy_column_name)};
         }
 
         // Write intervention policy data structures.
         policy_models.emplace_back(std::move(policy_model));
         policy_ranges.emplace_back(policy_json_params["Range"].get<core::DoubleInterval>());
-        for (size_t j = 0; j < policy_covariance_table.num_rows(); j++) {
-            policy_covariance(risk_factor_index, j) =
-                std::any_cast<double>(policy_covariance_table.column(risk_factor_index).value(j));
-        }
+        // Policy covariance matrix already loaded from rapidcsv above
 
         // MAHIMA: Trend model parameters
         if (trend_type == hgps::TrendType::Null) {
             // No trend data needed for Null type - skip to next risk factor
             std::cout << "\nTrend Type is NULL";
-            risk_factor_index++;
             continue;
         }
         if (trend_type == hgps::TrendType::Trend) {
@@ -400,18 +529,18 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                 trend_lambda->emplace_back(trend_json_params["Lambda"].get<double>());
 
                 // Load expected value trends (only if trend data exists).
-                (*expected_trend)[key] = json_params.contains("ExpectedTrend")
+                (*expected_trend)[csv_name] = json_params.contains("ExpectedTrend")
                                              ? json_params["ExpectedTrend"].get<double>()
                                              : 1.0;
-                (*expected_trend_boxcox)[key] =
+                (*expected_trend_boxcox)[csv_name] =
                     json_params.contains("ExpectedTrendBoxCox")
                         ? json_params["ExpectedTrendBoxCox"].get<double>()
                         : 1.0;
-                (*trend_steps)[key] =
+                (*trend_steps)[csv_name] =
                     json_params.contains("TrendSteps") ? json_params["TrendSteps"].get<int>() : 0;
             } else {
                 throw core::HgpsException{fmt::format(
-                    "Trend is enabled but Trend data is missing for risk factor: {}", key)};
+                    "Trend is enabled but Trend data is missing for risk factor: {}", csv_name.to_string())};
             }
         } else {
             // For Null or IncomeTrend types, we don't need regular trend data
@@ -422,9 +551,9 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             trend_lambda->emplace_back(1.0);
 
             // Set default values for expected trends
-            (*expected_trend)[key] = 1.0;
-            (*expected_trend_boxcox)[key] = 1.0;
-            (*trend_steps)[key] = 0;
+            (*expected_trend)[csv_name] = 1.0;
+            (*expected_trend_boxcox)[csv_name] = 1.0;
+            (*trend_steps)[csv_name] = 0;
         }
 
         // Income trend model parameters (only if income trend is enabled in the config.json)
@@ -466,54 +595,52 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                 // Load expected income trend values (no defaults - throw error if missing)
                 if (!json_params.contains("ExpectedIncomeTrend")) {
                     throw core::HgpsException{
-                        fmt::format("ExpectedIncomeTrend is missing for risk factor: {}", key)};
+                        fmt::format("ExpectedIncomeTrend is missing for risk factor: {}", csv_name.to_string())};
                 }
                 if (!json_params.contains("ExpectedIncomeTrendBoxCox")) {
                     throw core::HgpsException{fmt::format(
-                        "ExpectedIncomeTrendBoxCox is missing for risk factor: {}", key)};
+                        "ExpectedIncomeTrendBoxCox is missing for risk factor: {}", csv_name.to_string())};
                 }
                 if (!json_params.contains("IncomeTrendSteps")) {
                     throw core::HgpsException{
-                        fmt::format("IncomeTrendSteps is missing for risk factor: {}", key)};
+                        fmt::format("IncomeTrendSteps is missing for risk factor: {}", csv_name.to_string())};
                 }
                 if (!json_params.contains("IncomeDecayFactor")) {
                     throw core::HgpsException{
-                        fmt::format("IncomeDecayFactor is missing for risk factor: {}", key)};
+                        fmt::format("IncomeDecayFactor is missing for risk factor: {}", csv_name.to_string())};
                 }
 
-                (*expected_income_trend)[key] = json_params["ExpectedIncomeTrend"].get<double>();
-                (*expected_income_trend_boxcox)[key] =
+                (*expected_income_trend)[csv_name] = json_params["ExpectedIncomeTrend"].get<double>();
+                (*expected_income_trend_boxcox)[csv_name] =
                     json_params["ExpectedIncomeTrendBoxCox"].get<double>();
-                (*income_trend_steps)[key] = json_params["IncomeTrendSteps"].get<int>();
-                (*income_trend_decay_factors)[key] = json_params["IncomeDecayFactor"].get<double>();
+                (*income_trend_steps)[csv_name] = json_params["IncomeTrendSteps"].get<int>();
+                (*income_trend_decay_factors)[csv_name] = json_params["IncomeDecayFactor"].get<double>();
             } else {
                 throw core::HgpsException{fmt::format(
                     "Income trend is enabled but IncomeTrend data is missing for risk factor: {}",
-                    key)};
+                    csv_name.to_string())};
             }
         }
 
-        // Increment table column index.
-        risk_factor_index++;
     } // NOLINTEND(readability-function-cognitive-complexity)
 
     // Check risk factor correlation matrix column count matches risk factor count.
-    if (opt["RiskFactorModels"].size() != correlation_table.num_columns()) {
+    if (opt["RiskFactorModels"].size() != csv_ordered_names.size()) {
         throw core::HgpsException{fmt::format("Risk factor count ({}) does not match risk "
                                               "factor correlation matrix column count ({})",
                                               opt["RiskFactorModels"].size(),
-                                              correlation_table.num_columns())};
+                                              csv_ordered_names.size())};
     }
 
     // Compute Cholesky decomposition of the risk factor correlation matrix.
     auto cholesky = Eigen::MatrixXd{Eigen::LLT<Eigen::MatrixXd>{correlation}.matrixL()};
 
     // Check intervention policy covariance matrix column count matches risk factor count.
-    if (opt["RiskFactorModels"].size() != policy_covariance_table.num_columns()) {
+    if (opt["RiskFactorModels"].size() != policy_csv_ordered_names.size()) {
         throw core::HgpsException{fmt::format("Risk factor count ({}) does not match intervention "
                                               "policy covariance matrix column count ({})",
                                               opt["RiskFactorModels"].size(),
-                                              policy_covariance_table.num_columns())};
+                                              policy_csv_ordered_names.size())};
     }
 
     // Compute Cholesky decomposition of the intervention policy covariance matrix.
@@ -787,26 +914,26 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     // Parse continuous income model outside constructor to avoid issues
     LinearModelParams continuous_income_model;
     if (is_continuous_model) {
-        std::cout << "\nDEBUG: Parsing continuous income model...";
-        const auto &continuous_json = opt["IncomeModels"]["continuous"];
+            std::cout << "\nDEBUG: Parsing continuous income model...";
+            const auto &continuous_json = opt["IncomeModels"]["continuous"];
 
-        if (continuous_json.contains("csv_file")) {
-            std::string csv_filename = continuous_json["csv_file"].get<std::string>();
-            std::cout << "\n  Loading continuous income model from file: " << csv_filename;
+            if (continuous_json.contains("csv_file")) {
+                std::string csv_filename = continuous_json["csv_file"].get<std::string>();
+                std::cout << "\n  Loading continuous income model from file: " << csv_filename;
 
-            // Load CSV file directly using rapidcsv
-            std::filesystem::path csv_path = config.root_path / csv_filename;
+                // Load CSV file directly using rapidcsv
+                std::filesystem::path csv_path = config.root_path / csv_filename;
 
-            // Handle tab delimiter properly
+                // Handle tab delimiter properly
             std::string delimiter =
                 continuous_json.contains("delimiter") ? continuous_json["delimiter"] : ",";
-            if (delimiter == "\\t") {
-                delimiter = "\t"; // Convert escaped tab to actual tab character
-            }
+                if (delimiter == "\\t") {
+                    delimiter = "\t"; // Convert escaped tab to actual tab character
+                }
 
             // Use rapidcsv directly to load the CSV file (no headers)
             rapidcsv::Document doc(csv_path.string(), rapidcsv::LabelParams(-1, -1),
-                                   rapidcsv::SeparatorParams(delimiter.front()));
+                                     rapidcsv::SeparatorParams(delimiter.front()));
 
             // Check that we have exactly 2 columns
             if (doc.GetColumnCount() != 2) {
@@ -814,28 +941,28 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                     fmt::format("Continuous income CSV file {} must have exactly 2 columns. "
                                 "Found {} columns",
                                 csv_filename, doc.GetColumnCount())};
-            }
+                }
 
-            std::cout << "\n      CSV file loaded: " << doc.GetRowCount() << " rows, "
+                std::cout << "\n      CSV file loaded: " << doc.GetRowCount() << " rows, "
                       << doc.GetColumnCount() << " columns";
             std::cout << "\n        Column 0: Factor names";
             std::cout << "\n        Column 1: Coefficient values";
 
-            // Parse CSV into LinearModelParams
+                // Parse CSV into LinearModelParams
             // Parse each row (all rows are data, no headers)
             std::cout << "\n      Parsing CSV data:";
-            for (size_t row_idx = 0; row_idx < doc.GetRowCount(); row_idx++) {
-                // Get factor name and coefficient value directly from rapidcsv
-                std::string factor_name = doc.GetCell<std::string>(0, row_idx);
-                double coefficient_value = doc.GetCell<double>(1, row_idx);
+                for (size_t row_idx = 0; row_idx < doc.GetRowCount(); row_idx++) {
+                    // Get factor name and coefficient value directly from rapidcsv
+                    std::string factor_name = doc.GetCell<std::string>(0, row_idx);
+                    double coefficient_value = doc.GetCell<double>(1, row_idx);
 
                 std::cout << "\n        Row " << row_idx << ": " << factor_name << " = "
                           << coefficient_value;
 
-                if (factor_name == "Intercept") {
+                    if (factor_name == "Intercept") {
                     continuous_income_model.intercept = coefficient_value;
-                } else {
-                    // All other rows are coefficients
+                    } else {
+                        // All other rows are coefficients
                     continuous_income_model.coefficients[core::Identifier(factor_name)] =
                         coefficient_value;
                 }
@@ -846,16 +973,19 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             std::cout << "\n        Coefficients: " << continuous_income_model.coefficients.size();
             for (const auto &[coef_name, coef_value] : continuous_income_model.coefficients) {
                 std::cout << "\n          " << coef_name.to_string() << ": " << coef_value;
-            }
-        } else {
+                }
+            } else {
             throw core::HgpsException{
                 fmt::format("Continuous income model must specify 'csv_file'")};
-        }
+            }
 
-        std::cout << "\nDEBUG: Continuous income model parsing completed";
+            std::cout << "\nDEBUG: Continuous income model parsing completed";
     }
 
     std::cout << "\nDEBUG: About to call StaticLinearModelDefinition constructor...";
+    std::cout << "\nDEBUG: All risk factor data (names_, models_, ranges_, etc.) follows CSV correlation matrix order";
+    std::cout << "\nDEBUG: This ensures Cholesky decomposition and residual calculations are correct";
+    std::cout << "\nDEBUG: CSV names are used directly throughout - no name mapping required";
     std::cout << "\nDEBUG: Checking for null pointers...";
     std::cout << "\nDEBUG: expected_trend = " << (expected_trend ? "not null" : "null");
     std::cout << "\nDEBUG: expected_trend_boxcox = "
@@ -877,11 +1007,11 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             std::move(income_trend_steps), std::move(income_trend_models),
             std::move(income_trend_ranges), std::move(income_trend_lambda),
             std::move(income_trend_decay_factors), is_continuous_model, continuous_income_model,
-            income_categories, std::move(physical_activity_models));
+        income_categories, std::move(physical_activity_models));
         std::cout << "\nDEBUG: Constructor call completed successfully";
 
-        std::cout << "\nDEBUG: StaticLinearModelDefinition created successfully";
-        return result;
+    std::cout << "\nDEBUG: StaticLinearModelDefinition created successfully";
+    return result;
     } catch (const std::exception &e) {
         std::cout << "\nDEBUG: Exception in StaticLinearModelDefinition constructor: " << e.what();
         throw;
