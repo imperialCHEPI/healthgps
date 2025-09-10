@@ -68,64 +68,69 @@ StaticLinearModel::StaticLinearModel(
       has_physical_activity_models_{!physical_activity_models.empty()} {
 
     std::cout << "\nDEBUG: StaticLinearModel constructor - member variables initialized";
-    std::cout << "\nDEBUG: is_continuous_income_model_ = " << (is_continuous_income_model_ ? "true" : "false");
-    std::cout << "\nDEBUG: continuous_income_model_.intercept = " << continuous_income_model_.intercept;
-    std::cout << "\nDEBUG: continuous_income_model_.coefficients.size() = " << continuous_income_model_.coefficients.size();
+    std::cout << "\nDEBUG: is_continuous_income_model_ = "
+              << (is_continuous_income_model_ ? "true" : "false");
+    std::cout << "\nDEBUG: continuous_income_model_.intercept = "
+              << continuous_income_model_.intercept;
+    std::cout << "\nDEBUG: continuous_income_model_.coefficients.size() = "
+              << continuous_income_model_.coefficients.size();
     std::cout << "\nDEBUG: About to check member variables...";
-    
+
     std::cout << "\nDEBUG: Checking names_...";
     if (names_.empty()) {
         throw core::HgpsException("Risk factor names list is empty");
     }
     std::cout << " OK, names_.size() = " << names_.size();
-    
+
     std::cout << "\nDEBUG: Checking models_...";
     if (models_.empty()) {
         throw core::HgpsException("Risk factor model list is empty");
     }
     std::cout << " OK, models_.size() = " << models_.size();
-    
+
     std::cout << "\nDEBUG: Checking ranges_...";
     if (ranges_.empty()) {
         throw core::HgpsException("Risk factor ranges list is empty");
     }
     std::cout << " OK, ranges_.size() = " << ranges_.size();
-    
+
     std::cout << "\nDEBUG: Checking lambda_...";
     if (lambda_.empty()) {
         throw core::HgpsException("Risk factor lambda list is empty");
     }
     std::cout << " OK, lambda_.size() = " << lambda_.size();
-    
+
     std::cout << "\nDEBUG: Checking stddev_...";
     if (stddev_.empty()) {
         throw core::HgpsException("Risk factor standard deviation list is empty");
     }
     std::cout << " OK, stddev_.size() = " << stddev_.size();
-    
+
     std::cout << "\nDEBUG: Checking cholesky_...";
     if (!cholesky_.allFinite()) {
         throw core::HgpsException("Risk factor Cholesky matrix contains non-finite values");
     }
-    std::cout << " OK, cholesky_.rows() = " << cholesky_.rows() << ", cholesky_.cols() = " << cholesky_.cols();
-    
+    std::cout << " OK, cholesky_.rows() = " << cholesky_.rows()
+              << ", cholesky_.cols() = " << cholesky_.cols();
+
     std::cout << "\nDEBUG: Checking policy_models_...";
     if (policy_models_.empty()) {
         throw core::HgpsException("Intervention policy model list is empty");
     }
     std::cout << " OK, policy_models_.size() = " << policy_models_.size();
-    
+
     std::cout << "\nDEBUG: Checking policy_ranges_...";
     if (policy_ranges_.empty()) {
         throw core::HgpsException("Intervention policy ranges list is empty");
     }
     std::cout << " OK, policy_ranges_.size() = " << policy_ranges_.size();
-    
+
     std::cout << "\nDEBUG: Checking policy_cholesky_...";
     if (!policy_cholesky_.allFinite()) {
         throw core::HgpsException("Intervention policy Cholesky matrix contains non-finite values");
     }
-    std::cout << " OK, policy_cholesky_.rows() = " << policy_cholesky_.rows() << ", policy_cholesky_.cols() = " << policy_cholesky_.cols();
+    std::cout << " OK, policy_cholesky_.rows() = " << policy_cholesky_.rows()
+              << ", policy_cholesky_.cols() = " << policy_cholesky_.cols();
     // Validate regular trend parameters only if trend type is Trend
     std::cout << "\nDEBUG: Checking trend validation...";
     std::cout << "\nDEBUG: trend_type_ = " << static_cast<int>(trend_type_);
@@ -136,13 +141,13 @@ StaticLinearModel::StaticLinearModel(
             throw core::HgpsException("Time trend model list is empty");
         }
         std::cout << " OK, trend_models_.size() = " << trend_models_->size();
-        
+
         std::cout << "\nDEBUG: Checking trend_ranges_...";
         if (trend_ranges_->empty()) {
             throw core::HgpsException("Time trend ranges list is empty");
         }
         std::cout << " OK, trend_ranges_.size() = " << trend_ranges_->size();
-        
+
         std::cout << "\nDEBUG: Checking trend_lambda_...";
         if (trend_lambda_->empty()) {
             throw core::HgpsException("Time trend lambda list is empty");
@@ -162,38 +167,38 @@ StaticLinearModel::StaticLinearModel(
                 "Income trend is enabled but expected_income_trend is missing");
         }
         std::cout << " OK";
-        
+
         std::cout << "\nDEBUG: Checking expected_income_trend_boxcox_...";
         if (!expected_income_trend_boxcox_) {
             throw core::HgpsException(
                 "Income trend is enabled but expected_income_trend_boxcox is missing");
         }
         std::cout << " OK";
-        
+
         std::cout << "\nDEBUG: Checking income_trend_steps_...";
         if (!income_trend_steps_) {
             throw core::HgpsException("Income trend is enabled but income_trend_steps is missing");
         }
         std::cout << " OK";
-        
+
         std::cout << "\nDEBUG: Checking income_trend_models_...";
         if (!income_trend_models_) {
             throw core::HgpsException("Income trend is enabled but income_trend_models is missing");
         }
         std::cout << " OK";
-        
+
         std::cout << "\nDEBUG: Checking income_trend_ranges_...";
         if (!income_trend_ranges_) {
             throw core::HgpsException("Income trend is enabled but income_trend_ranges is missing");
         }
         std::cout << " OK";
-        
+
         std::cout << "\nDEBUG: Checking income_trend_lambda_...";
         if (!income_trend_lambda_) {
             throw core::HgpsException("Income trend is enabled but income_trend_lambda is missing");
         }
         std::cout << " OK";
-        
+
         std::cout << "\nDEBUG: Checking income_trend_decay_factors_...";
         if (!income_trend_decay_factors_) {
             throw core::HgpsException(
@@ -210,12 +215,12 @@ StaticLinearModel::StaticLinearModel(
         throw core::HgpsException("Income trend model list is empty");
     }
     std::cout << " OK";
-    
+
     if (income_trend_ranges_ && income_trend_ranges_->empty()) {
         throw core::HgpsException("Income trend ranges list is empty");
     }
     std::cout << " OK";
-    
+
     if (income_trend_lambda_ && income_trend_lambda_->empty()) {
         throw core::HgpsException("Income trend lambda list is empty");
     }
@@ -234,21 +239,21 @@ StaticLinearModel::StaticLinearModel(
                     name.to_string());
             }
             std::cout << " expected_income_trend OK";
-            
+
             if (!expected_income_trend_boxcox_->contains(name)) {
                 throw core::HgpsException(
                     "One or more expected income trend BoxCox value is missing for risk factor: " +
                     name.to_string());
             }
             std::cout << " expected_income_trend_boxcox OK";
-            
+
             if (!income_trend_steps_->contains(name)) {
                 throw core::HgpsException(
                     "One or more income trend steps value is missing for risk factor: " +
                     name.to_string());
             }
             std::cout << " income_trend_steps OK";
-            
+
             if (!income_trend_decay_factors_->contains(name)) {
                 throw core::HgpsException(
                     "One or more income trend decay factor is missing for risk factor: " +
@@ -258,7 +263,8 @@ StaticLinearModel::StaticLinearModel(
         }
         std::cout << "\nDEBUG: All risk factor income trend parameters validated successfully";
     } else {
-        std::cout << "\nDEBUG: Skipping risk factor income trend parameter validation (trend_type_ != IncomeTrend or expected_income_trend_ is null)";
+        std::cout << "\nDEBUG: Skipping risk factor income trend parameter validation (trend_type_ "
+                     "!= IncomeTrend or expected_income_trend_ is null)";
     }
 
     std::cout << "\nDEBUG: Checking final validation...";
@@ -266,7 +272,7 @@ StaticLinearModel::StaticLinearModel(
         throw core::HgpsException("Rural prevalence mapping is empty");
     }
     std::cout << " rural_prevalence OK";
-    
+
     if (income_models_.empty()) {
         throw core::HgpsException("Income models mapping is empty");
     }
@@ -282,7 +288,7 @@ StaticLinearModel::StaticLinearModel(
                 throw core::HgpsException("One or more expected trend value is missing");
             }
             std::cout << " expected_trend OK";
-            
+
             if (!expected_trend_boxcox_->contains(name)) {
                 throw core::HgpsException("One or more expected trend BoxCox value is missing");
             }
@@ -291,7 +297,7 @@ StaticLinearModel::StaticLinearModel(
     } else {
         std::cout << "\nDEBUG: Skipping final trend validation (trend_type_ != Trend)";
     }
-    
+
     std::cout << "\nDEBUG: StaticLinearModel constructor completed successfully";
 }
 
