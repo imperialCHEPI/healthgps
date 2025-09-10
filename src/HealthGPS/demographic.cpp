@@ -60,26 +60,16 @@ SimulationModuleType DemographicModule::type() const noexcept {
 const std::string &DemographicModule::name() const noexcept { return name_; }
 
 std::size_t DemographicModule::get_total_population_size(int time_year) const noexcept {
-    std::cout << "\nDEBUG: get_total_population_size called with time_year: " << time_year;
     auto total = 0.0f;
-
-    std::cout << "\nDEBUG: Checking if pop_data_ contains time_year...";
     if (pop_data_.contains(time_year)) {
-        std::cout << " YES, found data";
         const auto &year_data = pop_data_.at(time_year);
-        std::cout << "\nDEBUG: Calculating total from year_data, size: " << year_data.size();
         total = std::accumulate(year_data.begin(), year_data.end(), 0.0f,
                                 [](const float previous, const auto &element) {
                                     return previous + element.second.total();
                                 });
-        std::cout << "\nDEBUG: Total calculated: " << total;
-    } else {
-        std::cout << " NO, no data for this year";
     }
 
-    auto result = static_cast<std::size_t>(total);
-    std::cout << "\nDEBUG: Returning population size: " << result;
-    return result;
+    return static_cast<std::size_t>(total);
 }
 
 double DemographicModule::get_total_deaths(int time_year) const noexcept {
@@ -97,24 +87,14 @@ DemographicModule::get_population_distribution(int time_year) const {
 
 std::map<int, DoubleGenderValue>
 DemographicModule::get_age_gender_distribution(int time_year) const noexcept {
-    std::cout << "\nDEBUG: get_age_gender_distribution called with time_year: " << time_year;
     std::map<int, DoubleGenderValue> result;
-
-    std::cout << "\nDEBUG: Checking if pop_data_ contains time_year...";
     if (!pop_data_.contains(time_year)) {
-        std::cout << " NO, returning empty result";
         return result;
     }
-    std::cout << " YES, found data for year";
 
-    std::cout << "\nDEBUG: Getting year data...";
     const auto &year_data = pop_data_.at(time_year);
-    std::cout << " OK, year_data size: " << year_data.size();
-
     if (!year_data.empty()) {
-        std::cout << "\nDEBUG: Calculating total ratio...";
         double total_ratio = 1.0 / get_total_population_size(time_year);
-        std::cout << " OK, total_ratio: " << total_ratio;
 
         for (const auto &age : year_data) {
             result.emplace(age.first, DoubleGenderValue(age.second.males * total_ratio,
@@ -144,46 +124,17 @@ double DemographicModule::get_residual_death_rate(int age, core::Gender gender) 
 }
 
 void DemographicModule::initialise_population(RuntimeContext &context) {
-    std::cout << "\nDEBUG: DemographicModule::initialise_population called - START";
-    std::cout << "\nDEBUG: Getting age-gender distribution...";
     auto age_gender_dist = get_age_gender_distribution(context.start_time());
-    std::cout << " OK, distribution size: " << age_gender_dist.size();
-
-    std::cout << "\nDEBUG: Getting population size...";
     auto index = 0;
     auto pop_size = static_cast<int>(context.population().size());
-    std::cout << " OK, population size: " << pop_size;
-
-    std::cout << "\nDEBUG: Getting entry total...";
     auto entry_total = static_cast<int>(age_gender_dist.size());
-    std::cout << " OK, entry total: " << entry_total;
-
-    std::cout << "\nDEBUG: Starting age-gender distribution loop...";
     for (auto entry_count = 1; auto &entry : age_gender_dist) {
-        std::cout << "\nDEBUG: Processing entry " << entry_count << "/" << entry_total
-                  << ", age: " << entry.first << ", males: " << entry.second.males
-                  << ", females: " << entry.second.females;
-
-        std::cout << "\nDEBUG: Calculating num_males...";
         auto num_males = static_cast<int>(std::round(pop_size * entry.second.males));
-        std::cout << " OK, num_males: " << num_males;
-
-        std::cout << "\nDEBUG: Calculating num_females...";
         auto num_females = static_cast<int>(std::round(pop_size * entry.second.females));
-        std::cout << " OK, num_females: " << num_females;
-
-        std::cout << "\nDEBUG: Calculating num_required...";
         auto num_required = index + num_males + num_females;
-        std::cout << " OK, num_required: " << num_required;
-
-        std::cout << "\nDEBUG: Calculating pop_diff...";
         auto pop_diff = pop_size - num_required;
-        std::cout << " OK, pop_diff: " << pop_diff;
-
-        std::cout << "\nDEBUG: Checking final adjustment conditions...";
         // Final adjustment due to rounding errors
         if (entry_count == entry_total && pop_diff > 0) {
-            std::cout << " Final entry with positive diff, adjusting...";
             auto half_diff = pop_diff / 2;
             num_males += half_diff;
             num_females += half_diff;
@@ -195,9 +146,7 @@ void DemographicModule::initialise_population(RuntimeContext &context) {
 
             [[maybe_unused]] auto pop_diff_new = pop_size - (index + num_males + num_females);
             assert(pop_diff_new == 0);
-            std::cout << " OK, final adjustment completed";
         } else if (pop_diff < 0) {
-            std::cout << " Negative diff, adjusting...";
             pop_diff *= -1;
             if (entry.second.males > entry.second.females) {
                 num_females -= pop_diff;
@@ -216,54 +165,37 @@ void DemographicModule::initialise_population(RuntimeContext &context) {
 
             [[maybe_unused]] auto pop_diff_new = pop_size - (index + num_males + num_females);
             assert(pop_diff_new == 0);
-            std::cout << " OK, negative diff adjustment completed";
-        } else {
-            std::cout << " No adjustment needed";
         }
 
-        std::cout << "\nDEBUG: Starting male person initialization loop, num_males: " << num_males;
         // [index, index + num_males)
         for (auto i = 0; i < num_males; i++) {
-            std::cout << "\nDEBUG: Initializing male person " << (i + 1) << "/" << num_males
-                      << " at index " << (index + i);
             // STEP 1: Initilaize age
             // STEP 2: Initialize gender
-            context.population()[index].age = entry.first;
-            context.population()[index].gender = core::Gender::male;
+            context.population()[index + i].age = entry.first;
+            context.population()[index + i].gender = core::Gender::male;
 
             // STEP3: Initialize region
             // STEP 4: Initialize ethnicity
-            initialise_region(context, context.population()[index], context.random());
-            initialise_ethnicity(context, context.population()[index], context.random());
-
-            index++;
+            initialise_region(context, context.population()[index + i], context.random());
+            initialise_ethnicity(context, context.population()[index + i], context.random());
         }
+        index += num_males;
 
-        std::cout << "\nDEBUG: Starting female person initialization loop, num_females: "
-                  << num_females;
         // [index + num_males, num_required)
         for (auto i = 0; i < num_females; i++) {
-            std::cout << "\nDEBUG: Initializing female person " << (i + 1) << "/" << num_females
-                      << " at index " << (index + i);
-            context.population()[index].age = entry.first;
-            context.population()[index].gender = core::Gender::female;
+            context.population()[index + i].age = entry.first;
+            context.population()[index + i].gender = core::Gender::female;
 
             // Initialize region and ethnicity in correct order
-            initialise_region(context, context.population()[index], context.random());
-            initialise_ethnicity(context, context.population()[index], context.random());
-
-            index++;
+            initialise_region(context, context.population()[index + i], context.random());
+            initialise_ethnicity(context, context.population()[index + i], context.random());
         }
+        index += num_females;
 
         entry_count++;
-        std::cout << "\nDEBUG: Completed entry " << (entry_count - 1) << "/" << entry_total
-                  << ", index now: " << index;
     }
 
-    std::cout << "\nDEBUG: Completed all age-gender distribution entries";
-    std::cout << "\nDEBUG: Final index: " << index << ", expected pop_size: " << pop_size;
     assert(index == pop_size);
-    std::cout << "\nDEBUG: DemographicModule::initialise_population completed successfully";
 }
 
 void DemographicModule::update_population(RuntimeContext &context,
