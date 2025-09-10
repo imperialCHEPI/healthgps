@@ -129,6 +129,7 @@ nlohmann::json load_json(const std::filesystem::path &filepath) {
     }
 }
 
+// Loading of Factors Mean CSV file for Male and Female
 std::unique_ptr<hgps::RiskFactorSexAgeTable>
 load_risk_factor_expected(const Configuration &config) {
     MEASURE_FUNCTION();
@@ -185,6 +186,7 @@ load_dummy_risk_model_definition(hgps::RiskFactorModelType type, const nlohmann:
                                                         std::move(policy), std::move(policy_start));
 }
 
+//Loading of HLM model
 std::unique_ptr<hgps::StaticHierarchicalLinearModelDefinition>
 load_hlm_risk_model_definition(const nlohmann::json &opt) {
     MEASURE_FUNCTION();
@@ -246,7 +248,7 @@ load_hlm_risk_model_definition(const nlohmann::json &opt) {
     return std::make_unique<hgps::StaticHierarchicalLinearModelDefinition>(std::move(models),
                                                                            std::move(levels));
 }
-
+// Loading of Static Linear Model from static_model.json
 // NOLINTBEGIN(readability-function-cognitive-complexity)
 std::unique_ptr<hgps::StaticLinearModelDefinition>
 load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configuration &config) {
@@ -254,7 +256,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
     std::cout << "\nDEBUG: Starting load_staticlinear_risk_model_definition";
 
-    // Parse trend_type from config.json- Reda which trend type to use.
+    // Parse trend_type from config.json- Read which trend type to use (null, trend or income_trend)
     hgps::TrendType trend_type = hgps::TrendType::Null;
     if (config.trend_type == "trend") {
         trend_type = hgps::TrendType::Trend;
@@ -262,7 +264,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         trend_type = hgps::TrendType::IncomeTrend;
     }
 
-    // Auto-detect income trend data if present in static_model.json
+    // MAHIMA: Auto-detect income trend data if present in static_model.json
     // This overrides the config.json setting if income trend data is found
     bool has_income_trend_data = false;
     for (const auto &[key, json_params] : opt["RiskFactorModels"].items()) {
@@ -449,8 +451,6 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         // This ensures consistent naming throughout the entire codebase
         // CSV names: foodcarbohydrate, foodprotein, foodfat, etc.
         // JSON keys: FoodCarbohydrate, FoodProtein, FoodFat, etc. (PascalCase)
-        std::cout << "\n  DEBUG: Processing risk factor[" << i << "] = " << csv_name.to_string()
-                  << " (CSV name for ordering)";
 
         // Find the corresponding JSON parameters using case-insensitive lookup
         std::string json_key;
@@ -476,9 +476,6 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                                 return keys;
                             }())};
         }
-
-        std::cout << "\n  DEBUG: Found JSON key '" << json_key << "' for CSV name '"
-                  << csv_name.to_string() << "'";
         const auto &json_params = opt["RiskFactorModels"][json_key];
 
         // Risk factor model parameters.
@@ -829,19 +826,13 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
                     std::cout << "\n      CSV file loaded: " << doc.GetRowCount() << " rows, "
                               << doc.GetColumnCount() << " columns";
-                    std::cout << "\n        Column 0: Factor names";
-                    std::cout << "\n        Column 1: Coefficient values";
 
                     // Parse CSV into PhysicalActivityModel (using existing model variable)
                     // Parse each row (all rows are data, no headers)
-                    std::cout << "\n      Parsing CSV data:";
                     for (size_t row_idx = 0; row_idx < doc.GetRowCount(); row_idx++) {
                         // Get factor name and coefficient value directly from rapidcsv
                         std::string factor_name = doc.GetCell<std::string>(0, row_idx);
                         double coefficient_value = doc.GetCell<double>(1, row_idx);
-
-                        std::cout << "\n        Row " << row_idx << ": " << factor_name << " = "
-                                  << coefficient_value;
 
                         if (factor_name == "Intercept") {
                             model.intercept = coefficient_value;
@@ -877,11 +868,6 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             physical_activity_models[core::Identifier(model_name)] = std::move(model);
             std::cout << "\n  DEBUG: Physical activity model '" << model_name
                       << "' stored successfully";
-        }
-
-        if (!physical_activity_models.empty()) {
-            std::cout << "\n  Successfully loaded " << physical_activity_models.size()
-                      << " physical activity models";
         }
     } else {
         std::cout << "\nNo PhysicalActivityModels found, using PhysicalActivityStdDev approach";
@@ -923,21 +909,6 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         }
     }
 
-    std::cout << "\nDEBUG: About to create StaticLinearModelDefinition...";
-    std::cout << "\nDEBUG: trend_type = " << static_cast<int>(trend_type);
-    std::cout << "\nDEBUG: expected_income_trend = "
-              << (expected_income_trend ? "not null" : "null");
-    std::cout << "\nDEBUG: income_trend_models = " << (income_trend_models ? "not null" : "null");
-    std::cout << "\nDEBUG: names.size() = " << names.size();
-    std::cout << "\nDEBUG: models.size() = " << models.size();
-    std::cout << "\nDEBUG: expected = " << (expected ? "not null" : "null");
-    std::cout << "\nDEBUG: expected_trend = " << (expected_trend ? "not null" : "null");
-    std::cout << "\nDEBUG: trend_models = " << (trend_models ? "not null" : "null");
-    std::cout << "\nDEBUG: cholesky.rows() = " << cholesky.rows()
-              << ", cholesky.cols() = " << cholesky.cols();
-    std::cout << "\nDEBUG: policy_cholesky.rows() = " << policy_cholesky.rows()
-              << ", policy_cholesky.cols() = " << policy_cholesky.cols();
-
     // Parse continuous income model outside constructor to avoid issues
     LinearModelParams continuous_income_model;
     if (is_continuous_model) {
@@ -972,8 +943,6 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
             std::cout << "\n      CSV file loaded: " << doc.GetRowCount() << " rows, "
                       << doc.GetColumnCount() << " columns";
-            std::cout << "\n        Column 0: Factor names";
-            std::cout << "\n        Column 1: Coefficient values";
 
             // Parse CSV into LinearModelParams
             // Parse each row (all rows are data, no headers)
@@ -982,9 +951,6 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                 // Get factor name and coefficient value directly from rapidcsv
                 std::string factor_name = doc.GetCell<std::string>(0, row_idx);
                 double coefficient_value = doc.GetCell<double>(1, row_idx);
-
-                std::cout << "\n        Row " << row_idx << ": " << factor_name << " = "
-                          << coefficient_value;
 
                 if (factor_name == "Intercept") {
                     continuous_income_model.intercept = coefficient_value;
@@ -1010,12 +976,6 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     }
 
     std::cout << "\nDEBUG: About to call StaticLinearModelDefinition constructor...";
-    std::cout << "\nDEBUG: All risk factor data (names_, models_, ranges_, etc.) follows CSV "
-                 "correlation matrix order";
-    std::cout
-        << "\nDEBUG: This ensures Cholesky decomposition and residual calculations are correct";
-    std::cout << "\nDEBUG: CSV names are used directly throughout - no name mapping required";
-    std::cout << "\nDEBUG: Checking for null pointers...";
     std::cout << "\nDEBUG: expected_trend = " << (expected_trend ? "not null" : "null");
     std::cout << "\nDEBUG: expected_trend_boxcox = "
               << (expected_trend_boxcox ? "not null" : "null");
@@ -1298,6 +1258,7 @@ void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
         // Register model in cache
         repository.register_risk_factor_model_definition(model_type, std::move(model_definition));
     }
+    std::cout << "\nFINISHED ALL THE LOADING REQUIRED CUTIEPIE :)\n";
 }
 
 } // namespace hgps::input

@@ -838,21 +838,21 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
     income_channels.emplace_back("mean_sector");
     income_channels.emplace_back("std_sector");
 
-    // NEW: Add enhanced demographic channels for income analysis (only if data exists)
+    // MAHIMA: Add enhanced demographic channels for income analysis (only if data exists)
     // These will be populated if region, ethnicity data is available
     income_channels.emplace_back("mean_region");
     income_channels.emplace_back("std_region");
     income_channels.emplace_back("mean_ethnicity");
     income_channels.emplace_back("std_ethnicity");
 
-    // NEW: Add enhanced income channels for income analysis (only if data exists)
+    // MAHIMA: Add enhanced income channels for income analysis (only if data exists)
     // These will be populated if income data is available
     income_channels.emplace_back("mean_income_category");
     income_channels.emplace_back("std_income_category");
     income_channels.emplace_back("mean_income_continuous");
     income_channels.emplace_back("std_income_continuous");
 
-    // NEW: Add physical activity channels for income analysis (only if data exists)
+    // MAHIMA: Add physical activity channels for income analysis (only if data exists)
     // These will be populated if physical activity data is available
     income_channels.emplace_back("mean_physical_activity");
     income_channels.emplace_back("std_physical_activity");
@@ -1094,7 +1094,7 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
                 series.at(core::Gender::male, income, "mean_sector").at(age) /= count_M;
             }
 
-            // NEW: Calculate in-place enhanced demographic averages for this income category (only
+            // MAHIMA: Calculate in-place enhanced demographic averages for this income category (only
             // if data exists)
             if (count_F > 0) {
                 // Region averages

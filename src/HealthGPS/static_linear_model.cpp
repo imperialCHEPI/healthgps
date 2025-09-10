@@ -306,11 +306,13 @@ RiskFactorModelType StaticLinearModel::type() const noexcept { return RiskFactor
 std::string StaticLinearModel::name() const noexcept { return "Static"; }
 
 void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
-    std::cout << "\nDEBUG: generate_risk_factors called - START";
+    std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors called - START";
     std::cout << "\nDEBUG: Population size: " << context.population().size();
     std::cout << "\nDEBUG: Trend type: " << static_cast<int>(trend_type_);
     std::cout << "\nDEBUG: Is continuous income model: "
               << (is_continuous_income_model_ ? "true" : "false");
+    std::cout << "\nDEBUG: Names count: " << names_.size();
+    std::cout << "\nDEBUG: Models count: " << models_.size();
 
     // MAHIMA: Initialise everyone. Order is important here.
     // STEP 1: Age and gender initalized in demographic.cpp
@@ -325,7 +327,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
               << " people...";
     size_t person_count = 0;
     for (auto &person : context.population()) {
-        std::cout << "\nDEBUG: Initializing person " << person_count << "...";
+        std::cout << "\nDEBUG: Initializing a person";
 
         std::cout << "\n  DEBUG: Calling initialise_sector...";
         initialise_sector(person, context.random());
