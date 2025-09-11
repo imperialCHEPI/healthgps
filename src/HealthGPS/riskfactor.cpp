@@ -42,11 +42,20 @@ RiskFactorModel &RiskFactorModule::at(const RiskFactorModelType &model_type) con
 }
 
 void RiskFactorModule::initialise_population(RuntimeContext &context) {
+    std::cout << "\nMAHIMA: RiskFactorModule::initialise_population - STARTING";
+    std::cout << "\nMAHIMA: Population size: " << context.population().size();
+    
     auto &static_model = models_.at(RiskFactorModelType::Static);
+    std::cout << "\nMAHIMA: About to call static_model->generate_risk_factors";
     static_model->generate_risk_factors(context);
+    std::cout << "\nMAHIMA: static_model->generate_risk_factors completed";
 
     auto &dynamic_model = models_.at(RiskFactorModelType::Dynamic);
+    std::cout << "\nMAHIMA: About to call dynamic_model->generate_risk_factors";
     dynamic_model->generate_risk_factors(context);
+    std::cout << "\nMAHIMA: dynamic_model->generate_risk_factors completed";
+    
+    std::cout << "\nMAHIMA: RiskFactorModule::initialise_population - COMPLETED";
 }
 
 void RiskFactorModule::update_population(RuntimeContext &context) {

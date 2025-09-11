@@ -3,6 +3,7 @@
 #include "HealthGPS.Input/model_parser.h"
 #include "demographic.h"
 #include "risk_factor_inspector.h"
+#include "risk_factor_adjustable_model.h"
 
 #include <iostream>
 #include <ranges>
@@ -15,26 +16,89 @@ namespace hgps {
 // Change this to 'false' to disable it (default for normal simulations)
 static constexpr bool ENABLE_YEAR3_RISK_FACTOR_INSPECTION = false;
 
+// Helper function to combine food and other risk factors into a single vector
+// This ensures we have one adjustments map with all factors instead of separate maps
+std::vector<core::Identifier> StaticLinearModel::combine_risk_factors() const {
+    std::vector<core::Identifier> combined_factors;
+    
+    // Reserve space for both food and other risk factors
+    combined_factors.reserve(names_.size() + other_risk_factor_names_.size());
+    
+    // Add food factors first (maintains correlation matrix order)
+    combined_factors.insert(combined_factors.end(), names_.begin(), names_.end());
+    
+    // Add other risk factors (demographics, physical measurements, etc.)
+    combined_factors.insert(combined_factors.end(), other_risk_factor_names_.begin(), other_risk_factor_names_.end());
+    
+    return combined_factors;
+}
+
+// Helper function to combine food and other risk factor ranges into a single vector
+// This ensures each factor has its appropriate range constraints
+std::vector<core::DoubleInterval> StaticLinearModel::combine_risk_factor_ranges() const {
+    std::vector<core::DoubleInterval> combined_ranges;
+    
+    // Reserve space for both food and other risk factor ranges
+    combined_ranges.reserve(ranges_.size() + other_risk_factor_ranges_.size());
+    
+    // Add food factor ranges first (maintains correlation matrix order)
+    combined_ranges.insert(combined_ranges.end(), ranges_.begin(), ranges_.end());
+    
+    // Add other risk factor ranges (demographics, physical measurements, etc.)
+    combined_ranges.insert(combined_ranges.end(), other_risk_factor_ranges_.begin(), other_risk_factor_ranges_.end());
+    
+    return combined_ranges;
+}
+
 RiskFactorModelType StaticLinearModel::type() const noexcept { return RiskFactorModelType::Static; }
 
 std::string StaticLinearModel::name() const noexcept { return "Static"; }
 
 void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
+    std::cout << "\nMAHIMA: StaticLinearModel::generate_risk_factors - STARTING";
 
     // Verify that all expected risk factors are included in the names_ vector
     verify_risk_factors();
+    std::cout << "\nMAHIMA: Risk factor verification completed";
 
     // NOTE: Demographic variables (region, ethnicity, income, etc.) are already
     // initialized by the DemographicModule in initialise_population
 
     // Initialise everyone with risk factors.
-    for (auto &person : context.population()) {
-        initialise_factors(context, person, context.random());
-        initialise_physical_activity(context, person, context.random());
+    std::cout << "\nMAHIMA: Starting risk factor initialization for " << context.population().size() << " people";
+    try {
+        for (auto &person : context.population()) {
+            initialise_factors(context, person, context.random());
+            initialise_physical_activity(context, person, context.random());
+        }
+        std::cout << "\nMAHIMA: Risk factor initialization completed";
+    } catch (const std::exception& e) {
+        std::cout << "\nMAHIMA: ERROR in risk factor initialization: " << e.what();
+        throw;
+    } catch (...) {
+        std::cout << "\nMAHIMA: UNKNOWN ERROR in risk factor initialization";
+        throw;
     }
 
-    // Adjust such that risk factor means match expected values.
-    adjust_risk_factors(context, names_, ranges_, false);
+
+    // MAHIMA: Combine risk factors for adjustment
+    // Both scenarios need these variables for the trended adjustment later
+    std::cout << "\nMAHIMA: Combining risk factors for adjustment";
+    auto combined_factors = combine_risk_factors();
+    auto combined_ranges = combine_risk_factor_ranges();
+    std::cout << "\nMAHIMA: Combined " << combined_factors.size() << " factors for adjustment";
+    
+    // MAHIMA: Only adjust risk factors for baseline scenario during initialization
+    // Intervention scenario will receive adjustments during updates
+    if (context.scenario().type() == ScenarioType::baseline) {
+        std::cout << "\nMAHIMA: About to call adjust_risk_factors (baseline scenario)";
+        adjust_risk_factors(context, combined_factors, combined_ranges, false);
+        
+        // MAHIMA: Success message for risk factor adjustment
+        std::cout << "\nMAHIMA: Risk factors successfully adjusted to means (26 factors: 21 food + 5 other)";
+    } else {
+        std::cout << "\nMAHIMA: Skipping risk factor adjustment for intervention scenario during initialization";
+    }
 
     // Initialise everyone with policies and trends.
     for (auto &person : context.population()) {
@@ -42,8 +106,11 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         initialise_trends(context, person);
     }
 
-    // Adjust such that trended risk factor means match trended expected values.
-    adjust_risk_factors(context, names_, ranges_, true);
+    // MAHIMA: Adjust trended risk factor means using combined factors
+    // Use the same combined factors and ranges for trended adjustment
+    if (context.scenario().type() == ScenarioType::baseline) {
+        adjust_risk_factors(context, combined_factors, combined_ranges, true);
+    }
 
     // Print risk factor summary once at the end
     std::string risk_factor_list;
@@ -81,8 +148,14 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
         }
     }
 
-    // Adjust such that risk factor means match expected values.
-    adjust_risk_factors(context, names_, ranges_, false);
+    // MAHIMA: Combine food and other risk factors into single adjustment call
+    // This prevents the "invalid unordered_map<K, T> key" error by ensuring all factors
+    // are processed in one adjustments map instead of separate maps
+    auto combined_factors = combine_risk_factors();
+    auto combined_ranges = combine_risk_factor_ranges();
+    
+    // Single call to adjust_risk_factors with all factors and their ranges
+    adjust_risk_factors(context, combined_factors, combined_ranges, false);
 
     // Update policies and trends for all people, initializing for newborns.
     for (auto &person : context.population()) {
@@ -99,8 +172,10 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
         }
     }
 
-    // Adjust such that trended risk factor means match trended expected values.
-    adjust_risk_factors(context, names_, ranges_, true);
+    // MAHIMA: Adjust trended risk factor means using combined factors
+    // Use the same combined factors and ranges for trended adjustment
+    adjust_risk_factors(context, combined_factors, combined_ranges, true);
+    
 
     // Apply policies if intervening.
     for (auto &person : context.population()) {
@@ -747,7 +822,9 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::unordered_map<core::Region, LinearModelParams> region_models,
     double physical_activity_stddev,
     const std::unordered_map<core::Identifier, LinearModelParams> &physical_activity_models,
-    std::vector<LinearModelParams> logistic_models)
+    std::vector<LinearModelParams> logistic_models,
+    std::vector<core::Identifier> other_names,
+    std::vector<core::DoubleInterval> other_ranges)
     : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend),
                                           std::move(trend_steps)},
       expected_trend_boxcox_{std::move(expected_trend_boxcox)}, names_{std::move(names)},
@@ -762,7 +839,8 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
       income_models_{std::move(income_models)}, region_models_{std::move(region_models)},
       physical_activity_stddev_{physical_activity_stddev},
       physical_activity_models_{physical_activity_models},
-      logistic_models_{std::move(logistic_models)} {
+      logistic_models_{std::move(logistic_models)},
+      other_risk_factor_names_{std::move(other_names)}, other_risk_factor_ranges_{std::move(other_ranges)} {
 
     if (names_.empty()) {
         throw core::HgpsException("Risk factor names list is empty");
@@ -852,7 +930,8 @@ std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() con
         lambda_, stddev_, cholesky_, policy_models_, policy_ranges_, policy_cholesky_,
         trend_models_, trend_ranges_, trend_lambda_, info_speed_, rural_prevalence_,
         region_prevalence_, ethnicity_prevalence_, income_models_, region_models_,
-        physical_activity_stddev_, get_physical_activity_models(), logistic_models_);
+        physical_activity_stddev_, get_physical_activity_models(), logistic_models_,
+        other_risk_factor_names_, other_risk_factor_ranges_);
 }
 
 // Add a new method to verify risk factors
@@ -894,5 +973,6 @@ void StaticLinearModel::verify_risk_factors() const {
     // std::cout << "\nDEBUG: StaticLinearModel::verify_risk_factors - Verification completed with "
     // << names_.size() << " risk factors";
 }
+
 
 } // namespace hgps

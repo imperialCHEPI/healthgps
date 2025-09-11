@@ -995,6 +995,54 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         }
     }
 
+    // MAHIMA: Create other risk factor names vector for non-food risk factors
+    // These factors are adjusted to their means separately from food factors
+    std::vector<core::Identifier> other_risk_factor_names;
+    std::vector<core::DoubleInterval> other_risk_factor_ranges;
+    
+    // Load other risk factors and their ranges from config.json
+    try {
+        // Load config.json to get other risk factor names and ranges
+        auto config_json = load_json(config.root_path / "config.json");
+        if (config_json.contains("modelling") &&
+            config_json["modelling"].contains("risk_factors")) {
+
+            // List of other risk factors that should be adjusted to their means
+            const std::vector<std::string> other_factor_names = {
+                "Weight", "Height", "EnergyIntake", "Income", "PhysicalActivity"
+            };
+
+            for (const auto &risk_factor : config_json["modelling"]["risk_factors"]) {
+                const std::string rf_name = risk_factor["name"];
+                
+                // Check if this is one of our other risk factors
+                if (std::find(other_factor_names.begin(), other_factor_names.end(), rf_name) !=
+                    other_factor_names.end()) {
+                    // Convert to lowercase to match the factors mean CSV format
+                    other_risk_factor_names.emplace_back(core::to_lower(rf_name));
+                    
+                    // Load the range for this risk factor
+                    auto range = risk_factor["range"].get<core::DoubleInterval>();
+                    other_risk_factor_ranges.emplace_back(range);
+                    
+                    std::cout << "\nLoaded " << rf_name << " range from config.json: ["
+                              << range.lower() << ", " << range.upper() << "]";
+                }
+            }
+
+            std::cout << "\nLoaded " << other_risk_factor_names.size()
+                      << " other risk factors with ranges from config.json";
+        }
+    } catch (const std::exception &e) {
+        std::cout << "\nWARNING: Failed to load other risk factors from config.json: " << e.what();
+    }
+    
+    std::cout << "\n======= OTHER RISK FACTORS FOR MEAN ADJUSTMENT =======";
+    for (const auto &name : other_risk_factor_names) {
+        std::cout << "\nOther risk factor: " << name.to_string();
+    }
+    std::cout << "\n====================================================\n";
+
     // std::cout << "\nDEBUG: About to create StaticLinearModelDefinition";
     // NOLINTBEGIN(readability-function-cognitive-complexity)
     return std::make_unique<StaticLinearModelDefinition>(
@@ -1043,7 +1091,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                 // will handle this)
                 return std::vector<LinearModelParams>{};
             }
-        }());
+        }(),
+        std::move(other_risk_factor_names), std::move(other_risk_factor_ranges));
 }
 // NOLINTEND(readability-function-cognitive-complexity)
 

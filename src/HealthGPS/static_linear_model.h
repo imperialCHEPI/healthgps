@@ -47,6 +47,8 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param phycical_activity_stddev The standard deviation of the physical activity
     /// @param physical_activity_models The physical activity models for each region
     /// @param logistic_models The logistic models for each risk factor
+    /// @param other_risk_factor_names The other risk factor names (Weight, Height, BMI, Income, PhysicalActivity, EnergyIntake)
+    /// @param other_risk_factor_ranges The ranges for other risk factors
     /// @throws HgpsException for invalid arguments
     StaticLinearModel(
         std::shared_ptr<RiskFactorSexAgeTable> expected,
@@ -76,7 +78,9 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
         const std::unordered_map<core::Region, LinearModelParams> &region_models,
         double physical_activity_stddev,
         const std::unordered_map<core::Identifier, LinearModelParams> &physical_activity_models,
-        const std::vector<LinearModelParams> &logistic_models)
+        const std::vector<LinearModelParams> &logistic_models,
+        const std::vector<core::Identifier> &other_risk_factor_names,
+        const std::vector<core::DoubleInterval> &other_risk_factor_ranges)
         : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend),
                                     std::move(trend_steps)},
           expected_trend_boxcox_{std::move(expected_trend_boxcox)}, names_{names}, models_{models},
@@ -87,7 +91,8 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
           rural_prevalence_{rural_prevalence}, region_prevalence_{region_prevalence},
           ethnicity_prevalence_{ethnicity_prevalence}, income_models_{income_models},
           region_models_{region_models}, physical_activity_stddev_{physical_activity_stddev},
-          physical_activity_models_{physical_activity_models}, logistic_models_{logistic_models} {}
+          physical_activity_models_{physical_activity_models}, logistic_models_{logistic_models},
+          other_risk_factor_names_{other_risk_factor_names}, other_risk_factor_ranges_{other_risk_factor_ranges} {}
 
     RiskFactorModelType type() const noexcept override;
 
@@ -101,6 +106,11 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     double calculate_zero_probability(Person &person, size_t risk_factor_index) const;
 
   private:
+    // Helper functions to combine food and other risk factors for single adjustment call
+    // This prevents the "invalid unordered_map<K, T> key" error by ensuring all factors
+    // are in one adjustments map instead of separate maps
+    std::vector<core::Identifier> combine_risk_factors() const;
+    std::vector<core::DoubleInterval> combine_risk_factor_ranges() const;
     static double inverse_box_cox(double factor, double lambda);
 
     void initialise_factors(RuntimeContext &context, Person &person, Random &random) const;
@@ -140,6 +150,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
 
     /// Verify that all risk factors from the configuration are properly included
     void verify_risk_factors() const;
+    
 
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox_;
     const std::vector<core::Identifier> &names_;
@@ -170,6 +181,11 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     const double physical_activity_stddev_;
     const std::unordered_map<core::Identifier, LinearModelParams> &physical_activity_models_;
     const std::vector<LinearModelParams> &logistic_models_;
+    
+    // MAHIMA: Other risk factors (Weight, Height, BMI, Income, PhysicalActivity, EnergyIntake)
+    // These are separate from food factors and are adjusted to their means
+    const std::vector<core::Identifier> &other_risk_factor_names_;
+    const std::vector<core::DoubleInterval> &other_risk_factor_ranges_;
 };
 
 /// @brief Defines the static linear model data type
@@ -201,6 +217,8 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     /// @param phycical_activity_stddev The standard deviation of the physical activity
     /// @param physical_activity_models The physical activity models for each region
     /// @param logistic_models The logistic models for each risk factor
+    /// @param other_risk_factor_names The other risk factor names (Weight, Height, BMI, Income, PhysicalActivity, EnergyIntake)
+    /// @param other_risk_factor_ranges The ranges for other risk factors
     /// @throws HgpsException for invalid arguments
     StaticLinearModelDefinition(
         std::unique_ptr<RiskFactorSexAgeTable> expected,
@@ -229,7 +247,9 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
         std::unordered_map<core::Region, LinearModelParams> region_models,
         double physical_activity_stddev,
         const std::unordered_map<core::Identifier, LinearModelParams> &physical_activity_models,
-        std::vector<LinearModelParams> logistic_models);
+        std::vector<LinearModelParams> logistic_models,
+        std::vector<core::Identifier> other_risk_factor_names,
+        std::vector<core::DoubleInterval> other_risk_factor_ranges);
 
     /// @brief Construct a new StaticLinearModel from this definition
     /// @return A unique pointer to the new StaticLinearModel instance
@@ -303,6 +323,8 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     double physical_activity_stddev_;
     std::unordered_map<core::Identifier, LinearModelParams> physical_activity_models_;
     std::vector<LinearModelParams> logistic_models_;
+    std::vector<core::Identifier> other_risk_factor_names_;
+    std::vector<core::DoubleInterval> other_risk_factor_ranges_;
 };
 
 } // namespace hgps
