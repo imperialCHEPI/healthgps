@@ -975,16 +975,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         std::cout << "\nDEBUG: Continuous income model parsing completed";
     }
 
-    std::cout << "\nDEBUG: About to call StaticLinearModelDefinition constructor...";
-    std::cout << "\nDEBUG: expected_trend = " << (expected_trend ? "not null" : "null");
-    std::cout << "\nDEBUG: expected_trend_boxcox = "
-              << (expected_trend_boxcox ? "not null" : "null");
-    std::cout << "\nDEBUG: trend_models = " << (trend_models ? "not null" : "null");
-    std::cout << "\nDEBUG: trend_ranges = " << (trend_ranges ? "not null" : "null");
-    std::cout << "\nDEBUG: trend_lambda = " << (trend_lambda ? "not null" : "null");
 
     try {
-        std::cout << "\nDEBUG: About to call constructor with all parameters...";
         auto result = std::make_unique<StaticLinearModelDefinition>(
             std::move(expected), std::move(expected_trend), std::move(trend_steps),
             std::move(expected_trend_boxcox), std::move(names), std::move(models),
@@ -997,7 +989,6 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             std::move(income_trend_ranges), std::move(income_trend_lambda),
             std::move(income_trend_decay_factors), is_continuous_model, continuous_income_model,
             income_categories, std::move(physical_activity_models));
-        std::cout << "\nDEBUG: Constructor call completed successfully";
 
         std::cout << "\nDEBUG: StaticLinearModelDefinition created successfully";
         return result;

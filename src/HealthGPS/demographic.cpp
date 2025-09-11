@@ -124,10 +124,12 @@ double DemographicModule::get_residual_death_rate(int age, core::Gender gender) 
 }
 
 void DemographicModule::initialise_population(RuntimeContext &context) {
+    std::cout << "\nDEBUG: DemographicModule::initialise_population - START";
     auto age_gender_dist = get_age_gender_distribution(context.start_time());
     auto index = 0;
     auto pop_size = static_cast<int>(context.population().size());
     auto entry_total = static_cast<int>(age_gender_dist.size());
+    std::cout << "\nDEBUG: Population size: " << pop_size << ", Age groups: " << entry_total;
     for (auto entry_count = 1; auto &entry : age_gender_dist) {
         auto num_males = static_cast<int>(std::round(pop_size * entry.second.males));
         auto num_females = static_cast<int>(std::round(pop_size * entry.second.females));
@@ -196,6 +198,7 @@ void DemographicModule::initialise_population(RuntimeContext &context) {
     }
 
     assert(index == pop_size);
+    std::cout << "\nDEBUG: DemographicModule::initialise_population - COMPLETED";
 }
 
 void DemographicModule::update_population(RuntimeContext &context,
@@ -393,11 +396,19 @@ int DemographicModule::update_age_and_death_events(RuntimeContext &context,
 
 void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &context, Person &person,
                                           Random &random) {
+    // If no region data is available, skip region assignment
+    if (region_prevalence_.empty()) {
+        return;
+    }
+    
     // Create an age-specific identifier in the format used in the CSV loading
     core::Identifier age_id("age_" + std::to_string(person.age));
+    
+    std::cout << "\nDEBUG: region_prevalence_ size: " << region_prevalence_.size();
 
     // Check if this specific age exists in region_prevalence_ map
     if (region_prevalence_.contains(age_id)) {
+        std::cout << "\nDEBUG: Found age_id in region_prevalence_";
         // Check if the gender exists for this age
         if (!region_prevalence_.at(age_id).contains(person.gender)) {
             std::string gender_str = (person.gender == core::Gender::male) ? "male" : "female";
@@ -443,6 +454,7 @@ void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &conte
             fmt::format("[{}]", fmt::join(region_names, ", ")),
             fmt::format("[{}]", fmt::join(probs, ", ")), cumulative_prob));
     } else {
+        std::cout << "\nDEBUG: age_id NOT found in region_prevalence_";
         // If no region data for this age, throw detailed error
         std::vector<std::string> available_ages;
         for (const auto &[age, _] : region_prevalence_) {
@@ -458,6 +470,11 @@ void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &conte
 
 void DemographicModule::initialise_ethnicity([[maybe_unused]] RuntimeContext &context,
                                              Person &person, Random &random) {
+    // If no ethnicity data is available, skip ethnicity assignment
+    if (ethnicity_prevalence_.empty()) {
+        return;
+    }
+    
     // Determine the age group for this person
     // In the loading I'm assigning 0-under18 and 1-over18
     core::Identifier age_group = person.age < 18 ? "Under18"_id : "Over18"_id;
@@ -515,7 +532,20 @@ void DemographicModule::initialise_ethnicity([[maybe_unused]] RuntimeContext &co
     for (const auto &[ethnicity_name, prob] : ethnicity_probs) {
         cumulative_prob += prob;
         if (rand_value < cumulative_prob) {
-            person.ethnicity = ethnicity_name;
+            // Store the numeric ethnicity identifier that matches coefficient names
+            // Convert ethnicity name to numeric identifier (ethnicity1, ethnicity2, etc.)
+            if (ethnicity_name == "1") {
+                person.ethnicity = "ethnicity1";
+            } else if (ethnicity_name == "2") {
+                person.ethnicity = "ethnicity2";
+            } else if (ethnicity_name == "3") {
+                person.ethnicity = "ethnicity3";
+            } else if (ethnicity_name == "4") {
+                person.ethnicity = "ethnicity4";
+            } else {
+                // Default fallback
+                person.ethnicity = "ethnicity1";
+            }
             return;
         }
     }

@@ -768,6 +768,10 @@ std::vector<double> StaticLinearModel::compute_residuals(Random &random,
 }
 
 void StaticLinearModel::initialise_sector(Person &person, Random &random) const {
+    // If no rural prevalence data is available, skip sector assignment
+    if (rural_prevalence_.empty()) {
+        return;
+    }
 
     // Get rural prevalence for age group and sex.
     double prevalence;
@@ -784,6 +788,10 @@ void StaticLinearModel::initialise_sector(Person &person, Random &random) const 
 }
 
 void StaticLinearModel::update_sector(Person &person, Random &random) const {
+    // If no rural prevalence data is available, skip sector update
+    if (rural_prevalence_.empty()) {
+        return;
+    }
 
     // Only update rural sector 18 year olds.
     if ((person.age != 18) || (person.sector != core::Sector::rural)) {
