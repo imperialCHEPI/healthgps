@@ -975,7 +975,6 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         std::cout << "\nDEBUG: Continuous income model parsing completed";
     }
 
-
     try {
         auto result = std::make_unique<StaticLinearModelDefinition>(
             std::move(expected), std::move(expected_trend), std::move(trend_steps),
