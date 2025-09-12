@@ -4,6 +4,7 @@
 #include "sync_message.h"
 
 #include <iostream>
+#include <iomanip>
 #include <oneapi/tbb/parallel_for_each.h>
 #include <utility>
 #include <thread>
@@ -70,8 +71,6 @@ double RiskFactorAdjustableModel::get_expected(RuntimeContext &context, core::Ge
 void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
                                                     const std::vector<core::Identifier> &factors,
                                                     OptionalRanges ranges, bool apply_trend) const {
-    std::cout << "\nMAHIMA: adjust_risk_factors - STARTING (apply_trend=" << (apply_trend ? "true" : "false") << ")";
-    std::cout << "\nMAHIMA: Processing " << factors.size() << " factors";
     RiskFactorSexAgeTable adjustments;
 
     // Flag to track if ranges are applied at least once
@@ -79,67 +78,54 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
 
     // Baseline scenario: compute adjustments.
     if (context.scenario().type() == ScenarioType::baseline) {
-        std::cout << "\nMAHIMA: Calculating adjustments for baseline scenario";
-        try {
-            adjustments = calculate_adjustments(context, factors, ranges, apply_trend);
-            std::cout << "\nMAHIMA: Adjustments calculated successfully";
-        } catch (const std::exception& e) {
-            std::cout << "\nMAHIMA: ERROR in calculate_adjustments: " << e.what();
-            throw;
-        } catch (...) {
-            std::cout << "\nMAHIMA: UNKNOWN ERROR in calculate_adjustments";
-            throw;
-        }
+        adjustments = calculate_adjustments(context, factors, ranges, apply_trend);    
     }
 
     // Intervention scenario: receive adjustments from baseline scenario.
     else {
-        std::cout << "\nMAHIMA: Receiving adjustments for intervention scenario";
-        try {
-            // Wait a bit longer for the baseline scenario to finish
-            std::cout << "\nMAHIMA: Waiting for baseline scenario to send adjustments...";
+            // Wait for baseline scenario to finish calculating adjustments
             auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
             int retry_count = 0;
-            while (!message.has_value() && retry_count < 100) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            while (!message.has_value() && retry_count < 500) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(50));
                 message = context.scenario().channel().try_receive(context.sync_timeout_millis());
                 retry_count++;
             }
             
             if (!message.has_value()) {
-                std::cout << "\nMAHIMA: ERROR - No message received after " << retry_count << " retries";
+                std::cout << "\nERROR - No message received after " << retry_count << " retries";
                 throw std::runtime_error("Failed to receive adjustments from baseline scenario");
             }
 
-            // Keep trying until we get a message of the correct type
             auto *messagePrt = dynamic_cast<RiskFactorAdjustmentMessage *>(message.value().get());
-            while (!messagePrt) {
-                message = context.scenario().channel().try_receive(context.sync_timeout_millis());
-                while (!message.has_value()) {
-                    message = context.scenario().channel().try_receive(context.sync_timeout_millis());
-                }
-                messagePrt = dynamic_cast<RiskFactorAdjustmentMessage *>(message.value().get());
+            if (!messagePrt) {
+                std::cout << "\nERROR - Invalid message type received";
+                throw std::runtime_error("Invalid message type received from baseline scenario");
             }
 
             adjustments = messagePrt->data();
-            std::cout << "\nMAHIMA: Adjustments received successfully";
-            for (const auto& [gender, gender_map] : adjustments) {
-                std::cout << "\nMAHIMA: Gender " << (gender == core::Gender::male ? "Male" : "Female") << " has " << gender_map.size() << " factors";
-            }
-        } catch (const std::exception& e) {
-            std::cout << "\nMAHIMA: ERROR receiving adjustments: " << e.what();
-            throw;
-        } catch (...) {
-            std::cout << "\nMAHIMA: UNKNOWN ERROR receiving adjustments";
-            throw;
-        }
     }
 
     // All scenarios: apply adjustments to population.
-    std::cout << "\nMAHIMA: Applying adjustments to population of " << context.population().size() << " people";
     
     auto &pop = context.population();
-    try {
+    
+    // MAHIMA: Store original values for verification (only for baseline scenario)
+    // Only for income and physical activity to verify that they are adjusted to factors mean
+    std::unordered_map<size_t, double> original_income;
+    std::unordered_map<size_t, double> original_physical_activity;
+    if (context.scenario().type() == ScenarioType::baseline && context.time_now() == context.start_time()) {
+        for (const auto& person : pop) {
+            if (!person.is_active()) continue;
+            if (std::find(factors.begin(), factors.end(), "income"_id) != factors.end()) {
+                original_income[person.id()] = person.income_continuous;
+            }
+            if (std::find(factors.begin(), factors.end(), "physicalactivity"_id) != factors.end()) {
+                original_physical_activity[person.id()] = person.physical_activity;
+            }
+        }
+    }
+    
         tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         if (!person.is_active()) {
             return;
@@ -148,47 +134,42 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
         for (size_t factor_index = 0; factor_index < factors.size(); factor_index++) {
             const auto &factor = factors[factor_index];
             
-            // Debug: Check if factor exists in adjustments map
-            if (!adjustments.contains(person.gender)) {
-                std::cout << "\nERROR: Gender " << (person.gender == core::Gender::male ? "Male" : "Female") << " not found in adjustments map";
+            // MAHIMA: Skip income and physicalactivity - they are handled separately below
+            if (factor.to_string() == "income" || factor.to_string() == "physicalactivity") {
                 continue;
             }
             
-            if (!adjustments.at(person.gender).contains(factor)) {
-                std::cout << "\nERROR: Factor " << factor.to_string() << " not found in adjustments map for gender " << (person.gender == core::Gender::male ? "Male" : "Female");
-                continue;
+    // Check if factor exists in adjustments map
+    if (!adjustments.contains(person.gender)) {
+        std::cout << "\nERROR: Gender " << (person.gender == core::Gender::male ? "Male" : "Female") << " not found in adjustments map";
+        continue;
+    }
+    
+    if (!adjustments.at(person.gender).contains(factor)) {
+        std::cout << "\nERROR: Factor " << factor.to_string() << " not found in adjustments map for gender " << (person.gender == core::Gender::male ? "Male" : "Female");
+        continue;
+    }
+
+            // MAHIMA: Check if the person has this risk factor before accessing it
+            if (!person.risk_factors.contains(factor)) {
+        std::cout << "\nWARNING: Person ID " << person.id() << " does not have risk factor " 
+                         << factor.to_string();
             }
 
-
-            // MAHIMA: Skip adjustment for risk factors that are currently 0
+            // MAHIMA: If adjustment for risk factors that are currently 0 (in case something is not initialized)
             // This preserves zero values set by logistic regression (two-stage modeling)
             double original_value = person.risk_factors.at(factor);
-            if (original_value == 0.0) {
-                continue; // Don't adjust zero risk factors
-            }
 
             // Check if age is within bounds
-            if (person.age >= static_cast<int>(adjustments.at(person.gender, factor).size())) {
+            const auto &age_vector = adjustments.at(person.gender, factor);
+            if (person.age >= static_cast<int>(age_vector.size())) {
                 std::cout << "\nWARNING: Person age " << person.age << " is out of bounds for factor " 
                           << factor.to_string() << " (max age: " 
-                          << adjustments.at(person.gender, factor).size() - 1 << ")";
-                continue; // Skip adjustment for this factor
+                          << age_vector.size() - 1 << ")";
             }
             
-            double delta = adjustments.at(person.gender, factor).at(person.age);
+            double delta = age_vector.at(person.age);
             double value = original_value + delta;
-
-            // Check for NaN values and fix them
-            if (std::isnan(value)) {
-                std::cout << "\nWARNING: NaN value detected during risk factor adjustment for "
-                          << factor.to_string() << " (Person ID: " << person.id() << ", Gender: "
-                          << (person.gender == core::Gender::male ? "Male" : "Female")
-                          << ", Age: " << person.age << ", Original value: " << original_value
-                          << ", Delta: " << delta << ")";
-
-                // Use original value as fallback
-                value = original_value;
-            }
 
             // Apply range clamping if ranges are provided
             if (ranges.has_value()) {
@@ -205,17 +186,11 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
         // These are demographic attributes, not regular risk factors
         // Map income_continuous to income (lowercase)
         if (std::find(factors.begin(), factors.end(), "income"_id) != factors.end()) {
-            // Debug: Check if income exists in adjustments map
-            if (!adjustments.contains(person.gender)) {
-                std::cout << "\nERROR: Gender " << (person.gender == core::Gender::male ? "Male" : "Female") << " not found in adjustments map for income";
-            } else if (!adjustments.at(person.gender).contains("income"_id)) {
-                std::cout << "\nERROR: income not found in adjustments map for gender " << (person.gender == core::Gender::male ? "Male" : "Female");
-            } else {
+            if (adjustments.contains(person.gender) && adjustments.at(person.gender).contains("income"_id)) {
                 // Check if age is within bounds
-                if (person.age >= static_cast<int>(adjustments.at(person.gender, "income"_id).size())) {
-                    std::cout << "\nWARNING: Person age " << person.age << " is out of bounds for income adjustment";
-                } else {
-                    double delta = adjustments.at(person.gender, "income"_id).at(person.age);
+                const auto &income_vector = adjustments.at(person.gender, "income"_id);
+                if (person.age < static_cast<int>(income_vector.size())) {
+                    double delta = income_vector.at(person.age);
                     person.income_continuous += delta;
                 }
             }
@@ -223,56 +198,107 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
 
         // Map physical_activity to physicalactivity (lowercase)
         if (std::find(factors.begin(), factors.end(), "physicalactivity"_id) != factors.end()) {
-            // Debug: Check if physicalactivity exists in adjustments map
-            if (!adjustments.contains(person.gender)) {
-                std::cout << "\nERROR: Gender " << (person.gender == core::Gender::male ? "Male" : "Female") << " not found in adjustments map for physicalactivity";
-            } else if (!adjustments.at(person.gender).contains("physicalactivity"_id)) {
-                std::cout << "\nERROR: physicalactivity not found in adjustments map for gender " << (person.gender == core::Gender::male ? "Male" : "Female");
-            } else {
+            if (adjustments.contains(person.gender) && adjustments.at(person.gender).contains("physicalactivity"_id)) {
                 // Check if age is within bounds
-                if (person.age >= static_cast<int>(adjustments.at(person.gender, "physicalactivity"_id).size())) {
-                    std::cout << "\nWARNING: Person age " << person.age << " is out of bounds for physical activity adjustment";
-                } else {
-                    double delta = adjustments.at(person.gender, "physicalactivity"_id).at(person.age);
+                const auto &pa_vector = adjustments.at(person.gender, "physicalactivity"_id);
+                if (person.age < static_cast<int>(pa_vector.size())) {
+                    double delta = pa_vector.at(person.age);
                     person.physical_activity += delta;
                 }
             }
         }
     });
-    std::cout << "\nMAHIMA: Adjustments applied successfully";
-    } catch (const std::exception& e) {
-        std::cout << "\nMAHIMA: ERROR applying adjustments: " << e.what();
-        throw;
-    } catch (...) {
-        std::cout << "\nMAHIMA: UNKNOWN ERROR applying adjustments";
-        throw;
+    
+    // MAHIMA: Verification box - show before/after values for sample of 6 people from different ages and genders
+    if (context.scenario().type() == ScenarioType::baseline && context.time_now() == context.start_time()) {
+        std::cout << "\n\n=== STATIC LINEAR MODEL VERIFICATION BOX (Sample of 6 people from different ages and genders) ===";
+        std::cout << "\nPerson ID | Age | Gender | INCOME BEFORE | INCOME AFTER | INCOME DELTA | PHYSICAL ACTIVITY BEFORE | PHYSICAL ACTIVITY AFTER | PHYSICAL ACTIVITY DELTA";
+        std::cout << "\n----------|-----|--------|---------------|--------------|-------------|-------------------------|------------------------|----------------------";
+        
+        // Sample from different ages and genders: (0,M), (0,F), (25,M), (25,F), (50,M), (50,F)
+        std::vector<std::pair<int, core::Gender>> target_combinations = {
+            {0, core::Gender::male}, {0, core::Gender::female},
+            {25, core::Gender::male}, {25, core::Gender::female},
+            {50, core::Gender::male}, {50, core::Gender::female}
+        };
+        int sample_count = 0;
+        
+        for (auto [target_age, target_gender] : target_combinations) {
+            if (sample_count >= 6) break;
+            
+            for (const auto& person : pop) {
+                if (!person.is_active() || person.age != target_age || person.gender != target_gender) continue;
+                
+                std::cout << "\n" << std::setw(9) << static_cast<int>(person.id()) 
+                          << " | " << std::setw(3) << person.age 
+                          << " | " << std::setw(6) << (person.gender == core::Gender::male ? "Male" : "Female");
+                
+                // Show income before/after values
+                if (std::find(factors.begin(), factors.end(), "income"_id) != factors.end() && 
+                    original_income.find(person.id()) != original_income.end()) {
+                    double before = original_income[person.id()];
+                    double after = person.income_continuous;
+                    double delta = after - before;
+                    std::cout << " | " << std::setw(13) << std::fixed << std::setprecision(2) << before
+                              << " | " << std::setw(12) << std::fixed << std::setprecision(2) << after
+                              << " | " << std::setw(11) << std::fixed << std::setprecision(2) << delta;
+                } else {
+                    std::cout << " | " << std::setw(13) << "N/A" << " | " << std::setw(12) << "N/A" << " | " << std::setw(11) << "N/A";
+                }
+                
+                // Show physical activity before/after values
+                if (std::find(factors.begin(), factors.end(), "physicalactivity"_id) != factors.end() && 
+                    original_physical_activity.find(person.id()) != original_physical_activity.end()) {
+                    double before = original_physical_activity[person.id()];
+                    double after = person.physical_activity;
+                    double delta = after - before;
+                    std::cout << " | " << std::setw(23) << std::fixed << std::setprecision(2) << before
+                              << " | " << std::setw(22) << std::fixed << std::setprecision(2) << after
+                              << " | " << std::setw(20) << std::fixed << std::setprecision(2) << delta;
+                } else {
+                    std::cout << " | " << std::setw(23) << "N/A" << " | " << std::setw(22) << "N/A" << " | " << std::setw(20) << "N/A";
+                }
+                
+                sample_count++;
+                break; // Found one person of this age/gender, move to next combination
+            }
+        }
+        
+        // Debug: Show expected vs simulated values for income to understand adjustments
+        if (expected_->contains(core::Gender::male) && expected_->at(core::Gender::male).contains("income"_id)) {
+            std::cout << "\n\n=== DEBUG: Income Expected vs Simulated Analysis ===";
+            auto& male_expected_income = expected_->at(core::Gender::male, "income"_id);
+            std::cout << "\nMale expected income values (ages 0,25,50): ";
+            for (int age : {0, 25, 50}) {
+                if (age < static_cast<int>(male_expected_income.size())) {
+                    std::cout << "age" << age << "=" << std::fixed << std::setprecision(2) << male_expected_income[age] << " ";
+                }
+            }
+            
+            // Calculate simulated means for income
+            std::cout << "\nMale simulated income means (ages 0,25,50): ";
+            for (int age : {0, 25, 50}) {
+                double sum = 0.0;
+                int count = 0;
+                for (const auto& person : pop) {
+                    if (person.is_active() && person.gender == core::Gender::male && person.age == age) {
+                        sum += person.income_continuous;
+                        count++;
+                    }
+                }
+                double mean = (count > 0) ? sum / count : 0.0;
+                std::cout << "age" << age << "=" << std::fixed << std::setprecision(2) << mean << " ";
+            }
+        }
+        
+        std::cout << "\n======================================================================================================================================================\n";
     }
-
-    // Print single debug message about range application
-    // std::cout << "\nRANGE DEBUG: " << (any_ranges_applied ? "Ranges were applied for risk factor
-    // adjustment": "NO ranges were applied during adjustment");
 
     // Baseline scenario: send adjustments to intervention scenario.
     if (context.scenario().type() == ScenarioType::baseline) {
-        std::cout << "\nMAHIMA: Sending adjustments to intervention scenario";
-        for (const auto& [gender, gender_map] : adjustments) {
-            std::cout << "\nMAHIMA: Gender " << (gender == core::Gender::male ? "Male" : "Female") << " has " << gender_map.size() << " factors";
-        }
-        
-        try {
             context.scenario().channel().send(std::make_unique<RiskFactorAdjustmentMessage>(
                 context.current_run(), context.time_now(), std::move(adjustments)));
-            std::cout << "\nMAHIMA: Adjustments sent successfully";
-        } catch (const std::exception& e) {
-            std::cout << "\nMAHIMA: ERROR sending adjustments: " << e.what();
-            throw;
-        } catch (...) {
-            std::cout << "\nMAHIMA: UNKNOWN ERROR sending adjustments";
-            throw;
-        }
     }
-
-    std::cout << "\nMAHIMA: adjust_risk_factors - COMPLETED successfully";
 }
 
 int RiskFactorAdjustableModel::get_trend_steps(const core::Identifier &factor) const {
@@ -288,19 +314,19 @@ RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context,
     auto age_count = age_range.upper() + 1;
 
     // Compute simulated means.
-    // std::cout<< "\nDEBUG: RiskFactorAdjustableModel::calculate_adjustments - Calculating
-    // simulated means";
     auto simulated_means = calculate_simulated_mean(context.population(), age_range, factors);
-    // std::cout << "\nDEBUG: RiskFactorAdjustableModel::calculate_adjustments - Simulated means
-    // calculated";
 
     // Compute adjustments.
-    // std::cout << "\nDEBUG: RiskFactorAdjustableModel::calculate_adjustments - Computing
-    // adjustments";
     auto adjustments = RiskFactorSexAgeTable{};
     for (const auto &[sex, simulated_means_by_sex] : simulated_means) {
         for (size_t i = 0; i < factors.size(); i++) {
             const core::Identifier &factor = factors[i];
+
+            // Check if this factor exists in the expected table
+            if (!expected_->contains(sex, factor)) {
+                std::cout << "\nWARNING - Factor " << factor.to_string() << " not found in expected table for gender " << (sex == core::Gender::male ? "Male" : "Female") << " - skipping";
+                continue;
+            }
 
             OptionalRange range;
             if (ranges.has_value()) {
@@ -335,7 +361,6 @@ RiskFactorSexAgeTable
 RiskFactorAdjustableModel::calculate_simulated_mean(Population &population,
                                                     const core::IntegerInterval age_range,
                                                     const std::vector<core::Identifier> &factors) {
-    // std::cout << "\nDEBUG: RiskFactorAdjustableModel::calculate_simulated_mean - Starting";
     auto age_count = age_range.upper() + 1;
 
     // Compute first moments.
@@ -351,24 +376,28 @@ RiskFactorAdjustableModel::calculate_simulated_mean(Population &population,
                 moments.emplace(person.gender, factor, std::vector<FirstMoment>(age_count));
             }
 
-            // Check if the risk factor exists for this person
-            if (!person.risk_factors.contains(factor)) {
-                continue;
+            double value = 0.0;
+            bool has_value = false;
+
+            // Special handling for income and physical activity
+            if (factor.to_string() == "income") {
+                value = person.income_continuous;
+                has_value = true;
+            } else if (factor.to_string() == "physicalactivity") {
+                value = person.physical_activity;
+                has_value = true;
+            } else if (person.risk_factors.contains(factor)) {
+                value = person.risk_factors.at(factor);
+                has_value = true;
             }
 
-            double value = person.risk_factors.at(factor);
-            moments.at(person.gender, factor).at(person.age).append(value);
+            if (has_value) {
+                moments.at(person.gender, factor).at(person.age).append(value);
+            }
         }
-
-        /*if (processed_count % 1000 == 0) {
-            std::cout << "\nDEBUG: Processed " << processed_count << " people for first moments"
-                      << std::endl;
-        }*/
     }
 
     // Compute means.
-    // std::cout << "\nDEBUG: RiskFactorAdjustableModel::calculate_simulated_mean - Computing
-    // means";
     auto means = RiskFactorSexAgeTable{};
     for (const auto &[sex, moments_by_sex] : moments) {
         for (const auto &factor : factors) {
@@ -404,3 +433,4 @@ RiskFactorAdjustableModelDefinition::RiskFactorAdjustableModelDefinition(
 }
 
 } // namespace hgps
+

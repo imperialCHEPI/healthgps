@@ -21,14 +21,19 @@ static constexpr bool ENABLE_YEAR3_RISK_FACTOR_INSPECTION = false;
 std::vector<core::Identifier> StaticLinearModel::combine_risk_factors() const {
     std::vector<core::Identifier> combined_factors;
     
-    // Reserve space for both food and other risk factors
-    combined_factors.reserve(names_.size() + other_risk_factor_names_.size());
+    // Reserve space for food factors + only income and physicalactivity
+    combined_factors.reserve(names_.size() + 2);
     
     // Add food factors first (maintains correlation matrix order)
     combined_factors.insert(combined_factors.end(), names_.begin(), names_.end());
     
-    // Add other risk factors (demographics, physical measurements, etc.)
-    combined_factors.insert(combined_factors.end(), other_risk_factor_names_.begin(), other_risk_factor_names_.end());
+    // Add only income and physicalactivity from other risk factors
+    // height, weight, energyintake are handled by Kevin Hall model
+    for (const auto& factor : other_risk_factor_names_) {
+        if (factor.to_string() == "income" || factor.to_string() == "physicalactivity") {
+            combined_factors.push_back(factor);
+        }
+    }
     
     return combined_factors;
 }
@@ -38,14 +43,20 @@ std::vector<core::Identifier> StaticLinearModel::combine_risk_factors() const {
 std::vector<core::DoubleInterval> StaticLinearModel::combine_risk_factor_ranges() const {
     std::vector<core::DoubleInterval> combined_ranges;
     
-    // Reserve space for both food and other risk factor ranges
-    combined_ranges.reserve(ranges_.size() + other_risk_factor_ranges_.size());
+    // Reserve space for food factor ranges + only income and physicalactivity ranges
+    combined_ranges.reserve(ranges_.size() + 2);
     
     // Add food factor ranges first (maintains correlation matrix order)
     combined_ranges.insert(combined_ranges.end(), ranges_.begin(), ranges_.end());
     
-    // Add other risk factor ranges (demographics, physical measurements, etc.)
-    combined_ranges.insert(combined_ranges.end(), other_risk_factor_ranges_.begin(), other_risk_factor_ranges_.end());
+    // Add only income and physicalactivity ranges from other risk factors
+    // height, weight, energyintake are handled by Kevin Hall model
+    for (size_t i = 0; i < other_risk_factor_names_.size(); i++) {
+        const auto& factor = other_risk_factor_names_[i];
+        if (factor.to_string() == "income" || factor.to_string() == "physicalactivity") {
+            combined_ranges.push_back(other_risk_factor_ranges_[i]);
+        }
+    }
     
     return combined_ranges;
 }
@@ -55,50 +66,31 @@ RiskFactorModelType StaticLinearModel::type() const noexcept { return RiskFactor
 std::string StaticLinearModel::name() const noexcept { return "Static"; }
 
 void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
-    std::cout << "\nMAHIMA: StaticLinearModel::generate_risk_factors - STARTING";
-
     // Verify that all expected risk factors are included in the names_ vector
     verify_risk_factors();
-    std::cout << "\nMAHIMA: Risk factor verification completed";
 
     // NOTE: Demographic variables (region, ethnicity, income, etc.) are already
     // initialized by the DemographicModule in initialise_population
 
     // Initialise everyone with risk factors.
-    std::cout << "\nMAHIMA: Starting risk factor initialization for " << context.population().size() << " people";
-    try {
-        for (auto &person : context.population()) {
+    for (auto &person : context.population()) {
             initialise_factors(context, person, context.random());
             initialise_physical_activity(context, person, context.random());
         }
-        std::cout << "\nMAHIMA: Risk factor initialization completed";
-    } catch (const std::exception& e) {
-        std::cout << "\nMAHIMA: ERROR in risk factor initialization: " << e.what();
-        throw;
-    } catch (...) {
-        std::cout << "\nMAHIMA: UNKNOWN ERROR in risk factor initialization";
-        throw;
-    }
 
-
-    // MAHIMA: Combine risk factors for adjustment
-    // Both scenarios need these variables for the trended adjustment later
-    std::cout << "\nMAHIMA: Combining risk factors for adjustment";
+    // MAHIMA: Combine food and other risk factors into single adjustment call
+    // This prevents the "invalid unordered_map<K, T> key" error by ensuring all factors
+    // are processed in one adjustments map instead of separate maps
     auto combined_factors = combine_risk_factors();
     auto combined_ranges = combine_risk_factor_ranges();
-    std::cout << "\nMAHIMA: Combined " << combined_factors.size() << " factors for adjustment";
     
-    // MAHIMA: Only adjust risk factors for baseline scenario during initialization
-    // Intervention scenario will receive adjustments during updates
-    if (context.scenario().type() == ScenarioType::baseline) {
-        std::cout << "\nMAHIMA: About to call adjust_risk_factors (baseline scenario)";
-        adjust_risk_factors(context, combined_factors, combined_ranges, false);
-        
-        // MAHIMA: Success message for risk factor adjustment
-        std::cout << "\nMAHIMA: Risk factors successfully adjusted to means (26 factors: 21 food + 5 other)";
-    } else {
-        std::cout << "\nMAHIMA: Skipping risk factor adjustment for intervention scenario during initialization";
-    }
+    // MAHIMA: Use all combined factors (both food and other risk factors)
+    // All factors are now initialized in person.risk_factors
+    auto filtered_factors = combined_factors;
+    auto filtered_ranges = combined_ranges;
+    
+    // Single call to adjust_risk_factors with filtered factors and their ranges
+    adjust_risk_factors(context, filtered_factors, filtered_ranges, false);
 
     // Initialise everyone with policies and trends.
     for (auto &person : context.population()) {
@@ -108,9 +100,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
 
     // MAHIMA: Adjust trended risk factor means using combined factors
     // Use the same combined factors and ranges for trended adjustment
-    if (context.scenario().type() == ScenarioType::baseline) {
-        adjust_risk_factors(context, combined_factors, combined_ranges, true);
-    }
+    adjust_risk_factors(context, combined_factors, combined_ranges, true);
 
     // Print risk factor summary once at the end
     std::string risk_factor_list;
@@ -154,8 +144,13 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
     auto combined_factors = combine_risk_factors();
     auto combined_ranges = combine_risk_factor_ranges();
     
-    // Single call to adjust_risk_factors with all factors and their ranges
-    adjust_risk_factors(context, combined_factors, combined_ranges, false);
+    // MAHIMA: Use all combined factors (both food and other risk factors)
+    // All factors are now initialized in person.risk_factors
+    auto filtered_factors = combined_factors;
+    auto filtered_ranges = combined_ranges;
+    
+    // Single call to adjust_risk_factors with filtered factors and their ranges
+    adjust_risk_factors(context, filtered_factors, filtered_ranges, false);
 
     // Update policies and trends for all people, initializing for newborns.
     for (auto &person : context.population()) {
@@ -593,22 +588,6 @@ StaticLinearModel::compute_linear_models(Person &person,
             if (value <= 0) {
                 value = 1e-10; // Avoid log of zero or negative
             }
-
-            // MAHIMA: Verification print for EnergyIntake log coefficient fix
-            /* if (coefficient_name == "EnergyIntake"_id) {
-                static int print_count = 0;
-                if (print_count < 3) { // Only print first 3 times to avoid spam
-                    std::cout << "\nMAHIMA VERIFICATION: EnergyIntake log coefficient applied
-            correctly!"
-                              << "\n  Coefficient value: " << coefficient_value
-                              << "\n  EnergyIntake value: " << value
-                              << "\n  log(EnergyIntake): " << log(value)
-                              << "\n  Linear term contribution: " << coefficient_value * log(value)
-                              << "\n  (Previous bug would have been: " << coefficient_value * value
-            << ")"; print_count++;
-                }
-            }*/
-
             factor += coefficient_value * log(value);
         }
 

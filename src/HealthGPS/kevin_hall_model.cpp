@@ -5,6 +5,7 @@
 #include "sync_message.h"
 
 #include <algorithm>
+#include <iomanip>
 #include <iostream>
 #include <iterator>
 #include <utility>
@@ -44,7 +45,7 @@ KevinHallModel::KevinHallModel(
       height_stddev_{height_stddev}, height_slope_{height_slope} {
 
     // Print nutrient ranges to verify they're loaded correctly
-    std::cout << "\n======= LOADED NUTRIENT RANGES IN KEVIN HALL =======";
+    /*std::cout << "\n======= LOADED NUTRIENT RANGES IN KEVIN HALL =======";
     bool weight_range_found = false;
     for (const auto &[key, range] : nutrient_ranges_) {
         std::cout << "\nNutrient: " << key.to_string() << ", Range: [" << range.lower() << " , "
@@ -60,7 +61,7 @@ KevinHallModel::KevinHallModel(
     } else {
         std::cout << "\n*** Weight range is defined and will be used for clamping ***";
     }
-    std::cout << "\n=====================================\n";
+    std::cout << "\n=====================================\n";*/ 
 }
 
 RiskFactorModelType KevinHallModel::type() const noexcept { return RiskFactorModelType::Dynamic; }
@@ -87,26 +88,6 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
         // Fall back to std::nullopt if no Weight range is defined
         adjust_risk_factors(context, {"Weight"_id}, std::nullopt, true);
     }
-
-    //// Print weight values for a sample of people after adjustment
-    // std::cout << "\n===== WEIGHT ADJUSTMENT CHECK: SAMPLE OF 5 PEOPLE =====";
-    // int sample_count = 0;
-    // int print_interval = std::max(1, static_cast<int>(context.population().size() / 5));
-    // for (const auto &person : context.population()) {
-    //     if (!person.is_active())
-    //         continue;
-
-    //    if (person.id() % print_interval == 0 && sample_count < 5) {
-    //        std::cout << "\nPerson ID: " << person.id() << ", Age: " << person.age
-    //                  << ", Gender: " << (person.gender == core::Gender::male ? "Male" : "Female")
-    //                  << ", Weight: " << person.risk_factors.at("Weight"_id) << " kg";
-    //        sample_count++;
-    //    }
-
-    //    if (sample_count >= 5)
-    //        break;
-    //}
-    // std::cout << "\n================================================\n";
 
     // Compute weight power means by sex and age.
     auto W_power_means = compute_mean_weight(context.population(), height_slope_);
@@ -267,33 +248,6 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
             }
         }
     }
-
-    // Print weight values for a sample of people after adjustment
-    /*std::cout << "\n===== WEIGHT ADJUSTMENT CHECK DURING UPDATE: SAMPLE OF 5 PEOPLE =====";
-    std::cout << "\nYear: " << context.time_now();
-    int sample_count = 0;
-    int print_interval = std::max(1, static_cast<int>(context.population().size() / 5));
-    for (const auto &person : context.population()) {
-        if (!person.is_active() || person.age == 0)
-            continue;
-
-        if (person.id() % print_interval == 0 && sample_count < 5) {
-            double adjustment_value = 0.0;
-            if (adjustments.contains(person.gender, person.age)) {
-                adjustment_value = adjustments.at(person.gender, person.age);
-            }
-
-            std::cout << "\nPerson ID: " << person.id() << ", Age: " << person.age
-                      << ", Gender: " << (person.gender == core::Gender::male ? "Male" : "Female")
-                      << ", Weight: " << person.risk_factors.at("Weight"_id) << " kg"
-                      << ", Adjustment: " << adjustment_value;
-            sample_count++;
-        }
-
-        if (sample_count >= 5)
-            break;
-    }
-    std::cout << "\n=================================================================\n";*/
 
     // Send (baseline) weight adjustments to intervention scenario.
     send_weight_adjustments(context, std::move(adjustments));
@@ -458,16 +412,6 @@ double KevinHallModel::get_expected(RuntimeContext &context, core::Gender sex, i
 }
 
 void KevinHallModel::initialise_nutrient_intakes(Person &person) const {
-    // Set all nutrients to valid initial values before computing
-    /*for (const auto &[nutrient_key, unused] : energy_equation_) {
-        // Initialize to minimum valid value if range exists
-        if (nutrient_ranges_.contains(nutrient_key)) {
-            person.risk_factors[nutrient_key] = nutrient_ranges_.at(nutrient_key).lower();
-        } else {
-            person.risk_factors[nutrient_key] = 0.0;
-        }
-    }*/ 
-
     // Now compute nutrient intakes
     compute_nutrient_intakes(person);
 

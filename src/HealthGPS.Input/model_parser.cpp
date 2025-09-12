@@ -398,53 +398,6 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         policy_ranges_map = load_policy_ranges_from_csv(policy_csv_path);
         std::cout << "\nSuccessfully loaded policy coefficients from CSV for "
                   << policy_csv_coefficients.size() << " risk factors";
-
-        // MAHIMA: Print the complete contents of the loaded policy CSV file
-        /*std::cout << "\n======= CONTENTS OF policyeffect_model.csv =======";
-        for (const auto &[risk_factor_name, model_params] : policy_csv_coefficients) {
-            std::cout << "\n\nRisk Factor: " << risk_factor_name;
-            std::cout << "\n  Intercept: " << model_params.intercept;
-
-            // Print all coefficients
-            std::cout << "\n  Coefficients:";
-            for (const auto &[coef_name, coef_value] : model_params.coefficients) {
-                std::cout << "\n    " << coef_name.to_string() << ": " << coef_value;
-            }
-
-            // Print log coefficients if any
-            if (!model_params.log_coefficients.empty()) {
-                std::cout << "\n  Log Coefficients:";
-                for (const auto &[log_coef_name, log_coef_value] : model_params.log_coefficients) {
-                    std::cout << "\n    " << log_coef_name.to_string() << ": " << log_coef_value;
-                }
-            }
-
-            // Print range if available
-            if (policy_ranges_map.find(risk_factor_name) != policy_ranges_map.end()) {
-                const auto &range = policy_ranges_map[risk_factor_name];
-                std::cout << "\n  Range: [" << range.lower() << ", " << range.upper() << "]";
-            }
-        }
-        std::cout << "\n================================================================\n";*/
-
-        // Print a sample of the loaded policy coefficients for verification
-        if (!policy_csv_coefficients.empty()) {
-            auto first_rf = policy_csv_coefficients.begin()->first;
-            // std::cout << "\n\nSample policy coefficient values for risk factor '" << first_rf <<
-            // "':"; std::cout << "\n  Policy Intercept: " <<
-            // policy_csv_coefficients[first_rf].intercept;
-
-            // Print a few coefficients
-            /*for (const auto &coef_pair : policy_csv_coefficients[first_rf].coefficients) {
-                std::cout << "\n  " << coef_pair.first.to_string() << ": " << coef_pair.second;
-            }*/
-
-            // Print range if available
-            if (policy_ranges_map.find(first_rf) != policy_ranges_map.end()) {
-                // std::cout << "\n  Policy range: [" << policy_ranges_map[first_rf].lower() << ",
-                // "<< policy_ranges_map[first_rf].upper() << "]";
-            }
-        }
     }
 
     // Load logistic regression coefficients from CSV if the file exists
@@ -574,15 +527,6 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         if (policy_csv_coefficients.find(key.to_string()) != policy_csv_coefficients.end()) {
             // Use coefficients from CSV file
             policy_model = policy_csv_coefficients[key.to_string()];
-            // std::cout << "\nLoading policy coefficients using CSV for: " << key.to_string();
-
-            // Print a sample of the key coefficients for verification
-            // std::cout << "\n  Policy Intercept: " << policy_model.intercept;
-            /*if (!policy_model.coefficients.empty()) {
-                auto first_coef = policy_model.coefficients.begin()->first;
-                std::cout << "\n  First policy coefficient (" << first_coef.to_string() << "): " <<
-            policy_model.coefficients[first_coef];
-            }*/
         } else {
             // Fall back to JSON if not found in CSV- worst case
             std::cout << "\nLoading policy coefficients using JSON NOOOOOOO!!! for: " << key.to_string();
@@ -606,8 +550,6 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             policy_ranges_map.find(key.to_string()) != policy_ranges_map.end()) {
             // Use ranges from CSV
             policy_ranges.emplace_back(policy_ranges_map[key.to_string()]);
-            // std::cout << "\n  Using policy range from CSV: [" << policy_ranges_map[key.to_string()].lower()
-            // << ", " << policy_ranges_map[key.to_string()].upper() << "]";
         } else {
             // Fall back to JSON ranges
             const auto &policy_json_params = json_params["Policy"];
@@ -693,9 +635,6 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             std::cout << "\nWARNING: Failed to load region prevalence from CSV, falling back to "
                          "JSON. NOOOOOO!!!"
                       << "\n";
-        } else {
-            std::cout << "\nSuccessfully loaded region prevalence from CSV with "
-                      << region_prevalence.size() << " age entries" << "\n";
         }
     }
 
@@ -1001,22 +940,22 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     std::vector<core::DoubleInterval> other_risk_factor_ranges;
     
     // Load other risk factors and their ranges from config.json
-    try {
-        // Load config.json to get other risk factor names and ranges
+    // Load config.json to get other risk factor names and ranges
         auto config_json = load_json(config.root_path / "config.json");
         if (config_json.contains("modelling") &&
             config_json["modelling"].contains("risk_factors")) {
 
             // List of other risk factors that should be adjusted to their means
+            // Only include factors that actually exist in the factors mean CSV files
             const std::vector<std::string> other_factor_names = {
-                "Weight", "Height", "EnergyIntake", "Income", "PhysicalActivity"
+                "weight", "height", "energyintake", "income", "physicalactivity"
             };
 
             for (const auto &risk_factor : config_json["modelling"]["risk_factors"]) {
                 const std::string rf_name = risk_factor["name"];
                 
                 // Check if this is one of our other risk factors
-                if (std::find(other_factor_names.begin(), other_factor_names.end(), rf_name) !=
+                if (std::find(other_factor_names.begin(), other_factor_names.end(), core::to_lower(rf_name)) !=
                     other_factor_names.end()) {
                     // Convert to lowercase to match the factors mean CSV format
                     other_risk_factor_names.emplace_back(core::to_lower(rf_name));
@@ -1029,14 +968,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                               << range.lower() << ", " << range.upper() << "]";
                 }
             }
-
-            std::cout << "\nLoaded " << other_risk_factor_names.size()
-                      << " other risk factors with ranges from config.json";
         }
-    } catch (const std::exception &e) {
-        std::cout << "\nWARNING: Failed to load other risk factors from config.json: " << e.what();
-    }
-    
     std::cout << "\n======= OTHER RISK FACTORS FOR MEAN ADJUSTMENT =======";
     for (const auto &name : other_risk_factor_names) {
         std::cout << "\nOther risk factor: " << name.to_string();
@@ -1228,8 +1160,7 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
     }
 
     // Add additional important ranges from config.json risk_factors section- Mahima
-    try {
-        // Load config.json to get additional ranges
+    // Load config.json to get additional ranges
         auto config_json = load_json(config.root_path / "config.json");
         if (config_json.contains("modelling") &&
             config_json["modelling"].contains("risk_factors")) {
@@ -1259,9 +1190,6 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
             std::cout << "\nLoaded " << factors_added
                       << " additional factor ranges from config.json";
         }
-    } catch (const std::exception &e) {
-        std::cout << "\nWARNING: Failed to load additional ranges from config.json: " << e.what();
-    }
 
     // std::cout << "\nFinished loading Kevin Hall nutrients";
 
@@ -1494,24 +1422,6 @@ load_risk_factor_coefficients_from_csv(const std::filesystem::path &csv_path, bo
         if (print_debug) {
             std::cout << "\nSuccessfully loaded risk factor coefficients from CSV: \n"
                       << csv_path.string();
-
-            // Print a sample of the loaded coefficient values for verification
-            if (!result.empty()) {
-                // Take the first risk factor as an example
-                auto first_rf = result.begin()->first;
-                // std::cout << "\n\nSample coefficient values for risk factor '" << first_rf <<
-                // "':"; std::cout << "\n  Intercept: " << result[first_rf].intercept;
-
-                // Print a few coefficients
-                for (const auto &coef_pair : result[first_rf].coefficients) {
-                    std::cout << "\n  " << coef_pair.first.to_string() << ": " << coef_pair.second;
-                }
-
-                // Print total number of risk factors and coefficients loaded
-                // std::cout << "\n\nTotal risk factors loaded: " << result.size();
-                // std::cout << "\nAverage coefficients per risk factor: " << (result.empty() ? 0 :
-                // result.begin()->second.coefficients.size());
-            }
         }
     } catch (const std::exception &e) {
         std::cout << "\nERROR: Failed to load risk factor coefficients from CSV: " << e.what();
@@ -1609,20 +1519,9 @@ load_policy_ranges_from_csv(const std::filesystem::path &csv_path) {
         }
 
         std::cout << "\nSuccessfully loaded policy ranges from CSV";
-
-        // Print a sample of the loaded ranges for verification
-        if (!result.empty()) {
-            // Take the first risk factor as an example
-            auto first_rf = result.begin()->first;
-            // std::cout << "\n\nSample range values for policy risk factor '" << first_rf << "':";
-            // std::cout << "\n  Range: [" << result[first_rf].lower() << ", "<<
-            // result[first_rf].upper() << "]";
-            std::cout << "\n\nTotal policy ranges loaded: " << result.size() << "\n";
-        }
     } catch (const std::exception &e) {
         std::cout << "\nERROR: Failed to load policy ranges from CSV: " << e.what();
     }
-
     return result;
 }
 // NOLINTEND(readability-function-cognitive-complexity)
@@ -1723,32 +1622,11 @@ load_logistic_regression_coefficients_from_csv(const std::filesystem::path &csv_
         if (print_debug) {
             std::cout << "\nSuccessfully loaded logistic regression coefficients from CSV: \n"
                       << csv_path.string();
-
-            // Print a sample of the loaded coefficient values for verification
-            if (!result.empty()) {
-                // Take the first risk factor as an example
-                auto first_rf = result.begin()->first;
-                // std::cout << "\n\nSample logistic regression coefficient values for risk factor
-                // '" << first_rf << "':"; std::cout << "\n  Intercept: " <<
-                // result[first_rf].intercept;
-
-                // Print a few coefficients
-                // for (const auto &coef_pair : result[first_rf].coefficients) {
-                // std::cout << "\n  " << coef_pair.first.to_string() << ": " << coef_pair.second;
-                //}
-
-                // Print total number of risk factors and coefficients loaded
-                std::cout << "\n\nTotal risk factors with logistic regression coefficients loaded: "
-                          << result.size();
-                // std::cout << "\nAverage coefficients per risk factor: " << (result.empty() ? 0 :
-                // result.begin()->second.coefficients.size());
-            }
         }
     } catch (const std::exception &e) {
         std::cout << "\nERROR: Failed to load logistic regression coefficients from CSV: "
                   << e.what();
     }
-
     return result;
 }
 // NOLINTEND(readability-function-cognitive-complexity)
@@ -1810,14 +1688,6 @@ load_region_prevalence_from_csv(const std::filesystem::path &csv_path) {
             double wales_prob = std::stod(row[3]);
             double scotland_prob = std::stod(row[4]);
             double ni_prob = std::stod(row[5]);
-
-            // Print a sample of the first few rows
-            /*if (sample_count < 5) {
-                std::cout << age << " | " << (gender == core::Gender::male ? "male" : "female")
-                          << " | " << england_prob << " | " << wales_prob << " | " << scotland_prob
-                          << " | " << ni_prob << std::endl;
-                sample_count++;
-            }*/
 
             // Store in result map with same structure as the existing JSON-loaded data
             result[age_id][gender][core::Region::England] = england_prob;
@@ -1924,19 +1794,6 @@ load_ethnicity_prevalence_from_csv(const std::filesystem::path &csv_path) {
             // Get England probability for this specific ethnicity
             // (we only use England probabilities as specified)
             double england_prob = std::stod(row[3]);
-
-            // These variables are unused - removed to fix compiler warnings
-            // double wales_prob = std::stod(row[4]);
-            // double ni_prob = std::stod(row[5]);
-            // double scotland_prob = std::stod(row[6]);
-
-            // Print a sample of the first few rows
-            /*if (sample_count < 5) {
-                std::cout << adult << " | " << (gender == core::Gender::male ? "male" : "female")
-                          << " | " << ethnicity_code << " | " << england_prob << " | " << wales_prob
-                          << " | " << ni_prob << " | " << scotland_prob << std::endl;
-                sample_count++;
-            }*/
 
             // Store in result map with same structure as the existing JSON-loaded data
             // Each row in the CSV represents one ethnicity for a specific age group and gender
