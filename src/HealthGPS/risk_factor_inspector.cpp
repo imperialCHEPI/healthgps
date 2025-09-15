@@ -14,7 +14,7 @@ namespace hgps {
 static constexpr bool ENABLE_YEAR3_RISK_FACTOR_INSPECTION = false;
 
 RiskFactorInspector::RiskFactorInspector(const std::filesystem::path &output_dir)
-    : year_3_captured_(false) {
+    : year_3_captured_(false), output_dir_(output_dir) {
 
     // MAHIMA: Initialize target risk factors for inspection
     // These are the specific nutrients/risk factors that were producing
@@ -50,31 +50,41 @@ RiskFactorInspector::RiskFactorInspector(const std::filesystem::path &output_dir
     ss << std::put_time(std::localtime(&time_t), "%Y-%m-%d_%H-%M-%S");
     std::string timestamp_str = ss.str();
 
-    auto baseline_path =
-        output_dir / ("Year3_Baseline_Individual_RiskFactors_" + timestamp_str + ".csv");
-    auto intervention_path =
-        output_dir / ("Year3_Intervention_Individual_RiskFactors_" + timestamp_str + ".csv");
+    // MAHIMA: Only create Year 3 files if the feature is enabled
+    if constexpr (ENABLE_YEAR3_RISK_FACTOR_INSPECTION) {
+        auto baseline_path =
+            output_dir / ("Year3_Baseline_Individual_RiskFactors_" + timestamp_str + ".csv");
+        auto intervention_path =
+            output_dir / ("Year3_Intervention_Individual_RiskFactors_" + timestamp_str + ".csv");
 
-    // MAHIMA: Open output file streams with error checking
-    // These files will contain individual person records for inspection
-    baseline_file_.open(baseline_path, std::ios::out);
-    intervention_file_.open(intervention_path, std::ios::out);
+        // MAHIMA: Open output file streams with error checking
+        // These files will contain individual person records for inspection
+        baseline_file_.open(baseline_path, std::ios::out);
+        intervention_file_.open(intervention_path, std::ios::out);
 
-    if (!baseline_file_.is_open()) {
-        throw core::HgpsException("MAHIMA: Failed to create baseline inspection file: " +
-                                  baseline_path.string());
+        if (!baseline_file_.is_open()) {
+            throw core::HgpsException("MAHIMA: Failed to create baseline inspection file: " +
+                                      baseline_path.string());
+        }
+
+        if (!intervention_file_.is_open()) {
+            throw core::HgpsException("MAHIMA: Failed to create intervention inspection file: " +
+                                      intervention_path.string());
+        }
     }
 
-    if (!intervention_file_.is_open()) {
-        throw core::HgpsException("MAHIMA: Failed to create intervention inspection file: " +
-                                  intervention_path.string());
+    // MAHIMA: Write CSV headers immediately to both files (only if Year 3 inspection is enabled)
+    if constexpr (ENABLE_YEAR3_RISK_FACTOR_INSPECTION) {
+        write_headers();
     }
-
-    // MAHIMA: Write CSV headers immediately to both files
-    write_headers();
 
     // MAHIMA: Print confirmation of file creation for debugging
     if constexpr (ENABLE_YEAR3_RISK_FACTOR_INSPECTION) {
+        auto baseline_path =
+            output_dir / ("Year3_Baseline_Individual_RiskFactors_" + timestamp_str + ".csv");
+        auto intervention_path =
+            output_dir / ("Year3_Intervention_Individual_RiskFactors_" + timestamp_str + ".csv");
+            
         std::cout << "\nMAHIMA: Risk Factor Inspector initialized successfully:";
         std::cout << "\n  Baseline file: " << baseline_path.string();
         std::cout << "\n  Intervention file: " << intervention_path.string();
@@ -325,6 +335,282 @@ std::string RiskFactorInspector::ethnicity_enum_to_string(core::Ethnicity ethnic
     default:
         return "Unknown";
     }
+}
+
+// MAHIMA: Set debug configuration for detailed calculation capture
+void RiskFactorInspector::set_debug_config(bool enabled, int age, core::Gender gender, 
+                                          const std::string &risk_factor) {
+    debug_config_.enabled = enabled;
+    debug_config_.target_age = age;
+    debug_config_.target_gender = gender;
+    debug_config_.target_risk_factor = risk_factor;
+    
+    if (enabled) {
+        std::cout << "\nMAHIMA: Debug configuration set - Age: " << age 
+                  << ", Gender: " << (gender == core::Gender::male ? "male" : 
+                                     gender == core::Gender::female ? "female" : "any")
+                  << ", Risk Factor: " << (risk_factor.empty() ? "any" : risk_factor);
+    }
+}
+
+// MAHIMA: Capture detailed risk factor calculation steps for debugging
+void RiskFactorInspector::capture_detailed_calculation(RuntimeContext &context, const Person &person, 
+                                                      const std::string &risk_factor_name, size_t risk_factor_index,
+                                                      double random_residual_before_cholesky, double residual_after_cholesky,
+                                                      double expected_value, double linear_result, double residual,
+                                                      double stddev, double combined, double lambda, double boxcox_result,
+                                                      double factor_before_clamp, double range_lower, double range_upper,
+                                                      double final_clamped_factor) {
+    
+    // Check if debugging is enabled and this person/risk factor matches our criteria
+    if (!debug_config_.enabled) {
+        return;
+    }
+    
+    // Check age filter
+    if (debug_config_.target_age != -1 && person.age != static_cast<unsigned int>(debug_config_.target_age)) {
+        return;
+    }
+    
+    // Check gender filter
+    if (debug_config_.target_gender != core::Gender::unknown && person.gender != debug_config_.target_gender) {
+        return;
+    }
+    
+    // Check risk factor filter
+    if (!debug_config_.target_risk_factor.empty() && 
+        !core::case_insensitive::equals(risk_factor_name, debug_config_.target_risk_factor)) {
+        return;
+    }
+    
+    // Create filename: {risk_factor_name}_inspection.csv
+    std::string filename = core::to_lower(risk_factor_name) + "_inspection.csv";
+    std::filesystem::path file_path = output_dir_ / filename;
+    
+    // Check if file exists to determine if we need to write headers
+    bool file_exists = std::filesystem::exists(file_path);
+    
+    // Open file in append mode
+    std::ofstream file(file_path, std::ios::app);
+    if (!file.is_open()) {
+        std::cout << "\nERROR: Could not open debug file: " << file_path.string();
+        return;
+    }
+    
+    // Write headers if this is a new file
+    if (!file_exists) {
+        file << "person_id,gender,age,region,ethnicity,physical_activity,income_continuous,income_category,"
+             << "random_residual_before_cholesky,residual_after_cholesky,RF_value,expected_value,linear_result,"
+             << "residual,stddev,combined,lambda,boxcox_result,factor_before_clamp,range_lower,range_upper,"
+             << "final_clamped_factor\n";
+    }
+    
+    // Write person data
+    file << person.id() << ","
+         << (person.gender == core::Gender::male ? "male" : "female") << ","
+         << person.age << ","
+         << region_enum_to_string(person.region) << ","
+         << ethnicity_enum_to_string(person.ethnicity) << ","
+         << person.physical_activity << ","
+         << person.income_continuous << ","
+         << person.income_category << ","
+         << random_residual_before_cholesky << ","
+         << residual_after_cholesky << ","
+         << risk_factor_name << ","
+         << expected_value << ","
+         << linear_result << ","
+         << residual << ","
+         << stddev << ","
+         << combined << ","
+         << lambda << ","
+         << boxcox_result << ","
+         << factor_before_clamp << ","
+         << range_lower << ","
+         << range_upper << ","
+         << final_clamped_factor << "\n";
+    
+    file.close();
+}
+
+// MAHIMA: Store calculation details for later capture
+void RiskFactorInspector::store_calculation_details(const Person &person, const std::string &risk_factor_name, size_t risk_factor_index,
+                                                   double random_residual_before_cholesky, double residual_after_cholesky,
+                                                   double expected_value, double linear_result, double residual,
+                                                   double stddev, double combined, double lambda, double boxcox_result,
+                                                   double factor_before_clamp, double range_lower, double range_upper,
+                                                   double final_clamped_factor) {
+    if (!debug_config_.enabled) {
+        return;
+    }
+
+    // Check if this person and risk factor should be captured
+    bool should_capture = true;
+    
+    if (debug_config_.target_age != -1 && person.age != debug_config_.target_age) {
+        should_capture = false;
+    }
+    
+    if (debug_config_.target_gender != core::Gender::unknown && person.gender != debug_config_.target_gender) {
+        should_capture = false;
+    }
+    
+    if (!debug_config_.target_risk_factor.empty() && risk_factor_name != debug_config_.target_risk_factor) {
+        should_capture = false;
+    }
+    
+    // Debug output removed for cleaner console output
+    
+    if (!should_capture) {
+        return;
+    }
+
+    // Store the calculation details
+    std::string person_id = std::to_string(person.id());
+    CalculationDetails details;
+    details.random_residual_before_cholesky = random_residual_before_cholesky;
+    details.residual_after_cholesky = residual_after_cholesky;
+    details.expected_value = expected_value;
+    details.linear_result = linear_result;
+    details.residual = residual;
+    details.stddev = stddev;
+    details.combined = combined;
+    details.lambda = lambda;
+    details.boxcox_result = boxcox_result;
+    details.factor_before_clamp = factor_before_clamp;
+    details.range_lower = range_lower;
+    details.range_upper = range_upper;
+    details.final_clamped_factor = final_clamped_factor;
+    
+    calculation_storage_[person_id][risk_factor_name] = details;
+}
+
+// MAHIMA: Capture person risk factors after all calculations are complete
+void RiskFactorInspector::capture_person_risk_factors(RuntimeContext &context, const Person &person, 
+                                                     const std::string &risk_factor_name, size_t risk_factor_index) {
+    if (!debug_config_.enabled) {
+        return;
+    }
+
+    // Check if this person and risk factor should be captured
+    bool should_capture = true;
+    
+    if (debug_config_.target_age != -1 && person.age != debug_config_.target_age) {
+        should_capture = false;
+    }
+    
+    if (debug_config_.target_gender != core::Gender::unknown && person.gender != debug_config_.target_gender) {
+        should_capture = false;
+    }
+    
+    if (!debug_config_.target_risk_factor.empty() && risk_factor_name != debug_config_.target_risk_factor) {
+        should_capture = false;
+    }
+    
+    if (!should_capture) {
+        return;
+    }
+
+    // Count how many people match our criteria (no console output)
+    static int match_count = 0;
+    match_count++;
+
+    std::string person_id = std::to_string(person.id());
+    
+    // Check if we have stored calculation details for this person and risk factor
+    if (calculation_storage_.find(person_id) == calculation_storage_.end() ||
+        calculation_storage_[person_id].find(risk_factor_name) == calculation_storage_[person_id].end()) {
+        return;
+    }
+    
+    const auto& details = calculation_storage_[person_id][risk_factor_name];
+    
+    // Create the CSV file path (only baseline scenario runs debugging)
+    std::filesystem::path csv_path = output_dir_ / (risk_factor_name + "_inspection.csv");
+    
+    // Check if file exists to determine if we need to write headers
+    bool file_exists = std::filesystem::exists(csv_path);
+    
+    // Open file in append mode
+    std::ofstream file(csv_path, std::ios::app);
+    if (!file.is_open()) {
+        std::cerr << "\nMAHIMA: Error opening file for writing: " << csv_path << std::endl;
+        return;
+    }
+    
+    // Write headers if file is new
+    if (!file_exists) {
+        file << "person_id,gender,age,region,ethnicity,physical_activity,income_continuous,income_category,"
+             << "random_residual_before_cholesky,residual_after_cholesky,RF_value,expected_value,linear_result,"
+             << "residual,stddev,combined,lambda,boxcox_result,factor_before_clamp,range_lower,range_upper,"
+             << "final_clamped_factor\n";
+    }
+    
+    // Write the data
+    file << person_id << ","
+         << (person.gender == core::Gender::male ? "male" : "female") << ","
+         << person.age << ","
+         << (person.region == core::Region::England ? "England" : 
+             person.region == core::Region::Scotland ? "Scotland" : 
+             person.region == core::Region::Wales ? "Wales" : "NorthernIreland") << ","
+         << (person.ethnicity == core::Ethnicity::White ? "White" :
+             person.ethnicity == core::Ethnicity::Black ? "Black" :
+             person.ethnicity == core::Ethnicity::Asian ? "Asian" :
+             person.ethnicity == core::Ethnicity::Mixed ? "Mixed" : "Other") << ","
+         << person.physical_activity << ","
+         << person.income_continuous << ","
+         << static_cast<int>(person.income) << ","
+         << details.random_residual_before_cholesky << ","
+         << details.residual_after_cholesky << ","
+         << risk_factor_name << ","
+         << details.expected_value << ","
+         << details.linear_result << ","
+         << details.residual << ","
+         << details.stddev << ","
+         << details.combined << ","
+         << details.lambda << ","
+         << details.boxcox_result << ","
+         << details.factor_before_clamp << ","
+         << details.range_lower << ","
+         << details.range_upper << ","
+         << details.final_clamped_factor << "\n";
+    
+    file.close();
+    
+    // Count records written (no console output for cleaner display)
+    static int total_written = 0;
+    total_written++;
+}
+
+// MAHIMA: Analyze population and count people matching debug criteria
+void RiskFactorInspector::analyze_population_demographics(RuntimeContext &context) {
+    if (!debug_config_.enabled) {
+        return;
+    }
+    
+    int total_population = context.population().size();
+    int matching_age_gender = 0;
+    int matching_age_gender_risk_factor = 0;
+    
+    // Count people matching age and gender criteria
+    for (const auto &person : context.population()) {
+        bool age_matches = (debug_config_.target_age == -1) || (person.age == debug_config_.target_age);
+        bool gender_matches = (debug_config_.target_gender == core::Gender::unknown) || (person.gender == debug_config_.target_gender);
+        
+        if (age_matches && gender_matches) {
+            matching_age_gender++;
+            
+            // Check if this person has the target risk factor
+            if (!debug_config_.target_risk_factor.empty()) {
+                auto risk_factor_id = core::Identifier(debug_config_.target_risk_factor);
+                if (person.risk_factors.find(risk_factor_id) != person.risk_factors.end()) {
+                    matching_age_gender_risk_factor++;
+                }
+            }
+        }
+    }
+    
+    // Population analysis completed (no console output for cleaner display)
+    // Results: Total population: {total_population}, Matching: {matching_age_gender_risk_factor}
 }
 
 } // namespace hgps

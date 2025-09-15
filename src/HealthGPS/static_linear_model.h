@@ -105,6 +105,10 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     // Calculate the probability of a risk factor being zero using logistic regression
     double calculate_zero_probability(Person &person, size_t risk_factor_index) const;
 
+    // MAHIMA: Set debug configuration for detailed calculation capture
+    void set_debug_config(bool enabled, int age = -1, core::Gender gender = core::Gender::unknown, 
+                         const std::string &risk_factor = "");
+
   private:
     // Helper functions to combine food and other risk factors for single adjustment call
     // This prevents the "invalid unordered_map<K, T> key" error by ensuring all factors

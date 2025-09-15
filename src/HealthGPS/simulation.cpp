@@ -47,10 +47,10 @@ Simulation::Simulation(SimulationModuleFactory &factory, std::shared_ptr<const E
     disease_ = std::static_pointer_cast<DiseaseModule>(disease_base);
     analysis_ = std::static_pointer_cast<UpdatableModule>(analysis_base);
 
-    // MAHIMA: Initialize Risk Factor Inspector for Year 3 Policy Inspection
-    // This inspector will capture individual person risk factor values in Year 3
-    // (when policies are applied) to help debug weird/incorrect values and identify outliers
-    if constexpr (ENABLE_YEAR3_RISK_FACTOR_INSPECTION) {
+    // MAHIMA: Initialize Risk Factor Inspector for Individual-Level Debugging
+    // This inspector will capture detailed calculation steps for debugging purposes
+    // Only run for baseline scenario to avoid duplicate data
+    if (context_.scenario().type() == ScenarioType::baseline) {
         try {
             // MAHIMA: Create output directory for the inspection files
             // We'll use the current working directory as a fallback since we don't have
@@ -69,25 +69,31 @@ Simulation::Simulation(SimulationModuleFactory &factory, std::shared_ptr<const E
             // MAHIMA: Set the inspector in the runtime context
             context_.set_risk_factor_inspector(std::move(inspector));
 
-            std::cout << "\nMAHIMA: Risk Factor Inspector initialized successfully in Simulation "
-                         "constructor";
+            std::cout << "\nMAHIMA: Risk Factor Inspector initialized successfully for individual-level debugging";
             std::cout << "\n  Output directory: " << inspection_dir.string();
             std::cout << "\n  Scenario: " << context_.scenario().name();
-            std::cout
-                << "\n  Ready to capture Year 3 individual person data for policy inspection.\n";
+
+            // MAHIMA: Enable detailed calculation debugging
+            // To debug specific age, gender, risk factor, modify these values:
+            // Example: 30-year-old female for foodfat risk factor (initialization phase)
+            context_.get_risk_factor_inspector().set_debug_config(true, 30, core::Gender::female, "FoodCarbohydrate");
 
         } catch (const std::exception &e) {
             // MAHIMA: If inspector initialization fails, log the error but don't crash the
-            // simulation The simulation can still run without the inspector, just without Year 3
-            // data capture
-            if constexpr (ENABLE_YEAR3_RISK_FACTOR_INSPECTION) {
-                std::cout << "\nMAHIMA: Warning - Failed to initialize Risk Factor Inspector: "
-                          << e.what();
-                std::cout << "\n  Simulation will continue without Year 3 policy inspection data "
-                             "capture.";
-                std::cout << "\n  This may be normal if inspection is not needed for this run.\n";
-            }
+            // simulation The simulation can still run without the inspector, just without debugging
+            std::cout << "\nMAHIMA: Warning - Failed to initialize Risk Factor Inspector: "
+                      << e.what();
+            std::cout << "\n  Simulation will continue without individual-level debugging.";
+            std::cout << "\n  This may be normal if debugging is not needed for this run.\n";
         }
+    }
+
+    // MAHIMA: Initialize Risk Factor Inspector for Year 3 Policy Inspection
+    // This inspector will capture individual person risk factor values in Year 3
+    // (when policies are applied) to help debug weird/incorrect values and identify outliers
+    if constexpr (ENABLE_YEAR3_RISK_FACTOR_INSPECTION) {
+        // Year 3 specific inspection code can go here if needed
+        std::cout << "\nMAHIMA: Year 3 inspection is enabled but separate from individual-level debugging";
     }
 }
 

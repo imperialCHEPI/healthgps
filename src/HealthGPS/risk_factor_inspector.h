@@ -47,6 +47,58 @@ class RiskFactorInspector {
     /// (baseline or intervention). Called after policies have been applied.
     void capture_year_3_data(RuntimeContext &context);
 
+    /// @brief MAHIMA: Set debug configuration for detailed calculation capture
+    /// @param enabled Whether to enable detailed debugging
+    /// @param age Target age to debug (-1 for any age)
+    /// @param gender Target gender to debug (unknown for any gender)
+    /// @param risk_factor Target risk factor to debug (empty for any risk factor)
+    void set_debug_config(bool enabled, int age = -1, core::Gender gender = core::Gender::unknown, 
+                         const std::string &risk_factor = "");
+
+    /// @brief MAHIMA: Capture detailed risk factor calculation steps for debugging
+    /// @param context Runtime context containing population and scenario information
+    /// @param person Individual person whose calculation to capture
+    /// @param risk_factor_name Name of the risk factor to debug
+    /// @param risk_factor_index Index of the risk factor in the calculation
+    /// @param random_residual_before_cholesky Random residual before Cholesky transformation
+    /// @param residual_after_cholesky Residual after Cholesky transformation
+    /// @param expected_value Expected value for this risk factor
+    /// @param linear_result Linear model result
+    /// @param residual Final residual value
+    /// @param stddev Standard deviation for this risk factor
+    /// @param combined Combined value before BoxCox
+    /// @param lambda Lambda value for BoxCox transformation
+    /// @param boxcox_result Result after BoxCox transformation
+    /// @param factor_before_clamp Value before range clamping
+    /// @param range_lower Lower bound of the range
+    /// @param range_upper Upper bound of the range
+    /// @param final_clamped_factor Final value after range clamping
+    ///
+    /// @details This method captures detailed calculation steps for a specific risk factor
+    /// and writes them to a CSV file named {risk_factor_name}_inspection.csv
+    void capture_detailed_calculation(RuntimeContext &context, const Person &person, 
+                                    const std::string &risk_factor_name, size_t risk_factor_index,
+                                    double random_residual_before_cholesky, double residual_after_cholesky,
+                                    double expected_value, double linear_result, double residual,
+                                    double stddev, double combined, double lambda, double boxcox_result,
+                                    double factor_before_clamp, double range_lower, double range_upper,
+                                    double final_clamped_factor);
+
+    // MAHIMA: Capture person risk factors after all calculations are complete
+    void capture_person_risk_factors(RuntimeContext &context, const Person &person, 
+                                   const std::string &risk_factor_name, size_t risk_factor_index);
+
+    // MAHIMA: Store calculation details for later capture
+    void store_calculation_details(const Person &person, const std::string &risk_factor_name, size_t risk_factor_index,
+                                 double random_residual_before_cholesky, double residual_after_cholesky,
+                                 double expected_value, double linear_result, double residual,
+                                 double stddev, double combined, double lambda, double boxcox_result,
+                                 double factor_before_clamp, double range_lower, double range_upper,
+                                 double final_clamped_factor);
+
+    // MAHIMA: Analyze population and count people matching debug criteria
+    void analyze_population_demographics(RuntimeContext &context);
+
   private:
     /// @brief MAHIMA: Target risk factors to capture for inspection
     ///
@@ -58,6 +110,15 @@ class RiskFactorInspector {
     /// Plus BMI, Weight, Height for context
     std::vector<core::Identifier> target_factors_;
 
+    /// @brief MAHIMA: Configuration for detailed calculation debugging
+    /// @details User can specify age, gender, and risk factor to debug
+    struct DebugConfig {
+        bool enabled = false;
+        int target_age = 30;  
+        core::Gender target_gender = core::Gender::unknown;  // unknown means any gender
+        std::string target_risk_factor = "";  // empty means any risk factor
+    } debug_config_;
+
     /// @brief MAHIMA: Output file stream for baseline scenario data
     std::ofstream baseline_file_;
 
@@ -66,6 +127,29 @@ class RiskFactorInspector {
 
     /// @brief MAHIMA: Flag to ensure Year 3 data is captured only once per scenario
     bool year_3_captured_;
+
+    /// @brief MAHIMA: Output directory for inspection files
+    std::filesystem::path output_dir_;
+
+    /// @brief MAHIMA: Structure to store calculation details for each person
+    struct CalculationDetails {
+        double random_residual_before_cholesky;
+        double residual_after_cholesky;
+        double expected_value;
+        double linear_result;
+        double residual;
+        double stddev;
+        double combined;
+        double lambda;
+        double boxcox_result;
+        double factor_before_clamp;
+        double range_lower;
+        double range_upper;
+        double final_clamped_factor;
+    };
+    
+    /// @brief MAHIMA: Map to store calculation details by person ID and risk factor
+    std::unordered_map<std::string, std::unordered_map<std::string, CalculationDetails>> calculation_storage_;
 
     /// @brief MAHIMA: Write CSV headers for both output files
     ///

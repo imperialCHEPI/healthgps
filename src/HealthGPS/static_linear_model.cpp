@@ -16,6 +16,11 @@ namespace hgps {
 // Change this to 'false' to disable it (default for normal simulations)
 static constexpr bool ENABLE_YEAR3_RISK_FACTOR_INSPECTION = false;
 
+// MAHIMA: TOGGLE FOR DETAILED CALCULATION DEBUGGING
+// Change this to 'true' to enable detailed risk factor calculation debugging
+// Change this to 'false' to disable it (default for normal simulations)
+static constexpr bool ENABLE_DETAILED_CALCULATION_DEBUG = true;
+
 // Helper function to combine food and other risk factors into a single vector
 // This ensures we have one adjustments map with all factors instead of separate maps
 std::vector<core::Identifier> StaticLinearModel::combine_risk_factors() const {
@@ -76,7 +81,27 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     for (auto &person : context.population()) {
             initialise_factors(context, person, context.random());
             initialise_physical_activity(context, person, context.random());
+            
+            // MAHIMA: Capture detailed calculation steps for debugging
+            // This is called after physical activity is assigned so we have all the data
+            if constexpr (ENABLE_DETAILED_CALCULATION_DEBUG) {
+                if (context.has_risk_factor_inspector()) {
+                    auto &inspector = context.get_risk_factor_inspector();
+                    // Capture all risk factors for this person
+                    for (size_t i = 0; i < names_.size(); i++) {
+                        // Get the stored calculation details and write to CSV
+                        inspector.capture_person_risk_factors(context, person, names_[i].to_string(), i);
+                    }
+                }
+            }
         }
+
+    // MAHIMA: Analyze population demographics to show expected counts
+    if constexpr (ENABLE_DETAILED_CALCULATION_DEBUG) {
+        if (context.has_risk_factor_inspector()) {
+            context.get_risk_factor_inspector().analyze_population_demographics(context);
+        }
+    }
 
     // MAHIMA: Combine food and other risk factors into single adjustment call
     // This prevents the "invalid unordered_map<K, T> key" error by ensuring all factors
@@ -131,10 +156,16 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             //  DemographicModule
             initialise_factors(context, person, context.random());
             initialise_physical_activity(context, person, context.random());
+            
+            // MAHIMA: No debugging capture for newborns in update_risk_factors
+            // Individual-level debugging only happens during initial population generation
         } else {
             // For existing people, only update sector and factors
             // update_sector(person, context.random());
             update_factors(context, person, context.random());
+            
+            // MAHIMA: No debugging capture for existing people updates
+            // Individual-level debugging only happens during initial population generation
         }
     }
 
@@ -278,11 +309,36 @@ double StaticLinearModel::calculate_zero_probability(Person &person,
     return probability;
 }
 
+// MAHIMA: Set debug configuration for detailed calculation capture
+void StaticLinearModel::set_debug_config(bool enabled, int age, core::Gender gender, 
+                                        const std::string &risk_factor) {
+    // This method can be called to configure debugging, but the actual configuration
+    // is handled by the RiskFactorInspector. This is just a placeholder for now.
+    // In a real implementation, you would need to pass this configuration to the inspector.
+    std::cout << "\nMAHIMA: Debug configuration requested - Age: " << age 
+              << ", Gender: " << (gender == core::Gender::male ? "male" : 
+                                 gender == core::Gender::female ? "female" : "any")
+              << ", Risk Factor: " << (risk_factor.empty() ? "any" : risk_factor)
+              << ", Enabled: " << (enabled ? "true" : "false");
+}
+
 void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &person,
                                            Random &random) const {
 
     // Correlated residual sampling.
     auto residuals = compute_residuals(random, cholesky_);
+    
+    // MAHIMA: Store original residuals before Cholesky for debugging
+    std::vector<double> original_residuals;
+    if constexpr (ENABLE_DETAILED_CALCULATION_DEBUG) {
+        if (context.has_risk_factor_inspector()) {
+            // Generate original residuals before Cholesky transformation
+            original_residuals.reserve(names_.size());
+            for (size_t i = 0; i < names_.size(); i++) {
+                original_residuals.push_back(random.next_normal(0.0, 1.0));
+            }
+        }
+    }
 
     // Approximate risk factors with linear models.
     auto linear = compute_linear_models(person, models_);
@@ -330,11 +386,26 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
         // STAGE 2: Calculate non-zero risk factor value using BoxCox transformation
         // (This code runs whether we have a logistic model or not)
         double factor = linear[i] + residual * stddev_[i];
-        factor = expected * inverse_box_cox(factor, lambda_[i]);
-        factor = ranges_[i].clamp(factor);
+        double boxcox_result = inverse_box_cox(factor, lambda_[i]);
+        double factor_before_clamp = expected * boxcox_result;
+        double final_clamped_factor = ranges_[i].clamp(factor_before_clamp);
+
+        // MAHIMA: Store calculation details for later debugging capture
+        if constexpr (ENABLE_DETAILED_CALCULATION_DEBUG) {
+            if (context.has_risk_factor_inspector()) {
+                auto &inspector = context.get_risk_factor_inspector();
+                // Store the calculation details for this person and risk factor
+                inspector.store_calculation_details(person, names_[i].to_string(), i,
+                                                 original_residuals.empty() ? 0.0 : original_residuals[i], 
+                                                 residuals[i], expected, linear[i], residual,
+                                                 stddev_[i], factor, lambda_[i], boxcox_result,
+                                                 factor_before_clamp, ranges_[i].lower(), ranges_[i].upper(),
+                                                 final_clamped_factor);
+            }
+        }
 
         // Save risk factor
-        person.risk_factors[names_[i]] = factor;
+        person.risk_factors[names_[i]] = final_clamped_factor;
     }
 }
 
@@ -397,11 +468,15 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
         // STAGE 2: Calculate non-zero risk factor value using BoxCox transformation
         // (This code runs whether we have a logistic model or not)
         double factor = linear[i] + residual * stddev_[i];
-        factor = expected * inverse_box_cox(factor, lambda_[i]);
-        factor = ranges_[i].clamp(factor);
+        double boxcox_result = inverse_box_cox(factor, lambda_[i]);
+        double factor_before_clamp = expected * boxcox_result;
+        double final_clamped_factor = ranges_[i].clamp(factor_before_clamp);
+
+        // MAHIMA: No debugging capture during updates
+        // Individual-level debugging only happens during initial population generation
 
         // Save risk factor
-        person.risk_factors[names_[i]] = factor;
+        person.risk_factors[names_[i]] = final_clamped_factor;
     }
 }
 
