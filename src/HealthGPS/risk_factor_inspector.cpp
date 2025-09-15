@@ -576,9 +576,14 @@ void RiskFactorInspector::capture_person_risk_factors(RuntimeContext &context, c
     
     file.close();
     
-    // Count records written (no console output for cleaner display)
+    // Count records written and show progress
     static int total_written = 0;
     total_written++;
+    
+    // Show progress every 50 records
+    if (total_written % 200 == 0 || total_written == 1) {
+        std::cout << "\nMAHIMA: Written " << total_written << " records to " << csv_path.filename().string();
+    }
 }
 
 // MAHIMA: Analyze population and count people matching debug criteria
@@ -609,8 +614,11 @@ void RiskFactorInspector::analyze_population_demographics(RuntimeContext &contex
         }
     }
     
-    // Population analysis completed (no console output for cleaner display)
-    // Results: Total population: {total_population}, Matching: {matching_age_gender_risk_factor}
+    // Show population analysis results
+    std::cout << "\nMAHIMA: Population analysis - Total: " << total_population 
+              << ", Matching " << debug_config_.target_age << "-year-old " 
+              << (debug_config_.target_gender == core::Gender::male ? "males" : "females")
+              << " for " << debug_config_.target_risk_factor << ": " << matching_age_gender_risk_factor << " people";
 }
 
 } // namespace hgps
