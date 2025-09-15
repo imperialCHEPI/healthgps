@@ -1160,7 +1160,7 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
     }
 
     // Add additional important ranges from config.json risk_factors section- Mahima
-    // Load config.json to get additional ranges
+        // Load config.json to get additional ranges
         auto config_json = load_json(config.root_path / "config.json");
         if (config_json.contains("modelling") &&
             config_json["modelling"].contains("risk_factors")) {
@@ -1189,7 +1189,7 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
 
             std::cout << "\nLoaded " << factors_added
                       << " additional factor ranges from config.json";
-        }
+    }
 
     // std::cout << "\nFinished loading Kevin Hall nutrients";
 
@@ -1607,7 +1607,7 @@ load_logistic_regression_coefficients_from_csv(const std::filesystem::path &csv_
 
                 // Read the value from the CSV
                 auto value = doc.GetCell<double>(col_idx + 1,
-                                                  row_idx); // +1 because first column is row names
+                                                 row_idx); // +1 because first column is row names
 
                 // Set the appropriate value based on the row type
                 if (coef_name == "Intercept") {

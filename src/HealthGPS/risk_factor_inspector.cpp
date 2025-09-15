@@ -14,7 +14,7 @@ namespace hgps {
 static constexpr bool ENABLE_YEAR3_RISK_FACTOR_INSPECTION = false;
 
 RiskFactorInspector::RiskFactorInspector(const std::filesystem::path &output_dir)
-    : year_3_captured_(false), output_dir_(output_dir) {
+    : year_3_captured_(false), output_dir_(output_dir), total_records_written_(0) {
 
     // MAHIMA: Initialize target risk factors for inspection
     // These are the specific nutrients/risk factors that were producing
@@ -577,12 +577,16 @@ void RiskFactorInspector::capture_person_risk_factors(RuntimeContext &context, c
     file.close();
     
     // Count records written and show progress
-    static int total_written = 0;
-    total_written++;
+    total_records_written_++;
     
-    // Show progress every 50 records
-    if (total_written % 200 == 0 || total_written == 1) {
-        std::cout << "\nMAHIMA: Written " << total_written << " records to " << csv_path.filename().string();
+    // Show progress every 200 records
+    if (total_records_written_ % 200 == 0) {
+        std::cout << "\nMAHIMA: Written " << total_records_written_ << " records to " << csv_path.filename().string();
+    }
+    
+    // Show first record message
+    if (total_records_written_ == 1) {
+        std::cout << "\nMAHIMA: Starting to write records to " << csv_path.filename().string() << "...";
     }
 }
 
@@ -619,6 +623,11 @@ void RiskFactorInspector::analyze_population_demographics(RuntimeContext &contex
               << ", Matching " << debug_config_.target_age << "-year-old " 
               << (debug_config_.target_gender == core::Gender::male ? "males" : "females")
               << " for " << debug_config_.target_risk_factor << ": " << matching_age_gender_risk_factor << " people";
+    
+    // Show final record count
+    if (total_records_written_ > 0) {
+        std::cout << "\nMAHIMA: Total records written to " << debug_config_.target_risk_factor << "_inspection.csv: " << total_records_written_;
+    }
 }
 
 } // namespace hgps

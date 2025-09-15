@@ -79,9 +79,9 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
 
     // Initialise everyone with risk factors.
     for (auto &person : context.population()) {
-            initialise_factors(context, person, context.random());
-            initialise_physical_activity(context, person, context.random());
-            
+        initialise_factors(context, person, context.random());
+        initialise_physical_activity(context, person, context.random());
+        
             // MAHIMA: Capture detailed calculation steps for debugging
             // This is called after physical activity is assigned so we have all the data
             if constexpr (ENABLE_DETAILED_CALCULATION_DEBUG) {
@@ -122,7 +122,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         initialise_policies(person, context.random(), false);
         initialise_trends(context, person);
     }
-
+    
     // MAHIMA: Adjust trended risk factor means using combined factors
     // Use the same combined factors and ranges for trended adjustment
     adjust_risk_factors(context, combined_factors, combined_ranges, true);
@@ -191,10 +191,10 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 
         if (person.age == 0) {
             initialise_policies(person, context.random(), intervene);
-            initialise_trends(context, person);
+                initialise_trends(context, person);
         } else {
             update_policies(person, intervene);
-            update_trends(context, person);
+                update_trends(context, person);
         }
     }
 
@@ -369,28 +369,20 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
         // Empty logistic model means intentionally skip Stage 1 and use boxcox-only modeling
         bool has_logistic_model = !(logistic_models_[i].coefficients.empty());
 
-        // STAGE 1: Determine if risk factor should be zero (only if logistic model exists)
-        if (has_logistic_model) {
-            double zero_probability = calculate_zero_probability(person, i);
+// ... existing code ...
 
-            // Sample from this probability to determine if risk factor should be zero
-            // if logistic regression output = 1, risk factor value = 0
-            double random_sample = random.next_double(); // Uniform random value between 0 and 1
-            if (random_sample < zero_probability) {
-                // Risk factor should be zero
-                person.risk_factors[names_[i]] = 0.0;
-                continue;
-            }
-        }
-
-        // STAGE 2: Calculate non-zero risk factor value using BoxCox transformation
-        // (This code runs whether we have a logistic model or not)
-        double factor = linear[i] + residual * stddev_[i];
-        double boxcox_result = inverse_box_cox(factor, lambda_[i]);
-        double factor_before_clamp = expected * boxcox_result;
-        double final_clamped_factor = ranges_[i].clamp(factor_before_clamp);
-
-        // MAHIMA: Store calculation details for later debugging capture
+// STAGE 1: Determine if risk factor should be zero (only if logistic model exists)
+if (has_logistic_model) {
+    double zero_probability = calculate_zero_probability(person, i);
+    
+    // Sample from this probability to determine if risk factor should be zero
+    // if logistic regression output = 1, risk factor value = 0
+    double random_sample = random.next_double(); // Uniform random value between 0 and 1
+    if (random_sample < zero_probability) {
+        // Risk factor should be zero
+        person.risk_factors[names_[i]] = 0.0;
+        
+        // MAHIMA: Store calculation details for Stage 1 (logistic regression)
         if constexpr (ENABLE_DETAILED_CALCULATION_DEBUG) {
             if (context.has_risk_factor_inspector()) {
                 auto &inspector = context.get_risk_factor_inspector();
@@ -398,14 +390,38 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
                 inspector.store_calculation_details(person, names_[i].to_string(), i,
                                                  original_residuals.empty() ? 0.0 : original_residuals[i], 
                                                  residuals[i], expected, linear[i], residual,
-                                                 stddev_[i], factor, lambda_[i], boxcox_result,
-                                                 factor_before_clamp, ranges_[i].lower(), ranges_[i].upper(),
-                                                 final_clamped_factor);
+                                                 stddev_[i], 0.0, lambda_[i], 0.0, // factor = 0, boxcox_result = 0
+                                                 0.0, ranges_[i].lower(), ranges_[i].upper(), // factor_before_clamp = 0
+                                                 0.0); // final_clamped_factor = 0
             }
         }
+        continue;
+    }
+}
 
-        // Save risk factor
-        person.risk_factors[names_[i]] = final_clamped_factor;
+// STAGE 2: Calculate non-zero risk factor value using BoxCox transformation
+// (This code runs whether we have a logistic model or not)
+double factor = linear[i] + residual * stddev_[i];
+double boxcox_result = inverse_box_cox(factor, lambda_[i]);
+double factor_before_clamp = expected * boxcox_result;
+double final_clamped_factor = ranges_[i].clamp(factor_before_clamp);
+
+// MAHIMA: Store calculation details for Stage 2 (BoxCox transformation)
+if constexpr (ENABLE_DETAILED_CALCULATION_DEBUG) {
+    if (context.has_risk_factor_inspector()) {
+        auto &inspector = context.get_risk_factor_inspector();
+        // Store the calculation details for this person and risk factor
+        inspector.store_calculation_details(person, names_[i].to_string(), i,
+                                         original_residuals.empty() ? 0.0 : original_residuals[i], 
+                                         residuals[i], expected, linear[i], residual,
+                                         stddev_[i], factor, lambda_[i], boxcox_result,
+                                         factor_before_clamp, ranges_[i].lower(), ranges_[i].upper(),
+                                         final_clamped_factor);
+    }
+}
+
+// Save risk factor
+person.risk_factors[names_[i]] = final_clamped_factor;
     }
 }
 
@@ -932,26 +948,26 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     if (!policy_cholesky_.allFinite()) {
         throw core::HgpsException("Intervention policy Cholesky matrix contains non-finite values");
     }
-    if (trend_models_->empty()) {
-        throw core::HgpsException("Time trend model list is empty");
-    }
-    if (trend_ranges_->empty()) {
-        throw core::HgpsException("Time trend ranges list is empty");
-    }
-    if (trend_lambda_->empty()) {
-        throw core::HgpsException("Time trend lambda list is empty");
-    }
+        if (trend_models_->empty()) {
+            throw core::HgpsException("Time trend model list is empty");
+        }
+        if (trend_ranges_->empty()) {
+            throw core::HgpsException("Time trend ranges list is empty");
+        }
+        if (trend_lambda_->empty()) {
+            throw core::HgpsException("Time trend lambda list is empty");
+        }
     if (rural_prevalence_.empty()) {
         throw core::HgpsException("Rural prevalence mapping is empty");
     }
-    for (const auto &name : names_) {
-        if (!expected_trend_->contains(name)) {
-            throw core::HgpsException("One or more expected trend value is missing");
+        for (const auto &name : names_) {
+            if (!expected_trend_->contains(name)) {
+                throw core::HgpsException("One or more expected trend value is missing");
+            }
+            if (!expected_trend_boxcox_->contains(name)) {
+                throw core::HgpsException("One or more expected trend BoxCox value is missing");
+            }
         }
-        if (!expected_trend_boxcox_->contains(name)) {
-            throw core::HgpsException("One or more expected trend BoxCox value is missing");
-        }
-    }
 
     // If logistic models are empty, initialize them to be the same as the boxcox models
     // This is just a fallback in case logistic models were not provided
@@ -963,7 +979,7 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
 
     // Check if the number of logistic models matches the number of risk factors
     if (logistic_models_.size() != names_.size()) {
-        throw core::HgpsException(
+                throw core::HgpsException(
             fmt::format("Number of logistic models ({}) does not match number of risk factors ({})",
                         logistic_models_.size(), names_.size()));
     }

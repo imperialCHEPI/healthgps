@@ -150,6 +150,9 @@ class RiskFactorInspector {
     
     /// @brief MAHIMA: Map to store calculation details by person ID and risk factor
     std::unordered_map<std::string, std::unordered_map<std::string, CalculationDetails>> calculation_storage_;
+    
+    /// @brief MAHIMA: Counter for total records written to inspection files
+    int total_records_written_;
 
     /// @brief MAHIMA: Write CSV headers for both output files
     ///
