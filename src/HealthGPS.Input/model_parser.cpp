@@ -549,8 +549,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
                 // Load expected value trends (only if trend data exists).
                 (*expected_trend)[csv_name] = json_params.contains("ExpectedTrend")
-                                             ? json_params["ExpectedTrend"].get<double>()
-                                             : 1.0;
+                                                  ? json_params["ExpectedTrend"].get<double>()
+                                                  : 1.0;
                 (*expected_trend_boxcox)[csv_name] =
                     json_params.contains("ExpectedTrendBoxCox")
                         ? json_params["ExpectedTrendBoxCox"].get<double>()
@@ -949,7 +949,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
                 if (factor_name == "Intercept") {
                     continuous_income_model.intercept = coefficient_value;
-    } else {
+                } else {
                     // All other rows are coefficients
                     continuous_income_model.coefficients[core::Identifier(factor_name)] =
                         coefficient_value;
@@ -969,15 +969,15 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
     try {
         auto result = std::make_unique<StaticLinearModelDefinition>(
-        std::move(expected), std::move(expected_trend), std::move(trend_steps),
+            std::move(expected), std::move(expected_trend), std::move(trend_steps),
             std::move(expected_trend_boxcox), std::move(names), std::move(models),
             std::move(ranges), std::move(lambda), std::move(stddev), std::move(cholesky),
             std::move(policy_models), std::move(policy_ranges), std::move(policy_cholesky),
             std::move(trend_models), std::move(trend_ranges), std::move(trend_lambda), info_speed,
             std::move(rural_prevalence), std::move(income_models), physical_activity_stddev,
             trend_type, std::move(expected_income_trend), std::move(expected_income_trend_boxcox),
-        std::move(income_trend_steps), std::move(income_trend_models),
-        std::move(income_trend_ranges), std::move(income_trend_lambda),
+            std::move(income_trend_steps), std::move(income_trend_models),
+            std::move(income_trend_ranges), std::move(income_trend_lambda),
             std::move(income_trend_decay_factors), is_continuous_model, continuous_income_model,
             income_categories, std::move(physical_activity_models));
 
