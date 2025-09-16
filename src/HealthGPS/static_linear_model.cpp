@@ -239,7 +239,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         initialise_physical_activity(context, person, context.random());
 
         person_count++;
-        if (person_count % 500 == 0) {
+        if (person_count % 1000 == 0) {
             std::cout << "\nDEBUG: Processed " << person_count << " people so far...";
     }
     }
