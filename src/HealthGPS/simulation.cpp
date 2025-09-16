@@ -111,59 +111,34 @@ void Simulation::fini(adevs::Time clock) {
 }
 
 void Simulation::initialise_population() {
-    std::cout << "\nDEBUG: Simulation::initialise_population called - START";
     /* Note: order is very important */
 
     // Create virtual population
-    std::cout << "\nDEBUG: Getting inputs...";
     const auto &inputs = context_.inputs();
-    std::cout << " OK";
 
-    std::cout << "\nDEBUG: Getting model start year...";
     auto model_start_year = inputs.start_time();
-    std::cout << " OK, start year: " << model_start_year;
-
-    std::cout << "\nDEBUG: Getting total population size...";
     auto total_year_pop_size = demographic_->get_total_population_size(model_start_year);
-    std::cout << " OK, total population: " << total_year_pop_size;
-
-    std::cout << "\nDEBUG: Calculating virtual population size...";
     float size_fraction = inputs.settings().size_fraction();
     auto virtual_pop_size = static_cast<int>(size_fraction * total_year_pop_size);
-    std::cout << " OK, virtual population size: " << virtual_pop_size;
 
-    std::cout << "\nDEBUG: Resetting population...";
     context_.reset_population(virtual_pop_size);
-    std::cout << " OK, population reset";
 
     // Gender - Age, must be first
-    std::cout << "\nDEBUG: Calling demographic_->initialise_population...";
     demographic_->initialise_population(context_);
-    std::cout << " OK, demographic initialization completed";
 
     // Social economics status
-    std::cout << "\nDEBUG: Calling ses_->initialise_population...";
     ses_->initialise_population(context_);
-    std::cout << " OK, SES initialization completed";
 
-    // Generate risk factors
-    std::cout << "\nDEBUG: Calling risk_factor_->initialise_population...";
+    // Generate risk factors;
     risk_factor_->initialise_population(context_);
-    std::cout << " OK, risk factor initialization completed";
 
     // Initialise diseases
-    std::cout << "\nDEBUG: Calling disease_->initialise_population...";
     disease_->initialise_population(context_);
-    std::cout << " OK, disease initialization completed";
 
     // Initialise analysis
-    std::cout << "\nDEBUG: Calling analysis_->initialise_population...";
     analysis_->initialise_population(context_);
-    std::cout << " OK, analysis initialization completed";
 
-    std::cout << "\nDEBUG: Calling print_initial_population_statistics...";
     print_initial_population_statistics();
-    std::cout << " OK, statistics printed";
 
     std::cout << "\nDEBUG: Simulation::initialise_population completed successfully";
 }

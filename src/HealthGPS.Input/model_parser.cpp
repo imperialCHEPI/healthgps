@@ -549,8 +549,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
                 // Load expected value trends (only if trend data exists).
                 (*expected_trend)[csv_name] = json_params.contains("ExpectedTrend")
-                                                  ? json_params["ExpectedTrend"].get<double>()
-                                                  : 1.0;
+                                             ? json_params["ExpectedTrend"].get<double>()
+                                             : 1.0;
                 (*expected_trend_boxcox)[csv_name] =
                     json_params.contains("ExpectedTrendBoxCox")
                         ? json_params["ExpectedTrendBoxCox"].get<double>()
@@ -824,9 +824,6 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                             csv_filename, doc.GetColumnCount())};
                     }
 
-                    std::cout << "\n      CSV file loaded: " << doc.GetRowCount() << " rows, "
-                              << doc.GetColumnCount() << " columns";
-
                     // Parse CSV into PhysicalActivityModel (using existing model variable)
                     // Parse each row (all rows are data, no headers)
                     for (size_t row_idx = 0; row_idx < doc.GetRowCount(); row_idx++) {
@@ -866,8 +863,6 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             }
 
             physical_activity_models[core::Identifier(model_name)] = std::move(model);
-            std::cout << "\n  DEBUG: Physical activity model '" << model_name
-                      << "' stored successfully";
         }
     } else {
         std::cout << "\nNo PhysicalActivityModels found, using PhysicalActivityStdDev approach";
@@ -954,7 +949,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
                 if (factor_name == "Intercept") {
                     continuous_income_model.intercept = coefficient_value;
-                } else {
+    } else {
                     // All other rows are coefficients
                     continuous_income_model.coefficients[core::Identifier(factor_name)] =
                         coefficient_value;
@@ -964,9 +959,6 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             std::cout << "\n      Parsed values:";
             std::cout << "\n        Intercept: " << continuous_income_model.intercept;
             std::cout << "\n        Coefficients: " << continuous_income_model.coefficients.size();
-            for (const auto &[coef_name, coef_value] : continuous_income_model.coefficients) {
-                std::cout << "\n          " << coef_name.to_string() << ": " << coef_value;
-            }
         } else {
             throw core::HgpsException{
                 fmt::format("Continuous income model must specify 'csv_file'")};
@@ -977,15 +969,15 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
     try {
         auto result = std::make_unique<StaticLinearModelDefinition>(
-            std::move(expected), std::move(expected_trend), std::move(trend_steps),
+        std::move(expected), std::move(expected_trend), std::move(trend_steps),
             std::move(expected_trend_boxcox), std::move(names), std::move(models),
             std::move(ranges), std::move(lambda), std::move(stddev), std::move(cholesky),
             std::move(policy_models), std::move(policy_ranges), std::move(policy_cholesky),
             std::move(trend_models), std::move(trend_ranges), std::move(trend_lambda), info_speed,
             std::move(rural_prevalence), std::move(income_models), physical_activity_stddev,
             trend_type, std::move(expected_income_trend), std::move(expected_income_trend_boxcox),
-            std::move(income_trend_steps), std::move(income_trend_models),
-            std::move(income_trend_ranges), std::move(income_trend_lambda),
+        std::move(income_trend_steps), std::move(income_trend_models),
+        std::move(income_trend_ranges), std::move(income_trend_lambda),
             std::move(income_trend_decay_factors), is_continuous_model, continuous_income_model,
             income_categories, std::move(physical_activity_models));
 

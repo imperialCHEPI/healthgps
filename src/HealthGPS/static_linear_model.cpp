@@ -67,237 +67,151 @@ StaticLinearModel::StaticLinearModel(
       physical_activity_models_{physical_activity_models},
       has_physical_activity_models_{!physical_activity_models.empty()} {
 
-    std::cout << "\nDEBUG: StaticLinearModel constructor - member variables initialized";
-    std::cout << "\nDEBUG: is_continuous_income_model_ = "
-              << (is_continuous_income_model_ ? "true" : "false");
-    std::cout << "\nDEBUG: continuous_income_model_.intercept = "
-              << continuous_income_model_.intercept;
-    std::cout << "\nDEBUG: continuous_income_model_.coefficients.size() = "
-              << continuous_income_model_.coefficients.size();
-    std::cout << "\nDEBUG: About to check member variables...";
-
-    std::cout << "\nDEBUG: Checking names_...";
     if (names_.empty()) {
         throw core::HgpsException("Risk factor names list is empty");
     }
-    std::cout << " OK, names_.size() = " << names_.size();
 
-    std::cout << "\nDEBUG: Checking models_...";
     if (models_.empty()) {
         throw core::HgpsException("Risk factor model list is empty");
     }
-    std::cout << " OK, models_.size() = " << models_.size();
 
-    std::cout << "\nDEBUG: Checking ranges_...";
     if (ranges_.empty()) {
         throw core::HgpsException("Risk factor ranges list is empty");
     }
-    std::cout << " OK, ranges_.size() = " << ranges_.size();
 
-    std::cout << "\nDEBUG: Checking lambda_...";
     if (lambda_.empty()) {
         throw core::HgpsException("Risk factor lambda list is empty");
     }
-    std::cout << " OK, lambda_.size() = " << lambda_.size();
 
-    std::cout << "\nDEBUG: Checking stddev_...";
     if (stddev_.empty()) {
         throw core::HgpsException("Risk factor standard deviation list is empty");
     }
-    std::cout << " OK, stddev_.size() = " << stddev_.size();
 
-    std::cout << "\nDEBUG: Checking cholesky_...";
     if (!cholesky_.allFinite()) {
         throw core::HgpsException("Risk factor Cholesky matrix contains non-finite values");
     }
-    std::cout << " OK, cholesky_.rows() = " << cholesky_.rows()
-              << ", cholesky_.cols() = " << cholesky_.cols();
 
-    std::cout << "\nDEBUG: Checking policy_models_...";
     if (policy_models_.empty()) {
         throw core::HgpsException("Intervention policy model list is empty");
     }
-    std::cout << " OK, policy_models_.size() = " << policy_models_.size();
 
-    std::cout << "\nDEBUG: Checking policy_ranges_...";
     if (policy_ranges_.empty()) {
         throw core::HgpsException("Intervention policy ranges list is empty");
     }
-    std::cout << " OK, policy_ranges_.size() = " << policy_ranges_.size();
 
-    std::cout << "\nDEBUG: Checking policy_cholesky_...";
     if (!policy_cholesky_.allFinite()) {
         throw core::HgpsException("Intervention policy Cholesky matrix contains non-finite values");
     }
-    std::cout << " OK, policy_cholesky_.rows() = " << policy_cholesky_.rows()
-              << ", policy_cholesky_.cols() = " << policy_cholesky_.cols();
+
     // Validate regular trend parameters only if trend type is Trend
-    std::cout << "\nDEBUG: Checking trend validation...";
-    std::cout << "\nDEBUG: trend_type_ = " << static_cast<int>(trend_type_);
     if (trend_type_ == TrendType::Trend) {
-        std::cout << "\nDEBUG: Validating regular trend parameters...";
-        std::cout << "\nDEBUG: Checking trend_models_...";
+        std::cout << "\nDEBUG: Validating UPF trend parameters...";
         if (trend_models_->empty()) {
             throw core::HgpsException("Time trend model list is empty");
         }
-        std::cout << " OK, trend_models_.size() = " << trend_models_->size();
-
-        std::cout << "\nDEBUG: Checking trend_ranges_...";
         if (trend_ranges_->empty()) {
             throw core::HgpsException("Time trend ranges list is empty");
         }
-        std::cout << " OK, trend_ranges_.size() = " << trend_ranges_->size();
-
-        std::cout << "\nDEBUG: Checking trend_lambda_...";
         if (trend_lambda_->empty()) {
             throw core::HgpsException("Time trend lambda list is empty");
         }
-        std::cout << " OK, trend_lambda_.size() = " << trend_lambda_->size();
     } else {
-        std::cout << "\nDEBUG: Skipping regular trend validation (trend_type_ != Trend)";
+        std::cout << "\nDEBUG: Skipping UPF trend validation (trend_type_ != Trend)";
     }
 
     // Validate income trend parameters if income trend is enabled
-    std::cout << "\nDEBUG: Checking income trend validation...";
     if (trend_type_ == TrendType::IncomeTrend) {
         std::cout << "\nDEBUG: Validating income trend parameters...";
-        std::cout << "\nDEBUG: Checking expected_income_trend_...";
         if (!expected_income_trend_) {
             throw core::HgpsException(
                 "Income trend is enabled but expected_income_trend is missing");
         }
-        std::cout << " OK";
-
-        std::cout << "\nDEBUG: Checking expected_income_trend_boxcox_...";
         if (!expected_income_trend_boxcox_) {
             throw core::HgpsException(
                 "Income trend is enabled but expected_income_trend_boxcox is missing");
         }
-        std::cout << " OK";
-
-        std::cout << "\nDEBUG: Checking income_trend_steps_...";
         if (!income_trend_steps_) {
             throw core::HgpsException("Income trend is enabled but income_trend_steps is missing");
         }
-        std::cout << " OK";
-
-        std::cout << "\nDEBUG: Checking income_trend_models_...";
         if (!income_trend_models_) {
             throw core::HgpsException("Income trend is enabled but income_trend_models is missing");
         }
-        std::cout << " OK";
-
-        std::cout << "\nDEBUG: Checking income_trend_ranges_...";
         if (!income_trend_ranges_) {
             throw core::HgpsException("Income trend is enabled but income_trend_ranges is missing");
         }
-        std::cout << " OK";
-
-        std::cout << "\nDEBUG: Checking income_trend_lambda_...";
         if (!income_trend_lambda_) {
             throw core::HgpsException("Income trend is enabled but income_trend_lambda is missing");
         }
-        std::cout << " OK";
-
-        std::cout << "\nDEBUG: Checking income_trend_decay_factors_...";
         if (!income_trend_decay_factors_) {
             throw core::HgpsException(
                 "Income trend is enabled but income_trend_decay_factors is missing");
         }
-        std::cout << " OK";
     } else {
         std::cout << "\nDEBUG: Skipping income trend validation (trend_type_ != IncomeTrend)";
     }
 
     // Validate income trend data consistency
-    std::cout << "\nDEBUG: Checking income trend data consistency...";
     if (income_trend_models_ && income_trend_models_->empty()) {
         throw core::HgpsException("Income trend model list is empty");
     }
-    std::cout << " OK";
-
     if (income_trend_ranges_ && income_trend_ranges_->empty()) {
         throw core::HgpsException("Income trend ranges list is empty");
     }
-    std::cout << " OK";
-
     if (income_trend_lambda_ && income_trend_lambda_->empty()) {
         throw core::HgpsException("Income trend lambda list is empty");
     }
-    std::cout << " OK";
 
     // Validate that all risk factors have income trend parameters
-    std::cout << "\nDEBUG: Checking risk factor income trend parameters...";
     // Only validate income trend parameters if income trend is enabled
     if (trend_type_ == TrendType::IncomeTrend && expected_income_trend_) {
-        std::cout << "\nDEBUG: Validating income trend parameters for all risk factors...";
-        for (const auto &name : names_) {
+    for (const auto &name : names_) {
             std::cout << "\nDEBUG: Checking risk factor: " << name.to_string();
-            if (!expected_income_trend_->contains(name)) {
-                throw core::HgpsException(
-                    "One or more expected income trend value is missing for risk factor: " +
-                    name.to_string());
-            }
-            std::cout << " expected_income_trend OK";
-
-            if (!expected_income_trend_boxcox_->contains(name)) {
-                throw core::HgpsException(
-                    "One or more expected income trend BoxCox value is missing for risk factor: " +
-                    name.to_string());
-            }
-            std::cout << " expected_income_trend_boxcox OK";
-
-            if (!income_trend_steps_->contains(name)) {
-                throw core::HgpsException(
-                    "One or more income trend steps value is missing for risk factor: " +
-                    name.to_string());
-            }
-            std::cout << " income_trend_steps OK";
-
-            if (!income_trend_decay_factors_->contains(name)) {
-                throw core::HgpsException(
-                    "One or more income trend decay factor is missing for risk factor: " +
-                    name.to_string());
-            }
-            std::cout << " income_trend_decay_factors OK";
+        if (!expected_income_trend_->contains(name)) {
+            throw core::HgpsException(
+                "One or more expected income trend value is missing for risk factor: " +
+                name.to_string());
         }
+        if (!expected_income_trend_boxcox_->contains(name)) {
+            throw core::HgpsException(
+                "One or more expected income trend BoxCox value is missing for risk factor: " +
+                name.to_string());
+        }
+
+        if (!income_trend_steps_->contains(name)) {
+            throw core::HgpsException(
+                "One or more income trend steps value is missing for risk factor: " +
+                name.to_string());
+        }
+
+        if (!income_trend_decay_factors_->contains(name)) {
+            throw core::HgpsException(
+                "One or more income trend decay factor is missing for risk factor: " +
+                name.to_string());
+        }
+    }
         std::cout << "\nDEBUG: All risk factor income trend parameters validated successfully";
     } else {
         std::cout << "\nDEBUG: Skipping risk factor income trend parameter validation (trend_type_ "
                      "!= IncomeTrend or expected_income_trend_ is null)";
     }
-
-    std::cout << "\nDEBUG: Checking final validation...";
     if (rural_prevalence_.empty()) {
         throw core::HgpsException("Rural prevalence mapping is empty");
     }
-    std::cout << " rural_prevalence OK";
-
     if (income_models_.empty()) {
         throw core::HgpsException("Income models mapping is empty");
     }
-    std::cout << " income_models OK";
 
     // Validate regular trend parameters for all risk factors only if trend type is Trend
-    std::cout << "\nDEBUG: Checking final trend validation...";
     if (trend_type_ == TrendType::Trend) {
-        std::cout << "\nDEBUG: Validating final regular trend parameters...";
         for (const auto &name : names_) {
-            std::cout << "\nDEBUG: Checking final trend for risk factor: " << name.to_string();
             if (!expected_trend_->contains(name)) {
                 throw core::HgpsException("One or more expected trend value is missing");
             }
-            std::cout << " expected_trend OK";
-
             if (!expected_trend_boxcox_->contains(name)) {
                 throw core::HgpsException("One or more expected trend BoxCox value is missing");
             }
-            std::cout << " expected_trend_boxcox OK";
         }
-    } else {
-        std::cout << "\nDEBUG: Skipping final trend validation (trend_type_ != Trend)";
     }
-
     std::cout << "\nDEBUG: StaticLinearModel constructor completed successfully";
 }
 
@@ -307,12 +221,6 @@ std::string StaticLinearModel::name() const noexcept { return "Static"; }
 
 void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors called - START";
-    std::cout << "\nDEBUG: Population size: " << context.population().size();
-    std::cout << "\nDEBUG: Trend type: " << static_cast<int>(trend_type_);
-    std::cout << "\nDEBUG: Is continuous income model: "
-              << (is_continuous_income_model_ ? "true" : "false");
-    std::cout << "\nDEBUG: Names count: " << names_.size();
-    std::cout << "\nDEBUG: Models count: " << models_.size();
 
     // MAHIMA: Initialise everyone. Order is important here.
     // STEP 1: Age and gender initalized in demographic.cpp
@@ -323,32 +231,17 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     // STEP 6: Policies in static_linear_model.cpp (below)
     // STEP 7: Trends in static_linear_model.cpp (below) depnds on whether trends are enabled
     // STEP 8: Risk factors adjusted to trended expected means in static_linear_model.cpp (below)
-    std::cout << "\nDEBUG: Starting person initialization loop for " << context.population().size()
-              << " people...";
     size_t person_count = 0;
     for (auto &person : context.population()) {
-        std::cout << "\nDEBUG: Initializing a person";
-
-        std::cout << "\n  DEBUG: Calling initialise_sector...";
         initialise_sector(person, context.random());
-        std::cout << " OK";
-
-        std::cout << "\n  DEBUG: Calling initialise_income...";
         initialise_income(context, person, context.random());
-        std::cout << " OK";
-
-        std::cout << "\n  DEBUG: Calling initialise_factors...";
         initialise_factors(context, person, context.random());
-        std::cout << " OK";
-
-        std::cout << "\n  DEBUG: Calling initialise_physical_activity...";
         initialise_physical_activity(context, person, context.random());
-        std::cout << " OK";
 
         person_count++;
-        if (person_count % 100 == 0) {
+        if (person_count % 500 == 0) {
             std::cout << "\nDEBUG: Processed " << person_count << " people so far...";
-        }
+    }
     }
     std::cout << "\nDEBUG: Person initialization loop completed successfully for " << person_count
               << " people";
@@ -811,18 +704,16 @@ void StaticLinearModel::update_sector(Person &person, Random &random) const {
 }
 
 void StaticLinearModel::initialise_income(RuntimeContext &context, Person &person, Random &random) {
-    std::cout << "\n    DEBUG: initialise_income called for person age=" << person.age
-              << ", gender=" << (person.gender == core::Gender::male ? "male" : "female");
     if (is_continuous_income_model_) {
         // FINCH approach: Use continuous income calculation
-        std::cout << "\n    DEBUG: Using continuous income model (FINCH approach)";
+        std::cout << "\nDEBUG: Using CONTINUOUS income model";
         initialise_continuous_income(context, person, random);
     } else {
         // India approach: Use direct categorical assignment
-        std::cout << "\n    DEBUG: Using categorical income model (India approach)";
+        std::cout << "\nDEBUG: Using CATEGORICAL income model";
         initialise_categorical_income(person, random);
     }
-    std::cout << "\n    DEBUG: initialise_income completed successfully";
+    std::cout << "\nDEBUG: initialise_income completed successfully";
 }
 
 void StaticLinearModel::update_income(RuntimeContext &context, Person &person, Random &random) {
@@ -881,23 +772,15 @@ void StaticLinearModel::initialise_categorical_income(Person &person, Random &ra
 void StaticLinearModel::initialise_continuous_income(RuntimeContext &context, Person &person,
                                                      Random &random) {
     // FINCH approach: Calculate continuous income, then convert to category
-    std::cout << "\n      DEBUG: initialise_continuous_income called";
-
     // Step 1: Calculate continuous income
-    std::cout << "\n      DEBUG: Calling calculate_continuous_income...";
     double continuous_income = calculate_continuous_income(person, random);
-    std::cout << " OK, income=" << continuous_income;
 
     // Store continuous income in risk factors for future use
-    std::cout << "\n      DEBUG: Storing continuous income in risk factors...";
     person.risk_factors["income_continuous"_id] = continuous_income;
-    std::cout << " OK";
 
     // Step 2: Convert to income category based on population quartiles
-    std::cout << "\n      DEBUG: Calling convert_income_continuous_to_category...";
     person.income =
         convert_income_continuous_to_category(continuous_income, context.population(), random);
-    std::cout << " OK, category=" << static_cast<int>(person.income);
 }
 
 double StaticLinearModel::calculate_continuous_income(Person &person, Random &random) {
@@ -908,53 +791,133 @@ double StaticLinearModel::calculate_continuous_income(Person &person, Random &ra
     for (const auto &[factor, coefficient] : continuous_income_model_.coefficients) {
         std::string factor_name = factor.to_string();
 
-        if (factor_name == "IncomeContinuousStdDev") {
-            // Skip - this is used for standard deviation, not as a coefficient
+        // Skip special coefficients that are not part of the regression
+        if (factor_name == "IncomeContinuousStdDev" || factor_name == "min" || factor_name == "max") {
             continue;
         }
 
-        if (factor_name == "gender2") {
-            // Male = 1, Female = 0
-            income += coefficient * (person.gender == core::Gender::male ? 1.0 : 0.0);
-        } else if (factor_name == "age1") {
-            income += coefficient * person.age;
-        } else if (factor_name == "age2") {
-            income += coefficient * (person.age * person.age);
-        } else if (factor_name == "age3") {
-            income += coefficient * (person.age * person.age * person.age);
-        } else if (factor_name == "region2") {
-            // Region effect - only apply if the region matches
-            if (person.region == "region2") {
-                income += coefficient;
-            }
-        } else if (factor_name == "region3") {
-            if (person.region == "region3") {
-                income += coefficient;
-            }
-        } else if (factor_name == "region4") {
-            if (person.region == "region4") {
-                income += coefficient;
-            }
-        } else if (factor_name == "ethnicity2") {
-            // Ethnicity effect - only apply if the ethnicity matches
-            if (person.ethnicity == "ethnicity2") {
-                income += coefficient;
-            }
-        } else if (factor_name == "ethnicity3") {
-            if (person.ethnicity == "ethnicity3") {
-                income += coefficient;
-            }
-        } else if (factor_name == "ethnicity4") {
-            if (person.ethnicity == "ethnicity4") {
-                income += coefficient;
-            }
-        } else if (factor_name == "min" || factor_name == "max") {
-            // Skip min/max bounds - they're handled separately
+        // Dynamic coefficient matching based on factor name patterns
+        double factor_value = 0.0;
+
+        // Age effects - handle age, age2, age3, etc. dynamically
+        if (factor_name.starts_with("age")) {
+            if (factor_name == "age") {
+                factor_value = static_cast<double>(person.age);
+            } else if (factor_name == "age2") {
+                factor_value = person.age * person.age;
+            } else if (factor_name == "age3") {
+                factor_value = person.age * person.age * person.age;
+            } else {
+                // Handle age4, age5, etc. dynamically
+                int power = 1;
+                if (factor_name.length() > 3) {
+                    try {
+                        power = std::stoi(factor_name.substr(3));
+                    } catch (...) {
+                        std::cout << "Warning: Could not parse age power from factor name: " << factor_name << std::endl;
             continue;
+                    }
+                }
+                factor_value = std::pow(person.age, power);
+            }
+        }
+        // Gender effects - handle gender, gender2, etc. dynamically
+        else if (factor_name.starts_with("gender")) {
+            if (factor_name == "gender") {
+                factor_value = person.gender_to_value();
+            } else if (factor_name == "gender2") {
+                factor_value = person.gender == core::Gender::male ? 1.0 : 0.0;
         } else {
-            // For any other factors, try to get from risk factors
+                // Handle gender3, gender4, etc. dynamically
+                int power = 1;
+                if (factor_name.length() > 6) {
+                    try {
+                        power = std::stoi(factor_name.substr(6));
+                    } catch (...) {
+                        std::cout << "Warning: Could not parse gender power from factor name: " << factor_name << std::endl;
+                        continue;
+                    }
+                }
+                double base_value = person.gender == core::Gender::male ? 1.0 : 0.0;
+                factor_value = std::pow(base_value, power);
+            }
+        }
+        // Region effects - handle region2, region3, region56, etc. dynamically
+        else if (factor_name.starts_with("region")) {
+            if (factor_name == "region") {
+                // If person.region is a number, use it directly
+                try {
+                    factor_value = std::stod(person.region);
+                } catch (...) {
+                    // If not a number, check if it matches the factor name
+                    factor_value = (person.region == factor_name) ? 1.0 : 0.0; //this shows if the factor value is 1 (available )then use else if it is 0 (not available) then move on. 
+                }
+            } else {
+                // Handle region2, region3, region56, etc. dynamically
+                std::string region_number = factor_name.substr(6); // Remove "region" prefix
+                factor_value = (person.region == factor_name) ? 1.0 : 0.0;
+            }
+        }
+        // Ethnicity effects - handle ethnicity2, ethnicity3, ethnicity90, etc. dynamically
+        else if (factor_name.starts_with("ethnicity")) {
+            if (factor_name == "ethnicity") {
+                // If person.ethnicity is a number, use it directly
+                try {
+                    factor_value = std::stod(person.ethnicity);
+                } catch (...) {
+                    // If not a number, check if it matches the factor name
+                    factor_value = (person.ethnicity == factor_name) ? 1.0 : 0.0;
+                }
+            } else {
+                // Handle ethnicity2, ethnicity3, ethnicity90, etc. dynamically
+                std::string ethnicity_number = factor_name.substr(9); // Remove "ethnicity" prefix
+                factor_value = (person.ethnicity == factor_name) ? 1.0 : 0.0;
+            }
+        }
+        // Sector effects - handle sector, sector2, etc. dynamically
+        else if (factor_name.starts_with("sector")) {
+            if (factor_name == "sector") {
+                factor_value = person.sector_to_value();
+            } else {
+                // Handle sector2, sector3, etc. dynamically
+                int power = 1;
+                if (factor_name.length() > 6) {
+                    try {
+                        power = std::stoi(factor_name.substr(6));
+                    } catch (...) {
+                        std::cout << "Warning: Could not parse sector power from factor name: " << factor_name << std::endl;
+                        continue;
+                    }
+                }
+                double base_value = person.sector_to_value();
+                factor_value = std::pow(base_value, power);
+            }
+        }
+        // Income effects - handle income, income2, etc. dynamically
+        else if (factor_name.starts_with("income")) {
+            if (factor_name == "income") {
+                factor_value = static_cast<double>(person.income);
+            } else if (factor_name == "income_continuous") {
+                factor_value = person.income_continuous;
+            } else {
+                // Handle income2, income3, etc. dynamically
+                int power = 1;
+                if (factor_name.length() > 6) {
+                    try {
+                        power = std::stoi(factor_name.substr(6));
+                    } catch (...) {
+                        std::cout << "Warning: Could not parse income power from factor name: " << factor_name << std::endl;
+                        continue;
+                    }
+                }
+                double base_value = static_cast<double>(person.income);
+                factor_value = std::pow(base_value, power);
+            }
+        }
+        // Risk factor effects - try to get from risk factors
+        else {
             try {
-                income += coefficient * person.get_risk_factor_value(factor);
+                factor_value = person.get_risk_factor_value(factor);
             } catch (...) {
                 // Factor not found, skip it
                 std::cout << "Warning: Factor " << factor_name
@@ -962,6 +925,9 @@ double StaticLinearModel::calculate_continuous_income(Person &person, Random &ra
                 continue;
             }
         }
+
+        // Add the coefficient contribution
+        income += coefficient * factor_value;
     }
 
     // Add random noise based on standard deviation
@@ -1106,8 +1072,8 @@ void StaticLinearModel::initialise_physical_activity(RuntimeContext &context, Pe
     }
 }
 
-// MAHIMA: Function to insatialise continuous physical activity model using regression.
-// This is for Finch or any project that has region, ethncity, income continuous etc in the CSV
+// MAHIMA: Function to initialise continuous physical activity model using regression.
+// This is for Finch or any project that has region, ethnicity, income continuous etc in the CSV
 // file.
 void StaticLinearModel::initialise_continuous_physical_activity(
     [[maybe_unused]] RuntimeContext &context, Person &person, Random &random,
@@ -1117,50 +1083,144 @@ void StaticLinearModel::initialise_continuous_physical_activity(
 
     // Process coefficients dynamically from CSV file
     for (const auto &[factor_name, coefficient] : model.coefficients) {
-        // Skip the standard deviation entry as it's not a factor
-        if (factor_name == "stddev"_id) {
+        std::string factor_name_str = factor_name.to_string();
+
+        // Skip special coefficients that are not part of the regression
+        if (factor_name_str == "stddev" || factor_name_str == "min" || factor_name_str == "max") {
             continue;
         }
 
-        // Apply coefficient based on its name - dynamically handle any factor names from CSV
+        // Dynamic coefficient matching based on factor name patterns
         double factor_value = 0.0;
 
-        // Age effects
-        if (factor_name == "age"_id) {
+        // Age effects - handle age, age2, age3, etc. dynamically
+        if (factor_name_str.starts_with("age")) {
+            if (factor_name_str == "age") {
             factor_value = static_cast<double>(person.age);
-        } else if (factor_name == "age2"_id) {
-            factor_value = std::pow(person.age, 2);
-        } else if (factor_name == "age3"_id) {
-            factor_value = std::pow(person.age, 3);
+            } else if (factor_name_str == "age2") {
+                factor_value = person.age * person.age;
+            } else if (factor_name_str == "age3") {
+                factor_value = person.age * person.age * person.age;
+            } else {
+                // Handle age4, age5, etc. dynamically
+                int power = 1;
+                if (factor_name_str.length() > 3) {
+                    try {
+                        power = std::stoi(factor_name_str.substr(3));
+                    } catch (...) {
+                        std::cout << "Warning: Could not parse age power from factor name: " << factor_name_str << std::endl;
+                        continue;
+                    }
+                }
+                factor_value = std::pow(person.age, power);
+            }
         }
-        // Gender effect
-        else if (factor_name == "gender"_id) {
+        // Gender effects - handle gender, gender2, etc. dynamically
+        else if (factor_name_str.starts_with("gender")) {
+            if (factor_name_str == "gender") {
             factor_value = person.gender_to_value();
+            } else if (factor_name_str == "gender2") {
+                factor_value = person.gender == core::Gender::male ? 1.0 : 0.0;
+            } else {
+                // Handle gender3, gender4, etc. dynamically
+                int power = 1;
+                if (factor_name_str.length() > 6) {
+                    try {
+                        power = std::stoi(factor_name_str.substr(6));
+                    } catch (...) {
+                        std::cout << "Warning: Could not parse gender power from factor name: " << factor_name_str << std::endl;
+                        continue;
+                    }
+                }
+                double base_value = person.gender == core::Gender::male ? 1.0 : 0.0;
+                factor_value = std::pow(base_value, power);
+            }
         }
-        // Sector effect
-        else if (factor_name == "sector"_id) {
+        // Region effects - handle region2, region3, region56, etc. dynamically
+        else if (factor_name_str.starts_with("region")) {
+            if (factor_name_str == "region") {
+                // If person.region is a number, use it directly
+                try {
+                    factor_value = std::stod(person.region);
+                } catch (...) {
+                    // If not a number, check if it matches the factor name
+                    factor_value = (person.region == factor_name_str) ? 1.0 : 0.0; //this shows if the factor value is 1 (available )then use else if it is 0 (not available) then move on. 
+                }
+            } else {
+                // Handle region2, region3,.... region56, etc. dynamically
+                std::string region_number = factor_name_str.substr(6); // Remove "region" prefix
+                factor_value = (person.region == factor_name_str) ? 1.0 : 0.0;
+            }
+        }
+        // Ethnicity effects - handle ethnicity2, ethnicity3, ethnicity90, etc. dynamically
+        else if (factor_name_str.starts_with("ethnicity")) {
+            if (factor_name_str == "ethnicity") {
+                // If person.ethnicity is a number, use it directly
+                try {
+                    factor_value = std::stod(person.ethnicity);
+                } catch (...) {
+                    // If not a number, check if it matches the factor name
+                    factor_value = (person.ethnicity == factor_name_str) ? 1.0 : 0.0;
+                }
+            } else {
+                // Handle ethnicity2, ethnicity3, ethnicity90, etc. dynamically
+                std::string ethnicity_number = factor_name_str.substr(9); // Remove "ethnicity" prefix
+                factor_value = (person.ethnicity == factor_name_str) ? 1.0 : 0.0;
+            }
+        }
+        // Sector effects - handle sector, sector2, etc. dynamically
+        else if (factor_name_str.starts_with("sector")) {
+            if (factor_name_str == "sector") {
             factor_value = person.sector_to_value();
+            } else {
+                // Handle sector2, sector3, etc. dynamically
+                int power = 1;
+                if (factor_name_str.length() > 6) {
+                    try {
+                        power = std::stoi(factor_name_str.substr(6));
+                    } catch (...) {
+                        std::cout << "Warning: Could not parse sector power from factor name: " << factor_name_str << std::endl;
+                        continue;
+                    }
+                }
+                double base_value = person.sector_to_value();
+                factor_value = std::pow(base_value, power);
+            }
         }
-        // Region effects - dynamically handle any region names from CSV
-        else if (factor_name.to_string() == person.region) {
-            factor_value = 1.0;
-        }
-        // Ethnicity effects - dynamically handle any ethnicity names from CSV
-        else if (factor_name.to_string() == person.ethnicity) {
-            factor_value = 1.0;
-        }
-        // Income effects
-        else if (factor_name == "income"_id) {
+        // Income effects - handle income, income2, etc. dynamically
+        else if (factor_name_str.starts_with("income")) {
+            if (factor_name_str == "income") {
             factor_value = static_cast<double>(person.income);
-        } else if (factor_name == "income_continuous"_id) {
+            } else if (factor_name_str == "income_continuous") {
             factor_value = person.income_continuous;
+            } else {
+                // Handle income2, income3, etc. dynamically
+                int power = 1;
+                if (factor_name_str.length() > 6) {
+                    try {
+                        power = std::stoi(factor_name_str.substr(6));
+                    } catch (...) {
+                        std::cout << "Warning: Could not parse income power from factor name: " << factor_name_str << std::endl;
+                        continue;
+                    }
+                }
+                double base_value = static_cast<double>(person.income);
+                factor_value = std::pow(base_value, power);
+            }
         }
-        // Risk factor effects
+        // Risk factor effects - try to get from risk factors
         else {
-            // Check if it's a risk factor
+            try {
             factor_value = person.get_risk_factor_value(factor_name);
+            } catch (...) {
+                // Factor not found, skip it
+                std::cout << "Warning: Factor " << factor_name_str
+                          << " not found for continuous physical activity calculation, skipping.\n";
+                continue;
+            }
         }
 
+        // Add the coefficient contribution
         value += coefficient * factor_value;
     }
 
@@ -1272,16 +1332,6 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
       // Continuous income model support (FINCH approach)
       is_continuous_income_model_{is_continuous_income_model},
       continuous_income_model_{continuous_income_model}, income_categories_{income_categories} {
-
-    std::cout << "\nDEBUG: StaticLinearModelDefinition constructor - member variables initialized";
-    std::cout << "\nDEBUG: is_continuous_income_model_ = "
-              << (is_continuous_income_model_ ? "true" : "false");
-    std::cout << "\nDEBUG: continuous_income_model_.intercept = "
-              << continuous_income_model_.intercept;
-    std::cout << "\nDEBUG: continuous_income_model_.coefficients.size() = "
-              << continuous_income_model_.coefficients.size();
-    std::cout << "\nDEBUG: income_categories_ = " << income_categories_;
-
     if (names_.empty()) {
         throw core::HgpsException("Risk factor names list is empty");
     }
@@ -1409,12 +1459,6 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
 }
 
 std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() const {
-    std::cout << "\nDEBUG: StaticLinearModelDefinition::create_model called";
-    std::cout << "\nDEBUG: Creating StaticLinearModel with continuous_income_model_.intercept = "
-              << continuous_income_model_.intercept;
-    std::cout << "\nDEBUG: continuous_income_model_.coefficients.size() = "
-              << continuous_income_model_.coefficients.size();
-
     return std::make_unique<StaticLinearModel>(
         expected_, expected_trend_, trend_steps_, expected_trend_boxcox_, names_, models_, ranges_,
         lambda_, stddev_, cholesky_, policy_models_, policy_ranges_, policy_cholesky_,
