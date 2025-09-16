@@ -44,20 +44,12 @@ RiskFactorModel &RiskFactorModule::at(const RiskFactorModelType &model_type) con
 
 void RiskFactorModule::initialise_population(RuntimeContext &context) {
     std::cout << "\nDEBUG: RiskFactorModule::initialise_population called - START";
-    std::cout << "\nDEBUG: Population size: " << context.population().size();
-    std::cout << "\nDEBUG: Models count: " << models_.size();
-
-    std::cout << "\nDEBUG: Checking if static model exists...";
     if (!models_.contains(RiskFactorModelType::Static)) {
         std::cout << " ERROR: Static model not found!";
         throw std::runtime_error("Static model not found in RiskFactorModule");
     }
-    std::cout << " OK, static model exists";
-
-    std::cout << "\nDEBUG: Getting static model...";
     try {
         auto &static_model = models_.at(RiskFactorModelType::Static);
-        std::cout << " OK, static model obtained";
 
         std::cout << "\nDEBUG: Calling static_model->generate_risk_factors...";
         static_model->generate_risk_factors(context);

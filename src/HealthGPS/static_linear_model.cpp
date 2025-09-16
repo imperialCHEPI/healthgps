@@ -164,31 +164,31 @@ StaticLinearModel::StaticLinearModel(
     // Validate that all risk factors have income trend parameters
     // Only validate income trend parameters if income trend is enabled
     if (trend_type_ == TrendType::IncomeTrend && expected_income_trend_) {
-        for (const auto &name : names_) {
+    for (const auto &name : names_) {
             std::cout << "\nDEBUG: Checking risk factor: " << name.to_string();
-            if (!expected_income_trend_->contains(name)) {
-                throw core::HgpsException(
-                    "One or more expected income trend value is missing for risk factor: " +
-                    name.to_string());
-            }
-            if (!expected_income_trend_boxcox_->contains(name)) {
-                throw core::HgpsException(
-                    "One or more expected income trend BoxCox value is missing for risk factor: " +
-                    name.to_string());
-            }
-
-            if (!income_trend_steps_->contains(name)) {
-                throw core::HgpsException(
-                    "One or more income trend steps value is missing for risk factor: " +
-                    name.to_string());
-            }
-
-            if (!income_trend_decay_factors_->contains(name)) {
-                throw core::HgpsException(
-                    "One or more income trend decay factor is missing for risk factor: " +
-                    name.to_string());
-            }
+        if (!expected_income_trend_->contains(name)) {
+            throw core::HgpsException(
+                "One or more expected income trend value is missing for risk factor: " +
+                name.to_string());
         }
+        if (!expected_income_trend_boxcox_->contains(name)) {
+            throw core::HgpsException(
+                "One or more expected income trend BoxCox value is missing for risk factor: " +
+                name.to_string());
+        }
+
+        if (!income_trend_steps_->contains(name)) {
+            throw core::HgpsException(
+                "One or more income trend steps value is missing for risk factor: " +
+                name.to_string());
+        }
+
+        if (!income_trend_decay_factors_->contains(name)) {
+            throw core::HgpsException(
+                "One or more income trend decay factor is missing for risk factor: " +
+                name.to_string());
+        }
+    }
         std::cout << "\nDEBUG: All risk factor income trend parameters validated successfully";
     } else {
         std::cout << "\nDEBUG: Skipping risk factor income trend parameter validation (trend_type_ "
@@ -241,7 +241,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         person_count++;
         if (person_count % 500 == 0) {
             std::cout << "\nDEBUG: Processed " << person_count << " people so far...";
-        }
+    }
     }
     std::cout << "\nDEBUG: Person initialization loop completed successfully for " << person_count
               << " people";
@@ -706,14 +706,11 @@ void StaticLinearModel::update_sector(Person &person, Random &random) const {
 void StaticLinearModel::initialise_income(RuntimeContext &context, Person &person, Random &random) {
     if (is_continuous_income_model_) {
         // FINCH approach: Use continuous income calculation
-        std::cout << "\nDEBUG: Using CONTINUOUS income model";
         initialise_continuous_income(context, person, random);
     } else {
         // India approach: Use direct categorical assignment
-        std::cout << "\nDEBUG: Using CATEGORICAL income model";
         initialise_categorical_income(person, random);
     }
-    std::cout << "\nDEBUG: initialise_income completed successfully";
 }
 
 void StaticLinearModel::update_income(RuntimeContext &context, Person &person, Random &random) {
@@ -792,8 +789,8 @@ double StaticLinearModel::calculate_continuous_income(Person &person, Random &ra
         std::string factor_name = factor.to_string();
 
         // Skip special coefficients that are not part of the regression
-        if (factor_name == "IncomeContinuousStdDev" || factor_name == "min" ||
-            factor_name == "max") {
+        if (factor_name == "IncomeContinuousStdDev" || factor_name == "stddev" || 
+            factor_name == "min" || factor_name == "max") {
             continue;
         }
 
@@ -817,7 +814,7 @@ double StaticLinearModel::calculate_continuous_income(Person &person, Random &ra
                     } catch (...) {
                         std::cout << "Warning: Could not parse age power from factor name: "
                                   << factor_name << std::endl;
-                        continue;
+            continue;
                     }
                 }
                 factor_value = std::pow(person.age, power);
@@ -829,7 +826,7 @@ double StaticLinearModel::calculate_continuous_income(Person &person, Random &ra
                 factor_value = person.gender_to_value();
             } else if (factor_name == "gender2") {
                 factor_value = person.gender == core::Gender::male ? 1.0 : 0.0;
-            } else {
+        } else {
                 // Handle gender3, gender4, etc. dynamically
                 int power = 1;
                 if (factor_name.length() > 6) {
@@ -922,6 +919,16 @@ double StaticLinearModel::calculate_continuous_income(Person &person, Random &ra
                 double base_value = static_cast<double>(person.income);
                 factor_value = std::pow(base_value, power);
             }
+        }
+        // Region value effects - handle any region values dynamically
+        else if (factor_name == person.region) {
+            // Check if person's region matches this factor name exactly
+            factor_value = 1.0;
+        }
+        // Ethnicity value effects - handle any ethnicity values dynamically
+        else if (factor_name == person.ethnicity) {
+            // Check if person's ethnicity matches this factor name exactly
+            factor_value = 1.0;
         }
         // Risk factor effects - try to get from risk factors
         else {
@@ -1105,7 +1112,7 @@ void StaticLinearModel::initialise_continuous_physical_activity(
         // Age effects - handle age, age2, age3, etc. dynamically
         if (factor_name_str.starts_with("age")) {
             if (factor_name_str == "age") {
-                factor_value = static_cast<double>(person.age);
+            factor_value = static_cast<double>(person.age);
             } else if (factor_name_str == "age2") {
                 factor_value = person.age * person.age;
             } else if (factor_name_str == "age3") {
@@ -1128,7 +1135,7 @@ void StaticLinearModel::initialise_continuous_physical_activity(
         // Gender effects - handle gender, gender2, etc. dynamically
         else if (factor_name_str.starts_with("gender")) {
             if (factor_name_str == "gender") {
-                factor_value = person.gender_to_value();
+            factor_value = person.gender_to_value();
             } else if (factor_name_str == "gender2") {
                 factor_value = person.gender == core::Gender::male ? 1.0 : 0.0;
             } else {
@@ -1187,7 +1194,7 @@ void StaticLinearModel::initialise_continuous_physical_activity(
         // Sector effects - handle sector, sector2, etc. dynamically
         else if (factor_name_str.starts_with("sector")) {
             if (factor_name_str == "sector") {
-                factor_value = person.sector_to_value();
+            factor_value = person.sector_to_value();
             } else {
                 // Handle sector2, sector3, etc. dynamically
                 int power = 1;
@@ -1207,9 +1214,9 @@ void StaticLinearModel::initialise_continuous_physical_activity(
         // Income effects - handle income, income2, etc. dynamically
         else if (factor_name_str.starts_with("income")) {
             if (factor_name_str == "income") {
-                factor_value = static_cast<double>(person.income);
+            factor_value = static_cast<double>(person.income);
             } else if (factor_name_str == "income_continuous") {
-                factor_value = person.income_continuous;
+            factor_value = person.income_continuous;
             } else {
                 // Handle income2, income3, etc. dynamically
                 int power = 1;
@@ -1226,10 +1233,20 @@ void StaticLinearModel::initialise_continuous_physical_activity(
                 factor_value = std::pow(base_value, power);
             }
         }
+        // Region value effects - handle any region values dynamically
+        else if (factor_name_str == person.region) {
+            // Check if person's region matches this factor name exactly
+            factor_value = 1.0;
+        }
+        // Ethnicity value effects - handle any ethnicity values dynamically
+        else if (factor_name_str == person.ethnicity) {
+            // Check if person's ethnicity matches this factor name exactly
+            factor_value = 1.0;
+        }
         // Risk factor effects - try to get from risk factors
         else {
             try {
-                factor_value = person.get_risk_factor_value(factor_name);
+            factor_value = person.get_risk_factor_value(factor_name);
             } catch (...) {
                 // Factor not found, skip it
                 std::cout << "Warning: Factor " << factor_name_str
