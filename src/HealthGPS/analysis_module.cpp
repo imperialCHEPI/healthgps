@@ -420,6 +420,14 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
     // extract DataSeries and IncomeCategoryString from ModelResult
     DataSeries &series = result.series;
     std::string IncomeCategory = result.IncomeCategory;
+    
+    // MAHIMA: Debug to track when this function is called
+    static int analysis_debug_count = 0;
+    if (IncomeCategory == "All" && analysis_debug_count < 3) {
+        std::cout << "\n=== ANALYSIS MODULE DEBUG #" << (analysis_debug_count + 1) << " ===" << std::endl;
+        std::cout << "IncomeCategory: " << IncomeCategory << ", Time: " << context.time_now() << std::endl;
+        analysis_debug_count++;
+    }
 
     if (series.size() > 0) {
         throw std::logic_error("This should be a new object!");
@@ -450,6 +458,11 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
     std::map<std::string, std::map<int, int>> age_zero_counts;
     std::map<std::string, std::map<int, int>> age_total_counts;
     std::map<std::string, std::map<int, double>> age_sum_values;
+    
+    // MAHIMA: Gender-specific age tracking
+    std::map<std::string, std::map<int, std::map<core::Gender, int>>> age_gender_zero_counts;
+    std::map<std::string, std::map<int, std::map<core::Gender, int>>> age_gender_total_counts;
+    std::map<std::string, std::map<int, std::map<core::Gender, double>>> age_gender_sum_values;
     
     for (const auto &person : context.population()) {
         total_people_processed++;
@@ -511,6 +524,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
             if (value == 0.0) {
                 zero_value_counts[factor_key]++;
                 age_zero_counts[factor_key][age]++;
+                age_gender_zero_counts[factor_key][age][gender]++;
             }
             total_value_counts[factor_key]++;
             sum_values[factor_key] += value;
@@ -518,6 +532,10 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
             // MAHIMA: Track age-specific values
             age_total_counts[factor_key][age]++;
             age_sum_values[factor_key][age] += value;
+            
+            // MAHIMA: Track gender-specific age values
+            age_gender_total_counts[factor_key][age][gender]++;
+            age_gender_sum_values[factor_key][age][gender] += value;
 
             // Add the value to the appropriate channel if vector is large enough
             if (static_cast<size_t>(age) < series(gender, mean_key).size()) {
@@ -646,25 +664,30 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
                     // Check specific age groups for alcohol
                     if (factor_key == "alcohol" || factor_key == "Alcohol") {
                         std::cout << "  - ALCOHOL SPECIFIC DEBUG:" << std::endl;
-                        std::cout << "    Age Group Analysis (showing zero vs non-zero breakdown):" << std::endl;
+                        std::cout << "    Age Group Analysis (showing zero vs non-zero breakdown by gender):" << std::endl;
                         for (int age = 15; age <= 25; age++) {
                             if (age < series(core::Gender::female, "mean_" + factor_key).size()) {
-                                double female_count = series(core::Gender::female, "count").at(age);
-                                double female_sum = series(core::Gender::female, "mean_" + factor_key).at(age);
-                                double female_mean = female_count > 0 ? female_sum / female_count : 0.0;
+                                // MAHIMA: Show gender-specific breakdown for each age
+                                int male_zeros = age_gender_zero_counts[factor_key][age][core::Gender::male];
+                                int male_total = age_gender_total_counts[factor_key][age][core::Gender::male];
+                                int male_non_zeros = male_total - male_zeros;
+                                double male_zero_percentage = male_total > 0 ? (100.0 * male_zeros) / male_total : 0.0;
+                                double male_mean = male_total > 0 ? age_gender_sum_values[factor_key][age][core::Gender::male] / male_total : 0.0;
                                 
-                                // MAHIMA: Show zero vs non-zero breakdown for each age
-                                int age_zeros = age_zero_counts[factor_key][age];
-                                int age_total = age_total_counts[factor_key][age];
-                                int age_non_zeros = age_total - age_zeros;
-                                double age_zero_percentage = age_total > 0 ? (100.0 * age_zeros) / age_total : 0.0;
+                                int female_zeros = age_gender_zero_counts[factor_key][age][core::Gender::female];
+                                int female_total = age_gender_total_counts[factor_key][age][core::Gender::female];
+                                int female_non_zeros = female_total - female_zeros;
+                                double female_zero_percentage = female_total > 0 ? (100.0 * female_zeros) / female_total : 0.0;
+                                double female_mean = female_total > 0 ? age_gender_sum_values[factor_key][age][core::Gender::female] / female_total : 0.0;
                                 
-                                if (age_total > 0) { // Only show ages with data
-                                    std::cout << "    Age " << age << ": count=" << age_total 
-                                             << ", zeros=" << age_zeros << " (" << age_zero_percentage << "%)"
-                                             << ", non-zeros=" << age_non_zeros
-                                             << ", sum=" << age_sum_values[factor_key][age] << ", mean="
-                                        << (age_sum_values[factor_key][age] / age_total) << "\n";
+                                if (male_total > 0 || female_total > 0) { // Only show ages with data
+                                    std::cout << "    Age " << age << ":" << std::endl;
+                                    std::cout << "      Male: count=" << male_total << ", zeros=" << male_zeros << " (" << male_zero_percentage << "%)"
+                                             << ", non-zeros=" << male_non_zeros << ", sum=" << age_gender_sum_values[factor_key][age][core::Gender::male]
+                                             << ", mean=" << male_mean << std::endl;
+                                    std::cout << "      Female: count=" << female_total << ", zeros=" << female_zeros << " (" << female_zero_percentage << "%)"
+                                             << ", non-zeros=" << female_non_zeros << ", sum=" << age_gender_sum_values[factor_key][age][core::Gender::female]
+                                             << ", mean=" << female_mean << std::endl;
                                 }
                             }
                         }

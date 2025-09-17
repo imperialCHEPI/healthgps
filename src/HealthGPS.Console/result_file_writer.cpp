@@ -279,9 +279,10 @@ void ResultFileWriter::write_csv_channels(const hgps::ResultEventMessage &messag
     std::stringstream fss;
 
     // MAHIMA: Debug output for CSV writing - only for "All" category and specific factors
-    static bool debug_printed = false;
-    if (message.content.IncomeCategory == "All" && !debug_printed) {
-        std::cout << "\n=== CSV WRITING DEBUG (Income Category: " << message.content.IncomeCategory << ") ===" << std::endl;
+    static int csv_debug_count = 0;
+    if (message.content.IncomeCategory == "All" && csv_debug_count < 3) {
+        std::cout << "\n=== CSV WRITING DEBUG #" << (csv_debug_count + 1) << " (Income Category: " << message.content.IncomeCategory << ") ===" << std::endl;
+        std::cout << "Message details: source=" << message.source << ", run=" << message.run_number << ", time=" << message.model_time << std::endl;
         
         // Check alcohol values for ages 15-18
         std::vector<std::string> debug_factors = {"mean_alcohol", "mean_legume", "mean_redmeat"};
@@ -298,8 +299,8 @@ void ResultFileWriter::write_csv_channels(const hgps::ResultEventMessage &messag
                 std::cout << std::endl;
             }
         }
-        std::cout << "=== END CSV WRITING DEBUG ===" << std::endl;
-        debug_printed = true;
+        std::cout << "=== END CSV WRITING DEBUG #" << (csv_debug_count + 1) << " ===" << std::endl;
+        csv_debug_count++;
     }
 
     for (auto index = 0u; index < series.sample_size(); index++) {
