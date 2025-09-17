@@ -9,6 +9,7 @@
 #include <nlohmann/json.hpp>
 #include <sstream>
 #include <utility>
+#include <iostream>
 
 namespace hgps {
 ResultFileWriter::ResultFileWriter(const std::filesystem::path &file_name, ExperimentInfo info)
@@ -276,6 +277,30 @@ void ResultFileWriter::write_csv_channels(const hgps::ResultEventMessage &messag
     const auto &series = message.content.series;
     std::stringstream mss;
     std::stringstream fss;
+
+    // MAHIMA: Debug output for CSV writing - only for "All" category and specific factors
+    static bool debug_printed = false;
+    if (message.content.IncomeCategory == "All" && !debug_printed) {
+        std::cout << "\n=== CSV WRITING DEBUG (Income Category: " << message.content.IncomeCategory << ") ===" << std::endl;
+        
+        // Check alcohol values for ages 15-18
+        std::vector<std::string> debug_factors = {"mean_alcohol", "mean_legume", "mean_redmeat"};
+        for (const auto &factor : debug_factors) {
+            if (series.has_channel(factor)) {
+                std::cout << "Factor: " << factor << std::endl;
+                for (int age = 15; age <= 18; age++) {
+                    if (age < series.at(Gender::female, factor).size()) {
+                        double female_value = series.at(Gender::female, factor).at(age);
+                        double male_value = series.at(Gender::male, factor).at(age);
+                        std::cout << "  Age " << age << " - Female: " << female_value << ", Male: " << male_value << std::endl;
+                    }
+                }
+                std::cout << std::endl;
+            }
+        }
+        std::cout << "=== END CSV WRITING DEBUG ===" << std::endl;
+        debug_printed = true;
+    }
 
     for (auto index = 0u; index < series.sample_size(); index++) {
         mss << message.source << sep << message.run_number << sep << message.model_time << sep

@@ -438,7 +438,21 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
     }
 
     auto current_time = static_cast<unsigned int>(context.time_now());
+    
+    // MAHIMA: Debug counters for zero value tracking
+    std::map<std::string, int> zero_value_counts;
+    std::map<std::string, int> total_value_counts;
+    std::map<std::string, double> sum_values;
+    int total_people_processed = 0;
+    int active_people_processed = 0;
+    
+    // MAHIMA: Age-specific zero value tracking for detailed analysis
+    std::map<std::string, std::map<int, int>> age_zero_counts;
+    std::map<std::string, std::map<int, int>> age_total_counts;
+    std::map<std::string, std::map<int, double>> age_sum_values;
+    
     for (const auto &person : context.population()) {
+        total_people_processed++;
 
         //// Only do this proposed loop if considering all income categories, or if the person
         /// belongs to this particular income category.
@@ -476,6 +490,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
             continue;
         }
 
+        active_people_processed++;
         series(gender, "count").at(age)++;
 
         // Process all risk factors defined in the mapping
@@ -491,6 +506,18 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
                 // Try to use the get_risk_factor_value method which includes static properties
                 value = person.get_risk_factor_value(factor.key());
             }
+
+            // MAHIMA: Track zero values for debugging
+            if (value == 0.0) {
+                zero_value_counts[factor_key]++;
+                age_zero_counts[factor_key][age]++;
+            }
+            total_value_counts[factor_key]++;
+            sum_values[factor_key] += value;
+            
+            // MAHIMA: Track age-specific values
+            age_total_counts[factor_key][age]++;
+            age_sum_values[factor_key][age] += value;
 
             // Add the value to the appropriate channel if vector is large enough
             if (static_cast<size_t>(age) < series(gender, mean_key).size()) {
@@ -592,6 +619,62 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
 
     // Calculate standard deviation
     calculate_standard_deviation(context, series);
+    
+    // MAHIMA: Debug output to verify zero value handling - ONLY for "All" category
+    if (IncomeCategory == "All") {
+        std::cout << "\n=== ZERO VALUE DEBUG REPORT (Income Category: " << IncomeCategory << ") ===" << std::endl;
+        std::cout << "Total people in population: " << total_people_processed << std::endl;
+        std::cout << "Active people processed: " << active_people_processed << std::endl;
+        
+        // Only show factors that have significant zero values (two-stage modeling factors)
+        std::vector<std::string> two_stage_factors = {"alcohol", "legume", "redmeat", "addedsugar", "processedmeat", "fruit", "vegetable"};
+        
+        for (const auto &factor : context.mapping().entries()) {
+            std::string factor_key = factor.key().to_string();
+            if (total_value_counts[factor_key] > 0) {
+                double zero_percentage = (100.0 * zero_value_counts[factor_key]) / total_value_counts[factor_key];
+                double calculated_mean = sum_values[factor_key] / total_value_counts[factor_key];
+                
+                // Only show factors with significant zero values or specific factors of interest
+                if (zero_percentage > 5.0 || std::find(two_stage_factors.begin(), two_stage_factors.end(), factor_key) != two_stage_factors.end()) {
+                    std::cout << "Factor: " << factor_key << std::endl;
+                    std::cout << "  - Total values: " << total_value_counts[factor_key] << std::endl;
+                    std::cout << "  - Zero values: " << zero_value_counts[factor_key] << " (" << zero_percentage << "%)" << std::endl;
+                    std::cout << "  - Sum of all values: " << sum_values[factor_key] << std::endl;
+                    std::cout << "  - Calculated mean (including zeros): " << calculated_mean << std::endl;
+                    
+                    // Check specific age groups for alcohol
+                    if (factor_key == "alcohol" || factor_key == "Alcohol") {
+                        std::cout << "  - ALCOHOL SPECIFIC DEBUG:" << std::endl;
+                        std::cout << "    Age Group Analysis (showing zero vs non-zero breakdown):" << std::endl;
+                        for (int age = 15; age <= 25; age++) {
+                            if (age < series(core::Gender::female, "mean_" + factor_key).size()) {
+                                double female_count = series(core::Gender::female, "count").at(age);
+                                double female_sum = series(core::Gender::female, "mean_" + factor_key).at(age);
+                                double female_mean = female_count > 0 ? female_sum / female_count : 0.0;
+                                
+                                // MAHIMA: Show zero vs non-zero breakdown for each age
+                                int age_zeros = age_zero_counts[factor_key][age];
+                                int age_total = age_total_counts[factor_key][age];
+                                int age_non_zeros = age_total - age_zeros;
+                                double age_zero_percentage = age_total > 0 ? (100.0 * age_zeros) / age_total : 0.0;
+                                
+                                if (age_total > 0) { // Only show ages with data
+                                    std::cout << "    Age " << age << ": count=" << age_total 
+                                             << ", zeros=" << age_zeros << " (" << age_zero_percentage << "%)"
+                                             << ", non-zeros=" << age_non_zeros
+                                             << ", sum=" << age_sum_values[factor_key][age] << ", mean="
+                                        << (age_sum_values[factor_key][age] / age_total) << "\n";
+                                }
+                            }
+                        }
+                    }
+                    std::cout << std::endl;
+                }
+            }
+        }
+        std::cout << "=== END ZERO VALUE DEBUG REPORT ===" << std::endl;
+    }
 }
 // NOLINTEND(readability-function-cognitive-complexity)
 
