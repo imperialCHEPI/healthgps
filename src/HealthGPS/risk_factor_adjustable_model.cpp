@@ -9,6 +9,7 @@
 #include <utility>
 #include <thread>
 #include <chrono>
+#include <set>
 
 namespace { // anonymous namespace
 
@@ -75,6 +76,32 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
 
     // Flag to track if ranges are applied at least once
     // bool any_ranges_applied = false;
+
+    // MAHIMA: Track zero values that will be skipped during adjustment (print once only)
+    static bool zero_skip_info_printed = false;
+    if (!zero_skip_info_printed) {
+        std::set<std::string> factors_with_zeros;
+        for (const auto &person : context.population()) {
+            if (!person.is_active()) continue;
+            for (const auto &factor : factors) {
+                if (person.risk_factors.contains(factor) && person.risk_factors.at(factor) == 0.0) {
+                    factors_with_zeros.insert(factor.to_string());
+                }
+            }
+        }
+        
+        if (!factors_with_zeros.empty()) {
+            std::cout << "\n=== ZERO VALUES PRESERVED (Skipped from Mean Adjustment) ===" << std::endl;
+            std::cout << "Risk factors with zero values that will NOT be adjusted: ";
+            for (const auto &factor : factors_with_zeros) {
+                std::cout << factor << " ";
+            }
+            std::cout << std::endl;
+            std::cout << "These zeros are preserved from two-stage modeling (logistic regression)." << std::endl;
+            std::cout << "===============================================================" << std::endl;
+        }
+        zero_skip_info_printed = true;
+    }
 
     // Baseline scenario: compute adjustments.
     if (context.scenario().type() == ScenarioType::baseline) {
@@ -159,6 +186,12 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
             // MAHIMA: If adjustment for risk factors that are currently 0 (in case something is not initialized)
             // This preserves zero values set by logistic regression (two-stage modeling)
             double original_value = person.risk_factors.at(factor);
+
+            // MAHIMA: Preserve zero values from two-stage modeling - don't adjust them
+            if (original_value == 0.0) {
+                // Skip adjustment for zero values to preserve two-stage modeling results
+                continue;
+            }
 
             // Check if age is within bounds
             const auto &age_vector = adjustments.at(person.gender, factor);
