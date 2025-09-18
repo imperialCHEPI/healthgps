@@ -159,6 +159,11 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
             // MAHIMA: If adjustment for risk factors that are currently 0 (in case something is not initialized)
             // This preserves zero values set by logistic regression (two-stage modeling)
             double original_value = person.risk_factors.at(factor);
+            // MAHIMA: Preserve zero values from two-stage modeling - don't adjust them
+            if (original_value == 0.0) {
+                // Skip adjustment for zero values to preserve two-stage modeling results
+                continue;
+            }
 
             // Check if age is within bounds
             const auto &age_vector = adjustments.at(person.gender, factor);
