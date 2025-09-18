@@ -186,50 +186,6 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
             // Set the adjusted value with any additional validation
             person.set_risk_factor(context, factor, value);
         }
-        
-        // MAHIMA: Update stored calculation details for ALL risk factors for this person
-        // This ensures we capture debugging info for all people, not just those with adjustments
-        if (context.has_risk_factor_inspector()) {
-            auto &inspector = context.get_risk_factor_inspector();
-            
-            // Process all factors for debugging, regardless of whether they were adjusted
-            for (size_t factor_index = 0; factor_index < factors.size(); factor_index++) {
-                const auto &factor = factors[factor_index];
-                
-                // Skip income and physicalactivity - they are handled separately below
-                if (factor.to_string() == "income" || factor.to_string() == "physicalactivity") {
-                    continue;
-                }
-                
-                // Get the adjustment delta for this age/gender/factor
-                double adjustment_delta = 0.0;
-                if (adjustments.contains(person.gender) && adjustments.at(person.gender).contains(factor)) {
-                    const auto &adjustment_vector = adjustments.at(person.gender, factor);
-                    if (person.age < static_cast<int>(adjustment_vector.size())) {
-                        adjustment_delta = adjustment_vector.at(person.age);
-                    }
-                }
-                
-                // Get the actual simulated mean from the calculated table (same for all people of this age/gender)
-                double simulated_mean = 0.0;
-                if (simulated_means.contains(person.gender) && simulated_means.at(person.gender).contains(factor)) {
-                    const auto &sim_mean_vector = simulated_means.at(person.gender, factor);
-                    if (person.age < static_cast<int>(sim_mean_vector.size())) {
-                        simulated_mean = sim_mean_vector.at(person.age);
-                    }
-                }
-                
-                // Get the current value of the risk factor
-                double current_value = 0.0;
-                if (person.risk_factors.contains(factor)) {
-                    current_value = person.risk_factors.at(factor);
-                }
-                
-                // Update the stored calculation details
-                inspector.update_calculation_details_with_adjustments(person, factor.to_string(),
-                                                                     simulated_mean, adjustment_delta, current_value, current_value);
-            }
-        }
 
         // MAHIMA: Special handling for Income and PhysicalActivity
         // These are demographic attributes, not regular risk factors
@@ -290,6 +246,50 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
                                                                              pa_sim_mean, delta, person.physical_activity, person.physical_activity);
                     }
                 }
+            }
+        }
+        
+        // MAHIMA: Update stored calculation details for ALL risk factors for this person
+        // This ensures we capture debugging info for all people AFTER adjustments are applied
+        if (context.has_risk_factor_inspector()) {
+            auto &inspector = context.get_risk_factor_inspector();
+            
+            // Process all factors for debugging, regardless of whether they were adjusted
+            for (size_t factor_index = 0; factor_index < factors.size(); factor_index++) {
+                const auto &factor = factors[factor_index];
+                
+                // Skip income and physicalactivity - they are handled separately above
+                if (factor.to_string() == "income" || factor.to_string() == "physicalactivity") {
+                    continue;
+                }
+                
+                // Get the adjustment delta for this age/gender/factor
+                double adjustment_delta = 0.0;
+                if (adjustments.contains(person.gender) && adjustments.at(person.gender).contains(factor)) {
+                    const auto &adjustment_vector = adjustments.at(person.gender, factor);
+                    if (person.age < static_cast<int>(adjustment_vector.size())) {
+                        adjustment_delta = adjustment_vector.at(person.age);
+                    }
+                }
+                
+                // Get the actual simulated mean from the calculated table (same for all people of this age/gender)
+                double simulated_mean = 0.0;
+                if (simulated_means.contains(person.gender) && simulated_means.at(person.gender).contains(factor)) {
+                    const auto &sim_mean_vector = simulated_means.at(person.gender, factor);
+                    if (person.age < static_cast<int>(sim_mean_vector.size())) {
+                        simulated_mean = sim_mean_vector.at(person.age);
+                    }
+                }
+                
+                // Get the current value of the risk factor AFTER adjustment
+                double current_value = 0.0;
+                if (person.risk_factors.contains(factor)) {
+                    current_value = person.risk_factors.at(factor);
+                }
+                
+                // Update the stored calculation details with the final adjusted values
+                inspector.update_calculation_details_with_adjustments(person, factor.to_string(),
+                                                                     simulated_mean, adjustment_delta, current_value, current_value);
             }
         }
     });
@@ -473,6 +473,11 @@ RiskFactorAdjustableModel::calculate_simulated_mean(Population &population,
                 has_value = true;
             } else if (person.risk_factors.contains(factor)) {
                 value = person.risk_factors.at(factor);
+                has_value = true;
+            } else {
+                // MAHIMA: If person doesn't have this risk factor, it means they got 0 from logistic regression
+                // We still need to include them in the mean calculation with value 0.0
+                value = 0.0;
                 has_value = true;
             }
 
