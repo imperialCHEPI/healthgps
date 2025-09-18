@@ -354,13 +354,15 @@ void RiskFactorInspector::set_debug_config(bool enabled, int age, core::Gender g
 }
 
 // MAHIMA: Capture detailed risk factor calculation steps for debugging
-void RiskFactorInspector::capture_detailed_calculation(RuntimeContext &context, const Person &person, 
-                                                      const std::string &risk_factor_name, size_t risk_factor_index,
+void RiskFactorInspector::capture_detailed_calculation(RuntimeContext & /*context*/, const Person &person, 
+                                                      const std::string &risk_factor_name, size_t /*risk_factor_index*/,
                                                       double random_residual_before_cholesky, double residual_after_cholesky,
                                                       double expected_value, double linear_result, double residual,
                                                       double stddev, double combined, double lambda, double boxcox_result,
-                                                      double factor_before_clamp, double range_lower, double range_upper,
-                                                      double final_clamped_factor) {
+                                                      double factor_before_clamp, double range_lower, double range_upper, double first_clamped_factor_value,
+    double simulated_mean,
+                                                      double factors_mean_delta, double value_after_adjustment_before_second_clamp,
+                                                      double final_value_after_second_clamp) {
     
     // Check if debugging is enabled and this person/risk factor matches our criteria
     if (!debug_config_.enabled) {
@@ -402,7 +404,8 @@ void RiskFactorInspector::capture_detailed_calculation(RuntimeContext &context, 
         file << "person_id,gender,age,region,ethnicity,physical_activity,income_continuous,income_category,"
              << "random_residual_before_cholesky,residual_after_cholesky,RF_value,expected_value,linear_result,"
              << "residual,stddev,combined,lambda,boxcox_result,factor_before_clamp,range_lower,range_upper,"
-             << "final_clamped_factor\n";
+             << "first_clamped_factor_value,simulated_mean,factors_mean_delta,value_after_adjustment_before_second_clamp,"
+             << "final_value_after_second_clamp\n";
     }
     
     // Write person data
@@ -427,18 +430,24 @@ void RiskFactorInspector::capture_detailed_calculation(RuntimeContext &context, 
          << factor_before_clamp << ","
          << range_lower << ","
          << range_upper << ","
-         << final_clamped_factor << "\n";
+         << first_clamped_factor_value << ","
+         << simulated_mean << ","
+         << factors_mean_delta << ","
+         << value_after_adjustment_before_second_clamp << ","
+         << final_value_after_second_clamp << "\n";
     
     file.close();
 }
 
 // MAHIMA: Store calculation details for later capture
-void RiskFactorInspector::store_calculation_details(const Person &person, const std::string &risk_factor_name, size_t risk_factor_index,
+void RiskFactorInspector::store_calculation_details(const Person &person, const std::string &risk_factor_name, size_t /*risk_factor_index*/,
                                                    double random_residual_before_cholesky, double residual_after_cholesky,
                                                    double expected_value, double linear_result, double residual,
                                                    double stddev, double combined, double lambda, double boxcox_result,
                                                    double factor_before_clamp, double range_lower, double range_upper,
-                                                   double final_clamped_factor) {
+    double first_clamped_factor_value, double simulated_mean,
+                                                   double factors_mean_delta, double value_after_adjustment_before_second_clamp,
+                                                   double final_value_after_second_clamp) {
     if (!debug_config_.enabled) {
         return;
     }
@@ -446,7 +455,7 @@ void RiskFactorInspector::store_calculation_details(const Person &person, const 
     // Check if this person and risk factor should be captured
     bool should_capture = true;
     
-    if (debug_config_.target_age != -1 && person.age != debug_config_.target_age) {
+    if (debug_config_.target_age != -1 && person.age != static_cast<unsigned int>(debug_config_.target_age)) {
         should_capture = false;
     }
     
@@ -479,14 +488,18 @@ void RiskFactorInspector::store_calculation_details(const Person &person, const 
     details.factor_before_clamp = factor_before_clamp;
     details.range_lower = range_lower;
     details.range_upper = range_upper;
-    details.final_clamped_factor = final_clamped_factor;
+    details.first_clamped_factor_value = first_clamped_factor_value;
+    details.simulated_mean = simulated_mean;
+    details.factors_mean_delta = factors_mean_delta;
+    details.value_after_adjustment_before_second_clamp = value_after_adjustment_before_second_clamp;
+    details.final_value_after_second_clamp = final_value_after_second_clamp;
     
     calculation_storage_[person_id][risk_factor_name] = details;
 }
 
 // MAHIMA: Capture person risk factors after all calculations are complete
-void RiskFactorInspector::capture_person_risk_factors(RuntimeContext &context, const Person &person, 
-                                                     const std::string &risk_factor_name, size_t risk_factor_index) {
+void RiskFactorInspector::capture_person_risk_factors(RuntimeContext & /*context*/, const Person &person, 
+                                                     const std::string &risk_factor_name, size_t /*risk_factor_index*/) {
     if (!debug_config_.enabled) {
         return;
     }
@@ -494,7 +507,7 @@ void RiskFactorInspector::capture_person_risk_factors(RuntimeContext &context, c
     // Check if this person and risk factor should be captured
     bool should_capture = true;
     
-    if (debug_config_.target_age != -1 && person.age != debug_config_.target_age) {
+    if (debug_config_.target_age != -1 && person.age != static_cast<unsigned int>(debug_config_.target_age)) {
         should_capture = false;
     }
     
@@ -542,7 +555,8 @@ void RiskFactorInspector::capture_person_risk_factors(RuntimeContext &context, c
         file << "person_id,gender,age,region,ethnicity,physical_activity,income_continuous,income_category,"
              << "random_residual_before_cholesky,residual_after_cholesky,RF_value,expected_value,linear_result,"
              << "residual,stddev,combined,lambda,boxcox_result,factor_before_clamp,range_lower,range_upper,"
-             << "final_clamped_factor\n";
+             << "first_clamped_factor_value,simulated_mean,factors_mean_delta,value_after_adjustment_before_second_clamp,"
+             << "final_value_after_second_clamp\n";
     }
     
     // Write the data
@@ -572,7 +586,11 @@ void RiskFactorInspector::capture_person_risk_factors(RuntimeContext &context, c
          << details.factor_before_clamp << ","
          << details.range_lower << ","
          << details.range_upper << ","
-         << details.final_clamped_factor << "\n";
+         << details.first_clamped_factor_value << ","
+         << details.simulated_mean << ","
+         << details.factors_mean_delta << ","
+         << details.value_after_adjustment_before_second_clamp << ","
+         << details.final_value_after_second_clamp << "\n";
     
     file.close();
     
@@ -596,13 +614,13 @@ void RiskFactorInspector::analyze_population_demographics(RuntimeContext &contex
         return;
     }
     
-    int total_population = context.population().size();
+    int total_population = static_cast<int>(context.population().size());
     int matching_age_gender = 0;
     int matching_age_gender_risk_factor = 0;
     
     // Count people matching age and gender criteria
     for (const auto &person : context.population()) {
-        bool age_matches = (debug_config_.target_age == -1) || (person.age == debug_config_.target_age);
+        bool age_matches = (debug_config_.target_age == -1) || (person.age == static_cast<unsigned int>(debug_config_.target_age));
         bool gender_matches = (debug_config_.target_gender == core::Gender::unknown) || (person.gender == debug_config_.target_gender);
         
         if (age_matches && gender_matches) {
@@ -627,6 +645,48 @@ void RiskFactorInspector::analyze_population_demographics(RuntimeContext &contex
     // Show final record count
     if (total_records_written_ > 0) {
         std::cout << "\nMAHIMA: Total records written to " << debug_config_.target_risk_factor << "_inspection.csv: " << total_records_written_;
+    }
+}
+
+// MAHIMA: Update stored calculation details with adjustment values
+void RiskFactorInspector::update_calculation_details_with_adjustments(const Person &person, const std::string &risk_factor_name,
+                                                                     double simulated_mean, double factors_mean_delta,
+                                                                     double value_after_adjustment_before_second_clamp,
+                                                                     double final_value_after_second_clamp) {
+    if (!debug_config_.enabled) {
+        return;
+    }
+
+    // Check if this person and risk factor should be updated
+    bool should_update = true;
+    
+    if (debug_config_.target_age != -1 && person.age != static_cast<unsigned int>(debug_config_.target_age)) {
+        should_update = false;
+    }
+    
+    if (debug_config_.target_gender != core::Gender::unknown && person.gender != debug_config_.target_gender) {
+        should_update = false;
+    }
+    
+    if (!debug_config_.target_risk_factor.empty() && risk_factor_name != debug_config_.target_risk_factor) {
+        should_update = false;
+    }
+    
+    if (!should_update) {
+        return;
+    }
+
+    // Update the stored calculation details
+    std::string person_id = std::to_string(person.id());
+    
+    if (calculation_storage_.find(person_id) != calculation_storage_.end() &&
+        calculation_storage_[person_id].find(risk_factor_name) != calculation_storage_[person_id].end()) {
+        
+        auto& details = calculation_storage_[person_id][risk_factor_name];
+        details.simulated_mean = simulated_mean;
+        details.factors_mean_delta = factors_mean_delta;
+        details.value_after_adjustment_before_second_clamp = value_after_adjustment_before_second_clamp;
+        details.final_value_after_second_clamp = final_value_after_second_clamp;
     }
 }
 

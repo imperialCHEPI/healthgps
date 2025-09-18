@@ -82,18 +82,8 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         initialise_factors(context, person, context.random());
         initialise_physical_activity(context, person, context.random());
         
-            // MAHIMA: Capture detailed calculation steps for debugging
-            // This is called after physical activity is assigned so we have all the data
-            if constexpr (ENABLE_DETAILED_CALCULATION_DEBUG) {
-                if (context.has_risk_factor_inspector()) {
-                    auto &inspector = context.get_risk_factor_inspector();
-                    // Capture all risk factors for this person
-                    for (size_t i = 0; i < names_.size(); i++) {
-                        // Get the stored calculation details and write to CSV
-                        inspector.capture_person_risk_factors(context, person, names_[i].to_string(), i);
-                    }
-                }
-            }
+            // MAHIMA: No debugging capture here - will be done after adjustments
+            // Individual-level debugging capture happens after all adjustments are applied
         }
 
     // MAHIMA: Analyze population demographics to show expected counts
@@ -126,6 +116,21 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     // MAHIMA: Adjust trended risk factor means using combined factors
     // Use the same combined factors and ranges for trended adjustment
     adjust_risk_factors(context, combined_factors, combined_ranges, true);
+
+    // MAHIMA: Capture detailed calculation steps for debugging AFTER all adjustments
+    // This ensures we have the final values including adjustments
+    if constexpr (ENABLE_DETAILED_CALCULATION_DEBUG) {
+        if (context.has_risk_factor_inspector()) {
+            auto &inspector = context.get_risk_factor_inspector();
+            // Capture all risk factors for all people after adjustments
+            for (auto &person : context.population()) {
+                for (size_t i = 0; i < names_.size(); i++) {
+                    // Get the stored calculation details and write to CSV
+                    inspector.capture_person_risk_factors(context, person, names_[i].to_string(), i);
+                }
+            }
+        }
+    }
 
     // Print risk factor summary once at the end
     std::string risk_factor_list;
@@ -392,7 +397,11 @@ if (has_logistic_model) {
                                                  residuals[i], expected, linear[i], residual,
                                                  stddev_[i], 0.0, lambda_[i], 0.0, // factor = 0, boxcox_result = 0
                                                  0.0, ranges_[i].lower(), ranges_[i].upper(), // factor_before_clamp = 0
-                                                 0.0); // final_clamped_factor = 0
+                                                 0.0, // first_clamped_factor_value = 0
+                                                 0.0, // simulated_mean (will be calculated during adjustment)
+                                                 0.0, // factors_mean_delta (will be calculated during adjustment)
+                                                 0.0, // value_after_adjustment_before_second_clamp (will be calculated during adjustment)
+                                                 0.0); // final_value_after_second_clamp (will be calculated during adjustment)
             }
         }
         continue;
@@ -404,7 +413,7 @@ if (has_logistic_model) {
 double factor = linear[i] + residual * stddev_[i];
 double boxcox_result = inverse_box_cox(factor, lambda_[i]);
 double factor_before_clamp = expected * boxcox_result;
-double final_clamped_factor = ranges_[i].clamp(factor_before_clamp);
+double first_clamped_factor_value = ranges_[i].clamp(factor_before_clamp);
 
 // MAHIMA: Store calculation details for Stage 2 (BoxCox transformation)
 if constexpr (ENABLE_DETAILED_CALCULATION_DEBUG) {
@@ -415,13 +424,16 @@ if constexpr (ENABLE_DETAILED_CALCULATION_DEBUG) {
                                          original_residuals.empty() ? 0.0 : original_residuals[i], 
                                          residuals[i], expected, linear[i], residual,
                                          stddev_[i], factor, lambda_[i], boxcox_result,
-                                         factor_before_clamp, ranges_[i].lower(), ranges_[i].upper(),
-                                         final_clamped_factor);
+                                         factor_before_clamp, ranges_[i].lower(), ranges_[i].upper(), first_clamped_factor_value,
+                                         0.0, // simulated_mean (will be calculated during adjustment)
+                                         0.0, // factors_mean_delta (will be calculated during adjustment)
+                                         0.0, // value_after_adjustment_before_second_clamp (will be calculated during adjustment)
+                                         0.0); // final_value_after_second_clamp (will be calculated during adjustment)
     }
 }
 
 // Save risk factor
-person.risk_factors[names_[i]] = final_clamped_factor;
+person.risk_factors[names_[i]] = first_clamped_factor_value;
     }
 }
 
@@ -486,13 +498,13 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
         double factor = linear[i] + residual * stddev_[i];
         double boxcox_result = inverse_box_cox(factor, lambda_[i]);
         double factor_before_clamp = expected * boxcox_result;
-        double final_clamped_factor = ranges_[i].clamp(factor_before_clamp);
+        double first_clamped_factor_value = ranges_[i].clamp(factor_before_clamp);
 
         // MAHIMA: No debugging capture during updates
         // Individual-level debugging only happens during initial population generation
 
         // Save risk factor
-        person.risk_factors[names_[i]] = final_clamped_factor;
+        person.risk_factors[names_[i]] = first_clamped_factor_value;
     }
 }
 

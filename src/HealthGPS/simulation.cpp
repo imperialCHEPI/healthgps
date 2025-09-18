@@ -76,7 +76,7 @@ Simulation::Simulation(SimulationModuleFactory &factory, std::shared_ptr<const E
             // MAHIMA: Enable detailed calculation debugging
             // To debug specific age, gender, risk factor, modify these values:
             // Example: 30-year-old female for foodfat risk factor (initialization phase)
-            context_.get_risk_factor_inspector().set_debug_config(true, 30, core::Gender::female, "foodlegume");
+            context_.get_risk_factor_inspector().set_debug_config(true, 30, core::Gender::female, "foodalcohol");
 
         } catch (const std::exception &e) {
             // MAHIMA: If inspector initialization fails, log the error but don't crash the

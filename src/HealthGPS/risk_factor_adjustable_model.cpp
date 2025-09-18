@@ -1,6 +1,7 @@
 #include "HealthGPS.Core/exception.h"
 
 #include "risk_factor_adjustable_model.h"
+#include "risk_factor_inspector.h"
 #include "sync_message.h"
 
 #include <iostream>
@@ -72,39 +73,38 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
                                                     const std::vector<core::Identifier> &factors,
                                                     OptionalRanges ranges, bool apply_trend) const {
     RiskFactorSexAgeTable adjustments;
+    RiskFactorSexAgeTable simulated_means; // MAHIMA: Store simulated means for debugging
 
     // Flag to track if ranges are applied at least once
     // bool any_ranges_applied = false;
 
     // Baseline scenario: compute adjustments.
     if (context.scenario().type() == ScenarioType::baseline) {
+        // MAHIMA: Calculate simulated means for debugging
+        auto age_range = context.age_range();
+        simulated_means = calculate_simulated_mean(context.population(), age_range, factors);
+        
         adjustments = calculate_adjustments(context, factors, ranges, apply_trend);    
     }
 
-    // Intervention scenario: receive adjustments from baseline scenario.
+        // Intervention scenario: receive adjustments from baseline scenario.
     else {
-            // Wait for baseline scenario to finish calculating adjustments
-            auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
-            int retry_count = 0;
-            while (!message.has_value() && retry_count < 500) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(50));
-                message = context.scenario().channel().try_receive(context.sync_timeout_millis());
-                retry_count++;
-            }
-            
-            if (!message.has_value()) {
-                std::cout << "\nERROR - No message received after " << retry_count << " retries";
-                throw std::runtime_error("Failed to receive adjustments from baseline scenario");
-            }
+        auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
+        if (!message.has_value()) {
+            throw core::HgpsException(
+                "Simulation out of sync, receive baseline adjustments message has timed out");
+        }
 
-            auto *messagePrt = dynamic_cast<RiskFactorAdjustmentMessage *>(message.value().get());
-            if (!messagePrt) {
-                std::cout << "\nERROR - Invalid message type received";
-                throw std::runtime_error("Invalid message type received from baseline scenario");
-            }
+        auto &basePtr = message.value();
+        auto *messagePrt = dynamic_cast<RiskFactorAdjustmentMessage *>(basePtr.get());
+        if (!messagePrt) {
+            throw core::HgpsException(
+                "Simulation out of sync, failed to receive a baseline adjustments message");
+        }
 
-            adjustments = messagePrt->data();
+        adjustments = messagePrt->data();
     }
+
 
     // All scenarios: apply adjustments to population.
     
@@ -186,6 +186,50 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
             // Set the adjusted value with any additional validation
             person.set_risk_factor(context, factor, value);
         }
+        
+        // MAHIMA: Update stored calculation details for ALL risk factors for this person
+        // This ensures we capture debugging info for all people, not just those with adjustments
+        if (context.has_risk_factor_inspector()) {
+            auto &inspector = context.get_risk_factor_inspector();
+            
+            // Process all factors for debugging, regardless of whether they were adjusted
+            for (size_t factor_index = 0; factor_index < factors.size(); factor_index++) {
+                const auto &factor = factors[factor_index];
+                
+                // Skip income and physicalactivity - they are handled separately below
+                if (factor.to_string() == "income" || factor.to_string() == "physicalactivity") {
+                    continue;
+                }
+                
+                // Get the adjustment delta for this age/gender/factor
+                double adjustment_delta = 0.0;
+                if (adjustments.contains(person.gender) && adjustments.at(person.gender).contains(factor)) {
+                    const auto &adjustment_vector = adjustments.at(person.gender, factor);
+                    if (person.age < static_cast<int>(adjustment_vector.size())) {
+                        adjustment_delta = adjustment_vector.at(person.age);
+                    }
+                }
+                
+                // Get the actual simulated mean from the calculated table (same for all people of this age/gender)
+                double simulated_mean = 0.0;
+                if (simulated_means.contains(person.gender) && simulated_means.at(person.gender).contains(factor)) {
+                    const auto &sim_mean_vector = simulated_means.at(person.gender, factor);
+                    if (person.age < static_cast<int>(sim_mean_vector.size())) {
+                        simulated_mean = sim_mean_vector.at(person.age);
+                    }
+                }
+                
+                // Get the current value of the risk factor
+                double current_value = 0.0;
+                if (person.risk_factors.contains(factor)) {
+                    current_value = person.risk_factors.at(factor);
+                }
+                
+                // Update the stored calculation details
+                inspector.update_calculation_details_with_adjustments(person, factor.to_string(),
+                                                                     simulated_mean, adjustment_delta, current_value, current_value);
+            }
+        }
 
         // MAHIMA: Special handling for Income and PhysicalActivity
         // These are demographic attributes, not regular risk factors
@@ -196,7 +240,25 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
                 const auto &income_vector = adjustments.at(person.gender, "income"_id);
                 if (person.age < static_cast<int>(income_vector.size())) {
                     double delta = income_vector.at(person.age);
+                    double original_income = person.income_continuous;
                     person.income_continuous += delta;
+                    
+                    // MAHIMA: Update stored calculation details for income
+                    if (context.has_risk_factor_inspector()) {
+                        auto &inspector = context.get_risk_factor_inspector();
+                        
+                        // Get the actual simulated mean for income from the calculated table
+                        double income_sim_mean = 0.0;
+                        if (simulated_means.contains(person.gender) && simulated_means.at(person.gender).contains("income"_id)) {
+                            const auto &sim_mean_vector = simulated_means.at(person.gender, "income"_id);
+                            if (person.age < static_cast<int>(sim_mean_vector.size())) {
+                                income_sim_mean = sim_mean_vector.at(person.age);
+                            }
+                        }
+                        
+                        inspector.update_calculation_details_with_adjustments(person, "income",
+                                                                             income_sim_mean, delta, person.income_continuous, person.income_continuous);
+                    }
                 }
             }
         }
@@ -208,7 +270,25 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
                 const auto &pa_vector = adjustments.at(person.gender, "physicalactivity"_id);
                 if (person.age < static_cast<int>(pa_vector.size())) {
                     double delta = pa_vector.at(person.age);
+                    double original_pa = person.physical_activity;
                     person.physical_activity += delta;
+                    
+                    // MAHIMA: Update stored calculation details for physical activity
+                    if (context.has_risk_factor_inspector()) {
+                        auto &inspector = context.get_risk_factor_inspector();
+                        
+                        // Get the actual simulated mean for physical activity from the calculated table
+                        double pa_sim_mean = 0.0;
+                        if (simulated_means.contains(person.gender) && simulated_means.at(person.gender).contains("physicalactivity"_id)) {
+                            const auto &sim_mean_vector = simulated_means.at(person.gender, "physicalactivity"_id);
+                            if (person.age < static_cast<int>(sim_mean_vector.size())) {
+                                pa_sim_mean = sim_mean_vector.at(person.age);
+                            }
+                        }
+                        
+                        inspector.update_calculation_details_with_adjustments(person, "physicalactivity",
+                                                                             pa_sim_mean, delta, person.physical_activity, person.physical_activity);
+                    }
                 }
             }
         }

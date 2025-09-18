@@ -73,6 +73,10 @@ class RiskFactorInspector {
     /// @param range_lower Lower bound of the range
     /// @param range_upper Upper bound of the range
     /// @param final_clamped_factor Final value after range clamping
+    /// @param simulated_mean Mean value for this age/gender group
+    /// @param factors_mean_delta Adjustment delta (expected - simulated_mean)
+    /// @param final_factor_value_after_adjustment Value after adding delta
+    /// @param final_value_after_everything Final value after all processing
     ///
     /// @details This method captures detailed calculation steps for a specific risk factor
     /// and writes them to a CSV file named {risk_factor_name}_inspection.csv
@@ -82,7 +86,9 @@ class RiskFactorInspector {
                                     double expected_value, double linear_result, double residual,
                                     double stddev, double combined, double lambda, double boxcox_result,
                                     double factor_before_clamp, double range_lower, double range_upper,
-                                    double final_clamped_factor);
+                                    double first_clamped_factor_value, double simulated_mean = 0.0,
+                                    double factors_mean_delta = 0.0, double final_factor_value_after_adjustment = 0.0,
+                                    double final_value_after_everything = 0.0);
 
     // MAHIMA: Capture person risk factors after all calculations are complete
     void capture_person_risk_factors(RuntimeContext &context, const Person &person, 
@@ -94,10 +100,18 @@ class RiskFactorInspector {
                                  double expected_value, double linear_result, double residual,
                                  double stddev, double combined, double lambda, double boxcox_result,
                                  double factor_before_clamp, double range_lower, double range_upper,
-                                 double final_clamped_factor);
+                                 double first_clamped_factor_value, double simulated_mean = 0.0, 
+                                 double factors_mean_delta = 0.0, double value_after_adjustment_before_second_clamp = 0.0,
+                                 double final_value_after_second_clamp = 0.0);
 
     // MAHIMA: Analyze population and count people matching debug criteria
     void analyze_population_demographics(RuntimeContext &context);
+    
+    // MAHIMA: Update stored calculation details with adjustment values
+    void update_calculation_details_with_adjustments(const Person &person, const std::string &risk_factor_name,
+                                                   double simulated_mean, double factors_mean_delta,
+                                                   double value_after_adjustment_before_second_clamp,
+                                                   double final_value_after_second_clamp);
 
   private:
     /// @brief MAHIMA: Target risk factors to capture for inspection
@@ -145,7 +159,11 @@ class RiskFactorInspector {
         double factor_before_clamp;
         double range_lower;
         double range_upper;
-        double final_clamped_factor;
+        double first_clamped_factor_value;
+        double simulated_mean;                        // Mean value for this age/gender group
+        double factors_mean_delta;                    // Adjustment delta (expected - simulated_mean)
+        double value_after_adjustment_before_second_clamp;  // Value after adding delta but before second clamp
+        double final_value_after_second_clamp;       // Final value after second clamp (final value)
     };
     
     /// @brief MAHIMA: Map to store calculation details by person ID and risk factor
