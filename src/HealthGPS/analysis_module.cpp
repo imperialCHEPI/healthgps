@@ -422,12 +422,12 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
     std::string IncomeCategory = result.IncomeCategory;
     
     // MAHIMA: Debug to track when this function is called
-    static int analysis_debug_count = 0;
+    /*static int analysis_debug_count = 0;
     if (IncomeCategory == "All" && analysis_debug_count < 3) {
         std::cout << "\n=== ANALYSIS MODULE DEBUG #" << (analysis_debug_count + 1) << " ===" << std::endl;
         std::cout << "IncomeCategory: " << IncomeCategory << ", Time: " << context.time_now() << std::endl;
         analysis_debug_count++;
-    }
+    }*/ 
 
     if (series.size() > 0) {
         throw std::logic_error("This should be a new object!");
@@ -639,7 +639,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
     calculate_standard_deviation(context, series);
     
     // MAHIMA: Debug output to verify zero value handling - ONLY for "All" category
-    if (IncomeCategory == "All") {
+     /*if (IncomeCategory == "All") {
         std::cout << "\n=== ZERO VALUE DEBUG REPORT (Income Category: " << IncomeCategory << ") ===" << std::endl;
         std::cout << "Total people in population: " << total_people_processed << std::endl;
         std::cout << "Active people processed: " << active_people_processed << std::endl;
@@ -697,7 +697,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
             }
         }
         std::cout << "=== END ZERO VALUE DEBUG REPORT ===" << std::endl;
-    }
+    }*/
 }
 // NOLINTEND(readability-function-cognitive-complexity)
 

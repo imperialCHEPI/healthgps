@@ -10,6 +10,7 @@
 #include <thread>
 #include <chrono>
 #include <set>
+#include <unordered_set>
 
 namespace { // anonymous namespace
 
@@ -41,7 +42,7 @@ RiskFactorAdjustableModel::RiskFactorAdjustableModel(
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
     std::shared_ptr<std::unordered_map<core::Identifier, int>> trend_steps)
     : expected_{std::move(expected)}, expected_trend_{std::move(expected_trend)},
-      trend_steps_{std::move(trend_steps)} {}
+      trend_steps_{std::move(trend_steps)}, logistic_factors_{} {}
 
 double RiskFactorAdjustableModel::get_expected(RuntimeContext &context, core::Gender sex, int age,
                                                const core::Identifier &factor, OptionalRange range,
@@ -76,33 +77,7 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
 
     // Flag to track if ranges are applied at least once
     // bool any_ranges_applied = false;
-
-    // MAHIMA: Track zero values that will be skipped during adjustment (print once only)
-    static bool zero_skip_info_printed = false;
-    if (!zero_skip_info_printed) {
-        std::set<std::string> factors_with_zeros;
-        for (const auto &person : context.population()) {
-            if (!person.is_active()) continue;
-            for (const auto &factor : factors) {
-                if (person.risk_factors.contains(factor) && person.risk_factors.at(factor) == 0.0) {
-                    factors_with_zeros.insert(factor.to_string());
-                }
-            }
-        }
-        
-        if (!factors_with_zeros.empty()) {
-            std::cout << "\n=== ZERO VALUES PRESERVED (Skipped from Mean Adjustment) ===" << std::endl;
-            std::cout << "Risk factors with zero values that will NOT be adjusted: ";
-            for (const auto &factor : factors_with_zeros) {
-                std::cout << factor << " ";
-            }
-            std::cout << std::endl;
-            std::cout << "These zeros are preserved from two-stage modeling (logistic regression)." << std::endl;
-            std::cout << "===============================================================" << std::endl;
-        }
-        zero_skip_info_printed = true;
-    }
-
+   
     // Baseline scenario: compute adjustments.
     if (context.scenario().type() == ScenarioType::baseline) {
         adjustments = calculate_adjustments(context, factors, ranges, apply_trend);    
@@ -243,7 +218,7 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
     });
     
     // MAHIMA: Verification box - show before/after values for sample of 6 people from different ages and genders
-    if (context.scenario().type() == ScenarioType::baseline && context.time_now() == context.start_time()) {
+     /*if (context.scenario().type() == ScenarioType::baseline && context.time_now() == context.start_time()) {
         std::cout << "\n\n=== STATIC LINEAR MODEL VERIFICATION BOX (Sample of 6 people from different ages and genders) ===";
         std::cout << "\nPerson ID | Age | Gender | INCOME BEFORE | INCOME AFTER | INCOME DELTA | PHYSICAL ACTIVITY BEFORE | PHYSICAL ACTIVITY AFTER | PHYSICAL ACTIVITY DELTA";
         std::cout << "\n----------|-----|--------|---------------|--------------|-------------|-------------------------|------------------------|----------------------";
@@ -325,7 +300,7 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
         }
         
         std::cout << "\n======================================================================================================================================================\n";
-    }
+    }*/
 
     // Baseline scenario: send adjustments to intervention scenario.
     if (context.scenario().type() == ScenarioType::baseline) {
@@ -338,6 +313,10 @@ int RiskFactorAdjustableModel::get_trend_steps(const core::Identifier &factor) c
     return trend_steps_->at(factor);
 }
 
+void RiskFactorAdjustableModel::set_logistic_factors(const std::unordered_set<core::Identifier> &logistic_factors) {
+    logistic_factors_ = logistic_factors;
+}
+
 RiskFactorSexAgeTable
 RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context,
                                                  const std::vector<core::Identifier> &factors,
@@ -346,8 +325,8 @@ RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context,
     auto age_range = context.age_range();
     auto age_count = age_range.upper() + 1;
 
-    // Compute simulated means.
-    auto simulated_means = calculate_simulated_mean(context.population(), age_range, factors);
+    // Compute simulated means using stored logistic factors
+    auto simulated_means = calculate_simulated_mean(context.population(), age_range, factors, logistic_factors_);
 
     // Compute adjustments.
     auto adjustments = RiskFactorSexAgeTable{};
@@ -393,8 +372,17 @@ RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context,
 RiskFactorSexAgeTable
 RiskFactorAdjustableModel::calculate_simulated_mean(Population &population,
                                                     const core::IntegerInterval age_range,
-                                                    const std::vector<core::Identifier> &factors) {
+                                                    const std::vector<core::Identifier> &factors,
+                                                    const std::unordered_set<core::Identifier> &logistic_factors) {
     auto age_count = age_range.upper() + 1;
+
+    // MAHIMA: Track excluded values for debugging
+    std::unordered_map<core::Identifier, int> excluded_counts;
+    std::unordered_map<core::Identifier, int> total_counts;
+    for (const auto &factor : factors) {
+        excluded_counts[factor] = 0;
+        total_counts[factor] = 0;
+    }
 
     // Compute first moments.
     auto moments = UnorderedMap2d<core::Gender, core::Identifier, std::vector<FirstMoment>>{};
@@ -423,9 +411,25 @@ RiskFactorAdjustableModel::calculate_simulated_mean(Population &population,
                 value = person.risk_factors.at(factor);
                 has_value = true;
             }
-
+            // MAHIMA: Apply logistic model logic for simulated mean calculation
+            // For factors WITH logistic models: only include non-zero values
+            // For factors WITHOUT logistic models: include all values (including zeros)
             if (has_value) {
-                moments.at(person.gender, factor).at(person.age).append(value);
+                total_counts[factor]++;
+                bool should_include = true;
+                if (logistic_factors.contains(factor)) {
+                    // Factor has logistic model - only include non-zero values
+                    if (value == 0)
+                        should_include = false;
+                    if (!should_include) {
+                        excluded_counts[factor]++;
+                    }
+                }
+                // If factor doesn't have logistic model, include all values (including zeros)
+                
+                if (should_include) {
+                    moments.at(person.gender, factor).at(person.age).append(value);
+                }
             }
         }
     }
@@ -441,29 +445,35 @@ RiskFactorAdjustableModel::calculate_simulated_mean(Population &population,
             }
         }
     }
-    // std::cout << "\nDEBUG: RiskFactorAdjustableModel::calculate_simulated_mean - Means computed";
-    // std::cout << "\nDEBUG: RiskFactorAdjustableModel::calculate_simulated_mean - Completed";
+    
+    // MAHIMA: Print excluded values summary only once
+    static bool debug_summary_printed = false;
+    if (!debug_summary_printed) {
+        std::cout << "\n=== SIMULATED MEAN CALCULATION - EXCLUDED VALUES SUMMARY ===";
+        for (const auto &factor : factors) {
+            if (logistic_factors.contains(factor)) {
+                std::cout << "\n" << factor.to_string() << " (HAS logistic model): " 
+                          << excluded_counts[factor] << " zero values excluded out of " 
+                          << total_counts[factor] << " total values ("
+                          << std::fixed << std::setprecision(1) 
+                          << (total_counts[factor] > 0 ? (100.0 * excluded_counts[factor] / total_counts[factor]) : 0.0) 
+                          << "% excluded)";
+            } else {
+                std::cout << "\n" << factor.to_string() << " (NO logistic model): " 
+                          << excluded_counts[factor] << " zero values excluded out of " 
+                          << total_counts[factor] << " total values ("
+                          << std::fixed << std::setprecision(1) 
+                          << (total_counts[factor] > 0 ? (100.0 * excluded_counts[factor] / total_counts[factor]) : 0.0) 
+                          << "% excluded)";
+            }
+        }
+        std::cout << "\n===============================================================";
+        debug_summary_printed = true;
+    }
 
     return means;
 }
 
-RiskFactorAdjustableModelDefinition::RiskFactorAdjustableModelDefinition(
-    std::unique_ptr<RiskFactorSexAgeTable> expected,
-    std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
-    std::unique_ptr<std::unordered_map<core::Identifier, int>> trend_steps)
-    : expected_{std::move(expected)}, expected_trend_{std::move(expected_trend)},
-      trend_steps_{std::move(trend_steps)} {
-
-    if (expected_->empty()) {
-        throw core::HgpsException("Risk factor expected value mapping is empty");
-    }
-    if (expected_trend_->empty()) {
-        throw core::HgpsException("Risk factor expected trend mapping is empty");
-    }
-    if (trend_steps_->empty()) {
-        throw core::HgpsException("Risk factor trend steps mapping is empty");
-    }
-}
 
 } // namespace hgps
 

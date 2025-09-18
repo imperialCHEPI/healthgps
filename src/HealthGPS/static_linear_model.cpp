@@ -8,6 +8,9 @@
 #include <iostream>
 #include <ranges>
 #include <utility>
+#include <unordered_set>
+#include <thread>
+#include <chrono>
 
 namespace hgps {
 
@@ -84,6 +87,16 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     auto combined_factors = combine_risk_factors();
     auto combined_ranges = combine_risk_factor_ranges();
     
+    // MAHIMA: Set logistic factors for simulated mean calculation
+    std::unordered_set<core::Identifier> logistic_factors;
+    for (size_t i = 0; i < names_.size(); i++) {
+        bool has_logistic = !logistic_models_[i].coefficients.empty();
+        if (has_logistic) {
+            logistic_factors.insert(names_[i]);
+        }
+    }
+    set_logistic_factors(logistic_factors);
+    
     // MAHIMA: Use all combined factors (both food and other risk factors)
     // All factors are now initialized in person.risk_factors
     auto filtered_factors = combined_factors;
@@ -143,6 +156,16 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
     // are processed in one adjustments map instead of separate maps
     auto combined_factors = combine_risk_factors();
     auto combined_ranges = combine_risk_factor_ranges();
+    
+    // MAHIMA: Set logistic factors for simulated mean calculation
+    std::unordered_set<core::Identifier> logistic_factors;
+    for (size_t i = 0; i < names_.size(); i++) {
+        bool has_logistic = !logistic_models_[i].coefficients.empty();
+        if (has_logistic) {
+            logistic_factors.insert(names_[i]);
+        }
+    }
+    set_logistic_factors(logistic_factors);
     
     // MAHIMA: Use all combined factors (both food and other risk factors)
     // All factors are now initialized in person.risk_factors

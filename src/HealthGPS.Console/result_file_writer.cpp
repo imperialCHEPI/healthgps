@@ -279,7 +279,7 @@ void ResultFileWriter::write_csv_channels(const hgps::ResultEventMessage &messag
     std::stringstream fss;
 
     // MAHIMA: Debug output for CSV writing - only for "All" category and specific factors
-    static int csv_debug_count = 0;
+    /*static int csv_debug_count = 0;
     if (message.content.IncomeCategory == "All" && csv_debug_count < 3) {
         std::cout << "\n=== CSV WRITING DEBUG #" << (csv_debug_count + 1) << " (Income Category: " << message.content.IncomeCategory << ") ===" << std::endl;
         std::cout << "Message details: source=" << message.source << ", run=" << message.run_number << ", time=" << message.model_time << std::endl;
@@ -301,7 +301,7 @@ void ResultFileWriter::write_csv_channels(const hgps::ResultEventMessage &messag
         }
         std::cout << "=== END CSV WRITING DEBUG #" << (csv_debug_count + 1) << " ===" << std::endl;
         csv_debug_count++;
-    }
+    }*/
 
     for (auto index = 0u; index < series.sample_size(); index++) {
         mss << message.source << sep << message.run_number << sep << message.model_time << sep

@@ -2,6 +2,7 @@
 
 #include "HealthGPS.Core/forward_type.h"
 #include "HealthGPS.Core/identifier.h"
+#include "HealthGPS.Core/exception.h"
 
 #include "map2d.h"
 #include "risk_factor_model.h"
@@ -9,6 +10,7 @@
 
 #include <functional>
 #include <optional>
+#include <unordered_set>
 #include <vector>
 
 namespace { // anonymous namespace
@@ -62,6 +64,10 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
     /// @returns The number of time steps to apply the trend
     int get_trend_steps(const core::Identifier &factor) const;
 
+    /// @brief Sets the logistic factors for simulated mean calculation
+    /// @param logistic_factors Set of factors that have logistic models
+    void set_logistic_factors(const std::unordered_set<core::Identifier> &logistic_factors);
+
   private:
     /// @brief Adjust risk factors such that mean sim value matches expected value
     /// @param context The simulation run-time context
@@ -74,11 +80,13 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
 
     static RiskFactorSexAgeTable
     calculate_simulated_mean(Population &population, core::IntegerInterval age_range,
-                             const std::vector<core::Identifier> &factors);
+                             const std::vector<core::Identifier> &factors,
+                             const std::unordered_set<core::Identifier> &logistic_factors = {});
 
     std::shared_ptr<RiskFactorSexAgeTable> expected_;
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_;
     std::shared_ptr<std::unordered_map<core::Identifier, int>> trend_steps_;
+    std::unordered_set<core::Identifier> logistic_factors_;
 };
 
 /// @brief Risk factor adjustable model definition interface
@@ -92,7 +100,20 @@ class RiskFactorAdjustableModelDefinition : public RiskFactorModelDefinition {
     RiskFactorAdjustableModelDefinition(
         std::unique_ptr<RiskFactorSexAgeTable> expected,
         std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
-        std::unique_ptr<std::unordered_map<core::Identifier, int>> trend_steps);
+        std::unique_ptr<std::unordered_map<core::Identifier, int>> trend_steps)
+        : expected_{std::move(expected)}, expected_trend_{std::move(expected_trend)},
+          trend_steps_{std::move(trend_steps)} {
+
+        if (expected_->empty()) {
+            throw core::HgpsException("Risk factor expected value mapping is empty");
+        }
+        if (expected_trend_->empty()) {
+            throw core::HgpsException("Risk factor expected trend mapping is empty");
+        }
+        if (trend_steps_->empty()) {
+            throw core::HgpsException("Risk factor trend steps mapping is empty");
+        }
+    }
 
   protected:
     std::shared_ptr<RiskFactorSexAgeTable> expected_;
