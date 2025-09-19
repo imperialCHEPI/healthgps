@@ -508,8 +508,22 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
         double factor_before_clamp = expected * boxcox_result;
         double first_clamped_factor_value = ranges_[i].clamp(factor_before_clamp);
 
-        // MAHIMA: No debugging capture during updates
-        // Individual-level debugging only happens during initial population generation
+        // MAHIMA: Store calculation details during updates for target year debugging
+        if constexpr (ENABLE_DETAILED_CALCULATION_DEBUG) {
+            if (context.has_risk_factor_inspector()) {
+                auto &inspector = context.get_risk_factor_inspector();
+                // Store the calculation details for this person and risk factor
+                inspector.store_calculation_details(person, names_[i].to_string(), i,
+                                                 new_residuals[i], // Use new residuals for updates
+                                                 residual, expected, linear[i], residual,
+                                                 stddev_[i], factor, lambda_[i], boxcox_result,
+                                                 factor_before_clamp, ranges_[i].lower(), ranges_[i].upper(), first_clamped_factor_value,
+                                                 0.0, // simulated_mean (will be calculated during adjustment)
+                                                 0.0, // factors_mean_delta (will be calculated during adjustment)
+                                                 0.0, // value_after_adjustment_before_second_clamp (will be calculated during adjustment)
+                                                 0.0); // final_value_after_second_clamp (will be calculated during adjustment)
+            }
+        }
 
         // Save risk factor
         person.risk_factors[names_[i]] = first_clamped_factor_value;

@@ -49,11 +49,24 @@ class RiskFactorInspector {
 
     /// @brief MAHIMA: Set debug configuration for detailed calculation capture
     /// @param enabled Whether to enable detailed debugging
-    /// @param age Target age to debug (-1 for any age)
+    /// @param min_age Minimum age to debug (-1 for no minimum)
+    /// @param max_age Maximum age to debug (-1 for no maximum)
     /// @param gender Target gender to debug (unknown for any gender)
     /// @param risk_factor Target risk factor to debug (empty for any risk factor)
-    void set_debug_config(bool enabled, int age = -1, core::Gender gender = core::Gender::unknown, 
-                         const std::string &risk_factor = "");
+    /// @param target_year Target year to debug (-1 for any year)
+    void set_debug_config(bool enabled, int min_age = -1, int max_age = -1, 
+                         core::Gender gender = core::Gender::unknown, 
+                         const std::string &risk_factor = "", int target_year = -1);
+    
+    /// @brief MAHIMA: Set debug configuration for single age (convenience method)
+    /// @param enabled Whether to enable detailed debugging
+    /// @param age Single age to debug (-1 for any age)
+    /// @param gender Target gender to debug (unknown for any gender)
+    /// @param risk_factor Target risk factor to debug (empty for any risk factor)
+    /// @param target_year Target year to debug (-1 for any year)
+    void set_debug_config_single_age(bool enabled, int age = -1, 
+                                   core::Gender gender = core::Gender::unknown, 
+                                   const std::string &risk_factor = "", int target_year = -1);
     
     /// @brief MAHIMA: Check if debug is enabled
     bool is_debug_enabled() const;
@@ -168,12 +181,28 @@ class RiskFactorInspector {
     std::vector<core::Identifier> target_factors_;
 
     /// @brief MAHIMA: Configuration for detailed calculation debugging
-    /// @details User can specify age, gender, and risk factor to debug
+    /// @details User can specify age range, gender, risk factor, and year to debug
     struct DebugConfig {
         bool enabled = false;
-        int target_age = 30;  
+        int min_age = -1;  // -1 means no minimum age limit
+        int max_age = -1;  // -1 means no maximum age limit
         core::Gender target_gender = core::Gender::unknown;  // unknown means any gender
         std::string target_risk_factor = "";  // empty means any risk factor
+        int target_year = -1;  // -1 means any year, otherwise specific year (e.g., 2032)
+        
+        // Helper method to check if an age is within the range
+        bool is_age_in_range(int age) const {
+            if (min_age == -1 && max_age == -1) return true;  // No age restrictions
+            if (min_age == -1) return age <= max_age;  // Only max age specified
+            if (max_age == -1) return age >= min_age;  // Only min age specified
+            return age >= min_age && age <= max_age;  // Both min and max specified
+        }
+        
+        // Helper method to check if a year matches the target
+        bool is_year_match(int current_year) const {
+            if (target_year == -1) return true;  // No year restriction
+            return current_year == target_year;  // Specific year match
+        }
     } debug_config_;
 
     /// @brief MAHIMA: Output file stream for baseline scenario data

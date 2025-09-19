@@ -392,18 +392,46 @@ std::string RiskFactorInspector::ethnicity_enum_to_string(core::Ethnicity ethnic
 }
 
 // MAHIMA: Set debug configuration for detailed calculation capture
-void RiskFactorInspector::set_debug_config(bool enabled, int age, core::Gender gender, 
-                                          const std::string &risk_factor) {
+void RiskFactorInspector::set_debug_config(bool enabled, int min_age, int max_age, 
+                                          core::Gender gender, const std::string &risk_factor, int target_year) {
     debug_config_.enabled = enabled;
-    debug_config_.target_age = age;
+    debug_config_.min_age = min_age;
+    debug_config_.max_age = max_age;
     debug_config_.target_gender = gender;
     debug_config_.target_risk_factor = risk_factor;
+    debug_config_.target_year = target_year;
     
     if (enabled) {
-        std::cout << "\nMAHIMA: Debug configuration set - Age: " << age 
+        std::string age_range_str;
+        if (min_age == -1 && max_age == -1) {
+            age_range_str = "any age";
+        } else if (min_age == -1) {
+            age_range_str = "age <= " + std::to_string(max_age);
+        } else if (max_age == -1) {
+            age_range_str = "age >= " + std::to_string(min_age);
+        } else {
+            age_range_str = "age " + std::to_string(min_age) + "-" + std::to_string(max_age);
+        }
+        
+        std::string year_str = (target_year == -1) ? "any year" : "year " + std::to_string(target_year);
+        
+        std::cout << "\nMAHIMA: Debug configuration set - " << age_range_str
                   << ", Gender: " << (gender == core::Gender::male ? "male" : 
                                      gender == core::Gender::female ? "female" : "any")
-                  << ", Risk Factor: " << (risk_factor.empty() ? "any" : risk_factor);
+                  << ", Risk Factor: " << (risk_factor.empty() ? "any" : risk_factor)
+                  << ", Year: " << year_str;
+    }
+}
+
+// MAHIMA: Set debug configuration for single age (convenience method)
+void RiskFactorInspector::set_debug_config_single_age(bool enabled, int age, 
+                                                     core::Gender gender, const std::string &risk_factor, int target_year) {
+    if (age == -1) {
+        // No age restriction
+        set_debug_config(enabled, -1, -1, gender, risk_factor, target_year);
+    } else {
+        // Single age - set both min and max to the same value
+        set_debug_config(enabled, age, age, gender, risk_factor, target_year);
     }
 }
 
@@ -433,8 +461,8 @@ void RiskFactorInspector::capture_detailed_calculation(RuntimeContext & /*contex
         return;
     }
     
-    // Check age filter
-    if (debug_config_.target_age != -1 && person.age != static_cast<unsigned int>(debug_config_.target_age)) {
+    // Check age range filter
+    if (!debug_config_.is_age_in_range(static_cast<int>(person.age))) {
         return;
     }
     
@@ -520,7 +548,7 @@ void RiskFactorInspector::store_calculation_details(const Person &person, const 
     // Check if this person and risk factor should be captured
     bool should_capture = true;
     
-    if (debug_config_.target_age != -1 && person.age != static_cast<unsigned int>(debug_config_.target_age)) {
+    if (!debug_config_.is_age_in_range(static_cast<int>(person.age))) {
         should_capture = false;
     }
     
@@ -563,7 +591,7 @@ void RiskFactorInspector::store_calculation_details(const Person &person, const 
 }
 
 // MAHIMA: Capture person risk factors after all calculations are complete
-void RiskFactorInspector::capture_person_risk_factors(RuntimeContext & /*context*/, const Person &person, 
+void RiskFactorInspector::capture_person_risk_factors(RuntimeContext &context, const Person &person, 
                                                      const std::string &risk_factor_name, size_t /*risk_factor_index*/) {
     if (!debug_config_.enabled) {
         return;
@@ -572,7 +600,8 @@ void RiskFactorInspector::capture_person_risk_factors(RuntimeContext & /*context
     // Check if this person and risk factor should be captured
     bool should_capture = true;
     
-    if (debug_config_.target_age != -1 && person.age != static_cast<unsigned int>(debug_config_.target_age)) {
+    // Check age range
+    if (!debug_config_.is_age_in_range(static_cast<int>(person.age))) {
         should_capture = false;
     }
     
@@ -584,8 +613,24 @@ void RiskFactorInspector::capture_person_risk_factors(RuntimeContext & /*context
         should_capture = false;
     }
     
+    // Check year - only capture if we're in the target year
+    if (!debug_config_.is_year_match(context.time_now())) {
+        should_capture = false;
+    }
+    
     if (!should_capture) {
         return;
+    }
+    
+    // Debug output for first few matches
+    static int debug_count = 0;
+    if (debug_count < 5) {
+        std::cout << "\nMAHIMA: Capturing person " << person.id() 
+                  << " (age " << person.age << ", " 
+                  << (person.gender == core::Gender::male ? "male" : "female") 
+                  << ") for risk factor " << risk_factor_name 
+                  << " in year " << context.time_now();
+        debug_count++;
     }
 
     // Count how many people match our criteria (no console output)
@@ -597,7 +642,31 @@ void RiskFactorInspector::capture_person_risk_factors(RuntimeContext & /*context
     // Check if we have stored calculation details for this person and risk factor
     if (calculation_storage_.find(person_id) == calculation_storage_.end() ||
         calculation_storage_[person_id].find(risk_factor_name) == calculation_storage_[person_id].end()) {
-        return;
+        // If no stored details, create a minimal record with current values
+        std::cout << "\nMAHIMA: No stored calculation details for person " << person_id 
+                  << ", risk factor " << risk_factor_name << " - creating minimal record";
+        
+        // Create minimal calculation details with current values
+        CalculationDetails details;
+        details.random_residual_before_cholesky = 0.0;
+        details.residual_after_cholesky = 0.0;
+        details.expected_value = 0.0;
+        details.linear_result = 0.0;
+        details.residual = 0.0;
+        details.stddev = 0.0;
+        details.combined = 0.0;
+        details.lambda = 0.0;
+        details.boxcox_result = 0.0;
+        details.factor_before_clamp = 0.0;
+        details.range_lower = 0.0;
+        details.range_upper = 0.0;
+        details.first_clamped_factor_value = 0.0;
+        details.simulated_mean = 0.0;
+        details.factors_mean_delta = 0.0;
+        details.value_after_adjustment_before_second_clamp = 0.0;
+        details.final_value_after_second_clamp = 0.0;
+        
+        calculation_storage_[person_id][risk_factor_name] = details;
     }
     
     const auto& details = calculation_storage_[person_id][risk_factor_name];
@@ -665,13 +734,15 @@ void RiskFactorInspector::capture_person_risk_factors(RuntimeContext & /*context
     total_records_written_++;
     
     // Show progress every 200 records
-    if (total_records_written_ % 200 == 0) {
+    if (total_records_written_ % 2000 == 0) {
         std::cout << "\nMAHIMA: Written " << total_records_written_ << " records to " << csv_path.filename().string();
     }
     
     // Show first record message
     if (total_records_written_ == 1) {
         std::cout << "\nMAHIMA: Starting to write records to " << csv_path.filename().string() << "...";
+        std::cout << "\nMAHIMA: Writing data for year " << context.time_now() 
+                  << ", risk factor " << risk_factor_name;
     }
 }
 
@@ -687,7 +758,7 @@ void RiskFactorInspector::analyze_population_demographics(RuntimeContext &contex
     
     // Count people matching age and gender criteria
     for (const auto &person : context.population()) {
-        bool age_matches = (debug_config_.target_age == -1) || (person.age == static_cast<unsigned int>(debug_config_.target_age));
+        bool age_matches = debug_config_.is_age_in_range(static_cast<int>(person.age));
         bool gender_matches = (debug_config_.target_gender == core::Gender::unknown) || (person.gender == debug_config_.target_gender);
         
         if (age_matches && gender_matches) {
@@ -704,9 +775,21 @@ void RiskFactorInspector::analyze_population_demographics(RuntimeContext &contex
     }
     
     // Show population analysis results
+    std::string age_range_str;
+    if (debug_config_.min_age == -1 && debug_config_.max_age == -1) {
+        age_range_str = "any age";
+    } else if (debug_config_.min_age == -1) {
+        age_range_str = "age <= " + std::to_string(debug_config_.max_age);
+    } else if (debug_config_.max_age == -1) {
+        age_range_str = "age >= " + std::to_string(debug_config_.min_age);
+    } else {
+        age_range_str = "age " + std::to_string(debug_config_.min_age) + "-" + std::to_string(debug_config_.max_age);
+    }
+    
     std::cout << "\nMAHIMA: Population analysis - Total: " << total_population 
-              << ", Matching " << debug_config_.target_age << "-year-old " 
-              << (debug_config_.target_gender == core::Gender::male ? "males" : "females")
+              << ", Matching " << age_range_str << " " 
+              << (debug_config_.target_gender == core::Gender::male ? "males" : 
+                  debug_config_.target_gender == core::Gender::female ? "females" : "people")
               << " for " << debug_config_.target_risk_factor << ": " << matching_age_gender_risk_factor << " people";
     
     // Show final record count
@@ -727,7 +810,8 @@ void RiskFactorInspector::update_calculation_details_with_adjustments(const Pers
     // Check if this person and risk factor should be updated
     bool should_update = true;
     
-    if (debug_config_.target_age != -1 && person.age != static_cast<unsigned int>(debug_config_.target_age)) {
+    // Check age range
+    if (!debug_config_.is_age_in_range(static_cast<int>(person.age))) {
         should_update = false;
     }
     
@@ -767,7 +851,8 @@ bool RiskFactorInspector::get_stored_calculation_details(const Person &person, c
     // Check if this person and risk factor should be retrieved
     bool should_retrieve = true;
     
-    if (debug_config_.target_age != -1 && person.age != static_cast<unsigned int>(debug_config_.target_age)) {
+    // Check age range
+    if (!debug_config_.is_age_in_range(static_cast<int>(person.age))) {
         should_retrieve = false;
     }
     
@@ -805,7 +890,8 @@ void RiskFactorInspector::update_bmi_in_stored_details(const Person &person) {
     // Check if this person should be updated based on debug criteria
     bool should_update = true;
     
-    if (debug_config_.target_age != -1 && person.age != static_cast<unsigned int>(debug_config_.target_age)) {
+    // Check age range
+    if (!debug_config_.is_age_in_range(static_cast<int>(person.age))) {
         should_update = false;
     }
     
