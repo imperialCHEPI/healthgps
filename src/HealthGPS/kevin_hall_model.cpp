@@ -1,6 +1,7 @@
 #include "HealthGPS.Core/exception.h"
 
 #include "kevin_hall_model.h"
+#include "risk_factor_inspector.h"
 #include "runtime_context.h"
 #include "sync_message.h"
 
@@ -9,6 +10,11 @@
 #include <iostream>
 #include <iterator>
 #include <utility>
+
+// MAHIMA: TOGGLE FOR DETAILED CALCULATION DEBUGGING
+// Change this to 'true' to enable detailed risk factor calculation debugging
+// Change this to 'false' to disable it (default for normal simulations)
+static constexpr bool ENABLE_DETAILED_CALCULATION_DEBUG = true;
 
 namespace { // anonymous namespace
 
@@ -99,6 +105,19 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
         initialise_kevin_hall_state(person);
         compute_bmi(person);
     }
+    
+    // MAHIMA: Update BMI values in stored calculation details after BMI calculation
+    if constexpr (ENABLE_DETAILED_CALCULATION_DEBUG) {
+        if (context.has_risk_factor_inspector()) {
+            auto &inspector = context.get_risk_factor_inspector();
+            for (auto &person : context.population()) {
+                if (person.is_active()) {
+                    // Update BMI for all stored calculation details for this person
+                    inspector.update_bmi_in_stored_details(person);
+                }
+            }
+        }
+    }
 }
 
 void KevinHallModel::update_risk_factors(RuntimeContext &context) {
@@ -118,6 +137,19 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
         }
 
         compute_bmi(person);
+    }
+    
+    // MAHIMA: Update BMI values in stored calculation details after BMI calculation
+    if constexpr (ENABLE_DETAILED_CALCULATION_DEBUG) {
+        if (context.has_risk_factor_inspector()) {
+            auto &inspector = context.get_risk_factor_inspector();
+            for (auto &person : context.population()) {
+                if (person.is_active()) {
+                    // Update BMI for all stored calculation details for this person
+                    inspector.update_bmi_in_stored_details(person);
+                }
+            }
+        }
     }
 }
 

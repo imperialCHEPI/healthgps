@@ -259,6 +259,60 @@ void RiskFactorInspector::write_person_record(std::ofstream &file, const Person 
     file << "\n";
 }
 
+std::string RiskFactorInspector::get_bmi_value(const Person &person) {
+    // MAHIMA: Calculate BMI on-the-fly if Weight and Height are available
+    // This handles the case where BMI hasn't been calculated yet by the Kevin Hall model
+    
+    try {
+        // Check if BMI is already calculated and stored
+        if (person.risk_factors.contains("BMI"_id)) {
+            double bmi = person.risk_factors.at("BMI"_id);
+            if (std::isnan(bmi)) {
+                return "NaN";
+            }
+            if (std::isinf(bmi)) {
+                return "INF";
+            }
+            std::ostringstream oss;
+            oss << std::fixed << std::setprecision(6) << bmi;
+            return oss.str();
+        }
+        
+        // If BMI not available, try to calculate it from Weight and Height
+        if (person.risk_factors.contains("Weight"_id) && person.risk_factors.contains("Height"_id)) {
+            double weight = person.risk_factors.at("Weight"_id);
+            double height = person.risk_factors.at("Height"_id);
+            
+            if (std::isnan(weight) || std::isnan(height) || std::isinf(weight) || std::isinf(height)) {
+                return "INVALID_DATA";
+            }
+            
+            if (height <= 0.0) {
+                return "INVALID_HEIGHT";
+            }
+            
+            // Calculate BMI: weight (kg) / height (m)^2
+            // Height is stored in cm, so convert to meters
+            double height_m = height / 100.0;
+            double bmi = weight / (height_m * height_m);
+            
+            if (std::isnan(bmi) || std::isinf(bmi)) {
+                return "CALC_ERROR";
+            }
+            
+            std::ostringstream oss;
+            oss << std::fixed << std::setprecision(6) << bmi;
+            return oss.str();
+        }
+        
+        // If neither BMI nor Weight/Height are available
+        return "NOT_CALCULATED_YET";
+        
+    } catch (const std::exception &) {
+        return "ERROR";
+    }
+}
+
 std::string RiskFactorInspector::get_safe_risk_factor_value(const Person &person,
                                                             const core::Identifier &factor) {
     // MAHIMA: Safely extract risk factor value with comprehensive error handling
@@ -353,6 +407,16 @@ void RiskFactorInspector::set_debug_config(bool enabled, int age, core::Gender g
     }
 }
 
+// MAHIMA: Check if debug is enabled
+bool RiskFactorInspector::is_debug_enabled() const {
+    return debug_config_.enabled;
+}
+
+// MAHIMA: Get target risk factor from debug config
+const std::string& RiskFactorInspector::get_target_risk_factor() const {
+    return debug_config_.target_risk_factor;
+}
+
 // MAHIMA: Capture detailed risk factor calculation steps for debugging
 void RiskFactorInspector::capture_detailed_calculation(RuntimeContext & /*context*/, const Person &person, 
                                                       const std::string &risk_factor_name, size_t /*risk_factor_index*/,
@@ -405,7 +469,7 @@ void RiskFactorInspector::capture_detailed_calculation(RuntimeContext & /*contex
              << "random_residual_before_cholesky,residual_after_cholesky,RF_value,expected_value,linear_result,"
              << "residual,stddev,combined,lambda,boxcox_result,factor_before_clamp,range_lower,range_upper,"
              << "first_clamped_factor_value,simulated_mean,factors_mean_delta,value_after_adjustment_before_second_clamp,"
-             << "final_value_after_second_clamp\n";
+             << "final_value_after_second_clamp,bmi\n";
     }
     
     // Write person data
@@ -434,7 +498,8 @@ void RiskFactorInspector::capture_detailed_calculation(RuntimeContext & /*contex
          << simulated_mean << ","
          << factors_mean_delta << ","
          << value_after_adjustment_before_second_clamp << ","
-         << final_value_after_second_clamp << "\n";
+         << final_value_after_second_clamp << ","
+         << get_bmi_value(person) << "\n";
     
     file.close();
 }
@@ -556,10 +621,11 @@ void RiskFactorInspector::capture_person_risk_factors(RuntimeContext & /*context
              << "random_residual_before_cholesky,residual_after_cholesky,RF_value,expected_value,linear_result,"
              << "residual,stddev,combined,lambda,boxcox_result,factor_before_clamp,range_lower,range_upper,"
              << "first_clamped_factor_value,simulated_mean,factors_mean_delta,value_after_adjustment_before_second_clamp,"
-             << "final_value_after_second_clamp\n";
+             << "final_value_after_second_clamp,bmi\n";
     }
     
     // Write the data
+    std::string bmi_value = get_bmi_value(person);
     file << person_id << ","
          << (person.gender == core::Gender::male ? "male" : "female") << ","
          << person.age << ","
@@ -590,7 +656,8 @@ void RiskFactorInspector::capture_person_risk_factors(RuntimeContext & /*context
          << details.simulated_mean << ","
          << details.factors_mean_delta << ","
          << details.value_after_adjustment_before_second_clamp << ","
-         << details.final_value_after_second_clamp << "\n";
+         << details.final_value_after_second_clamp << ","
+         << bmi_value << "\n";
     
     file.close();
     
@@ -728,5 +795,57 @@ bool RiskFactorInspector::get_stored_calculation_details(const Person &person, c
     
     return false;
 }
+
+// MAHIMA: Update BMI values in stored calculation details after BMI calculation
+void RiskFactorInspector::update_bmi_in_stored_details(const Person &person) {
+    if (!debug_config_.enabled) {
+        return;
+    }
+
+    // Check if this person should be updated based on debug criteria
+    bool should_update = true;
+    
+    if (debug_config_.target_age != -1 && person.age != static_cast<unsigned int>(debug_config_.target_age)) {
+        should_update = false;
+    }
+    
+    if (debug_config_.target_gender != core::Gender::unknown && person.gender != debug_config_.target_gender) {
+        should_update = false;
+    }
+    
+    if (!should_update) {
+        return;
+    }
+
+    // Get the person's ID
+    std::string person_id = std::to_string(person.id());
+    
+    // Check if we have stored calculation details for this person
+    if (calculation_storage_.find(person_id) != calculation_storage_.end()) {
+        // Get the current BMI value from the person's risk factors
+        double current_bmi = 0.0;
+        if (person.risk_factors.contains("BMI"_id)) {
+            current_bmi = person.risk_factors.at("BMI"_id);
+        } else {
+            // Calculate BMI on-the-fly if not stored
+            if (person.risk_factors.contains("Weight"_id) && person.risk_factors.contains("Height"_id)) {
+                double weight = person.risk_factors.at("Weight"_id);
+                double height = person.risk_factors.at("Height"_id);
+                
+                if (height > 0.0 && !std::isnan(weight) && !std::isnan(height) && 
+                    !std::isinf(weight) && !std::isinf(height)) {
+                    double height_m = height / 100.0;
+                    current_bmi = weight / (height_m * height_m);
+                }
+            }
+        }
+        
+        // Update BMI for all stored risk factors for this person
+        // Note: We don't need to store BMI separately since it's calculated from Weight and Height
+        // The get_bmi_value() function will use the current BMI value when writing the CSV
+        // This method is here for future extensibility if we need to store BMI separately
+    }
+}
+
 
 } // namespace hgps

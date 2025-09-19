@@ -120,20 +120,8 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     // Use the same combined factors and ranges for trended adjustment
     adjust_risk_factors(context, combined_factors, combined_ranges, true);
 
-    // MAHIMA: Capture detailed calculation steps for debugging AFTER all adjustments
-    // This ensures we have the final values including adjustments
-    if constexpr (ENABLE_DETAILED_CALCULATION_DEBUG) {
-        if (context.has_risk_factor_inspector()) {
-            auto &inspector = context.get_risk_factor_inspector();
-            // Capture all risk factors for all people after adjustments
-            for (auto &person : context.population()) {
-                for (size_t i = 0; i < names_.size(); i++) {
-                    // Get the stored calculation details and write to CSV
-                    inspector.capture_person_risk_factors(context, person, names_[i].to_string(), i);
-                }
-            }
-        }
-    }
+    // MAHIMA: CSV writing moved to KevinHallModel after BMI calculation
+    // This ensures Weight, Height, and BMI are available when writing CSV
 
     // Print risk factor summary once at the end
     std::string risk_factor_list;

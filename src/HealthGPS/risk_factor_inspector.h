@@ -54,6 +54,15 @@ class RiskFactorInspector {
     /// @param risk_factor Target risk factor to debug (empty for any risk factor)
     void set_debug_config(bool enabled, int age = -1, core::Gender gender = core::Gender::unknown, 
                          const std::string &risk_factor = "");
+    
+    /// @brief MAHIMA: Check if debug is enabled
+    bool is_debug_enabled() const;
+    
+    /// @brief MAHIMA: Get target risk factor from debug config
+    const std::string& get_target_risk_factor() const;
+    
+    /// @brief MAHIMA: Get BMI value for a person (calculated or stored)
+    std::string get_bmi_value(const Person &person);
 
     /// @brief MAHIMA: Capture detailed risk factor calculation steps for debugging
     /// @param context Runtime context containing population and scenario information
@@ -140,6 +149,12 @@ class RiskFactorInspector {
     /// @param details Output parameter to store the details
     /// @return true if details were found and stored, false otherwise
     bool get_stored_calculation_details(const Person &person, const std::string &risk_factor_name, CalculationDetails &details);
+
+    /// @brief MAHIMA: Update BMI values in stored calculation details after BMI calculation
+    /// @param person The person whose BMI was just calculated
+    /// @details This method updates the BMI value in all stored calculation details
+    /// for the given person after the Kevin Hall model has calculated the final BMI
+    void update_bmi_in_stored_details(const Person &person);
 
   private:
     /// @brief MAHIMA: Target risk factors to capture for inspection

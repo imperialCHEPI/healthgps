@@ -1,4 +1,6 @@
 #include "riskfactor.h"
+#include "static_linear_model.h"
+#include "risk_factor_inspector.h"
 
 namespace hgps {
 
@@ -47,6 +49,24 @@ void RiskFactorModule::initialise_population(RuntimeContext &context) {
 
     auto &dynamic_model = models_.at(RiskFactorModelType::Dynamic);
     dynamic_model->generate_risk_factors(context);
+    
+    // MAHIMA: Write inspection CSV files AFTER both models complete
+    // This ensures BMI is available when writing CSV
+    if (context.has_risk_factor_inspector()) {
+        auto &inspector = context.get_risk_factor_inspector();
+        
+        // Only write CSV if debug config is enabled and specifies a risk factor
+        if (inspector.is_debug_enabled() && !inspector.get_target_risk_factor().empty()) {
+            std::string target_risk_factor = inspector.get_target_risk_factor();
+            
+            // Write CSV only for the specific risk factor specified in debug config
+            for (auto &person : context.population()) {
+                if (person.is_active()) {
+                    inspector.capture_person_risk_factors(context, person, target_risk_factor, 0);
+                }
+            }
+        }
+    }
 }
 
 void RiskFactorModule::update_population(RuntimeContext &context) {
