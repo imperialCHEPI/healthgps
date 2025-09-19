@@ -74,6 +74,9 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     // Verify that all expected risk factors are included in the names_ vector
     verify_risk_factors();
 
+    // MAHIMA: Initialize logistic factors for simulated mean calculation
+    initialize_logistic_factors();
+
     // NOTE: Demographic variables (region, ethnicity, income, etc.) are already
     // initialized by the DemographicModule in initialise_population
 
@@ -325,6 +328,23 @@ void StaticLinearModel::set_debug_config(bool enabled, int age, core::Gender gen
                                  gender == core::Gender::female ? "female" : "any")
               << ", Risk Factor: " << (risk_factor.empty() ? "any" : risk_factor)
               << ", Enabled: " << (enabled ? "true" : "false");
+}
+
+// MAHIMA: Initialize logistic factors for simulated mean calculation
+void StaticLinearModel::initialize_logistic_factors() {
+    // Clear any existing logistic factors
+    logistic_factors_.clear();
+    
+    // Check each risk factor to see if it has a logistic model
+    for (size_t i = 0; i < names_.size(); i++) {
+        // A factor has a logistic model if its coefficients are not empty
+        bool has_logistic_model = !(logistic_models_[i].coefficients.empty());
+        
+        if (has_logistic_model) {
+            logistic_factors_.insert(names_[i]);
+        } 
+    }
+    std::cout << "\nMAHIMA: Total factors with logistic models: " << logistic_factors_.size() << " out of " << names_.size();
 }
 
 void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &person,

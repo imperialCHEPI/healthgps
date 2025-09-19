@@ -650,7 +650,7 @@ void RiskFactorInspector::analyze_population_demographics(RuntimeContext &contex
 
 // MAHIMA: Update stored calculation details with adjustment values
 void RiskFactorInspector::update_calculation_details_with_adjustments(const Person &person, const std::string &risk_factor_name,
-                                                                     double simulated_mean, double factors_mean_delta,
+                                                                     double expected_value, double simulated_mean, double factors_mean_delta,
                                                                      double value_after_adjustment_before_second_clamp,
                                                                      double final_value_after_second_clamp) {
     if (!debug_config_.enabled) {
@@ -683,11 +683,50 @@ void RiskFactorInspector::update_calculation_details_with_adjustments(const Pers
         calculation_storage_[person_id].find(risk_factor_name) != calculation_storage_[person_id].end()) {
         
         auto& details = calculation_storage_[person_id][risk_factor_name];
+        details.expected_value = expected_value;  // Store expected value from factors mean table
         details.simulated_mean = simulated_mean;
         details.factors_mean_delta = factors_mean_delta;
         details.value_after_adjustment_before_second_clamp = value_after_adjustment_before_second_clamp;
         details.final_value_after_second_clamp = final_value_after_second_clamp;
     }
+}
+
+// MAHIMA: Get stored calculation details for a person and risk factor
+bool RiskFactorInspector::get_stored_calculation_details(const Person &person, const std::string &risk_factor_name, CalculationDetails &details) {
+    if (!debug_config_.enabled) {
+        return false;
+    }
+
+    // Check if this person and risk factor should be retrieved
+    bool should_retrieve = true;
+    
+    if (debug_config_.target_age != -1 && person.age != static_cast<unsigned int>(debug_config_.target_age)) {
+        should_retrieve = false;
+    }
+    
+    if (debug_config_.target_gender != core::Gender::unknown && person.gender != debug_config_.target_gender) {
+        should_retrieve = false;
+    }
+    
+    if (!debug_config_.target_risk_factor.empty() && risk_factor_name != debug_config_.target_risk_factor) {
+        should_retrieve = false;
+    }
+    
+    if (!should_retrieve) {
+        return false;
+    }
+
+    // Get the stored calculation details
+    std::string person_id = std::to_string(person.id());
+    
+    if (calculation_storage_.find(person_id) != calculation_storage_.end() &&
+        calculation_storage_[person_id].find(risk_factor_name) != calculation_storage_[person_id].end()) {
+        
+        details = calculation_storage_[person_id][risk_factor_name];
+        return true;
+    }
+    
+    return false;
 }
 
 } // namespace hgps

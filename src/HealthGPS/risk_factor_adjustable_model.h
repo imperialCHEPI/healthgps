@@ -9,6 +9,7 @@
 
 #include <functional>
 #include <optional>
+#include <unordered_set>
 #include <vector>
 
 namespace { // anonymous namespace
@@ -62,6 +63,10 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
     /// @returns The number of time steps to apply the trend
     int get_trend_steps(const core::Identifier &factor) const;
 
+  protected:
+    /// @brief Set of factors that have logistic models for simulated mean calculation
+    std::unordered_set<core::Identifier> logistic_factors_;
+
   private:
     /// @brief Adjust risk factors such that mean sim value matches expected value
     /// @param context The simulation run-time context
@@ -74,7 +79,19 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
 
     static RiskFactorSexAgeTable
     calculate_simulated_mean(Population &population, core::IntegerInterval age_range,
-                             const std::vector<core::Identifier> &factors);
+                             const std::vector<core::Identifier> &factors,
+                             const std::unordered_set<core::Identifier> &logistic_factors);
+
+    // MAHIMA: New overloaded function that can access stored calculation details
+    static RiskFactorSexAgeTable
+    calculate_simulated_mean_with_details(Population &population, core::IntegerInterval age_range,
+                                         const std::vector<core::Identifier> &factors,
+                                         const std::unordered_set<core::Identifier> &logistic_factors,
+                                         const std::function<double(const Person&, const core::Identifier&)>& get_value_func);
+
+    /// @brief Set logistic factors for simulated mean calculation
+    /// @param logistic_factors Set of factors that have logistic models
+    void set_logistic_factors(const std::unordered_set<core::Identifier> &logistic_factors);
 
     std::shared_ptr<RiskFactorSexAgeTable> expected_;
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_;

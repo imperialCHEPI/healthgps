@@ -10,6 +10,7 @@
 #include <utility>
 #include <thread>
 #include <chrono>
+#include <unordered_set>
 
 namespace { // anonymous namespace
 
@@ -80,29 +81,46 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
 
     // Baseline scenario: compute adjustments.
     if (context.scenario().type() == ScenarioType::baseline) {
-        // MAHIMA: Calculate simulated means for debugging
+        // MAHIMA: Calculate simulated means using first_clamped_factor_value from stored details
         auto age_range = context.age_range();
-        simulated_means = calculate_simulated_mean(context.population(), age_range, factors);
+        
+        // Create a lambda function to get first_clamped_factor_value from stored calculation details
+        auto get_first_clamped_value = [&context](const Person& person, const core::Identifier& factor) -> double {
+            if (context.has_risk_factor_inspector()) {
+                auto &inspector = context.get_risk_factor_inspector();
+                RiskFactorInspector::CalculationDetails details;
+                if (inspector.get_stored_calculation_details(person, factor.to_string(), details)) {
+                    return details.first_clamped_factor_value;
+                }
+            }
+            // Fallback to current risk factor value if no stored details
+            if (person.risk_factors.contains(factor)) {
+                return person.risk_factors.at(factor);
+            }
+            return 0.0;
+        };
+        
+        simulated_means = calculate_simulated_mean_with_details(context.population(), age_range, factors, logistic_factors_, get_first_clamped_value);
         
         adjustments = calculate_adjustments(context, factors, ranges, apply_trend);    
     }
 
-        // Intervention scenario: receive adjustments from baseline scenario.
+    // Intervention scenario: receive adjustments from baseline scenario.
     else {
-        auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
-        if (!message.has_value()) {
+            auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
+            if (!message.has_value()) {
             throw core::HgpsException(
                 "Simulation out of sync, receive baseline adjustments message has timed out");
-        }
+            }
 
         auto &basePtr = message.value();
         auto *messagePrt = dynamic_cast<RiskFactorAdjustmentMessage *>(basePtr.get());
-        if (!messagePrt) {
+            if (!messagePrt) {
             throw core::HgpsException(
                 "Simulation out of sync, failed to receive a baseline adjustments message");
-        }
+            }
 
-        adjustments = messagePrt->data();
+            adjustments = messagePrt->data();
     }
 
 
@@ -150,17 +168,14 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
         continue;
     }
 
-            // MAHIMA: Check if the person has this risk factor before accessing it
-            if (!person.risk_factors.contains(factor)) {
-        std::cout << "\nWARNING: Person ID " << person.id() << " does not have risk factor " 
-                         << factor.to_string();
+            // MAHIMA: Get first_clamped_factor_value from stored calculation details
+            double first_clamped_factor_value = 0.0;
+            if (person.risk_factors.contains(factor)) {
+                first_clamped_factor_value = person.risk_factors.at(factor);
             }
 
-            // MAHIMA: If adjustment for risk factors that are currently 0 (in case something is not initialized)
-            // This preserves zero values set by logistic regression (two-stage modeling)
-            double original_value = person.risk_factors.at(factor);
             // MAHIMA: Preserve zero values from two-stage modeling - don't adjust them
-            if (original_value == 0.0) {
+            if (first_clamped_factor_value == 0.0) {
                 // Skip adjustment for zero values to preserve two-stage modeling results
                 continue;
             }
@@ -173,18 +188,36 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
                           << age_vector.size() - 1 << ")";
             }
             
-            double delta = age_vector.at(person.age);
-            double value = original_value + delta;
-
-            // Apply range clamping if ranges are provided
+            // MAHIMA: Get the simulated mean for this age/gender/factor
+            double simulated_mean = 0.0;
+            if (simulated_means.contains(person.gender) && simulated_means.at(person.gender).contains(factor)) {
+                const auto &sim_mean_vector = simulated_means.at(person.gender, factor);
+                if (person.age < static_cast<int>(sim_mean_vector.size())) {
+                    simulated_mean = sim_mean_vector.at(person.age);
+                }
+            }
+            
+            // MAHIMA: Get the expected value from factors mean table
+            double expected_value = 0.0;
+            if (expected_->contains(person.gender, factor)) {
+                const auto &expected_vector = expected_->at(person.gender, factor);
+                if (person.age < static_cast<int>(expected_vector.size())) {
+                    expected_value = expected_vector.at(person.age);
+                }
+            }
+            
+            // MAHIMA: Calculate the 4 new values
+            double factors_mean_delta = expected_value - simulated_mean;
+            double value_after_adjustment_before_second_clamp = first_clamped_factor_value + factors_mean_delta;
+            
+            // Apply range clamping to get final value
+            double final_value_after_second_clamp = value_after_adjustment_before_second_clamp;
             if (ranges.has_value()) {
-                // Make sure we're using the right index for the range
-                value = ranges.value().get().at(factor_index).clamp(value);
-                // any_ranges_applied = true; // Mark that ranges were applied at least once
+                final_value_after_second_clamp = ranges.value().get().at(factor_index).clamp(value_after_adjustment_before_second_clamp);
             }
 
             // Set the adjusted value with any additional validation
-            person.set_risk_factor(context, factor, value);
+            person.set_risk_factor(context, factor, final_value_after_second_clamp);
         }
 
         // MAHIMA: Special handling for Income and PhysicalActivity
@@ -212,8 +245,17 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
                             }
                         }
                         
+                        // Get expected income value
+                        double income_expected_value = 0.0;
+                        if (expected_->contains(person.gender, "income"_id)) {
+                            const auto &expected_vector = expected_->at(person.gender, "income"_id);
+                            if (person.age < static_cast<int>(expected_vector.size())) {
+                                income_expected_value = expected_vector.at(person.age);
+                            }
+                        }
+                        
                         inspector.update_calculation_details_with_adjustments(person, "income",
-                                                                             income_sim_mean, delta, person.income_continuous, person.income_continuous);
+                                                                             income_expected_value, income_sim_mean, delta, person.income_continuous, person.income_continuous);
                     }
                 }
             }
@@ -242,8 +284,17 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
                             }
                         }
                         
+                        // Get expected physical activity value
+                        double pa_expected_value = 0.0;
+                        if (expected_->contains(person.gender, "physicalactivity"_id)) {
+                            const auto &expected_vector = expected_->at(person.gender, "physicalactivity"_id);
+                            if (person.age < static_cast<int>(expected_vector.size())) {
+                                pa_expected_value = expected_vector.at(person.age);
+                            }
+                        }
+                        
                         inspector.update_calculation_details_with_adjustments(person, "physicalactivity",
-                                                                             pa_sim_mean, delta, person.physical_activity, person.physical_activity);
+                                                                             pa_expected_value, pa_sim_mean, delta, person.physical_activity, person.physical_activity);
                     }
                 }
             }
@@ -263,12 +314,26 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
                     continue;
                 }
                 
-                // Get the adjustment delta for this age/gender/factor
-                double adjustment_delta = 0.0;
-                if (adjustments.contains(person.gender) && adjustments.at(person.gender).contains(factor)) {
-                    const auto &adjustment_vector = adjustments.at(person.gender, factor);
-                    if (person.age < static_cast<int>(adjustment_vector.size())) {
-                        adjustment_delta = adjustment_vector.at(person.age);
+                // Get first_clamped_factor_value from stored calculation details
+                double first_clamped_factor_value = 0.0;
+                RiskFactorInspector::CalculationDetails stored_details;
+                if (context.has_risk_factor_inspector()) {
+                    auto &inspector = context.get_risk_factor_inspector();
+                    if (inspector.get_stored_calculation_details(person, factor.to_string(), stored_details)) {
+                        first_clamped_factor_value = stored_details.first_clamped_factor_value;
+                    }
+                }
+                // Fallback to current risk factor value if no stored details
+                if (first_clamped_factor_value == 0.0 && person.risk_factors.contains(factor)) {
+                    first_clamped_factor_value = person.risk_factors.at(factor);
+                }
+                
+                // Get the expected value from factors mean table (same for all people of this age/gender)
+                double expected_value = 0.0;
+                if (expected_->contains(person.gender, factor)) {
+                    const auto &expected_vector = expected_->at(person.gender, factor);
+                    if (person.age < static_cast<int>(expected_vector.size())) {
+                        expected_value = expected_vector.at(person.age);
                     }
                 }
                 
@@ -281,103 +346,32 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
                     }
                 }
                 
-                // Get the current value of the risk factor AFTER adjustment
-                double current_value = 0.0;
-                if (person.risk_factors.contains(factor)) {
-                    current_value = person.risk_factors.at(factor);
+                // MAHIMA: Preserve zero values from two-stage modeling - don't adjust them
+                if (first_clamped_factor_value == 0.0) {
+                    // For zero values, set adjustment values to 0 but keep expected_value and simulated_mean
+                    double factors_mean_delta = expected_value - simulated_mean;
+                    inspector.update_calculation_details_with_adjustments(person, factor.to_string(),
+                                                                         expected_value, simulated_mean, factors_mean_delta, 0.0, 0.0);
+                    continue;
+                }
+                
+                // Calculate the 4 new values
+                double factors_mean_delta = expected_value - simulated_mean;
+                double value_after_adjustment_before_second_clamp = first_clamped_factor_value + factors_mean_delta;
+                
+                // Apply range clamping to get final value
+                double final_value_after_second_clamp = value_after_adjustment_before_second_clamp;
+                if (ranges.has_value()) {
+                    final_value_after_second_clamp = ranges.value().get().at(factor_index).clamp(value_after_adjustment_before_second_clamp);
                 }
                 
                 // Update the stored calculation details with the final adjusted values
                 inspector.update_calculation_details_with_adjustments(person, factor.to_string(),
-                                                                     simulated_mean, adjustment_delta, current_value, current_value);
+                                                                     expected_value, simulated_mean, factors_mean_delta, 
+                                                                     value_after_adjustment_before_second_clamp, final_value_after_second_clamp);
             }
         }
     });
-    
-    // MAHIMA: Verification box - show before/after values for sample of 6 people from different ages and genders
-    if (context.scenario().type() == ScenarioType::baseline && context.time_now() == context.start_time()) {
-        std::cout << "\n\n=== STATIC LINEAR MODEL VERIFICATION BOX (Sample of 6 people from different ages and genders) ===";
-        std::cout << "\nPerson ID | Age | Gender | INCOME BEFORE | INCOME AFTER | INCOME DELTA | PHYSICAL ACTIVITY BEFORE | PHYSICAL ACTIVITY AFTER | PHYSICAL ACTIVITY DELTA";
-        std::cout << "\n----------|-----|--------|---------------|--------------|-------------|-------------------------|------------------------|----------------------";
-        
-        // Sample from different ages and genders: (0,M), (0,F), (25,M), (25,F), (50,M), (50,F)
-        std::vector<std::pair<int, core::Gender>> target_combinations = {
-            {0, core::Gender::male}, {0, core::Gender::female},
-            {25, core::Gender::male}, {25, core::Gender::female},
-            {50, core::Gender::male}, {50, core::Gender::female}
-        };
-        int sample_count = 0;
-        
-        for (auto [target_age, target_gender] : target_combinations) {
-            if (sample_count >= 6) break;
-            
-            for (const auto& person : pop) {
-                if (!person.is_active() || person.age != target_age || person.gender != target_gender) continue;
-                
-                std::cout << "\n" << std::setw(9) << static_cast<int>(person.id()) 
-                          << " | " << std::setw(3) << person.age 
-                          << " | " << std::setw(6) << (person.gender == core::Gender::male ? "Male" : "Female");
-                
-                // Show income before/after values
-                if (std::find(factors.begin(), factors.end(), "income"_id) != factors.end() && 
-                    original_income.find(person.id()) != original_income.end()) {
-                    double before = original_income[person.id()];
-                    double after = person.income_continuous;
-                    double delta = after - before;
-                    std::cout << " | " << std::setw(13) << std::fixed << std::setprecision(2) << before
-                              << " | " << std::setw(12) << std::fixed << std::setprecision(2) << after
-                              << " | " << std::setw(11) << std::fixed << std::setprecision(2) << delta;
-                } else {
-                    std::cout << " | " << std::setw(13) << "N/A" << " | " << std::setw(12) << "N/A" << " | " << std::setw(11) << "N/A";
-                }
-                
-                // Show physical activity before/after values
-                if (std::find(factors.begin(), factors.end(), "physicalactivity"_id) != factors.end() && 
-                    original_physical_activity.find(person.id()) != original_physical_activity.end()) {
-                    double before = original_physical_activity[person.id()];
-                    double after = person.physical_activity;
-                    double delta = after - before;
-                    std::cout << " | " << std::setw(23) << std::fixed << std::setprecision(2) << before
-                              << " | " << std::setw(22) << std::fixed << std::setprecision(2) << after
-                              << " | " << std::setw(20) << std::fixed << std::setprecision(2) << delta;
-                } else {
-                    std::cout << " | " << std::setw(23) << "N/A" << " | " << std::setw(22) << "N/A" << " | " << std::setw(20) << "N/A";
-                }
-                
-                sample_count++;
-                break; // Found one person of this age/gender, move to next combination
-            }
-        }
-        
-        // Debug: Show expected vs simulated values for income to understand adjustments
-        if (expected_->contains(core::Gender::male) && expected_->at(core::Gender::male).contains("income"_id)) {
-            std::cout << "\n\n=== DEBUG: Income Expected vs Simulated Analysis ===";
-            auto& male_expected_income = expected_->at(core::Gender::male, "income"_id);
-            std::cout << "\nMale expected income values (ages 0,25,50): ";
-            for (int age : {0, 25, 50}) {
-                if (age < static_cast<int>(male_expected_income.size())) {
-                    std::cout << "age" << age << "=" << std::fixed << std::setprecision(2) << male_expected_income[age] << " ";
-                }
-            }
-            
-            // Calculate simulated means for income
-            std::cout << "\nMale simulated income means (ages 0,25,50): ";
-            for (int age : {0, 25, 50}) {
-                double sum = 0.0;
-                int count = 0;
-                for (const auto& person : pop) {
-                    if (person.is_active() && person.gender == core::Gender::male && person.age == age) {
-                        sum += person.income_continuous;
-                        count++;
-                    }
-                }
-                double mean = (count > 0) ? sum / count : 0.0;
-                std::cout << "age" << age << "=" << std::fixed << std::setprecision(2) << mean << " ";
-            }
-        }
-        
-        std::cout << "\n======================================================================================================================================================\n";
-    }
 
     // Baseline scenario: send adjustments to intervention scenario.
     if (context.scenario().type() == ScenarioType::baseline) {
@@ -390,6 +384,10 @@ int RiskFactorAdjustableModel::get_trend_steps(const core::Identifier &factor) c
     return trend_steps_->at(factor);
 }
 
+void RiskFactorAdjustableModel::set_logistic_factors(const std::unordered_set<core::Identifier> &logistic_factors) {
+    logistic_factors_ = logistic_factors;
+}
+
 RiskFactorSexAgeTable
 RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context,
                                                  const std::vector<core::Identifier> &factors,
@@ -398,8 +396,19 @@ RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context,
     auto age_range = context.age_range();
     auto age_count = age_range.upper() + 1;
 
-    // Compute simulated means.
-    auto simulated_means = calculate_simulated_mean(context.population(), age_range, factors);
+    // MAHIMA: Calculate simulated means using first_clamped_factor_value from stored details
+    // Create a lambda function to get first_clamped_factor_value from stored calculation details
+    auto get_first_clamped_value = [&context](const Person& person, const core::Identifier& factor) -> double {
+        if (context.has_risk_factor_inspector()) {
+            auto &inspector = context.get_risk_factor_inspector();
+            RiskFactorInspector::CalculationDetails details;
+            if (inspector.get_stored_calculation_details(person, factor.to_string(), details)) {
+                return details.first_clamped_factor_value;
+            }
+        }
+    };
+    
+    auto simulated_means = calculate_simulated_mean_with_details(context.population(), age_range, factors, logistic_factors_, get_first_clamped_value);
 
     // Compute adjustments.
     auto adjustments = RiskFactorSexAgeTable{};
@@ -442,11 +451,89 @@ RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context,
     return adjustments;
 }
 
-RiskFactorSexAgeTable
-RiskFactorAdjustableModel::calculate_simulated_mean(Population &population,
-                                                    const core::IntegerInterval age_range,
-                                                    const std::vector<core::Identifier> &factors) {
+// MAHIMA: New overloaded function that can access stored calculation details
+RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_simulated_mean_with_details(
+    Population &population, const core::IntegerInterval age_range,
+    const std::vector<core::Identifier> &factors,
+    const std::unordered_set<core::Identifier> &logistic_factors,
+    const std::function<double(const Person&, const core::Identifier&)>& get_value_func) {
     auto age_count = age_range.upper() + 1;
+
+    // MAHIMA: Track excluded values for debugging
+    std::unordered_map<core::Identifier, int> excluded_counts;
+    std::unordered_map<core::Identifier, int> total_counts;
+    for (const auto &factor : factors) {
+        excluded_counts[factor] = 0;
+        total_counts[factor] = 0;
+    }
+
+    // Compute first moments.
+    auto moments = UnorderedMap2d<core::Gender, core::Identifier, std::vector<FirstMoment>>{};
+
+    for (const auto &person : population) {
+        if (!person.is_active()) {
+            continue;
+        }
+
+        for (const auto &factor : factors) {
+            if (!moments.contains(person.gender, factor)) {
+                moments.emplace(person.gender, factor, std::vector<FirstMoment>(age_count));
+            }
+
+            double value = get_value_func(person, factor);
+            bool has_value = true; // The function should handle missing values
+
+            // MAHIMA: Apply logistic model logic for simulated mean calculation
+            // For factors WITH logistic models: only include non-zero values
+            // For factors WITHOUT logistic models: include all values (including zeros)
+            if (has_value) {
+                total_counts[factor]++;
+                bool should_include = true;
+                if (logistic_factors.contains(factor)) {
+                    // Factor has logistic model - only include non-zero values
+                    if (value == 0)
+                        should_include = false;
+                    if (!should_include) {
+                        excluded_counts[factor]++;
+                    }
+                }
+                // If factor doesn't have logistic model, include all values (including zeros)
+
+                if (should_include) {
+                moments.at(person.gender, factor).at(person.age).append(value);
+                }
+            }
+        }
+    }
+
+    // Compute means.
+    auto means = RiskFactorSexAgeTable{};
+    for (const auto &[sex, moments_by_sex] : moments) {
+        for (const auto &factor : factors) {
+            means.emplace(sex, factor, std::vector<double>(age_count));
+            for (auto age = age_range.lower(); age <= age_range.upper(); age++) {
+                double value = moments_by_sex.at(factor).at(age).mean();
+                means.at(sex, factor).at(age) = value;
+            }
+        }
+    }
+
+    return means;
+}
+
+RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_simulated_mean(
+    Population &population, const core::IntegerInterval age_range,
+    const std::vector<core::Identifier> &factors,
+    const std::unordered_set<core::Identifier> &logistic_factors) {
+    auto age_count = age_range.upper() + 1;
+
+    // MAHIMA: Track excluded values for debugging
+    std::unordered_map<core::Identifier, int> excluded_counts;
+    std::unordered_map<core::Identifier, int> total_counts;
+    for (const auto &factor : factors) {
+        excluded_counts[factor] = 0;
+        total_counts[factor] = 0;
+    }
 
     // Compute first moments.
     auto moments = UnorderedMap2d<core::Gender, core::Identifier, std::vector<FirstMoment>>{};
@@ -472,17 +559,35 @@ RiskFactorAdjustableModel::calculate_simulated_mean(Population &population,
                 value = person.physical_activity;
                 has_value = true;
             } else if (person.risk_factors.contains(factor)) {
+                // MAHIMA: Use first_clamped_factor_value from stored calculation details if available
+                // Otherwise fall back to the current risk factor value
                 value = person.risk_factors.at(factor);
                 has_value = true;
             } else {
-                // MAHIMA: If person doesn't have this risk factor, it means they got 0 from logistic regression
-                // We still need to include them in the mean calculation with value 0.0
+                // MAHIMA: Person doesn't have this risk factor (e.g., set to 0 by logistic regression)
+                // Still include them in the mean calculation with value 0.0
                 value = 0.0;
                 has_value = true;
             }
-
+            // MAHIMA: Apply logistic model logic for simulated mean calculation
+            // For factors WITH logistic models: only include non-zero values
+            // For factors WITHOUT logistic models: include all values (including zeros)
             if (has_value) {
+                total_counts[factor]++;
+                bool should_include = true;
+                if (logistic_factors.contains(factor)) {
+                    // Factor has logistic model - only include non-zero values
+                    if (value == 0)
+                        should_include = false;
+                    if (!should_include) {
+                        excluded_counts[factor]++;
+                    }
+                }
+                // If factor doesn't have logistic model, include all values (including zeros)
+
+                if (should_include) {
                 moments.at(person.gender, factor).at(person.age).append(value);
+                }
             }
         }
     }
@@ -498,11 +603,59 @@ RiskFactorAdjustableModel::calculate_simulated_mean(Population &population,
             }
         }
     }
-    // std::cout << "\nDEBUG: RiskFactorAdjustableModel::calculate_simulated_mean - Means computed";
-    // std::cout << "\nDEBUG: RiskFactorAdjustableModel::calculate_simulated_mean - Completed";
+
+    // MAHIMA: Print excluded values summary only once
+    static bool debug_summary_printed = false;
+    if (!debug_summary_printed) {
+        std::cout << "\n=== SIMULATED MEAN CALCULATION - EXCLUDED VALUES SUMMARY ===";
+        for (const auto &factor : factors) {
+            if (logistic_factors.contains(factor)) {
+                std::cout << "\n"
+                          << factor.to_string()
+                          << " (HAS logistic model): " << excluded_counts[factor]
+                          << " zero values excluded out of " << total_counts[factor]
+                          << " total values (" << std::fixed << std::setprecision(1)
+                          << (total_counts[factor] > 0
+                                  ? (100.0 * excluded_counts[factor] / total_counts[factor])
+                                  : 0.0)
+                          << "% excluded)";
+            } else {
+                std::cout << "\n"
+                          << factor.to_string()
+                          << " (NO logistic model): " << excluded_counts[factor]
+                          << " zero values excluded out of " << total_counts[factor]
+                          << " total values (" << std::fixed << std::setprecision(1)
+                          << (total_counts[factor] > 0
+                                  ? (100.0 * excluded_counts[factor] / total_counts[factor])
+                                  : 0.0)
+                          << "% excluded)";
+            }
+        }
+        std::cout << "\n===============================================================";
+        
+        // MAHIMA: Debug output to show some calculated means
+        std::cout << "\n=== DEBUG: Sample calculated means ===";
+        for (const auto &[sex, moments_by_sex] : moments) {
+            for (const auto &factor : factors) {
+                if (factor.to_string() == "foodalcohol" && sex == core::Gender::female) {
+                    std::cout << "\n" << factor.to_string() << " (female):";
+                    for (int age = 15; age <= 20; age++) {
+                        if (age < static_cast<int>(moments_by_sex.at(factor).size())) {
+                            double mean_val = moments_by_sex.at(factor).at(age).mean();
+                            std::cout << "\n  Age " << age << ": " << mean_val;
+                        }
+                    }
+                }
+            }
+        }
+        std::cout << "\n=====================================";
+        
+        debug_summary_printed = true;
+    }
 
     return means;
 }
+
 
 RiskFactorAdjustableModelDefinition::RiskFactorAdjustableModelDefinition(
     std::unique_ptr<RiskFactorSexAgeTable> expected,

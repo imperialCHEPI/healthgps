@@ -109,6 +109,9 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     void set_debug_config(bool enabled, int age = -1, core::Gender gender = core::Gender::unknown, 
                          const std::string &risk_factor = "");
 
+    // MAHIMA: Initialize logistic factors for simulated mean calculation
+    void initialize_logistic_factors();
+
   private:
     // Helper functions to combine food and other risk factors for single adjustment call
     // This prevents the "invalid unordered_map<K, T> key" error by ensuring all factors
