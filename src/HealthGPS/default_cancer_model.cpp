@@ -249,8 +249,17 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
         {
             // calculate YearPostInt
             int YearPostInt = context.time_now(); // may need to change this to account for lags.
-            double PIF_ThisPerson_ThisDisease =
-                definition_.get().PIFtable(person.age, person.gender, (context.time_now()));
+            double PIF_ThisPerson_ThisDisease; 
+            if (context.scenario().type() == ScenarioType::baseline)
+            {
+                PIF_ThisPerson_ThisDisease = 0;
+            } 
+            else {
+
+                PIF_ThisPerson_ThisDisease =
+                    definition_.get().PIFtable(person.age, person.gender, (context.time_now()));
+            }
+
             // relative_risk *= calculate_relative_risk_for_diseases(person); // not sure whether to include this. 
             probability = incidence * relative_risk * (1 - PIF_ThisPerson_ThisDisease); 
         }
