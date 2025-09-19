@@ -240,7 +240,29 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
             continue;
         }
 
-        double relative_risk = 1.0;
+        double relative_risk = 1.0, incidence, probability, hazard;
+        double average_relative_risk = average_relative_risk_.at(person.age, person.gender);
+        double incidence = definition_.get().table()(person.age, person.gender).at(incidence_id);
+        hazard = context.random().next_double();
+
+        if (context.RunningPIFAnalysis)
+        {
+            // calculate YearPostInt
+            int YearPostInt = context.time_now(); // may need to change this to account for lags.
+            double PIF_ThisPerson_ThisDisease =
+                definition_.get().PIFtable(person.age, person.gender, (context.time_now()));
+            // relative_risk *= calculate_relative_risk_for_diseases(person); // not sure whether to include this. 
+            probability = incidence * relative_risk * (1 - PIF_ThisPerson_ThisDisease); 
+        }
+        else
+        {
+            relative_risk *= calculate_relative_risk_for_risk_factors(person);
+            relative_risk *= calculate_relative_risk_for_diseases(person);
+
+            probability = incidence * relative_risk / average_relative_risk;
+        }
+
+        /*double relative_risk = 1.0;
         relative_risk *= calculate_relative_risk_for_risk_factors(person);
         relative_risk *= calculate_relative_risk_for_diseases(person);
 
@@ -248,7 +270,7 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
 
         double incidence = definition_.get().table()(person.age, person.gender).at(incidence_id);
         double probability = incidence * relative_risk / average_relative_risk;
-        double hazard = context.random().next_double();
+        double hazard = context.random().next_double();*/
         if (hazard < probability) {
             person.diseases[disease_type()] = Disease{.status = DiseaseStatus::active,
                                                       .start_time = context.time_now(),
