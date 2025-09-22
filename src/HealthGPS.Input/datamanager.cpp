@@ -685,7 +685,7 @@ std::optional<PIFData> DataManager::get_pif_data(const DiseaseInfo &disease_info
                 fmt::print("  - Country: {} (Code: {})\n", country.name, country_code);
                 fmt::print("  - Risk Factor: {}\n", risk_factor);
                 fmt::print("  - Scenario: {}\n", scenario);
-                fmt::print("  - Data Points: {}\n", pif_data.get_scenario_data(scenario)->size());
+                fmt::print("  - Toatal Data Rows: {}\n", pif_data.get_scenario_data(scenario)->size());
                 fmt::print("  - File: {}\n", csv_filename);
                 fmt::print("  - Path: {}\n", full_path.string());
                 fmt::print("  - PIF Analysis: ENABLED and READY\n\n");
@@ -752,7 +752,7 @@ PIFTable DataManager::load_pif_from_csv(const std::filesystem::path &filepath) c
         for (size_t i = 0; i < doc.GetRowCount(); i++) {
             auto row = doc.GetRow<std::string>(i);
 
-            PIFDataItem item;
+            PIFDataItem item{};
             item.gender = static_cast<core::Gender>(std::stoi(row[mapping["Gender"]]));
             item.age = std::stoi(row[mapping["Age"]]);
             item.year_post_intervention = std::stoi(row[mapping["YearPostInt"]]);

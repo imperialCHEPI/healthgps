@@ -54,8 +54,7 @@ class DiseaseDefinition final {
                       RelativeRiskLookupMap &&risk_factors,
                       hgps::input::PIFData &&pif_data = hgps::input::PIFData{})
         : measures_table_{std::move(measures_table)}, relative_risk_diseases_{std::move(diseases)},
-          relative_risk_factors_{std::move(risk_factors)}, parameters_{},
-          pif_data_{std::move(pif_data)} {}
+          relative_risk_factors_{std::move(risk_factors)}, pif_data_{std::move(pif_data)} {}
 
     /// @brief Initialises a new instance of the DiseaseDefinition class for cancer diseases
     /// @param measures_table The disease measures table

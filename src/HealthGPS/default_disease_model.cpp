@@ -3,6 +3,7 @@
 #include "person.h"
 #include "runtime_context.h"
 
+#include <fmt/color.h>
 #include <oneapi/tbb/parallel_for_each.h>
 
 namespace hgps {
@@ -241,6 +242,13 @@ void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
         // Apply PIF adjustment if PIF data is available and we're in baseline scenario
         if (definition_.get().has_pif_data() &&
             context.scenario().type() == ScenarioType::baseline) {
+            // Print confirmation message once (only for the first disease that uses PIF)
+            static bool pif_used_printed = false;
+            if (!pif_used_printed) {
+                fmt::print(fg(fmt::color::green), "PIF Analysis: Applying Population Impact Fraction adjustments to disease incidence calculations\n");
+                pif_used_printed = true;
+            }
+            
             // Calculate years post intervention (assuming intervention starts at time 0)
             int year_post_intervention = context.time_now();
 

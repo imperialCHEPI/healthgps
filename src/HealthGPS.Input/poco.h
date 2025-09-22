@@ -153,9 +153,9 @@ struct PolicyScenarioInfo {
 //! Population Impact Fraction (PIF) configuration
 struct PIFInfo {
     bool enabled{};
-    std::string data_root_path{};
-    std::string risk_factor{};
-    std::string scenario{};
+    std::string data_root_path;
+    std::string risk_factor;
+    std::string scenario;
 
     auto operator<=>(const PIFInfo &rhs) const = default;
 };
