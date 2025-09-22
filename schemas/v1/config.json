@@ -35,8 +35,48 @@
             "$ref": "config/output.json"
         },
         "population_impact_fraction": {
-            "$ref": "data_index/population_impact_fraction.json"
+            "type": "object",
+            "description": "Population Impact Fraction configuration",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Whether PIF analysis is enabled for this simulation"
+                },
+                "data_root_path": {
+                    "type": "string",
+                    "description": "Root path to PIF data files. Can use environment variables like ${PIF_DATA_ROOT}/data or ${HOME}/healthgps-data/data"
+                },
+                "risk_factor": {
+                    "type": "string",
+                    "description": "Risk factor name for PIF data (e.g., Smoking, Diet)"
+                },
+                "scenario": {
+                    "type": "string",
+                    "enum": [
+                        "Scenario1",
+                        "Scenario2",
+                        "Scenario3"
+                    ],
+                    "description": "PIF scenario to use for all diseases in the simulation"
+                }
+            },
+            "required": [
+                "enabled",
+                "data_root_path",
+                "risk_factor",
+                "scenario"
+            ],
+            "additionalProperties": false
         }
     },
-    "additionalProperties": false
+    "required": [
+        "version",
+        "trend_type",
+        "data",
+        "inputs",
+        "modelling",
+        "running",
+        "output"
+    ],
+    "additionalProperties": true
 }
