@@ -1,5 +1,5 @@
-#include "HealthGPS.Input/pif_data.h"
 #include "HealthGPS.Core/disease.h"
+#include "HealthGPS.Input/pif_data.h"
 #include "pch.h"
 
 using namespace hgps::input;
@@ -83,10 +83,10 @@ TEST(PIFData, AddScenarioData) {
     pif_data.add_scenario_data("Scenario2", std::move(table2));
 
     EXPECT_TRUE(pif_data.has_data());
-    
-    auto* scenario1 = pif_data.get_scenario_data("Scenario1");
-    auto* scenario2 = pif_data.get_scenario_data("Scenario2");
-    auto* scenario3 = pif_data.get_scenario_data("Scenario3");
+
+    auto *scenario1 = pif_data.get_scenario_data("Scenario1");
+    auto *scenario2 = pif_data.get_scenario_data("Scenario2");
+    auto *scenario3 = pif_data.get_scenario_data("Scenario3");
 
     EXPECT_NE(nullptr, scenario1);
     EXPECT_NE(nullptr, scenario2);
@@ -102,7 +102,7 @@ TEST(PIFData, GetScenarioData) {
     table.add_item({25, Gender::male, 5, 0.3});
     pif_data.add_scenario_data("Scenario1", std::move(table));
 
-    auto* scenario = pif_data.get_scenario_data("Scenario1");
+    auto *scenario = pif_data.get_scenario_data("Scenario1");
     EXPECT_NE(nullptr, scenario);
     EXPECT_TRUE(scenario->has_data());
     EXPECT_NEAR(0.3, scenario->get_pif_value(25, Gender::male, 5), 1e-6);

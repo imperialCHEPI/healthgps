@@ -14,13 +14,13 @@ TEST(ConfigurationPIF, PIFInfoStructure) {
     EXPECT_TRUE(info.data_root_path.empty());
     EXPECT_TRUE(info.risk_factor.empty());
     EXPECT_TRUE(info.scenario.empty());
-    
+
     PIFInfo info2{true, "data", "Smoking", "Scenario1"};
     EXPECT_TRUE(info2.enabled);
     EXPECT_EQ("data", info2.data_root_path);
     EXPECT_EQ("Smoking", info2.risk_factor);
     EXPECT_EQ("Scenario1", info2.scenario);
-    
+
     EXPECT_NE(info, info2);
 }
 
@@ -28,7 +28,7 @@ TEST(ConfigurationPIF, PIFInfoEquality) {
     PIFInfo info1{true, "data", "Smoking", "Scenario1"};
     PIFInfo info2{true, "data", "Smoking", "Scenario1"};
     PIFInfo info3{false, "data", "Smoking", "Scenario1"};
-    
+
     EXPECT_EQ(info1, info2);
     EXPECT_NE(info1, info3);
 }
