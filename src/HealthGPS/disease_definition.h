@@ -4,6 +4,7 @@
 #include "disease_table.h"
 #include "gender_value.h"
 #include "relative_risk.h"
+#include "HealthGPS.Input/pif_data.h"
 
 namespace hgps {
 
@@ -48,20 +49,22 @@ class DiseaseDefinition final {
     /// @param measures_table The disease measures table
     /// @param diseases The diseases to disease relative risk table
     /// @param risk_factors The risk-factors to diseases relative risk values
+    /// @param pif_data The PIF data for this disease (optional)
     DiseaseDefinition(DiseaseTable &&measures_table, RelativeRiskTableMap &&diseases,
-                      RelativeRiskLookupMap &&risk_factors)
+                      RelativeRiskLookupMap &&risk_factors, hgps::input::PIFData &&pif_data = hgps::input::PIFData{})
         : measures_table_{std::move(measures_table)}, relative_risk_diseases_{std::move(diseases)},
-          relative_risk_factors_{std::move(risk_factors)}, parameters_{} {}
+          relative_risk_factors_{std::move(risk_factors)}, parameters_{}, pif_data_{std::move(pif_data)} {}
 
     /// @brief Initialises a new instance of the DiseaseDefinition class for cancer diseases
     /// @param measures_table The disease measures table
     /// @param diseases The diseases to disease relative risk table
     /// @param risk_factors The risk-factors to diseases relative risk values
     /// @param parameter The cancer disease parameter
+    /// @param pif_data The PIF data for this disease (optional)
     DiseaseDefinition(DiseaseTable &&measures_table, RelativeRiskTableMap &&diseases,
-                      RelativeRiskLookupMap &&risk_factors, DiseaseParameter &&parameter)
+                      RelativeRiskLookupMap &&risk_factors, DiseaseParameter &&parameter, hgps::input::PIFData &&pif_data = hgps::input::PIFData{})
         : measures_table_{std::move(measures_table)}, relative_risk_diseases_{std::move(diseases)},
-          relative_risk_factors_{std::move(risk_factors)}, parameters_{std::move(parameter)} {}
+          relative_risk_factors_{std::move(risk_factors)}, parameters_{std::move(parameter)}, pif_data_{std::move(pif_data)} {}
 
     /// @brief Gets the disease unique identifier
     /// @return The disease identifier
@@ -87,10 +90,23 @@ class DiseaseDefinition final {
     /// @return The cancer parameters
     const DiseaseParameter &parameters() const noexcept { return parameters_; }
 
+    /// @brief Gets the PIF data for this disease
+    /// @return Reference to PIF data
+    const hgps::input::PIFData& pif_data() const noexcept { return pif_data_; }
+    
+    /// @brief Sets the PIF data for this disease
+    /// @param pif_data The PIF data to set
+    void set_pif_data(hgps::input::PIFData&& pif_data) { pif_data_ = std::move(pif_data); }
+    
+    /// @brief Checks if PIF data is available for this disease
+    /// @return true if PIF data is available, false otherwise
+    bool has_pif_data() const noexcept { return pif_data_.has_data(); }
+
   private:
     DiseaseTable measures_table_;
     RelativeRiskTableMap relative_risk_diseases_;
     RelativeRiskLookupMap relative_risk_factors_;
     DiseaseParameter parameters_;
+    hgps::input::PIFData pif_data_;
 };
 } // namespace hgps
