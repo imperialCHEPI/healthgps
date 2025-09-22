@@ -33,6 +33,9 @@
         },
         "output": {
             "$ref": "config/output.json"
+        },
+        "population_impact_fraction": {
+            "$ref": "data_index/population_impact_fraction.json"
         }
     },
     "additionalProperties": false
