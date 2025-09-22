@@ -685,7 +685,8 @@ std::optional<PIFData> DataManager::get_pif_data(const DiseaseInfo &disease_info
                 fmt::print("  - Country: {} (Code: {})\n", country.name, country_code);
                 fmt::print("  - Risk Factor: {}\n", risk_factor);
                 fmt::print("  - Scenario: {}\n", scenario);
-                fmt::print("  - Toatal Data Rows: {}\n", pif_data.get_scenario_data(scenario)->size());
+                fmt::print("  - Toatal Data Rows: {}\n",
+                           pif_data.get_scenario_data(scenario)->size());
                 fmt::print("  - File: {}\n", csv_filename);
                 fmt::print("  - Path: {}\n", full_path.string());
                 fmt::print("  - PIF Analysis: ENABLED and READY\n\n");
