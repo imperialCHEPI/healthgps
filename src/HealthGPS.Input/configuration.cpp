@@ -116,7 +116,8 @@ Configuration get_configuration(const std::string &config_source,
     if (opt.contains("population_impact_fraction")) {
         const auto &pif_json = opt["population_impact_fraction"];
         config.population_impact_fraction.enabled = pif_json["enabled"].get<bool>();
-        config.population_impact_fraction.data_root_path = pif_json["data_root_path"].get<std::string>();
+        config.population_impact_fraction.data_root_path =
+            pif_json["data_root_path"].get<std::string>();
         config.population_impact_fraction.risk_factor = pif_json["risk_factor"].get<std::string>();
         config.population_impact_fraction.scenario = pif_json["scenario"].get<std::string>();
     }

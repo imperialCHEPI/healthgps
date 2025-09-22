@@ -4,9 +4,9 @@
 #include <HealthGPS.Core/string_util.h>
 #include <map>
 
+#include "HealthGPS.Input/poco.h"
 #include "mapping.h"
 #include "settings.h"
-#include "HealthGPS.Input/poco.h"
 
 namespace hgps {
 
@@ -55,7 +55,8 @@ class ModelInput {
     /// @param pif_info Population Impact Fraction configuration
     ModelInput(core::DataTable &data, Settings settings, const RunInfo &run_info,
                SESDefinition ses_info, HierarchicalMapping risk_mapping,
-               std::vector<core::DiseaseInfo> diseases, hgps::input::PIFInfo pif_info = hgps::input::PIFInfo{});
+               std::vector<core::DiseaseInfo> diseases,
+               hgps::input::PIFInfo pif_info = hgps::input::PIFInfo{});
 
     /// @brief Gets the simulation experiment settings definition
     /// @return Experiment settings definition
@@ -103,7 +104,7 @@ class ModelInput {
 
     /// @brief Gets the Population Impact Fraction configuration
     /// @return PIF configuration
-    const hgps::input::PIFInfo& population_impact_fraction() const noexcept;
+    const hgps::input::PIFInfo &population_impact_fraction() const noexcept;
 
   private:
     std::reference_wrapper<core::DataTable> input_data_;
@@ -112,7 +113,8 @@ class ModelInput {
     SESDefinition ses_definition_;
     HierarchicalMapping risk_mapping_;
     std::vector<core::DiseaseInfo> diseases_;
-    bool enable_income_analysis_{true}; // This is to set if results be categorised by income or not. Set to TRUE for now.
+    bool enable_income_analysis_{
+        true}; // This is to set if results be categorised by income or not. Set to TRUE for now.
     hgps::input::PIFInfo pif_info_;
 };
 } // namespace hgps

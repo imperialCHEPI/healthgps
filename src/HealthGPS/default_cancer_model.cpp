@@ -1,7 +1,7 @@
 #include "default_cancer_model.h"
+#include "HealthGPS.Input/pif_data.h"
 #include "person.h"
 #include "runtime_context.h"
-#include "HealthGPS.Input/pif_data.h"
 
 #include <oneapi/tbb/parallel_for_each.h>
 
@@ -249,22 +249,24 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
 
         double incidence = definition_.get().table()(person.age, person.gender).at(incidence_id);
         double probability = incidence * relative_risk / average_relative_risk;
-        
+
         // Apply PIF adjustment if PIF data is available and we're in baseline scenario
-        if (definition_.get().has_pif_data() && context.scenario().type() == ScenarioType::baseline) {
+        if (definition_.get().has_pif_data() &&
+            context.scenario().type() == ScenarioType::baseline) {
             // Calculate years post intervention (assuming intervention starts at time 0)
             int year_post_intervention = context.time_now();
-            
+
             // Get PIF value for this person and disease
-            const auto& pif_data = definition_.get().pif_data();
-            const auto& pif_config = context.inputs().population_impact_fraction();
-            const auto* pif_table = pif_data.get_scenario_data(pif_config.scenario);
+            const auto &pif_data = definition_.get().pif_data();
+            const auto &pif_config = context.inputs().population_impact_fraction();
+            const auto *pif_table = pif_data.get_scenario_data(pif_config.scenario);
             if (pif_table) {
-                double pif_value = pif_table->get_pif_value(person.age, person.gender, year_post_intervention);
+                double pif_value =
+                    pif_table->get_pif_value(person.age, person.gender, year_post_intervention);
                 probability *= (1.0 - pif_value);
             }
         }
-        
+
         double hazard = context.random().next_double();
         if (hazard < probability) {
             person.diseases[disease_type()] = Disease{.status = DiseaseStatus::active,

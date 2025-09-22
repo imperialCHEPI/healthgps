@@ -36,7 +36,7 @@ bool ModelInput::enable_income_analysis() const noexcept {
     return enable_income_analysis_;
 }
 
-const hgps::input::PIFInfo& ModelInput::population_impact_fraction() const noexcept {
+const hgps::input::PIFInfo &ModelInput::population_impact_fraction() const noexcept {
     return pif_info_;
 }
 
