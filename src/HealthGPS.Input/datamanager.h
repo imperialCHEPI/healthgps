@@ -87,6 +87,10 @@ class DataManager : public Datastore {
     std::optional<PIFData> get_pif_data(const DiseaseInfo &disease_info, const Country &country,
                                         const nlohmann::json &pif_config) const;
 
+    /// @brief Get the root data directory path
+    /// @return The root data directory path
+    const std::filesystem::path& get_root_path() const noexcept { return root_; }
+
   private:
     std::filesystem::path root_;
     VerboseMode verbosity_;

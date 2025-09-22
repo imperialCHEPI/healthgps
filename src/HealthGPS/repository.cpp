@@ -109,10 +109,11 @@ void CachedRepository::load_disease_definition(const core::DiseaseInfo &info,
     // Load PIF data if available
     hgps::input::PIFData pif_data;
     if (config.population_impact_fraction().enabled) {
-        // Convert PIFInfo to JSON for DataManager
+        // Convert PIFInfo to JSON for DataManager, using the DataManager's root directory
         nlohmann::json pif_config;
         pif_config["enabled"] = config.population_impact_fraction().enabled;
-        pif_config["data_root_path"] = config.population_impact_fraction().data_root_path;
+        // Use the DataManager's root directory instead of requiring environment variable
+        pif_config["data_root_path"] = static_cast<hgps::input::DataManager&>(data_manager_.get()).get_root_path();
         pif_config["risk_factor"] = config.population_impact_fraction().risk_factor;
         pif_config["scenario"] = config.population_impact_fraction().scenario;
 
