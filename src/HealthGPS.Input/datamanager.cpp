@@ -11,6 +11,8 @@
 
 #include <fstream>
 #include <utility>
+#include <regex>
+#include <cstdlib>
 
 namespace {
 //! The name of the index file
@@ -643,4 +645,137 @@ void DataManager::notify_warning(std::string_view message) const {
 
     fmt::print(fg(fmt::color::dark_salmon), "File-based store, {}\n", message);
 }
+
+std::optional<PIFData> DataManager::get_pif_data(const DiseaseInfo& disease_info, 
+                                                const Country& country, 
+                                                const nlohmann::json& pif_config) const {
+    // Check if PIF is enabled
+    if (!pif_config.contains("enabled") || !pif_config["enabled"].get<bool>()) {
+        return std::nullopt;
+    }
+    
+    // Get PIF configuration
+    auto data_root_path = pif_config["data_root_path"].get<std::string>();
+    auto risk_factor = pif_config["risk_factor"].get<std::string>();
+    auto scenario = pif_config["scenario"].get<std::string>();
+    
+    // Expand environment variables in the path
+    data_root_path = expand_environment_variables(data_root_path);
+    
+    // Construct PIF data path: {data_root_path}/diseases/{disease_code}/PIF/{risk_factor}/{scenario}
+    auto pif_path = construct_pif_path(disease_info.code.to_string(), pif_config);
+    
+    // Look for PIF CSV file in the scenario folder
+    // File naming convention: IF{country_code}.csv (e.g., IF356.csv for India)
+    auto country_code = std::to_string(country.code);
+    auto csv_filename = "IF" + country_code + ".csv";
+    auto full_path = pif_path / csv_filename;
+    
+    if (std::filesystem::exists(full_path)) {
+        try {
+            auto pif_table = load_pif_from_csv(full_path);
+            if (pif_table.has_data()) {
+                PIFData pif_data;
+                pif_data.add_scenario_data(scenario, std::move(pif_table));
+                
+                // Print verification message
+                fmt::print(fg(fmt::color::green), 
+                          "PIF Data Loaded Successfully:\n");
+                fmt::print("  - Disease: {}\n", disease_info.code.to_string());
+                fmt::print("  - Country: {} (Code: {})\n", country.name, country_code);
+                fmt::print("  - Risk Factor: {}\n", risk_factor);
+                fmt::print("  - Scenario: {}\n", scenario);
+                fmt::print("  - Data Points: {}\n", pif_data.get_scenario_data(scenario)->size());
+                fmt::print("  - File: {}\n", csv_filename);
+                fmt::print("  - Path: {}\n", full_path.string());
+                fmt::print("  - PIF Analysis: ENABLED and READY\n\n");
+                
+                return pif_data;
+            }
+        } catch (const std::exception& e) {
+            notify_warning(fmt::format("Failed to load PIF data from {}: {}", 
+                                     full_path.string(), e.what()));
+        }
+    }
+    
+    notify_warning(fmt::format("PIF data not found for disease {} in scenario {} at path {} (expected file: {})", 
+                              disease_info.code.to_string(), scenario, pif_path.string(), csv_filename));
+    return std::nullopt;
+}
+
+std::filesystem::path DataManager::construct_pif_path(const std::string& disease_code, 
+                                                     const nlohmann::json& pif_config) const {
+    auto data_root_path = pif_config["data_root_path"].get<std::string>();
+    auto risk_factor = pif_config["risk_factor"].get<std::string>();
+    auto scenario = pif_config["scenario"].get<std::string>();
+    
+    // Expand environment variables
+    data_root_path = expand_environment_variables(data_root_path);
+    
+    // Construct path: {data_root_path}/diseases/{disease_code}/PIF/{risk_factor}/{scenario}
+    return std::filesystem::path(data_root_path) / "diseases" / disease_code / "PIF" / risk_factor / scenario;
+}
+
+std::string DataManager::expand_environment_variables(const std::string& path) const {
+    std::string result = path;
+    
+    // Find ${VAR_NAME} patterns and replace with environment variables
+    std::regex env_var_regex(R"(\$\{([^}]+)\})");
+    std::smatch match;
+    
+    while (std::regex_search(result, match, env_var_regex)) {
+        std::string var_name = match[1].str();
+        const char* env_value = std::getenv(var_name.c_str());
+        
+        if (env_value) {
+            result.replace(match.position(), match.length(), env_value);
+        } else {
+            // If environment variable not found, keep the original placeholder
+            notify_warning(fmt::format("Environment variable {} not found, using placeholder", var_name));
+        }
+    }
+    
+    return result;
+}
+
+PIFTable DataManager::load_pif_from_csv(const std::filesystem::path& filepath) const {
+    PIFTable table;
+    
+    try {
+        rapidcsv::Document doc(filepath.string());
+        auto mapping = create_fields_index_mapping(
+            doc.GetColumnNames(), {"Gender", "Age", "YearPostInt", "IF_Mean"});
+        
+        for (size_t i = 0; i < doc.GetRowCount(); i++) {
+            auto row = doc.GetRow<std::string>(i);
+            
+            PIFDataItem item;
+            item.gender = static_cast<core::Gender>(std::stoi(row[mapping["Gender"]]));
+            item.age = std::stoi(row[mapping["Age"]]);
+            item.year_post_intervention = std::stoi(row[mapping["YearPostInt"]]);
+            item.pif_value = std::stod(row[mapping["IF_Mean"]]);
+            
+            // Validate PIF value is in range [0.0, 1.0]
+            if (item.pif_value < 0.0 || item.pif_value > 1.0) {
+                notify_warning(fmt::format("PIF value {} out of range [0.0, 1.0] at row {}", 
+                                         item.pif_value, i + 1));
+                item.pif_value = std::clamp(item.pif_value, 0.0, 1.0);
+            }
+            
+            table.add_item(item);
+        }
+        
+        // Print CSV loading verification
+        fmt::print(fg(fmt::color::cyan), 
+                  "PIF CSV File Loaded: {} ({} rows)\n", 
+                  filepath.filename().string(), table.size());
+        
+    } catch (const std::exception& e) {
+        throw std::runtime_error(fmt::format("Failed to load PIF CSV file {}: {}", 
+                                           filepath.string(), e.what()));
+    }
+    
+    return table;
+}
+
 } // namespace hgps::input

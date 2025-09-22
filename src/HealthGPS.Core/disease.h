@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+#include "country.h"
 #include "forward_type.h"
 #include "identifier.h"
 
