@@ -89,7 +89,7 @@ class DataManager : public Datastore {
 
     /// @brief Get the root data directory path
     /// @return The root data directory path
-    const std::filesystem::path& get_root_path() const noexcept { return root_; }
+    const std::filesystem::path &get_root_path() const noexcept { return root_; }
 
   private:
     std::filesystem::path root_;

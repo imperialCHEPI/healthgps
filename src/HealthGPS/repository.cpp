@@ -113,7 +113,8 @@ void CachedRepository::load_disease_definition(const core::DiseaseInfo &info,
         nlohmann::json pif_config;
         pif_config["enabled"] = config.population_impact_fraction().enabled;
         // Use the DataManager's root directory instead of requiring environment variable
-        pif_config["data_root_path"] = static_cast<hgps::input::DataManager&>(data_manager_.get()).get_root_path();
+        pif_config["data_root_path"] =
+            static_cast<hgps::input::DataManager &>(data_manager_.get()).get_root_path();
         pif_config["risk_factor"] = config.population_impact_fraction().risk_factor;
         pif_config["scenario"] = config.population_impact_fraction().scenario;
 
