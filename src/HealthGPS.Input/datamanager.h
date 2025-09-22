@@ -84,9 +84,8 @@ class DataManager : public Datastore {
     /// @param country The country
     /// @param pif_config PIF configuration from config.json
     /// @return PIF data for the disease, or std::nullopt if not available
-    std::optional<PIFData> get_pif_data(const DiseaseInfo& disease_info, 
-                                       const Country& country, 
-                                       const nlohmann::json& pif_config) const;
+    std::optional<PIFData> get_pif_data(const DiseaseInfo &disease_info, const Country &country,
+                                        const nlohmann::json &pif_config) const;
 
   private:
     std::filesystem::path root_;
@@ -111,19 +110,19 @@ class DataManager : public Datastore {
     /// @brief Loads PIF data from CSV file
     /// @param filepath Path to PIF CSV file
     /// @return PIF table loaded from file
-    PIFTable load_pif_from_csv(const std::filesystem::path& filepath) const;
-    
+    PIFTable load_pif_from_csv(const std::filesystem::path &filepath) const;
+
     /// @brief Constructs PIF data path for a specific disease and scenario
     /// @param disease_code Disease code (e.g., "ischemicheartdisease")
     /// @param pif_config PIF configuration
     /// @return Full path to PIF data folder
-    std::filesystem::path construct_pif_path(const std::string& disease_code, 
-                                            const nlohmann::json& pif_config) const;
-    
+    std::filesystem::path construct_pif_path(const std::string &disease_code,
+                                             const nlohmann::json &pif_config) const;
+
     /// @brief Expands environment variables in a path string
     /// @param path Path string that may contain environment variables like ${VAR_NAME}
     /// @return Path with environment variables expanded
-    std::string expand_environment_variables(const std::string& path) const;
+    std::string expand_environment_variables(const std::string &path) const;
 };
 
 } // namespace hgps::input
