@@ -52,11 +52,20 @@
                 },
                 "scenario": {
                     "type": "string",
-                    "enum": ["Scenario1", "Scenario2", "Scenario3"],
+                    "enum": [
+                        "Scenario1",
+                        "Scenario2",
+                        "Scenario3"
+                    ],
                     "description": "PIF scenario to use for all diseases in the simulation"
                 }
             },
-            "required": ["enabled", "data_root_path", "risk_factor", "scenario"],
+            "required": [
+                "enabled",
+                "data_root_path",
+                "risk_factor",
+                "scenario"
+            ],
             "additionalProperties": false
         }
     },
