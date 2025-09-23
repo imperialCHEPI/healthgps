@@ -16,7 +16,8 @@ struct PIFDataItem {
     double pif_value;
 
     /// @brief Default constructor
-    PIFDataItem() : age(0), gender(core::Gender::female), year_post_intervention(0), pif_value(0.0) {}
+    PIFDataItem()
+        : age(0), gender(core::Gender::female), year_post_intervention(0), pif_value(0.0) {}
 
     /// @brief Constructor with parameters
     PIFDataItem(int age, core::Gender gender, int year_post_intervention, double pif_value)
