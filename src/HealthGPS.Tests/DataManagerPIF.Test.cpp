@@ -15,6 +15,7 @@ TEST(DataManagerPIF, BasicDataManagerCreation) {
     std::filesystem::create_directories(temp_dir);
 
     nlohmann::json index_json = {
+        {"$schema", "data_index.json"},
         {"diseases",
          {{"registry", nlohmann::json::array()},
           {"path", "diseases"},
