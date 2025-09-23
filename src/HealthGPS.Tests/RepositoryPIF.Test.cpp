@@ -25,7 +25,7 @@ TEST(RepositoryPIF, PIFInfoStructure) {
     EXPECT_EQ("Smoking", info.risk_factor);
     EXPECT_EQ("Scenario1", info.scenario);
 
-   PIFInfo info2{.enabled = false,
+    PIFInfo info2{.enabled = false,
                   .data_root_path = "other",
                   .risk_factor = "Diet",
                   .scenario = "Scenario2"};
