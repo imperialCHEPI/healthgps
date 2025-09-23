@@ -1,6 +1,6 @@
-#include "HealthGPS.Input/datamanager.h"
-#include "HealthGPS.Core/disease.h"
 #include "HealthGPS.Core/country.h"
+#include "HealthGPS.Core/disease.h"
+#include "HealthGPS.Input/datamanager.h"
 #include "pch.h"
 
 #include <filesystem>
@@ -14,13 +14,13 @@ TEST(DataManagerPIF, BasicDataManagerCreation) {
     // Test basic PIF data structure functionality instead of complex DataManager setup
     hgps::input::PIFData data;
     EXPECT_FALSE(data.has_data());
-    
+
     hgps::input::PIFTable table;
     table.add_item({25, Gender::male, 5, 0.3});
     data.add_scenario_data("Scenario1", std::move(table));
-    
+
     EXPECT_TRUE(data.has_data());
-    auto* scenario = data.get_scenario_data("Scenario1");
+    auto *scenario = data.get_scenario_data("Scenario1");
     EXPECT_NE(nullptr, scenario);
     EXPECT_TRUE(scenario->has_data());
 }
