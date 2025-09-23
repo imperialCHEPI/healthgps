@@ -21,7 +21,7 @@ TEST(PIFIntegration, PIFDataWorkflow) {
     // Verify data structure
     EXPECT_TRUE(data.has_data());
 
-    auto *scenario = data.get_scenario_data("Scenario1");
+    const auto *scenario = data.get_scenario_data("Scenario1");
     EXPECT_NE(nullptr, scenario);
     EXPECT_TRUE(scenario->has_data());
     EXPECT_EQ(3, scenario->size());
@@ -51,9 +51,9 @@ TEST(PIFIntegration, MultipleScenarios) {
 
     EXPECT_TRUE(data.has_data());
 
-    auto *scenario1 = data.get_scenario_data("Scenario1");
-    auto *scenario2 = data.get_scenario_data("Scenario2");
-    auto *scenario3 = data.get_scenario_data("Scenario3");
+    const auto *scenario1 = data.get_scenario_data("Scenario1");
+    const auto *scenario2 = data.get_scenario_data("Scenario2");
+    const auto *scenario3 = data.get_scenario_data("Scenario3");
 
     EXPECT_NE(nullptr, scenario1);
     EXPECT_NE(nullptr, scenario2);
