@@ -60,7 +60,7 @@ TEST(PIFTable, GetPIFValues) {
     // No match for gender - should return 0.0
     EXPECT_DOUBLE_EQ(0.0, table.get_pif_value(25, Gender::female, 5));
     EXPECT_DOUBLE_EQ(0.0, table.get_pif_value(30, Gender::male, 3));
-    
+
     // No exact match for year, but should find closest match
     EXPECT_NEAR(0.4, table.get_pif_value(25, Gender::male, 15), 1e-6); // Closest to year 10
 }
