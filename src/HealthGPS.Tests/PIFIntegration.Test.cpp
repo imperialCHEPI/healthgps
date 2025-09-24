@@ -41,7 +41,7 @@ TEST(PIFIntegration, MultipleScenarios) {
 
     // Add Scenario1 data
     hgps::input::PIFTable table1;
-    table1.add_item({25, Gender::male, 5, 0.3});  // 0 = male in CSV format
+    table1.add_item({25, Gender::male, 5, 0.3}); // 0 = male in CSV format
     data.add_scenario_data("Scenario1", std::move(table1));
 
     // Add Scenario2 data

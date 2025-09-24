@@ -4,8 +4,8 @@
 #include "runtime_context.h"
 
 #include <fmt/color.h>
-#include <oneapi/tbb/parallel_for_each.h>
 #include <iostream>
+#include <oneapi/tbb/parallel_for_each.h>
 #include <set>
 
 namespace hgps {
@@ -278,26 +278,31 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
 
                 // Manual PIF Debug - Show PIF data for ALL diseases
                 static std::set<std::string> debug_diseases_printed;
-                if (debug_diseases_printed.find(disease_type().to_string()) == debug_diseases_printed.end()) {
-                    std::cout << "=== PIF DEBUG FOR DISEASE: " << disease_type().to_string() << " ===" << std::endl;
+                if (debug_diseases_printed.find(disease_type().to_string()) ==
+                    debug_diseases_printed.end()) {
+                    std::cout << "=== PIF DEBUG FOR DISEASE: " << disease_type().to_string()
+                              << " ===" << std::endl;
                     std::cout << "PIF Table Size: " << pif_table->size() << std::endl;
-                    
+
                     // MANUAL DEBUG VALUES - Change these to test what you want
                     int debug_age = 55;                               // Change this age
                     core::Gender debug_gender = core::Gender::female; // Change this: male or female
                     int debug_year = 17;                              // Change this year
-                    
+
                     // Test PIF lookup for current disease
-                    double debug_pif = pif_table->get_pif_value(debug_age, debug_gender, debug_year);
-                    
-                    std::cout << "PIF Debug: Disease=" << disease_type().to_string() 
-                              << ", Age=" << debug_age 
-                              << ", Gender=" << (debug_gender == core::Gender::male ? "Male" : "Female")
-                              << ", YearPostInt=" << debug_year 
-                              << ", PIFValue=" << debug_pif << std::endl;
-                    
-                    std::cout << "=== END PIF DEBUG FOR " << disease_type().to_string() << " ===" << std::endl << std::endl;
-                    
+                    double debug_pif =
+                        pif_table->get_pif_value(debug_age, debug_gender, debug_year);
+
+                    std::cout << "PIF Debug: Disease=" << disease_type().to_string()
+                              << ", Age=" << debug_age << ", Gender="
+                              << (debug_gender == core::Gender::male ? "Male" : "Female")
+                              << ", YearPostInt=" << debug_year << ", PIFValue=" << debug_pif
+                              << std::endl;
+
+                    std::cout << "=== END PIF DEBUG FOR " << disease_type().to_string()
+                              << " ===" << std::endl
+                              << std::endl;
+
                     debug_diseases_printed.insert(disease_type().to_string());
                 }
 
