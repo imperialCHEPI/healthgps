@@ -754,7 +754,10 @@ PIFTable DataManager::load_pif_from_csv(const std::filesystem::path &filepath) c
             auto row = doc.GetRow<std::string>(i);
 
             PIFDataItem item{};
-            item.gender = static_cast<core::Gender>(std::stoi(row[mapping["Gender"]]));
+            // Convert CSV gender to core::Gender enum
+            // CSV: 0=male, 1=female
+            int csv_gender = std::stoi(row[mapping["Gender"]]);
+            item.gender = (csv_gender == 0) ? core::Gender::male : core::Gender::female;
             item.age = std::stoi(row[mapping["Age"]]);
             item.year_post_intervention = std::stoi(row[mapping["YearPostInt"]]);
             item.pif_value = std::stod(row[mapping["IF_Mean"]]);

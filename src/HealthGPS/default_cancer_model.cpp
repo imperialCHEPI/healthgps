@@ -5,6 +5,8 @@
 
 #include <fmt/color.h>
 #include <oneapi/tbb/parallel_for_each.h>
+#include <iostream>
+#include <set>
 
 namespace hgps {
 
@@ -263,8 +265,8 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
                 pif_used_printed = true;
             }
 
-            // Calculate years post intervention (assuming intervention starts at time 0)
-            int year_post_intervention = context.time_now();
+            // Calculate years post intervention (years since intervention start)
+            int year_post_intervention = context.time_now() - context.start_time();
 
             // Get PIF value for this person and disease
             const auto &pif_data = definition_.get().pif_data();
@@ -274,18 +276,29 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
                 double pif_value =
                     pif_table->get_pif_value(person.age, person.gender, year_post_intervention);
 
-                // Print random PIF values for verification (only 3 times per disease)
-                static int pif_print_count = 0;
-                static const int max_pif_prints = 3;
-                if (pif_print_count < max_pif_prints &&
-                    context.random().next_double() < 0.01) { // 1% chance to print
-                    fmt::print(fg(fmt::color::cyan),
-                               "PIF Verification [{}]: Disease={}, Age={}, Gender={}, "
-                               "YearPostInt={}, PIFValue={:.6f}\n",
-                               pif_print_count + 1, disease_type().to_string(), person.age,
-                               (person.gender == core::Gender::male ? "Male" : "Female"),
-                               year_post_intervention, pif_value);
-                    pif_print_count++;
+                // Manual PIF Debug - Show PIF data for ALL diseases
+                static std::set<std::string> debug_diseases_printed;
+                if (debug_diseases_printed.find(disease_type().to_string()) == debug_diseases_printed.end()) {
+                    std::cout << "=== PIF DEBUG FOR DISEASE: " << disease_type().to_string() << " ===" << std::endl;
+                    std::cout << "PIF Table Size: " << pif_table->size() << std::endl;
+                    
+                    // MANUAL DEBUG VALUES - Change these to test what you want
+                    int debug_age = 55;                               // Change this age
+                    core::Gender debug_gender = core::Gender::female; // Change this: male or female
+                    int debug_year = 17;                              // Change this year
+                    
+                    // Test PIF lookup for current disease
+                    double debug_pif = pif_table->get_pif_value(debug_age, debug_gender, debug_year);
+                    
+                    std::cout << "PIF Debug: Disease=" << disease_type().to_string() 
+                              << ", Age=" << debug_age 
+                              << ", Gender=" << (debug_gender == core::Gender::male ? "Male" : "Female")
+                              << ", YearPostInt=" << debug_year 
+                              << ", PIFValue=" << debug_pif << std::endl;
+                    
+                    std::cout << "=== END PIF DEBUG FOR " << disease_type().to_string() << " ===" << std::endl << std::endl;
+                    
+                    debug_diseases_printed.insert(disease_type().to_string());
                 }
 
                 probability *= (1.0 - pif_value);
