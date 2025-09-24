@@ -55,7 +55,8 @@ StaticLinearModel::StaticLinearModel(
       cholesky_{cholesky}, policy_models_{policy_models}, policy_ranges_{policy_ranges},
       policy_cholesky_{policy_cholesky}, info_speed_{info_speed},
       rural_prevalence_{rural_prevalence}, income_models_{income_models},
-      physical_activity_stddev_{physical_activity_stddev}, has_active_policies_{has_active_policies} {}
+      physical_activity_stddev_{physical_activity_stddev},
+      has_active_policies_{has_active_policies} {}
 
 RiskFactorModelType StaticLinearModel::type() const noexcept { return RiskFactorModelType::Static; }
 
@@ -382,7 +383,7 @@ void StaticLinearModel::update_income_trends(RuntimeContext &context, Person &pe
 void StaticLinearModel::initialise_policies(Person &person, Random &random, bool intervene) const {
     // Mahima's enhancement: Skip ALL policy initialization if policies are zero
     if (!has_active_policies_) {
-        return;  // Skip Cholesky decomposition, residual storage, everything!
+        return; // Skip Cholesky decomposition, residual storage, everything!
     }
 
     // NOTE: we need to keep baseline and intervention scenario RNGs in sync,
@@ -638,7 +639,8 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
       policy_models_{std::move(policy_models)}, policy_ranges_{std::move(policy_ranges)},
       policy_cholesky_{std::move(policy_cholesky)}, info_speed_{info_speed},
       rural_prevalence_{std::move(rural_prevalence)}, income_models_{std::move(income_models)},
-      physical_activity_stddev_{physical_activity_stddev}, has_active_policies_{has_active_policies} {
+      physical_activity_stddev_{physical_activity_stddev},
+      has_active_policies_{has_active_policies} {
 
     if (names_.empty()) {
         throw core::HgpsException("Risk factor names list is empty");
@@ -770,11 +772,12 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
             }
         }
     }
-    
+
     // Override the flag if all policies are zero
     if (all_policies_zero) {
         has_active_policies_ = false;
-        std::cout << "\nPolicy Skipping (MAHIMA): All policy values are zero - skipping ALL policy operations (Cholesky, residuals, computations) for maximum performance\n";
+        std::cout << "\nPolicy Skipping (MAHIMA): All policy values are zero - skipping ALL policy "
+                     "operations (Cholesky, residuals, computations) for maximum performance\n";
     }
 
     // Validate regular trend parameters for all risk factors only if trend type is Trend
@@ -797,7 +800,8 @@ std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() con
         trend_models_, trend_ranges_, trend_lambda_, info_speed_, rural_prevalence_, income_models_,
         physical_activity_stddev_, trend_type_, expected_income_trend_,
         expected_income_trend_boxcox_, income_trend_steps_, income_trend_models_,
-        income_trend_ranges_, income_trend_lambda_, income_trend_decay_factors_, has_active_policies_);
+        income_trend_ranges_, income_trend_lambda_, income_trend_decay_factors_,
+        has_active_policies_);
 }
 
 } // namespace hgps

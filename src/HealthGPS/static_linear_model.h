@@ -178,7 +178,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
         &rural_prevalence_;
     const std::unordered_map<core::Income, LinearModelParams> &income_models_;
     const double physical_activity_stddev_;
-    
+
     // Policy optimization flag - Mahima's enhancement
     const bool has_active_policies_;
 };
@@ -281,7 +281,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
         rural_prevalence_;
     std::unordered_map<core::Income, LinearModelParams> income_models_;
     double physical_activity_stddev_;
-    
+
     // Policy optimization flag - Mahima's enhancement
     bool has_active_policies_;
 };
