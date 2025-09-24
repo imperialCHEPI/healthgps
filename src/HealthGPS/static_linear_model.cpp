@@ -32,7 +32,8 @@ StaticLinearModel::StaticLinearModel(
     std::shared_ptr<std::vector<LinearModelParams>> income_trend_models,
     std::shared_ptr<std::vector<core::DoubleInterval>> income_trend_ranges,
     std::shared_ptr<std::vector<double>> income_trend_lambda,
-    std::shared_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors)
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors,
+    bool has_active_policies)
     : RiskFactorAdjustableModel{std::move(expected),       std::move(expected_trend),
                                 std::move(trend_steps),    trend_type,
                                 expected_income_trend,       // Pass by value, not moved
@@ -54,7 +55,7 @@ StaticLinearModel::StaticLinearModel(
       cholesky_{cholesky}, policy_models_{policy_models}, policy_ranges_{policy_ranges},
       policy_cholesky_{policy_cholesky}, info_speed_{info_speed},
       rural_prevalence_{rural_prevalence}, income_models_{income_models},
-      physical_activity_stddev_{physical_activity_stddev} {}
+      physical_activity_stddev_{physical_activity_stddev}, has_active_policies_{has_active_policies} {}
 
 RiskFactorModelType StaticLinearModel::type() const noexcept { return RiskFactorModelType::Static; }
 
@@ -74,7 +75,9 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
 
     // Initialise everyone with appropriate trend type.
     for (auto &person : context.population()) {
-        initialise_policies(person, context.random(), false);
+        if (has_active_policies_) {
+            initialise_policies(person, context.random(), false);
+        }
 
         // Apply trend based on trend_type
         switch (trend_type_) {
@@ -130,7 +133,9 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
         }
 
         if (person.age == 0) {
-            initialise_policies(person, context.random(), intervene);
+            if (has_active_policies_) {
+                initialise_policies(person, context.random(), intervene);
+            }
 
             // Apply trend based on trend_type
             switch (trend_type_) {
@@ -145,7 +150,9 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
                 break;
             }
         } else {
-            update_policies(person, intervene);
+            if (has_active_policies_) {
+                update_policies(person, intervene);
+            }
 
             // Apply trend based on trend_type
             switch (trend_type_) {
@@ -169,12 +176,14 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
     }
 
     // Apply policies if intervening.
-    for (auto &person : context.population()) {
-        if (!person.is_active()) {
-            continue;
-        }
+    if (has_active_policies_) {
+        for (auto &person : context.population()) {
+            if (!person.is_active()) {
+                continue;
+            }
 
-        apply_policies(person, intervene);
+            apply_policies(person, intervene);
+        }
     }
 }
 
@@ -371,6 +380,11 @@ void StaticLinearModel::update_income_trends(RuntimeContext &context, Person &pe
 }
 
 void StaticLinearModel::initialise_policies(Person &person, Random &random, bool intervene) const {
+    // Mahima's enhancement: Skip ALL policy initialization if policies are zero
+    if (!has_active_policies_) {
+        return;  // Skip Cholesky decomposition, residual storage, everything!
+    }
+
     // NOTE: we need to keep baseline and intervention scenario RNGs in sync,
     //       so we compute residuals even though they are not used in baseline.
 
@@ -388,6 +402,10 @@ void StaticLinearModel::initialise_policies(Person &person, Random &random, bool
 }
 
 void StaticLinearModel::update_policies(Person &person, bool intervene) const {
+    // Mahima's enhancement: Skip policy computation if all policies are zero
+    if (!has_active_policies_) {
+        return;
+    }
 
     // Set zero policy if not intervening.
     if (!intervene) {
@@ -419,6 +437,10 @@ void StaticLinearModel::update_policies(Person &person, bool intervene) const {
 }
 
 void StaticLinearModel::apply_policies(Person &person, bool intervene) const {
+    // Mahima's enhancement: Skip policy application if all policies are zero
+    if (!has_active_policies_) {
+        return;
+    }
 
     // No-op if not intervening.
     if (!intervene) {
@@ -594,7 +616,8 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::unique_ptr<std::vector<LinearModelParams>> income_trend_models,
     std::unique_ptr<std::vector<core::DoubleInterval>> income_trend_ranges,
     std::unique_ptr<std::vector<double>> income_trend_lambda,
-    std::unique_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors)
+    std::unique_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors,
+    bool has_active_policies)
     : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend),
                                           std::move(trend_steps), trend_type},
       // Regular trend member variables
@@ -615,7 +638,7 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
       policy_models_{std::move(policy_models)}, policy_ranges_{std::move(policy_ranges)},
       policy_cholesky_{std::move(policy_cholesky)}, info_speed_{info_speed},
       rural_prevalence_{std::move(rural_prevalence)}, income_models_{std::move(income_models)},
-      physical_activity_stddev_{physical_activity_stddev} {
+      physical_activity_stddev_{physical_activity_stddev}, has_active_policies_{has_active_policies} {
 
     if (names_.empty()) {
         throw core::HgpsException("Risk factor names list is empty");
@@ -727,6 +750,33 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
         throw core::HgpsException("Income models mapping is empty");
     }
 
+    // Mahima's enhancement: Detect if all policy values are zero to optimize performance
+    bool all_policies_zero = true;
+    for (const auto &policy_model : policy_models_) {
+        if (policy_model.intercept != 0.0) {
+            all_policies_zero = false;
+            break;
+        }
+        for (const auto &[coeff_name, coeff_value] : policy_model.coefficients) {
+            if (coeff_value != 0.0) {
+                all_policies_zero = false;
+                break;
+            }
+        }
+        for (const auto &[coeff_name, coeff_value] : policy_model.log_coefficients) {
+            if (coeff_value != 0.0) {
+                all_policies_zero = false;
+                break;
+            }
+        }
+    }
+    
+    // Override the flag if all policies are zero
+    if (all_policies_zero) {
+        has_active_policies_ = false;
+        std::cout << "\nPolicy Skipping (MAHIMA): All policy values are zero - skipping ALL policy operations (Cholesky, residuals, computations) for maximum performance\n";
+    }
+
     // Validate regular trend parameters for all risk factors only if trend type is Trend
     if (trend_type_ == TrendType::Trend) {
         for (const auto &name : names_) {
@@ -747,7 +797,7 @@ std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() con
         trend_models_, trend_ranges_, trend_lambda_, info_speed_, rural_prevalence_, income_models_,
         physical_activity_stddev_, trend_type_, expected_income_trend_,
         expected_income_trend_boxcox_, income_trend_steps_, income_trend_models_,
-        income_trend_ranges_, income_trend_lambda_, income_trend_decay_factors_);
+        income_trend_ranges_, income_trend_lambda_, income_trend_decay_factors_, has_active_policies_);
 }
 
 } // namespace hgps
