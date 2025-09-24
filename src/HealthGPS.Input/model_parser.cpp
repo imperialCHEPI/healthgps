@@ -455,6 +455,31 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                                               opt["RiskFactorModels"].size(),
                                               policy_covariance_table.num_columns())};
     }
+    // Mahima's enhancement: Detect if all policy values are zero for early optimization
+    bool has_active_policies = false;
+    for (const auto &policy_model : policy_models) {
+        if (policy_model.intercept != 0.0) {
+            has_active_policies = true;
+            break;
+        }
+        for (const auto &[coeff_name, coeff_value] : policy_model.coefficients) {
+            if (coeff_value != 0.0) {
+                has_active_policies = true;
+                break;
+            }
+        }
+        for (const auto &[coeff_name, coeff_value] : policy_model.log_coefficients) {
+            if (coeff_value != 0.0) {
+                has_active_policies = true;
+                break;
+            }
+        }
+    }
+
+    if (!has_active_policies) {
+        std::cout << "\nPolicy Detection (MAHIMA): All policy values are zero - will skip ALL "
+                     "policy operations for maximum performance\n";
+    }
 
     // Compute Cholesky decomposition of the intervention policy covariance matrix.
     auto policy_cholesky =
@@ -527,7 +552,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         std::move(expected_income_trend), std::move(expected_income_trend_boxcox),
         std::move(income_trend_steps), std::move(income_trend_models),
         std::move(income_trend_ranges), std::move(income_trend_lambda),
-        std::move(income_trend_decay_factors));
+        std::move(income_trend_decay_factors), has_active_policies);
 }
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)

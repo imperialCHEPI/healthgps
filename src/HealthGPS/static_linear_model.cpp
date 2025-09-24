@@ -752,33 +752,7 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
         throw core::HgpsException("Income models mapping is empty");
     }
 
-    // Mahima's enhancement: Detect if all policy values are zero to optimize performance
-    bool all_policies_zero = true;
-    for (const auto &policy_model : policy_models_) {
-        if (policy_model.intercept != 0.0) {
-            all_policies_zero = false;
-            break;
-        }
-        for (const auto &[coeff_name, coeff_value] : policy_model.coefficients) {
-            if (coeff_value != 0.0) {
-                all_policies_zero = false;
-                break;
-            }
-        }
-        for (const auto &[coeff_name, coeff_value] : policy_model.log_coefficients) {
-            if (coeff_value != 0.0) {
-                all_policies_zero = false;
-                break;
-            }
-        }
-    }
-
-    // Override the flag if all policies are zero
-    if (all_policies_zero) {
-        has_active_policies_ = false;
-        std::cout << "\nPolicy Skipping (MAHIMA): All policy values are zero - skipping ALL policy "
-                     "operations (Cholesky, residuals, computations) for maximum performance\n";
-    }
+    // Policy detection is now done earlier in the model parser for better performance
 
     // Validate regular trend parameters for all risk factors only if trend type is Trend
     if (trend_type_ == TrendType::Trend) {
