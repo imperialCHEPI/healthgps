@@ -261,6 +261,19 @@ void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
             if (pif_table) {
                 double pif_value =
                     pif_table->get_pif_value(person.age, person.gender, year_post_intervention);
+                
+                // Print random PIF values for verification (only 3 times per disease)
+                static int pif_print_count = 0;
+                static const int max_pif_prints = 3;
+                if (pif_print_count < max_pif_prints && context.random().next_double() < 0.01) { // 1% chance to print
+                    fmt::print(fg(fmt::color::cyan), 
+                               "PIF Verification [{}]: Disease={}, Age={}, Gender={}, YearPostInt={}, PIFValue={:.6f}\n",
+                               pif_print_count + 1, disease_type().to_string(), person.age, 
+                               (person.gender == core::Gender::male ? "Male" : "Female"), 
+                               year_post_intervention, pif_value);
+                    pif_print_count++;
+                }
+                
                 probability *= (1.0 - pif_value);
             }
         }
