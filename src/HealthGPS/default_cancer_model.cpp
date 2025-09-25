@@ -282,7 +282,7 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
                     debug_diseases_printed.end()) {
                     std::cout << "=== PIF DEBUG FOR DISEASE: " << disease_type().to_string()
                               << " ===" << '\n';
-                    std::cout << "PIF Table Size: " << pif_table->size() << std::endl;
+                    std::cout << "PIF Table Size: " << pif_table->size() << '\n';
 
                     // MANUAL DEBUG VALUES - Change these to test what you want
                     int debug_age = 55;                               // Change this age
