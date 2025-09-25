@@ -281,7 +281,7 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
                 if (debug_diseases_printed.find(disease_type().to_string()) ==
                     debug_diseases_printed.end()) {
                     std::cout << "=== PIF DEBUG FOR DISEASE: " << disease_type().to_string()
-                              << " ===" << std::endl;
+                              << " ===" << '\n';
                     std::cout << "PIF Table Size: " << pif_table->size() << std::endl;
 
                     // MANUAL DEBUG VALUES - Change these to test what you want
