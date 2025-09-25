@@ -277,7 +277,7 @@ void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
                               << ", Age=" << debug_age << ", Gender="
                               << (debug_gender == core::Gender::male ? "Male" : "Female")
                               << ", YearPostInt=" << debug_year << ", PIFValue=" << debug_pif
-                              << std::endl;
+                              << '\n';
 
                     std::cout << "=== END PIF DEBUG FOR " << disease_type().to_string()
                               << " ===" << std::endl
