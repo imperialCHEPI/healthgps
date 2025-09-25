@@ -301,7 +301,7 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
 
                     std::cout << "=== END PIF DEBUG FOR " << disease_type().to_string()
                               << " ===" << '\n'
-                              << std::endl;
+                              << '\n';
 
                     debug_diseases_printed.insert(disease_type().to_string());
                 }
