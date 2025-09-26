@@ -393,13 +393,21 @@ std::string RiskFactorInspector::ethnicity_enum_to_string(core::Ethnicity ethnic
 
 // MAHIMA: Set debug configuration for detailed calculation capture
 void RiskFactorInspector::set_debug_config(bool enabled, int min_age, int max_age, 
-                                          core::Gender gender, const std::string &risk_factor, int target_year) {
-    debug_config_.enabled = enabled;
-    debug_config_.min_age = min_age;
-    debug_config_.max_age = max_age;
-    debug_config_.target_gender = gender;
-    debug_config_.target_risk_factor = risk_factor;
-    debug_config_.target_year = target_year;
+                                          core::Gender gender, const std::string &risk_factor, int target_year,
+                                          const std::string &target_scenario) {
+    // Clear existing configs and add this one
+    debug_configs_.clear();
+    
+    DebugConfig config;
+    config.enabled = enabled;
+    config.min_age = min_age;
+    config.max_age = max_age;
+    config.target_gender = gender;
+    config.target_risk_factor = risk_factor;
+    config.target_year = target_year;
+    config.target_scenario = target_scenario;
+    
+    debug_configs_.push_back(config);
     
     if (enabled) {
         std::string age_range_str;
@@ -414,35 +422,100 @@ void RiskFactorInspector::set_debug_config(bool enabled, int min_age, int max_ag
         }
         
         std::string year_str = (target_year == -1) ? "any year" : "year " + std::to_string(target_year);
+        std::string scenario_str = (target_scenario.empty() ? "any scenario" : target_scenario);
         
         std::cout << "\nMAHIMA: Debug configuration set - " << age_range_str
                   << ", Gender: " << (gender == core::Gender::male ? "male" : 
                                      gender == core::Gender::female ? "female" : "any")
                   << ", Risk Factor: " << (risk_factor.empty() ? "any" : risk_factor)
-                  << ", Year: " << year_str;
+                  << ", Year: " << year_str
+                  << ", Scenario: " << scenario_str;
+        
+        // Debug: Show the actual values being stored
+        std::cout << "\nMAHIMA: DEBUG - Stored values: min_age=" << config.min_age 
+                  << ", max_age=" << config.max_age
+                  << ", gender=" << (config.target_gender == core::Gender::male ? "male" : 
+                                   config.target_gender == core::Gender::female ? "female" : "unknown")
+                  << ", risk_factor='" << config.target_risk_factor << "'"
+                  << ", year=" << config.target_year
+                  << ", scenario='" << config.target_scenario << "'";
     }
 }
 
 // MAHIMA: Set debug configuration for single age (convenience method)
 void RiskFactorInspector::set_debug_config_single_age(bool enabled, int age, 
-                                                     core::Gender gender, const std::string &risk_factor, int target_year) {
+                                                     core::Gender gender, const std::string &risk_factor, int target_year,
+                                                     const std::string &target_scenario) {
     if (age == -1) {
         // No age restriction
-        set_debug_config(enabled, -1, -1, gender, risk_factor, target_year);
+        set_debug_config(enabled, -1, -1, gender, risk_factor, target_year, target_scenario);
     } else {
         // Single age - set both min and max to the same value
-        set_debug_config(enabled, age, age, gender, risk_factor, target_year);
+        set_debug_config(enabled, age, age, gender, risk_factor, target_year, target_scenario);
     }
+}
+
+// MAHIMA: Add multiple debug configurations for different capture scenarios
+void RiskFactorInspector::add_debug_configs(const std::vector<DebugConfig> &configs) {
+    for (const auto &config : configs) {
+        debug_configs_.push_back(config);
+    }
+    
+    std::cout << "\nMAHIMA: Added " << configs.size() << " debug configurations. Total configs: " << debug_configs_.size();
+}
+
+// MAHIMA: Add a single debug configuration (convenience method)
+void RiskFactorInspector::add_debug_config(bool enabled, int min_age, int max_age, 
+                                          core::Gender gender, const std::string &risk_factor, int target_year,
+                                          const std::string &target_scenario) {
+    DebugConfig config;
+    config.enabled = enabled;
+    config.min_age = min_age;
+    config.max_age = max_age;
+    config.target_gender = gender;
+    config.target_risk_factor = risk_factor;
+    config.target_year = target_year;
+    config.target_scenario = target_scenario;
+    
+    debug_configs_.push_back(config);
+}
+
+// MAHIMA: Clear all debug configurations
+void RiskFactorInspector::clear_debug_configs() {
+    debug_configs_.clear();
+    std::cout << "\nMAHIMA: Cleared all debug configurations";
 }
 
 // MAHIMA: Check if debug is enabled
 bool RiskFactorInspector::is_debug_enabled() const {
-    return debug_config_.enabled;
+    return !debug_configs_.empty() && std::any_of(debug_configs_.begin(), debug_configs_.end(),
+                                                   [](const DebugConfig &config) { return config.enabled; });
 }
 
 // MAHIMA: Get target risk factor from debug config
 const std::string& RiskFactorInspector::get_target_risk_factor() const {
-    return debug_config_.target_risk_factor;
+    // Return the first enabled config's risk factor, or empty string if none enabled
+    for (const auto &config : debug_configs_) {
+        if (config.enabled && !config.target_risk_factor.empty()) {
+            return config.target_risk_factor;
+        }
+    }
+    static const std::string empty_string = "";
+    return empty_string;
+}
+
+// MAHIMA: Get all debug configurations
+const std::vector<DebugConfig>& RiskFactorInspector::get_debug_configs() const {
+    return debug_configs_;
+}
+
+// MAHIMA: Get current scenario name from context
+std::string RiskFactorInspector::get_current_scenario_name(RuntimeContext &context) const {
+    if (context.scenario().type() == ScenarioType::baseline) {
+        return "baseline";
+    } else {
+        return "intervention";
+    }
 }
 
 // MAHIMA: Capture detailed risk factor calculation steps for debugging
@@ -457,23 +530,41 @@ void RiskFactorInspector::capture_detailed_calculation(RuntimeContext & /*contex
                                                       double final_value_after_second_clamp) {
     
     // Check if debugging is enabled and this person/risk factor matches our criteria
-    if (!debug_config_.enabled) {
+    if (!is_debug_enabled()) {
         return;
     }
     
-    // Check age range filter
-    if (!debug_config_.is_age_in_range(static_cast<int>(person.age))) {
-        return;
+    // Check if this person and risk factor matches ANY of our debug configurations
+    bool should_capture = false;
+    
+    for (const auto &debug_config : debug_configs_) {
+        if (!debug_config.enabled) continue;
+        
+        bool config_matches = true;
+        
+        // Check age range filter
+        if (!debug_config.is_age_in_range(static_cast<int>(person.age))) {
+            config_matches = false;
     }
     
     // Check gender filter
-    if (debug_config_.target_gender != core::Gender::unknown && person.gender != debug_config_.target_gender) {
-        return;
+        if (debug_config.target_gender != core::Gender::unknown && person.gender != debug_config.target_gender) {
+            config_matches = false;
     }
     
     // Check risk factor filter
-    if (!debug_config_.target_risk_factor.empty() && 
-        !core::case_insensitive::equals(risk_factor_name, debug_config_.target_risk_factor)) {
+        if (!debug_config.target_risk_factor.empty() && 
+            !core::case_insensitive::equals(std::string_view(risk_factor_name), std::string_view(debug_config.target_risk_factor))) {
+            config_matches = false;
+        }
+        
+        if (config_matches) {
+            should_capture = true;
+            break; // Found a matching configuration
+        }
+    }
+    
+    if (!should_capture) {
         return;
     }
     
@@ -541,26 +632,35 @@ void RiskFactorInspector::store_calculation_details(const Person &person, const 
     double first_clamped_factor_value, double simulated_mean,
                                                    double factors_mean_delta, double value_after_adjustment_before_second_clamp,
                                                    double final_value_after_second_clamp) {
-    if (!debug_config_.enabled) {
+    if (!is_debug_enabled()) {
         return;
     }
 
     // Check if this person and risk factor should be captured
-    bool should_capture = true;
+    bool should_capture = false;
     
-    if (!debug_config_.is_age_in_range(static_cast<int>(person.age))) {
-        should_capture = false;
+    for (const auto &debug_config : debug_configs_) {
+        if (!debug_config.enabled) continue;
+        
+        bool config_matches = true;
+        
+        if (!debug_config.is_age_in_range(static_cast<int>(person.age))) {
+            config_matches = false;
+        }
+        
+        if (debug_config.target_gender != core::Gender::unknown && person.gender != debug_config.target_gender) {
+            config_matches = false;
+        }
+        
+        if (!debug_config.target_risk_factor.empty() && risk_factor_name != debug_config.target_risk_factor) {
+            config_matches = false;
+        }
+        
+        if (config_matches) {
+            should_capture = true;
+            break; // Found a matching configuration
+        }
     }
-    
-    if (debug_config_.target_gender != core::Gender::unknown && person.gender != debug_config_.target_gender) {
-        should_capture = false;
-    }
-    
-    if (!debug_config_.target_risk_factor.empty() && risk_factor_name != debug_config_.target_risk_factor) {
-        should_capture = false;
-    }
-    
-    // Debug output removed for cleaner console output
     
     if (!should_capture) {
         return;
@@ -593,29 +693,46 @@ void RiskFactorInspector::store_calculation_details(const Person &person, const 
 // MAHIMA: Capture person risk factors after all calculations are complete
 void RiskFactorInspector::capture_person_risk_factors(RuntimeContext &context, const Person &person, 
                                                      const std::string &risk_factor_name, size_t /*risk_factor_index*/) {
-    if (!debug_config_.enabled) {
+    if (!is_debug_enabled()) {
         return;
     }
 
-    // Check if this person and risk factor should be captured
-    bool should_capture = true;
+    // Check if this person and risk factor matches ANY of our debug configurations
+    bool should_capture = false;
+    std::string current_scenario = get_current_scenario_name(context);
     
-    // Check age range
-    if (!debug_config_.is_age_in_range(static_cast<int>(person.age))) {
-        should_capture = false;
-    }
-    
-    if (debug_config_.target_gender != core::Gender::unknown && person.gender != debug_config_.target_gender) {
-        should_capture = false;
-    }
-    
-    if (!debug_config_.target_risk_factor.empty() && risk_factor_name != debug_config_.target_risk_factor) {
-        should_capture = false;
-    }
-    
-    // Check year - only capture if we're in the target year
-    if (!debug_config_.is_year_match(context.time_now())) {
-        should_capture = false;
+    for (const auto &debug_config : debug_configs_) {
+        if (!debug_config.enabled) continue;
+        
+        bool config_matches = true;
+        
+        // Check age range
+        if (!debug_config.is_age_in_range(static_cast<int>(person.age))) {
+            config_matches = false;
+        }
+        
+        if (debug_config.target_gender != core::Gender::unknown && person.gender != debug_config.target_gender) {
+            config_matches = false;
+        }
+        
+        if (!debug_config.target_risk_factor.empty() && risk_factor_name != debug_config.target_risk_factor) {
+            config_matches = false;
+        }
+        
+        // Check year - only capture if we're in the target year
+        if (!debug_config.is_year_match(context.time_now())) {
+            config_matches = false;
+        }
+        
+        // Check scenario - only capture if we're in the target scenario
+        if (!debug_config.is_scenario_match(current_scenario)) {
+            config_matches = false;
+        }
+        
+        if (config_matches) {
+            should_capture = true;
+            break; // Found a matching configuration
+        }
     }
     
     if (!should_capture) {
@@ -629,7 +746,8 @@ void RiskFactorInspector::capture_person_risk_factors(RuntimeContext &context, c
                   << " (age " << person.age << ", " 
                   << (person.gender == core::Gender::male ? "male" : "female") 
                   << ") for risk factor " << risk_factor_name 
-                  << " in year " << context.time_now();
+                  << " in year " << context.time_now()
+                  << ", scenario " << current_scenario;
         debug_count++;
     }
 
@@ -686,18 +804,49 @@ void RiskFactorInspector::capture_person_risk_factors(RuntimeContext &context, c
     
     // Write headers if file is new
     if (!file_exists) {
-        file << "person_id,gender,age,region,ethnicity,physical_activity,income_continuous,income_category,"
+        file << "person_id,age,gender,year,scenario,risk_factor,region,ethnicity,physical_activity,income_continuous,income_category,"
              << "random_residual_before_cholesky,residual_after_cholesky,RF_value,expected_value,linear_result,"
              << "residual,stddev,combined,lambda,boxcox_result,factor_before_clamp,range_lower,range_upper,"
              << "first_clamped_factor_value,simulated_mean,factors_mean_delta,value_after_adjustment_before_second_clamp,"
-             << "final_value_after_second_clamp,bmi\n";
+             << "final_value_after_second_clamp,weight_kg,height_cm,bmi_calculated,"
+             << "ei_expected,pa_expected,epa_expected,ei_actual,pa_actual,epa_actual,epa_quantile,"
+             << "w_expected,w_quantile,initial_weight,weight_adjustment,adjusted_weight,weight_after_clamping,"
+             << "body_fat,lean_tissue,glycogen,water,extracellular_fluid\n";
     }
     
-    // Write the data
+    // Write the data in the new order: person_id,age,gender,year,scenario,risk_factor,...
     std::string bmi_value = get_bmi_value(person);
+    
+    // Get weight and height for BMI calculation elements
+    std::string weight_str = get_safe_risk_factor_value(person, "Weight"_id);
+    std::string height_str = get_safe_risk_factor_value(person, "Height"_id);
+    
+    // Get weight calculation elements from KevinHallModel
+    std::string ei_expected_str = get_safe_risk_factor_value(person, "EnergyIntake_expected"_id);
+    std::string pa_expected_str = get_safe_risk_factor_value(person, "PhysicalActivity_expected"_id);
+    std::string epa_expected_str = get_safe_risk_factor_value(person, "EPA_expected"_id);
+    std::string ei_actual_str = get_safe_risk_factor_value(person, "EnergyIntake"_id);
+    std::string pa_actual_str = get_safe_risk_factor_value(person, "PhysicalActivity"_id);
+    std::string epa_actual_str = get_safe_risk_factor_value(person, "EPA_actual"_id);
+    std::string epa_quantile_str = get_safe_risk_factor_value(person, "EPA_quantile"_id);
+    std::string w_expected_str = get_safe_risk_factor_value(person, "Weight_expected"_id);
+    std::string w_quantile_str = get_safe_risk_factor_value(person, "Weight_quantile"_id);
+    std::string initial_weight_str = get_safe_risk_factor_value(person, "Weight_initial"_id);
+    std::string weight_adjustment_str = get_safe_risk_factor_value(person, "Weight_adjustment"_id);
+    std::string adjusted_weight_str = get_safe_risk_factor_value(person, "Weight_adjusted"_id);
+    std::string weight_after_clamping_str = get_safe_risk_factor_value(person, "Weight"_id);
+    std::string body_fat_str = get_safe_risk_factor_value(person, "BodyFat"_id);
+    std::string lean_tissue_str = get_safe_risk_factor_value(person, "LeanTissue"_id);
+    std::string glycogen_str = get_safe_risk_factor_value(person, "Glycogen"_id);
+    std::string water_str = get_safe_risk_factor_value(person, "Water"_id);
+    std::string extracellular_fluid_str = get_safe_risk_factor_value(person, "ExtracellularFluid"_id);
+    
     file << person_id << ","
-         << (person.gender == core::Gender::male ? "male" : "female") << ","
          << person.age << ","
+         << (person.gender == core::Gender::male ? "male" : "female") << ","
+         << context.time_now() << ","
+         << current_scenario << ","
+         << risk_factor_name << ","
          << (person.region == core::Region::England ? "England" : 
              person.region == core::Region::Scotland ? "Scotland" : 
              person.region == core::Region::Wales ? "Wales" : "NorthernIreland") << ","
@@ -726,7 +875,27 @@ void RiskFactorInspector::capture_person_risk_factors(RuntimeContext &context, c
          << details.factors_mean_delta << ","
          << details.value_after_adjustment_before_second_clamp << ","
          << details.final_value_after_second_clamp << ","
-         << bmi_value << "\n";
+         << weight_str << ","
+         << height_str << ","
+         << bmi_value << ","
+         << ei_expected_str << ","
+         << pa_expected_str << ","
+         << epa_expected_str << ","
+         << ei_actual_str << ","
+         << pa_actual_str << ","
+         << epa_actual_str << ","
+         << epa_quantile_str << ","
+         << w_expected_str << ","
+         << w_quantile_str << ","
+         << initial_weight_str << ","
+         << weight_adjustment_str << ","
+         << adjusted_weight_str << ","
+         << weight_after_clamping_str << ","
+         << body_fat_str << ","
+         << lean_tissue_str << ","
+         << glycogen_str << ","
+         << water_str << ","
+         << extracellular_fluid_str << "\n";
     
     file.close();
     
@@ -742,31 +911,38 @@ void RiskFactorInspector::capture_person_risk_factors(RuntimeContext &context, c
     if (total_records_written_ == 1) {
         std::cout << "\nMAHIMA: Starting to write records to " << csv_path.filename().string() << "...";
         std::cout << "\nMAHIMA: Writing data for year " << context.time_now() 
-                  << ", risk factor " << risk_factor_name;
+                  << ", risk factor " << risk_factor_name
+                  << ", scenario " << current_scenario;
+        std::cout << "\nMAHIMA: CSV file location: " << csv_path.string();
     }
 }
 
 // MAHIMA: Analyze population and count people matching debug criteria
 void RiskFactorInspector::analyze_population_demographics(RuntimeContext &context) {
-    if (!debug_config_.enabled) {
+    if (!is_debug_enabled()) {
         return;
     }
     
     int total_population = static_cast<int>(context.population().size());
+    
+    // Show analysis for each enabled configuration
+    for (const auto &debug_config : debug_configs_) {
+        if (!debug_config.enabled) continue;
+        
     int matching_age_gender = 0;
     int matching_age_gender_risk_factor = 0;
     
     // Count people matching age and gender criteria
     for (const auto &person : context.population()) {
-        bool age_matches = debug_config_.is_age_in_range(static_cast<int>(person.age));
-        bool gender_matches = (debug_config_.target_gender == core::Gender::unknown) || (person.gender == debug_config_.target_gender);
+            bool age_matches = debug_config.is_age_in_range(static_cast<int>(person.age));
+            bool gender_matches = (debug_config.target_gender == core::Gender::unknown) || (person.gender == debug_config.target_gender);
         
         if (age_matches && gender_matches) {
             matching_age_gender++;
             
             // Check if this person has the target risk factor
-            if (!debug_config_.target_risk_factor.empty()) {
-                auto risk_factor_id = core::Identifier(debug_config_.target_risk_factor);
+                if (!debug_config.target_risk_factor.empty()) {
+                    auto risk_factor_id = core::Identifier(debug_config.target_risk_factor);
                 if (person.risk_factors.find(risk_factor_id) != person.risk_factors.end()) {
                     matching_age_gender_risk_factor++;
                 }
@@ -775,26 +951,35 @@ void RiskFactorInspector::analyze_population_demographics(RuntimeContext &contex
     }
     
     // Show population analysis results
-    std::string age_range_str;
-    if (debug_config_.min_age == -1 && debug_config_.max_age == -1) {
-        age_range_str = "any age";
-    } else if (debug_config_.min_age == -1) {
-        age_range_str = "age <= " + std::to_string(debug_config_.max_age);
-    } else if (debug_config_.max_age == -1) {
-        age_range_str = "age >= " + std::to_string(debug_config_.min_age);
-    } else {
-        age_range_str = "age " + std::to_string(debug_config_.min_age) + "-" + std::to_string(debug_config_.max_age);
-    }
-    
+        std::string age_range_str;
+        if (debug_config.min_age == -1 && debug_config.max_age == -1) {
+            age_range_str = "any age";
+        } else if (debug_config.min_age == -1) {
+            age_range_str = "age <= " + std::to_string(debug_config.max_age);
+        } else if (debug_config.max_age == -1) {
+            age_range_str = "age >= " + std::to_string(debug_config.min_age);
+        } else {
+            age_range_str = "age " + std::to_string(debug_config.min_age) + "-" + std::to_string(debug_config.max_age);
+        }
+        
     std::cout << "\nMAHIMA: Population analysis - Total: " << total_population 
-              << ", Matching " << age_range_str << " " 
-              << (debug_config_.target_gender == core::Gender::male ? "males" : 
-                  debug_config_.target_gender == core::Gender::female ? "females" : "people")
-              << " for " << debug_config_.target_risk_factor << ": " << matching_age_gender_risk_factor << " people";
+                  << ", Matching " << age_range_str << " " 
+                  << (debug_config.target_gender == core::Gender::male ? "males" : 
+                      debug_config.target_gender == core::Gender::female ? "females" : "people")
+                  << " for " << debug_config.target_risk_factor << ": " << matching_age_gender_risk_factor << " people";
+        
+        // Debug: Show what we're actually looking for
+        std::cout << "\nMAHIMA: DEBUG - Looking for: age " << debug_config.min_age << "-" << debug_config.max_age
+                  << ", gender " << (debug_config.target_gender == core::Gender::male ? "male" : 
+                                   debug_config.target_gender == core::Gender::female ? "female" : "any")
+                  << ", risk_factor '" << debug_config.target_risk_factor << "'"
+                  << ", year " << debug_config.target_year
+                  << ", scenario '" << debug_config.target_scenario << "'";
+    }
     
     // Show final record count
     if (total_records_written_ > 0) {
-        std::cout << "\nMAHIMA: Total records written to " << debug_config_.target_risk_factor << "_inspection.csv: " << total_records_written_;
+        std::cout << "\nMAHIMA: Total records written to inspection CSV files: " << total_records_written_;
     }
 }
 
@@ -803,24 +988,35 @@ void RiskFactorInspector::update_calculation_details_with_adjustments(const Pers
                                                                      double expected_value, double simulated_mean, double factors_mean_delta,
                                                                      double value_after_adjustment_before_second_clamp,
                                                                      double final_value_after_second_clamp) {
-    if (!debug_config_.enabled) {
+    if (!is_debug_enabled()) {
         return;
     }
 
     // Check if this person and risk factor should be updated
-    bool should_update = true;
+    bool should_update = false;
     
-    // Check age range
-    if (!debug_config_.is_age_in_range(static_cast<int>(person.age))) {
-        should_update = false;
-    }
-    
-    if (debug_config_.target_gender != core::Gender::unknown && person.gender != debug_config_.target_gender) {
-        should_update = false;
-    }
-    
-    if (!debug_config_.target_risk_factor.empty() && risk_factor_name != debug_config_.target_risk_factor) {
-        should_update = false;
+    for (const auto &debug_config : debug_configs_) {
+        if (!debug_config.enabled) continue;
+        
+        bool config_matches = true;
+        
+        // Check age range
+        if (!debug_config.is_age_in_range(static_cast<int>(person.age))) {
+            config_matches = false;
+        }
+        
+        if (debug_config.target_gender != core::Gender::unknown && person.gender != debug_config.target_gender) {
+            config_matches = false;
+        }
+        
+        if (!debug_config.target_risk_factor.empty() && risk_factor_name != debug_config.target_risk_factor) {
+            config_matches = false;
+        }
+        
+        if (config_matches) {
+            should_update = true;
+            break; // Found a matching configuration
+        }
     }
     
     if (!should_update) {
@@ -844,24 +1040,35 @@ void RiskFactorInspector::update_calculation_details_with_adjustments(const Pers
 
 // MAHIMA: Get stored calculation details for a person and risk factor
 bool RiskFactorInspector::get_stored_calculation_details(const Person &person, const std::string &risk_factor_name, CalculationDetails &details) {
-    if (!debug_config_.enabled) {
+    if (!is_debug_enabled()) {
         return false;
     }
 
     // Check if this person and risk factor should be retrieved
-    bool should_retrieve = true;
+    bool should_retrieve = false;
     
-    // Check age range
-    if (!debug_config_.is_age_in_range(static_cast<int>(person.age))) {
-        should_retrieve = false;
-    }
-    
-    if (debug_config_.target_gender != core::Gender::unknown && person.gender != debug_config_.target_gender) {
-        should_retrieve = false;
-    }
-    
-    if (!debug_config_.target_risk_factor.empty() && risk_factor_name != debug_config_.target_risk_factor) {
-        should_retrieve = false;
+    for (const auto &debug_config : debug_configs_) {
+        if (!debug_config.enabled) continue;
+        
+        bool config_matches = true;
+        
+        // Check age range
+        if (!debug_config.is_age_in_range(static_cast<int>(person.age))) {
+            config_matches = false;
+        }
+        
+        if (debug_config.target_gender != core::Gender::unknown && person.gender != debug_config.target_gender) {
+            config_matches = false;
+        }
+        
+        if (!debug_config.target_risk_factor.empty() && risk_factor_name != debug_config.target_risk_factor) {
+            config_matches = false;
+        }
+        
+        if (config_matches) {
+            should_retrieve = true;
+            break; // Found a matching configuration
+        }
     }
     
     if (!should_retrieve) {
@@ -883,20 +1090,31 @@ bool RiskFactorInspector::get_stored_calculation_details(const Person &person, c
 
 // MAHIMA: Update BMI values in stored calculation details after BMI calculation
 void RiskFactorInspector::update_bmi_in_stored_details(const Person &person) {
-    if (!debug_config_.enabled) {
+    if (!is_debug_enabled()) {
         return;
     }
 
     // Check if this person should be updated based on debug criteria
-    bool should_update = true;
+    bool should_update = false;
     
-    // Check age range
-    if (!debug_config_.is_age_in_range(static_cast<int>(person.age))) {
-        should_update = false;
-    }
-    
-    if (debug_config_.target_gender != core::Gender::unknown && person.gender != debug_config_.target_gender) {
-        should_update = false;
+    for (const auto &debug_config : debug_configs_) {
+        if (!debug_config.enabled) continue;
+        
+        bool config_matches = true;
+        
+        // Check age range
+        if (!debug_config.is_age_in_range(static_cast<int>(person.age))) {
+            config_matches = false;
+        }
+        
+        if (debug_config.target_gender != core::Gender::unknown && person.gender != debug_config.target_gender) {
+            config_matches = false;
+        }
+        
+        if (config_matches) {
+            should_update = true;
+            break; // Found a matching configuration
+        }
     }
     
     if (!should_update) {

@@ -7,6 +7,7 @@
 #include <iostream>
 #include <iomanip>
 #include <oneapi/tbb/parallel_for_each.h>
+#include <set>
 #include <utility>
 #include <thread>
 #include <chrono>
@@ -189,11 +190,14 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
             }
             
             // MAHIMA: Get the simulated mean for this age/gender/factor
+            // Only calculate simulated_mean for baseline scenario
             double simulated_mean = 0.0;
-            if (simulated_means.contains(person.gender) && simulated_means.at(person.gender).contains(factor)) {
-                const auto &sim_mean_vector = simulated_means.at(person.gender, factor);
-                if (person.age < static_cast<int>(sim_mean_vector.size())) {
-                    simulated_mean = sim_mean_vector.at(person.age);
+            if (context.scenario().type() == ScenarioType::baseline) {
+                if (simulated_means.contains(person.gender) && simulated_means.at(person.gender).contains(factor)) {
+                    const auto &sim_mean_vector = simulated_means.at(person.gender, factor);
+                    if (person.age < static_cast<int>(sim_mean_vector.size())) {
+                        simulated_mean = sim_mean_vector.at(person.age);
+                    }
                 }
             }
             
@@ -206,8 +210,16 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
                 }
             }
             
-            // MAHIMA: Calculate the 4 new values
-            double factors_mean_delta = expected_value - simulated_mean;
+            // MAHIMA: Calculate factors_mean_delta differently for baseline vs intervention
+            double factors_mean_delta;
+            if (context.scenario().type() == ScenarioType::baseline) {
+                // Baseline: Calculate factors_mean_delta normally
+                factors_mean_delta = expected_value - simulated_mean;
+            } else {
+                // Intervention: Use the received adjustments directly
+                factors_mean_delta = adjustments.at(person.gender, factor).at(person.age);
+            }
+            
             double value_after_adjustment_before_second_clamp = first_clamped_factor_value + factors_mean_delta;
             
             // Apply range clamping to get final value
@@ -349,14 +361,26 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
                 // MAHIMA: Preserve zero values from two-stage modeling - don't adjust them
                 if (first_clamped_factor_value == 0.0) {
                     // For zero values, set adjustment values to 0 but keep expected_value and simulated_mean
-                    double factors_mean_delta = expected_value - simulated_mean;
+                    double factors_mean_delta;
+                    if (context.scenario().type() == ScenarioType::baseline) {
+                        factors_mean_delta = expected_value - simulated_mean;
+                    } else {
+                        factors_mean_delta = adjustments.at(person.gender, factor).at(person.age);
+                    }
                     inspector.update_calculation_details_with_adjustments(person, factor.to_string(),
                                                                          expected_value, simulated_mean, factors_mean_delta, 0.0, 0.0);
                     continue;
                 }
                 
                 // Calculate the 4 new values
-                double factors_mean_delta = expected_value - simulated_mean;
+                double factors_mean_delta;
+                if (context.scenario().type() == ScenarioType::baseline) {
+                    // Baseline: Calculate factors_mean_delta normally
+                    factors_mean_delta = expected_value - simulated_mean;
+                } else {
+                    // Intervention: Use the received adjustments directly
+                    factors_mean_delta = adjustments.at(person.gender, factor).at(person.age);
+                }
                 double value_after_adjustment_before_second_clamp = first_clamped_factor_value + factors_mean_delta;
                 
                 // Apply range clamping to get final value
@@ -406,6 +430,11 @@ RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context,
                 return details.first_clamped_factor_value;
             }
         }
+        // Fallback: return current risk factor value
+        if (person.risk_factors.contains(factor)) {
+            return person.risk_factors.at(factor);
+        }
+        return 0.0;
     };
     
     auto simulated_means = calculate_simulated_mean_with_details(context.population(), age_range, factors, logistic_factors_, get_first_clamped_value);

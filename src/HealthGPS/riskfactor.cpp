@@ -1,6 +1,7 @@
 #include "riskfactor.h"
 #include "static_linear_model.h"
 #include "risk_factor_inspector.h"
+#include <set>
 
 namespace hgps {
 
@@ -51,18 +52,26 @@ void RiskFactorModule::initialise_population(RuntimeContext &context) {
     dynamic_model->generate_risk_factors(context);
     
     // MAHIMA: Write inspection CSV files AFTER both models complete
-    // This ensures BMI is available when writing CSV
+    // This ensures BMI is calculated and adjustments are applied
     if (context.has_risk_factor_inspector()) {
         auto &inspector = context.get_risk_factor_inspector();
         
-        // Only write CSV if debug config is enabled and specifies a risk factor
-        if (inspector.is_debug_enabled() && !inspector.get_target_risk_factor().empty()) {
-            std::string target_risk_factor = inspector.get_target_risk_factor();
+        // Only write CSV if debug config is enabled
+        if (inspector.is_debug_enabled()) {
+            // Get all unique risk factors from all enabled configurations
+            std::set<std::string> unique_risk_factors;
+            for (const auto &config : inspector.get_debug_configs()) {
+                if (config.enabled && !config.target_risk_factor.empty()) {
+                    unique_risk_factors.insert(config.target_risk_factor);
+                }
+            }
             
-            // Write CSV only for the specific risk factor specified in debug config
-            for (auto &person : context.population()) {
-                if (person.is_active()) {
-                    inspector.capture_person_risk_factors(context, person, target_risk_factor, 0);
+            // Write CSV for each unique risk factor
+            for (const auto &risk_factor : unique_risk_factors) { 
+                for (auto &person : context.population()) {
+                    if (person.is_active()) {
+                        inspector.capture_person_risk_factors(context, person, risk_factor, 0);
+                    }
                 }
             }
         }
@@ -78,19 +87,27 @@ void RiskFactorModule::update_population(RuntimeContext &context) {
     auto &dynamic_model = models_.at(RiskFactorModelType::Dynamic);
     dynamic_model->update_risk_factors(context);
     
-    // MAHIMA: Write inspection CSV files AFTER both models have run (for target year)
-    // This ensures BMI is available when writing CSV and respects target year
+    // MAHIMA: Write inspection CSV files AFTER both models complete
+    // This ensures BMI is calculated and adjustments are applied
     if (context.has_risk_factor_inspector()) {
         auto &inspector = context.get_risk_factor_inspector();
         
-        // Only write CSV if debug config is enabled and specifies a risk factor
-        if (inspector.is_debug_enabled() && !inspector.get_target_risk_factor().empty()) {
-            std::string target_risk_factor = inspector.get_target_risk_factor();
+        // Only write CSV if debug config is enabled
+        if (inspector.is_debug_enabled()) {
+            // Get all unique risk factors from all enabled configurations
+            std::set<std::string> unique_risk_factors;
+            for (const auto &config : inspector.get_debug_configs()) {
+                if (config.enabled && !config.target_risk_factor.empty()) {
+                    unique_risk_factors.insert(config.target_risk_factor);
+                }
+            }
             
-            // Write CSV only for the specific risk factor specified in debug config
-            for (auto &person : context.population()) {
-                if (person.is_active()) {
-                    inspector.capture_person_risk_factors(context, person, target_risk_factor, 0);
+            // Write CSV for each unique risk factor
+            for (const auto &risk_factor : unique_risk_factors) {
+                for (auto &person : context.population()) {
+                    if (person.is_active()) {
+                        inspector.capture_person_risk_factors(context, person, risk_factor, 0);
+                    }
                 }
             }
         }
@@ -118,3 +135,4 @@ build_risk_factor_module(Repository &repository, [[maybe_unused]] const ModelInp
 }
 
 } // namespace hgps
+

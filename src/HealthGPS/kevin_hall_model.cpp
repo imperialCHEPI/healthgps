@@ -94,6 +94,33 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
         // Fall back to std::nullopt if no Weight range is defined
         adjust_risk_factors(context, {"Weight"_id}, std::nullopt, true);
     }
+    
+    // MAHIMA: Re-store weight calculation intermediate values after adjustment
+    // The adjust_risk_factors call might have overwritten these values
+    for (auto &person : context.population()) {
+        if (person.is_active()) {
+            // Re-calculate and store the intermediate values
+            double ei_expected = get_expected(context, person.gender, person.age, "EnergyIntake"_id, std::nullopt, true);
+            double pa_expected = get_expected(context, person.gender, person.age, "PhysicalActivity"_id, std::nullopt, false);
+            double epa_expected = ei_expected / pa_expected;
+            double ei_actual = person.risk_factors.at("EnergyIntake"_id);
+            double pa_actual = person.risk_factors.at("PhysicalActivity"_id);
+            double epa_actual = ei_actual / pa_actual;
+            double epa_quantile = epa_actual / epa_expected;
+            double w_expected = get_expected(context, person.gender, person.age, "Weight"_id, std::nullopt, true);
+            double w_quantile = get_weight_quantile(epa_quantile, person.gender);
+            
+            // Store the intermediate values
+            person.risk_factors["EnergyIntake_expected"_id] = ei_expected;
+            person.risk_factors["PhysicalActivity_expected"_id] = pa_expected;
+            person.risk_factors["EPA_expected"_id] = epa_expected;
+            person.risk_factors["EPA_actual"_id] = epa_actual;
+            person.risk_factors["EPA_quantile"_id] = epa_quantile;
+            person.risk_factors["Weight_expected"_id] = w_expected;
+            person.risk_factors["Weight_quantile"_id] = w_quantile;
+            person.risk_factors["Weight_initial"_id] = w_expected * w_quantile;
+        }
+    }
 
     // Compute weight power means by sex and age.
     auto W_power_means = compute_mean_weight(context.population(), height_slope_);
@@ -283,6 +310,36 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
 
     // Send (baseline) weight adjustments to intervention scenario.
     send_weight_adjustments(context, std::move(adjustments));
+    
+    // MAHIMA: Store weight adjustment values for CSV output
+    for (auto &person : context.population()) {
+        if (person.is_active() && person.age != 0) {
+            // Get the weight adjustment that was applied
+            double current_weight = person.risk_factors.at("Weight"_id);
+            double initial_weight = person.risk_factors.at("Weight_initial"_id);
+            double weight_adjustment = current_weight - initial_weight;
+            
+            // Store the adjustment values
+            person.risk_factors["Weight_adjustment"_id] = weight_adjustment;
+            person.risk_factors["Weight_adjusted"_id] = current_weight;
+            
+            // Store body composition values if they exist
+            if (person.risk_factors.contains("BodyFat"_id)) {
+                person.risk_factors["BodyFat"_id] = person.risk_factors.at("BodyFat"_id);
+            }
+            if (person.risk_factors.contains("LeanTissue"_id)) {
+                person.risk_factors["LeanTissue"_id] = person.risk_factors.at("LeanTissue"_id);
+            }
+            if (person.risk_factors.contains("Glycogen"_id)) {
+                person.risk_factors["Glycogen"_id] = person.risk_factors.at("Glycogen"_id);
+                // Water = 2.7 * Glycogen
+                person.risk_factors["Water"_id] = 2.7 * person.risk_factors.at("Glycogen"_id);
+            }
+            if (person.risk_factors.contains("ExtracellularFluid"_id)) {
+                person.risk_factors["ExtracellularFluid"_id] = person.risk_factors.at("ExtracellularFluid"_id);
+            }
+        }
+    }
 
     // Compute weight power means by sex and age.
     auto W_power_means = compute_mean_weight(context.population(), height_slope_);
@@ -884,6 +941,16 @@ void KevinHallModel::initialise_weight(RuntimeContext &context, Person &person) 
     double w_quantile = get_weight_quantile(epa_quantile, person.gender);
     double weight = w_expected * w_quantile;
 
+    // Store weight calculation intermediate values for CSV output
+    person.risk_factors["EnergyIntake_expected"_id] = ei_expected;
+    person.risk_factors["PhysicalActivity_expected"_id] = pa_expected;
+    person.risk_factors["EPA_expected"_id] = epa_expected;
+    person.risk_factors["EPA_actual"_id] = epa_actual;
+    person.risk_factors["EPA_quantile"_id] = epa_quantile;
+    person.risk_factors["Weight_expected"_id] = w_expected;
+    person.risk_factors["Weight_quantile"_id] = w_quantile;
+    person.risk_factors["Weight_initial"_id] = weight;
+
     // Debug NaN check
     if (std::isnan(weight)) {
         std::cout << "\nDEBUG NaN DETECTED in initialise_weight:"
@@ -929,6 +996,10 @@ void KevinHallModel::adjust_weight(Person &person, double adjustment) const {
     // Adjust weight and compute adjustment ratio for other factors.
     double BW = BW_0 + adjustment;
 
+    // Store weight adjustment intermediate values for CSV output
+    person.risk_factors["Weight_adjustment"_id] = adjustment;
+    person.risk_factors["Weight_adjusted"_id] = BW;
+
     // Clamp weight within valid range if it exists in nutrient_ranges_
     if (nutrient_ranges_.contains("Weight"_id)) {
         BW = nutrient_ranges_.at("Weight"_id).clamp(BW);
@@ -941,6 +1012,13 @@ void KevinHallModel::adjust_weight(Person &person, double adjustment) const {
     double L = L_0 * ratio;
     double ECF = ECF_0 * ratio;
 
+    // Store body composition values for CSV output
+    person.risk_factors["BodyFat"_id] = F;
+    person.risk_factors["LeanTissue"_id] = L;
+    person.risk_factors["Glycogen"_id] = G;
+    person.risk_factors["Water"_id] = W;
+    person.risk_factors["ExtracellularFluid"_id] = ECF;
+
     // Compute new energy expenditure.
     double p = C / (C + F);
     double x = p * eta_L / rho_L + (1.0 - p) * eta_F / rho_F;
@@ -952,9 +1030,6 @@ void KevinHallModel::adjust_weight(Person &person, double adjustment) const {
 
     // Set new state.
     person.risk_factors.at("Weight"_id) = BW;
-    person.risk_factors.at("BodyFat"_id) = F;
-    person.risk_factors.at("LeanTissue"_id) = L;
-    person.risk_factors.at("ExtracellularFluid"_id) = ECF;
     person.risk_factors.at("Intercept_K"_id) = K;
 
     // Set new energy expenditure (may not exist yet).

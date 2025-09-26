@@ -49,8 +49,8 @@ Simulation::Simulation(SimulationModuleFactory &factory, std::shared_ptr<const E
 
     // MAHIMA: Initialize Risk Factor Inspector for Individual-Level Debugging
     // This inspector will capture detailed calculation steps for debugging purposes
-    // Only run for baseline scenario to avoid duplicate data
-    if (context_.scenario().type() == ScenarioType::baseline) {
+    // Only run for baseline/intervention scenario to avoid duplicate data
+    if (context_.scenario().type() == ScenarioType::intervention) {
         try {
             // MAHIMA: Create output directory for the inspection files
             // We'll use the current working directory as a fallback since we don't have
@@ -78,8 +78,42 @@ Simulation::Simulation(SimulationModuleFactory &factory, std::shared_ptr<const E
             // Example: 30-year-old female for foodfat risk factor (initialization phase)
             // For single age and age range, uncomment one of the lines below
 
-            //context_.get_risk_factor_inspector().set_debug_config_single_age(true, 20, core::Gender::female, "foodsodium", 2032);
-            context_.get_risk_factor_inspector().set_debug_config(true, 51, 110, core::Gender::female, "foodiron", 2032);
+            // MAHIMA: Configure multiple debug scenarios for comprehensive data capture
+            std::string current_scenario = context_.scenario().name();
+            std::cout << "\nMAHIMA: Configuring debug for scenario: " << current_scenario;
+            
+            // Add multiple debug configurations for INTERVENTION ONLY
+            auto &inspector_ref = context_.get_risk_factor_inspector();
+            int config_count = 0;
+            
+            // Sodium configurations for INTERVENTION ONLY
+            inspector_ref.add_debug_config(true, 20, 20, core::Gender::female, "foodsodium", 2022, "intervention");
+            inspector_ref.add_debug_config(true, 20, 20, core::Gender::female, "foodsodium", 2032, "intervention");
+            
+            inspector_ref.add_debug_config(true, 20, 20, core::Gender::male, "foodsodium", 2022, "intervention");
+            inspector_ref.add_debug_config(true, 20, 20, core::Gender::male, "foodsodium", 2032, "intervention");
+            
+            inspector_ref.add_debug_config(true, 55, 55, core::Gender::female, "foodsodium", 2022, "intervention");
+            inspector_ref.add_debug_config(true, 55, 55, core::Gender::female, "foodsodium", 2032, "intervention");
+            
+            inspector_ref.add_debug_config(true, 55, 55, core::Gender::male, "foodsodium", 2022, "intervention");
+            inspector_ref.add_debug_config(true, 55, 55, core::Gender::male, "foodsodium", 2032, "intervention");
+            
+            // Calcium configurations for INTERVENTION ONLY
+            inspector_ref.add_debug_config(true, 11, 18, core::Gender::female, "foodcalcium", 2022, "intervention");
+            inspector_ref.add_debug_config(true, 11, 18, core::Gender::female, "foodcalcium", 2032, "intervention");
+            
+            inspector_ref.add_debug_config(true, 11, 18, core::Gender::male, "foodcalcium", 2022, "intervention");
+            inspector_ref.add_debug_config(true, 11, 18, core::Gender::male, "foodcalcium", 2032, "intervention");
+            
+            // Iron configurations for INTERVENTION ONLY
+            inspector_ref.add_debug_config(true, 11, 50, core::Gender::female, "foodiron", 2022, "intervention");
+            inspector_ref.add_debug_config(true, 11, 50, core::Gender::female, "foodiron", 2032, "intervention");
+            
+            inspector_ref.add_debug_config(true, 51, 110, core::Gender::female, "foodiron", 2022, "intervention");
+            inspector_ref.add_debug_config(true, 51, 110, core::Gender::female, "foodiron", 2032, "intervention");
+            
+            std::cout << "\nMAHIMA: Configured 16 debug scenarios for " << current_scenario;
 
         } catch (const std::exception &e) {
             // MAHIMA: If inspector initialization fails, log the error but don't crash the

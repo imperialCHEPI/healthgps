@@ -10,6 +10,38 @@
 
 namespace hgps {
 
+/// @brief MAHIMA: Configuration for detailed calculation debugging
+/// @details User can specify age range, gender, risk factor, and year to debug
+struct DebugConfig {
+    bool enabled = false;
+    int min_age = -1;  // -1 means no minimum age limit
+    int max_age = -1;  // -1 means no maximum age limit
+    core::Gender target_gender = core::Gender::unknown;  // unknown means any gender
+    std::string target_risk_factor = "";  // empty means any risk factor
+    int target_year = -1;  // -1 means any year, otherwise specific year (e.g., 2032)
+    std::string target_scenario = "";  // empty means any scenario, "baseline" or "intervention"
+    
+    // Helper method to check if an age is within the range
+    bool is_age_in_range(int age) const {
+        if (min_age == -1 && max_age == -1) return true;  // No age restrictions
+        if (min_age == -1) return age <= max_age;  // Only max age specified
+        if (max_age == -1) return age >= min_age;  // Only min age specified
+        return age >= min_age && age <= max_age;  // Both min and max specified
+    }
+    
+    // Helper method to check if a year matches the target
+    bool is_year_match(int current_year) const {
+        if (target_year == -1) return true;  // No year restriction
+        return current_year == target_year;
+    }
+    
+    // Helper method to check if a scenario matches the target
+    bool is_scenario_match(const std::string& current_scenario) const {
+        if (target_scenario.empty()) return true;  // No scenario restriction
+        return current_scenario == target_scenario;
+    }
+};
+
 /// @brief MAHIMA: Risk Factor Inspector for Year 3 Policy Application Analysis
 ///
 /// @details This class captures individual person risk factor values in Year 3
@@ -56,7 +88,8 @@ class RiskFactorInspector {
     /// @param target_year Target year to debug (-1 for any year)
     void set_debug_config(bool enabled, int min_age = -1, int max_age = -1, 
                          core::Gender gender = core::Gender::unknown, 
-                         const std::string &risk_factor = "", int target_year = -1);
+                         const std::string &risk_factor = "", int target_year = -1,
+                         const std::string &target_scenario = "");
     
     /// @brief MAHIMA: Set debug configuration for single age (convenience method)
     /// @param enabled Whether to enable detailed debugging
@@ -66,13 +99,40 @@ class RiskFactorInspector {
     /// @param target_year Target year to debug (-1 for any year)
     void set_debug_config_single_age(bool enabled, int age = -1, 
                                    core::Gender gender = core::Gender::unknown, 
-                                   const std::string &risk_factor = "", int target_year = -1);
+                                   const std::string &risk_factor = "", int target_year = -1,
+                                   const std::string &target_scenario = "");
+    
+    /// @brief MAHIMA: Add multiple debug configurations for different capture scenarios
+    /// @param configs Vector of debug configurations to add
+    void add_debug_configs(const std::vector<DebugConfig> &configs);
+    
+    /// @brief MAHIMA: Add a single debug configuration (convenience method)
+    /// @param enabled Whether debugging is enabled
+    /// @param min_age Minimum age to capture (or -1 for no minimum)
+    /// @param max_age Maximum age to capture (or -1 for no maximum)
+    /// @param gender Target gender to capture (or unknown for any)
+    /// @param risk_factor Target risk factor to capture (or empty for any)
+    /// @param target_year Target year to capture (or -1 for any year)
+    /// @param target_scenario Target scenario to capture (or empty for any)
+    void add_debug_config(bool enabled, int min_age = -1, int max_age = -1,
+                          core::Gender gender = core::Gender::unknown,
+                          const std::string &risk_factor = "", int target_year = -1,
+                          const std::string &target_scenario = "");
+    
+    /// @brief MAHIMA: Clear all debug configurations
+    void clear_debug_configs();
     
     /// @brief MAHIMA: Check if debug is enabled
     bool is_debug_enabled() const;
     
     /// @brief MAHIMA: Get target risk factor from debug config
     const std::string& get_target_risk_factor() const;
+    
+    /// @brief MAHIMA: Get all debug configurations
+    const std::vector<DebugConfig>& get_debug_configs() const;
+    
+    /// @brief MAHIMA: Get current scenario name from context
+    std::string get_current_scenario_name(RuntimeContext &context) const;
     
     /// @brief MAHIMA: Get BMI value for a person (calculated or stored)
     std::string get_bmi_value(const Person &person);
@@ -180,30 +240,10 @@ class RiskFactorInspector {
     /// Plus BMI, Weight, Height for context
     std::vector<core::Identifier> target_factors_;
 
-    /// @brief MAHIMA: Configuration for detailed calculation debugging
-    /// @details User can specify age range, gender, risk factor, and year to debug
-    struct DebugConfig {
-        bool enabled = false;
-        int min_age = -1;  // -1 means no minimum age limit
-        int max_age = -1;  // -1 means no maximum age limit
-        core::Gender target_gender = core::Gender::unknown;  // unknown means any gender
-        std::string target_risk_factor = "";  // empty means any risk factor
-        int target_year = -1;  // -1 means any year, otherwise specific year (e.g., 2032)
-        
-        // Helper method to check if an age is within the range
-        bool is_age_in_range(int age) const {
-            if (min_age == -1 && max_age == -1) return true;  // No age restrictions
-            if (min_age == -1) return age <= max_age;  // Only max age specified
-            if (max_age == -1) return age >= min_age;  // Only min age specified
-            return age >= min_age && age <= max_age;  // Both min and max specified
-        }
-        
-        // Helper method to check if a year matches the target
-        bool is_year_match(int current_year) const {
-            if (target_year == -1) return true;  // No year restriction
-            return current_year == target_year;  // Specific year match
-        }
-    } debug_config_;
+private:
+    
+    /// @brief MAHIMA: Multiple debug configurations for different capture scenarios
+    std::vector<DebugConfig> debug_configs_;
 
     /// @brief MAHIMA: Output file stream for baseline scenario data
     std::ofstream baseline_file_;
