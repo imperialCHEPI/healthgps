@@ -808,7 +808,7 @@ void RiskFactorInspector::capture_person_risk_factors(RuntimeContext &context, c
              << "random_residual_before_cholesky,residual_after_cholesky,RF_value,expected_value,linear_result,"
              << "residual,stddev,combined,lambda,boxcox_result,factor_before_clamp,range_lower,range_upper,"
              << "first_clamped_factor_value,simulated_mean,factors_mean_delta,value_after_adjustment_before_second_clamp,"
-             << "final_value_after_second_clamp,weight_kg,height_cm,bmi_calculated,"
+             << "final_value_after_second_clamp,weight_kg,height_cm,bmi_calculated,energy_intake,"
              << "ei_expected,pa_expected,epa_expected,ei_actual,pa_actual,epa_actual,epa_quantile,"
              << "w_expected,w_quantile,initial_weight,weight_adjustment,adjusted_weight,weight_after_clamping,"
              << "body_fat,lean_tissue,glycogen,water,extracellular_fluid\n";
@@ -820,6 +820,9 @@ void RiskFactorInspector::capture_person_risk_factors(RuntimeContext &context, c
     // Get weight and height for BMI calculation elements
     std::string weight_str = get_safe_risk_factor_value(person, "Weight"_id);
     std::string height_str = get_safe_risk_factor_value(person, "Height"_id);
+    
+    // Get energy intake value
+    std::string energy_intake_str = get_safe_risk_factor_value(person, "EnergyIntake"_id);
     
     // Get weight calculation elements from KevinHallModel
     std::string ei_expected_str = get_safe_risk_factor_value(person, "EnergyIntake_expected"_id);
@@ -878,6 +881,7 @@ void RiskFactorInspector::capture_person_risk_factors(RuntimeContext &context, c
          << weight_str << ","
          << height_str << ","
          << bmi_value << ","
+         << energy_intake_str << ","
          << ei_expected_str << ","
          << pa_expected_str << ","
          << epa_expected_str << ","

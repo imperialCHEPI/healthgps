@@ -85,9 +85,39 @@ Simulation::Simulation(SimulationModuleFactory &factory, std::shared_ptr<const E
             // Add multiple debug configurations for INTERVENTION ONLY
             auto &inspector_ref = context_.get_risk_factor_inspector();
             int config_count = 0;
+
+            // Capture ALL risk factors for 2022 and 2032 (all ages, all genders)
+            std::vector<std::string> all_risk_factors = {"foodcarbohydrate",
+                                                         "foodprotein",
+                                                         "foodfat",
+                                                         "foodsodium",
+                                                         "foodalcohol",
+                                                         "foodprocessedmeat",
+                                                         "foodredmeat",
+                                                         "foodlegume",
+                                                         "foodfruit",
+                                                         "foodvegetable",
+                                                         "foodaddedsugar",
+                                                         "foodtotalsugar",
+                                                         "foodmonounsaturatedfat",
+                                                         "foodpolyunsaturatedfattyacid",
+                                                         "foodsaturatedfat",
+                                                         "foodfibre",
+                                                         "foodcalcium",
+                                                         "foodiron",
+                                                         "foodvitaminc",
+                                                         "foodcopper",
+                                                         "foodzinc"
+            };
+
+            for (const auto& risk_factor : all_risk_factors) {
+                inspector_ref.add_debug_config(true, -1, -1, core::Gender::unknown, risk_factor, 2022, "intervention");
+                inspector_ref.add_debug_config(true, -1, -1, core::Gender::unknown, risk_factor, 2032, "intervention");
+            }
             
             // Sodium configurations for INTERVENTION ONLY
-            inspector_ref.add_debug_config(true, 20, 20, core::Gender::female, "foodsodium", 2022, "intervention");
+            /*inspector_ref.add_debug_config(true, 20, 20, core::Gender::female, "foodsodium",
+                                                2022, "intervention");
             inspector_ref.add_debug_config(true, 20, 20, core::Gender::female, "foodsodium", 2032, "intervention");
             
             inspector_ref.add_debug_config(true, 20, 20, core::Gender::male, "foodsodium", 2022, "intervention");
@@ -111,9 +141,9 @@ Simulation::Simulation(SimulationModuleFactory &factory, std::shared_ptr<const E
             inspector_ref.add_debug_config(true, 11, 50, core::Gender::female, "foodiron", 2032, "intervention");
             
             inspector_ref.add_debug_config(true, 51, 110, core::Gender::female, "foodiron", 2022, "intervention");
-            inspector_ref.add_debug_config(true, 51, 110, core::Gender::female, "foodiron", 2032, "intervention");
+            inspector_ref.add_debug_config(true, 51, 110, core::Gender::female, "foodiron", 2032, "intervention");*/ 
             
-            std::cout << "\nMAHIMA: Configured 16 debug scenarios for " << current_scenario;
+            std::cout << "\nMAHIMA: Configured " << (all_risk_factors.size() * 2) << " debug scenarios for " << current_scenario;
 
         } catch (const std::exception &e) {
             // MAHIMA: If inspector initialization fails, log the error but don't crash the
