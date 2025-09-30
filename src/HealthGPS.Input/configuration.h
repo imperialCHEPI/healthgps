@@ -81,6 +81,9 @@ struct Configuration {
 
     /// @brief Type of trend to apply to risk factors (null, trend, income_trend)
     std::string trend_type = "null";
+
+    /// @brief Original config.json data for accessing additional fields like income_categories
+    nlohmann::json config_data;
 };
 
 /// @brief Represents an error that occurred with the format of a config file

@@ -55,8 +55,14 @@ enum class Income : uint8_t {
     /// @brief Low income
     low,
 
-    /// @brief Middle income
+    /// @brief Lower middle income (4-category system)
+    lowermiddle,
+
+    /// @brief Middle income (3-category system)
     middle,
+
+    /// @brief Upper middle income (4-category system)
+    uppermiddle,
 
     /// @brief High income
     high
