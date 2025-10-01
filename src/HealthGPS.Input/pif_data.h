@@ -55,17 +55,18 @@ class PIFTable {
     std::size_t size() const noexcept { return data_.size(); }
 
     /// @brief Clear all data
-    void clear() noexcept { 
-        data_.clear(); 
+    void clear() noexcept {
+        data_.clear();
         hash_table_.clear();
     }
 
   private:
     std::vector<PIFDataItem> data_;
-    
+
     // 3-level hash table: age -> gender -> year -> value
     // This provides O(1) lookup instead of O(n) linear search
-    std::unordered_map<int, std::unordered_map<core::Gender, std::unordered_map<int, double>>> hash_table_;
+    std::unordered_map<int, std::unordered_map<core::Gender, std::unordered_map<int, double>>>
+        hash_table_;
 };
 
 /// @brief PIF data container for multiple scenarios

@@ -7,7 +7,7 @@ namespace hgps::input {
 double PIFTable::get_pif_value(int age, core::Gender gender, int year_post_intervention) const {
     // PHASE 1 OPTIMIZATION: Use hash table for O(1) lookup instead of O(n) linear search
     // This provides 2,220x performance improvement for smoking scenarios
-    
+
     // Try exact match first using hash table
     auto age_it = hash_table_.find(age);
     if (age_it != hash_table_.end()) {
@@ -48,13 +48,13 @@ void PIFTable::add_item(const PIFDataItem &item) { data_.push_back(item); }
 void PIFTable::build_hash_table() {
     // PHASE 1 OPTIMIZATION: Build hash table from vector data for O(1) lookups
     // This is called once after all data is loaded to optimize lookup performance
-    
+
     hash_table_.clear();
-    
+
     for (const auto &item : data_) {
         hash_table_[item.age][item.gender][item.year_post_intervention] = item.pif_value;
     }
-    
+
     // Optional: Clear the vector data to save memory (uncomment if memory is critical)
     // data_.clear();
 }
