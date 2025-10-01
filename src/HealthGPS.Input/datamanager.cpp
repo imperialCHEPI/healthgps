@@ -772,9 +772,14 @@ PIFTable DataManager::load_pif_from_csv(const std::filesystem::path &filepath) c
             table.add_item(item);
         }
 
+        // PHASE 1 OPTIMIZATION: Build hash table for O(1) lookups
+        // This dramatically improves performance from O(n) to O(1) for PIF lookups
+        table.build_hash_table();
+
         // Print CSV loading verification
         fmt::print(fg(fmt::color::cyan), "PIF CSV File Loaded: {} ({} rows)\n",
                    filepath.filename().string(), table.size());
+        fmt::print(fg(fmt::color::green), "PIF Hash Table Built: O(1) lookup optimization enabled\n");
 
     } catch (const std::exception &e) {
         throw std::runtime_error(
