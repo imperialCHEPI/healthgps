@@ -42,7 +42,7 @@ class PIFTable {
     /// @param item PIF data item to add
     void add_item(const PIFDataItem &item);
 
-    /// @brief Build hash table from vector data for O(1) lookups
+    /// @brief Build hash table from vector data for direct access
     /// Call this after adding all items to optimize lookup performance
     void build_hash_table();
 
@@ -57,16 +57,18 @@ class PIFTable {
     /// @brief Clear all data
     void clear() noexcept {
         data_.clear();
-        hash_table_.clear();
+        direct_array_.clear();
     }
 
   private:
     std::vector<PIFDataItem> data_;
 
-    // 3-level hash table: age -> gender -> year -> value
-    // This provides O(1) lookup instead of O(n) linear search
-    std::unordered_map<int, std::unordered_map<core::Gender, std::unordered_map<int, double>>>
-        hash_table_;
+    // Direct array for TRUE O(1) access - no lookups!
+    std::vector<PIFDataItem> direct_array_;
+    
+    // Dynamic ranges calculated from actual data
+    int min_age_, max_age_, min_year_, max_year_;
+    int age_range_, year_range_;
 };
 
 /// @brief PIF data container for multiple scenarios

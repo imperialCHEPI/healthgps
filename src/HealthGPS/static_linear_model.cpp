@@ -77,7 +77,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     // Initialise everyone with appropriate trend type.
     for (auto &person : context.population()) {
         if (has_active_policies_) {
-            initialise_policies(person, context.random(), false);
+        initialise_policies(person, context.random(), false);
         }
 
         // Apply trend based on trend_type
@@ -135,7 +135,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 
         if (person.age == 0) {
             if (has_active_policies_) {
-                initialise_policies(person, context.random(), intervene);
+            initialise_policies(person, context.random(), intervene);
             }
 
             // Apply trend based on trend_type
@@ -152,7 +152,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             }
         } else {
             if (has_active_policies_) {
-                update_policies(person, intervene);
+            update_policies(person, intervene);
             }
 
             // Apply trend based on trend_type
@@ -178,12 +178,12 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 
     // Apply policies if intervening.
     if (has_active_policies_) {
-        for (auto &person : context.population()) {
-            if (!person.is_active()) {
-                continue;
-            }
+    for (auto &person : context.population()) {
+        if (!person.is_active()) {
+            continue;
+        }
 
-            apply_policies(person, intervene);
+        apply_policies(person, intervene);
         }
     }
 }

@@ -102,30 +102,30 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
 
     // Baseline scenatio: compute adjustments.
     if (context.scenario().type() == ScenarioType::baseline) {
-        adjustments = calculate_adjustments(context, factors, ranges, apply_trend);
+        adjustments = calculate_adjustments(context, factors, ranges, apply_trend);    
     }
 
     // Intervention scenario: receive adjustments from baseline scenario.
     else {
-        auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
-        if (!message.has_value()) {
+            auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
+            if (!message.has_value()) {
             throw core::HgpsException(
                 "Simulation out of sync, receive baseline adjustments message has timed out");
-        }
+            }
 
         auto &basePtr = message.value();
         auto *messagePrt = dynamic_cast<RiskFactorAdjustmentMessage *>(basePtr.get());
-        if (!messagePrt) {
+            if (!messagePrt) {
             throw core::HgpsException(
                 "Simulation out of sync, failed to receive a baseline adjustments message");
-        }
+            }
 
-        adjustments = messagePrt->data();
+            adjustments = messagePrt->data();
     }
 
     // All scenarios: apply adjustments to population.
     auto &pop = context.population();
-    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
+        tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         if (!person.is_active()) {
             return;
         }
@@ -147,15 +147,15 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
 
     // Baseline scenario: send adjustments to intervention scenario.
     if (context.scenario().type() == ScenarioType::baseline) {
-        context.scenario().channel().send(std::make_unique<RiskFactorAdjustmentMessage>(
-            context.current_run(), context.time_now(), std::move(adjustments)));
+            context.scenario().channel().send(std::make_unique<RiskFactorAdjustmentMessage>(
+                context.current_run(), context.time_now(), std::move(adjustments)));
     }
 }
 
 int RiskFactorAdjustableModel::get_trend_steps(const core::Identifier &factor) const {
     if (trend_steps_) {
-        return trend_steps_->at(factor);
-    }
+    return trend_steps_->at(factor);
+}
     return 0; // Default to no trend steps if trend data is not available
 }
 
@@ -219,7 +219,7 @@ RiskFactorAdjustableModel::calculate_simulated_mean(Population &population,
                 moments.emplace(person.gender, factor, std::vector<FirstMoment>(age_count));
             }
             double value = person.risk_factors.at(factor);
-            moments.at(person.gender, factor).at(person.age).append(value);
+                moments.at(person.gender, factor).at(person.age).append(value);
         }
     }
 
@@ -251,11 +251,11 @@ RiskFactorAdjustableModelDefinition::RiskFactorAdjustableModelDefinition(
 
     // Only validate trend data if trends are actually being used
     if (trend_type_ != TrendType::Null) {
-        if (expected_trend_->empty()) {
-            throw core::HgpsException("Risk factor expected trend mapping is empty");
-        }
-        if (trend_steps_->empty()) {
-            throw core::HgpsException("Risk factor trend steps mapping is empty");
+    if (expected_trend_->empty()) {
+        throw core::HgpsException("Risk factor expected trend mapping is empty");
+    }
+    if (trend_steps_->empty()) {
+        throw core::HgpsException("Risk factor trend steps mapping is empty");
         }
     }
 }

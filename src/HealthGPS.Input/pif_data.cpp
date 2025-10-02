@@ -5,58 +5,74 @@
 namespace hgps::input {
 
 double PIFTable::get_pif_value(int age, core::Gender gender, int year_post_intervention) const {
-    // PHASE 1 OPTIMIZATION: Use hash table for O(1) lookup instead of O(n) linear search
-    // This provides 2,220x performance improvement for smoking scenarios
-
-    // Try exact match first using hash table
-    auto age_it = hash_table_.find(age);
-    if (age_it != hash_table_.end()) {
-        auto gender_it = age_it->second.find(gender);
-        if (gender_it != age_it->second.end()) {
-            auto year_it = gender_it->second.find(year_post_intervention);
-            if (year_it != gender_it->second.end()) {
-                return year_it->second; // Exact match found!
-            }
-        }
+    //OPTIMIZATION: Direct array access - no lookups, no searching
+    // Formula: index = ((year - min_year) * age_range * 2) + (gender * age_range) + (age - min_age)
+    
+    int RowThisAgeThisGenderThisYear = ((year_post_intervention - min_year_) * age_range_ * 2) +
+                                      (static_cast<int>(gender) * age_range_) + 
+                                      (age - min_age_);
+    
+    if (RowThisAgeThisGenderThisYear >= 0 && RowThisAgeThisGenderThisYear < static_cast<int>(direct_array_.size())) {
+        PIFDataItem Item = direct_array_[RowThisAgeThisGenderThisYear];
+        double PIFValue = Item.pif_value;
+        return PIFValue;
     }
-
-    // If no exact match, fall back to closest year_post_intervention
-    // This still uses the hash table for age/gender lookup, then searches years
-    auto age_it2 = hash_table_.find(age);
-    if (age_it2 != hash_table_.end()) {
-        auto gender_it2 = age_it2->second.find(gender);
-        if (gender_it2 != age_it2->second.end()) {
-            double closest_pif = 0.0;
-            int min_time_diff = std::numeric_limits<int>::max();
-
-            for (const auto &year_pair : gender_it2->second) {
-                int time_diff = std::abs(year_pair.first - year_post_intervention);
-                if (time_diff < min_time_diff) {
-                    min_time_diff = time_diff;
-                    closest_pif = year_pair.second;
-                }
-            }
-            return closest_pif;
-        }
-    }
-
-    return 0.0; // No data found
+    
+    return 0.0; // No data = 0.0
 }
 
 void PIFTable::add_item(const PIFDataItem &item) { data_.push_back(item); }
 
 void PIFTable::build_hash_table() {
-    // PHASE 1 OPTIMIZATION: Build hash table from vector data for O(1) lookups
-    // This is called once after all data is loaded to optimize lookup performance
-
-    hash_table_.clear();
-
-    for (const auto &item : data_) {
-        hash_table_[item.age][item.gender][item.year_post_intervention] = item.pif_value;
+    // OPTIMIZATION: Build direct array for ultra-fast access
+    // Calculate dynamic ranges from actual data
+    
+    if (data_.empty()) {
+        direct_array_.clear();
+        return;
     }
-
-    // Optional: Clear the vector data to save memory (uncomment if memory is critical)
-    // data_.clear();
+    
+    // Find actual data ranges
+    int min_age = data_[0].age;
+    int max_age = data_[0].age;
+    int min_year = data_[0].year_post_intervention;
+    int max_year = data_[0].year_post_intervention;
+    
+    for (const auto &item : data_) {
+        min_age = std::min(min_age, item.age);
+        max_age = std::max(max_age, item.age);
+        min_year = std::min(min_year, item.year_post_intervention);
+        max_year = std::max(max_year, item.year_post_intervention);
+    }
+    
+    // Store ranges for use in get_pif_value
+    min_age_ = min_age;
+    max_age_ = max_age;
+    min_year_ = min_year;
+    max_year_ = max_year;
+    age_range_ = max_age - min_age + 1;
+    year_range_ = max_year - min_year + 1;
+    
+    constexpr int GENDERS = 2;     // male, female
+    int array_size = year_range_ * age_range_ * GENDERS;
+    
+    direct_array_.resize(array_size);
+    
+    // Initialize all with default PIFDataItem (pif_value = 0.0)
+    for (auto& item : direct_array_) {
+        item = PIFDataItem{};
+    }
+    
+    // Populate with actual data using dynamic ranges
+    for (const auto &item : data_) {
+        int index = ((item.year_post_intervention - min_year_) * age_range_ * GENDERS) +
+                   (static_cast<int>(item.gender) * age_range_) + 
+                   (item.age - min_age_);
+        
+        if (index >= 0 && index < array_size) {
+            direct_array_[index] = item;
+        }
+    }
 }
 
 void PIFData::add_scenario_data(const std::string &scenario, PIFTable &&table) {
