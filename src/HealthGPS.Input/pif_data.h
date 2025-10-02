@@ -29,7 +29,7 @@ struct PIFDataItem {
 class PIFTable {
   public:
     /// @brief Default constructor
-    PIFTable() = default;
+    PIFTable() : min_age_(0), max_age_(0), min_year_(0), max_year_(0), age_range_(1), year_range_(1) {}
 
     /// @brief Get PIF value for specific age, gender, and time
     /// @param age Person's age
