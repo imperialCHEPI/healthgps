@@ -14,6 +14,10 @@ TEST(DiseaseModelPIF, PIFDataIntegration) {
 
     table.add_item({25, Gender::male, 5, 0.3});
     table.add_item({30, Gender::female, 3, 0.2});
+    
+    // PHASE 1 OPTIMIZATION: Build hash table for O(1) lookups
+    table.build_hash_table();
+    
     data.add_scenario_data("Scenario1", std::move(table));
 
     EXPECT_TRUE(data.has_data());
@@ -42,6 +46,10 @@ TEST(DiseaseModelPIF, PIFTable) {
     EXPECT_EQ(0, table.size());
 
     table.add_item({25, Gender::male, 5, 0.3});
+    
+    // PHASE 1 OPTIMIZATION: Build hash table for O(1) lookups
+    table.build_hash_table();
+    
     EXPECT_TRUE(table.has_data());
     EXPECT_EQ(1, table.size());
     EXPECT_NEAR(0.3, table.get_pif_value(25, Gender::male, 5), 1e-6);

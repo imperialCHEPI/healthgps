@@ -16,6 +16,10 @@ TEST(PIFIntegration, PIFDataWorkflow) {
     table.add_item({25, Gender::male, 5, 0.3});
     table.add_item({30, Gender::female, 3, 0.2});
     table.add_item({35, Gender::male, 10, 0.4});
+    
+    // PHASE 1 OPTIMIZATION: Build hash table for O(1) lookups
+    table.build_hash_table();
+    
     data.add_scenario_data("Scenario1", std::move(table));
 
     // Verify data structure
@@ -42,11 +46,19 @@ TEST(PIFIntegration, MultipleScenarios) {
     // Add Scenario1 data
     hgps::input::PIFTable table1;
     table1.add_item({25, Gender::male, 5, 0.3}); // 0 = male in CSV format
+    
+    // PHASE 1 OPTIMIZATION: Build hash table for O(1) lookups
+    table1.build_hash_table();
+    
     data.add_scenario_data("Scenario1", std::move(table1));
 
     // Add Scenario2 data
     hgps::input::PIFTable table2;
     table2.add_item({25, Gender::male, 5, 0.5});
+    
+    // PHASE 1 OPTIMIZATION: Build hash table for O(1) lookups
+    table2.build_hash_table();
+    
     data.add_scenario_data("Scenario2", std::move(table2));
 
     EXPECT_TRUE(data.has_data());
