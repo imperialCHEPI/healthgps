@@ -253,9 +253,9 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
         double incidence = definition_.get().table()(person.age, person.gender).at(incidence_id);
         double probability = incidence * relative_risk / average_relative_risk;
 
-        // Apply PIF adjustment if PIF data is available and we're in baseline scenario
+        // Apply PIF adjustment if PIF data is available and we're in intervention scenario
         if (definition_.get().has_pif_data() &&
-            context.scenario().type() == ScenarioType::baseline) {
+            context.scenario().type() == ScenarioType::intervention) {
             // Print confirmation message once (only for the first disease that uses PIF)
             static bool pif_used_printed = false;
             if (!pif_used_printed) {
