@@ -51,7 +51,7 @@ TEST(PIFTable, GetPIFValues) {
     table.add_item(item1);
     table.add_item(item2);
     table.add_item(item3);
-    
+
     // PHASE 1 OPTIMIZATION: Build hash table for O(1) lookups
     table.build_hash_table();
 
@@ -105,10 +105,10 @@ TEST(PIFData, GetScenarioData) {
     PIFData pif_data;
     PIFTable table;
     table.add_item({25, Gender::male, 5, 0.3});
-    
+
     // PHASE 1 OPTIMIZATION: Build hash table for O(1) lookups
     table.build_hash_table();
-    
+
     pif_data.add_scenario_data("Scenario1", std::move(table));
 
     const auto *scenario = pif_data.get_scenario_data("Scenario1");
