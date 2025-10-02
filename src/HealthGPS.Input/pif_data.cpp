@@ -5,19 +5,20 @@
 namespace hgps::input {
 
 double PIFTable::get_pif_value(int age, core::Gender gender, int year_post_intervention) const {
-    //OPTIMIZATION: Direct array access - no lookups, no searching
-    // Formula: index = ((year - min_year) * age_range * 2) + (gender * age_range) + (age - min_age)
-    
+    // OPTIMIZATION: Direct array access - no lookups, no searching
+    //  Formula: index = ((year - min_year) * age_range * 2) + (gender * age_range) + (age -
+    //  min_age)
+
     int RowThisAgeThisGenderThisYear = ((year_post_intervention - min_year_) * age_range_ * 2) +
-                                      (static_cast<int>(gender) * age_range_) + 
-                                      (age - min_age_);
-    
-    if (RowThisAgeThisGenderThisYear >= 0 && RowThisAgeThisGenderThisYear < static_cast<int>(direct_array_.size())) {
+                                       (static_cast<int>(gender) * age_range_) + (age - min_age_);
+
+    if (RowThisAgeThisGenderThisYear >= 0 &&
+        RowThisAgeThisGenderThisYear < static_cast<int>(direct_array_.size())) {
         PIFDataItem Item = direct_array_[RowThisAgeThisGenderThisYear];
         double PIFValue = Item.pif_value;
         return PIFValue;
     }
-    
+
     return 0.0; // No data = 0.0
 }
 
@@ -26,25 +27,25 @@ void PIFTable::add_item(const PIFDataItem &item) { data_.push_back(item); }
 void PIFTable::build_hash_table() {
     // OPTIMIZATION: Build direct array for ultra-fast access
     // Calculate dynamic ranges from actual data
-    
+
     if (data_.empty()) {
         direct_array_.clear();
         return;
     }
-    
+
     // Find actual data ranges
     int min_age = data_[0].age;
     int max_age = data_[0].age;
     int min_year = data_[0].year_post_intervention;
     int max_year = data_[0].year_post_intervention;
-    
+
     for (const auto &item : data_) {
         min_age = std::min(min_age, item.age);
         max_age = std::max(max_age, item.age);
         min_year = std::min(min_year, item.year_post_intervention);
         max_year = std::max(max_year, item.year_post_intervention);
     }
-    
+
     // Store ranges for use in get_pif_value
     min_age_ = min_age;
     max_age_ = max_age;
@@ -52,23 +53,22 @@ void PIFTable::build_hash_table() {
     max_year_ = max_year;
     age_range_ = max_age - min_age + 1;
     year_range_ = max_year - min_year + 1;
-    
-    constexpr int GENDERS = 2;     // male, female
+
+    constexpr int GENDERS = 2; // male, female
     int array_size = year_range_ * age_range_ * GENDERS;
-    
+
     direct_array_.resize(array_size);
-    
+
     // Initialize all with default PIFDataItem (pif_value = 0.0)
-    for (auto& item : direct_array_) {
+    for (auto &item : direct_array_) {
         item = PIFDataItem{};
     }
-    
+
     // Populate with actual data using dynamic ranges
     for (const auto &item : data_) {
         int index = ((item.year_post_intervention - min_year_) * age_range_ * GENDERS) +
-                   (static_cast<int>(item.gender) * age_range_) + 
-                   (item.age - min_age_);
-        
+                    (static_cast<int>(item.gender) * age_range_) + (item.age - min_age_);
+
         if (index >= 0 && index < array_size) {
             direct_array_[index] = item;
         }
