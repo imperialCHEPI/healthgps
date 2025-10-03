@@ -69,7 +69,6 @@ class PIFTable {
 
     int min_age_, max_age_, min_year_{0}, max_year_;
     int age_range_, year_range_{1};
-    int age_range_, year_range_;
 };
 
 /// @brief PIF data container for multiple scenarios
