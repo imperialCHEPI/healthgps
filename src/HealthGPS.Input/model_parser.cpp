@@ -208,6 +208,7 @@ load_hlm_risk_model_definition(const nlohmann::json &opt) {
                                                                            std::move(levels));
 }
 
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 std::unique_ptr<hgps::StaticLinearModelDefinition>
 load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configuration &config) {
     MEASURE_FUNCTION();

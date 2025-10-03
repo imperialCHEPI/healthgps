@@ -180,7 +180,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     const double physical_activity_stddev_;
 
     // Policy optimization flag - Mahima's enhancement
-    const bool has_active_policies_;
+    bool has_active_policies_;
 };
 
 /// @brief Defines the static linear model data type

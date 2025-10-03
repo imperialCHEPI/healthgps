@@ -223,6 +223,7 @@ void DefaultCancerModel::update_remission_cases(RuntimeContext &context) {
     }
 }
 
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
     int incidence_id = definition_.get().table().at(MeasureKey::incidence);
 

@@ -20,7 +20,7 @@ TEST(DataManagerPIF, BasicDataManagerCreation) {
     data.add_scenario_data("Scenario1", std::move(table));
 
     EXPECT_TRUE(data.has_data());
-    auto *scenario = data.get_scenario_data("Scenario1");
+    const auto *scenario = data.get_scenario_data("Scenario1");
     EXPECT_NE(nullptr, scenario);
     EXPECT_TRUE(scenario->has_data());
 }

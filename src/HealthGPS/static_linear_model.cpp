@@ -62,6 +62,7 @@ RiskFactorModelType StaticLinearModel::type() const noexcept { return RiskFactor
 
 std::string StaticLinearModel::name() const noexcept { return "Static"; }
 
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     // Initialise everyone.
     for (auto &person : context.population()) {
@@ -101,6 +102,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     }
 }
 
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
     // HACK: start intervening two years into the simulation.
     bool intervene = (context.scenario().type() == ScenarioType::intervention &&

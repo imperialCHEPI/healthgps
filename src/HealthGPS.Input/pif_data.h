@@ -29,8 +29,7 @@ struct PIFDataItem {
 class PIFTable {
   public:
     /// @brief Default constructor
-    PIFTable()
-        : min_age_(0), max_age_(0), min_year_(0), max_year_(0), age_range_(1), year_range_(1) {}
+    PIFTable() = default;
 
     /// @brief Get PIF value for specific age, gender, and time
     /// @param age Person's age
@@ -67,8 +66,8 @@ class PIFTable {
     // Direct array for TRUE O(1) access - no lookups!
     std::vector<PIFDataItem> direct_array_;
 
-    int min_age_, max_age_, min_year_{0}, max_year_;
-    int age_range_, year_range_{1};
+    int min_age_{0}, max_age_{0}, min_year_{0}, max_year_{0};
+    int age_range_{1}, year_range_{1};
 };
 
 /// @brief PIF data container for multiple scenarios

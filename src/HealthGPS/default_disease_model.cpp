@@ -211,6 +211,7 @@ void DefaultDiseaseModel::update_remission_cases(RuntimeContext &context) {
     }
 }
 
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
     int incidence_id = definition_.get().table().at(MeasureKey::incidence);
 
@@ -261,7 +262,7 @@ void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
                 if (debug_diseases_printed.find(disease_type().to_string()) ==
                     debug_diseases_printed.end()) {
                     std::cout << "=== PIF DEBUG FOR DISEASE: " << disease_type().to_string()
-                              << " ===" << std::endl;
+                              << " ===";
                     std::cout << "PIF Table Size: " << pif_table->size() << '\n';
 
                     // MANUAL DEBUG VALUES - Change these to test what you want

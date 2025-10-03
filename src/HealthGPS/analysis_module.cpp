@@ -677,6 +677,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
 }
 // NOLINTEND(readability-function-cognitive-complexity)
 
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext &context,
                                                                   DataSeries &series) const {
     if (!enable_income_analysis_) {
