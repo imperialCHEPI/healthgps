@@ -68,7 +68,7 @@ class PIFTable {
     std::vector<PIFDataItem> direct_array_;
 
     // Dynamic ranges calculated from actual data
-    int min_age_, max_age_, min_year_, max_year_;
+    int age_range_, year_range_{1};
     int age_range_, year_range_;
 };
 
