@@ -489,10 +489,23 @@ double KevinHallModel::get_expected(RuntimeContext &context, core::Gender sex, i
 
         // Adult case.
         double weight = 16.1161;
-        weight += 0.06256 * get_expected(context, sex, age, "EnergyIntake"_id, std::nullopt, true);
+
+        // MAHIMA: Calculate PAL-based coefficient from factors mean
+        // Replaces hardcoded 0.06256 with 1/(9.99 * PA) where PA is person-specific physical
+        // activity
+        double pa_from_factors_mean =
+            get_expected(context, sex, age, "PhysicalActivity"_id, std::nullopt, false);
+        double pal_coefficient = 1.0 / (9.99 * pa_from_factors_mean);
+        weight += pal_coefficient *
+                  get_expected(context, sex, age, "EnergyIntake"_id, std::nullopt, true);
         weight -= 0.6256 * get_expected(context, sex, age, "Height"_id, std::nullopt, false);
         weight += 0.4925 * age;
-        weight -= 16.6166 * Person::gender_to_value(sex);
+
+        // MAHIMA: Gender coefficient fix - assign to males instead of females
+        // Due to enum mismatch where female=1 instead of male=1
+        double gender_coefficient = (sex == core::Gender::male) ? 16.6166 : 0.0;
+        weight -= gender_coefficient;
+
         return weight;
     }
 
