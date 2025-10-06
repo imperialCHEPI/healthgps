@@ -681,7 +681,7 @@ std::optional<PIFData> DataManager::get_pif_data(const DiseaseInfo &disease_info
                 pif_data.add_scenario_data(scenario, std::move(pif_table));
 
                 // Print verification message with performance metrics
-                auto loaded_pif_table = pif_data.get_scenario_data(scenario);
+                const auto *loaded_pif_table = pif_data.get_scenario_data(scenario);
                 auto file_size = std::filesystem::file_size(full_path);
 
                 fmt::print(fg(fmt::color::green), "PIF Data Loaded Successfully:\n");
