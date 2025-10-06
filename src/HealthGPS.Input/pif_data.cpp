@@ -6,20 +6,21 @@ namespace hgps::input {
 
 double PIFTable::get_pif_value(int age, core::Gender gender, int year_post_intervention) const {
     // OPTIMIZATION: Direct array access - no lookups, no searching
-    //  Formula: index = ((year - min_year) * age_range * 2) + (gender * age_range) + (age -
-    //  min_age)
+    //  Formula: index = ((year - min_year) * age_range * 2) + (gender_index * age_range) + (age - min_age)
+    //  Gender mapping: male=0, female=1 (convert from enum: male=1->0, female=2->1)
 
-    int RowThisAgeThisGenderThisYear = ((year_post_intervention - min_year_) * age_range_ * 2) +
-                                       (static_cast<int>(gender) * age_range_) + (age - min_age_);
-
-    if (RowThisAgeThisGenderThisYear >= 0 &&
-        RowThisAgeThisGenderThisYear < static_cast<int>(direct_array_.size())) {
-        PIFDataItem Item = direct_array_[RowThisAgeThisGenderThisYear];
-        double PIFValue = Item.pif_value;
-        return PIFValue;
+    // Early bounds check for performance
+    if (age < min_age_ || age > max_age_ || 
+        year_post_intervention < min_year_ || year_post_intervention > max_year_) {
+        return 0.0;
     }
 
-    return 0.0; // No data = 0.0
+    int gender_index = (gender == core::Gender::male) ? 0 : 1;
+    int index = ((year_post_intervention - min_year_) * age_range_ * 2) +
+                (gender_index * age_range_) + (age - min_age_);
+
+    // Direct access without bounds check (already validated above)
+    return direct_array_[index].pif_value;
 }
 
 void PIFTable::add_item(const PIFDataItem &item) { data_.push_back(item); }
@@ -66,8 +67,9 @@ void PIFTable::build_hash_table() {
 
     // Populate with actual data using dynamic ranges
     for (const auto &item : data_) {
+        int gender_index = (item.gender == core::Gender::male) ? 0 : 1;
         int index = ((item.year_post_intervention - min_year_) * age_range_ * GENDERS) +
-                    (static_cast<int>(item.gender) * age_range_) + (item.age - min_age_);
+                    (gender_index * age_range_) + (item.age - min_age_);
 
         if (index >= 0 && index < array_size) {
             direct_array_[index] = item;

@@ -9,6 +9,7 @@
 #include <fmt/color.h>
 #include <rapidcsv.h>
 
+#include <chrono>
 #include <cstdlib>
 #include <fstream>
 #include <regex>
@@ -679,14 +680,20 @@ std::optional<PIFData> DataManager::get_pif_data(const DiseaseInfo &disease_info
                 PIFData pif_data;
                 pif_data.add_scenario_data(scenario, std::move(pif_table));
 
-                // Print verification message
+                // Print verification message with performance metrics
+                auto pif_table = pif_data.get_scenario_data(scenario);
+                auto file_size = std::filesystem::file_size(full_path);
+                
                 fmt::print(fg(fmt::color::green), "PIF Data Loaded Successfully:\n");
                 fmt::print("  - Disease: {}\n", disease_info.code.to_string());
                 fmt::print("  - Country: {} (Code: {})\n", country.name, country_code);
                 fmt::print("  - Risk Factor: {}\n", risk_factor);
                 fmt::print("  - Scenario: {}\n", scenario);
-                fmt::print("  - Toatal Data Rows: {}\n",
-                           pif_data.get_scenario_data(scenario)->size());
+                fmt::print("  - Total Data Rows: {}\n", pif_table->size());
+                fmt::print("  - File Size: {} bytes ({:.2f} KB)\n", file_size, file_size / 1024.0);
+                fmt::print("  - Memory Usage: {} bytes ({:.2f} KB)\n", 
+                           pif_table->size() * sizeof(PIFDataItem), 
+                           (pif_table->size() * sizeof(PIFDataItem)) / 1024.0);
                 fmt::print("  - File: {}\n", csv_filename);
                 fmt::print("  - Path: {}\n", full_path.string());
                 fmt::print("  - PIF Analysis: ENABLED and READY\n\n");
@@ -744,6 +751,7 @@ std::string DataManager::expand_environment_variables(const std::string &path) c
 
 PIFTable DataManager::load_pif_from_csv(const std::filesystem::path &filepath) const {
     PIFTable table;
+    auto start_time = std::chrono::high_resolution_clock::now();
 
     try {
         rapidcsv::Document doc(filepath.string());
@@ -776,9 +784,13 @@ PIFTable DataManager::load_pif_from_csv(const std::filesystem::path &filepath) c
         // This dramatically improves performance from O(n) to O(1) for PIF lookups
         table.build_hash_table();
 
-        // Print CSV loading verification
-        fmt::print(fg(fmt::color::cyan), "PIF CSV File Loaded: {} ({} rows)\n",
-                   filepath.filename().string(), table.size());
+        // Calculate loading time
+        auto end_time = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+        
+        // Print CSV loading verification with timing
+        fmt::print(fg(fmt::color::cyan), "PIF CSV File Loaded: {} ({} rows) in {}ms\n",
+                   filepath.filename().string(), table.size(), duration.count());
         fmt::print(fg(fmt::color::green),
                    "PIF Hash Table Built: O(1) lookup optimization enabled\n");
 
