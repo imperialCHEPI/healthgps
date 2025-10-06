@@ -683,7 +683,7 @@ std::optional<PIFData> DataManager::get_pif_data(const DiseaseInfo &disease_info
                 // Print verification message with performance metrics
                 auto pif_table = pif_data.get_scenario_data(scenario);
                 auto file_size = std::filesystem::file_size(full_path);
-                
+
                 fmt::print(fg(fmt::color::green), "PIF Data Loaded Successfully:\n");
                 fmt::print("  - Disease: {}\n", disease_info.code.to_string());
                 fmt::print("  - Country: {} (Code: {})\n", country.name, country_code);
@@ -691,8 +691,8 @@ std::optional<PIFData> DataManager::get_pif_data(const DiseaseInfo &disease_info
                 fmt::print("  - Scenario: {}\n", scenario);
                 fmt::print("  - Total Data Rows: {}\n", pif_table->size());
                 fmt::print("  - File Size: {} bytes ({:.2f} KB)\n", file_size, file_size / 1024.0);
-                fmt::print("  - Memory Usage: {} bytes ({:.2f} KB)\n", 
-                           pif_table->size() * sizeof(PIFDataItem), 
+                fmt::print("  - Memory Usage: {} bytes ({:.2f} KB)\n",
+                           pif_table->size() * sizeof(PIFDataItem),
                            (pif_table->size() * sizeof(PIFDataItem)) / 1024.0);
                 fmt::print("  - File: {}\n", csv_filename);
                 fmt::print("  - Path: {}\n", full_path.string());
@@ -786,8 +786,9 @@ PIFTable DataManager::load_pif_from_csv(const std::filesystem::path &filepath) c
 
         // Calculate loading time
         auto end_time = std::chrono::high_resolution_clock::now();
-        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
-        
+        auto duration =
+            std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+
         // Print CSV loading verification with timing
         fmt::print(fg(fmt::color::cyan), "PIF CSV File Loaded: {} ({} rows) in {}ms\n",
                    filepath.filename().string(), table.size(), duration.count());
