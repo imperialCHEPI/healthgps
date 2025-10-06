@@ -217,7 +217,7 @@ void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
 
     std::cout << "Start update_incidence_cases: " << disease_type() << "\n";
     fflush(stderr);
-    fflush(stdout); 
+    fflush(stdout);
 
     for (auto &person : context.population()) {
         // Skip if person is inactive.

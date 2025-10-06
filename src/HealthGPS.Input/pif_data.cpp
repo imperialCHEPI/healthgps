@@ -48,8 +48,8 @@ void PIFTable::build_hash_table() {
     }
 
     // Store ranges for use in get_pif_value
-    min_age_ = min_age; //0
-    max_age_ = max_age; //110
+    min_age_ = min_age; // 0
+    max_age_ = max_age; // 110
     min_year_ = min_year;
     max_year_ = max_year;
     age_range_ = max_age - min_age + 1;
