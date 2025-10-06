@@ -683,7 +683,7 @@ std::optional<PIFData> DataManager::get_pif_data(const DiseaseInfo &disease_info
                 // Print verification message with performance metrics
                 auto loaded_pif_table = pif_data.get_scenario_data(scenario);
                 auto file_size = std::filesystem::file_size(full_path);
-                
+
                 fmt::print(fg(fmt::color::green), "PIF Data Loaded Successfully:\n");
                 fmt::print("  - Disease: {}\n", disease_info.code.to_string());
                 fmt::print("  - Country: {} (Code: {})\n", country.name, country_code);
@@ -691,8 +691,8 @@ std::optional<PIFData> DataManager::get_pif_data(const DiseaseInfo &disease_info
                 fmt::print("  - Scenario: {}\n", scenario);
                 fmt::print("  - Total Data Rows: {}\n", loaded_pif_table->size());
                 fmt::print("  - File Size: {} bytes ({:.2f} KB)\n", file_size, file_size / 1024.0);
-                fmt::print("  - Memory Usage: {} bytes ({:.2f} KB)\n", 
-                           loaded_pif_table->size() * sizeof(PIFDataItem), 
+                fmt::print("  - Memory Usage: {} bytes ({:.2f} KB)\n",
+                           loaded_pif_table->size() * sizeof(PIFDataItem),
                            (loaded_pif_table->size() * sizeof(PIFDataItem)) / 1024.0);
                 fmt::print("  - File: {}\n", csv_filename);
                 fmt::print("  - Path: {}\n", full_path.string());
