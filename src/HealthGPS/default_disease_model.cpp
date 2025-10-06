@@ -215,6 +215,10 @@ void DefaultDiseaseModel::update_remission_cases(RuntimeContext &context) {
 void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
     int incidence_id = definition_.get().table().at(MeasureKey::incidence);
 
+    std::cout << "Start update_incidence_cases: " << disease_type() << "\n";
+    fflush(stderr);
+    fflush(stdout); 
+
     for (auto &person : context.population()) {
         // Skip if person is inactive.
         if (!person.is_active()) {
@@ -297,6 +301,9 @@ void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
                 Disease{.status = DiseaseStatus::active, .start_time = context.time_now()};
         }
     }
+    std::cout << "End update_incidence_cases: " << disease_type() << "\n";
+    fflush(stderr);
+    fflush(stdout);
 }
 
 } // namespace hgps
