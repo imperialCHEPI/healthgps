@@ -6,7 +6,7 @@ namespace hgps::input {
 
 double PIFTable::get_pif_value(int age, core::Gender gender, int year_post_intervention) const {
     // OPTIMIZATION: Direct array access - no lookups, no searching
-    //  Formula: index = ((year - min_year) * age_range * 2) + (gender_index * age_range) + (age -
+    //  Formula: index = ((year - min_year) * age_range * GENDERS) + (gender_index * age_range) + (age -
     //  min_age) Gender mapping: male=0, female=1 (convert from enum: male=1->0, female=2->1)
 
     // Early bounds check for performance
@@ -15,8 +15,9 @@ double PIFTable::get_pif_value(int age, core::Gender gender, int year_post_inter
         return 0.0;
     }
 
+    constexpr int GENDERS = 2; // male, female
     int gender_index = (gender == core::Gender::male) ? 0 : 1;
-    int index = ((year_post_intervention - min_year_) * age_range_ * 2) +
+    int index = ((year_post_intervention - min_year_) * age_range_ * GENDERS) +
                 (gender_index * age_range_) + (age - min_age_);
 
     // Direct access without bounds check (already validated above)
