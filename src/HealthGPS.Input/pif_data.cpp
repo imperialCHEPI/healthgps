@@ -61,11 +61,6 @@ void PIFTable::build_hash_table() {
 
     direct_array_.resize(array_size);
 
-    // Initialize all with default PIFDataItem (pif_value = 0.0)
-    for (auto &item : direct_array_) {
-        item = PIFDataItem{};
-    }
-
     // Populate with actual data using dynamic ranges
     for (const auto &item : data_) {
         int gender_index = (item.gender == core::Gender::male) ? 0 : 1;
