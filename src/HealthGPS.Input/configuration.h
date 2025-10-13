@@ -84,6 +84,8 @@ struct Configuration {
 
     /// @brief Original config.json data for accessing additional fields like income_categories
     nlohmann::json config_data;
+    /// @brief Population Impact Fraction (PIF) configuration
+    PIFInfo population_impact_fraction{};
 };
 
 /// @brief Represents an error that occurred with the format of a config file

@@ -113,6 +113,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
         /// FINCH (continuous) approaches
         const std::unordered_map<core::Identifier, PhysicalActivityModel>
             &physical_activity_models = {});
+        bool has_active_policies = true);
 
     RiskFactorModelType type() const noexcept override;
 
@@ -272,6 +273,8 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     // Physical activity model support (both India and FINCH approaches)
     std::unordered_map<core::Identifier, PhysicalActivityModel> physical_activity_models_;
     bool has_physical_activity_models_ = false;
+    // Policy optimization flag - Mahima's enhancement
+    bool has_active_policies_;
 };
 
 /// @brief Defines the static linear model data type
@@ -343,6 +346,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
         const LinearModelParams &continuous_income_model = LinearModelParams{},
         const std::string &income_categories = "3",
         std::unordered_map<core::Identifier, PhysicalActivityModel> physical_activity_models = {});
+        bool has_active_policies = true);
 
     /// @brief Construct a new StaticLinearModel from this definition
     /// @return A unique pointer to the new StaticLinearModel instance
@@ -390,6 +394,8 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     bool is_continuous_income_model_;
     LinearModelParams continuous_income_model_;
     std::string income_categories_;
+    // Policy optimization flag - Mahima's enhancement
+    bool has_active_policies_;
 };
 
 } // namespace hgps

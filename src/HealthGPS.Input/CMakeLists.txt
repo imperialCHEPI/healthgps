@@ -26,6 +26,8 @@ target_sources(
             "jsonparser.h"
             "model_parser.cpp"
             "model_parser.h"
+            "pif_data.cpp"
+            "pif_data.h"
             "poco.h"
             "riskmodel.h"
             "schema.cpp"
