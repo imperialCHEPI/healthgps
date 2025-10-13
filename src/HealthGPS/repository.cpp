@@ -1,4 +1,6 @@
 #include "repository.h"
+#include "HealthGPS.Input/datamanager.h"
+#include "HealthGPS.Input/pif_data.h"
 #include "converter.h"
 
 #include <fmt/core.h>
@@ -104,19 +106,38 @@ void CachedRepository::load_disease_definition(const core::DiseaseInfo &info,
                                                               .inputs = config,
                                                               .risk_factors = risk_factors});
 
+    // Load PIF data if available
+    hgps::input::PIFData pif_data;
+    if (config.population_impact_fraction().enabled) {
+        // Convert PIFInfo to JSON for DataManager, using the DataManager's root directory
+        nlohmann::json pif_config;
+        pif_config["enabled"] = config.population_impact_fraction().enabled;
+        // Use the DataManager's root directory instead of requiring environment variable
+        pif_config["data_root_path"] =
+            dynamic_cast<hgps::input::DataManager &>(data_manager_.get()).get_root_path();
+        pif_config["risk_factor"] = config.population_impact_fraction().risk_factor;
+        pif_config["scenario"] = config.population_impact_fraction().scenario;
+
+        auto pif_result = dynamic_cast<hgps::input::DataManager &>(data_manager_.get())
+                              .get_pif_data(info, config.settings().country(), pif_config);
+        if (pif_result.has_value()) {
+            pif_data = std::move(pif_result.value());
+        }
+    }
+
     if (info.group != core::DiseaseGroup::cancer) {
         auto definition =
             DiseaseDefinition(std::move(disease_table), std::move(relative_risks.diseases),
-                              std::move(relative_risks.risk_factors));
+                              std::move(relative_risks.risk_factors), std::move(pif_data));
         diseases_.emplace(info.code, definition);
     } else {
         auto cancer_param =
             data_manager_.get().get_disease_parameter(info, config.settings().country());
         auto parameter = detail::StoreConverter::to_disease_parameter(cancer_param);
 
-        auto definition =
-            DiseaseDefinition(std::move(disease_table), std::move(relative_risks.diseases),
-                              std::move(relative_risks.risk_factors), std::move(parameter));
+        auto definition = DiseaseDefinition(
+            std::move(disease_table), std::move(relative_risks.diseases),
+            std::move(relative_risks.risk_factors), std::move(parameter), std::move(pif_data));
         diseases_.emplace(info.code, definition);
     }
 }
