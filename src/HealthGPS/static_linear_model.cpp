@@ -38,11 +38,10 @@ StaticLinearModel::StaticLinearModel(
     std::shared_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors,
     bool is_continuous_income_model, const LinearModelParams &continuous_income_model,
     const std::string &income_categories,
-    const std::unordered_map<core::Identifier, PhysicalActivityModel> &physical_activity_models)
-    : RiskFactorAdjustableModel {std::move(expected),       expected_trend, trend_steps, trend_type,
+    const std::unordered_map<core::Identifier, PhysicalActivityModel> &physical_activity_models,
     bool has_active_policies)
-    : RiskFactorAdjustableModel{std::move(expected),       std::move(expected_trend),
-                                std::move(trend_steps),    trend_type,
+    : RiskFactorAdjustableModel{std::move(expected),       expected_trend,
+                                trend_steps,               trend_type,
                                 expected_income_trend,       // Pass by value, not moved
                                 income_trend_decay_factors}, // Pass by value, not moved
       // Continuous income model support (FINCH approach) - must come first
@@ -68,7 +67,8 @@ StaticLinearModel::StaticLinearModel(
       rural_prevalence_{rural_prevalence}, income_models_{income_models},
       physical_activity_stddev_{physical_activity_stddev},
       physical_activity_models_{physical_activity_models},
-      has_physical_activity_models_{!physical_activity_models.empty()} {
+      has_physical_activity_models_{!physical_activity_models.empty()},
+      has_active_policies_{has_active_policies} {
 
         if (names_.empty()) {
             throw core::HgpsException("Risk factor names list is empty");
@@ -223,7 +223,6 @@ StaticLinearModel::StaticLinearModel(
         }
         std::cout << "\nDEBUG: StaticLinearModel constructor completed successfully";
     }
-    has_active_policies_{has_active_policies} {}
 
     RiskFactorModelType StaticLinearModel::type() const noexcept {
         return RiskFactorModelType::Static;
@@ -251,11 +250,6 @@ StaticLinearModel::StaticLinearModel(
             initialise_income(context, person, context.random());
             initialise_factors(context, person, context.random());
             initialise_physical_activity(context, person, context.random());
-
-            person_count++;
-            if (person_count % 500 == 0) {
-                std::cout << "\nDEBUG: Processed " << person_count << " people so far...";
-            }
         }
         std::cout << "\nDEBUG: Person initialization loop completed successfully for "
                   << person_count << " people";
@@ -1118,9 +1112,7 @@ StaticLinearModel::StaticLinearModel(
                                                         continuous_model->second);
             }
         } else {
-            // No physical activity models configured - use simple approach with global stddev
-            std::cout << "\nWARNING: No 'simple' or 'continuous' model found, using simple model "
-                         "as default";
+            // No physical activity models configured - use simple approach with global stddev (India approach)
             PhysicalActivityModel simple_model;
             simple_model.model_type = "simple";
             simple_model.stddev = physical_activity_stddev_;
@@ -1358,8 +1350,7 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::unique_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors,
     bool is_continuous_income_model, const LinearModelParams &continuous_income_model,
     const std::string &income_categories,
-    std::unordered_map<core::Identifier, PhysicalActivityModel> physical_activity_models)
-    // FIXED: Create copies of data before moving unique_ptrs to avoid use-after-move warnings
+    std::unordered_map<core::Identifier, PhysicalActivityModel> physical_activity_models,
     bool has_active_policies)
     : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend),
                                           std::move(trend_steps), trend_type},
@@ -1409,8 +1400,8 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
       has_physical_activity_models_{!physical_activity_models.empty()},
       // Continuous income model support (FINCH approach)
       is_continuous_income_model_{is_continuous_income_model},
-      continuous_income_model_{continuous_income_model}, income_categories_{income_categories} {
-    has_active_policies_{has_active_policies} {
+      continuous_income_model_{continuous_income_model}, income_categories_{income_categories},
+      has_active_policies_{has_active_policies} {
 
         if (names_.empty()) {
             throw core::HgpsException("Risk factor names list is empty");
@@ -1554,8 +1545,7 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
             expected_income_trend_boxcox_, income_trend_steps_, income_trend_models_,
             income_trend_ranges_, income_trend_lambda_, income_trend_decay_factors_,
             is_continuous_income_model_, continuous_income_model_, income_categories_,
-            physical_activity_models_);
-        has_active_policies_);
+            physical_activity_models_, has_active_policies_);
     }
 
 } // namespace hgps
