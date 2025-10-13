@@ -241,6 +241,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         initialise_income(context, person, context.random());
         initialise_factors(context, person, context.random());
         initialise_physical_activity(context, person, context.random());
+        person_count++;
     }
     std::cout << "\nDEBUG: Person initialization loop completed successfully for " << person_count
               << " people";
