@@ -112,6 +112,16 @@ Configuration get_configuration(const std::string &config_source,
         }
     }
 
+    // Read PIF configuration from JSON file (if available)
+    if (opt.contains("population_impact_fraction")) {
+        const auto &pif_json = opt["population_impact_fraction"];
+        config.population_impact_fraction.enabled = pif_json["enabled"].get<bool>();
+        config.population_impact_fraction.data_root_path =
+            pif_json["data_root_path"].get<std::string>();
+        config.population_impact_fraction.risk_factor = pif_json["risk_factor"].get<std::string>();
+        config.population_impact_fraction.scenario = pif_json["scenario"].get<std::string>();
+    }
+
     // Read data source from JSON file. For now, this is optional, but in future it will be
     // mandatory.
     if (opt.contains("data")) {
@@ -209,7 +219,8 @@ ModelInput create_model_input(core::DataTable &input_table, core::Country countr
             run_info,
             ses_mapping,
             HierarchicalMapping(std::move(mapping)),
-            std::move(diseases)};
+            std::move(diseases),
+            config.population_impact_fraction};
 }
 
 std::string create_output_file_name(const OutputInfo &info, int job_id) {

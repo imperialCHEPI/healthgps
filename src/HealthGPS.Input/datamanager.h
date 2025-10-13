@@ -1,6 +1,7 @@
 #pragma once
 
 #include "HealthGPS.Core/api.h"
+#include "pif_data.h"
 
 #include <filesystem>
 #include <nlohmann/json.hpp>
@@ -78,6 +79,18 @@ class DataManager : public Datastore {
 
     std::vector<LmsDataRow> get_lms_parameters() const override;
 
+    /// @brief Gets PIF data for a specific disease
+    /// @param disease_info The disease information
+    /// @param country The country
+    /// @param pif_config PIF configuration from config.json
+    /// @return PIF data for the disease, or std::nullopt if not available
+    std::optional<PIFData> get_pif_data(const DiseaseInfo &disease_info, const Country &country,
+                                        const nlohmann::json &pif_config) const;
+
+    /// @brief Get the root data directory path
+    /// @return The root data directory path
+    const std::filesystem::path &get_root_path() const noexcept { return root_; }
+
   private:
     std::filesystem::path root_;
     VerboseMode verbosity_;
@@ -97,6 +110,23 @@ class DataManager : public Datastore {
                                 const std::vector<std::string> &fields);
 
     void notify_warning(std::string_view message) const;
+
+    /// @brief Loads PIF data from CSV file
+    /// @param filepath Path to PIF CSV file
+    /// @return PIF table loaded from file
+    PIFTable load_pif_from_csv(const std::filesystem::path &filepath) const;
+
+    /// @brief Constructs PIF data path for a specific disease and scenario
+    /// @param disease_code Disease code (e.g., "ischemicheartdisease")
+    /// @param pif_config PIF configuration
+    /// @return Full path to PIF data folder
+    std::filesystem::path construct_pif_path(const std::string &disease_code,
+                                             const nlohmann::json &pif_config) const;
+
+    /// @brief Expands environment variables in a path string
+    /// @param path Path string that may contain environment variables like ${VAR_NAME}
+    /// @return Path with environment variables expanded
+    std::string expand_environment_variables(const std::string &path) const;
 };
 
 } // namespace hgps::input

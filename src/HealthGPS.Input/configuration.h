@@ -81,6 +81,9 @@ struct Configuration {
 
     /// @brief Type of trend to apply to risk factors (null, trend, income_trend)
     std::string trend_type = "null";
+
+    /// @brief Population Impact Fraction (PIF) configuration
+    PIFInfo population_impact_fraction{};
 };
 
 /// @brief Represents an error that occurred with the format of a config file
