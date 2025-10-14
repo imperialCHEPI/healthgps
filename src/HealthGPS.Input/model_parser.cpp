@@ -1018,17 +1018,6 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         std::cout << "\nDEBUG: Unknown exception in StaticLinearModelDefinition constructor";
         throw;
     }
-    return std::make_unique<StaticLinearModelDefinition>(
-        std::move(expected), std::move(expected_trend), std::move(trend_steps),
-        std::move(expected_trend_boxcox), std::move(names), std::move(models), std::move(ranges),
-        std::move(lambda), std::move(stddev), std::move(cholesky), std::move(policy_models),
-        std::move(policy_ranges), std::move(policy_cholesky), std::move(trend_models),
-        std::move(trend_ranges), std::move(trend_lambda), info_speed, std::move(rural_prevalence),
-        std::move(income_models), physical_activity_stddev, trend_type,
-        std::move(expected_income_trend), std::move(expected_income_trend_boxcox),
-        std::move(income_trend_steps), std::move(income_trend_models),
-        std::move(income_trend_ranges), std::move(income_trend_lambda),
-        std::move(income_trend_decay_factors), has_active_policies);
 }
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
