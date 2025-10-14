@@ -83,9 +83,8 @@ float Person::income_to_value() const {
     case core::Income::low:
         return 1.0f; // Low income
     case core::Income::lowermiddle:
-        return 2.0f; // Lower middle income
     case core::Income::middle:
-        return 2.0f; // Middle income (maps to same value as lowermiddle for consistency)
+        return 2.0f; // Both middle income categories map to same value for consistency
     case core::Income::uppermiddle:
         return 3.0f; // Upper middle income
     case core::Income::high:

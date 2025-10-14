@@ -392,7 +392,7 @@ void AnalysisModule::calculate_income_based_statistics(RuntimeContext &context,
                         ResultByGender{.male = male_avg, .female = female_avg};
                     break;
                 case core::Income::uppermiddle:
-                    result_by_income.uppermiddle = ResultByGender{male_avg, female_avg};
+                    result_by_income.uppermiddle = ResultByGender{.male = male_avg, .female = female_avg};
                     break;
                 case core::Income::high:
                     result_by_income.high = ResultByGender{male_avg, female_avg};
@@ -433,17 +433,17 @@ void AnalysisModule::calculate_income_based_statistics(RuntimeContext &context,
                     break;
                 case core::Income::lowermiddle:
                     result_by_income.lowermiddle =
-                        ResultByGender{male_prevalence, female_prevalence};
+                        ResultByGender{.male = male_prevalence, .female = female_prevalence};
                     break;
                 case core::Income::middle:
-                    result_by_income.middle = ResultByGender{male_prevalence, female_prevalence};
+                    result_by_income.middle = ResultByGender{.male = male_prevalence, .female = female_prevalence};
                     break;
                 case core::Income::uppermiddle:
                     result_by_income.uppermiddle =
-                        ResultByGender{male_prevalence, female_prevalence};
+                        ResultByGender{.male = male_prevalence, .female = female_prevalence};
                     break;
                 case core::Income::high:
-                    result_by_income.high = ResultByGender{male_prevalence, female_prevalence};
+                    result_by_income.high = ResultByGender{.male = male_prevalence, .female = female_prevalence};
                     break;
                 default:
                     break;
@@ -469,14 +469,14 @@ void AnalysisModule::calculate_income_based_statistics(RuntimeContext &context,
                     break;
                 case core::Income::lowermiddle:
                     result_by_income.lowermiddle =
-                        ResultByGender{male_comorbidity, female_comorbidity};
+                        ResultByGender{.male = male_comorbidity, .female = female_comorbidity};
                     break;
                 case core::Income::middle:
-                    result_by_income.middle = ResultByGender{male_comorbidity, female_comorbidity};
+                    result_by_income.middle = ResultByGender{.male = male_comorbidity, .female = female_comorbidity};
                     break;
                 case core::Income::uppermiddle:
                     result_by_income.uppermiddle =
-                        ResultByGender{male_comorbidity, female_comorbidity};
+                        ResultByGender{.male = male_comorbidity, .female = female_comorbidity};
                     break;
                 case core::Income::high:
                     result_by_income.high = ResultByGender{male_comorbidity, female_comorbidity};
@@ -1161,6 +1161,7 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
     calculate_income_based_standard_deviation(context, series);
 }
 
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &context,
                                                                DataSeries &series) const {
     // Accumulate squared deviations from mean for income-based data
@@ -1320,6 +1321,7 @@ void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &c
     }
 }
 
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
                                                   DataSeries &series) const {
 

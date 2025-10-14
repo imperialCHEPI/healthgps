@@ -394,6 +394,7 @@ int DemographicModule::update_age_and_death_events(RuntimeContext &context,
     return number_of_deaths;
 }
 
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &context, Person &person,
                                           Random &random) {
     // If no region data is available, skip region assignment
@@ -457,8 +458,9 @@ void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &conte
         std::cout << "\nDEBUG: age_id NOT found in region_prevalence_";
         // If no region data for this age, throw detailed error
         std::vector<std::string> available_ages;
+        available_ages.reserve(region_prevalence_.size());
         for (const auto &[age, _] : region_prevalence_) {
-            available_ages.push_back(age.to_string());
+            available_ages.emplace_back(age.to_string());
         }
 
         throw core::HgpsException(
@@ -468,6 +470,7 @@ void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &conte
     }
 }
 
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void DemographicModule::initialise_ethnicity([[maybe_unused]] RuntimeContext &context,
                                              Person &person, Random &random) {
     // If no ethnicity data is available, skip ethnicity assignment
@@ -482,8 +485,9 @@ void DemographicModule::initialise_ethnicity([[maybe_unused]] RuntimeContext &co
     // Check if the age_group exists in ethnicity_prevalence_
     if (!ethnicity_prevalence_.contains(age_group)) {
         std::vector<std::string> available_age_groups;
+        available_age_groups.reserve(ethnicity_prevalence_.size());
         for (const auto &[ag, _] : ethnicity_prevalence_) {
-            available_age_groups.push_back(ag.to_string());
+            available_age_groups.emplace_back(ag.to_string());
         }
 
         throw core::HgpsException(fmt::format(
@@ -497,7 +501,7 @@ void DemographicModule::initialise_ethnicity([[maybe_unused]] RuntimeContext &co
         std::string gender_str = (person.gender == core::Gender::male) ? "male" : "female";
         std::vector<std::string> available_genders;
         for (const auto &[g, _] : ethnicity_prevalence_.at(age_group)) {
-            available_genders.push_back((g == core::Gender::male) ? "male" : "female");
+            available_genders.emplace_back((g == core::Gender::male) ? "male" : "female");
         }
 
         throw core::HgpsException(fmt::format("Gender '{}' not found in ethnicity_prevalence_ for "
@@ -543,8 +547,7 @@ void DemographicModule::initialise_ethnicity([[maybe_unused]] RuntimeContext &co
             } else if (ethnicity_name == "4") {
                 person.ethnicity = "ethnicity4";
             } else {
-                // Default fallback
-                person.ethnicity = "ethnicity1";
+                person.ethnicity = ethnicity_name; // Use the name as-is for other values
             }
             return;
         }
@@ -575,7 +578,7 @@ void DemographicModule::set_region_prevalence(
 
     // Print summary of loaded region data
     if (!region_data.empty()) {
-        std::cout << "\n=== REGION DATA LOADED ===" << std::endl;
+        std::cout << "\n=== REGION DATA LOADED ===" << '\n';
 
         // Get unique region names from the first age entry
         auto first_age = region_data.begin();
@@ -587,13 +590,13 @@ void DemographicModule::set_region_prevalence(
                     region_names.push_back(region);
                 }
                 std::cout << "Regions found: " << fmt::format("[{}]", fmt::join(region_names, ", "))
-                          << std::endl;
+                          << '\n';
             }
         }
 
-        std::cout << "Age groups: " << region_data.size() << std::endl;
-        std::cout << "Sample age: " << region_data.begin()->first.to_string() << std::endl;
-        std::cout << "=========================" << std::endl;
+        std::cout << "Age groups: " << region_data.size() << '\n';
+        std::cout << "Sample age: " << region_data.begin()->first.to_string() << '\n';
+        std::cout << "=========================" << '\n';
     }
 }
 
@@ -605,7 +608,7 @@ void DemographicModule::set_ethnicity_prevalence(
 
     // Print summary of loaded ethnicity data
     if (!ethnicity_data.empty()) {
-        std::cout << "\n=== ETHNICITY DATA LOADED ===" << std::endl;
+        std::cout << "\n=== ETHNICITY DATA LOADED ===" << '\n';
 
         // Get unique ethnicity names from the first entry
         auto first_age_group = ethnicity_data.begin();
@@ -619,14 +622,14 @@ void DemographicModule::set_ethnicity_prevalence(
                         ethnicity_names.push_back(ethnicity);
                     }
                     std::cout << "Ethnicities found: "
-                              << fmt::format("[{}]", fmt::join(ethnicity_names, ", ")) << std::endl;
+                              << fmt::format("[{}]", fmt::join(ethnicity_names, ", ")) << '\n';
                 }
             }
         }
 
-        std::cout << "Age groups: " << ethnicity_data.size() << std::endl;
-        std::cout << "Sample age group: " << ethnicity_data.begin()->first.to_string() << std::endl;
-        std::cout << "=============================" << std::endl;
+        std::cout << "Age groups: " << ethnicity_data.size() << '\n';
+        std::cout << "Sample age group: " << ethnicity_data.begin()->first.to_string() << '\n';
+        std::cout << "=============================" << '\n';
     }
 }
 

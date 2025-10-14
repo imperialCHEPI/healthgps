@@ -29,6 +29,16 @@ enum class TrendType {
     IncomeTrend ///< Income-based trends applied to factors mean adjustment
 };
 
+/// @brief Equality comparison operator for TrendType
+inline bool operator==(TrendType lhs, TrendType rhs) noexcept {
+    return static_cast<int>(lhs) == static_cast<int>(rhs);
+}
+
+/// @brief Inequality comparison operator for TrendType
+inline bool operator!=(TrendType lhs, TrendType rhs) noexcept {
+    return !(lhs == rhs);
+}
+
 /// @brief Defines a table type for double values by sex and age
 using RiskFactorSexAgeTable = UnorderedMap2d<core::Gender, core::Identifier, std::vector<double>>;
 

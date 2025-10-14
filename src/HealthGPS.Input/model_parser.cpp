@@ -345,15 +345,16 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     // It has 21 columns total, all of which are risk factor names
     // So we use all columns as risk factor names
     std::vector<core::Identifier> policy_csv_ordered_names;
-    for (size_t i = 0; i < policy_covariance_headers.size(); ++i) {
-        policy_csv_ordered_names.emplace_back(policy_covariance_headers[i]);
+    policy_csv_ordered_names.reserve(policy_covariance_headers.size());
+    for (const auto &policy_covariance_header : policy_covariance_headers) {
+        policy_csv_ordered_names.emplace_back(policy_covariance_header);
     }
 
     // MAHIMA: Create mapping from correlation matrix order to policy covariance matrix order
     // This ensures we use the correlation matrix as the canonical order
     std::vector<size_t> policy_column_mapping;
-    for (size_t i = 0; i < csv_ordered_names.size(); ++i) {
-        const auto &correlation_name = csv_ordered_names[i].to_string();
+    for (const auto &csv_ordered_name : csv_ordered_names) {
+        const auto &correlation_name = csv_ordered_name.to_string();
         bool found = false;
         for (size_t j = 0; j < policy_csv_ordered_names.size(); ++j) {
             if (core::case_insensitive::equals(correlation_name,
@@ -470,8 +471,9 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                             csv_name.to_string(), [&]() {
                                 std::string keys;
                                 for (const auto &[key, value] : opt["RiskFactorModels"].items()) {
-                                    if (!keys.empty())
+                                    if (!keys.empty()) {
                                         keys += ", ";
+                                    }
                                     keys += key;
                                 }
                                 return keys;
@@ -854,8 +856,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                     // Parse each row (all rows are data, no headers)
                     for (size_t row_idx = 0; row_idx < doc.GetRowCount(); row_idx++) {
                         // Get factor name and coefficient value directly from rapidcsv
-                        std::string factor_name = doc.GetCell<std::string>(0, row_idx);
-                        double coefficient_value = doc.GetCell<double>(1, row_idx);
+                        auto factor_name = doc.GetCell<std::string>(0, row_idx);
+                        auto coefficient_value = doc.GetCell<double>(1, row_idx);
 
                         if (factor_name == "Intercept") {
                             model.intercept = coefficient_value;
@@ -970,8 +972,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             std::cout << "\n      Parsing CSV data:";
             for (size_t row_idx = 0; row_idx < doc.GetRowCount(); row_idx++) {
                 // Get factor name and coefficient value directly from rapidcsv
-                std::string factor_name = doc.GetCell<std::string>(0, row_idx);
-                double coefficient_value = doc.GetCell<double>(1, row_idx);
+                auto factor_name = doc.GetCell<std::string>(0, row_idx);
+                auto coefficient_value = doc.GetCell<double>(1, row_idx);
 
                 if (factor_name == "Intercept") {
                     continuous_income_model.intercept = coefficient_value;
