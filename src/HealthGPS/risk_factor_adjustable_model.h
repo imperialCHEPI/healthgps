@@ -35,9 +35,7 @@ inline bool operator==(TrendType lhs, TrendType rhs) noexcept {
 }
 
 /// @brief Inequality comparison operator for TrendType
-inline bool operator!=(TrendType lhs, TrendType rhs) noexcept {
-    return !(lhs == rhs);
-}
+inline bool operator!=(TrendType lhs, TrendType rhs) noexcept { return !(lhs == rhs); }
 
 /// @brief Defines a table type for double values by sex and age
 using RiskFactorSexAgeTable = UnorderedMap2d<core::Gender, core::Identifier, std::vector<double>>;
