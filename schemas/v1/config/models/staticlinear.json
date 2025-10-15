@@ -127,26 +127,6 @@
                     ]
                 }
             },
-            "additionalProperties": {
-                "type": "object",
-                "description": "Categorical income model (India approach) - directly assigns income categories",
-                "properties": {
-                    "Intercept": {
-                        "type": "number"
-                    },
-                    "Coefficients": {
-                        "type": "object",
-                        "additionalProperties": {
-                            "type": "number"
-                        }
-                    }
-                },
-                "required": [
-                    "Intercept",
-                    "Coefficients"
-                ],
-                "additionalProperties": false
-            },
             "additionalProperties": false
         },
         "PhysicalActivityModels": {

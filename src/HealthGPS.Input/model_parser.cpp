@@ -954,7 +954,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
             // Use rapidcsv directly to load the CSV file (no headers, like physical activity)
             char sep_char = (delimiter == "\\t") ? '\t' : delimiter.front();
-            std::cout << "\n      Using delimiter: '" << sep_char << "' (from '" << delimiter << "')";
+            std::cout << "\n      Using delimiter: '" << sep_char << "' (from '" << delimiter
+                      << "')";
             std::cout << "\n      File path: " << csv_path.string();
             rapidcsv::Document doc(csv_path.string(), rapidcsv::LabelParams(-1, -1),
                                    rapidcsv::SeparatorParams(sep_char));

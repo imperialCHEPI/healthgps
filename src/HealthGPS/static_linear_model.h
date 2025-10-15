@@ -115,166 +115,166 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
             &physical_activity_models = {},
         bool has_active_policies = true);
 
-        RiskFactorModelType type() const noexcept override;
+    RiskFactorModelType type() const noexcept override;
 
-        std::string name() const noexcept override;
+    std::string name() const noexcept override;
 
-        void generate_risk_factors(RuntimeContext &context) override;
+    void generate_risk_factors(RuntimeContext &context) override;
 
-        void update_risk_factors(RuntimeContext &context) override;
+    void update_risk_factors(RuntimeContext &context) override;
 
-      private:
-        static double inverse_box_cox(double factor, double lambda);
+  private:
+    static double inverse_box_cox(double factor, double lambda);
 
-        void initialise_factors(RuntimeContext &context, Person &person, Random &random) const;
+    void initialise_factors(RuntimeContext &context, Person &person, Random &random) const;
 
-        void update_factors(RuntimeContext &context, Person &person, Random &random) const;
+    void update_factors(RuntimeContext &context, Person &person, Random &random) const;
 
-        void initialise_UPF_trends(RuntimeContext &context, Person &person) const;
+    void initialise_UPF_trends(RuntimeContext &context, Person &person) const;
 
-        void update_UPF_trends(RuntimeContext &context, Person &person) const;
+    void update_UPF_trends(RuntimeContext &context, Person &person) const;
 
-        /// @brief Initialise income for a person using the appropriate method
-        /// @param context The runtime context
-        /// @param person The person to initialise income for
-        /// @param random Random number generator
-        void initialise_income(RuntimeContext &context, Person &person, Random &random);
+    /// @brief Initialise income for a person using the appropriate method
+    /// @param context The runtime context
+    /// @param person The person to initialise income for
+    /// @param random Random number generator
+    void initialise_income(RuntimeContext &context, Person &person, Random &random);
 
-        /// @brief Update income for a person (only for 18-year-olds)
-        /// @param context The runtime context
-        /// @param person The person to update income for
-        /// @param random Random number generator
-        void update_income(RuntimeContext &context, Person &person, Random &random);
+    /// @brief Update income for a person (only for 18-year-olds)
+    /// @param context The runtime context
+    /// @param person The person to update income for
+    /// @param random Random number generator
+    void update_income(RuntimeContext &context, Person &person, Random &random);
 
-        /// @brief Update income trends for a person
-        /// @param context The runtime context
-        /// @param person The person to update income trends for
-        void update_income_trends(RuntimeContext &context, Person &person) const;
+    /// @brief Update income trends for a person
+    /// @param context The runtime context
+    /// @param person The person to update income trends for
+    void update_income_trends(RuntimeContext &context, Person &person) const;
 
-        /// @brief Initialise income trends for a person
-        /// @param context The runtime context
-        /// @param person The person to initialise income trends for
-        void initialise_income_trends(RuntimeContext &context, Person &person) const;
+    /// @brief Initialise income trends for a person
+    /// @param context The runtime context
+    /// @param person The person to initialise income trends for
+    void initialise_income_trends(RuntimeContext &context, Person &person) const;
 
-        void initialise_policies(Person &person, Random &random, bool intervene) const;
+    void initialise_policies(Person &person, Random &random, bool intervene) const;
 
-        void update_policies(Person &person, bool intervene) const;
+    void update_policies(Person &person, bool intervene) const;
 
-        void apply_policies(Person &person, bool intervene) const;
+    void apply_policies(Person &person, bool intervene) const;
 
     std::vector<double> compute_linear_models(Person &person,
                                               const std::vector<LinearModelParams> &models) const;
 
     std::vector<double> compute_residuals(Random &random, const Eigen::MatrixXd &cholesky) const;
 
-        /// @brief Initialise the sector of a person
-        /// @param person The person to initialise sector for
-        /// @param random The random number generator from the runtime context
-        void initialise_sector(Person &person, Random &random) const;
+    /// @brief Initialise the sector of a person
+    /// @param person The person to initialise sector for
+    /// @param random The random number generator from the runtime context
+    void initialise_sector(Person &person, Random &random) const;
 
-        /// @brief Update the sector of a person
-        /// @param person The person to update sector for
-        /// @param random The random number generator from the runtime context
-        void update_sector(Person &person, Random &random) const;
+    /// @brief Update the sector of a person
+    /// @param person The person to update sector for
+    /// @param random The random number generator from the runtime context
+    void update_sector(Person &person, Random &random) const;
 
-        // Continuous income model support (FINCH approach)
-        bool is_continuous_income_model_;
-        LinearModelParams continuous_income_model_;
-        std::string income_categories_;
+    // Continuous income model support (FINCH approach)
+    bool is_continuous_income_model_;
+    LinearModelParams continuous_income_model_;
+    std::string income_categories_;
 
-        /// @brief Calculate continuous income using FINCH approach
-        /// @param person The person to calculate income for
-        /// @param random Random number generator
-        /// @return The calculated continuous income value
-        double calculate_continuous_income(Person &person, Random &random);
+    /// @brief Calculate continuous income using FINCH approach
+    /// @param person The person to calculate income for
+    /// @param random Random number generator
+    /// @return The calculated continuous income value
+    double calculate_continuous_income(Person &person, Random &random);
 
-        /// @brief Convert continuous income to income category based on population quartiles
-        /// @param continuous_income The continuous income value
-        /// @param population The population to calculate quartiles from
-        /// @param random Random number generator
-        /// @return The assigned income category
-        core::Income convert_income_continuous_to_category(double continuous_income,
-                                                           const Population &population,
-                                                           Random &random) const;
+    /// @brief Convert continuous income to income category based on population quartiles
+    /// @param continuous_income The continuous income value
+    /// @param population The population to calculate quartiles from
+    /// @param random Random number generator
+    /// @return The assigned income category
+    core::Income convert_income_continuous_to_category(double continuous_income,
+                                                       const Population &population,
+                                                       Random &random) const;
 
-        /// @brief Calculate income quartiles from population data
-        /// @param population The population to calculate quartiles from
-        /// @return Vector of quartile thresholds [Q1, Q2, Q3]
+    /// @brief Calculate income quartiles from population data
+    /// @param population The population to calculate quartiles from
+    /// @return Vector of quartile thresholds [Q1, Q2, Q3]
     static std::vector<double> calculate_income_quartiles(const Population &population);
 
-        /// @brief Initialise income using categorical approach (India method)
-        /// @param person The person to initialise income for
-        /// @param random Random number generator
-        void initialise_categorical_income(Person &person, Random &random);
+    /// @brief Initialise income using categorical approach (India method)
+    /// @param person The person to initialise income for
+    /// @param random Random number generator
+    void initialise_categorical_income(Person &person, Random &random);
 
-        /// @brief Initialise income using continuous approach (FINCH method)
-        /// @param context The runtime context
-        /// @param person The person to initialise income for
-        /// @param random Random number generator
-        void initialise_continuous_income(RuntimeContext &context, Person &person, Random &random);
+    /// @brief Initialise income using continuous approach (FINCH method)
+    /// @param context The runtime context
+    /// @param person The person to initialise income for
+    /// @param random Random number generator
+    void initialise_continuous_income(RuntimeContext &context, Person &person, Random &random);
 
-        /// @brief Initialise the physical activity of a person
-        /// @param person The person to initialise PAL for
-        /// @param random The random number generator from the runtime context
-        void initialise_physical_activity(RuntimeContext &context, Person &person,
-                                          Random &random) const;
+    /// @brief Initialise the physical activity of a person
+    /// @param person The person to initialise PAL for
+    /// @param random The random number generator from the runtime context
+    void initialise_physical_activity(RuntimeContext &context, Person &person,
+                                      Random &random) const;
 
-        /// @brief Initialise physical activity using continuous model approach (FINCH method)
-        /// @param context The runtime context
-        /// @param person The person to initialise physical activity for
-        /// @param random Random number generator
-        /// @param model The physical activity model to use
+    /// @brief Initialise physical activity using continuous model approach (FINCH method)
+    /// @param context The runtime context
+    /// @param person The person to initialise physical activity for
+    /// @param random Random number generator
+    /// @param model The physical activity model to use
     static void initialise_continuous_physical_activity(RuntimeContext &context, Person &person,
-                                                     Random &random,
+                                                        Random &random,
                                                         const PhysicalActivityModel &model);
 
-        /// @brief Initialise physical activity using simple model approach (India method)
-        /// @param context The runtime context
-        /// @param person The person to initialise physical activity for
-        /// @param random Random number generator
-        /// @param model The physical activity model to use
-        void initialise_simple_physical_activity(RuntimeContext &context, Person &person,
-                                                 Random &random,
-                                                 const PhysicalActivityModel &model) const;
+    /// @brief Initialise physical activity using simple model approach (India method)
+    /// @param context The runtime context
+    /// @param person The person to initialise physical activity for
+    /// @param random Random number generator
+    /// @param model The physical activity model to use
+    void initialise_simple_physical_activity(RuntimeContext &context, Person &person,
+                                             Random &random,
+                                             const PhysicalActivityModel &model) const;
 
-        // Regular trend member variables
-        std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_;
-        std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox_;
-        std::shared_ptr<std::vector<LinearModelParams>> trend_models_;
-        std::shared_ptr<std::vector<core::DoubleInterval>> trend_ranges_;
-        std::shared_ptr<std::vector<double>> trend_lambda_;
+    // Regular trend member variables
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_;
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox_;
+    std::shared_ptr<std::vector<LinearModelParams>> trend_models_;
+    std::shared_ptr<std::vector<core::DoubleInterval>> trend_ranges_;
+    std::shared_ptr<std::vector<double>> trend_lambda_;
 
-        // Income trend member variables
-        TrendType trend_type_;
-        std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend_;
-        std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend_boxcox_;
-        std::shared_ptr<std::unordered_map<core::Identifier, int>> income_trend_steps_;
-        std::shared_ptr<std::vector<LinearModelParams>> income_trend_models_;
-        std::shared_ptr<std::vector<core::DoubleInterval>> income_trend_ranges_;
-        std::shared_ptr<std::vector<double>> income_trend_lambda_;
-        std::shared_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors_;
+    // Income trend member variables
+    TrendType trend_type_;
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend_;
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend_boxcox_;
+    std::shared_ptr<std::unordered_map<core::Identifier, int>> income_trend_steps_;
+    std::shared_ptr<std::vector<LinearModelParams>> income_trend_models_;
+    std::shared_ptr<std::vector<core::DoubleInterval>> income_trend_ranges_;
+    std::shared_ptr<std::vector<double>> income_trend_lambda_;
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors_;
 
-        // Common member variables
-        const std::vector<core::Identifier> &names_;
-        const std::vector<LinearModelParams> &models_;
-        const std::vector<core::DoubleInterval> &ranges_;
-        const std::vector<double> &lambda_;
-        const std::vector<double> &stddev_;
-        const Eigen::MatrixXd &cholesky_;
-        const std::vector<LinearModelParams> &policy_models_;
-        const std::vector<core::DoubleInterval> &policy_ranges_;
-        const Eigen::MatrixXd &policy_cholesky_;
-        const double info_speed_;
-        const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
-            &rural_prevalence_;
-        const std::unordered_map<core::Income, LinearModelParams> &income_models_;
-        const double physical_activity_stddev_;
+    // Common member variables
+    const std::vector<core::Identifier> &names_;
+    const std::vector<LinearModelParams> &models_;
+    const std::vector<core::DoubleInterval> &ranges_;
+    const std::vector<double> &lambda_;
+    const std::vector<double> &stddev_;
+    const Eigen::MatrixXd &cholesky_;
+    const std::vector<LinearModelParams> &policy_models_;
+    const std::vector<core::DoubleInterval> &policy_ranges_;
+    const Eigen::MatrixXd &policy_cholesky_;
+    const double info_speed_;
+    const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
+        &rural_prevalence_;
+    const std::unordered_map<core::Income, LinearModelParams> &income_models_;
+    const double physical_activity_stddev_;
 
-        // Physical activity model support (both India and FINCH approaches)
-        std::unordered_map<core::Identifier, PhysicalActivityModel> physical_activity_models_;
-        bool has_physical_activity_models_ = false;
-        // Policy optimization flag - Mahima's enhancement
-        bool has_active_policies_;
+    // Physical activity model support (both India and FINCH approaches)
+    std::unordered_map<core::Identifier, PhysicalActivityModel> physical_activity_models_;
+    bool has_physical_activity_models_ = false;
+    // Policy optimization flag - Mahima's enhancement
+    bool has_active_policies_;
 };
 
 /// @brief Defines the static linear model data type
@@ -348,54 +348,54 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
         std::unordered_map<core::Identifier, PhysicalActivityModel> physical_activity_models = {},
         bool has_active_policies = true);
 
-        /// @brief Construct a new StaticLinearModel from this definition
-        /// @return A unique pointer to the new StaticLinearModel instance
-        std::unique_ptr<RiskFactorModel> create_model() const override;
+    /// @brief Construct a new StaticLinearModel from this definition
+    /// @return A unique pointer to the new StaticLinearModel instance
+    std::unique_ptr<RiskFactorModel> create_model() const override;
 
-      private:
-        // Regular trend member variables
-        std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_;
-        std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox_;
-        std::shared_ptr<std::vector<LinearModelParams>> trend_models_;
-        std::shared_ptr<std::vector<core::DoubleInterval>> trend_ranges_;
-        std::shared_ptr<std::vector<double>> trend_lambda_;
+  private:
+    // Regular trend member variables
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_;
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox_;
+    std::shared_ptr<std::vector<LinearModelParams>> trend_models_;
+    std::shared_ptr<std::vector<core::DoubleInterval>> trend_ranges_;
+    std::shared_ptr<std::vector<double>> trend_lambda_;
 
-        // Income trend member variables
-        TrendType trend_type_;
-        std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend_;
-        std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend_boxcox_;
-        std::shared_ptr<std::unordered_map<core::Identifier, int>> income_trend_steps_;
-        std::shared_ptr<std::vector<LinearModelParams>> income_trend_models_;
-        std::shared_ptr<std::vector<core::DoubleInterval>> income_trend_ranges_;
-        std::shared_ptr<std::vector<double>> income_trend_lambda_;
-        std::shared_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors_;
+    // Income trend member variables
+    TrendType trend_type_;
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend_;
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend_boxcox_;
+    std::shared_ptr<std::unordered_map<core::Identifier, int>> income_trend_steps_;
+    std::shared_ptr<std::vector<LinearModelParams>> income_trend_models_;
+    std::shared_ptr<std::vector<core::DoubleInterval>> income_trend_ranges_;
+    std::shared_ptr<std::vector<double>> income_trend_lambda_;
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors_;
 
-        // Common member variables
-        std::vector<core::Identifier> names_;
-        std::vector<LinearModelParams> models_;
-        std::vector<core::DoubleInterval> ranges_;
-        std::vector<double> lambda_;
-        std::vector<double> stddev_;
-        Eigen::MatrixXd cholesky_;
-        std::vector<LinearModelParams> policy_models_;
-        std::vector<core::DoubleInterval> policy_ranges_;
-        Eigen::MatrixXd policy_cholesky_;
-        double info_speed_;
-        std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
-            rural_prevalence_;
-        std::unordered_map<core::Income, LinearModelParams> income_models_;
-        double physical_activity_stddev_;
+    // Common member variables
+    std::vector<core::Identifier> names_;
+    std::vector<LinearModelParams> models_;
+    std::vector<core::DoubleInterval> ranges_;
+    std::vector<double> lambda_;
+    std::vector<double> stddev_;
+    Eigen::MatrixXd cholesky_;
+    std::vector<LinearModelParams> policy_models_;
+    std::vector<core::DoubleInterval> policy_ranges_;
+    Eigen::MatrixXd policy_cholesky_;
+    double info_speed_;
+    std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
+        rural_prevalence_;
+    std::unordered_map<core::Income, LinearModelParams> income_models_;
+    double physical_activity_stddev_;
 
-        // Physical activity model support (FINCH approach)
-        std::unordered_map<core::Identifier, PhysicalActivityModel> physical_activity_models_;
-        bool has_physical_activity_models_ = false;
+    // Physical activity model support (FINCH approach)
+    std::unordered_map<core::Identifier, PhysicalActivityModel> physical_activity_models_;
+    bool has_physical_activity_models_ = false;
 
-        // Continuous income model support (FINCH approach)
-        bool is_continuous_income_model_;
-        LinearModelParams continuous_income_model_;
-        std::string income_categories_;
-        // Policy optimization flag - Mahima's enhancement
-        bool has_active_policies_;
+    // Continuous income model support (FINCH approach)
+    bool is_continuous_income_model_;
+    LinearModelParams continuous_income_model_;
+    std::string income_categories_;
+    // Policy optimization flag - Mahima's enhancement
+    bool has_active_policies_;
 };
 
 } // namespace hgps
