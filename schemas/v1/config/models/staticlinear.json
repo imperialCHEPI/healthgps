@@ -146,7 +146,8 @@
                     "Coefficients"
                 ],
                 "additionalProperties": false
-            }
+            },
+            "additionalProperties": false
         },
         "PhysicalActivityModels": {
             "type": "object",

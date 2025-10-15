@@ -952,11 +952,16 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                 delimiter = "\t"; // Convert escaped tab to actual tab character
             }
 
-            // Use rapidcsv directly to load the CSV file (no headers)
+            // Use rapidcsv directly to load the CSV file (no headers, like physical activity)
+            char sep_char = (delimiter == "\\t") ? '\t' : delimiter.front();
+            std::cout << "\n      Using delimiter: '" << sep_char << "' (from '" << delimiter << "')";
+            std::cout << "\n      File path: " << csv_path.string();
             rapidcsv::Document doc(csv_path.string(), rapidcsv::LabelParams(-1, -1),
-                                   rapidcsv::SeparatorParams(delimiter.front()));
+                                   rapidcsv::SeparatorParams(sep_char));
 
             // Check that we have exactly 2 columns
+            std::cout << "\n      CSV file loaded: " << doc.GetRowCount() << " rows, "
+                      << doc.GetColumnCount() << " columns";
             if (doc.GetColumnCount() != 2) {
                 throw core::HgpsException{
                     fmt::format("Continuous income CSV file {} must have exactly 2 columns. "
@@ -964,13 +969,10 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                                 csv_filename, doc.GetColumnCount())};
             }
 
-            std::cout << "\n      CSV file loaded: " << doc.GetRowCount() << " rows, "
-                      << doc.GetColumnCount() << " columns";
-
             // Parse CSV into LinearModelParams
-            // Parse each row (all rows are data, no headers)
+            // Skip header row (row 0) and parse data rows
             std::cout << "\n      Parsing CSV data:";
-            for (size_t row_idx = 0; row_idx < doc.GetRowCount(); row_idx++) {
+            for (size_t row_idx = 1; row_idx < doc.GetRowCount(); row_idx++) {
                 // Get factor name and coefficient value directly from rapidcsv
                 auto factor_name = doc.GetCell<std::string>(0, row_idx);
                 auto coefficient_value = doc.GetCell<double>(1, row_idx);

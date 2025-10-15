@@ -122,6 +122,9 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
 /// @brief Risk factor adjustable model definition interface
 class RiskFactorAdjustableModelDefinition : public RiskFactorModelDefinition {
   public:
+    /// @brief Destroys a RiskFactorAdjustableModelDefinition instance
+    virtual ~RiskFactorAdjustableModelDefinition() = default;
+
     /// @brief Constructs a new RiskFactorAdjustableModelDefinition instance
     /// @param expected The expected risk factor values by sex and age
     /// @param expected_trend The expected trend of risk factor values
