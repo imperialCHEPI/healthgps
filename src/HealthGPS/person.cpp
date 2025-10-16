@@ -18,6 +18,18 @@ std::map<core::Identifier, std::function<double(const Person &)>> Person::curren
     {"Ethnicity"_id, [](const Person &p) { return p.ethnicity_to_value(); }},
     {"Income"_id, [](const Person &p) { return p.income_to_value(); }},
     {"SES"_id, [](const Person &p) { return p.ses; }},
+    
+    // FINCH-specific coefficient mappings (lowercase with numbers)
+    {"gender2"_id, [](const Person &p) { return p.gender_to_value(); }},
+    {"age1"_id, [](const Person &p) { return static_cast<double>(p.age); }},
+    {"age2"_id, [](const Person &p) { return pow(p.age, 2); }},
+    {"ethnicity2"_id, [](const Person &p) { return p.ethnicity_to_value() == 2.0 ? 1.0 : 0.0; }},
+    {"ethnicity3"_id, [](const Person &p) { return p.ethnicity_to_value() == 3.0 ? 1.0 : 0.0; }},
+    {"ethnicity4"_id, [](const Person &p) { return p.ethnicity_to_value() == 4.0 ? 1.0 : 0.0; }},
+    {"income"_id, [](const Person &p) { return p.income_to_value(); }},
+    {"region2"_id, [](const Person &p) { return p.region_to_value() == 2.0 ? 1.0 : 0.0; }},
+    {"region3"_id, [](const Person &p) { return p.region_to_value() == 3.0 ? 1.0 : 0.0; }},
+    {"region4"_id, [](const Person &p) { return p.region_to_value() == 4.0 ? 1.0 : 0.0; }},
 };
 
 Person::Person() : id_{++Person::newUID} {}
@@ -96,35 +108,41 @@ float Person::income_to_value() const {
 }
 
 float Person::region_to_value() const {
-    // This method will need to be updated to work with the dynamic region mapping
-    // For now, return a default value - the actual mapping will be implemented
-    // when we implement the CSV loading system
     if (region == "unknown") {
         throw core::HgpsException(
             "Region is unknown - CSV data may not have been loaded properly.");
     }
 
-    // TODO: Implement dynamic mapping based on CSV column order
-    // This should be updated when we implement the CSV loading system
-    // For now, return a hash-based value to ensure uniqueness
-    std::hash<std::string> hasher;
-    return static_cast<float>(hasher(region) % 1000) + 1.0f; // Ensure positive values
+    // Parse numeric value from region string (e.g., "region1" -> 1, "region2" -> 2)
+    if (region.substr(0, 6) == "region") {
+        try {
+            std::string num_str = region.substr(6); // Get the number part
+            return static_cast<float>(std::stoi(num_str));
+        } catch (const std::exception &) {
+            throw core::HgpsException("Invalid region format: " + region);
+        }
+    }
+    
+    throw core::HgpsException("Unknown region format: " + region);
 }
 
 float Person::ethnicity_to_value() const {
-    // This method will need to be updated to work with the dynamic ethnicity mapping
-    // For now, return a default value - the actual mapping will be implemented
-    // when we implement the CSV loading system
     if (ethnicity == "unknown") {
         throw core::HgpsException(
             "Ethnicity is unknown - CSV data may not have been loaded properly.");
     }
 
-    // TODO: Implement dynamic mapping based on CSV column order
-    // This should be updated when we implement the CSV loading system
-    // For now, return a hash-based value to ensure uniqueness
-    std::hash<std::string> hasher;
-    return static_cast<float>(hasher(ethnicity) % 1000) + 1.0f; // Ensure positive values
+    // Parse numeric value from ethnicity string (e.g., "ethnicity1" -> 1, "ethnicity2" -> 2)
+    if (ethnicity.substr(0, 9) == "ethnicity") {
+        try {
+            std::string num_str = ethnicity.substr(9); // Get the number part
+            return static_cast<float>(std::stoi(num_str));
+        } catch (const std::exception &) {
+            throw core::HgpsException("Invalid ethnicity format: " + ethnicity);
+        }
+    }
+    
+    throw core::HgpsException("Unknown ethnicity format: " + ethnicity);
 }
 
 void Person::emigrate(const unsigned int time) {

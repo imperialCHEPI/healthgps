@@ -586,6 +586,14 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             for (const auto &[coeff_name, coeff_map] : csv_coefficients) {
                 if (coeff_name == "Intercept")
                     continue; // Skip intercept, already handled
+                if (coeff_name == "lambda")
+                    continue; // Skip lambda, handled separately
+                if (coeff_name == "stddev")
+                    continue; // Skip stddev, handled separately
+                if (coeff_name == "min")
+                    continue; // Skip min, handled separately
+                if (coeff_name == "max")
+                    continue; // Skip max, handled separately
 
                 if (coeff_map.find(csv_risk_factor_name) != coeff_map.end()) {
                     model.coefficients[core::Identifier(coeff_name)] =
@@ -749,6 +757,10 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             for (const auto &[coeff_name, coeff_map] : csv_policy_coefficients) {
                 if (coeff_name == "Intercept")
                     continue; // Skip intercept, already handled
+                if (coeff_name == "min")
+                    continue; // Skip min, handled separately
+                if (coeff_name == "max")
+                    continue; // Skip max, handled separately
 
                 if (coeff_map.find(csv_risk_factor_name) != coeff_map.end()) {
                     policy_model.coefficients[core::Identifier(coeff_name)] =

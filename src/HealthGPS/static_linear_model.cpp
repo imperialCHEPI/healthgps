@@ -373,12 +373,17 @@ double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
 
 void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &person,
                                            Random &random) const {
+    std::cout << "\nDEBUG: StaticLinearModel::initialise_factors called - START";
 
     // Correlated residual sampling.
+    std::cout << "\nDEBUG: Computing residuals...";
     auto residuals = compute_residuals(random, cholesky_);
+    std::cout << "\nDEBUG: Residuals computed successfully, size: " << residuals.size();
 
     // Approximate risk factors with linear models.
+    std::cout << "\nDEBUG: Computing linear models...";
     auto linear = compute_linear_models(person, models_);
+    std::cout << "\nDEBUG: Linear models computed successfully, size: " << linear.size();
 
     // Initialise residuals and risk factors (do not exist yet).
     for (size_t i = 0; i < names_.size(); i++) {
@@ -645,6 +650,7 @@ void StaticLinearModel::apply_policies(Person &person, bool intervene) const {
 std::vector<double>
 StaticLinearModel::compute_linear_models(Person &person,
                                          const std::vector<LinearModelParams> &models) const {
+    std::cout << "\nDEBUG: StaticLinearModel::compute_linear_models called - START";
     std::vector<double> linear{};
     linear.reserve(names_.size());
 
@@ -652,16 +658,36 @@ StaticLinearModel::compute_linear_models(Person &person,
     for (size_t i = 0; i < names_.size(); i++) {
         auto name = names_[i];
         auto model = models[i];
+        std::cout << "\nDEBUG: Processing risk factor " << i << ": " << name.to_string() 
+                  << " with " << model.coefficients.size() << " coefficients";
+        
         double factor = model.intercept;
         for (const auto &[coefficient_name, coefficient_value] : model.coefficients) {
-            factor += coefficient_value * person.get_risk_factor_value(coefficient_name);
+            std::cout << "\nDEBUG: Looking for coefficient: " << coefficient_name.to_string();
+            try {
+                double value = person.get_risk_factor_value(coefficient_name);
+                factor += coefficient_value * value;
+                std::cout << " -> Found value: " << value;
+            } catch (const std::exception &e) {
+                std::cout << " -> ERROR: " << e.what();
+                throw;
+            }
         }
         for (const auto &[coefficient_name, coefficient_value] : model.log_coefficients) {
-            factor += coefficient_value * log(person.get_risk_factor_value(coefficient_name));
+            std::cout << "\nDEBUG: Looking for log coefficient: " << coefficient_name.to_string();
+            try {
+                double value = person.get_risk_factor_value(coefficient_name);
+                factor += coefficient_value * log(value);
+                std::cout << " -> Found value: " << value;
+            } catch (const std::exception &e) {
+                std::cout << " -> ERROR: " << e.what();
+                throw;
+            }
         }
         linear.emplace_back(factor);
     }
 
+    std::cout << "\nDEBUG: StaticLinearModel::compute_linear_models completed successfully";
     return linear;
 }
 
