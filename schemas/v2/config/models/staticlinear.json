@@ -261,7 +261,9 @@
                     "type": "object",
                     "description": "Legacy individual risk factor structure (India/PIF approach)",
                     "not": {
-                        "required": ["boxcox_coefficients"]
+                        "required": [
+                            "boxcox_coefficients"
+                        ]
                     },
                     "additionalProperties": {
                         "type": "object",
@@ -421,7 +423,9 @@
                                 },
                                 "format": {
                                     "type": "string",
-                                    "enum": ["csv"],
+                                    "enum": [
+                                        "csv"
+                                    ],
                                     "default": "csv"
                                 },
                                 "delimiter": {
@@ -437,11 +441,17 @@
                                     "description": "Column definitions for risk factors (columns in CSV)",
                                     "additionalProperties": {
                                         "type": "string",
-                                        "enum": ["double"]
+                                        "enum": [
+                                            "double"
+                                        ]
                                     }
                                 }
                             },
-                            "required": ["name", "format", "delimiter"],
+                            "required": [
+                                "name",
+                                "format",
+                                "delimiter"
+                            ],
                             "additionalProperties": false
                         },
                         "policy_coefficients": {
@@ -454,7 +464,9 @@
                                 },
                                 "format": {
                                     "type": "string",
-                                    "enum": ["csv"],
+                                    "enum": [
+                                        "csv"
+                                    ],
                                     "default": "csv"
                                 },
                                 "delimiter": {
@@ -470,11 +482,17 @@
                                     "description": "Column definitions for risk factors (columns in CSV)",
                                     "additionalProperties": {
                                         "type": "string",
-                                        "enum": ["double"]
+                                        "enum": [
+                                            "double"
+                                        ]
                                     }
                                 }
                             },
-                            "required": ["name", "format", "delimiter"],
+                            "required": [
+                                "name",
+                                "format",
+                                "delimiter"
+                            ],
                             "additionalProperties": false
                         },
                         "trend_coefficients": {
@@ -487,7 +505,9 @@
                                 },
                                 "format": {
                                     "type": "string",
-                                    "enum": ["csv"],
+                                    "enum": [
+                                        "csv"
+                                    ],
                                     "default": "csv"
                                 },
                                 "delimiter": {
@@ -503,15 +523,23 @@
                                     "description": "Column definitions for risk factors (columns in CSV)",
                                     "additionalProperties": {
                                         "type": "string",
-                                        "enum": ["double"]
+                                        "enum": [
+                                            "double"
+                                        ]
                                     }
                                 }
                             },
-                            "required": ["name", "format", "delimiter"],
+                            "required": [
+                                "name",
+                                "format",
+                                "delimiter"
+                            ],
                             "additionalProperties": false
                         }
                     },
-                    "required": ["boxcox_coefficients"],
+                    "required": [
+                        "boxcox_coefficients"
+                    ],
                     "additionalProperties": false
                 }
             ]
