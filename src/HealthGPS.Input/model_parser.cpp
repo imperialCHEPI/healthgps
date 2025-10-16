@@ -265,9 +265,10 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         trend_type = hgps::TrendType::IncomeTrend;
     }
 
-    // Detect whether we're using legacy structure (India/PIF) or new matrix-based CSV structure (FINCH)
+    // Detect whether we're using legacy structure (India/PIF) or new matrix-based CSV structure
+    // (FINCH)
     bool is_matrix_based_structure = opt["RiskFactorModels"].contains("boxcox_coefficients");
-    
+
     if (is_matrix_based_structure) {
         std::cout << "\nDEBUG: Detected matrix-based CSV structure (FINCH approach)";
     } else {
@@ -459,59 +460,66 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
     // Load CSV coefficients if using matrix-based structure
     std::unordered_map<std::string, std::unordered_map<std::string, double>> csv_coefficients;
-    std::unordered_map<std::string, std::unordered_map<std::string, double>> csv_policy_coefficients;
-    
+    std::unordered_map<std::string, std::unordered_map<std::string, double>>
+        csv_policy_coefficients;
+
     if (is_matrix_based_structure) {
         std::cout << "\nDEBUG: Loading matrix-based CSV coefficients...";
-        
+
         // Load boxcox coefficients
         const auto &boxcox_config = opt["RiskFactorModels"]["boxcox_coefficients"];
         std::string boxcox_filename = boxcox_config["name"].get<std::string>();
-        std::string boxcox_delimiter = boxcox_config.contains("delimiter") ? boxcox_config["delimiter"] : ",";
+        std::string boxcox_delimiter =
+            boxcox_config.contains("delimiter") ? boxcox_config["delimiter"] : ",";
         if (boxcox_delimiter == "\\t") {
             boxcox_delimiter = "\t";
         }
-        
+
         std::filesystem::path boxcox_path = config.root_path / boxcox_filename;
-        rapidcsv::Document boxcox_doc(boxcox_path.string(), rapidcsv::LabelParams{}, 
-                                     rapidcsv::SeparatorParams{boxcox_delimiter.front()});
-        
+        rapidcsv::Document boxcox_doc(boxcox_path.string(), rapidcsv::LabelParams{},
+                                      rapidcsv::SeparatorParams{boxcox_delimiter.front()});
+
         std::cout << "\n  Loading boxcox coefficients from: " << boxcox_filename;
-        std::cout << "\n    CSV dimensions: " << boxcox_doc.GetRowCount() << " rows, " << boxcox_doc.GetColumnCount() << " columns";
-        
-        // Load boxcox coefficients: row names (coefficients) -> column names (risk factors) -> values
+        std::cout << "\n    CSV dimensions: " << boxcox_doc.GetRowCount() << " rows, "
+                  << boxcox_doc.GetColumnCount() << " columns";
+
+        // Load boxcox coefficients: row names (coefficients) -> column names (risk factors) ->
+        // values
         for (size_t row_idx = 0; row_idx < boxcox_doc.GetRowCount(); ++row_idx) {
             std::string coefficient_name = boxcox_doc.GetCell<std::string>(0, row_idx);
             csv_coefficients[coefficient_name] = {};
-            
+
             for (size_t col_idx = 1; col_idx < boxcox_doc.GetColumnCount(); ++col_idx) {
                 std::string risk_factor_name = boxcox_doc.GetColumnName(col_idx);
                 double coefficient_value = boxcox_doc.GetCell<double>(col_idx, row_idx);
                 csv_coefficients[coefficient_name][risk_factor_name] = coefficient_value;
             }
         }
-        
+
         // Load policy coefficients if they exist
         if (opt["RiskFactorModels"].contains("policy_coefficients")) {
             const auto &policy_config = opt["RiskFactorModels"]["policy_coefficients"];
             std::string policy_filename = policy_config["name"].get<std::string>();
-            std::string policy_delimiter = policy_config.contains("delimiter") ? policy_config["delimiter"] : ",";
+            std::string policy_delimiter =
+                policy_config.contains("delimiter") ? policy_config["delimiter"] : ",";
             if (policy_delimiter == "\\t") {
                 policy_delimiter = "\t";
             }
-            
+
             std::filesystem::path policy_path = config.root_path / policy_filename;
-            rapidcsv::Document policy_doc(policy_path.string(), rapidcsv::LabelParams{}, 
-                                         rapidcsv::SeparatorParams{policy_delimiter.front()});
-            
+            rapidcsv::Document policy_doc(policy_path.string(), rapidcsv::LabelParams{},
+                                          rapidcsv::SeparatorParams{policy_delimiter.front()});
+
             std::cout << "\n  Loading policy coefficients from: " << policy_filename;
-            std::cout << "\n    CSV dimensions: " << policy_doc.GetRowCount() << " rows, " << policy_doc.GetColumnCount() << " columns";
-            
-            // Load policy coefficients: row names (coefficients) -> column names (risk factors) -> values
+            std::cout << "\n    CSV dimensions: " << policy_doc.GetRowCount() << " rows, "
+                      << policy_doc.GetColumnCount() << " columns";
+
+            // Load policy coefficients: row names (coefficients) -> column names (risk factors) ->
+            // values
             for (size_t row_idx = 0; row_idx < policy_doc.GetRowCount(); ++row_idx) {
                 std::string coefficient_name = policy_doc.GetCell<std::string>(0, row_idx);
                 csv_policy_coefficients[coefficient_name] = {};
-                
+
                 for (size_t col_idx = 1; col_idx < policy_doc.GetColumnCount(); ++col_idx) {
                     std::string risk_factor_name = policy_doc.GetColumnName(col_idx);
                     double coefficient_value = policy_doc.GetCell<double>(col_idx, row_idx);
@@ -519,10 +527,11 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                 }
             }
         }
-        
+
         std::cout << "\nDEBUG: CSV coefficients loaded successfully";
         std::cout << "\n  BoxCox coefficients: " << csv_coefficients.size() << " coefficient types";
-        std::cout << "\n  Policy coefficients: " << csv_policy_coefficients.size() << " coefficient types";
+        std::cout << "\n  Policy coefficients: " << csv_policy_coefficients.size()
+                  << " coefficient types";
     }
 
     // MAHIMA: Use CSV order instead of JSON iteration order to ensure consistency
@@ -534,34 +543,41 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
         // Process risk factor model parameters based on structure type
         LinearModelParams model;
-        const nlohmann::json* json_params = nullptr; // Declare json_params for both branches
-        
+        const nlohmann::json *json_params = nullptr; // Declare json_params for both branches
+
         if (is_matrix_based_structure) {
             // Matrix-based structure: Load coefficients from CSV data
-            std::cout << "\nDEBUG: Processing risk factor " << csv_name.to_string() << " from CSV data";
-            
+            std::cout << "\nDEBUG: Processing risk factor " << csv_name.to_string()
+                      << " from CSV data";
+
             // Get intercept from CSV data
             if (csv_coefficients.find("Intercept") != csv_coefficients.end() &&
-                csv_coefficients.at("Intercept").find(csv_name.to_string()) != csv_coefficients.at("Intercept").end()) {
+                csv_coefficients.at("Intercept").find(csv_name.to_string()) !=
+                    csv_coefficients.at("Intercept").end()) {
                 model.intercept = csv_coefficients.at("Intercept").at(csv_name.to_string());
             } else {
-                throw core::HgpsException{fmt::format("Intercept not found for risk factor '{}' in CSV data", csv_name.to_string())};
+                throw core::HgpsException{fmt::format(
+                    "Intercept not found for risk factor '{}' in CSV data", csv_name.to_string())};
             }
-            
+
             // Load coefficients from CSV data
             for (const auto &[coeff_name, coeff_map] : csv_coefficients) {
-                if (coeff_name == "Intercept") continue; // Skip intercept, already handled
-                
+                if (coeff_name == "Intercept")
+                    continue; // Skip intercept, already handled
+
                 if (coeff_map.find(csv_name.to_string()) != coeff_map.end()) {
-                    model.coefficients[core::Identifier(coeff_name)] = coeff_map.at(csv_name.to_string());
+                    model.coefficients[core::Identifier(coeff_name)] =
+                        coeff_map.at(csv_name.to_string());
                 }
             }
-            
-            std::cout << "\n  Loaded " << model.coefficients.size() << " coefficients for " << csv_name.to_string();
+
+            std::cout << "\n  Loaded " << model.coefficients.size() << " coefficients for "
+                      << csv_name.to_string();
         } else {
             // Legacy structure: Load coefficients from JSON
-            std::cout << "\nDEBUG: Processing risk factor " << csv_name.to_string() << " from JSON data";
-            
+            std::cout << "\nDEBUG: Processing risk factor " << csv_name.to_string()
+                      << " from JSON data";
+
             // Find the corresponding JSON parameters using case-insensitive lookup
             std::string json_key;
             bool found = false;
@@ -574,18 +590,18 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             }
 
             if (!found) {
-                throw core::HgpsException{
-                    fmt::format("Risk factor '{}' not found in RiskFactorModels. Available keys: {}",
-                                csv_name.to_string(), [&]() {
-                                    std::string keys;
-                                    for (const auto &[key, value] : opt["RiskFactorModels"].items()) {
-                                        if (!keys.empty()) {
-                                            keys += ", ";
-                                        }
-                                        keys += key;
-                                    }
-                                    return keys;
-                                }())};
+                throw core::HgpsException{fmt::format(
+                    "Risk factor '{}' not found in RiskFactorModels. Available keys: {}",
+                    csv_name.to_string(), [&]() {
+                        std::string keys;
+                        for (const auto &[key, value] : opt["RiskFactorModels"].items()) {
+                            if (!keys.empty()) {
+                                keys += ", ";
+                            }
+                            keys += key;
+                        }
+                        return keys;
+                    }())};
             }
             json_params = &opt["RiskFactorModels"][json_key];
 
@@ -605,14 +621,16 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
         // Write risk factor data structures.
         models.emplace_back(std::move(model));
-        
+
         // Handle ranges, lambda, and stddev based on structure type
         if (is_matrix_based_structure) {
             // For matrix-based structure, these values should come from Nutrients section
-            // We need to implement proper loading from Nutrients - for now, throw error to identify missing data
-            throw core::HgpsException{fmt::format(
-                "Matrix-based structure requires ranges, lambda, and stddev to be loaded from Nutrients section. "
-                "Risk factor: {}. This needs to be implemented.", csv_name.to_string())};
+            // We need to implement proper loading from Nutrients - for now, throw error to identify
+            // missing data
+            throw core::HgpsException{fmt::format("Matrix-based structure requires ranges, lambda, "
+                                                  "and stddev to be loaded from Nutrients section. "
+                                                  "Risk factor: {}. This needs to be implemented.",
+                                                  csv_name.to_string())};
         } else {
             // Legacy structure: Get values from JSON
             ranges.emplace_back((*json_params)["Range"].get<core::DoubleInterval>());
@@ -623,19 +641,23 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
         // Intervention policy model parameters.
         LinearModelParams policy_model;
-        const nlohmann::json* policy_json_params = nullptr; // Declare for both branches
-        
+        const nlohmann::json *policy_json_params = nullptr; // Declare for both branches
+
         if (is_matrix_based_structure) {
             // Matrix-based structure: Load policy coefficients from CSV data
             if (csv_policy_coefficients.find("Intercept") != csv_policy_coefficients.end() &&
-                csv_policy_coefficients.at("Intercept").find(csv_name.to_string()) != csv_policy_coefficients.at("Intercept").end()) {
-                policy_model.intercept = csv_policy_coefficients.at("Intercept").at(csv_name.to_string());
+                csv_policy_coefficients.at("Intercept").find(csv_name.to_string()) !=
+                    csv_policy_coefficients.at("Intercept").end()) {
+                policy_model.intercept =
+                    csv_policy_coefficients.at("Intercept").at(csv_name.to_string());
             } else {
                 throw core::HgpsException{fmt::format(
                     "Policy intercept not found for risk factor '{}' in CSV data. "
-                    "Available intercepts: {}", csv_name.to_string(), [&]() {
+                    "Available intercepts: {}",
+                    csv_name.to_string(), [&]() {
                         std::vector<std::string> intercepts;
-                        if (csv_policy_coefficients.find("Intercept") != csv_policy_coefficients.end()) {
+                        if (csv_policy_coefficients.find("Intercept") !=
+                            csv_policy_coefficients.end()) {
                             for (const auto &[rf, _] : csv_policy_coefficients.at("Intercept")) {
                                 intercepts.push_back(rf);
                             }
@@ -643,28 +665,32 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                         return fmt::format("[{}]", fmt::join(intercepts, ", "));
                     }())};
             }
-            
+
             // Load policy coefficients from CSV data
             for (const auto &[coeff_name, coeff_map] : csv_policy_coefficients) {
-                if (coeff_name == "Intercept") continue; // Skip intercept, already handled
-                
+                if (coeff_name == "Intercept")
+                    continue; // Skip intercept, already handled
+
                 if (coeff_map.find(csv_name.to_string()) != coeff_map.end()) {
-                    policy_model.coefficients[core::Identifier(coeff_name)] = coeff_map.at(csv_name.to_string());
+                    policy_model.coefficients[core::Identifier(coeff_name)] =
+                        coeff_map.at(csv_name.to_string());
                 }
             }
-            
+
             // For matrix-based structure, we don't have log coefficients in CSV, so use empty map
             policy_model.log_coefficients = {};
-            
-            std::cout << "\n  Loaded " << policy_model.coefficients.size() << " policy coefficients for " << csv_name.to_string();
+
+            std::cout << "\n  Loaded " << policy_model.coefficients.size()
+                      << " policy coefficients for " << csv_name.to_string();
         } else {
             // Legacy structure: Load policy coefficients from JSON
             policy_json_params = &(*json_params)["Policy"];
             policy_model.intercept = (*policy_json_params)["Intercept"].get<double>();
-            policy_model.coefficients =
-                (*policy_json_params)["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
-            policy_model.log_coefficients = (*policy_json_params)["LogCoefficients"]
-                                                .get<std::unordered_map<core::Identifier, double>>();
+            policy_model.coefficients = (*policy_json_params)["Coefficients"]
+                                            .get<std::unordered_map<core::Identifier, double>>();
+            policy_model.log_coefficients =
+                (*policy_json_params)["LogCoefficients"]
+                    .get<std::unordered_map<core::Identifier, double>>();
         }
 
         // Check intervention policy covariance matrix column name matches risk factor name.
@@ -678,14 +704,15 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
         // Write intervention policy data structures.
         policy_models.emplace_back(std::move(policy_model));
-        
+
         // Handle policy ranges based on structure type
         if (is_matrix_based_structure) {
             // For matrix-based structure, policy ranges should be defined somewhere
             // For now, throw error to identify missing data
-            throw core::HgpsException{fmt::format(
-                "Matrix-based structure requires policy ranges to be defined. "
-                "Risk factor: {}. This needs to be implemented.", csv_name.to_string())};
+            throw core::HgpsException{
+                fmt::format("Matrix-based structure requires policy ranges to be defined. "
+                            "Risk factor: {}. This needs to be implemented.",
+                            csv_name.to_string())};
         } else {
             // Legacy structure: Get policy range from JSON
             policy_ranges.emplace_back((*policy_json_params)["Range"].get<core::DoubleInterval>());
@@ -702,9 +729,10 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             // Only require trend data if trend type is Trend
             if (is_matrix_based_structure) {
                 // For matrix-based structure, trend data should be loaded from CSV
-                throw core::HgpsException{fmt::format(
-                    "Matrix-based structure requires trend data to be loaded from CSV. "
-                    "Risk factor: {}. Trend type: TREND. This needs to be implemented.", csv_name.to_string())};
+                throw core::HgpsException{
+                    fmt::format("Matrix-based structure requires trend data to be loaded from CSV. "
+                                "Risk factor: {}. Trend type: TREND. This needs to be implemented.",
+                                csv_name.to_string())};
             } else {
                 // Legacy structure: Check for trend data in JSON
                 if (json_params && json_params->contains("Trend")) {
@@ -713,31 +741,35 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                     const auto &trend_json_params = (*json_params)["Trend"];
                     LinearModelParams trend_model;
                     trend_model.intercept = trend_json_params["Intercept"].get<double>();
-                    trend_model.coefficients = trend_json_params["Coefficients"]
-                                                   .get<std::unordered_map<core::Identifier, double>>();
+                    trend_model.coefficients =
+                        trend_json_params["Coefficients"]
+                            .get<std::unordered_map<core::Identifier, double>>();
                     trend_model.log_coefficients =
                         trend_json_params["LogCoefficients"]
                             .get<std::unordered_map<core::Identifier, double>>();
 
                     // Write real trend data structures.
                     trend_models->emplace_back(std::move(trend_model));
-                    trend_ranges->emplace_back(trend_json_params["Range"].get<core::DoubleInterval>());
+                    trend_ranges->emplace_back(
+                        trend_json_params["Range"].get<core::DoubleInterval>());
                     trend_lambda->emplace_back(trend_json_params["Lambda"].get<double>());
 
                     // Load expected value trends (only if trend data exists).
-                    (*expected_trend)[csv_name] = json_params->contains("ExpectedTrend")
-                                                      ? (*json_params)["ExpectedTrend"].get<double>()
-                                                      : 1.0;
+                    (*expected_trend)[csv_name] =
+                        json_params->contains("ExpectedTrend")
+                            ? (*json_params)["ExpectedTrend"].get<double>()
+                            : 1.0;
                     (*expected_trend_boxcox)[csv_name] =
                         json_params->contains("ExpectedTrendBoxCox")
                             ? (*json_params)["ExpectedTrendBoxCox"].get<double>()
                             : 1.0;
-                    (*trend_steps)[csv_name] =
-                        json_params->contains("TrendSteps") ? (*json_params)["TrendSteps"].get<int>() : 0;
+                    (*trend_steps)[csv_name] = json_params->contains("TrendSteps")
+                                                   ? (*json_params)["TrendSteps"].get<int>()
+                                                   : 0;
                 } else {
-                    throw core::HgpsException{
-                        fmt::format("Trend is enabled but Trend data is missing for risk factor: {}",
-                                    csv_name.to_string())};
+                    throw core::HgpsException{fmt::format(
+                        "Trend is enabled but Trend data is missing for risk factor: {}",
+                        csv_name.to_string())};
                 }
             }
         } else {
@@ -775,14 +807,16 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                 // For matrix-based structure, income trend data should be loaded from CSV
                 throw core::HgpsException{fmt::format(
                     "Matrix-based structure requires income trend data to be loaded from CSV. "
-                    "Risk factor: {}. Trend type: IncomeTrend. This needs to be implemented.", csv_name.to_string())};
+                    "Risk factor: {}. Trend type: IncomeTrend. This needs to be implemented.",
+                    csv_name.to_string())};
             } else {
                 // Legacy structure: Check for income trend data in JSON
                 if (json_params && json_params->contains("IncomeTrend")) {
                     // Read income trend data from static_model.json
                     const auto &income_trend_json_params = (*json_params)["IncomeTrend"];
                     LinearModelParams income_trend_model;
-                    income_trend_model.intercept = income_trend_json_params["Intercept"].get<double>();
+                    income_trend_model.intercept =
+                        income_trend_json_params["Intercept"].get<double>();
                     income_trend_model.coefficients =
                         income_trend_json_params["Coefficients"]
                             .get<std::unordered_map<core::Identifier, double>>();
@@ -794,7 +828,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                     income_trend_models->emplace_back(std::move(income_trend_model));
                     income_trend_ranges->emplace_back(
                         income_trend_json_params["Range"].get<core::DoubleInterval>());
-                    income_trend_lambda->emplace_back(income_trend_json_params["Lambda"].get<double>());
+                    income_trend_lambda->emplace_back(
+                        income_trend_json_params["Lambda"].get<double>());
 
                     // Load expected income trend values (no defaults - throw error if missing)
                     if (!json_params->contains("ExpectedIncomeTrend")) {
@@ -808,12 +843,14 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                                         csv_name.to_string())};
                     }
                     if (!json_params->contains("IncomeTrendSteps")) {
-                        throw core::HgpsException{fmt::format(
-                            "IncomeTrendSteps is missing for risk factor: {}", csv_name.to_string())};
+                        throw core::HgpsException{
+                            fmt::format("IncomeTrendSteps is missing for risk factor: {}",
+                                        csv_name.to_string())};
                     }
                     if (!json_params->contains("IncomeDecayFactor")) {
-                        throw core::HgpsException{fmt::format(
-                            "IncomeDecayFactor is missing for risk factor: {}", csv_name.to_string())};
+                        throw core::HgpsException{
+                            fmt::format("IncomeDecayFactor is missing for risk factor: {}",
+                                        csv_name.to_string())};
                     }
 
                     (*expected_income_trend)[csv_name] =
@@ -824,9 +861,9 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                     (*income_trend_decay_factors)[csv_name] =
                         (*json_params)["IncomeDecayFactor"].get<double>();
                 } else {
-                    throw core::HgpsException{fmt::format(
-                        "Income trend is enabled but IncomeTrend data is missing for risk factor: {}",
-                        csv_name.to_string())};
+                    throw core::HgpsException{fmt::format("Income trend is enabled but IncomeTrend "
+                                                          "data is missing for risk factor: {}",
+                                                          csv_name.to_string())};
                 }
             }
         }
@@ -860,18 +897,18 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     if (is_matrix_based_structure) {
         // For matrix-based structure, check against correlation matrix columns
         if (csv_ordered_names.size() != policy_csv_ordered_names.size()) {
-            throw core::HgpsException{fmt::format("Risk factor count ({}) does not match intervention "
-                                                  "policy covariance matrix column count ({})",
-                                                  csv_ordered_names.size(),
-                                                  policy_csv_ordered_names.size())};
+            throw core::HgpsException{
+                fmt::format("Risk factor count ({}) does not match intervention "
+                            "policy covariance matrix column count ({})",
+                            csv_ordered_names.size(), policy_csv_ordered_names.size())};
         }
     } else {
         // For legacy structure, check against JSON entries
         if (opt["RiskFactorModels"].size() != policy_csv_ordered_names.size()) {
-            throw core::HgpsException{fmt::format("Risk factor count ({}) does not match intervention "
-                                                  "policy covariance matrix column count ({})",
-                                                  opt["RiskFactorModels"].size(),
-                                                  policy_csv_ordered_names.size())};
+            throw core::HgpsException{
+                fmt::format("Risk factor count ({}) does not match intervention "
+                            "policy covariance matrix column count ({})",
+                            opt["RiskFactorModels"].size(), policy_csv_ordered_names.size())};
         }
     }
     // Mahima's enhancement: Detect if all policy values are zero for early optimization
