@@ -658,9 +658,9 @@ StaticLinearModel::compute_linear_models(Person &person,
     for (size_t i = 0; i < names_.size(); i++) {
         auto name = names_[i];
         auto model = models[i];
-        std::cout << "\nDEBUG: Processing risk factor " << i << ": " << name.to_string() 
-                  << " with " << model.coefficients.size() << " coefficients";
-        
+        std::cout << "\nDEBUG: Processing risk factor " << i << ": " << name.to_string() << " with "
+                  << model.coefficients.size() << " coefficients";
+
         double factor = model.intercept;
         for (const auto &[coefficient_name, coefficient_value] : model.coefficients) {
             std::cout << "\nDEBUG: Looking for coefficient: " << coefficient_name.to_string();

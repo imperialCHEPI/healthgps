@@ -18,7 +18,7 @@ std::map<core::Identifier, std::function<double(const Person &)>> Person::curren
     {"Ethnicity"_id, [](const Person &p) { return p.ethnicity_to_value(); }},
     {"Income"_id, [](const Person &p) { return p.income_to_value(); }},
     {"SES"_id, [](const Person &p) { return p.ses; }},
-    
+
     // FINCH-specific coefficient mappings (lowercase with numbers)
     {"gender2"_id, [](const Person &p) { return p.gender_to_value(); }},
     {"age1"_id, [](const Person &p) { return static_cast<double>(p.age); }},
@@ -122,7 +122,7 @@ float Person::region_to_value() const {
             throw core::HgpsException("Invalid region format: " + region);
         }
     }
-    
+
     throw core::HgpsException("Unknown region format: " + region);
 }
 
@@ -141,7 +141,7 @@ float Person::ethnicity_to_value() const {
             throw core::HgpsException("Invalid ethnicity format: " + ethnicity);
         }
     }
-    
+
     throw core::HgpsException("Unknown ethnicity format: " + ethnicity);
 }
 
