@@ -3,6 +3,7 @@
 #include "person.h"
 #include "runtime_context.h"
 
+#include <chrono>
 #include <fmt/color.h>
 #include <iostream>
 #include <oneapi/tbb/parallel_for_each.h>
@@ -227,6 +228,7 @@ void DefaultCancerModel::update_remission_cases(RuntimeContext &context) {
 void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
     int incidence_id = definition_.get().table().at(MeasureKey::incidence);
 
+    auto start_time = std::chrono::high_resolution_clock::now();
     std::cout << "Start update_incidence_cases: " << disease_type() << "\n";
     fflush(stderr);
     fflush(stdout);
@@ -322,7 +324,9 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
                                                       .time_since_onset = 0};
         }
     }
-    std::cout << "End update_incidence_cases: " << disease_type() << "\n";
+    auto end_time = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+    std::cout << "End update_incidence_cases: " << disease_type() << " (took " << duration.count() << "ms)\n";
     fflush(stderr);
     fflush(stdout);
 }
