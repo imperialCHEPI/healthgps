@@ -326,7 +326,8 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
     }
     auto end_time = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
-    std::cout << "End update_incidence_cases: " << disease_type() << " (took " << duration.count() << "ms)\n";
+    std::cout << "End update_incidence_cases: " << disease_type() << " (took " << duration.count()
+              << "ms)\n";
     fflush(stderr);
     fflush(stdout);
 }
