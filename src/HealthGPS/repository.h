@@ -73,14 +73,16 @@ class Repository {
 
     /// @brief Gets region prevalence data
     /// @return Map of age-specific region probabilities by gender
-    virtual const std::map<core::Identifier, std::map<core::Gender, std::map<std::string, double>>>
-        &get_region_prevalence() const = 0;
+    virtual const std::map<core::Identifier,
+                           std::map<core::Gender, std::map<std::string, double>>> &
+    get_region_prevalence() const = 0;
 
     /// @brief Gets ethnicity prevalence data
     /// @return Map of age group, gender, and region-specific ethnicity probabilities
-    virtual const std::map<core::Identifier,
-                           std::map<core::Gender, std::map<std::string, std::map<std::string, double>>>>
-        &get_ethnicity_prevalence() const = 0;
+    virtual const std::map<
+        core::Identifier,
+        std::map<core::Gender, std::map<std::string, std::map<std::string, double>>>> &
+    get_ethnicity_prevalence() const = 0;
 };
 
 /// @brief Implements the cached data repository for input datasets and back-end storage
@@ -125,12 +127,12 @@ class CachedRepository final : public Repository {
                        std::map<core::Gender, std::map<std::string, std::map<std::string, double>>>>
             &ethnicity_data) override;
 
-    const std::map<core::Identifier, std::map<core::Gender, std::map<std::string, double>>>
-        &get_region_prevalence() const override;
+    const std::map<core::Identifier, std::map<core::Gender, std::map<std::string, double>>> &
+    get_region_prevalence() const override;
 
     const std::map<core::Identifier,
-                   std::map<core::Gender, std::map<std::string, std::map<std::string, double>>>>
-        &get_ethnicity_prevalence() const override;
+                   std::map<core::Gender, std::map<std::string, std::map<std::string, double>>>> &
+    get_ethnicity_prevalence() const override;
 
     void clear_cache() noexcept;
 
@@ -141,11 +143,11 @@ class CachedRepository final : public Repository {
     std::vector<core::DiseaseInfo> diseases_info_;
     std::map<core::Identifier, DiseaseDefinition> diseases_;
     LmsDefinition lms_parameters_;
-    
+
     /// @brief Region assignment probabilities by age and gender
     std::map<core::Identifier, std::map<core::Gender, std::map<std::string, double>>>
         region_prevalence_;
-    
+
     /// @brief Ethnicity assignment probabilities by age group, gender, and region
     std::map<core::Identifier,
              std::map<core::Gender, std::map<std::string, std::map<std::string, double>>>>

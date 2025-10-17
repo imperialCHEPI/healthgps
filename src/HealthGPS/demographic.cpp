@@ -401,7 +401,7 @@ void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &conte
     static int region_count = 0;
     static bool first_call = true;
     region_count++;
-    
+
     if (first_call) {
         std::cout << "\nStarting region initialization...";
         first_call = false;
@@ -473,7 +473,7 @@ void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &conte
                         "Please ensure region CSV file contains data for all required ages.",
                         person.age, fmt::join(available_ages, ", ")));
     }
-    
+
     if (region_count % 5000 == 0) {
         std::cout << "\nSuccessfully initialized region for " << region_count << " people";
     }
@@ -485,7 +485,7 @@ void DemographicModule::initialise_ethnicity([[maybe_unused]] RuntimeContext &co
     static int ethnicity_count = 0;
     static bool first_call = true;
     ethnicity_count++;
-    
+
     if (first_call) {
         std::cout << "\nStarting ethnicity initialization...";
         first_call = false;
@@ -584,9 +584,9 @@ void DemographicModule::initialise_ethnicity([[maybe_unused]] RuntimeContext &co
         "Age group: {}, Gender: {}, Region: {}, Ethnicities: {}, Probabilities: {}, Cumulative "
         "sum: {}",
         age_group.to_string(), (person.gender == core::Gender::male) ? "male" : "female",
-        person.region,         fmt::format("[{}]", fmt::join(ethnicity_names, ", ")),
+        person.region, fmt::format("[{}]", fmt::join(ethnicity_names, ", ")),
         fmt::format("[{}]", fmt::join(probs, ", ")), cumulative_prob));
-    
+
     if (ethnicity_count % 5000 == 0) {
         std::cout << "\nSuccessfully initialized ethnicity for " << ethnicity_count << " people";
     }
@@ -677,8 +677,9 @@ std::unique_ptr<DemographicModule> build_population_module(Repository &repositor
     auto life_table = detail::StoreConverter::to_life_table(births, deaths);
 
     // Create the DemographicModule
-    auto demographic_module = std::make_unique<DemographicModule>(std::move(pop_data), std::move(life_table));
-    
+    auto demographic_module =
+        std::make_unique<DemographicModule>(std::move(pop_data), std::move(life_table));
+
     // Set region and ethnicity data from repository
     try {
         const auto &region_data = repository.get_region_prevalence();
@@ -686,17 +687,18 @@ std::unique_ptr<DemographicModule> build_population_module(Repository &repositor
             demographic_module->set_region_prevalence(region_data);
             std::cout << "\nDEBUG: Region data set in DemographicModule";
         }
-        
+
         const auto &ethnicity_data = repository.get_ethnicity_prevalence();
         if (!ethnicity_data.empty()) {
             demographic_module->set_ethnicity_prevalence(ethnicity_data);
             std::cout << "\nDEBUG: Ethnicity data set in DemographicModule";
         }
     } catch (const std::exception &e) {
-        std::cout << "\nWARNING: Could not retrieve region/ethnicity data from repository: " << e.what();
+        std::cout << "\nWARNING: Could not retrieve region/ethnicity data from repository: "
+                  << e.what();
         std::cout << "\nContinuing without region/ethnicity data...";
     }
-    
+
     return demographic_module;
 }
 } // namespace hgps

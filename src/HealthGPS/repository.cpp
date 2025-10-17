@@ -159,15 +159,15 @@ void CachedRepository::register_ethnicity_prevalence(
     ethnicity_prevalence_ = ethnicity_data;
 }
 
-const std::map<core::Identifier, std::map<core::Gender, std::map<std::string, double>>>
-    &CachedRepository::get_region_prevalence() const {
+const std::map<core::Identifier, std::map<core::Gender, std::map<std::string, double>>> &
+CachedRepository::get_region_prevalence() const {
     std::scoped_lock<std::mutex> lock(mutex_);
     return region_prevalence_;
 }
 
 const std::map<core::Identifier,
-               std::map<core::Gender, std::map<std::string, std::map<std::string, double>>>>
-    &CachedRepository::get_ethnicity_prevalence() const {
+               std::map<core::Gender, std::map<std::string, std::map<std::string, double>>>> &
+CachedRepository::get_ethnicity_prevalence() const {
     std::scoped_lock<std::mutex> lock(mutex_);
     return ethnicity_prevalence_;
 }
