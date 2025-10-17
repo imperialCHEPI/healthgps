@@ -1260,38 +1260,6 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
     std::cout << "\nDEBUG: Physical activity models loading completed successfully";
 
-    // Load region and ethnicity data if present
-    std::cout << "\nDEBUG: Loading region and ethnicity data...";
-    if (opt.contains("RegionFile")) {
-        std::string region_filename = opt["RegionFile"]["name"].get<std::string>();
-        std::cout << "\n  Loading region file: " << region_filename;
-
-        // Load region data using the existing CSV parser
-        auto region_table =
-            load_datatable_from_csv(input::get_file_info(opt["RegionFile"], config.root_path));
-        std::cout << "\n    Region data loaded: " << region_table.num_rows() << " rows, "
-                  << region_table.num_columns() << " columns";
-
-        // Print column names for debugging
-        for (size_t i = 0; i < region_table.num_columns(); i++) {
-            std::cout << "\n      Column " << i << ": " << region_table.column(i).name();
-        }
-    }
-    if (opt.contains("EthnicityFile")) {
-        std::string ethnicity_filename = opt["EthnicityFile"]["name"].get<std::string>();
-        std::cout << "\n  Loading ethnicity file: " << ethnicity_filename;
-
-        // Load ethnicity data using the existing CSV parser
-        auto ethnicity_table =
-            load_datatable_from_csv(input::get_file_info(opt["EthnicityFile"], config.root_path));
-        std::cout << "\n    Ethnicity data loaded: " << ethnicity_table.num_rows() << " rows, "
-                  << ethnicity_table.num_columns() << " columns";
-
-        // Print column names for debugging
-        for (size_t i = 0; i < ethnicity_table.num_columns(); i++) {
-            std::cout << "\n      Column " << i << ": " << ethnicity_table.column(i).name();
-        }
-    }
 
     // Parse continuous income model outside constructor to avoid issues
     LinearModelParams continuous_income_model;
@@ -1632,6 +1600,102 @@ void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
         // Register model in cache
         repository.register_risk_factor_model_definition(model_type, std::move(model_definition));
     }
+    
+    // Load region and ethnicity data if present in static model
+    std::cout << "\nDEBUG: Loading region and ethnicity data...";
+    for (const auto &[model_type_str, model_path] : config.modelling.risk_factor_models) {
+        if (model_type_str == "static") {
+            const auto &[model_name, opt] = load_and_validate_model_json(model_path);
+            
+            if (opt.contains("RegionFile")) {
+                std::string region_filename = opt["RegionFile"]["name"].get<std::string>();
+                std::cout << "\n  Loading region file: " << region_filename;
+
+                // Load region data using the existing CSV parser
+                auto region_table =
+                    load_datatable_from_csv(input::get_file_info(opt["RegionFile"], config.root_path));
+                std::cout << "\n    Region data loaded: " << region_table.num_rows() << " rows, "
+                          << region_table.num_columns() << " columns";
+
+                // Process region data and store in repository
+                std::map<core::Identifier, std::map<core::Gender, std::map<std::string, double>>> region_data;
+                
+                // Get region column names (region1, region2, region3, region4)
+                std::vector<std::string> region_columns;
+                for (size_t col = 0; col < region_table.num_columns(); col++) {
+                    std::string col_name = region_table.column(col).name();
+                    if (col_name.substr(0, 6) == "region") {
+                        region_columns.push_back(col_name);
+                    }
+                }
+                
+                for (size_t i = 0; i < region_table.num_rows(); i++) {
+                    // Get age and gender
+                    int age = std::any_cast<int>(region_table.column("Age").value(i));
+                    int gender_int = std::any_cast<int>(region_table.column("Gender").value(i));
+                    core::Gender gender = (gender_int == 1) ? core::Gender::male : core::Gender::female;
+                    
+                    core::Identifier age_id("age_" + std::to_string(age));
+                    
+                    // Process each region column
+                    for (const auto& region_col : region_columns) {
+                        double probability = std::any_cast<double>(region_table.column(region_col).value(i));
+                        region_data[age_id][gender][region_col] = probability;
+                    }
+                }
+                
+                // Store in repository
+                repository.register_region_prevalence(region_data);
+                std::cout << "\n    Region data stored in repository";
+            }
+            
+            if (opt.contains("EthnicityFile")) {
+                std::string ethnicity_filename = opt["EthnicityFile"]["name"].get<std::string>();
+                std::cout << "\n  Loading ethnicity file: " << ethnicity_filename;
+
+                // Load ethnicity data using the existing CSV parser
+                auto ethnicity_table =
+                    load_datatable_from_csv(input::get_file_info(opt["EthnicityFile"], config.root_path));
+                std::cout << "\n    Ethnicity data loaded: " << ethnicity_table.num_rows() << " rows, "
+                          << ethnicity_table.num_columns() << " columns";
+
+                // Process ethnicity data and store in repository
+                std::map<core::Identifier, std::map<core::Gender, std::map<std::string, std::map<std::string, double>>>> ethnicity_data;
+                
+                // Get region column names (region1, region2, region3, region4)
+                std::vector<std::string> region_columns;
+                for (size_t col = 0; col < ethnicity_table.num_columns(); col++) {
+                    std::string col_name = ethnicity_table.column(col).name();
+                    if (col_name.substr(0, 6) == "region") {
+                        region_columns.push_back(col_name);
+                    }
+                }
+                
+                for (size_t i = 0; i < ethnicity_table.num_rows(); i++) {
+                    // Get age group, gender, and ethnicity
+                    int adult = std::any_cast<int>(ethnicity_table.column("adult").value(i));
+                    int gender_int = std::any_cast<int>(ethnicity_table.column("gender").value(i));
+                    int ethnicity_int = std::any_cast<int>(ethnicity_table.column("ethnicity").value(i));
+                    
+                    core::Identifier age_group = (adult == 0) ? "Under18"_id : "Over18"_id;
+                    core::Gender gender = (gender_int == 1) ? core::Gender::male : core::Gender::female;
+                    std::string ethnicity_name = std::to_string(ethnicity_int);
+                    
+                    // Process each region column
+                    for (const auto& region_col : region_columns) {
+                        double probability = std::any_cast<double>(ethnicity_table.column(region_col).value(i));
+                        ethnicity_data[age_group][gender][region_col][ethnicity_name] = probability;
+                    }
+                }
+                
+                // Store in repository
+                repository.register_ethnicity_prevalence(ethnicity_data);
+                std::cout << "\n    Ethnicity data stored in repository";
+            }
+            break; // Only process the first static model
+        }
+    }
+    
     std::cout << "\nFINISHED ALL THE LOADING REQUIRED CUTIEPIE :)\n";
 }
 

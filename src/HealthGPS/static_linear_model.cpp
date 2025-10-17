@@ -224,7 +224,7 @@ std::string StaticLinearModel::name() const noexcept { return "Static"; }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
-    std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors called - START";
+    std::cout << "\n=== STATIC LINEAR MODEL: GENERATING RISK FACTORS ===";
 
     // MAHIMA: Initialise everyone. Order is important here.
     // STEP 1: Age and gender initalized in demographic.cpp
@@ -237,6 +237,8 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     // STEP 8: Risk factors adjusted to trended expected means in static_linear_model.cpp
     // (below)
     size_t person_count = 0;
+    std::cout << "\nInitializing " << context.population().size() << " people...";
+    
     for (auto &person : context.population()) {
         initialise_sector(person, context.random());
         initialise_income(context, person, context.random());
@@ -244,13 +246,34 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         initialise_physical_activity(context, person, context.random());
         person_count++;
     }
-    std::cout << "\nDEBUG: Person initialization loop completed successfully for " << person_count
-              << " people";
+    
+    std::cout << "\nSuccessfully initialized " << person_count << " people";
+    std::cout << "\nInitialization order completed: Age -> Gender -> Region -> Ethnicity -> Sector -> Income -> Risk Factors -> Physical Activity";
+    
+    // Verify that all attributes are properly initialized
+    std::cout << "\nVerifying person attributes...";
+    int verified_count = 0;
+    for (const auto &person : context.population()) {
+        if (verified_count < 3) { // Check first 3 people
+            std::cout << "\nPerson " << verified_count + 1 << ": Age=" << person.age 
+                      << ", Gender=" << (person.gender == core::Gender::male ? "male" : "female")
+                      << ", Region=" << person.region 
+                      << ", Ethnicity=" << person.ethnicity
+                      << ", Sector=" << (person.sector == core::Sector::urban ? "urban" : "rural")
+                      << ", Income=" << static_cast<int>(person.income)
+                      << ", RiskFactors=" << person.risk_factors.size()
+                      << ", PhysicalActivity=" << person.physical_activity;
+        }
+        verified_count++;
+    }
 
     // Adjust such that risk factor means match expected values.
+    std::cout << "\nStarting risk factor adjustment...";
     adjust_risk_factors(context, names_, ranges_, false);
+    std::cout << "\nRisk factor adjustment completed";
 
     // Initialise everyone with appropriate trend type.
+    std::cout << "\nStarting trend initialization...";
     for (auto &person : context.population()) {
         if (has_active_policies_) {
             initialise_policies(person, context.random(), false);
@@ -269,12 +292,19 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
             break;
         }
     }
+    std::cout << "\nTrend initialization completed";
 
     // Adjust such that trended risk factor means match trended expected values.
     // Only apply trend adjustment if we have a trend type
     if (trend_type_ != TrendType::Null) {
+        std::cout << "\nStarting trended risk factor adjustment...";
         adjust_risk_factors(context, names_, ranges_, true);
+        std::cout << "\nTrended risk factor adjustment completed";
+    } else {
+        std::cout << "\nSkipping trended adjustment (trend_type_ is Null)";
     }
+    
+    std::cout << "\n=== STATIC LINEAR MODEL: RISK FACTOR GENERATION COMPLETED ===";
 }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
@@ -373,17 +403,19 @@ double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
 
 void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &person,
                                            Random &random) const {
-    std::cout << "\nDEBUG: StaticLinearModel::initialise_factors called - START";
+    static int factors_count = 0;
+    static bool first_call = true;
+    factors_count++;
 
+    if (first_call) {
+        std::cout << "\nStarting risk factors initialization...";
+        first_call = false;
+    }
     // Correlated residual sampling.
-    std::cout << "\nDEBUG: Computing residuals...";
     auto residuals = compute_residuals(random, cholesky_);
-    std::cout << "\nDEBUG: Residuals computed successfully, size: " << residuals.size();
 
     // Approximate risk factors with linear models.
-    std::cout << "\nDEBUG: Computing linear models...";
     auto linear = compute_linear_models(person, models_);
-    std::cout << "\nDEBUG: Linear models computed successfully, size: " << linear.size();
 
     // Initialise residuals and risk factors (do not exist yet).
     for (size_t i = 0; i < names_.size(); i++) {
@@ -404,6 +436,10 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
 
         // Save risk factor.
         person.risk_factors[names_[i]] = factor;
+    }
+    
+    if (factors_count % 5000 == 0) {
+        std::cout << "\nSuccessfully initialized risk factors for " << factors_count << " people";
     }
 }
 
@@ -650,7 +686,6 @@ void StaticLinearModel::apply_policies(Person &person, bool intervene) const {
 std::vector<double>
 StaticLinearModel::compute_linear_models(Person &person,
                                          const std::vector<LinearModelParams> &models) const {
-    std::cout << "\nDEBUG: StaticLinearModel::compute_linear_models called - START";
     std::vector<double> linear{};
     linear.reserve(names_.size());
 
@@ -658,36 +693,36 @@ StaticLinearModel::compute_linear_models(Person &person,
     for (size_t i = 0; i < names_.size(); i++) {
         auto name = names_[i];
         auto model = models[i];
-        std::cout << "\nDEBUG: Processing risk factor " << i << ": " << name.to_string() << " with "
-                  << model.coefficients.size() << " coefficients";
-
+        
         double factor = model.intercept;
         for (const auto &[coefficient_name, coefficient_value] : model.coefficients) {
-            std::cout << "\nDEBUG: Looking for coefficient: " << coefficient_name.to_string();
             try {
                 double value = person.get_risk_factor_value(coefficient_name);
                 factor += coefficient_value * value;
-                std::cout << " -> Found value: " << value;
             } catch (const std::exception &e) {
-                std::cout << " -> ERROR: " << e.what();
+                std::cout << "\nERROR: Coefficient '" << coefficient_name.to_string() 
+                          << "' not found: " << e.what();
+                std::cout << "\nPerson attributes: Age=" << person.age 
+                          << ", Gender=" << (person.gender == core::Gender::male ? "male" : "female")
+                          << ", Region=" << person.region 
+                          << ", Ethnicity=" << person.ethnicity
+                          << ", Income=" << static_cast<int>(person.income);
                 throw;
             }
         }
         for (const auto &[coefficient_name, coefficient_value] : model.log_coefficients) {
-            std::cout << "\nDEBUG: Looking for log coefficient: " << coefficient_name.to_string();
             try {
                 double value = person.get_risk_factor_value(coefficient_name);
                 factor += coefficient_value * log(value);
-                std::cout << " -> Found value: " << value;
             } catch (const std::exception &e) {
-                std::cout << " -> ERROR: " << e.what();
+                std::cout << "\nERROR: Log coefficient '" << coefficient_name.to_string() 
+                          << "' not found: " << e.what();
                 throw;
             }
         }
         linear.emplace_back(factor);
     }
 
-    std::cout << "\nDEBUG: StaticLinearModel::compute_linear_models completed successfully";
     return linear;
 }
 
@@ -753,12 +788,25 @@ void StaticLinearModel::update_sector(Person &person, Random &random) const {
 }
 
 void StaticLinearModel::initialise_income(RuntimeContext &context, Person &person, Random &random) {
+    static int income_count = 0;
+    static bool first_call = true;
+    income_count++;
+    
+    if (first_call) {
+        std::cout << "\nStarting income initialization...";
+        first_call = false;
+    }
+    
     if (is_continuous_income_model_) {
         // FINCH approach: Use continuous income calculation
         initialise_continuous_income(context, person, random);
     } else {
         // India approach: Use direct categorical assignment
         initialise_categorical_income(person, random);
+    }
+    
+    if (income_count % 5000 == 0) {
+        std::cout << "\nSuccessfully initialized income for " << income_count << " people";
     }
 }
 
@@ -774,7 +822,6 @@ void StaticLinearModel::update_income(RuntimeContext &context, Person &person, R
 // high)
 void StaticLinearModel::initialise_categorical_income(Person &person, Random &random) {
     // India approach: Direct categorical assignment using logits and softmax
-
     // Compute logits for each income category
     auto logits = std::unordered_map<core::Income, double>{};
     for (const auto &[income, params] : income_models_) {
@@ -1110,6 +1157,15 @@ core::Income StaticLinearModel::convert_income_continuous_to_category(double con
 
 void StaticLinearModel::initialise_physical_activity(RuntimeContext &context, Person &person,
                                                      Random &random) const {
+    static int physical_activity_count = 0;
+    static bool first_call = true;
+    physical_activity_count++;
+    
+    if (first_call) {
+        std::cout << "\nStarting physical activity initialization...";
+        first_call = false;
+    }
+    
     // Check if we have physical activity models
     if (has_physical_activity_models_) {
         // Check which type of model we have
@@ -1132,6 +1188,10 @@ void StaticLinearModel::initialise_physical_activity(RuntimeContext &context, Pe
         simple_model.stddev = physical_activity_stddev_;
         initialise_simple_physical_activity(context, person, random, simple_model);
     }
+    
+    if (physical_activity_count % 5000 == 0) {
+        std::cout << "\nSuccessfully initialized physical activity for " << physical_activity_count << " people";
+    }
 }
 
 // MAHIMA: Function to initialise continuous physical activity model using regression.
@@ -1141,6 +1201,7 @@ void StaticLinearModel::initialise_physical_activity(RuntimeContext &context, Pe
 void StaticLinearModel::initialise_continuous_physical_activity(
     [[maybe_unused]] RuntimeContext &context, Person &person, Random &random,
     const PhysicalActivityModel &model) {
+    
     // Start with the intercept
     double value = model.intercept;
 
@@ -1209,15 +1270,10 @@ void StaticLinearModel::initialise_continuous_physical_activity(
                     factor_value = std::stod(person.region);
                 } catch (...) {
                     // If not a number, check if it matches the factor name
-                    factor_value =
-                        (person.region == factor_name_str)
-                            ? 1.0
-                            : 0.0; // this shows if the factor value is 1 (available )then use
-                                   // else if it is 0 (not available) then move on.
+                    factor_value = (person.region == factor_name_str) ? 1.0 : 0.0;
                 }
             } else {
                 // Handle region2, region3,.... region56, etc. dynamically
-                // std::string region_number = factor_name_str.substr(6); // Remove "region" prefix
                 factor_value = (person.region == factor_name_str) ? 1.0 : 0.0;
             }
         }

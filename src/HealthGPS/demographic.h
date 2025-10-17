@@ -51,6 +51,19 @@ class DemographicModule final : public SimulationModule {
     /// @param disease_host The diseases host module instance
     void update_population(RuntimeContext &context, const DiseaseModule &disease_host);
 
+    /// @brief Sets the region prevalence data for assignment
+    /// @param region_data Map of age-specific region probabilities by gender
+    void set_region_prevalence(
+        const std::map<core::Identifier, std::map<core::Gender, std::map<std::string, double>>>
+            &region_data);
+
+    /// @brief Sets the ethnicity prevalence data for assignment
+    /// @param ethnicity_data Map of age group, gender, and region-specific ethnicity probabilities
+    void set_ethnicity_prevalence(
+        const std::map<core::Identifier,
+                       std::map<core::Gender, std::map<std::string, std::map<std::string, double>>>>
+            &ethnicity_data);
+
   private:
     std::map<int, std::map<int, PopulationRecord>> pop_data_;
     LifeTable life_table_;
@@ -82,19 +95,6 @@ class DemographicModule final : public SimulationModule {
     /// @param person The person to assign ethnicity to
     /// @param random Random number generator
     void initialise_ethnicity(RuntimeContext &context, Person &person, Random &random);
-
-    /// @brief Sets the region prevalence data for assignment
-    /// @param region_data Map of age-specific region probabilities by gender
-    void set_region_prevalence(
-        const std::map<core::Identifier, std::map<core::Gender, std::map<std::string, double>>>
-            &region_data);
-
-    /// @brief Sets the ethnicity prevalence data for assignment
-    /// @param ethnicity_data Map of age group, gender, and region-specific ethnicity probabilities
-    void set_ethnicity_prevalence(
-        const std::map<core::Identifier,
-                       std::map<core::Gender, std::map<std::string, std::map<std::string, double>>>>
-            &ethnicity_data);
 
     double get_total_deaths(int time_year) const noexcept;
     std::map<int, DoubleGenderValue> get_age_gender_distribution(int time_year) const noexcept;

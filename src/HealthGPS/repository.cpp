@@ -84,6 +84,8 @@ void CachedRepository::clear_cache() noexcept {
     rf_model_definition_.clear();
     diseases_info_.clear();
     diseases_.clear();
+    region_prevalence_.clear();
+    ethnicity_prevalence_.clear();
 }
 
 void CachedRepository::load_disease_definition(const core::DiseaseInfo &info,
@@ -140,5 +142,33 @@ void CachedRepository::load_disease_definition(const core::DiseaseInfo &info,
             std::move(relative_risks.risk_factors), std::move(parameter), std::move(pif_data));
         diseases_.emplace(info.code, definition);
     }
+}
+
+void CachedRepository::register_region_prevalence(
+    const std::map<core::Identifier, std::map<core::Gender, std::map<std::string, double>>>
+        &region_data) {
+    std::unique_lock<std::mutex> lock(mutex_);
+    region_prevalence_ = region_data;
+}
+
+void CachedRepository::register_ethnicity_prevalence(
+    const std::map<core::Identifier,
+                   std::map<core::Gender, std::map<std::string, std::map<std::string, double>>>>
+        &ethnicity_data) {
+    std::unique_lock<std::mutex> lock(mutex_);
+    ethnicity_prevalence_ = ethnicity_data;
+}
+
+const std::map<core::Identifier, std::map<core::Gender, std::map<std::string, double>>>
+    &CachedRepository::get_region_prevalence() const {
+    std::scoped_lock<std::mutex> lock(mutex_);
+    return region_prevalence_;
+}
+
+const std::map<core::Identifier,
+               std::map<core::Gender, std::map<std::string, std::map<std::string, double>>>>
+    &CachedRepository::get_ethnicity_prevalence() const {
+    std::scoped_lock<std::mutex> lock(mutex_);
+    return ethnicity_prevalence_;
 }
 } // namespace hgps

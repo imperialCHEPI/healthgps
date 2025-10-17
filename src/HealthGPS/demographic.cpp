@@ -124,12 +124,12 @@ double DemographicModule::get_residual_death_rate(int age, core::Gender gender) 
 }
 
 void DemographicModule::initialise_population(RuntimeContext &context) {
-    std::cout << "\nDEBUG: DemographicModule::initialise_population - START";
+    std::cout << "\n=== DEMOGRAPHIC MODULE: INITIALIZING POPULATION ===";
     auto age_gender_dist = get_age_gender_distribution(context.start_time());
     auto index = 0;
     auto pop_size = static_cast<int>(context.population().size());
     auto entry_total = static_cast<int>(age_gender_dist.size());
-    std::cout << "\nDEBUG: Population size: " << pop_size << ", Age groups: " << entry_total;
+    std::cout << "\nPopulation size: " << pop_size << ", Age groups: " << entry_total;
     for (auto entry_count = 1; auto &entry : age_gender_dist) {
         auto num_males = static_cast<int>(std::round(pop_size * entry.second.males));
         auto num_females = static_cast<int>(std::round(pop_size * entry.second.females));
@@ -198,7 +198,8 @@ void DemographicModule::initialise_population(RuntimeContext &context) {
     }
 
     assert(index == pop_size);
-    std::cout << "\nDEBUG: DemographicModule::initialise_population - COMPLETED";
+    std::cout << "\n=== DEMOGRAPHIC MODULE: POPULATION INITIALIZATION COMPLETED ===";
+    std::cout << "\nDemographic initialization order: Age -> Gender -> Region -> Ethnicity";
 }
 
 void DemographicModule::update_population(RuntimeContext &context,
@@ -397,6 +398,14 @@ int DemographicModule::update_age_and_death_events(RuntimeContext &context,
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &context, Person &person,
                                           Random &random) {
+    static int region_count = 0;
+    static bool first_call = true;
+    region_count++;
+    
+    if (first_call) {
+        std::cout << "\nStarting region initialization...";
+        first_call = false;
+    }
     // If no region data is available, skip region assignment
     if (region_prevalence_.empty()) {
         return;
@@ -405,11 +414,8 @@ void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &conte
     // Create an age-specific identifier in the format used in the CSV loading
     core::Identifier age_id("age_" + std::to_string(person.age));
 
-    std::cout << "\nDEBUG: region_prevalence_ size: " << region_prevalence_.size();
-
     // Check if this specific age exists in region_prevalence_ map
     if (region_prevalence_.contains(age_id)) {
-        std::cout << "\nDEBUG: Found age_id in region_prevalence_";
         // Check if the gender exists for this age
         if (!region_prevalence_.at(age_id).contains(person.gender)) {
             std::string gender_str = (person.gender == core::Gender::male) ? "male" : "female";
@@ -455,7 +461,6 @@ void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &conte
             fmt::format("[{}]", fmt::join(region_names, ", ")),
             fmt::format("[{}]", fmt::join(probs, ", ")), cumulative_prob));
     } else {
-        std::cout << "\nDEBUG: age_id NOT found in region_prevalence_";
         // If no region data for this age, throw detailed error
         std::vector<std::string> available_ages;
         available_ages.reserve(region_prevalence_.size());
@@ -468,11 +473,23 @@ void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &conte
                         "Please ensure region CSV file contains data for all required ages.",
                         person.age, fmt::join(available_ages, ", ")));
     }
+    
+    if (region_count % 5000 == 0) {
+        std::cout << "\nSuccessfully initialized region for " << region_count << " people";
+    }
 }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void DemographicModule::initialise_ethnicity([[maybe_unused]] RuntimeContext &context,
                                              Person &person, Random &random) {
+    static int ethnicity_count = 0;
+    static bool first_call = true;
+    ethnicity_count++;
+    
+    if (first_call) {
+        std::cout << "\nStarting ethnicity initialization...";
+        first_call = false;
+    }
     // If no ethnicity data is available, skip ethnicity assignment
     if (ethnicity_prevalence_.empty()) {
         return;
@@ -567,8 +584,12 @@ void DemographicModule::initialise_ethnicity([[maybe_unused]] RuntimeContext &co
         "Age group: {}, Gender: {}, Region: {}, Ethnicities: {}, Probabilities: {}, Cumulative "
         "sum: {}",
         age_group.to_string(), (person.gender == core::Gender::male) ? "male" : "female",
-        person.region, fmt::format("[{}]", fmt::join(ethnicity_names, ", ")),
+        person.region,         fmt::format("[{}]", fmt::join(ethnicity_names, ", ")),
         fmt::format("[{}]", fmt::join(probs, ", ")), cumulative_prob));
+    
+    if (ethnicity_count % 5000 == 0) {
+        std::cout << "\nSuccessfully initialized ethnicity for " << ethnicity_count << " people";
+    }
 }
 
 void DemographicModule::set_region_prevalence(
@@ -655,6 +676,27 @@ std::unique_ptr<DemographicModule> build_population_module(Repository &repositor
     auto deaths = repository.manager().get_mortality(config.settings().country(), time_filter);
     auto life_table = detail::StoreConverter::to_life_table(births, deaths);
 
-    return std::make_unique<DemographicModule>(std::move(pop_data), std::move(life_table));
+    // Create the DemographicModule
+    auto demographic_module = std::make_unique<DemographicModule>(std::move(pop_data), std::move(life_table));
+    
+    // Set region and ethnicity data from repository
+    try {
+        const auto &region_data = repository.get_region_prevalence();
+        if (!region_data.empty()) {
+            demographic_module->set_region_prevalence(region_data);
+            std::cout << "\nDEBUG: Region data set in DemographicModule";
+        }
+        
+        const auto &ethnicity_data = repository.get_ethnicity_prevalence();
+        if (!ethnicity_data.empty()) {
+            demographic_module->set_ethnicity_prevalence(ethnicity_data);
+            std::cout << "\nDEBUG: Ethnicity data set in DemographicModule";
+        }
+    } catch (const std::exception &e) {
+        std::cout << "\nWARNING: Could not retrieve region/ethnicity data from repository: " << e.what();
+        std::cout << "\nContinuing without region/ethnicity data...";
+    }
+    
+    return demographic_module;
 }
 } // namespace hgps
