@@ -6,6 +6,8 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <fmt/chrono.h>  // MAHIMA: Include for timestamp formatting
+#include <fmt/core.h>    // MAHIMA: Include for fmt::format
 
 namespace hgps {
 
@@ -41,21 +43,45 @@ RiskFactorInspector::RiskFactorInspector(const std::filesystem::path &output_dir
         core::Identifier{"Height"}  // Height (cm)
     };
 
-    // MAHIMA: Create timestamped output file paths
-    // Using current time to ensure unique filenames for each simulation run
+    // MAHIMA: Create timestamped output file paths using the SAME format as main simulation results
+    // This ensures consistency with HealthGPS_Result_YYYY-MM-DD_HH-MM-SS.microseconds.csv files
     auto timestamp = std::chrono::system_clock::now();
-    auto time_t = std::chrono::system_clock::to_time_t(timestamp);
+    auto timestamp_tk = fmt::format("{0:%F_%H-%M-}{1:%S}", timestamp, timestamp.time_since_epoch());
 
-    std::stringstream ss;
-    ss << std::put_time(std::localtime(&time_t), "%Y-%m-%d_%H-%M-%S");
-    std::string timestamp_str = ss.str();
+    // MAHIMA: Try to find the main simulation output folder by looking for existing result files
+    // This ensures risk factor inspection files are saved in the same location as main results
+    std::filesystem::path main_output_dir = output_dir;
+    
+    // Look for existing HealthGPS result files in the current directory and parent directories
+    std::vector<std::filesystem::path> search_paths = {
+        output_dir,
+        output_dir.parent_path(),
+        std::filesystem::current_path(),
+        std::filesystem::current_path().parent_path()
+    };
+    
+    for (const auto& search_path : search_paths) {
+        if (std::filesystem::exists(search_path)) {
+            for (const auto& entry : std::filesystem::directory_iterator(search_path)) {
+                if (entry.is_regular_file()) {
+                    std::string filename = entry.path().filename().string();
+                    if (filename.find("HealthGPS_Result_") == 0 && filename.find(".csv") != std::string::npos) {
+                        main_output_dir = entry.path().parent_path();
+                        std::cout << "\nMAHIMA: Found main simulation output folder: " << main_output_dir.string();
+                        break;
+                    }
+                }
+            }
+            if (main_output_dir != output_dir) break;
+        }
+    }
 
     // MAHIMA: Only create Year 3 files if the feature is enabled
     if constexpr (ENABLE_YEAR3_RISK_FACTOR_INSPECTION) {
         auto baseline_path =
-            output_dir / ("Year3_Baseline_Individual_RiskFactors_" + timestamp_str + ".csv");
+            main_output_dir / ("Year3_Baseline_Individual_RiskFactors_" + timestamp_tk + ".csv");
         auto intervention_path =
-            output_dir / ("Year3_Intervention_Individual_RiskFactors_" + timestamp_str + ".csv");
+            main_output_dir / ("Year3_Intervention_Individual_RiskFactors_" + timestamp_tk + ".csv");
 
         // MAHIMA: Open output file streams with error checking
         // These files will contain individual person records for inspection
@@ -81,11 +107,12 @@ RiskFactorInspector::RiskFactorInspector(const std::filesystem::path &output_dir
     // MAHIMA: Print confirmation of file creation for debugging
     if constexpr (ENABLE_YEAR3_RISK_FACTOR_INSPECTION) {
         auto baseline_path =
-            output_dir / ("Year3_Baseline_Individual_RiskFactors_" + timestamp_str + ".csv");
+            main_output_dir / ("Year3_Baseline_Individual_RiskFactors_" + timestamp_tk + ".csv");
         auto intervention_path =
-            output_dir / ("Year3_Intervention_Individual_RiskFactors_" + timestamp_str + ".csv");
+            main_output_dir / ("Year3_Intervention_Individual_RiskFactors_" + timestamp_tk + ".csv");
             
         std::cout << "\nMAHIMA: Risk Factor Inspector initialized successfully:";
+        std::cout << "\n  Main output directory: " << main_output_dir.string();
         std::cout << "\n  Baseline file: " << baseline_path.string();
         std::cout << "\n  Intervention file: " << intervention_path.string();
         std::cout << "\n  Target risk factors: " << target_factors_.size() << " factors";
@@ -568,9 +595,38 @@ void RiskFactorInspector::capture_detailed_calculation(RuntimeContext & /*contex
         return;
     }
     
-    // Create filename: {risk_factor_name}_inspection.csv
-    std::string filename = core::to_lower(risk_factor_name) + "_inspection.csv";
-    std::filesystem::path file_path = output_dir_ / filename;
+    // Create filename: riskfactor_{timestamp}_{risk_factor_name}.csv
+    // This matches the main simulation file naming pattern: HealthGPS_Result_{timestamp}.csv
+    auto timestamp = std::chrono::system_clock::now();
+    auto timestamp_tk = fmt::format("{0:%F_%H-%M-}{1:%S}", timestamp, timestamp.time_since_epoch());
+    
+    std::string filename = "riskfactor_" + timestamp_tk + "_" + core::to_lower(risk_factor_name) + ".csv";
+    
+    // Try to find the main simulation output folder
+    std::filesystem::path main_output_dir = output_dir_;
+    std::vector<std::filesystem::path> search_paths = {
+        output_dir_,
+        output_dir_.parent_path(),
+        std::filesystem::current_path(),
+        std::filesystem::current_path().parent_path()
+    };
+    
+    for (const auto& search_path : search_paths) {
+        if (std::filesystem::exists(search_path)) {
+            for (const auto& entry : std::filesystem::directory_iterator(search_path)) {
+                if (entry.is_regular_file()) {
+                    std::string entry_filename = entry.path().filename().string();
+                    if (entry_filename.find("HealthGPS_Result_") == 0 && entry_filename.find(".csv") != std::string::npos) {
+                        main_output_dir = entry.path().parent_path();
+                        break;
+                    }
+                }
+            }
+            if (main_output_dir != output_dir_) break;
+        }
+    }
+    
+    std::filesystem::path file_path = main_output_dir / filename;
     
     // Check if file exists to determine if we need to write headers
     bool file_exists = std::filesystem::exists(file_path);
@@ -789,8 +845,37 @@ void RiskFactorInspector::capture_person_risk_factors(RuntimeContext &context, c
     
     const auto& details = calculation_storage_[person_id][risk_factor_name];
     
-    // Create the CSV file path (only baseline scenario runs debugging)
-    std::filesystem::path csv_path = output_dir_ / (risk_factor_name + "_inspection.csv");
+    // Create the CSV file path with timestamp matching main simulation results
+    auto timestamp = std::chrono::system_clock::now();
+    auto timestamp_tk = fmt::format("{0:%F_%H-%M-}{1:%S}", timestamp, timestamp.time_since_epoch());
+    
+    std::string filename = "riskfactor_" + timestamp_tk + "_" + core::to_lower(risk_factor_name) + ".csv";
+    
+    // Try to find the main simulation output folder
+    std::filesystem::path main_output_dir = output_dir_;
+    std::vector<std::filesystem::path> search_paths = {
+        output_dir_,
+        output_dir_.parent_path(),
+        std::filesystem::current_path(),
+        std::filesystem::current_path().parent_path()
+    };
+    
+    for (const auto& search_path : search_paths) {
+        if (std::filesystem::exists(search_path)) {
+            for (const auto& entry : std::filesystem::directory_iterator(search_path)) {
+                if (entry.is_regular_file()) {
+                    std::string entry_filename = entry.path().filename().string();
+                    if (entry_filename.find("HealthGPS_Result_") == 0 && entry_filename.find(".csv") != std::string::npos) {
+                        main_output_dir = entry.path().parent_path();
+                        break;
+                    }
+                }
+            }
+            if (main_output_dir != output_dir_) break;
+        }
+    }
+    
+    std::filesystem::path csv_path = main_output_dir / filename;
     
     // Check if file exists to determine if we need to write headers
     bool file_exists = std::filesystem::exists(csv_path);

@@ -86,64 +86,17 @@ Simulation::Simulation(SimulationModuleFactory &factory, std::shared_ptr<const E
             auto &inspector_ref = context_.get_risk_factor_inspector();
             int config_count = 0;
 
-            // Capture ALL risk factors for 2022 and 2032 (all ages, all genders)
-            std::vector<std::string> all_risk_factors = {"foodcarbohydrate",
-                                                         "foodprotein",
-                                                         "foodfat",
-                                                         "foodsodium",
-                                                         "foodalcohol",
-                                                         "foodprocessedmeat",
-                                                         "foodredmeat",
-                                                         "foodlegume",
-                                                         "foodfruit",
-                                                         "foodvegetable",
-                                                         "foodaddedsugar",
-                                                         "foodtotalsugar",
-                                                         "foodmonounsaturatedfat",
-                                                         "foodpolyunsaturatedfattyacid",
-                                                         "foodsaturatedfat",
-                                                         "foodfibre",
-                                                         "foodcalcium",
-                                                         "foodiron",
-                                                         "foodvitaminc",
-                                                         "foodcopper",
-                                                         "foodzinc"
-            };
-
-            for (const auto& risk_factor : all_risk_factors) {
-                inspector_ref.add_debug_config(true, -1, -1, core::Gender::unknown, risk_factor, 2022, "intervention");
-                inspector_ref.add_debug_config(true, -1, -1, core::Gender::unknown, risk_factor, 2032, "intervention");
-            }
+          
             
-            // Sodium configurations for INTERVENTION ONLY
-            /*inspector_ref.add_debug_config(true, 20, 20, core::Gender::female, "foodsodium",
-                                                2022, "intervention");
-            inspector_ref.add_debug_config(true, 20, 20, core::Gender::female, "foodsodium", 2032, "intervention");
+            // Sodium configurations for BOTH BASELINE AND INTERVENTION
+            // Capture both male and female, both scenarios, SPECIFIC years in the same file
+            // USER CONFIGURATION: Specify which years you want to capture (e.g., 2022 and 2032)
+            int target_year_1 = 2022;  // CHANGE THIS to your first target year
+            int target_year_2 = 2032;  // CHANGE THIS to your second target year
             
-            inspector_ref.add_debug_config(true, 20, 20, core::Gender::male, "foodsodium", 2022, "intervention");
-            inspector_ref.add_debug_config(true, 20, 20, core::Gender::male, "foodsodium", 2032, "intervention");
-            
-            inspector_ref.add_debug_config(true, 55, 55, core::Gender::female, "foodsodium", 2022, "intervention");
-            inspector_ref.add_debug_config(true, 55, 55, core::Gender::female, "foodsodium", 2032, "intervention");
-            
-            inspector_ref.add_debug_config(true, 55, 55, core::Gender::male, "foodsodium", 2022, "intervention");
-            inspector_ref.add_debug_config(true, 55, 55, core::Gender::male, "foodsodium", 2032, "intervention");
-            
-            // Calcium configurations for INTERVENTION ONLY
-            inspector_ref.add_debug_config(true, 11, 18, core::Gender::female, "foodcalcium", 2022, "intervention");
-            inspector_ref.add_debug_config(true, 11, 18, core::Gender::female, "foodcalcium", 2032, "intervention");
-            
-            inspector_ref.add_debug_config(true, 11, 18, core::Gender::male, "foodcalcium", 2022, "intervention");
-            inspector_ref.add_debug_config(true, 11, 18, core::Gender::male, "foodcalcium", 2032, "intervention");
-            
-            // Iron configurations for INTERVENTION ONLY
-            inspector_ref.add_debug_config(true, 11, 50, core::Gender::female, "foodiron", 2022, "intervention");
-            inspector_ref.add_debug_config(true, 11, 50, core::Gender::female, "foodiron", 2032, "intervention");
-            
-            inspector_ref.add_debug_config(true, 51, 110, core::Gender::female, "foodiron", 2022, "intervention");
-            inspector_ref.add_debug_config(true, 51, 110, core::Gender::female, "foodiron", 2032, "intervention");*/ 
-            
-            std::cout << "\nMAHIMA: Configured " << (all_risk_factors.size() * 2) << " debug scenarios for " << current_scenario;
+            // Create a single configuration that captures BOTH years in the same file
+            inspector_ref.add_debug_config(true, 20, 20, core::Gender::unknown, "foodsodium", target_year_1, "");
+            inspector_ref.add_debug_config(true, 20, 20, core::Gender::unknown, "foodsodium", target_year_2, "");
 
         } catch (const std::exception &e) {
             // MAHIMA: If inspector initialization fails, log the error but don't crash the
