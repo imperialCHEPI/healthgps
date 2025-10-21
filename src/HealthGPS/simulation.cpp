@@ -49,63 +49,56 @@ Simulation::Simulation(SimulationModuleFactory &factory, std::shared_ptr<const E
 
     // MAHIMA: Initialize Risk Factor Inspector for Individual-Level Debugging
     // This inspector will capture detailed calculation steps for debugging purposes
-    // Only run for baseline/intervention scenario to avoid duplicate data
-    if (context_.scenario().type() == ScenarioType::intervention) {
-        try {
-            // MAHIMA: Create output directory for the inspection files
-            // We'll use the current working directory as a fallback since we don't have
-            // direct access to the configuration output folder here
-            std::filesystem::path output_dir = std::filesystem::current_path();
+    // Initialize for BOTH baseline and intervention scenarios
+    try {
+        // MAHIMA: Create output directory for the inspection files
+        // We'll use the current working directory as a fallback since we don't have
+        // direct access to the configuration output folder here
+        std::filesystem::path output_dir = std::filesystem::current_path();
 
-            // MAHIMA: Try to create a "risk_factor_inspection" subdirectory
-            auto inspection_dir = output_dir / "risk_factor_inspection";
-            if (!std::filesystem::exists(inspection_dir)) {
-                std::filesystem::create_directories(inspection_dir);
-            }
-
-            // MAHIMA: Create the risk factor inspector instance
-            auto inspector = std::make_unique<RiskFactorInspector>(inspection_dir);
-
-            // MAHIMA: Set the inspector in the runtime context
-            context_.set_risk_factor_inspector(std::move(inspector));
-
-            std::cout << "\nMAHIMA: Risk Factor Inspector initialized successfully for individual-level debugging";
-            std::cout << "\n  Output directory: " << inspection_dir.string();
-            std::cout << "\n  Scenario: " << context_.scenario().name();
-
-            // MAHIMA: Enable detailed calculation debugging
-            // To debug specific age, gender, risk factor, modify these values:
-            // Example: 30-year-old female for foodfat risk factor (initialization phase)
-            // For single age and age range, uncomment one of the lines below
-
-            // MAHIMA: Configure multiple debug scenarios for comprehensive data capture
-            std::string current_scenario = context_.scenario().name();
-            std::cout << "\nMAHIMA: Configuring debug for scenario: " << current_scenario;
-            
-            // Add multiple debug configurations for INTERVENTION ONLY
-            auto &inspector_ref = context_.get_risk_factor_inspector();
-            int config_count = 0;
-
-          
-            
-            // Sodium configurations for BOTH BASELINE AND INTERVENTION
-            // Capture both male and female, both scenarios, SPECIFIC years in the same file
-            // USER CONFIGURATION: Specify which years you want to capture (e.g., 2022 and 2032)
-            int target_year_1 = 2022;  // CHANGE THIS to your first target year
-            int target_year_2 = 2032;  // CHANGE THIS to your second target year
-            
-            // Create a single configuration that captures BOTH years in the same file
-            inspector_ref.add_debug_config(true, 20, 20, core::Gender::unknown, "foodsodium", target_year_1, "");
-            inspector_ref.add_debug_config(true, 20, 20, core::Gender::unknown, "foodsodium", target_year_2, "");
-
-        } catch (const std::exception &e) {
-            // MAHIMA: If inspector initialization fails, log the error but don't crash the
-            // simulation The simulation can still run without the inspector, just without debugging
-            std::cout << "\nMAHIMA: Warning - Failed to initialize Risk Factor Inspector: "
-                      << e.what();
-            std::cout << "\n  Simulation will continue without individual-level debugging.";
-            std::cout << "\n  This may be normal if debugging is not needed for this run.\n";
+        // MAHIMA: Try to create a "risk_factor_inspection" subdirectory
+        auto inspection_dir = output_dir / "risk_factor_inspection";
+        if (!std::filesystem::exists(inspection_dir)) {
+            std::filesystem::create_directories(inspection_dir);
         }
+
+        // MAHIMA: Create the risk factor inspector instance
+        auto inspector = std::make_unique<RiskFactorInspector>(inspection_dir);
+
+        // MAHIMA: Set the inspector in the runtime context
+        context_.set_risk_factor_inspector(std::move(inspector));
+
+        std::cout << "\nMAHIMA: Risk Factor Inspector initialized successfully for individual-level debugging";
+        std::cout << "\n  Output directory: " << inspection_dir.string();
+        std::cout << "\n  Scenario: " << context_.scenario().name();
+
+        // MAHIMA: Configure debug scenarios for BOTH baseline and intervention
+        std::string current_scenario = context_.scenario().name();
+        std::cout << "\nMAHIMA: Configuring debug for scenario: " << current_scenario;
+        
+        auto &inspector_ref = context_.get_risk_factor_inspector();
+        
+        // Sodium configurations for BOTH BASELINE AND INTERVENTION
+        // Capture both male and female, both scenarios, SPECIFIC years in the same file
+        // USER CONFIGURATION: Specify which years you want to capture (e.g., 2022 and 2032)
+        int target_year_1 = 2022;  // CHANGE THIS to your first target year
+        int target_year_2 = 2032;  // CHANGE THIS to your second target year
+        
+        std::cout << "\nMAHIMA: Configuring sodium capture for years " << target_year_1 << " and " << target_year_2;
+        std::cout << "\n  Both years will be captured in the SAME file";
+        std::cout << "\n  Both male and female, both baseline and intervention scenarios";
+        
+        // Create configurations for both years - they will be combined into ONE file
+        inspector_ref.add_debug_config(true, 20, 20, core::Gender::unknown, "foodsodium", target_year_1, "");
+        inspector_ref.add_debug_config(true, 20, 20, core::Gender::unknown, "foodsodium", target_year_2, "");
+
+    } catch (const std::exception &e) {
+        // MAHIMA: If inspector initialization fails, log the error but don't crash the
+        // simulation The simulation can still run without the inspector, just without debugging
+        std::cout << "\nMAHIMA: Warning - Failed to initialize Risk Factor Inspector: "
+                  << e.what();
+        std::cout << "\n  Simulation will continue without individual-level debugging.";
+        std::cout << "\n  This may be normal if debugging is not needed for this run.\n";
     }
 
     // MAHIMA: Initialize Risk Factor Inspector for Year 3 Policy Inspection

@@ -257,6 +257,9 @@ private:
     /// @brief MAHIMA: Output directory for inspection files
     std::filesystem::path output_dir_;
 
+    /// @brief MAHIMA: Timestamp for file naming (generated once during initialization)
+    std::string timestamp_str_;
+
     /// @brief MAHIMA: Map to store calculation details by person ID and risk factor
     std::unordered_map<std::string, std::unordered_map<std::string, CalculationDetails>> calculation_storage_;
     
