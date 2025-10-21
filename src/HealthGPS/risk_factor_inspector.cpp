@@ -65,28 +65,50 @@ RiskFactorInspector::RiskFactorInspector(const std::filesystem::path &output_dir
     // This ensures risk factor inspection files are saved in the same location as main results
     std::filesystem::path main_output_dir = output_dir;
     
-    // Look for existing HealthGPS result files in the current directory and parent directories
+    std::cout << "\nMAHIMA: Searching for main simulation output directory...";
+    std::cout << "\n  Current output_dir: " << output_dir.string();
+    std::cout << "\n  Current working directory: " << std::filesystem::current_path().string();
+    
+    // Look for existing HealthGPS result files in multiple locations
     std::vector<std::filesystem::path> search_paths = {
         output_dir,
         output_dir.parent_path(),
+        output_dir.parent_path().parent_path(),  // Go up one more level
         std::filesystem::current_path(),
-        std::filesystem::current_path().parent_path()
+        std::filesystem::current_path().parent_path(),
+        std::filesystem::current_path().parent_path().parent_path(),  // Go up one more level
+        std::filesystem::path("/rds/general/user/mg423/home/healthgps/results/finch"),  // HPC specific path
+        std::filesystem::path("/rds/general/user/mg423/home/healthgps/results"),  // Parent results directory
+        std::filesystem::path("/rds/general/user/mg423/home/healthgps")  // Main healthgps directory
     };
     
+    bool found_main_dir = false;
     for (const auto& search_path : search_paths) {
         if (std::filesystem::exists(search_path)) {
-            for (const auto& entry : std::filesystem::directory_iterator(search_path)) {
-                if (entry.is_regular_file()) {
-                    std::string filename = entry.path().filename().string();
-                    if (filename.find("HealthGPS_Result_") == 0 && filename.find(".csv") != std::string::npos) {
-                        main_output_dir = entry.path().parent_path();
-                        std::cout << "\nMAHIMA: Found main simulation output folder: " << main_output_dir.string();
-                        break;
+            std::cout << "\n  Checking: " << search_path.string();
+            try {
+                for (const auto& entry : std::filesystem::directory_iterator(search_path)) {
+                    if (entry.is_regular_file()) {
+                        std::string filename = entry.path().filename().string();
+                        if (filename.find("HealthGPS_Result_") == 0 && filename.find(".csv") != std::string::npos) {
+                            main_output_dir = entry.path().parent_path();
+                            std::cout << "\nMAHIMA: Found main simulation output folder: " << main_output_dir.string();
+                            found_main_dir = true;
+                            break;
+                        }
                     }
                 }
+            } catch (const std::exception& e) {
+                std::cout << "\n  Error accessing " << search_path.string() << ": " << e.what();
             }
-            if (main_output_dir != output_dir) break;
+            if (found_main_dir) break;
+        } else {
+            std::cout << "\n  Path does not exist: " << search_path.string();
         }
+    }
+    
+    if (!found_main_dir) {
+        std::cout << "\nMAHIMA: WARNING - Could not find main simulation output directory, using: " << main_output_dir.string();
     }
 
     // MAHIMA: Only create Year 3 files if the feature is enabled
@@ -617,22 +639,33 @@ void RiskFactorInspector::capture_detailed_calculation(RuntimeContext & /*contex
     std::vector<std::filesystem::path> search_paths = {
         output_dir_,
         output_dir_.parent_path(),
+        output_dir_.parent_path().parent_path(),  // Go up one more level
         std::filesystem::current_path(),
-        std::filesystem::current_path().parent_path()
+        std::filesystem::current_path().parent_path(),
+        std::filesystem::current_path().parent_path().parent_path(),  // Go up one more level
+        std::filesystem::path("/rds/general/user/mg423/home/healthgps/results/finch"),  // HPC specific path
+        std::filesystem::path("/rds/general/user/mg423/home/healthgps/results"),  // Parent results directory
+        std::filesystem::path("/rds/general/user/mg423/home/healthgps")  // Main healthgps directory
     };
     
+    bool found_main_dir = false;
     for (const auto& search_path : search_paths) {
         if (std::filesystem::exists(search_path)) {
-            for (const auto& entry : std::filesystem::directory_iterator(search_path)) {
-                if (entry.is_regular_file()) {
-                    std::string entry_filename = entry.path().filename().string();
-                    if (entry_filename.find("HealthGPS_Result_") == 0 && entry_filename.find(".csv") != std::string::npos) {
-                        main_output_dir = entry.path().parent_path();
-                        break;
+            try {
+                for (const auto& entry : std::filesystem::directory_iterator(search_path)) {
+                    if (entry.is_regular_file()) {
+                        std::string entry_filename = entry.path().filename().string();
+                        if (entry_filename.find("HealthGPS_Result_") == 0 && entry_filename.find(".csv") != std::string::npos) {
+                            main_output_dir = entry.path().parent_path();
+                            found_main_dir = true;
+                            break;
+                        }
                     }
                 }
+            } catch (const std::exception& e) {
+                // Ignore access errors
             }
-            if (main_output_dir != output_dir_) break;
+            if (found_main_dir) break;
         }
     }
     
@@ -864,22 +897,33 @@ void RiskFactorInspector::capture_person_risk_factors(RuntimeContext &context, c
     std::vector<std::filesystem::path> search_paths = {
         output_dir_,
         output_dir_.parent_path(),
+        output_dir_.parent_path().parent_path(),  // Go up one more level
         std::filesystem::current_path(),
-        std::filesystem::current_path().parent_path()
+        std::filesystem::current_path().parent_path(),
+        std::filesystem::current_path().parent_path().parent_path(),  // Go up one more level
+        std::filesystem::path("/rds/general/user/mg423/home/healthgps/results/finch"),  // HPC specific path
+        std::filesystem::path("/rds/general/user/mg423/home/healthgps/results"),  // Parent results directory
+        std::filesystem::path("/rds/general/user/mg423/home/healthgps")  // Main healthgps directory
     };
     
+    bool found_main_dir = false;
     for (const auto& search_path : search_paths) {
         if (std::filesystem::exists(search_path)) {
-            for (const auto& entry : std::filesystem::directory_iterator(search_path)) {
-                if (entry.is_regular_file()) {
-                    std::string entry_filename = entry.path().filename().string();
-                    if (entry_filename.find("HealthGPS_Result_") == 0 && entry_filename.find(".csv") != std::string::npos) {
-                        main_output_dir = entry.path().parent_path();
-                        break;
+            try {
+                for (const auto& entry : std::filesystem::directory_iterator(search_path)) {
+                    if (entry.is_regular_file()) {
+                        std::string entry_filename = entry.path().filename().string();
+                        if (entry_filename.find("HealthGPS_Result_") == 0 && entry_filename.find(".csv") != std::string::npos) {
+                            main_output_dir = entry.path().parent_path();
+                            found_main_dir = true;
+                            break;
+                        }
                     }
                 }
+            } catch (const std::exception& e) {
+                // Ignore access errors
             }
-            if (main_output_dir != output_dir_) break;
+            if (found_main_dir) break;
         }
     }
     

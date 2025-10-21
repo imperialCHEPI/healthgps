@@ -106,8 +106,8 @@ Simulation::Simulation(SimulationModuleFactory &factory, std::shared_ptr<const E
         std::cout << "\n  Both male and female, both baseline and intervention scenarios";
         
         // Create configurations for both years - they will be combined into ONE file
-        inspector_ref.add_debug_config(true, 20, 20, core::Gender::unknown, "foodsodium", target_year_1, "");
-        inspector_ref.add_debug_config(true, 20, 20, core::Gender::unknown, "foodsodium", target_year_2, "");
+        inspector_ref.add_debug_config(true, 30, 30, core::Gender::unknown, "foodalcohol", target_year_1, "");
+        inspector_ref.add_debug_config(true, 30, 30, core::Gender::unknown, "foodalcohol", target_year_2, "");
 
     } catch (const std::exception &e) {
         // MAHIMA: If inspector initialization fails, log the error but don't crash the
