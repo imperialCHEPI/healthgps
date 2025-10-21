@@ -56,8 +56,9 @@ class RiskFactorInspector {
   public:
     /// @brief MAHIMA: Initialize the Risk Factor Inspector
     /// @param output_dir Directory where the inspection CSV files will be created
+    /// @param simulation_start_time The simulation start time for consistent timestamping across scenarios
     /// @throws std::runtime_error if output files cannot be created
-    explicit RiskFactorInspector(const std::filesystem::path &output_dir);
+    explicit RiskFactorInspector(const std::filesystem::path &output_dir, int simulation_start_time);
 
     /// @brief MAHIMA: Destructor ensures files are properly closed
     ~RiskFactorInspector();
@@ -259,6 +260,9 @@ private:
 
     /// @brief MAHIMA: Timestamp for file naming (generated once during initialization)
     std::string timestamp_str_;
+    
+    /// @brief MAHIMA: Simulation start time for consistent timestamping across scenarios
+    int simulation_start_time_;
 
     /// @brief MAHIMA: Map to store calculation details by person ID and risk factor
     std::unordered_map<std::string, std::unordered_map<std::string, CalculationDetails>> calculation_storage_;

@@ -15,12 +15,19 @@ namespace hgps {
 // Must match the toggle in static_linear_model.cpp, simulation.cpp, and runtime_context.cpp
 static constexpr bool ENABLE_YEAR3_RISK_FACTOR_INSPECTION = false;
 
-RiskFactorInspector::RiskFactorInspector(const std::filesystem::path &output_dir)
-    : year_3_captured_(false), output_dir_(output_dir), total_records_written_(0) {
+RiskFactorInspector::RiskFactorInspector(const std::filesystem::path &output_dir, int simulation_start_time)
+    : year_3_captured_(false), output_dir_(output_dir), total_records_written_(0), simulation_start_time_(simulation_start_time) {
 
-    // MAHIMA: Generate timestamp ONCE during initialization for consistent file naming
+    // MAHIMA: Generate deterministic timestamp for consistent file naming across scenarios
+    // Use ONLY simulation start time to create a deterministic timestamp that will be identical
+    // for both baseline and intervention scenarios within the same simulation run
+    // Format: simulation_start_time_YYYY-MM-DD_HH-MM-SS
     auto timestamp = std::chrono::system_clock::now();
-    timestamp_str_ = fmt::format("{0:%F_%H-%M-}{1:%S}", timestamp, timestamp.time_since_epoch());
+    auto base_timestamp = fmt::format("{0:%F_%H-%M-}{1:%S}", timestamp, timestamp.time_since_epoch());
+    
+    // MAHIMA: Use simulation start time as the primary identifier for deterministic naming
+    // This ensures both baseline and intervention scenarios use the exact same filename
+    timestamp_str_ = std::to_string(simulation_start_time_) + "_" + base_timestamp;
 
     // MAHIMA: Initialize target risk factors for inspection
     // These are the specific nutrients/risk factors that were producing
@@ -597,6 +604,7 @@ void RiskFactorInspector::capture_detailed_calculation(RuntimeContext & /*contex
     }
     
     // Create filename using the pre-generated timestamp for consistent naming
+    // Single file for both baseline and intervention scenarios
     std::string filename = core::to_lower(risk_factor_name) + "_" + timestamp_str_ + ".csv";
     
     // Try to find the main simulation output folder
@@ -843,7 +851,8 @@ void RiskFactorInspector::capture_person_risk_factors(RuntimeContext &context, c
     const auto& details = calculation_storage_[person_id][risk_factor_name];
     
     // Create the CSV file path using the pre-generated timestamp for consistent naming
-    std::string filename = "riskfactor_" + timestamp_str_ + "_" + core::to_lower(risk_factor_name) + ".csv";
+    // Single file for both baseline and intervention scenarios
+    std::string filename = core::to_lower(risk_factor_name) + "_" + timestamp_str_ + ".csv";
     
     // Try to find the main simulation output folder
     std::filesystem::path main_output_dir = output_dir_;

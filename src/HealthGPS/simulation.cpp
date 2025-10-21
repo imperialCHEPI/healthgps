@@ -51,25 +51,42 @@ Simulation::Simulation(SimulationModuleFactory &factory, std::shared_ptr<const E
     // This inspector will capture detailed calculation steps for debugging purposes
     // Initialize for BOTH baseline and intervention scenarios
     try {
-        // MAHIMA: Create output directory for the inspection files
-        // We'll use the current working directory as a fallback since we don't have
-        // direct access to the configuration output folder here
+        // MAHIMA: Use the main simulation output directory instead of creating a subdirectory
+        // This ensures risk factor inspection files are saved alongside main simulation results
         std::filesystem::path output_dir = std::filesystem::current_path();
-
-        // MAHIMA: Try to create a "risk_factor_inspection" subdirectory
-        auto inspection_dir = output_dir / "risk_factor_inspection";
-        if (!std::filesystem::exists(inspection_dir)) {
-            std::filesystem::create_directories(inspection_dir);
+        
+        // Look for existing HealthGPS result files to find the main output directory
+        std::vector<std::filesystem::path> search_paths = {
+            output_dir,
+            output_dir.parent_path(),
+            std::filesystem::current_path(),
+            std::filesystem::current_path().parent_path()
+        };
+        
+        for (const auto& search_path : search_paths) {
+            if (std::filesystem::exists(search_path)) {
+                for (const auto& entry : std::filesystem::directory_iterator(search_path)) {
+                    if (entry.is_regular_file()) {
+                        std::string filename = entry.path().filename().string();
+                        if (filename.find("HealthGPS_Result_") == 0 && filename.find(".csv") != std::string::npos) {
+                            output_dir = entry.path().parent_path();
+                            std::cout << "\nMAHIMA: Found main simulation output folder: " << output_dir.string();
+                            break;
+                        }
+                    }
+                }
+                if (output_dir != std::filesystem::current_path()) break;
+            }
         }
 
-        // MAHIMA: Create the risk factor inspector instance
-        auto inspector = std::make_unique<RiskFactorInspector>(inspection_dir);
+        // MAHIMA: Create the risk factor inspector instance with simulation start time
+        auto inspector = std::make_unique<RiskFactorInspector>(output_dir, context_.inputs().start_time());
 
         // MAHIMA: Set the inspector in the runtime context
         context_.set_risk_factor_inspector(std::move(inspector));
 
         std::cout << "\nMAHIMA: Risk Factor Inspector initialized successfully for individual-level debugging";
-        std::cout << "\n  Output directory: " << inspection_dir.string();
+        std::cout << "\n  Output directory: " << output_dir.string();
         std::cout << "\n  Scenario: " << context_.scenario().name();
 
         // MAHIMA: Configure debug scenarios for BOTH baseline and intervention
