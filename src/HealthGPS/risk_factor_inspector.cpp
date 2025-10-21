@@ -22,8 +22,9 @@ RiskFactorInspector::RiskFactorInspector(const std::filesystem::path &output_dir
     // Use ONLY simulation start time to create a deterministic timestamp that will be identical
     // for both baseline and intervention scenarios within the same simulation run
     // Format: simulation_start_time_YYYY-MM-DD_HH-MM-SS
-    auto timestamp = std::chrono::system_clock::now();
-    auto base_timestamp = fmt::format("{0:%F_%H-%M-}{1:%S}", timestamp, timestamp.time_since_epoch());
+    // Convert simulation start time to a deterministic timestamp format
+    auto start_time_point = std::chrono::system_clock::from_time_t(simulation_start_time_);
+    auto base_timestamp = fmt::format("{0:%F_%H-%M-}{1:%S}", start_time_point, start_time_point.time_since_epoch());
     
     // MAHIMA: Use simulation start time as the primary identifier for deterministic naming
     // This ensures both baseline and intervention scenarios use the exact same filename
