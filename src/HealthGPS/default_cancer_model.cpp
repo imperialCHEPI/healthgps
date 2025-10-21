@@ -233,97 +233,99 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
     fflush(stderr);
     fflush(stdout);
 
-    for (auto &person : context.population()) {
-        // Skip if person is inactive.
-        if (!person.is_active()) {
-            continue;
-        }
-
-        // Clear newborn diseases.
-        if (person.age == 0) {
-            person.diseases.clear();
-            continue;
-        }
-
-        // Skip if the person already has the disease.
-        if (person.diseases.contains(disease_type()) &&
-            person.diseases.at(disease_type()).status == DiseaseStatus::active) {
-            continue;
-        }
-
-        double relative_risk = 1.0;
-        relative_risk *= calculate_relative_risk_for_risk_factors(person);
-        relative_risk *= calculate_relative_risk_for_diseases(person);
-
-        double average_relative_risk = average_relative_risk_.at(person.age, person.gender);
-
-        double incidence = definition_.get().table()(person.age, person.gender).at(incidence_id);
-        double probability = incidence * relative_risk / average_relative_risk;
-
-        // Apply PIF adjustment if PIF data is available and we're in intervention scenario
-        if (definition_.get().has_pif_data() &&
-            context.scenario().type() == ScenarioType::intervention) {
-            // Print confirmation message once (only for the first disease that uses PIF)
-            static bool pif_used_printed = false;
-            if (!pif_used_printed) {
-                fmt::print(fg(fmt::color::green),
-                           "PIF Analysis: Applying Population Impact Fraction adjustments to "
-                           "disease incidence calculations\n");
-                pif_used_printed = true;
+    // MAHIMA: Process people in parallel - each person's disease calculation is independent
+    tbb::parallel_for_each(context.population().begin(), context.population().end(), 
+        [&](auto &person) {
+            // Skip if person is inactive.
+            if (!person.is_active()) {
+                return;
             }
 
-            // Calculate years post intervention (years since intervention start)
-            int year_post_intervention = context.time_now() - context.start_time();
+            // Clear newborn diseases.
+            if (person.age == 0) {
+                person.diseases.clear();
+                return;
+            }
 
-            // Get PIF value for this person and disease
-            const auto &pif_data = definition_.get().pif_data();
-            const auto &pif_config = context.inputs().population_impact_fraction();
-            const auto *pif_table = pif_data.get_scenario_data(pif_config.scenario);
-            if (pif_table) {
-                double pif_value =
-                    pif_table->get_pif_value(person.age, person.gender, year_post_intervention);
+            // Skip if the person already has the disease.
+            if (person.diseases.contains(disease_type()) &&
+                person.diseases.at(disease_type()).status == DiseaseStatus::active) {
+                return;
+            }
 
-                // Manual PIF Debug - Show PIF data for ALL diseases
-                static std::set<std::string> debug_diseases_printed;
-                if (debug_diseases_printed.find(disease_type().to_string()) ==
-                    debug_diseases_printed.end()) {
-                    std::cout << "=== PIF DEBUG FOR DISEASE: " << disease_type().to_string()
-                              << " ===" << '\n';
-                    std::cout << "PIF Table Size: " << pif_table->size() << '\n';
+            double relative_risk = 1.0;
+            relative_risk *= calculate_relative_risk_for_risk_factors(person);
+            relative_risk *= calculate_relative_risk_for_diseases(person);
 
-                    // MANUAL DEBUG VALUES - Change these to test what you want
-                    int debug_age = 55;                               // Change this age
-                    core::Gender debug_gender = core::Gender::female; // Change this: male or female
-                    int debug_year = 17;                              // Change this year
+            double average_relative_risk = average_relative_risk_.at(person.age, person.gender);
 
-                    // Test PIF lookup for current disease
-                    double debug_pif =
-                        pif_table->get_pif_value(debug_age, debug_gender, debug_year);
+            double incidence = definition_.get().table()(person.age, person.gender).at(incidence_id);
+            double probability = incidence * relative_risk / average_relative_risk;
 
-                    std::cout << "PIF Debug: Disease=" << disease_type().to_string()
-                              << ", Age=" << debug_age << ", Gender="
-                              << (debug_gender == core::Gender::male ? "Male" : "Female")
-                              << ", YearPostInt=" << debug_year << ", PIFValue=" << debug_pif
-                              << '\n';
-
-                    std::cout << "=== END PIF DEBUG FOR " << disease_type().to_string()
-                              << " ===" << '\n'
-                              << '\n';
-
-                    debug_diseases_printed.insert(disease_type().to_string());
+            // Apply PIF adjustment if PIF data is available and we're in intervention scenario
+            if (definition_.get().has_pif_data() &&
+                context.scenario().type() == ScenarioType::intervention) {
+                // Print confirmation message once (only for the first disease that uses PIF)
+                static bool pif_used_printed = false;
+                if (!pif_used_printed) {
+                    fmt::print(fg(fmt::color::green),
+                               "PIF Analysis: Applying Population Impact Fraction adjustments to "
+                               "disease incidence calculations\n");
+                    pif_used_printed = true;
                 }
 
-                probability *= (1.0 - pif_value);
-            }
-        }
+                // Calculate years post intervention (years since intervention start)
+                int year_post_intervention = context.time_now() - context.start_time();
 
-        double hazard = context.random().next_double();
-        if (hazard < probability) {
-            person.diseases[disease_type()] = Disease{.status = DiseaseStatus::active,
-                                                      .start_time = context.time_now(),
-                                                      .time_since_onset = 0};
-        }
-    }
+                // Get PIF value for this person and disease
+                const auto &pif_data = definition_.get().pif_data();
+                const auto &pif_config = context.inputs().population_impact_fraction();
+                const auto *pif_table = pif_data.get_scenario_data(pif_config.scenario);
+                if (pif_table) {
+                    double pif_value =
+                        pif_table->get_pif_value(person.age, person.gender, year_post_intervention);
+
+                    // Manual PIF Debug - Show PIF data for ALL diseases
+                    static std::set<std::string> debug_diseases_printed;
+                    if (debug_diseases_printed.find(disease_type().to_string()) ==
+                        debug_diseases_printed.end()) {
+                        std::cout << "=== PIF DEBUG FOR DISEASE: " << disease_type().to_string()
+                                  << " ===" << '\n';
+                        std::cout << "PIF Table Size: " << pif_table->size() << '\n';
+
+                        // MANUAL DEBUG VALUES - Change these to test what you want
+                        int debug_age = 55;                               // Change this age
+                        core::Gender debug_gender = core::Gender::female; // Change this: male or female
+                        int debug_year = 17;                              // Change this year
+
+                        // Test PIF lookup for current disease
+                        double debug_pif =
+                            pif_table->get_pif_value(debug_age, debug_gender, debug_year);
+
+                        std::cout << "PIF Debug: Disease=" << disease_type().to_string()
+                                  << ", Age=" << debug_age << ", Gender="
+                                  << (debug_gender == core::Gender::male ? "Male" : "Female")
+                                  << ", YearPostInt=" << debug_year << ", PIFValue=" << debug_pif
+                                  << '\n';
+
+                        std::cout << "=== END PIF DEBUG FOR " << disease_type().to_string()
+                                  << " ===" << '\n'
+                                  << '\n';
+
+                        debug_diseases_printed.insert(disease_type().to_string());
+                    }
+
+                    probability *= (1.0 - pif_value);
+                }
+            }
+
+            double hazard = context.random().next_double();
+            if (hazard < probability) {
+                person.diseases[disease_type()] = Disease{.status = DiseaseStatus::active,
+                                                          .start_time = context.time_now(),
+                                                          .time_since_onset = 0};
+            }
+        });
     auto end_time = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
     std::cout << "End update_incidence_cases: " << disease_type() << " (took " << duration.count()
