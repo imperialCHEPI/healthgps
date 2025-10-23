@@ -234,8 +234,8 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
     fflush(stdout);
 
     // MAHIMA: Process people in parallel - each person's disease calculation is independent
-    tbb::parallel_for_each(context.population().begin(), context.population().end(), 
-        [&](auto &person) {
+    tbb::parallel_for_each(
+        context.population().begin(), context.population().end(), [&](auto &person) {
             // Skip if person is inactive.
             if (!person.is_active()) {
                 return;
@@ -259,7 +259,8 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
 
             double average_relative_risk = average_relative_risk_.at(person.age, person.gender);
 
-            double incidence = definition_.get().table()(person.age, person.gender).at(incidence_id);
+            double incidence =
+                definition_.get().table()(person.age, person.gender).at(incidence_id);
             double probability = incidence * relative_risk / average_relative_risk;
 
             // Apply PIF adjustment if PIF data is available and we're in intervention scenario
@@ -294,9 +295,10 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
                         std::cout << "PIF Table Size: " << pif_table->size() << '\n';
 
                         // MANUAL DEBUG VALUES - Change these to test what you want
-                        int debug_age = 55;                               // Change this age
-                        core::Gender debug_gender = core::Gender::female; // Change this: male or female
-                        int debug_year = 17;                              // Change this year
+                        int debug_age = 55; // Change this age
+                        core::Gender debug_gender =
+                            core::Gender::female; // Change this: male or female
+                        int debug_year = 17;      // Change this year
 
                         // Test PIF lookup for current disease
                         double debug_pif =

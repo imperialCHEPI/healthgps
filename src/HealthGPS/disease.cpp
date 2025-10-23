@@ -48,9 +48,8 @@ void DiseaseModule::initialise_population(RuntimeContext &context) {
 
 void DiseaseModule::update_population(RuntimeContext &context) {
     // MAHIMA: Process diseases in parallel - they are independent
-    tbb::parallel_for_each(models_.begin(), models_.end(), [&](auto &model) {
-        model.second->update_disease_status(context);
-    });
+    tbb::parallel_for_each(models_.begin(), models_.end(),
+                           [&](auto &model) { model.second->update_disease_status(context); });
 }
 
 double DiseaseModule::get_excess_mortality(const core::Identifier &disease_code,
