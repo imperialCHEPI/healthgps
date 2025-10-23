@@ -898,25 +898,29 @@ void RiskFactorInspector::capture_person_risk_factors(RuntimeContext &context, c
     // MAHIMA: Use the output directory that was already determined during initialization
     // This should be the user's home directory where main simulation results are stored
     std::filesystem::path main_output_dir = output_dir_;
-    std::vector<std::filesystem::path> search_paths = {
-        output_dir_,
-        output_dir_.parent_path(),
-        std::filesystem::current_path(),
-        std::filesystem::current_path().parent_path()
-    };
     
-    for (const auto& search_path : search_paths) {
-        if (std::filesystem::exists(search_path)) {
-            for (const auto& entry : std::filesystem::directory_iterator(search_path)) {
-                if (entry.is_regular_file()) {
-                    std::string entry_filename = entry.path().filename().string();
-                    if (entry_filename.find("HealthGPS_Result_") == 0 && entry_filename.find(".csv") != std::string::npos) {
-                        main_output_dir = entry.path().parent_path();
-                        break;
-                    }
-                }
-            }
-            if (main_output_dir != output_dir_) break;
+    // MAHIMA: Ensure the directory exists and is writable
+    try {
+        // Check if directory exists
+        if (!std::filesystem::exists(output_dir_)) {
+            std::cout << "\nMAHIMA: Output directory " << output_dir_.string() << " does not exist, creating it...";
+            std::filesystem::create_directories(output_dir_);
+        }
+        
+        // Test if we can write to the directory by creating a temporary file
+        std::filesystem::path test_file = output_dir_ / "test_write_permissions.tmp";
+        std::ofstream test_stream(test_file);
+        if (!test_stream.is_open()) {
+            throw std::runtime_error("Cannot write to directory");
+        }
+        test_stream.close();
+        std::filesystem::remove(test_file); // Clean up test file
+        
+        // MAHIMA: Only print permission verification once to avoid spam
+        static bool permission_verified = false;
+        if (!permission_verified) {
+            std::cout << "\nMAHIMA: Successfully verified write access to: " << output_dir_.string();
+            permission_verified = true;
         }
         
     } catch (const std::exception& e) {
