@@ -634,7 +634,8 @@ void RiskFactorInspector::capture_detailed_calculation(RuntimeContext & /*contex
     // Single file for both baseline and intervention scenarios
     std::string filename = core::to_lower(risk_factor_name) + "_" + timestamp_str_ + ".csv";
     
-    // Try to find the main simulation output folder
+    // MAHIMA: Use the output directory that was already determined during initialization
+    // This should be the user's home directory where main simulation results are stored
     std::filesystem::path main_output_dir = output_dir_;
     std::vector<std::filesystem::path> search_paths = {
         output_dir_,
@@ -648,28 +649,30 @@ void RiskFactorInspector::capture_detailed_calculation(RuntimeContext & /*contex
         std::filesystem::path("/rds/general/user/mg423/home/healthgps")  // Main healthgps directory
     };
     
-    bool found_main_dir = false;
     for (const auto& search_path : search_paths) {
         if (std::filesystem::exists(search_path)) {
-            try {
-                for (const auto& entry : std::filesystem::directory_iterator(search_path)) {
-                    if (entry.is_regular_file()) {
-                        std::string entry_filename = entry.path().filename().string();
-                        if (entry_filename.find("HealthGPS_Result_") == 0 && entry_filename.find(".csv") != std::string::npos) {
-                            main_output_dir = entry.path().parent_path();
-                            found_main_dir = true;
-                            break;
-                        }
+            for (const auto& entry : std::filesystem::directory_iterator(search_path)) {
+                if (entry.is_regular_file()) {
+                    std::string entry_filename = entry.path().filename().string();
+                    if (entry_filename.find("HealthGPS_Result_") == 0 && entry_filename.find(".csv") != std::string::npos) {
+                        main_output_dir = entry.path().parent_path();
+                        break;
                     }
                 }
-            } catch (const std::exception& e) {
-                // Ignore access errors
             }
-            if (found_main_dir) break;
+            if (main_output_dir != output_dir_) break;
         }
     }
     
     std::filesystem::path file_path = main_output_dir / filename;
+    
+    // MAHIMA: Debug output only for first record to avoid spam
+    static bool first_detailed_record_written = false;
+    if (!first_detailed_record_written) {
+        std::cout << "\nMAHIMA: Writing detailed calculation file: " << file_path.filename().string();
+        std::cout << "\nMAHIMA: Full path: " << file_path.string();
+        first_detailed_record_written = true;
+    }
     
     // Check if file exists to determine if we need to write headers
     bool file_exists = std::filesystem::exists(file_path);
@@ -892,42 +895,48 @@ void RiskFactorInspector::capture_person_risk_factors(RuntimeContext &context, c
     // Single file for both baseline and intervention scenarios
     std::string filename = core::to_lower(risk_factor_name) + "_" + timestamp_str_ + ".csv";
     
-    // Try to find the main simulation output folder
+    // MAHIMA: Use the output directory that was already determined during initialization
+    // This should be the user's home directory where main simulation results are stored
     std::filesystem::path main_output_dir = output_dir_;
     std::vector<std::filesystem::path> search_paths = {
         output_dir_,
         output_dir_.parent_path(),
-        output_dir_.parent_path().parent_path(),  // Go up one more level
         std::filesystem::current_path(),
-        std::filesystem::current_path().parent_path(),
-        std::filesystem::current_path().parent_path().parent_path(),  // Go up one more level
-        std::filesystem::path("/rds/general/user/mg423/home/healthgps/results/finch"),  // HPC specific path
-        std::filesystem::path("/rds/general/user/mg423/home/healthgps/results"),  // Parent results directory
-        std::filesystem::path("/rds/general/user/mg423/home/healthgps")  // Main healthgps directory
+        std::filesystem::current_path().parent_path()
     };
     
-    bool found_main_dir = false;
     for (const auto& search_path : search_paths) {
         if (std::filesystem::exists(search_path)) {
-            try {
-                for (const auto& entry : std::filesystem::directory_iterator(search_path)) {
-                    if (entry.is_regular_file()) {
-                        std::string entry_filename = entry.path().filename().string();
-                        if (entry_filename.find("HealthGPS_Result_") == 0 && entry_filename.find(".csv") != std::string::npos) {
-                            main_output_dir = entry.path().parent_path();
-                            found_main_dir = true;
-                            break;
-                        }
+            for (const auto& entry : std::filesystem::directory_iterator(search_path)) {
+                if (entry.is_regular_file()) {
+                    std::string entry_filename = entry.path().filename().string();
+                    if (entry_filename.find("HealthGPS_Result_") == 0 && entry_filename.find(".csv") != std::string::npos) {
+                        main_output_dir = entry.path().parent_path();
+                        break;
                     }
                 }
-            } catch (const std::exception& e) {
-                // Ignore access errors
             }
-            if (found_main_dir) break;
+            if (main_output_dir != output_dir_) break;
         }
+        
+    } catch (const std::exception& e) {
+        // If we can't write to the home directory, this is a serious issue
+        std::cerr << "\nMAHIMA: ERROR - Cannot write to home directory " << output_dir_.string() 
+                  << " (" << e.what() << ")" << std::endl;
+        std::cerr << "\nMAHIMA: This means risk factor inspection files cannot be saved!" << std::endl;
+        std::cerr << "\nMAHIMA: Please check directory permissions or contact system administrator." << std::endl;
+        return; // Exit without creating files
     }
     
     std::filesystem::path csv_path = main_output_dir / filename;
+    
+    // MAHIMA: Debug output only for first record to avoid spam
+    static bool first_record_written = false;
+    if (!first_record_written) {
+        std::cout << "\nMAHIMA: Writing risk factor inspection file: " << csv_path.filename().string();
+        std::cout << "\nMAHIMA: Full path: " << csv_path.string();
+        first_record_written = true;
+    }
     
     // Check if file exists to determine if we need to write headers
     bool file_exists = std::filesystem::exists(csv_path);

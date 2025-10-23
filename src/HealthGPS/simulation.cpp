@@ -51,33 +51,67 @@ Simulation::Simulation(SimulationModuleFactory &factory, std::shared_ptr<const E
     // This inspector will capture detailed calculation steps for debugging purposes
     // Initialize for BOTH baseline and intervention scenarios
     try {
-        // MAHIMA: Use the main simulation output directory instead of creating a subdirectory
+        // MAHIMA: Construct the output directory path to match where main simulation results are saved
         // This ensures risk factor inspection files are saved alongside main simulation results
-        std::filesystem::path output_dir = std::filesystem::current_path();
+        std::filesystem::path output_dir;
         
-        // Look for existing HealthGPS result files to find the main output directory
-        std::vector<std::filesystem::path> search_paths = {
-            output_dir,
-            output_dir.parent_path(),
-            std::filesystem::current_path(),
-            std::filesystem::current_path().parent_path()
-        };
+        // MAHIMA: Try to construct the expected results directory path
+        // The main simulation saves results to: {user_home}/healthgps/results/finch/
+        std::string home_dir;
         
-        for (const auto& search_path : search_paths) {
-            if (std::filesystem::exists(search_path)) {
-                for (const auto& entry : std::filesystem::directory_iterator(search_path)) {
-                    if (entry.is_regular_file()) {
-                        std::string filename = entry.path().filename().string();
-                        if (filename.find("HealthGPS_Result_") == 0 && filename.find(".csv") != std::string::npos) {
-                            output_dir = entry.path().parent_path();
-                            std::cout << "\nMAHIMA: Found main simulation output folder: " << output_dir.string();
-                            break;
-                        }
-                    }
-                }
-                if (output_dir != std::filesystem::current_path()) break;
+        // On Windows, try to get user profile directory
+        #ifdef _WIN32
+            const char* user_profile = std::getenv("USERPROFILE");
+            if (user_profile) {
+                home_dir = user_profile;
+            } else {
+                // Fallback to current directory
+                home_dir = std::filesystem::current_path().string();
             }
+        #else
+            // On Unix/Linux/HPC systems
+            const char* home = std::getenv("HOME");
+            if (home) {
+                home_dir = home;
+            } else {
+                // Fallback to current directory
+                home_dir = std::filesystem::current_path().string();
+            }
+        #endif
+        
+        // Construct the expected results directory path
+        std::filesystem::path expected_results_dir = std::filesystem::path(home_dir) / "healthgps" / "results" / "finch";
+        
+        std::cout << "\nMAHIMA: Constructing output directory path...";
+        std::cout << "\nMAHIMA: Home directory: " << home_dir;
+        std::cout << "\nMAHIMA: Expected results directory: " << expected_results_dir.string();
+        
+        // Check if the expected directory exists or can be created
+        try {
+            if (!std::filesystem::exists(expected_results_dir)) {
+                std::cout << "\nMAHIMA: Results directory doesn't exist, creating it...";
+                std::filesystem::create_directories(expected_results_dir);
+            }
+            
+            // Test write access
+            std::filesystem::path test_file = expected_results_dir / "test_write_access.tmp";
+            std::ofstream test_stream(test_file);
+            if (test_stream.is_open()) {
+                test_stream.close();
+                std::filesystem::remove(test_file);
+                output_dir = expected_results_dir;
+                std::cout << "\nMAHIMA: Successfully using results directory: " << output_dir.string();
+            } else {
+                throw std::runtime_error("Cannot write to results directory");
+            }
+            
+        } catch (const std::exception& e) {
+            // Fallback to current directory if results directory is not accessible
+            output_dir = std::filesystem::current_path();
+            std::cout << "\nMAHIMA: Cannot access results directory (" << e.what() << "), using current directory: " << output_dir.string();
         }
+        
+        std::cout << "\nMAHIMA: Final output directory: " << output_dir.string();
 
         // MAHIMA: Create the risk factor inspector instance with simulation start time
         auto inspector = std::make_unique<RiskFactorInspector>(output_dir, context_.inputs().start_time());
@@ -87,7 +121,19 @@ Simulation::Simulation(SimulationModuleFactory &factory, std::shared_ptr<const E
 
         std::cout << "\nMAHIMA: Risk Factor Inspector initialized successfully for individual-level debugging";
         std::cout << "\n  Output directory: " << output_dir.string();
+        std::cout << "\n  Current working directory: " << std::filesystem::current_path().string();
         std::cout << "\n  Scenario: " << context_.scenario().name();
+        
+        // MAHIMA: Verify the output directory is accessible
+        try {
+            if (std::filesystem::exists(output_dir)) {
+                std::cout << "\nMAHIMA: Output directory exists and is accessible";
+            } else {
+                std::cout << "\nMAHIMA: WARNING - Output directory does not exist: " << output_dir.string();
+            }
+        } catch (const std::exception& e) {
+            std::cout << "\nMAHIMA: WARNING - Cannot check output directory: " << e.what();
+        }
 
         // MAHIMA: Configure debug scenarios for BOTH baseline and intervention
         std::string current_scenario = context_.scenario().name();
