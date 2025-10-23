@@ -239,7 +239,7 @@ void Simulation::apply_net_migration(int net_value, unsigned int age, const core
             }
         }
     } else if (net_value < 0) {
-        //auto net_value_counter = net_value;
+        // auto net_value_counter = net_value;
         std::atomic<int> net_value_counter = net_value;
         auto &pop = context_.population();
         tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &entity) {
