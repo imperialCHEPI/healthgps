@@ -239,20 +239,19 @@ void Simulation::apply_net_migration(int net_value, unsigned int age, const core
             }
         }
     } else if (net_value < 0) {
-        auto net_value_counter = net_value;
-        for (auto &entity : context_.population()) {
+        //auto net_value_counter = net_value;
+        std::atomic<int> net_value_counter = net_value;
+        auto &pop = context_.population();
+        tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &entity) {
             if (!entity.is_active()) {
-                continue;
+                return;
             }
 
-            if (entity.age == age && entity.gender == gender) {
+            if (entity.age == age && entity.gender == gender && net_value_counter != 0) {
                 entity.emigrate(context_.time_now());
                 net_value_counter++;
-                if (net_value_counter == 0) {
-                    break;
-                }
             }
-        }
+        });
     }
 }
 
