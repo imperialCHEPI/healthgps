@@ -4,9 +4,9 @@
 
 #include <cmath>
 #include <iostream> // Added for print statements
+#include <oneapi/tbb/parallel_for_each.h>
 #include <ranges>
 #include <utility>
-#include <oneapi/tbb/parallel_for_each.h>
 
 namespace hgps {
 
