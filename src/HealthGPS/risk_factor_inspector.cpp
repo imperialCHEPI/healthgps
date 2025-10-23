@@ -76,10 +76,7 @@ RiskFactorInspector::RiskFactorInspector(const std::filesystem::path &output_dir
         output_dir.parent_path().parent_path(),  // Go up one more level
         std::filesystem::current_path(),
         std::filesystem::current_path().parent_path(),
-        std::filesystem::current_path().parent_path().parent_path(),  // Go up one more level
-        std::filesystem::path("/rds/general/user/mg423/home/healthgps/results/finch"),  // HPC specific path
-        std::filesystem::path("/rds/general/user/mg423/home/healthgps/results"),  // Parent results directory
-        std::filesystem::path("/rds/general/user/mg423/home/healthgps")  // Main healthgps directory
+        std::filesystem::current_path().parent_path().parent_path()  // Go up one more level
     };
     
     bool found_main_dir = false;
@@ -637,32 +634,6 @@ void RiskFactorInspector::capture_detailed_calculation(RuntimeContext & /*contex
     // MAHIMA: Use the output directory that was already determined during initialization
     // This should be the user's home directory where main simulation results are stored
     std::filesystem::path main_output_dir = output_dir_;
-    std::vector<std::filesystem::path> search_paths = {
-        output_dir_,
-        output_dir_.parent_path(),
-        output_dir_.parent_path().parent_path(),  // Go up one more level
-        std::filesystem::current_path(),
-        std::filesystem::current_path().parent_path(),
-        std::filesystem::current_path().parent_path().parent_path(),  // Go up one more level
-        std::filesystem::path("/rds/general/user/mg423/home/healthgps/results/finch"),  // HPC specific path
-        std::filesystem::path("/rds/general/user/mg423/home/healthgps/results"),  // Parent results directory
-        std::filesystem::path("/rds/general/user/mg423/home/healthgps")  // Main healthgps directory
-    };
-    
-    for (const auto& search_path : search_paths) {
-        if (std::filesystem::exists(search_path)) {
-            for (const auto& entry : std::filesystem::directory_iterator(search_path)) {
-                if (entry.is_regular_file()) {
-                    std::string entry_filename = entry.path().filename().string();
-                    if (entry_filename.find("HealthGPS_Result_") == 0 && entry_filename.find(".csv") != std::string::npos) {
-                        main_output_dir = entry.path().parent_path();
-                        break;
-                    }
-                }
-            }
-            if (main_output_dir != output_dir_) break;
-        }
-    }
     
     std::filesystem::path file_path = main_output_dir / filename;
     
