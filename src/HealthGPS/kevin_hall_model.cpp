@@ -6,8 +6,8 @@
 
 #include <algorithm>
 #include <iterator>
-#include <utility>
 #include <oneapi/tbb/parallel_for_each.h>
+#include <utility>
 
 namespace { // anonymous namespace
 
