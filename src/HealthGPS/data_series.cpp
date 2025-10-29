@@ -17,8 +17,8 @@ DataSeries::DataSeries(std::size_t sample_size) : sample_size_{sample_size} {
         income_data_.emplace(gender,
                              std::map<core::Income, std::map<std::string, std::vector<double>>>{});
         // Initialize ALL possible income categories to ensure any enum value can be accessed
-        for (auto income :
-             {core::Income::unknown, core::Income::low, core::Income::middle, core::Income::high}) {
+        for (auto income : {core::Income::unknown, core::Income::low, core::Income::lowermiddle,
+                            core::Income::middle, core::Income::uppermiddle, core::Income::high}) {
             income_data_[gender].emplace(income, std::map<std::string, std::vector<double>>{});
         }
     }
@@ -87,9 +87,10 @@ void DataSeries::add_income_channels(const std::vector<std::string> &keys) {
     // Pre-allocate vectors to avoid repeated allocations
     std::vector<double> empty_vector(sample_size_);
 
-    // Only create channels for the three main income categories that are actually used
-    const std::array<core::Income, 3> income_categories = {core::Income::low, core::Income::middle,
-                                                           core::Income::high};
+    // Only create channels for the main income categories that are actually used
+    const std::array<core::Income, 5> income_categories = {
+        core::Income::low, core::Income::lowermiddle, core::Income::middle,
+        core::Income::uppermiddle, core::Income::high};
 
     for (size_t i = 0; i < keys.size(); i++) {
         const auto &key = keys[i];
@@ -170,8 +171,12 @@ std::string DataSeries::income_category_to_string(core::Income income) const {
         return "Unknown";
     case core::Income::low:
         return "LowIncome";
+    case core::Income::lowermiddle:
+        return "LowerMiddleIncome";
     case core::Income::middle:
         return "MiddleIncome";
+    case core::Income::uppermiddle:
+        return "UpperMiddleIncome";
     case core::Income::high:
         return "HighIncome";
     default:
