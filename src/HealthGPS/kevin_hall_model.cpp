@@ -493,11 +493,12 @@ double KevinHallModel::get_expected(RuntimeContext &context, core::Gender sex, i
         // MAHIMA: Calculate PAL-based coefficient from factors mean
         // Replaces hardcoded 0.06256 with 1/(9.99 * PA) where PA is person-specific physical
         // activity
+        // Here we set the bool to false as we want the get_expected from factors mean and not from apply_trend
         double pa_from_factors_mean =
             get_expected(context, sex, age, "PhysicalActivity"_id, std::nullopt, false);
         double pal_coefficient = 1.0 / (9.99 * pa_from_factors_mean);
         weight += pal_coefficient *
-                  get_expected(context, sex, age, "EnergyIntake"_id, std::nullopt, true);
+                  get_expected(context, sex, age, "EnergyIntake"_id, std::nullopt, false);
         weight -= 0.6256 * get_expected(context, sex, age, "Height"_id, std::nullopt, false);
         weight += 0.4925 * age;
 
