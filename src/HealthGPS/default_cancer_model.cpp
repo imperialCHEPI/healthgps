@@ -227,28 +227,29 @@ void DefaultCancerModel::update_remission_cases(RuntimeContext &context) {
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
-    // PHASE 1: Move ALL lookups outside parallel loop to avoid race conditions and improve performance
-    
+    // PHASE 1: Move ALL lookups outside parallel loop to avoid race conditions and improve
+    // performance
+
     // 1. Cache disease type ID (to avoid calling disease_type() in loop)
     const auto &disease_type_id = disease_type();
-    
+
     // 2. Cache measures table and incidence_id (currently called inside loop on line 263)
     const auto &measures_table = definition_.get().table();
     int incidence_id = measures_table.at(MeasureKey::incidence);
-    
+
     // 3. Cache PIF data if exists (currently checked inside loop on lines 267-268, 282-284)
     bool has_pif_data = definition_.get().has_pif_data();
     ScenarioType scenario_type = context.scenario().type();
-    
+
     const hgps::input::PIFTable *pif_table = nullptr;
     int year_post_intervention = context.time_now() - context.start_time();
-    
+
     if (has_pif_data && scenario_type == ScenarioType::intervention) {
         const auto &pif_data = definition_.get().pif_data();
         const auto &pif_config = context.inputs().population_impact_fraction();
         pif_table = pif_data.get_scenario_data(pif_config.scenario);
     }
-    
+
     // PHASE 3: Thread-safe PIF print flag
     static std::atomic<bool> pif_printed_flag{false};
 
@@ -294,18 +295,20 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
             if (pif_table != nullptr) {
                 // THREAD-SAFE: Print confirmation message once using atomic flag
                 bool expected = false;
-                if (pif_printed_flag.compare_exchange_weak(expected, true, std::memory_order_relaxed)) {
+                if (pif_printed_flag.compare_exchange_weak(expected, true,
+                                                           std::memory_order_relaxed)) {
                     fmt::print(fg(fmt::color::green),
                                "PIF Analysis: Applying Population Impact Fraction adjustments to "
                                "disease incidence calculations\n");
                 }
-                
-                // Use cached year_post_intervention and disease_type_id
-                double pif_value = pif_table->get_pif_value(person.age, person.gender, year_post_intervention);
 
-                // Manual PIF Debug (only compiled if DEBUG_PIF is defined)
-                // Note: This debug code is NOT thread-safe - it's only for debugging
-                #ifdef DEBUG_PIF
+                // Use cached year_post_intervention and disease_type_id
+                double pif_value =
+                    pif_table->get_pif_value(person.age, person.gender, year_post_intervention);
+
+// Manual PIF Debug (only compiled if DEBUG_PIF is defined)
+// Note: This debug code is NOT thread-safe - it's only for debugging
+#ifdef DEBUG_PIF
                 static std::set<std::string> debug_diseases_printed;
                 if (debug_diseases_printed.find(disease_type_id.to_string()) ==
                     debug_diseases_printed.end()) {
@@ -327,11 +330,12 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
                               << '\n';
 
                     std::cout << "=== END PIF DEBUG FOR " << disease_type_id.to_string()
-                              << " ===" << '\n' << '\n';
+                              << " ===" << '\n'
+                              << '\n';
 
                     debug_diseases_printed.insert(disease_type_id.to_string());
                 }
-                #endif
+#endif
 
                 probability *= (1.0 - pif_value);
             }
