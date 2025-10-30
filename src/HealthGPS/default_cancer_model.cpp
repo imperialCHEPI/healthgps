@@ -233,8 +233,8 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
 
     const auto &table = definition_.get().table();
     const auto disease_code = disease_type();
-    const bool apply_pif = definition_.get().has_pif_data() &&
-                           context.scenario().type() == ScenarioType::intervention;
+    const bool apply_pif =
+        definition_.get().has_pif_data() && context.scenario().type() == ScenarioType::intervention;
 
     const int year_post_intervention = apply_pif ? (context.time_now() - context.start_time()) : 0;
     const auto *pif_table = [&]() -> const input::PIFTable * {
@@ -249,8 +249,8 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
     if (apply_pif && pif_table) {
         static std::once_flag pif_once_flag;
         std::call_once(pif_once_flag, []() {
-            fmt::print(fg(fmt::color::green),
-                       "PIF Analysis: Applying Population Impact Fraction adjustments to disease incidence calculations\n");
+            fmt::print(fg(fmt::color::green), "PIF Analysis: Applying Population Impact Fraction "
+                                              "adjustments to disease incidence calculations\n");
         });
 
         // Optional: one-off debug snapshot per call (no per-person lookups)
@@ -277,8 +277,8 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
         }
 
         // Skip if the person already has the disease.
-        if (auto it = person.diseases.find(disease_code); it != person.diseases.end() &&
-                                               it->second.status == DiseaseStatus::active) {
+        if (auto it = person.diseases.find(disease_code);
+            it != person.diseases.end() && it->second.status == DiseaseStatus::active) {
             continue;
         }
 
