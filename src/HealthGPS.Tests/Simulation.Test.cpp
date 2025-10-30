@@ -440,8 +440,9 @@ TEST(TestSimulation, DiseaseModuleUpdateWithBaselineScenario) {
     try {
         disease_module->initialise_population(context);
         disease_module->update_population(context);
-    } catch (const std::exception &) {
-        // Some test data stores may not include full disease measures; ignore to keep coverage.
+    } catch (const std::exception &ex) {
+        GTEST_SKIP() << "Skipping due to unavailable disease measures in test datastore: "
+                     << ex.what();
     }
 
     ASSERT_GT(disease_module->size(), 0);
@@ -493,8 +494,9 @@ TEST(TestSimulation, DiseaseModuleUpdateWithInterventionAndPIFConfig) {
     try {
         disease_module->initialise_population(context);
         disease_module->update_population(context);
-    } catch (const std::exception &) {
-        // Some test data stores may not include full disease measures; ignore to keep coverage.
+    } catch (const std::exception &ex) {
+        GTEST_SKIP() << "Skipping due to unavailable disease measures/PIF data in test datastore: "
+                     << ex.what();
     }
 
     ASSERT_GT(disease_module->size(), 0);
