@@ -458,11 +458,19 @@ TEST(TestSimulation, DiseaseModuleUpdateWithInterventionAndPIFConfig) {
     auto ses = SESDefinition{.fuction_name = "normal", .parameters = std::vector<double>{0.0, 1.0}};
     auto mapping = HierarchicalMapping(mapping_entries);
     auto diseases = std::vector<core::DiseaseInfo>{
-        core::DiseaseInfo{.group = core::DiseaseGroup::other, .code = core::Identifier{"asthma"}, .name = "Asthma"},
-        core::DiseaseInfo{.group = core::DiseaseGroup::cancer, .code = core::Identifier{"colorectalcancer"}, .name = "Colorectal cancer"},
+        core::DiseaseInfo{.group = core::DiseaseGroup::other,
+                          .code = core::Identifier{"asthma"},
+                          .name = "Asthma"},
+        core::DiseaseInfo{.group = core::DiseaseGroup::cancer,
+                          .code = core::Identifier{"colorectalcancer"},
+                          .name = "Colorectal cancer"},
     };
-    auto pif_info = PIFInfo{.enabled = true, .data_root_path = "data", .risk_factor = "Smoking", .scenario = "Scenario1"};
-    auto inputs = std::make_shared<ModelInput>(data, settings, run, ses, mapping, diseases, pif_info);
+    auto pif_info = PIFInfo{.enabled = true,
+                            .data_root_path = "data",
+                            .risk_factor = "Smoking",
+                            .scenario = "Scenario1"};
+    auto inputs =
+        std::make_shared<ModelInput>(data, settings, run, ses, mapping, diseases, pif_info);
 
     auto manager = DataManager(test_datastore_path);
     auto repository = CachedRepository(manager);
@@ -470,7 +478,8 @@ TEST(TestSimulation, DiseaseModuleUpdateWithInterventionAndPIFConfig) {
     auto bus = std::make_shared<DefaultEventBus>();
     auto channel = SyncChannel{};
     // Minimal SimplePolicyScenario to mark scenario as intervention
-    auto policy = SimplePolicyDefinition{PolicyImpactType::absolute, {}, PolicyInterval(run.start_time, std::nullopt)};
+    auto policy = SimplePolicyDefinition{
+        PolicyImpactType::absolute, {}, PolicyInterval(run.start_time, std::nullopt)};
     auto scenario = std::make_unique<SimplePolicyScenario>(channel, std::move(policy));
     auto context = RuntimeContext(bus, inputs, std::move(scenario));
 
