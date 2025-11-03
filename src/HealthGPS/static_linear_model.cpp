@@ -5,6 +5,7 @@
 #include "risk_factor_inspector.h"
 #include "risk_factor_adjustable_model.h"
 
+#include <algorithm>
 #include <iostream>
 #include <ranges>
 #include <utility>
@@ -103,6 +104,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     auto filtered_ranges = combined_ranges;
     
     // Single call to adjust_risk_factors with filtered factors and their ranges
+    //No trend applied. Set to false
     adjust_risk_factors(context, filtered_factors, filtered_ranges, false);
 
     // Initialise everyone with policies and trends.
@@ -113,7 +115,8 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
 
     // MAHIMA: Adjust trended risk factor means using combined factors
     // Use the same combined factors and ranges for trended adjustment
-    adjust_risk_factors(context, combined_factors, combined_ranges, true);
+    //No trend applied. Set to false
+    adjust_risk_factors(context, combined_factors, combined_ranges, false);
 
     // Print risk factor summary once at the end
     std::string risk_factor_list;
@@ -192,7 +195,8 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 
     // MAHIMA: Adjust trended risk factor means using combined factors
     // Use the same combined factors and ranges for trended adjustment
-    adjust_risk_factors(context, combined_factors, combined_ranges, true);
+    //No trend applied. Set to false
+    adjust_risk_factors(context, combined_factors, combined_ranges, false);
     
 
     // Apply policies if intervening.
