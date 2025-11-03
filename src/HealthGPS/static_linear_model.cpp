@@ -108,6 +108,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     auto filtered_ranges = combined_ranges;
     
     // Single call to adjust_risk_factors with filtered factors and their ranges
+    //Set trend to false. No trend applied
     adjust_risk_factors(context, filtered_factors, filtered_ranges, false);
 
     // Initialise everyone with policies and trends.
@@ -118,6 +119,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     
     // MAHIMA: Adjust trended risk factor means using combined factors
     // Use the same combined factors and ranges for trended adjustment
+    //Set trend to false. No trend applied
     adjust_risk_factors(context, combined_factors, combined_ranges, true);
 
     // MAHIMA: CSV writing moved to KevinHallModel after BMI calculation
@@ -177,6 +179,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
     auto filtered_ranges = combined_ranges;
     
     // Single call to adjust_risk_factors with filtered factors and their ranges
+    //Set trend to false. No trend applied
     adjust_risk_factors(context, filtered_factors, filtered_ranges, false);
 
     // Update policies and trends for all people, initializing for newborns.
@@ -196,7 +199,8 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 
     // MAHIMA: Adjust trended risk factor means using combined factors
     // Use the same combined factors and ranges for trended adjustment
-    adjust_risk_factors(context, combined_factors, combined_ranges, true);
+    //Set trend to fasle. No trend applied
+    adjust_risk_factors(context, combined_factors, combined_ranges, false);
     
 
     // Apply policies if intervening.

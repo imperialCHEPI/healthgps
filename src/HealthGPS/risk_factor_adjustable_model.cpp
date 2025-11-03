@@ -87,6 +87,14 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
         
         // Create a lambda function to get first_clamped_factor_value from stored calculation details
         auto get_first_clamped_value = [&context](const Person& person, const core::Identifier& factor) -> double {
+            // MAHIMA: Special handling for income and physical activity (demographic attributes, not in risk_factors)
+            if (factor.to_string() == "income") {
+                return person.income_continuous;
+            }
+            if (factor.to_string() == "physicalactivity") {
+                return person.physical_activity;
+            }
+            
             if (context.has_risk_factor_inspector()) {
                 auto &inspector = context.get_risk_factor_inspector();
                 RiskFactorInspector::CalculationDetails details;
@@ -423,6 +431,14 @@ RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context,
     // MAHIMA: Calculate simulated means using first_clamped_factor_value from stored details
     // Create a lambda function to get first_clamped_factor_value from stored calculation details
     auto get_first_clamped_value = [&context](const Person& person, const core::Identifier& factor) -> double {
+        // MAHIMA: Special handling for income and physical activity (demographic attributes, not in risk_factors)
+        if (factor.to_string() == "income") {
+            return person.income_continuous;
+        }
+        if (factor.to_string() == "physicalactivity") {
+            return person.physical_activity;
+        }
+        
         if (context.has_risk_factor_inspector()) {
             auto &inspector = context.get_risk_factor_inspector();
             RiskFactorInspector::CalculationDetails details;
