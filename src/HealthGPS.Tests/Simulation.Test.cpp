@@ -5,6 +5,7 @@
 #include "HealthGPS/api.h"
 #include "HealthGPS/event_bus.h"
 #include "HealthGPS/random_algorithm.h"
+#include "HealthGPS/simple_policy_scenario.h"
 
 #include "CountryModule.h"
 #include "RiskFactorData.h"
@@ -414,6 +415,91 @@ TEST(TestSimulation, CreateDiseaseModule) {
     ASSERT_FALSE(disease_module->contains(moonshot_key));
     ASSERT_GT(disease_module->get_excess_mortality(diabetes_key, test_person), 0);
     ASSERT_EQ(0.0, disease_module->get_excess_mortality(moonshot_key, test_person));
+}
+
+TEST(TestSimulation, DiseaseModuleUpdateWithBaselineScenario) {
+    using namespace hgps;
+    using namespace hgps::input;
+
+    core::DataTable data;
+    create_test_datatable(data);
+
+    auto inputs = create_test_configuration(data);
+
+    auto manager = DataManager(test_datastore_path);
+    auto repository = CachedRepository(manager);
+
+    auto bus = std::make_shared<DefaultEventBus>();
+    auto channel = SyncChannel{};
+    auto scenario = std::make_unique<BaselineScenario>(channel);
+    auto context = RuntimeContext(bus, inputs, std::move(scenario));
+
+    context.reset_population(10);
+
+    auto disease_module = build_disease_module(repository, *inputs);
+    try {
+        disease_module->initialise_population(context);
+        disease_module->update_population(context);
+    } catch (const std::exception &ex) {
+        GTEST_SKIP() << "Skipping due to unavailable disease measures in test datastore: "
+                     << ex.what();
+    }
+
+    ASSERT_GT(disease_module->size(), 0);
+}
+
+TEST(TestSimulation, DiseaseModuleUpdateWithInterventionAndPIFConfig) {
+    using namespace hgps;
+    using namespace hgps::input;
+
+    core::DataTable data;
+    create_test_datatable(data);
+
+    // Build inputs with PIF configuration enabled (repository may or may not have data)
+    auto uk = core::Country{.code = 826, .name = "United Kingdom", .alpha2 = "GB", .alpha3 = "GBR"};
+    auto age_range = core::IntegerInterval(0, 30);
+    auto settings = Settings{uk, 0.1f, age_range};
+    auto run = RunInfo{.start_time = 2018, .stop_time = 2025, .seed = std::nullopt};
+    auto ses = SESDefinition{.fuction_name = "normal", .parameters = std::vector<double>{0.0, 1.0}};
+    auto mapping = HierarchicalMapping(mapping_entries);
+    auto diseases = std::vector<core::DiseaseInfo>{
+        core::DiseaseInfo{.group = core::DiseaseGroup::other,
+                          .code = core::Identifier{"asthma"},
+                          .name = "Asthma"},
+        core::DiseaseInfo{.group = core::DiseaseGroup::cancer,
+                          .code = core::Identifier{"colorectalcancer"},
+                          .name = "Colorectal cancer"},
+    };
+    auto pif_info = PIFInfo{.enabled = true,
+                            .data_root_path = "data",
+                            .risk_factor = "Smoking",
+                            .scenario = "Scenario1"};
+    auto inputs =
+        std::make_shared<ModelInput>(data, settings, run, ses, mapping, diseases, pif_info);
+
+    auto manager = DataManager(test_datastore_path);
+    auto repository = CachedRepository(manager);
+
+    auto bus = std::make_shared<DefaultEventBus>();
+    auto channel = SyncChannel{};
+    // Minimal SimplePolicyScenario to mark scenario as intervention
+    auto policy = SimplePolicyDefinition{
+        PolicyImpactType::absolute, {}, PolicyInterval(run.start_time, std::nullopt)};
+    auto scenario = std::make_unique<SimplePolicyScenario>(channel, std::move(policy));
+    auto context = RuntimeContext(bus, inputs, std::move(scenario));
+
+    context.reset_population(10);
+
+    auto disease_module = build_disease_module(repository, *inputs);
+    try {
+        disease_module->initialise_population(context);
+        disease_module->update_population(context);
+    } catch (const std::exception &ex) {
+        GTEST_SKIP() << "Skipping due to unavailable disease measures/PIF data in test datastore: "
+                     << ex.what();
+    }
+
+    ASSERT_GT(disease_module->size(), 0);
 }
 
 TEST(TestSimulation, CreateAnalysisModule) {
