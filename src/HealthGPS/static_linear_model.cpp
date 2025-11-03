@@ -120,7 +120,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     // MAHIMA: Adjust trended risk factor means using combined factors
     // Use the same combined factors and ranges for trended adjustment
     //Set trend to false. No trend applied
-    adjust_risk_factors(context, combined_factors, combined_ranges, true);
+    adjust_risk_factors(context, combined_factors, combined_ranges, false);
 
     // MAHIMA: CSV writing moved to KevinHallModel after BMI calculation
     // This ensures Weight, Height, and BMI are available when writing CSV
