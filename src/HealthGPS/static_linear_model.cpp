@@ -1413,8 +1413,9 @@ void StaticLinearModel::initialise_continuous_physical_activity(
     // Apply min/max constraints
     final_value = std::max(model.min_value, std::min(final_value, model.max_value));
 
-    // Set the physical activity value
+    // Set the physical activity value (store in both member variable and risk_factors for compatibility)
     person.physical_activity = final_value;
+    person.risk_factors["PhysicalActivity"_id] = final_value;
 }
 
 // MAHIMA: Function to initialise simple physical activity model using log-normal distribution
