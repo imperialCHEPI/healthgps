@@ -395,9 +395,10 @@ void KevinHallModel::compute_nutrient_intakes(Person &person) const {
     // Compute nutrient intakes from food intakes.
     for (const auto &[food_key, nutrient_coefficients] : nutrient_equations_) {
         if (!person.risk_factors.contains(food_key)) {
-            std::cout << "\nERROR: Missing risk factor key in Kevin Hall model: '" 
-                      << food_key.to_string() << "' for person (age=" << person.age 
-                      << ", gender=" << (person.gender == core::Gender::male ? "male" : "female") << ")";
+            std::cout << "\nERROR: Missing risk factor key in Kevin Hall model: '"
+                      << food_key.to_string() << "' for person (age=" << person.age
+                      << ", gender=" << (person.gender == core::Gender::male ? "male" : "female")
+                      << ")";
             throw;
         }
         double food_intake = person.risk_factors.at(food_key);
@@ -440,9 +441,10 @@ void KevinHallModel::compute_energy_intake(Person &person) const {
     // Compute energy intake from nutrient intakes.
     for (const auto &[nutrient_key, energy_coefficient] : energy_equation_) {
         if (!person.risk_factors.contains(nutrient_key)) {
-            std::cout << "\nERROR: Missing nutrient key '" << nutrient_key.to_string() 
-                      << "' in compute_energy_intake for person (age=" << person.age 
-                      << ", gender=" << (person.gender == core::Gender::male ? "male" : "female") << ")";
+            std::cout << "\nERROR: Missing nutrient key '" << nutrient_key.to_string()
+                      << "' in compute_energy_intake for person (age=" << person.age
+                      << ", gender=" << (person.gender == core::Gender::male ? "male" : "female")
+                      << ")";
             throw;
         }
         double nutrient_intake = person.risk_factors.at(nutrient_key);
@@ -649,13 +651,17 @@ void KevinHallModel::initialise_weight(RuntimeContext &context, Person &person) 
 
     // Compute E/PA actual.
     if (!person.risk_factors.contains("EnergyIntake"_id)) {
-        std::cout << "\nERROR: Missing 'EnergyIntake' in initialise_weight for person (age=" 
-                  << person.age << ", gender=" << (person.gender == core::Gender::male ? "male" : "female") << ")";
+        std::cout << "\nERROR: Missing 'EnergyIntake' in initialise_weight for person (age="
+                  << person.age
+                  << ", gender=" << (person.gender == core::Gender::male ? "male" : "female")
+                  << ")";
         throw;
     }
     if (!person.risk_factors.contains("PhysicalActivity"_id)) {
-        std::cout << "\nERROR: Missing 'PhysicalActivity' in initialise_weight for person (age=" 
-                  << person.age << ", gender=" << (person.gender == core::Gender::male ? "male" : "female") << ")";
+        std::cout << "\nERROR: Missing 'PhysicalActivity' in initialise_weight for person (age="
+                  << person.age
+                  << ", gender=" << (person.gender == core::Gender::male ? "male" : "female")
+                  << ")";
         throw;
     }
     double ei_actual = person.risk_factors.at("EnergyIntake"_id);
