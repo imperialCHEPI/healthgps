@@ -201,7 +201,8 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
                                                        const Population &population,
                                                        Random &random) const;
 
-    /// @brief Convert continuous income to income category using pre-calculated quartiles (optimized)
+    /// @brief Convert continuous income to income category using pre-calculated quartiles
+    /// (optimized)
     /// @param continuous_income The continuous income value
     /// @param quartile_thresholds Pre-calculated quartile thresholds [Q1, Q2, Q3]
     /// @return The assigned income category
