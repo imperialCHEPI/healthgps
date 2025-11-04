@@ -4,6 +4,7 @@
 #include "converter.h"
 #include "info_message.h"
 #include "mtrandom.h"
+#include "static_linear_model.h"
 #include "sync_message.h"
 #include "univariate_visitor.h"
 

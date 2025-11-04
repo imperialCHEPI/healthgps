@@ -119,6 +119,10 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
 
     std::string name() const noexcept override;
 
+    /// @brief Check if using continuous income model (FINCH approach)
+    /// @return true if continuous income model is enabled
+    bool is_continuous_income_model() const noexcept;
+
     void generate_risk_factors(RuntimeContext &context) override;
 
     void update_risk_factors(RuntimeContext &context) override;
@@ -196,6 +200,13 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     core::Income convert_income_continuous_to_category(double continuous_income,
                                                        const Population &population,
                                                        Random &random) const;
+
+    /// @brief Convert continuous income to income category using pre-calculated quartiles (optimized)
+    /// @param continuous_income The continuous income value
+    /// @param quartile_thresholds Pre-calculated quartile thresholds [Q1, Q2, Q3]
+    /// @return The assigned income category
+    core::Income convert_income_to_category(double continuous_income,
+                                            const std::vector<double> &quartile_thresholds) const;
 
     /// @brief Calculate income quartiles from population data
     /// @param population The population to calculate quartiles from

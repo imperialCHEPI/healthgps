@@ -1640,7 +1640,7 @@ void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
 
                     // Process each region column
                     for (const auto &region_col : region_columns) {
-                        double probability =
+                        auto probability =
                             std::any_cast<double>(region_table.column(region_col).value(i));
                         region_data[age_id][gender][region_col] = probability;
                     }
@@ -1690,7 +1690,7 @@ void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
 
                     // Process each region column
                     for (const auto &region_col : region_columns) {
-                        double probability =
+                        auto probability =
                             std::any_cast<double>(ethnicity_table.column(region_col).value(i));
                         ethnicity_data[age_group][gender][region_col][ethnicity_name] = probability;
                     }
