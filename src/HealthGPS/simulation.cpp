@@ -134,12 +134,18 @@ void Simulation::initialise_population() {
     risk_factor_->initialise_population(context_);
 
     // Initialise diseases
+    std::cout << "\nDEBUG: Starting disease initialization...";
     disease_->initialise_population(context_);
+    std::cout << "\nDEBUG: Disease initialization completed";
 
     // Initialise analysis
+    std::cout << "\nDEBUG: Starting analysis initialization...";
     analysis_->initialise_population(context_);
+    std::cout << "\nDEBUG: Analysis initialization completed";
 
+    std::cout << "\nDEBUG: Starting print_initial_population_statistics...";
     print_initial_population_statistics();
+    std::cout << "\nDEBUG: print_initial_population_statistics completed";
 
     std::cout << "\nDEBUG: Simulation::initialise_population completed successfully";
 }
