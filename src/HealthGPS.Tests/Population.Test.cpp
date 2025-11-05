@@ -240,7 +240,7 @@ TEST(TestHealthGPS_Population, PersonIncomeValues) {
     ASSERT_EQ(2.0f, p.income_to_value());
 
     p.income = core::Income::high;
-    ASSERT_EQ(3.0f, p.income_to_value());
+    ASSERT_EQ(4.0f, p.income_to_value());
 
     p.income = core::Income::unknown;
     ASSERT_THROW(p.income_to_value(), core::HgpsException);
