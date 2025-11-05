@@ -253,6 +253,43 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
     // PHASE 3: Thread-safe PIF print flag
     static std::atomic<bool> pif_printed_flag{false};
 
+    // Pre-extract tables to vectors for faster access in parallel loop
+    const auto &age_range = context.age_range();
+    const int num_ages = age_range.length() + 1;
+    const int age_min = age_range.lower();
+    constexpr int gender_male = 0;
+    constexpr int gender_female = 1;
+
+    // Pre-extract incidence table to vector
+    std::vector<std::vector<double>> incidence_table(num_ages, std::vector<double>(2));
+    for (int age = age_min; age <= age_range.upper(); age++) {
+        int age_idx = age - age_min;
+        incidence_table[age_idx][gender_male] =
+            measures_table(age, core::Gender::male).at(incidence_id);
+        incidence_table[age_idx][gender_female] =
+            measures_table(age, core::Gender::female).at(incidence_id);
+    }
+
+    // Pre-extract average relative risk table to vector
+    std::vector<std::vector<double>> avg_rr_table(num_ages, std::vector<double>(2));
+    for (int age = age_min; age <= age_range.upper(); age++) {
+        int age_idx = age - age_min;
+        avg_rr_table[age_idx][gender_male] = average_relative_risk_.at(age, core::Gender::male);
+        avg_rr_table[age_idx][gender_female] = average_relative_risk_.at(age, core::Gender::female);
+    }
+
+    // Pre-extract PIF table to vector if PIF data is available
+    std::vector<std::vector<double>> pif_table_local(num_ages, std::vector<double>(2));
+    if (pif_table != nullptr) {
+        for (int age = age_min; age <= age_range.upper(); age++) {
+            int age_idx = age - age_min;
+            pif_table_local[age_idx][gender_male] =
+                pif_table->get_pif_value(age, core::Gender::male, year_post_intervention);
+            pif_table_local[age_idx][gender_female] =
+                pif_table->get_pif_value(age, core::Gender::female, year_post_intervention);
+        }
+    }
+
     auto start_time = std::chrono::high_resolution_clock::now();
     std::cout << "Start update_incidence_cases: " << disease_type() << "\n";
     fflush(stderr);
@@ -284,10 +321,11 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
             relative_risk *= calculate_relative_risk_for_risk_factors(person);
             relative_risk *= calculate_relative_risk_for_diseases(person);
 
-            double average_relative_risk = average_relative_risk_.at(person.age, person.gender);
+            int age_idx = person.age - age_min;
+            int gender_idx = (person.gender == core::Gender::male) ? gender_male : gender_female;
 
-            // Use cached measures_table and incidence_id instead of definition_.get() calls
-            double incidence = measures_table(person.age, person.gender).at(incidence_id);
+            double average_relative_risk = avg_rr_table[age_idx][gender_idx];
+            double incidence = incidence_table[age_idx][gender_idx];
             double probability = incidence * relative_risk / average_relative_risk;
 
             // Apply PIF adjustment if PIF data is available and we're in intervention scenario
@@ -302,9 +340,7 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
                                "disease incidence calculations\n");
                 }
 
-                // Use cached year_post_intervention and disease_type_id
-                double pif_value =
-                    pif_table->get_pif_value(person.age, person.gender, year_post_intervention);
+                double pif_value = pif_table_local[age_idx][gender_idx];
 
 // Manual PIF Debug (only compiled if DEBUG_PIF is defined)
 // Note: This debug code is NOT thread-safe - it's only for debugging
