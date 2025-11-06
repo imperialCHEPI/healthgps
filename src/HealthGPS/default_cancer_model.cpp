@@ -7,6 +7,7 @@
 #include <chrono>
 #include <fmt/color.h>
 #include <iostream>
+#include <mutex>
 #include <oneapi/tbb/parallel_for_each.h>
 #include <set>
 
@@ -251,7 +252,7 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
     }
 
     // PHASE 3: Thread-safe PIF print flag
-    static std::atomic<bool> pif_printed_flag{false};
+    static std::once_flag pif_print_once_flag;
 
     // Pre-extract tables to vectors for faster access in parallel loop
     const auto &age_range = context.age_range();
@@ -260,35 +261,71 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
     constexpr int gender_male = 0;
     constexpr int gender_female = 1;
 
+    // Create age range vector for parallel extraction
+    std::vector<int> ages;
+    ages.reserve(num_ages);
+    for (int age = age_min; age <= age_range.upper(); age++) {
+        ages.push_back(age);
+    }
+
     // Pre-extract incidence table to vector
     std::vector<std::vector<double>> incidence_table(num_ages, std::vector<double>(2));
-    for (int age = age_min; age <= age_range.upper(); age++) {
+    tbb::parallel_for_each(ages.begin(), ages.end(), [&](int age) {
         int age_idx = age - age_min;
         incidence_table[age_idx][gender_male] =
             measures_table(age, core::Gender::male).at(incidence_id);
         incidence_table[age_idx][gender_female] =
             measures_table(age, core::Gender::female).at(incidence_id);
-    }
+    });
 
     // Pre-extract average relative risk table to vector
     std::vector<std::vector<double>> avg_rr_table(num_ages, std::vector<double>(2));
-    for (int age = age_min; age <= age_range.upper(); age++) {
+    tbb::parallel_for_each(ages.begin(), ages.end(), [&](int age) {
         int age_idx = age - age_min;
         avg_rr_table[age_idx][gender_male] = average_relative_risk_.at(age, core::Gender::male);
         avg_rr_table[age_idx][gender_female] = average_relative_risk_.at(age, core::Gender::female);
-    }
+    });
 
     // Pre-extract PIF table to vector if PIF data is available
     std::vector<std::vector<double>> pif_table_local(num_ages, std::vector<double>(2));
     if (pif_table != nullptr) {
-        for (int age = age_min; age <= age_range.upper(); age++) {
+        tbb::parallel_for_each(ages.begin(), ages.end(), [&](int age) {
             int age_idx = age - age_min;
             pif_table_local[age_idx][gender_male] =
                 pif_table->get_pif_value(age, core::Gender::male, year_post_intervention);
             pif_table_local[age_idx][gender_female] =
                 pif_table->get_pif_value(age, core::Gender::female, year_post_intervention);
+        });
+    }
+
+// Manual PIF Debug (only compiled if DEBUG_PIF is defined)
+#ifdef DEBUG_PIF
+    if (pif_table != nullptr) {
+        static std::set<std::string> debug_diseases_printed;
+        if (debug_diseases_printed.find(disease_type_id.to_string()) ==
+            debug_diseases_printed.end()) {
+            std::cout << "=== PIF DEBUG FOR DISEASE: " << disease_type_id.to_string() << " ==="
+                      << '\n';
+            std::cout << "PIF Table Size: " << pif_table->size() << '\n';
+
+            int debug_age = 55; //change this
+            core::Gender debug_gender = core::Gender::female; //change gender
+            int debug_year = 17; //change years post int that you want to verify
+
+            double debug_pif =
+                pif_table->get_pif_value(debug_age, debug_gender, debug_year);
+
+            std::cout << "PIF Debug: Disease=" << disease_type_id.to_string() << ", Age=" << debug_age
+                      << ", Gender=" << (debug_gender == core::Gender::male ? "Male" : "Female")
+                      << ", YearPostInt=" << debug_year << ", PIFValue=" << debug_pif << '\n';
+
+            std::cout << "=== END PIF DEBUG FOR " << disease_type_id.to_string() << " ===" << '\n'
+                      << '\n';
+
+            debug_diseases_printed.insert(disease_type_id.to_string());
         }
     }
+#endif
 
     auto start_time = std::chrono::high_resolution_clock::now();
     std::cout << "Start update_incidence_cases: " << disease_type() << "\n";
@@ -331,48 +368,14 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
             // Apply PIF adjustment if PIF data is available and we're in intervention scenario
             // Use cached PIF data instead of repeated definition_.get() calls
             if (pif_table != nullptr) {
-                // THREAD-SAFE: Print confirmation message once using atomic flag
-                bool expected = false;
-                if (pif_printed_flag.compare_exchange_weak(expected, true,
-                                                           std::memory_order_relaxed)) {
+                // THREAD-SAFE: Print confirmation message once
+                std::call_once(pif_print_once_flag, []() {
                     fmt::print(fg(fmt::color::green),
                                "PIF Analysis: Applying Population Impact Fraction adjustments to "
                                "disease incidence calculations\n");
-                }
+                });
 
                 double pif_value = pif_table_local[age_idx][gender_idx];
-
-// Manual PIF Debug (only compiled if DEBUG_PIF is defined)
-// Note: This debug code is NOT thread-safe - it's only for debugging
-#ifdef DEBUG_PIF
-                static std::set<std::string> debug_diseases_printed;
-                if (debug_diseases_printed.find(disease_type_id.to_string()) ==
-                    debug_diseases_printed.end()) {
-                    std::cout << "=== PIF DEBUG FOR DISEASE: " << disease_type_id.to_string()
-                              << " ===" << '\n';
-                    std::cout << "PIF Table Size: " << pif_table->size() << '\n';
-
-                    int debug_age = 55;
-                    core::Gender debug_gender = core::Gender::female;
-                    int debug_year = 17;
-
-                    double debug_pif =
-                        pif_table->get_pif_value(debug_age, debug_gender, debug_year);
-
-                    std::cout << "PIF Debug: Disease=" << disease_type_id.to_string()
-                              << ", Age=" << debug_age << ", Gender="
-                              << (debug_gender == core::Gender::male ? "Male" : "Female")
-                              << ", YearPostInt=" << debug_year << ", PIFValue=" << debug_pif
-                              << '\n';
-
-                    std::cout << "=== END PIF DEBUG FOR " << disease_type_id.to_string()
-                              << " ===" << '\n'
-                              << '\n';
-
-                    debug_diseases_printed.insert(disease_type_id.to_string());
-                }
-#endif
-
                 probability *= (1.0 - pif_value);
             }
 
