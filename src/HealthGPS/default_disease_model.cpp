@@ -52,8 +52,7 @@ void DefaultDiseaseModel::initialise_disease_status(RuntimeContext &context) {
     std::vector<std::vector<double>> prevalence_table(num_ages, std::vector<double>(2));
     tbb::parallel_for_each(ages.begin(), ages.end(), [&](int age) {
         int age_idx = age - age_min;
-        prevalence_table[age_idx][gender_male] =
-            table(age, core::Gender::male).at(prevalence_id);
+        prevalence_table[age_idx][gender_male] = table(age, core::Gender::male).at(prevalence_id);
         prevalence_table[age_idx][gender_female] =
             table(age, core::Gender::female).at(prevalence_id);
     });
@@ -70,23 +69,23 @@ void DefaultDiseaseModel::initialise_disease_status(RuntimeContext &context) {
         context.population().begin(), context.population().end(), [&](auto &person) {
             if (!person.is_active() || !table.contains(person.age)) {
                 return;
-        }
+            }
 
-        double relative_risk = 1.0;
-        relative_risk *= calculate_relative_risk_for_risk_factors(person);
+            double relative_risk = 1.0;
+            relative_risk *= calculate_relative_risk_for_risk_factors(person);
 
             int age_idx = person.age - age_min;
             int gender_idx = (person.gender == core::Gender::male) ? gender_male : gender_female;
 
             double average_relative_risk = avg_rr_table[age_idx][gender_idx];
             double prevalence = prevalence_table[age_idx][gender_idx];
-        double probability = prevalence * relative_risk / average_relative_risk;
-        double hazard = context.random().next_double();
-        if (hazard < probability) {
-            // start_time = 0 means the disease existed before the simulation started.
+            double probability = prevalence * relative_risk / average_relative_risk;
+            double hazard = context.random().next_double();
+            if (hazard < probability) {
+                // start_time = 0 means the disease existed before the simulation started.
                 person.diseases[disease_type_id] =
-                Disease{.status = DiseaseStatus::active, .start_time = 0};
-        }
+                    Disease{.status = DiseaseStatus::active, .start_time = 0};
+            }
         });
 }
 
@@ -235,20 +234,20 @@ void DefaultDiseaseModel::update_remission_cases(RuntimeContext &context) {
 
     tbb::parallel_for_each(
         context.population().begin(), context.population().end(), [&](auto &person) {
-        // Skip if person is inactive or newborn.
-        if (!person.is_active() || person.age == 0) {
+            // Skip if person is inactive or newborn.
+            if (!person.is_active() || person.age == 0) {
                 return;
-        }
+            }
 
-        // Skip if person does not have the disease.
+            // Skip if person does not have the disease.
             if (person.diseases[disease_type_id].status == DiseaseStatus::active) {
                 return;
-        }
+            }
             auto probability = table(person.age, person.gender).at(remission_id);
-        auto hazard = context.random().next_double();
-        if (hazard < probability) {
+            auto hazard = context.random().next_double();
+            if (hazard < probability) {
                 person.diseases[disease_type_id].status = DiseaseStatus::free;
-        }
+            }
         });
 }
 

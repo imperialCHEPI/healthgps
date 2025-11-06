@@ -41,24 +41,23 @@ void DefaultCancerModel::initialise_disease_status(RuntimeContext &context) {
     constexpr int gender_male = 0;
     constexpr int gender_female = 1;
 
-    //Ages vector to access below when we get prevelance and RR table
+    // Ages vector to access below when we get prevelance and RR table
     std::vector<int> ages;
     ages.reserve(num_ages);
     for (int age = age_min; age <= age_range.upper(); age++) {
         ages.push_back(age);
     }
 
-    //prevelance table copy outside using vector and parallelized
+    // prevelance table copy outside using vector and parallelized
     std::vector<std::vector<double>> prevalence_table(num_ages, std::vector<double>(2));
     tbb::parallel_for_each(ages.begin(), ages.end(), [&](int age) {
         int age_idx = age - age_min;
-        prevalence_table[age_idx][gender_male] =
-            table(age, core::Gender::male).at(prevalence_id);
+        prevalence_table[age_idx][gender_male] = table(age, core::Gender::male).at(prevalence_id);
         prevalence_table[age_idx][gender_female] =
             table(age, core::Gender::female).at(prevalence_id);
     });
 
-    //relative risk table copy outside using vector and then parallelized
+    // relative risk table copy outside using vector and then parallelized
     std::vector<std::vector<double>> avg_rr_table(num_ages, std::vector<double>(2));
     tbb::parallel_for_each(ages.begin(), ages.end(), [&](int age) {
         int age_idx = age - age_min;
@@ -86,8 +85,8 @@ void DefaultCancerModel::initialise_disease_status(RuntimeContext &context) {
                 int time_since_onset = calculate_time_since_onset(context, person.gender);
                 // start_time = 0 means the disease existed before the simulation started.
                 person.diseases[disease_type_id] = Disease{.status = DiseaseStatus::active,
-                                                            .start_time = 0,
-                                                            .time_since_onset = time_since_onset};
+                                                           .start_time = 0,
+                                                           .time_since_onset = time_since_onset};
             }
         });
 }
