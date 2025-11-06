@@ -132,7 +132,7 @@ void DefaultDiseaseModel::initialise_average_relative_risk(RuntimeContext &conte
 
 void DefaultDiseaseModel::update_disease_status(RuntimeContext &context) {
     // Order is very important!
-    //update_remission_cases(context);
+    // update_remission_cases(context);
     update_incidence_cases(context);
 }
 
