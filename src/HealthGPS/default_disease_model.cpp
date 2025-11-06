@@ -296,18 +296,18 @@ void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
         static std::set<std::string> debug_diseases_printed;
         if (debug_diseases_printed.find(disease_type_id.to_string()) ==
             debug_diseases_printed.end()) {
-            std::cout << "=== PIF DEBUG FOR DISEASE: " << disease_type_id.to_string() << " ==="
-                      << '\n';
+            std::cout << "=== PIF DEBUG FOR DISEASE: " << disease_type_id.to_string()
+                      << " ===" << '\n';
             std::cout << "PIF Table Size: " << pif_table->size() << '\n';
 
             int debug_age = 55;
             core::Gender debug_gender = core::Gender::female;
             int debug_year = 17;
 
-            double debug_pif =
-                pif_table->get_pif_value(debug_age, debug_gender, debug_year);
+            double debug_pif = pif_table->get_pif_value(debug_age, debug_gender, debug_year);
 
-            std::cout << "PIF Debug: Disease=" << disease_type_id.to_string() << ", Age=" << debug_age
+            std::cout << "PIF Debug: Disease=" << disease_type_id.to_string()
+                      << ", Age=" << debug_age
                       << ", Gender=" << (debug_gender == core::Gender::male ? "Male" : "Female")
                       << ", YearPostInt=" << debug_year << ", PIFValue=" << debug_pif << '\n';
 
