@@ -29,30 +29,67 @@ const core::Identifier &DefaultCancerModel::disease_type() const noexcept {
 }
 
 void DefaultCancerModel::initialise_disease_status(RuntimeContext &context) {
-    int prevalence_id = definition_.get().table().at(MeasureKey::prevalence);
+    const auto &disease_type_id = disease_type();
+    const auto &table = definition_.get().table();
+    int prevalence_id = table.at(MeasureKey::prevalence);
 
     auto relative_risk_table = calculate_average_relative_risk(context);
-    for (auto &person : context.population()) {
-        if (!person.is_active() || !definition_.get().table().contains(person.age)) {
-            continue;
-        }
 
-        double relative_risk = 1.0;
-        relative_risk *= calculate_relative_risk_for_risk_factors(person);
+    const auto &age_range = context.age_range();
+    const int num_ages = age_range.length() + 1;
+    const int age_min = age_range.lower();
+    constexpr int gender_male = 0;
+    constexpr int gender_female = 1;
 
-        double average_relative_risk = relative_risk_table(person.age, person.gender);
-
-        double prevalence = definition_.get().table()(person.age, person.gender).at(prevalence_id);
-        double probability = prevalence * relative_risk / average_relative_risk;
-        double hazard = context.random().next_double();
-        if (hazard < probability) {
-            int time_since_onset = calculate_time_since_onset(context, person.gender);
-            // start_time = 0 means the disease existed before the simulation started.
-            person.diseases[disease_type()] = Disease{.status = DiseaseStatus::active,
-                                                      .start_time = 0,
-                                                      .time_since_onset = time_since_onset};
-        }
+    //Ages vector to access below when we get prevelance and RR table
+    std::vector<int> ages;
+    ages.reserve(num_ages);
+    for (int age = age_min; age <= age_range.upper(); age++) {
+        ages.push_back(age);
     }
+
+    //prevelance table copy outside using vector and parallelized
+    std::vector<std::vector<double>> prevalence_table(num_ages, std::vector<double>(2));
+    tbb::parallel_for_each(ages.begin(), ages.end(), [&](int age) {
+        int age_idx = age - age_min;
+        prevalence_table[age_idx][gender_male] =
+            table(age, core::Gender::male).at(prevalence_id);
+        prevalence_table[age_idx][gender_female] =
+            table(age, core::Gender::female).at(prevalence_id);
+    });
+
+    //relative risk table copy outside using vector and then parallelized
+    std::vector<std::vector<double>> avg_rr_table(num_ages, std::vector<double>(2));
+    tbb::parallel_for_each(ages.begin(), ages.end(), [&](int age) {
+        int age_idx = age - age_min;
+        avg_rr_table[age_idx][gender_male] = relative_risk_table(age, core::Gender::male);
+        avg_rr_table[age_idx][gender_female] = relative_risk_table(age, core::Gender::female);
+    });
+
+    tbb::parallel_for_each(
+        context.population().begin(), context.population().end(), [&](auto &person) {
+            if (!person.is_active() || !table.contains(person.age)) {
+                return;
+            }
+
+            double relative_risk = 1.0;
+            relative_risk *= calculate_relative_risk_for_risk_factors(person);
+
+            int age_idx = person.age - age_min;
+            int gender_idx = (person.gender == core::Gender::male) ? gender_male : gender_female;
+
+            double average_relative_risk = avg_rr_table[age_idx][gender_idx];
+            double prevalence = prevalence_table[age_idx][gender_idx];
+            double probability = prevalence * relative_risk / average_relative_risk;
+            double hazard = context.random().next_double();
+            if (hazard < probability) {
+                int time_since_onset = calculate_time_since_onset(context, person.gender);
+                // start_time = 0 means the disease existed before the simulation started.
+                person.diseases[disease_type_id] = Disease{.status = DiseaseStatus::active,
+                                                            .start_time = 0,
+                                                            .time_since_onset = time_since_onset};
+            }
+        });
 }
 
 void DefaultCancerModel::initialise_average_relative_risk(RuntimeContext &context) {
