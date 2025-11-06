@@ -192,26 +192,30 @@ double DefaultDiseaseModel::calculate_relative_risk_for_diseases(const Person &p
 }
 
 void DefaultDiseaseModel::update_remission_cases(RuntimeContext &context) {
-    int remission_id = definition_.get().table().at(MeasureKey::remission);
+    const auto &disease_type_id = disease_type();
+    const auto &table = definition_.get().table();
+    int remission_id = table.at(MeasureKey::remission);
 
-    for (auto &person : context.population()) {
-        // Skip if person is inactive or newborn.
-        if (!person.is_active() || person.age == 0) {
-            continue;
-        }
+    tbb::parallel_for_each(context.population().begin(), context.population().end(),
+                           [&](auto &person) {
+                               // Skip if person is inactive or newborn.
+                               if (!person.is_active() || person.age == 0) {
+                                   return;
+                               }
 
-        // Skip if person does not have the disease.
-        if (!person.diseases.contains(disease_type()) ||
-            person.diseases.at(disease_type()).status != DiseaseStatus::active) {
-            continue;
-        }
+                               // Skip if person does not have the disease.
+                               auto it = person.diseases.find(disease_type_id);
+                               if (it == person.diseases.end() ||
+                                   it->second.status != DiseaseStatus::active) {
+                                   return;
+                               }
 
-        auto probability = definition_.get().table()(person.age, person.gender).at(remission_id);
-        auto hazard = context.random().next_double();
-        if (hazard < probability) {
-            person.diseases.at(disease_type()).status = DiseaseStatus::free;
-        }
-    }
+                               auto probability = table(person.age, person.gender).at(remission_id);
+                               auto hazard = context.random().next_double();
+                               if (hazard < probability) {
+                                   it->second.status = DiseaseStatus::free;
+                               }
+                           });
 }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
@@ -316,9 +320,6 @@ void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
 #endif
 
     auto start_time = std::chrono::high_resolution_clock::now();
-    std::cout << "Start update_incidence_cases: " << disease_type() << "\n";
-    fflush(stderr);
-    fflush(stdout);
 
     // MAHIMA: Process people in parallel - each person's disease calculation is independent
     // All expensive lookups are now pre-computed above

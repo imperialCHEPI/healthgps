@@ -202,28 +202,31 @@ double DefaultCancerModel::calculate_relative_risk_for_diseases(const Person &pe
 }
 
 void DefaultCancerModel::update_remission_cases(RuntimeContext &context) {
+    const auto &disease_type_id = disease_type();
     int max_onset = definition_.get().parameters().max_time_since_onset;
 
-    for (auto &person : context.population()) {
+    tbb::parallel_for_each(context.population().begin(), context.population().end(),
+                           [&](auto &person) {
         // Skip if person is inactive or newborn.
         if (!person.is_active() || person.age == 0) {
-            continue;
+                                   return;
         }
 
         // Skip if person does not have the disease.
-        if (!person.diseases.contains(disease_type()) ||
-            person.diseases.at(disease_type()).status != DiseaseStatus::active) {
-            continue;
+                               auto it = person.diseases.find(disease_type_id);
+                               if (it == person.diseases.end() ||
+                                   it->second.status != DiseaseStatus::active) {
+                                   return;
         }
 
         // Increment duration by one year
-        auto &disease = person.diseases.at(disease_type());
+                               auto &disease = it->second;
         disease.time_since_onset++;
         if (disease.time_since_onset >= max_onset) {
             disease.status = DiseaseStatus::free;
             disease.time_since_onset = -1;
         }
-    }
+                           });
 }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
@@ -328,9 +331,6 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
 #endif
 
     auto start_time = std::chrono::high_resolution_clock::now();
-    std::cout << "Start update_incidence_cases: " << disease_type() << "\n";
-    fflush(stderr);
-    fflush(stdout);
 
     // MAHIMA: Process people in parallel - each person's disease calculation is independent
     // All expensive lookups are now pre-computed above
