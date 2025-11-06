@@ -205,28 +205,27 @@ void DefaultCancerModel::update_remission_cases(RuntimeContext &context) {
     const auto &disease_type_id = disease_type();
     int max_onset = definition_.get().parameters().max_time_since_onset;
 
-    tbb::parallel_for_each(context.population().begin(), context.population().end(),
-                           [&](auto &person) {
-        // Skip if person is inactive or newborn.
-        if (!person.is_active() || person.age == 0) {
-                                   return;
-        }
+    tbb::parallel_for_each(
+        context.population().begin(), context.population().end(), [&](auto &person) {
+            // Skip if person is inactive or newborn.
+            if (!person.is_active() || person.age == 0) {
+                return;
+            }
 
-        // Skip if person does not have the disease.
-                               auto it = person.diseases.find(disease_type_id);
-                               if (it == person.diseases.end() ||
-                                   it->second.status != DiseaseStatus::active) {
-                                   return;
-        }
+            // Skip if person does not have the disease.
+            auto it = person.diseases.find(disease_type_id);
+            if (it == person.diseases.end() || it->second.status != DiseaseStatus::active) {
+                return;
+            }
 
-        // Increment duration by one year
-                               auto &disease = it->second;
-        disease.time_since_onset++;
-        if (disease.time_since_onset >= max_onset) {
-            disease.status = DiseaseStatus::free;
-            disease.time_since_onset = -1;
-        }
-                           });
+            // Increment duration by one year
+            auto &disease = it->second;
+            disease.time_since_onset++;
+            if (disease.time_since_onset >= max_onset) {
+                disease.status = DiseaseStatus::free;
+                disease.time_since_onset = -1;
+            }
+        });
 }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)

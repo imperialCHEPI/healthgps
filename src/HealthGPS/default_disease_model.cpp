@@ -196,26 +196,25 @@ void DefaultDiseaseModel::update_remission_cases(RuntimeContext &context) {
     const auto &table = definition_.get().table();
     int remission_id = table.at(MeasureKey::remission);
 
-    tbb::parallel_for_each(context.population().begin(), context.population().end(),
-                           [&](auto &person) {
-                               // Skip if person is inactive or newborn.
-                               if (!person.is_active() || person.age == 0) {
-                                   return;
-                               }
+    tbb::parallel_for_each(
+        context.population().begin(), context.population().end(), [&](auto &person) {
+            // Skip if person is inactive or newborn.
+            if (!person.is_active() || person.age == 0) {
+                return;
+            }
 
-                               // Skip if person does not have the disease.
-                               auto it = person.diseases.find(disease_type_id);
-                               if (it == person.diseases.end() ||
-                                   it->second.status != DiseaseStatus::active) {
-                                   return;
-                               }
+            // Skip if person does not have the disease.
+            auto it = person.diseases.find(disease_type_id);
+            if (it == person.diseases.end() || it->second.status != DiseaseStatus::active) {
+                return;
+            }
 
-                               auto probability = table(person.age, person.gender).at(remission_id);
-                               auto hazard = context.random().next_double();
-                               if (hazard < probability) {
-                                   it->second.status = DiseaseStatus::free;
-                               }
-                           });
+            auto probability = table(person.age, person.gender).at(remission_id);
+            auto hazard = context.random().next_double();
+            if (hazard < probability) {
+                it->second.status = DiseaseStatus::free;
+            }
+        });
 }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
