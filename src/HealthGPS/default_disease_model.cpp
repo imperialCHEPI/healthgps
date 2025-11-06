@@ -335,7 +335,7 @@ void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
 
             // Skip if the person already has the disease.
             // Use cached disease_type_id instead of calling disease_type()
-     
+
             if (person.diseases[disease_type_id].status == DiseaseStatus::active) {
                 return;
             }
