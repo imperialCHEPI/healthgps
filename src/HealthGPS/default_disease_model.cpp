@@ -204,15 +204,13 @@ void DefaultDiseaseModel::update_remission_cases(RuntimeContext &context) {
             }
 
             // Skip if person does not have the disease.
-            auto it = person.diseases.find(disease_type_id);
-            if (it == person.diseases.end() || it->second.status != DiseaseStatus::active) {
+            if (person.diseases[disease_type_id].status == DiseaseStatus::active) {
                 return;
             }
-
             auto probability = table(person.age, person.gender).at(remission_id);
             auto hazard = context.random().next_double();
             if (hazard < probability) {
-                it->second.status = DiseaseStatus::free;
+                person.diseases[disease_type_id].status = DiseaseStatus::free;
             }
         });
 }
@@ -337,11 +335,10 @@ void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
 
             // Skip if the person already has the disease.
             // Use cached disease_type_id instead of calling disease_type()
-            if (person.diseases.contains(disease_type_id) &&
-                person.diseases.at(disease_type_id).status == DiseaseStatus::active) {
+     
+            if (person.diseases[disease_type_id].status == DiseaseStatus::active) {
                 return;
             }
-
             double relative_risk = 1.0;
             relative_risk *= calculate_relative_risk_for_risk_factors(person);
             relative_risk *= calculate_relative_risk_for_diseases(person);
