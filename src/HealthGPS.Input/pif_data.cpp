@@ -20,7 +20,12 @@ double PIFTable::get_pif_value(int age, core::Gender gender, int year_post_inter
     int index = ((year_post_intervention - min_year_) * age_range_ * GENDERS) +
                 (gender_index * age_range_) + (age - min_age_);
 
-    // Direct access without bounds check (already validated above)
+    // Additional bounds check on calculated index to prevent out-of-range access
+    if (index < 0 || static_cast<std::size_t>(index) >= direct_array_.size()) {
+        return 0.0;
+    }
+
+    // Direct access with bounds validation
     return direct_array_[index].pif_value;
 }
 
