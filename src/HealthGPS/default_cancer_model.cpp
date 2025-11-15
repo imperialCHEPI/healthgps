@@ -108,7 +108,13 @@ double DefaultCancerModel::get_excess_mortality(const Person &person) const noex
         return 0.0;
     }
 
-    double excess_mortality = definition_.get().table()(person.age, person.gender).at(mortality_id);
+    // Bounds check to prevent out-of-range access (critical for noexcept function)
+    const auto &table = definition_.get().table();
+    if (!table.contains(person.age)) {
+        return 0.0;
+    }
+
+    double excess_mortality = table(person.age, person.gender).at(mortality_id);
     const auto &sex_death_weights =
         definition_.get().parameters().death_weight.at(disease_info.time_since_onset);
     double death_weight =
@@ -285,6 +291,12 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
         double relative_risk = 1.0;
         relative_risk *= calculate_relative_risk_for_risk_factors(person);
         relative_risk *= calculate_relative_risk_for_diseases(person);
+
+        // Skip if person's age is outside the valid age range for the tables
+        if (!average_relative_risk_.contains(person.age, person.gender) ||
+            !table.contains(person.age)) {
+            continue;
+        }
 
         double average_relative_risk = average_relative_risk_.at(person.age, person.gender);
 

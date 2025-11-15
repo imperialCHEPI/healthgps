@@ -371,7 +371,14 @@ int DemographicModule::update_age_and_death_events(RuntimeContext &context,
         }
 
         if (entity.is_active()) {
-            entity.age = entity.age + 1;
+            // Prevent age from exceeding maximum age range
+            if (entity.age < max_age) {
+                entity.age = entity.age + 1;
+            } else {
+                // Age already at or above maximum, ensure person dies
+                entity.die(context.time_now());
+                number_of_deaths++;
+            }
         }
     }
 
