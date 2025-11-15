@@ -8,8 +8,12 @@ double PIFTable::get_pif_value(int age, core::Gender gender, int year_post_inter
     // OPTIMIZATION: Direct array access - no lookups, no searching
     //  Formula: index = ((year - min_year) * age_range * GENDERS) + (gender_index * age_range) +
     //  (age - min_age) Gender mapping: male=0, female=1 (convert from enum: male=1->0, female=2->1)
+    //
+    // NOTE: PIF data may contain ages 0-110, but the simulation may be configured for a smaller
+    // age range (e.g., 0-100). The bounds checks below ensure safe access even when the simulation
+    // age range is smaller than the PIF data range.
 
-    // Early bounds check for performance
+    // Early bounds check for performance (checks against PIF data's actual age range)
     if (age < min_age_ || age > max_age_ || year_post_intervention < min_year_ ||
         year_post_intervention > max_year_) {
         return 0.0;
@@ -21,6 +25,9 @@ double PIFTable::get_pif_value(int age, core::Gender gender, int year_post_inter
                 (gender_index * age_range_) + (age - min_age_);
 
     // Additional bounds check on calculated index to prevent out-of-range access
+    // This is a critical safety check that prevents crashes if there's any mismatch between
+    // the calculated index and the actual array size (e.g., due to data inconsistencies or
+    // edge cases in index calculation)
     if (index < 0 || static_cast<std::size_t>(index) >= direct_array_.size()) {
         return 0.0;
     }

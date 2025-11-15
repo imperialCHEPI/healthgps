@@ -274,6 +274,12 @@ void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
         relative_risk *= calculate_relative_risk_for_risk_factors(person);
         relative_risk *= calculate_relative_risk_for_diseases(person);
 
+        // Skip if person's age is outside the valid age range for the tables
+        if (!average_relative_risk_.contains(person.age, person.gender) ||
+            !table.contains(person.age)) {
+            continue;
+        }
+
         double average_relative_risk = average_relative_risk_.at(person.age, person.gender);
 
         double incidence = table(person.age, person.gender).at(incidence_id);
