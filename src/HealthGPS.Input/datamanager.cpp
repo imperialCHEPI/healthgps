@@ -768,11 +768,15 @@ std::string DataManager::expand_environment_variables(const std::string &path) c
 PIFTable DataManager::load_pif_from_csv(const std::filesystem::path &filepath, int max_age) const {
     PIFTable table;
     auto start_time = std::chrono::high_resolution_clock::now();
+    size_t total_rows = 0;
+    size_t filtered_rows = 0;
 
     try {
         rapidcsv::Document doc(filepath.string());
         auto mapping = create_fields_index_mapping(doc.GetColumnNames(),
                                                    {"Gender", "Age", "YearPostInt", "IF_Mean"});
+
+        total_rows = doc.GetRowCount();
 
         for (size_t i = 0; i < doc.GetRowCount(); i++) {
             auto row = doc.GetRow<std::string>(i);
@@ -789,6 +793,7 @@ PIFTable DataManager::load_pif_from_csv(const std::filesystem::path &filepath, i
             // Filter: Only include ages within the simulation's age range
             // PIF data may contain ages 0-110, but simulation may be limited to 0-100
             if (item.age > max_age) {
+                filtered_rows++;
                 continue; // Skip ages beyond simulation's max age
             }
 
@@ -812,8 +817,13 @@ PIFTable DataManager::load_pif_from_csv(const std::filesystem::path &filepath, i
             std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
 
         // Print CSV loading verification with timing
-        fmt::print(fg(fmt::color::cyan), "PIF CSV File Loaded: {} ({} rows) in {}ms\n",
-                   filepath.filename().string(), table.size(), duration.count());
+        // Print to both stdout and stderr for visibility on PBS
+        fmt::print(fg(fmt::color::cyan), "PIF CSV File Loaded: {} ({} rows, filtered from {} rows, max_age={}) in {}ms\n",
+                   filepath.filename().string(), table.size(), total_rows, max_age, duration.count());
+        std::fprintf(stderr, "[PIF] CSV File Loaded: %s (%zu rows, filtered from %zu rows, max_age=%d) in %lldms\n",
+                     filepath.filename().string().c_str(), table.size(), total_rows, max_age, duration.count());
+        std::fflush(stdout);
+        std::fflush(stderr);
         fmt::print(fg(fmt::color::green),
                    "PIF Hash Table Built: O(1) lookup optimization enabled\n");
 
