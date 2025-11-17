@@ -14,6 +14,7 @@
 #include <fmt/color.h>
 
 #include <chrono>
+#include <csignal>
 #include <cstdio>
 #include <cstdlib>
 #include <exception>
@@ -100,7 +101,7 @@ void install_terminate_handler() {
 
 #if HGPS_HAS_EXECINFO
     // Also install signal handler for SIGABRT to catch crashes
-    std::signal(SIGABRT, [](int) {
+    signal(SIGABRT, [](int) {
         fmt::print(fg(fmt::color::red), "\n\nSIGABRT received - program aborted.\n");
         print_stack_trace();
         std::fflush(stdout);
