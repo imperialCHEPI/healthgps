@@ -304,10 +304,16 @@ void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
         double probability = incidence * relative_risk / average_relative_risk;
 
         // Apply PIF adjustment if available (lookups cached outside loop)
+        // Only apply PIF if person's age is within the simulation's age range
+        // (PIF data may contain ages 0-110, but simulation may be limited to 0-100)
         if (apply_pif && pif_table) {
-            double pif_value =
-                pif_table->get_pif_value(person.age, person.gender, year_post_intervention);
-            probability *= (1.0 - pif_value);
+            const auto &sim_age_range = context.age_range();
+            if (person.age <= static_cast<unsigned int>(sim_age_range.upper())) {
+                double pif_value =
+                    pif_table->get_pif_value(person.age, person.gender, year_post_intervention);
+                probability *= (1.0 - pif_value);
+            }
+            // If person.age > sim_age_range.upper(), skip PIF adjustment (use probability as-is)
         }
 
         double hazard = context.random().next_double();

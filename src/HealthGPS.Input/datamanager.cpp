@@ -649,7 +649,8 @@ void DataManager::notify_warning(std::string_view message) const {
 
 std::optional<PIFData> DataManager::get_pif_data(const DiseaseInfo &disease_info,
                                                  const Country &country,
-                                                 const nlohmann::json &pif_config) const {
+                                                 const nlohmann::json &pif_config,
+                                                 int max_age) const {
     // Check if PIF is enabled
     if (!pif_config.contains("enabled") || !pif_config["enabled"].get<bool>()) {
         return std::nullopt;
@@ -675,7 +676,7 @@ std::optional<PIFData> DataManager::get_pif_data(const DiseaseInfo &disease_info
 
     if (std::filesystem::exists(full_path)) {
         try {
-            auto pif_table = load_pif_from_csv(full_path);
+            auto pif_table = load_pif_from_csv(full_path, max_age);
             if (pif_table.has_data()) {
                 PIFData pif_data;
                 pif_data.add_scenario_data(scenario, std::move(pif_table));
@@ -764,7 +765,7 @@ std::string DataManager::expand_environment_variables(const std::string &path) c
     return result;
 }
 
-PIFTable DataManager::load_pif_from_csv(const std::filesystem::path &filepath) const {
+PIFTable DataManager::load_pif_from_csv(const std::filesystem::path &filepath, int max_age) const {
     PIFTable table;
     auto start_time = std::chrono::high_resolution_clock::now();
 
@@ -784,6 +785,12 @@ PIFTable DataManager::load_pif_from_csv(const std::filesystem::path &filepath) c
             item.age = std::stoi(row[mapping["Age"]]);
             item.year_post_intervention = std::stoi(row[mapping["YearPostInt"]]);
             item.pif_value = std::stod(row[mapping["IF_Mean"]]);
+
+            // Filter: Only include ages within the simulation's age range
+            // PIF data may contain ages 0-110, but simulation may be limited to 0-100
+            if (item.age > max_age) {
+                continue; // Skip ages beyond simulation's max age
+            }
 
             // Validate PIF value is in range [0.0, 1.0]
             if (item.pif_value < 0.0 || item.pif_value > 1.0) {

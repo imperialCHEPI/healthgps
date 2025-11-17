@@ -83,9 +83,10 @@ class DataManager : public Datastore {
     /// @param disease_info The disease information
     /// @param country The country
     /// @param pif_config PIF configuration from config.json
+    /// @param max_age Maximum age to include (filters data to simulation's age range)
     /// @return PIF data for the disease, or std::nullopt if not available
     std::optional<PIFData> get_pif_data(const DiseaseInfo &disease_info, const Country &country,
-                                        const nlohmann::json &pif_config) const;
+                                        const nlohmann::json &pif_config, int max_age = 110) const;
 
     /// @brief Get the root data directory path
     /// @return The root data directory path
@@ -113,8 +114,9 @@ class DataManager : public Datastore {
 
     /// @brief Loads PIF data from CSV file
     /// @param filepath Path to PIF CSV file
+    /// @param max_age Maximum age to include (filters data to simulation's age range)
     /// @return PIF table loaded from file
-    PIFTable load_pif_from_csv(const std::filesystem::path &filepath) const;
+    PIFTable load_pif_from_csv(const std::filesystem::path &filepath, int max_age = 110) const;
 
     /// @brief Constructs PIF data path for a specific disease and scenario
     /// @param disease_code Disease code (e.g., "ischemicheartdisease")

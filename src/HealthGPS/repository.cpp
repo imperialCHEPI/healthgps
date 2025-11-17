@@ -118,8 +118,10 @@ void CachedRepository::load_disease_definition(const core::DiseaseInfo &info,
         pif_config["risk_factor"] = config.population_impact_fraction().risk_factor;
         pif_config["scenario"] = config.population_impact_fraction().scenario;
 
+        // Pass simulation's max age to filter PIF data during loading
+        int sim_max_age = config.settings().age_range().upper();
         auto pif_result = dynamic_cast<hgps::input::DataManager &>(data_manager_.get())
-                              .get_pif_data(info, config.settings().country(), pif_config);
+                              .get_pif_data(info, config.settings().country(), pif_config, sim_max_age);
         if (pif_result.has_value()) {
             pif_data = std::move(pif_result.value());
         }

@@ -657,7 +657,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
             std::fflush(stderr);
             continue;
         }
-        series(gender, "count").at(age)++;
+        DataSeries::safe_at(series(gender, "count"), age, "count++") += 1;
 
         for (const auto &factor : context.mapping().entries()) {
             if (age > max_age || age >= series.sample_size()) {
@@ -718,7 +718,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
         // Safety check before accessing vectors
         if (age < 0 || static_cast<std::size_t>(age) >= series.sample_size()) {
             std::fprintf(stderr,
-                         "[CRASH LOCATION] analysis_module.cpp:713 - age %d out of range [0, %zu) "
+                         "[CRASH LOCATION] analysis_module.cpp:723 - age %d out of range [0, %zu) "
                          "in final loop\n",
                          age, series.sample_size());
             std::fflush(stderr);
