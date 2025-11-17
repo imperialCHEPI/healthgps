@@ -14,12 +14,12 @@
 #include <fmt/color.h>
 
 #include <chrono>
-#include <cstdlib>
 #include <cstdio>
+#include <cstdlib>
 #include <exception>
-#include <typeinfo>
-#include <string>
 #include <oneapi/tbb/global_control.h>
+#include <string>
+#include <typeinfo>
 #if defined(__unix__) || defined(__APPLE__)
 #define HGPS_HAS_EXECINFO 1
 #include <cxxabi.h>
@@ -109,14 +109,14 @@ void install_terminate_handler() {
 #else
                 std::string readable_type = typeid(ex).name();
 #endif
-                fmt::print(fg(fmt::color::red),
-                           "\n\nUncaught exception: {} (type: {}).\n", ex.what(), readable_type);
+                fmt::print(fg(fmt::color::red), "\n\nUncaught exception: {} (type: {}).\n",
+                           ex.what(), readable_type);
             } catch (...) {
-                fmt::print(fg(fmt::color::red),
-                           "\n\nUncaught non-standard exception.\n");
+                fmt::print(fg(fmt::color::red), "\n\nUncaught non-standard exception.\n");
             }
         } else {
-            fmt::print(fg(fmt::color::red), "\n\nstd::terminate called without active exception.\n");
+            fmt::print(fg(fmt::color::red),
+                       "\n\nstd::terminate called without active exception.\n");
         }
         print_stack_trace();
         std::fflush(stderr);
