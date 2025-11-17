@@ -78,9 +78,13 @@ void print_stack_trace() {
     if (symbols != nullptr) {
         for (int i = 0; i < depth; i++) {
             fmt::print("  [{}] {}\n", i, symbols[i]);
+            // Also print to stderr directly to ensure it's captured
+            std::fprintf(stderr, "  [%d] %s\n", i, symbols[i]);
         }
         std::free(symbols);
     }
+    std::fflush(stdout);
+    std::fflush(stderr);
 #else
     fmt::print(fg(fmt::color::light_salmon),
                "\nStack trace unavailable on this platform/build (no execinfo).\n");
@@ -93,6 +97,17 @@ void install_terminate_handler() {
         return;
     }
     installed = true;
+
+#if HGPS_HAS_EXECINFO
+    // Also install signal handler for SIGABRT to catch crashes
+    std::signal(SIGABRT, [](int) {
+        fmt::print(fg(fmt::color::red), "\n\nSIGABRT received - program aborted.\n");
+        print_stack_trace();
+        std::fflush(stdout);
+        std::fflush(stderr);
+        std::_Exit(1);
+    });
+#endif
 
     std::set_terminate([] {
         if (auto current = std::current_exception()) {
@@ -111,14 +126,21 @@ void install_terminate_handler() {
 #endif
                 fmt::print(fg(fmt::color::red), "\n\nUncaught exception: {} (type: {}).\n",
                            ex.what(), readable_type);
+                std::fflush(stdout);
+                std::fflush(stderr);
             } catch (...) {
                 fmt::print(fg(fmt::color::red), "\n\nUncaught non-standard exception.\n");
+                std::fflush(stdout);
+                std::fflush(stderr);
             }
         } else {
             fmt::print(fg(fmt::color::red),
                        "\n\nstd::terminate called without active exception.\n");
+            std::fflush(stdout);
+            std::fflush(stderr);
         }
         print_stack_trace();
+        std::fflush(stdout);
         std::fflush(stderr);
         std::abort();
     });
@@ -286,6 +308,11 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
 #ifdef CATCH_EXCEPTIONS
     } catch (const std::exception &ex) {
         fmt::print(fg(fmt::color::red), "\n\nFailed with message: {}.\n\n", ex.what());
+        std::fflush(stdout);
+        std::fflush(stderr);
+        
+        // Print stack trace before rethrowing
+        print_stack_trace();
 
         // Rethrow exception so it can be handled by OS's default handler
         throw;
