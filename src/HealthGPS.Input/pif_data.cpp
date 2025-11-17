@@ -16,6 +16,10 @@ double PIFTable::get_pif_value(int age, core::Gender gender, int year_post_inter
     // Early bounds check for performance (checks against PIF data's actual age range)
     if (age < min_age_ || age > max_age_ || year_post_intervention < min_year_ ||
         year_post_intervention > max_year_) {
+        if (age > max_age_) {
+            std::fprintf(stderr, "[PIF] get_pif_value: age %d > max_age_ %d - returning 0.0\n", age, max_age_);
+            std::fflush(stderr);
+        }
         return 0.0;
     }
 
@@ -29,6 +33,9 @@ double PIFTable::get_pif_value(int age, core::Gender gender, int year_post_inter
     // the calculated index and the actual array size (e.g., due to data inconsistencies or
     // edge cases in index calculation)
     if (index < 0 || static_cast<std::size_t>(index) >= direct_array_.size()) {
+        std::fprintf(stderr, "[CRASH LOCATION] pif_data.cpp:31 - index %d >= direct_array_.size() %zu (age=%d, min_age=%d, max_age=%d, age_range=%d)\n", 
+                     index, direct_array_.size(), age, min_age_, max_age_, age_range_);
+        std::fflush(stderr);
         return 0.0;
     }
 
