@@ -87,12 +87,31 @@ void AnalysisModule::set_income_analysis_enabled(bool enabled) noexcept {
 
 void AnalysisModule::initialise_population(RuntimeContext &context) {
     const auto &age_range = context.age_range();
+    const auto max_age = static_cast<unsigned int>(age_range.upper());
     auto expected_sum = create_age_gender_table<double>(age_range);
     auto expected_count = create_age_gender_table<int>(age_range);
     auto &pop = context.population();
     auto sum_mutex = std::mutex{};
     tbb::parallel_for_each(pop.cbegin(), pop.cend(), [&](const auto &entity) {
         if (!entity.is_active()) {
+            return;
+        }
+
+        // Bounds check: skip if age exceeds simulation's max age
+        // (tables are sized for ages 0-max_age, so age > max_age would cause out-of-range access)
+        if (entity.age > max_age) {
+            std::fprintf(stderr, "[ERROR] AnalysisModule::initialise_population: entity.age %u > max_age %u - skipping\n",
+                         entity.age, max_age);
+            std::fflush(stderr);
+            return;
+        }
+
+        // Additional safety check using contains()
+        if (!expected_sum.contains(entity.age, entity.gender) || 
+            !expected_count.contains(entity.age, entity.gender)) {
+            std::fprintf(stderr, "[ERROR] AnalysisModule::initialise_population: age %u not in tables - skipping\n",
+                         entity.age);
+            std::fflush(stderr);
             return;
         }
 

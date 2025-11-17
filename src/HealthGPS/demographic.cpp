@@ -123,10 +123,19 @@ double DemographicModule::get_residual_death_rate(int age, core::Gender gender) 
 
 void DemographicModule::initialise_population(RuntimeContext &context) {
     auto age_gender_dist = get_age_gender_distribution(context.start_time());
+    const auto max_age = static_cast<unsigned int>(context.age_range().upper());
     auto index = 0;
     auto pop_size = static_cast<int>(context.population().size());
     auto entry_total = static_cast<int>(age_gender_dist.size());
     for (auto entry_count = 1; auto &entry : age_gender_dist) {
+        // Bounds check: skip ages beyond simulation's max age
+        // (population data may contain ages 0-110, but simulation may be limited to 0-100)
+        if (entry.first > static_cast<int>(max_age)) {
+            std::fprintf(stderr, "[ERROR] DemographicModule::initialise_population: skipping age %d > max_age %u\n",
+                         entry.first, max_age);
+            std::fflush(stderr);
+            continue;
+        }
         auto num_males = static_cast<int>(std::round(pop_size * entry.second.males));
         auto num_females = static_cast<int>(std::round(pop_size * entry.second.females));
         auto num_required = index + num_males + num_females;
