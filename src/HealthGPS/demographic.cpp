@@ -4,6 +4,8 @@
 #include "sync_message.h"
 #include <algorithm>
 #include <cassert>
+#include <cstdio>
+#include <fmt/core.h>
 #include <mutex>
 
 #include <oneapi/tbb/parallel_for_each.h>
@@ -131,10 +133,14 @@ void DemographicModule::initialise_population(RuntimeContext &context) {
         // Bounds check: skip ages beyond simulation's max age
         // (population data may contain ages 0-110, but simulation may be limited to 0-100)
         if (entry.first > static_cast<int>(max_age)) {
+            // Print to both stdout (for .o file) and stderr (for .e file) to ensure visibility on PBS
+            fmt::print("[ERROR] DemographicModule::initialise_population: skipping age {} > max_age {}\n",
+                       entry.first, max_age);
             std::fprintf(
                 stderr,
                 "[ERROR] DemographicModule::initialise_population: skipping age %d > max_age %u\n",
                 entry.first, max_age);
+            std::fflush(stdout);
             std::fflush(stderr);
             continue;
         }

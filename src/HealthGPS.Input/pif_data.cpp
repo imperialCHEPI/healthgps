@@ -81,10 +81,15 @@ void PIFTable::build_hash_table() {
     constexpr int GENDERS = 2; // male, female
     int array_size = year_range_ * age_range_ * GENDERS;
 
+    // Print to both stdout (for .o file) and stderr (for .e file) to ensure visibility
+    fmt::print("[PIF] build_hash_table: min_age={}, max_age={}, age_range={}, min_year={}, "
+               "max_year={}, year_range={}, array_size={}\n",
+               min_age, max_age, age_range_, min_year, max_year, year_range_, array_size);
     std::fprintf(stderr,
                  "[PIF] build_hash_table: min_age=%d, max_age=%d, age_range=%d, min_year=%d, "
                  "max_year=%d, year_range=%d, array_size=%d\n",
                  min_age, max_age, age_range_, min_year, max_year, year_range_, array_size);
+    std::fflush(stdout);
     std::fflush(stderr);
 
     direct_array_.resize(array_size);
