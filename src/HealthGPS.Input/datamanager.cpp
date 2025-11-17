@@ -684,7 +684,8 @@ std::optional<PIFData> DataManager::get_pif_data(const DiseaseInfo &disease_info
                 const auto *loaded_pif_table = pif_data.get_scenario_data(scenario);
                 auto file_size = std::filesystem::file_size(full_path);
 
-                std::fprintf(stderr, "[PIF] About to print PIF data for disease: %s\n", disease_info.code.to_string().c_str());
+                std::fprintf(stderr, "[PIF] About to print PIF data for disease: %s\n",
+                             disease_info.code.to_string().c_str());
                 std::fflush(stderr);
 
                 fmt::print(fg(fmt::color::green), "PIF Data Loaded Successfully:\n");
