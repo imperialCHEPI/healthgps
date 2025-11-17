@@ -277,19 +277,27 @@ void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
         // Skip if person's age is outside the valid age range for the tables
         if (!average_relative_risk_.contains(person.age, person.gender) ||
             !table.contains(person.age)) {
-            std::fprintf(stderr, "[DISEASE] default_disease_model: person.age %u not in tables - skipping\n", person.age);
+            std::fprintf(
+                stderr, "[DISEASE] default_disease_model: person.age %u not in tables - skipping\n",
+                person.age);
             std::fflush(stderr);
             continue;
         }
 
         if (person.age > 100) {
-            std::fprintf(stderr, "[CRASH LOCATION] default_disease_model.cpp:283 - average_relative_risk_.at(%u, gender) age > 100\n", person.age);
+            std::fprintf(stderr,
+                         "[CRASH LOCATION] default_disease_model.cpp:283 - "
+                         "average_relative_risk_.at(%u, gender) age > 100\n",
+                         person.age);
             std::fflush(stderr);
         }
         double average_relative_risk = average_relative_risk_.at(person.age, person.gender);
 
         if (person.age > 100) {
-            std::fprintf(stderr, "[CRASH LOCATION] default_disease_model.cpp:285 - table(%u, gender).at() age > 100\n", person.age);
+            std::fprintf(stderr,
+                         "[CRASH LOCATION] default_disease_model.cpp:285 - table(%u, gender).at() "
+                         "age > 100\n",
+                         person.age);
             std::fflush(stderr);
         }
         double incidence = table(person.age, person.gender).at(incidence_id);
