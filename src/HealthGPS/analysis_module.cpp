@@ -503,7 +503,7 @@ double AnalysisModule::calculate_disability_weight(const Person &entity) const {
     if (!residual_disability_weight_.contains(entity.age, entity.gender)) {
         return 0.0;
     }
-    
+
     auto residual_dw = residual_disability_weight_.at(entity.age, entity.gender);
     residual_dw = std::min(1.0, std::max(residual_dw, 0.0));
     sum *= (1.0 - residual_dw);
@@ -586,7 +586,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
     auto current_time = static_cast<unsigned int>(context.time_now());
     const auto age_range = context.age_range();
     const auto max_age = static_cast<unsigned int>(age_range.upper());
-    
+
     for (const auto &person : context.population()) {
         auto age = person.age;
         auto gender = person.gender;
@@ -1118,7 +1118,7 @@ void AnalysisModule::classify_weight(DataSeries &series, const Person &entity) c
     if (static_cast<unsigned int>(entity.age) >= series.sample_size()) {
         return;
     }
-    
+
     auto weight_class = weight_classifier_.classify_weight(entity);
     switch (weight_class) {
     case WeightCategory::normal:
