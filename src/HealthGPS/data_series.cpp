@@ -27,8 +27,10 @@ DataSeries::DataSeries(std::size_t sample_size) : sample_size_{sample_size} {
 std::vector<double> &DataSeries::operator()(core::Gender gender, const std::string &key) {
     auto &vec = data_.at(gender).at(key);
     if (vec.size() != sample_size_) {
-        std::fprintf(stderr, "[ERROR] DataSeries::operator(): vector size %zu != sample_size_ %zu for key '%s'\n",
-                     vec.size(), sample_size_, key.c_str());
+        std::fprintf(
+            stderr,
+            "[ERROR] DataSeries::operator(): vector size %zu != sample_size_ %zu for key '%s'\n",
+            vec.size(), sample_size_, key.c_str());
         std::fflush(stderr);
     }
     return vec;
@@ -37,7 +39,8 @@ std::vector<double> &DataSeries::operator()(core::Gender gender, const std::stri
 std::vector<double> &DataSeries::at(core::Gender gender, const std::string &key) {
     auto &vec = data_.at(gender).at(key);
     if (vec.size() != sample_size_) {
-        std::fprintf(stderr, "[ERROR] DataSeries::at(): vector size %zu != sample_size_ %zu for key '%s'\n",
+        std::fprintf(stderr,
+                     "[ERROR] DataSeries::at(): vector size %zu != sample_size_ %zu for key '%s'\n",
                      vec.size(), sample_size_, key.c_str());
         std::fflush(stderr);
     }
@@ -47,8 +50,10 @@ std::vector<double> &DataSeries::at(core::Gender gender, const std::string &key)
 const std::vector<double> &DataSeries::at(core::Gender gender, const std::string &key) const {
     const auto &vec = data_.at(gender).at(key);
     if (vec.size() != sample_size_) {
-        std::fprintf(stderr, "[ERROR] DataSeries::at() const: vector size %zu != sample_size_ %zu for key '%s'\n",
-                     vec.size(), sample_size_, key.c_str());
+        std::fprintf(
+            stderr,
+            "[ERROR] DataSeries::at() const: vector size %zu != sample_size_ %zu for key '%s'\n",
+            vec.size(), sample_size_, key.c_str());
         std::fflush(stderr);
     }
     return vec;

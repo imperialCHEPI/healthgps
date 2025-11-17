@@ -153,7 +153,8 @@ AnalysisModule::calculate_residual_disability_weight(int age, const core::Gender
 
 void AnalysisModule::publish_result_message(RuntimeContext &context) const {
     auto sample_size = context.age_range().upper() + 1u;
-    std::fprintf(stderr, "[DEBUG] AnalysisModule::calculate_result: age_range=[%d,%d] sample_size=%u\n",
+    std::fprintf(stderr,
+                 "[DEBUG] AnalysisModule::calculate_result: age_range=[%d,%d] sample_size=%u\n",
                  context.age_range().lower(), context.age_range().upper(), sample_size);
     std::fflush(stderr);
     auto result = ModelResult{sample_size};
@@ -716,7 +717,9 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
     for (int age = age_range.lower(); age <= age_range.upper(); age++) {
         // Safety check before accessing vectors
         if (age < 0 || static_cast<std::size_t>(age) >= series.sample_size()) {
-            std::fprintf(stderr, "[CRASH LOCATION] analysis_module.cpp:713 - age %d out of range [0, %zu) in final loop\n",
+            std::fprintf(stderr,
+                         "[CRASH LOCATION] analysis_module.cpp:713 - age %d out of range [0, %zu) "
+                         "in final loop\n",
                          age, series.sample_size());
             std::fflush(stderr);
             continue;
