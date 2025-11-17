@@ -153,6 +153,9 @@ AnalysisModule::calculate_residual_disability_weight(int age, const core::Gender
 
 void AnalysisModule::publish_result_message(RuntimeContext &context) const {
     auto sample_size = context.age_range().upper() + 1u;
+    std::fprintf(stderr, "[DEBUG] AnalysisModule::calculate_result: age_range=[%d,%d] sample_size=%u\n",
+                 context.age_range().lower(), context.age_range().upper(), sample_size);
+    std::fflush(stderr);
     auto result = ModelResult{sample_size};
 
     auto handle = core::run_async(&AnalysisModule::calculate_historical_statistics, this,
@@ -711,6 +714,13 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
 
     // For each age group in the analysis...
     for (int age = age_range.lower(); age <= age_range.upper(); age++) {
+        // Safety check before accessing vectors
+        if (age < 0 || static_cast<std::size_t>(age) >= series.sample_size()) {
+            std::fprintf(stderr, "[CRASH LOCATION] analysis_module.cpp:713 - age %d out of range [0, %zu) in final loop\n",
+                         age, series.sample_size());
+            std::fflush(stderr);
+            continue;
+        }
         double count_F = series(core::Gender::female, "count").at(age);
         double count_M = series(core::Gender::male, "count").at(age);
         double deaths_F = series(core::Gender::female, "deaths").at(age);
