@@ -2,11 +2,11 @@
 #include "HealthGPS.Core/string_util.h"
 
 #include "fmt/core.h"
-#include <array>    // Added for std::array
+#include <array> // Added for std::array
+#include <cstdio>
 #include <iostream> // Added for debug prints
 #include <stdexcept>
 #include <unordered_set>
-#include <cstdio>
 
 namespace hgps {
 DataSeries::DataSeries(std::size_t sample_size) : sample_size_{sample_size} {
@@ -159,10 +159,13 @@ void DataSeries::add_income_channels_for_categories(
 
 double &DataSeries::safe_at(std::vector<double> &vec, std::size_t index, const char *context) {
     if (index >= vec.size()) {
-        std::fprintf(stderr, "[CRASH LOCATION] DataSeries::safe_at - index %zu >= vec.size() %zu in context: %s\n",
-                     index, vec.size(), context ? context : "unknown");
+        std::fprintf(
+            stderr,
+            "[CRASH LOCATION] DataSeries::safe_at - index %zu >= vec.size() %zu in context: %s\n",
+            index, vec.size(), context ? context : "unknown");
         std::fflush(stderr);
-        throw std::out_of_range(fmt::format("Index {} >= vector size {} in {}", index, vec.size(), context ? context : "unknown"));
+        throw std::out_of_range(fmt::format("Index {} >= vector size {} in {}", index, vec.size(),
+                                            context ? context : "unknown"));
     }
     return vec[index];
 }

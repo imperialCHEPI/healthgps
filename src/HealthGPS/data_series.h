@@ -28,7 +28,7 @@ class DataSeries {
     /// @throws std::out_of_range if the container does not have a
     /// channel with the specified age and key
     std::vector<double> &operator()(core::Gender gender, const std::string &key);
-    
+
     /// @brief Safe wrapper for vector access with bounds checking and logging
     /// @param vec The vector to access
     /// @param index The index to access
