@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdio>
 #include <map>
 #include <numeric>
 
@@ -62,7 +63,7 @@ template <core::Numerical ROW, core::Numerical TYPE> class GenderTable {
     /// @return The lookup value
     /// @throws std::out_of_range for accessing unknown lookup breakpoints
     TYPE &at(const ROW row, const core::Gender gender) {
-        return table_(rows_index_.at(row), cols_index_.at(gender));
+        return table_(get_row_index(row, __FUNCTION__), get_col_index(gender, __FUNCTION__));
     }
 
     /// @brief Gets a read-only value at a given row and column intersection
@@ -71,7 +72,7 @@ template <core::Numerical ROW, core::Numerical TYPE> class GenderTable {
     /// @return The lookup value
     /// @throws std::out_of_range for accessing unknown lookup breakpoints
     const TYPE &at(const ROW row, const core::Gender gender) const {
-        return table_(rows_index_.at(row), cols_index_.at(gender));
+        return table_(get_row_index(row, __FUNCTION__), get_col_index(gender, __FUNCTION__));
     }
 
     /// @brief Gets a value at a given row and column intersection
@@ -80,7 +81,7 @@ template <core::Numerical ROW, core::Numerical TYPE> class GenderTable {
     /// @return The lookup value
     /// @throws std::out_of_range for accessing unknown lookup breakpoints
     TYPE &operator()(const ROW row, const core::Gender gender) {
-        return table_(rows_index_.at(row), cols_index_.at(gender));
+        return table_(get_row_index(row, __FUNCTION__), get_col_index(gender, __FUNCTION__));
     }
 
     /// @brief Gets a read-only value at a given row and column intersection
@@ -89,7 +90,7 @@ template <core::Numerical ROW, core::Numerical TYPE> class GenderTable {
     /// @return The lookup value
     /// @throws std::out_of_range for accessing unknown lookup breakpoints
     const TYPE &operator()(const ROW row, const core::Gender gender) const {
-        return table_(rows_index_.at(row), cols_index_.at(gender));
+        return table_(get_row_index(row, __FUNCTION__), get_col_index(gender, __FUNCTION__));
     }
 
     /// @brief Determines whether the lookup contains a row
@@ -110,6 +111,32 @@ template <core::Numerical ROW, core::Numerical TYPE> class GenderTable {
     }
 
   private:
+    int get_row_index(const ROW row, const char *caller) const {
+        if (auto it = rows_index_.find(row); it != rows_index_.end()) {
+            return it->second;
+        }
+
+        std::fprintf(stderr,
+                     "[CRASH LOCATION] gender_table.h:%s - row value %.3f not found in table "
+                     "(available rows: %zu)\n",
+                     caller, static_cast<double>(row), rows_index_.size());
+        std::fflush(stderr);
+        throw std::out_of_range("GenderTable row not found");
+    }
+
+    int get_col_index(const core::Gender gender, const char *caller) const {
+        if (auto it = cols_index_.find(gender); it != cols_index_.end()) {
+            return it->second;
+        }
+
+        std::fprintf(stderr,
+                     "[CRASH LOCATION] gender_table.h:%s - gender value %d not found in table "
+                     "(available cols: %zu)\n",
+                     caller, static_cast<int>(gender), cols_index_.size());
+        std::fflush(stderr);
+        throw std::out_of_range("GenderTable column not found");
+    }
+
     core::Array2D<TYPE> table_{};
     std::map<ROW, int> rows_index_{};
     std::map<core::Gender, int> cols_index_{};
