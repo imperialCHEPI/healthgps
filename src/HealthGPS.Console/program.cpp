@@ -310,7 +310,7 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
         fmt::print(fg(fmt::color::red), "\n\nFailed with message: {}.\n\n", ex.what());
         std::fflush(stdout);
         std::fflush(stderr);
-        
+
         // Print stack trace before rethrowing
         print_stack_trace();
 
