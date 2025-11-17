@@ -131,8 +131,10 @@ void DemographicModule::initialise_population(RuntimeContext &context) {
         // Bounds check: skip ages beyond simulation's max age
         // (population data may contain ages 0-110, but simulation may be limited to 0-100)
         if (entry.first > static_cast<int>(max_age)) {
-            std::fprintf(stderr, "[ERROR] DemographicModule::initialise_population: skipping age %d > max_age %u\n",
-                         entry.first, max_age);
+            std::fprintf(
+                stderr,
+                "[ERROR] DemographicModule::initialise_population: skipping age %d > max_age %u\n",
+                entry.first, max_age);
             std::fflush(stderr);
             continue;
         }

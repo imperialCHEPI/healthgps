@@ -100,17 +100,21 @@ void AnalysisModule::initialise_population(RuntimeContext &context) {
         // Bounds check: skip if age exceeds simulation's max age
         // (tables are sized for ages 0-max_age, so age > max_age would cause out-of-range access)
         if (entity.age > max_age) {
-            std::fprintf(stderr, "[ERROR] AnalysisModule::initialise_population: entity.age %u > max_age %u - skipping\n",
+            std::fprintf(stderr,
+                         "[ERROR] AnalysisModule::initialise_population: entity.age %u > max_age "
+                         "%u - skipping\n",
                          entity.age, max_age);
             std::fflush(stderr);
             return;
         }
 
         // Additional safety check using contains()
-        if (!expected_sum.contains(entity.age, entity.gender) || 
+        if (!expected_sum.contains(entity.age, entity.gender) ||
             !expected_count.contains(entity.age, entity.gender)) {
-            std::fprintf(stderr, "[ERROR] AnalysisModule::initialise_population: age %u not in tables - skipping\n",
-                         entity.age);
+            std::fprintf(
+                stderr,
+                "[ERROR] AnalysisModule::initialise_population: age %u not in tables - skipping\n",
+                entity.age);
             std::fflush(stderr);
             return;
         }
