@@ -818,10 +818,15 @@ PIFTable DataManager::load_pif_from_csv(const std::filesystem::path &filepath, i
 
         // Print CSV loading verification with timing
         // Print to both stdout and stderr for visibility on PBS
-        fmt::print(fg(fmt::color::cyan), "PIF CSV File Loaded: {} ({} rows, filtered from {} rows, max_age={}) in {}ms\n",
-                   filepath.filename().string(), table.size(), total_rows, max_age, duration.count());
-        std::fprintf(stderr, "[PIF] CSV File Loaded: %s (%zu rows, filtered from %zu rows, max_age=%d) in %lldms\n",
-                     filepath.filename().string().c_str(), table.size(), total_rows, max_age, duration.count());
+        fmt::print(fg(fmt::color::cyan),
+                   "PIF CSV File Loaded: {} ({} rows, filtered from {} rows, max_age={}) in {}ms\n",
+                   filepath.filename().string(), table.size(), total_rows, max_age,
+                   duration.count());
+        std::fprintf(
+            stderr,
+            "[PIF] CSV File Loaded: %s (%zu rows, filtered from %zu rows, max_age=%d) in %lldms\n",
+            filepath.filename().string().c_str(), table.size(), total_rows, max_age,
+            duration.count());
         std::fflush(stdout);
         std::fflush(stderr);
         fmt::print(fg(fmt::color::green),
