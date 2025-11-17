@@ -499,6 +499,11 @@ double AnalysisModule::calculate_disability_weight(const Person &entity) const {
         }
     }
 
+    // Bounds check to prevent out-of-range access
+    if (!residual_disability_weight_.contains(entity.age, entity.gender)) {
+        return 0.0;
+    }
+    
     auto residual_dw = residual_disability_weight_.at(entity.age, entity.gender);
     residual_dw = std::min(1.0, std::max(residual_dw, 0.0));
     sum *= (1.0 - residual_dw);
@@ -579,9 +584,17 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
     series.add_channels(channels_);
 
     auto current_time = static_cast<unsigned int>(context.time_now());
+    const auto age_range = context.age_range();
+    const auto max_age = static_cast<unsigned int>(age_range.upper());
+    
     for (const auto &person : context.population()) {
         auto age = person.age;
         auto gender = person.gender;
+
+        // Skip if age is outside valid range (prevents out-of-bounds vector access)
+        if (age > max_age) {
+            continue;
+        }
 
         if (!person.is_active()) {
             if (!person.is_alive() && person.time_of_death() == current_time) {
@@ -624,7 +637,6 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
     }
 
     // For each age group in the analysis...
-    const auto age_range = context.age_range();
     for (int age = age_range.lower(); age <= age_range.upper(); age++) {
         double count_F = series(core::Gender::female, "count").at(age);
         double count_M = series(core::Gender::male, "count").at(age);
@@ -760,12 +772,18 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
     }
 
     auto current_time = static_cast<unsigned int>(context.time_now());
+    const auto max_age = static_cast<unsigned int>(age_range.upper());
 
     for (const auto &person : context.population()) {
 
         auto age = person.age;
         auto gender = person.gender;
         auto income = person.income;
+
+        // Skip if age is outside valid range (prevents out-of-bounds vector access)
+        if (age > max_age) {
+            continue;
+        }
 
         if (!person.is_active()) {
             if (!person.is_alive() && person.time_of_death() == current_time) {
@@ -1096,6 +1114,11 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
 }
 
 void AnalysisModule::classify_weight(DataSeries &series, const Person &entity) const {
+    // Skip if age is outside valid range (prevents out-of-bounds vector access)
+    if (static_cast<unsigned int>(entity.age) >= series.sample_size()) {
+        return;
+    }
+    
     auto weight_class = weight_classifier_.classify_weight(entity);
     switch (weight_class) {
     case WeightCategory::normal:
