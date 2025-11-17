@@ -684,19 +684,33 @@ std::optional<PIFData> DataManager::get_pif_data(const DiseaseInfo &disease_info
                 const auto *loaded_pif_table = pif_data.get_scenario_data(scenario);
                 auto file_size = std::filesystem::file_size(full_path);
 
+                std::fprintf(stderr, "[PIF] About to print PIF data for disease: %s\n", disease_info.code.to_string().c_str());
+                std::fflush(stderr);
+
                 fmt::print(fg(fmt::color::green), "PIF Data Loaded Successfully:\n");
+                std::fflush(stdout);
                 fmt::print("  - Disease: {}\n", disease_info.code.to_string());
+                std::fflush(stdout);
                 fmt::print("  - Country: {} (Code: {})\n", country.name, country_code);
+                std::fflush(stdout);
                 fmt::print("  - Risk Factor: {}\n", risk_factor);
+                std::fflush(stdout);
                 fmt::print("  - Scenario: {}\n", scenario);
+                std::fflush(stdout);
                 fmt::print("  - Total Data Rows: {}\n", loaded_pif_table->size());
+                std::fflush(stdout);
                 fmt::print("  - File Size: {} bytes ({:.2f} KB)\n", file_size, file_size / 1024.0);
+                std::fflush(stdout);
                 fmt::print("  - Memory Usage: {} bytes ({:.2f} KB)\n",
                            loaded_pif_table->size() * sizeof(PIFDataItem),
                            (loaded_pif_table->size() * sizeof(PIFDataItem)) / 1024.0);
+                std::fflush(stdout);
                 fmt::print("  - File: {}\n", csv_filename);
+                std::fflush(stdout);
                 fmt::print("  - Path: {}\n", full_path.string());
+                std::fflush(stdout);
                 fmt::print("  - PIF Analysis: ENABLED and READY\n\n");
+                std::fflush(stdout);
 
                 return pif_data;
             }

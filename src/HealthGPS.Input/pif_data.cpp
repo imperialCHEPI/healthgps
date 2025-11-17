@@ -81,6 +81,10 @@ void PIFTable::build_hash_table() {
     constexpr int GENDERS = 2; // male, female
     int array_size = year_range_ * age_range_ * GENDERS;
 
+    std::fprintf(stderr, "[PIF] build_hash_table: min_age=%d, max_age=%d, age_range=%d, min_year=%d, max_year=%d, year_range=%d, array_size=%d\n",
+                 min_age, max_age, age_range_, min_year, max_year, year_range_, array_size);
+    std::fflush(stderr);
+
     direct_array_.resize(array_size);
 
     // Populate with actual data using dynamic ranges
@@ -89,9 +93,13 @@ void PIFTable::build_hash_table() {
         int index = ((item.year_post_intervention - min_year_) * age_range_ * GENDERS) +
                     (gender_index * age_range_) + (item.age - min_age_);
 
-        if (index >= 0 && index < array_size) {
-            direct_array_[index] = item;
+        if (index < 0 || static_cast<std::size_t>(index) >= direct_array_.size()) {
+            std::fprintf(stderr, "[CRASH LOCATION] pif_data.cpp:build_hash_table - index %d out of range [0, %zu) for age=%d, gender=%d, year=%d\n",
+                         index, direct_array_.size(), item.age, gender_index, item.year_post_intervention);
+            std::fflush(stderr);
+            continue; // Skip invalid index instead of crashing
         }
+        direct_array_[index] = item;
     }
 }
 
