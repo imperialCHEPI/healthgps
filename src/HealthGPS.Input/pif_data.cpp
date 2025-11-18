@@ -1,6 +1,8 @@
 #include "pif_data.h"
 #include <algorithm>
 #include <fmt/core.h>
+#include <fmt/color.h>
+#include <cstdio>
 
 namespace hgps::input {
 
@@ -19,6 +21,20 @@ double PIFTable::get_pif_value(int age, core::Gender gender, int year_post_inter
     int gender_index = (gender == core::Gender::male) ? 0 : 1;
     int index = ((year_post_intervention - min_year_) * age_range_ * GENDERS) +
                 (gender_index * age_range_) + (age - min_age_);
+
+    // DEBUG: Check for out-of-bounds access
+    if (index < 0 || static_cast<std::size_t>(index) >= direct_array_.size()) {
+        fmt::print(fg(fmt::color::red), "[PIF ERROR] Out of bounds access detected!\n");
+        fmt::print("  age={}, gender={}, year_post_int={}\n", age, 
+                   (gender == core::Gender::male ? "male" : "female"), year_post_intervention);
+        fmt::print("  min_age_={}, max_age_={}, min_year_={}, max_year_={}\n",
+                   min_age_, max_age_, min_year_, max_year_);
+        fmt::print("  age_range_={}, year_range_={}\n", age_range_, year_range_);
+        fmt::print("  calculated index={}, array_size={}\n", index, direct_array_.size());
+        fmt::print("  gender_index={}\n", gender_index);
+        std::fflush(stdout);
+        return 0.0; // Return safe default instead of crashing
+    }
 
     // Direct access without bounds check (already validated above)
     return direct_array_[index].pif_value;

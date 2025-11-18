@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <cassert>
 #include <mutex>
+#include <fmt/core.h>
+#include <fmt/color.h>
 
 #include <oneapi/tbb/parallel_for_each.h>
 
@@ -372,6 +374,15 @@ int DemographicModule::update_age_and_death_events(RuntimeContext &context,
 
         if (entity.is_active()) {
             entity.age = entity.age + 1;
+            // SAFETY: Ensure age never exceeds max_age to prevent out-of-bounds access
+            // This can happen if someone at max_age somehow doesn't die in the check above
+            if (entity.age > static_cast<int>(max_age)) {
+                fmt::print(fg(fmt::color::red), 
+                          "[DEMOGRAPHIC ERROR] Person age {} exceeded max_age {}! Forcing death.\n",
+                          entity.age, max_age);
+                entity.die(context.time_now());
+                number_of_deaths++;
+            }
         }
     }
 
