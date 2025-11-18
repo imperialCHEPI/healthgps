@@ -5,6 +5,7 @@
 #include "sync_message.h"
 
 #include <algorithm>
+#include <iostream>
 #include <iterator>
 #include <utility>
 
@@ -328,10 +329,23 @@ double KevinHallModel::get_expected(RuntimeContext &context, core::Gender sex, i
 
         // Adult case.
         double weight = 16.1161;
-        weight += 0.06256 * get_expected(context, sex, age, "EnergyIntake"_id, std::nullopt, true);
+
+        // MAHIMA: Calculate PAL-based coefficient from factors mean
+        // Replaces hardcoded 0.06256 with 1/(9.99 * PA) where PA is person-specific physical
+        // activity
+        double pa_from_factors_mean =
+            get_expected(context, sex, age, "PhysicalActivity"_id, std::nullopt, false);
+        double pal_coefficient = 1.0 / (9.99 * pa_from_factors_mean);
+        weight += pal_coefficient *
+                  get_expected(context, sex, age, "EnergyIntake"_id, std::nullopt, true);
         weight -= 0.6256 * get_expected(context, sex, age, "Height"_id, std::nullopt, false);
         weight += 0.4925 * age;
-        weight -= 16.6166 * Person::gender_to_value(sex);
+
+        // MAHIMA: Gender coefficient fix - assign to males instead of females
+        // Due to enum mismatch where female=1 instead of male=1
+        double gender_coefficient = (sex == core::Gender::male) ? 16.6166 : 0.0;
+        weight -= gender_coefficient;
+
         return weight;
     }
 
@@ -345,6 +359,14 @@ void KevinHallModel::initialise_nutrient_intakes(Person &person) const {
     compute_nutrient_intakes(person);
 
     // Start with previous = current.
+    if (!person.risk_factors.contains("Carbohydrate"_id)) {
+        std::cout << "\nERROR: Missing 'Carbohydrate' in initialise_nutrient_intakes";
+        throw;
+    }
+    if (!person.risk_factors.contains("Sodium"_id)) {
+        std::cout << "\nERROR: Missing 'Sodium' in initialise_nutrient_intakes";
+        throw;
+    }
     double carbohydrate = person.risk_factors.at("Carbohydrate"_id);
     person.risk_factors["Carbohydrate_previous"_id] = carbohydrate;
     double sodium = person.risk_factors.at("Sodium"_id);
@@ -372,6 +394,13 @@ void KevinHallModel::compute_nutrient_intakes(Person &person) const {
 
     // Compute nutrient intakes from food intakes.
     for (const auto &[food_key, nutrient_coefficients] : nutrient_equations_) {
+        if (!person.risk_factors.contains(food_key)) {
+            std::cout << "\nERROR: Missing risk factor key in Kevin Hall model: '"
+                      << food_key.to_string() << "' for person (age=" << person.age
+                      << ", gender=" << (person.gender == core::Gender::male ? "male" : "female")
+                      << ")";
+            throw;
+        }
         double food_intake = person.risk_factors.at(food_key);
         for (const auto &[nutrient_key, nutrient_coefficient] : nutrient_coefficients) {
             person.risk_factors.at(nutrient_key) += food_intake * nutrient_coefficient;
@@ -385,6 +414,10 @@ void KevinHallModel::initialise_energy_intake(Person &person) const {
     compute_energy_intake(person);
 
     // Start with previous = current.
+    if (!person.risk_factors.contains("EnergyIntake"_id)) {
+        std::cout << "\nERROR: Missing 'EnergyIntake' in initialise_energy_intake";
+        throw;
+    }
     double energy_intake = person.risk_factors.at("EnergyIntake"_id);
     person.risk_factors["EnergyIntake_previous"_id] = energy_intake;
 }
@@ -407,6 +440,13 @@ void KevinHallModel::compute_energy_intake(Person &person) const {
 
     // Compute energy intake from nutrient intakes.
     for (const auto &[nutrient_key, energy_coefficient] : energy_equation_) {
+        if (!person.risk_factors.contains(nutrient_key)) {
+            std::cout << "\nERROR: Missing nutrient key '" << nutrient_key.to_string()
+                      << "' in compute_energy_intake for person (age=" << person.age
+                      << ", gender=" << (person.gender == core::Gender::male ? "male" : "female")
+                      << ")";
+            throw;
+        }
         double nutrient_intake = person.risk_factors.at(nutrient_key);
         person.risk_factors.at(energy_intake_key) += nutrient_intake * energy_coefficient;
     }
@@ -421,6 +461,22 @@ void KevinHallModel::initialise_kevin_hall_state(Person &person,
     }
 
     // Get already computed values.
+    if (!person.risk_factors.contains("Height"_id)) {
+        std::cout << "\nERROR: Missing 'Height' in initialise_kevin_hall_state";
+        throw;
+    }
+    if (!person.risk_factors.contains("Weight"_id)) {
+        std::cout << "\nERROR: Missing 'Weight' in initialise_kevin_hall_state";
+        throw;
+    }
+    if (!person.risk_factors.contains("PhysicalActivity"_id)) {
+        std::cout << "\nERROR: Missing 'PhysicalActivity' in initialise_kevin_hall_state";
+        throw;
+    }
+    if (!person.risk_factors.contains("EnergyIntake"_id)) {
+        std::cout << "\nERROR: Missing 'EnergyIntake' in initialise_kevin_hall_state";
+        throw;
+    }
     double H = person.risk_factors.at("Height"_id);
     double BW = person.risk_factors.at("Weight"_id);
     double PAL = person.risk_factors.at("PhysicalActivity"_id);
@@ -594,6 +650,20 @@ void KevinHallModel::initialise_weight(RuntimeContext &context, Person &person) 
     double epa_expected = ei_expected / pa_expected;
 
     // Compute E/PA actual.
+    if (!person.risk_factors.contains("EnergyIntake"_id)) {
+        std::cout << "\nERROR: Missing 'EnergyIntake' in initialise_weight for person (age="
+                  << person.age
+                  << ", gender=" << (person.gender == core::Gender::male ? "male" : "female")
+                  << ")";
+        throw;
+    }
+    if (!person.risk_factors.contains("PhysicalActivity"_id)) {
+        std::cout << "\nERROR: Missing 'PhysicalActivity' in initialise_weight for person (age="
+                  << person.age
+                  << ", gender=" << (person.gender == core::Gender::male ? "male" : "female")
+                  << ")";
+        throw;
+    }
     double ei_actual = person.risk_factors.at("EnergyIntake"_id);
     double pa_actual = person.risk_factors.at("PhysicalActivity"_id);
     double epa_actual = ei_actual / pa_actual;

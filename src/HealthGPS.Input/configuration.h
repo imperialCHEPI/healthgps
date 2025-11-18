@@ -82,6 +82,8 @@ struct Configuration {
     /// @brief Type of trend to apply to risk factors (null, trend, income_trend)
     std::string trend_type = "null";
 
+    /// @brief Original config.json data for accessing additional fields like income_categories
+    nlohmann::json config_data;
     /// @brief Population Impact Fraction (PIF) configuration
     PIFInfo population_impact_fraction{};
 };

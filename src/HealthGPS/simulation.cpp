@@ -4,6 +4,7 @@
 #include "converter.h"
 #include "info_message.h"
 #include "mtrandom.h"
+#include "static_linear_model.h"
 #include "sync_message.h"
 #include "univariate_visitor.h"
 
@@ -115,10 +116,12 @@ void Simulation::initialise_population() {
 
     // Create virtual population
     const auto &inputs = context_.inputs();
+
     auto model_start_year = inputs.start_time();
     auto total_year_pop_size = demographic_->get_total_population_size(model_start_year);
     float size_fraction = inputs.settings().size_fraction();
     auto virtual_pop_size = static_cast<int>(size_fraction * total_year_pop_size);
+
     context_.reset_population(virtual_pop_size);
 
     // Gender - Age, must be first
@@ -127,15 +130,24 @@ void Simulation::initialise_population() {
     // Social economics status
     ses_->initialise_population(context_);
 
-    // Generate risk factors
+    // Generate risk factors;
     risk_factor_->initialise_population(context_);
 
     // Initialise diseases
+    std::cout << "\nDEBUG: Starting disease initialization...";
     disease_->initialise_population(context_);
+    std::cout << "\nDEBUG: Disease initialization completed";
 
     // Initialise analysis
+    std::cout << "\nDEBUG: Starting analysis initialization...";
     analysis_->initialise_population(context_);
+    std::cout << "\nDEBUG: Analysis initialization completed";
+
+    std::cout << "\nDEBUG: Starting print_initial_population_statistics...";
     print_initial_population_statistics();
+    std::cout << "\nDEBUG: print_initial_population_statistics completed";
+
+    std::cout << "\nDEBUG: Simulation::initialise_population completed successfully";
 }
 
 void Simulation::update_population() {

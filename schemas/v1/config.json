@@ -19,6 +19,15 @@
             "default": "null",
             "description": "Type of trend to apply to risk factors. 'null' = no trends, 'trend' = standard trends, 'income_trend' = income-based trends"
         },
+        "income_categories": {
+            "type": "string",
+            "enum": [
+                "3",
+                "4"
+            ],
+            "default": "3",
+            "description": "Number of income categories to use. '3' = low, middle, high. '4' = low, lowermiddle, uppermiddle, high"
+        },
         "data": {
             "$ref": "config/data.json"
         },
