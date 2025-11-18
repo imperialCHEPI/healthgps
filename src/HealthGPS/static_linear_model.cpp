@@ -65,25 +65,17 @@ std::string StaticLinearModel::name() const noexcept { return "Static"; }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
-    printf("[DEBUG] StaticLinearModel::generate_risk_factors() STARTED\n");
+    printf("[DEBUG] StaticLinearModel::generate_risk_factors() STARTED, population_size=%zu\n", context.population().size());
     fflush(stdout);
     
     // Initialise everyone.
-    printf("[DEBUG] About to loop through population, size=%zu\n", context.population().size());
-    fflush(stdout);
-    size_t person_count = 0;
     for (auto &person : context.population()) {
-        if (person_count % 1000 == 0) {
-            printf("[DEBUG] Processing person %zu, age=%d\n", person_count, person.age);
-            fflush(stdout);
-        }
-        person_count++;
         initialise_sector(person, context.random());
         initialise_income(person, context.random());
         initialise_factors(context, person, context.random());
         initialise_physical_activity(context, person, context.random());
     }
-    printf("[DEBUG] Finished initializing all persons, processed %zu persons\n", person_count);
+    printf("[DEBUG] Finished initializing all persons\n");
     fflush(stdout);
 
     // Adjust such that risk factor means match expected values.
@@ -224,6 +216,14 @@ double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
 
 void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &person,
                                            Random &random) const {
+    // DEBUG: Check age before processing
+    auto max_age = context.age_range().upper();
+    if (person.age > max_age) {
+        printf("[INITIALISE_FACTORS ERROR] person.age=%d > max_age=%d! person_id=%zu\n",
+               person.age, max_age, person.id());
+        fflush(stdout);
+        return; // Skip this person
+    }
 
     // Correlated residual sampling.
     auto residuals = compute_residuals(random, cholesky_);
@@ -242,6 +242,13 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
         person.risk_factors[residual_name] = residual;
 
         // Initialise risk factor.
+        // DEBUG: Check age before get_expected call
+        if (person.age > max_age) {
+            printf("[INITIALISE_FACTORS ERROR] person.age=%d > max_age=%d during loop! factor=%s\n",
+                   person.age, max_age, names_[i].to_string().c_str());
+            fflush(stdout);
+            return;
+        }
         double expected =
             get_expected(context, person.gender, person.age, names_[i], ranges_[i], false);
         double factor = linear[i] + residual * stddev_[i];

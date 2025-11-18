@@ -35,7 +35,13 @@ void DynamicHierarchicalLinearModel::generate_risk_factors(RuntimeContext &conte
         // factor.second contains the factor name.
         factor_keys.emplace_back(factor.second);
     }
+    printf("[DEBUG] About to call adjust_risk_factors() in dynamic model\n");
+    fflush(stdout);
     adjust_risk_factors(context, factor_keys, std::nullopt, false);
+    printf("[DEBUG] adjust_risk_factors() in dynamic model completed\n");
+    fflush(stdout);
+    printf("[DEBUG] DynamicHierarchicalLinearModel::generate_risk_factors() COMPLETED\n");
+    fflush(stdout);
 }
 
 void DynamicHierarchicalLinearModel::update_risk_factors(RuntimeContext &context) {

@@ -4,6 +4,7 @@
 #include "sync_message.h"
 
 #include <cmath>
+#include <cstdio>
 #include <oneapi/tbb/parallel_for_each.h>
 #include <utility>
 
@@ -47,7 +48,25 @@ RiskFactorAdjustableModel::RiskFactorAdjustableModel(
 double RiskFactorAdjustableModel::get_expected(RuntimeContext &context, core::Gender sex, int age,
                                                const core::Identifier &factor, OptionalRange range,
                                                bool apply_trend) const noexcept {
-    double expected = expected_->at(sex, factor).at(age);
+    // DEBUG: Check for age out of bounds before accessing vector
+    auto max_age = context.age_range().upper();
+    if (age > max_age) {
+        printf("[GET_EXPECTED ERROR] age=%d exceeded max_age=%d! sex=%d, factor=%s\n", 
+               age, max_age, static_cast<int>(sex), factor.to_string().c_str());
+        fflush(stdout);
+        return 0.0; // Return safe default
+    }
+    
+    // Check vector size before access
+    const auto &factor_vector = expected_->at(sex, factor);
+    if (static_cast<size_t>(age) >= factor_vector.size()) {
+        printf("[GET_EXPECTED ERROR] age=%d >= vector_size=%zu! sex=%d, factor=%s, max_age=%d\n",
+               age, factor_vector.size(), static_cast<int>(sex), factor.to_string().c_str(), max_age);
+        fflush(stdout);
+        return 0.0; // Return safe default
+    }
+    
+    double expected = factor_vector.at(age);
 
     // Apply trend to expected value based on trend type
     if (apply_trend && trend_type_ != TrendType::Null) {
