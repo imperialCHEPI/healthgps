@@ -4,6 +4,7 @@
 
 #include <cmath>
 #include <iostream> // Added for print statements
+#include <cstdio>
 #include <ranges>
 #include <utility>
 
@@ -64,18 +65,37 @@ std::string StaticLinearModel::name() const noexcept { return "Static"; }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
+    printf("[DEBUG] StaticLinearModel::generate_risk_factors() STARTED\n");
+    fflush(stdout);
+    
     // Initialise everyone.
+    printf("[DEBUG] About to loop through population, size=%zu\n", context.population().size());
+    fflush(stdout);
+    size_t person_count = 0;
     for (auto &person : context.population()) {
+        if (person_count % 1000 == 0) {
+            printf("[DEBUG] Processing person %zu, age=%d\n", person_count, person.age);
+            fflush(stdout);
+        }
+        person_count++;
         initialise_sector(person, context.random());
         initialise_income(person, context.random());
         initialise_factors(context, person, context.random());
         initialise_physical_activity(context, person, context.random());
     }
+    printf("[DEBUG] Finished initializing all persons, processed %zu persons\n", person_count);
+    fflush(stdout);
 
     // Adjust such that risk factor means match expected values.
+    printf("[DEBUG] About to call adjust_risk_factors() first time\n");
+    fflush(stdout);
     adjust_risk_factors(context, names_, ranges_, false);
+    printf("[DEBUG] adjust_risk_factors() first time completed\n");
+    fflush(stdout);
 
     // Initialise everyone with appropriate trend type.
+    printf("[DEBUG] About to loop through population again for trends\n");
+    fflush(stdout);
     for (auto &person : context.population()) {
         if (has_active_policies_) {
             initialise_policies(person, context.random(), false);
@@ -98,8 +118,14 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     // Adjust such that trended risk factor means match trended expected values.
     // Only apply trend adjustment if we have a trend type
     if (trend_type_ != TrendType::Null) {
+        printf("[DEBUG] About to call adjust_risk_factors() second time (with trends)\n");
+        fflush(stdout);
         adjust_risk_factors(context, names_, ranges_, true);
+        printf("[DEBUG] adjust_risk_factors() second time completed\n");
+        fflush(stdout);
     }
+    printf("[DEBUG] StaticLinearModel::generate_risk_factors() COMPLETED\n");
+    fflush(stdout);
 }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)

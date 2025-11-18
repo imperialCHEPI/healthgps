@@ -25,6 +25,8 @@ RiskFactorModelType DynamicHierarchicalLinearModel::type() const noexcept {
 std::string DynamicHierarchicalLinearModel::name() const noexcept { return "Dynamic"; }
 
 void DynamicHierarchicalLinearModel::generate_risk_factors(RuntimeContext &context) {
+    printf("[DEBUG] DynamicHierarchicalLinearModel::generate_risk_factors() STARTED\n");
+    fflush(stdout);
 
     // Adjust risk factors such that mean sim value matches expected value.
     std::vector<core::Identifier> factor_keys;

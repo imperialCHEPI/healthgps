@@ -1,4 +1,5 @@
 #include "riskfactor.h"
+#include <cstdio>
 
 namespace hgps {
 
@@ -42,11 +43,29 @@ RiskFactorModel &RiskFactorModule::at(const RiskFactorModelType &model_type) con
 }
 
 void RiskFactorModule::initialise_population(RuntimeContext &context) {
+    printf("[DEBUG] RiskFactorModule::initialise_population() STARTED\n");
+    fflush(stdout);
+    
+    printf("[DEBUG] About to get static model and call generate_risk_factors()\n");
+    fflush(stdout);
     auto &static_model = models_.at(RiskFactorModelType::Static);
+    printf("[DEBUG] Got static model, about to call generate_risk_factors()\n");
+    fflush(stdout);
     static_model->generate_risk_factors(context);
+    printf("[DEBUG] static_model->generate_risk_factors() completed\n");
+    fflush(stdout);
 
+    printf("[DEBUG] About to get dynamic model and call generate_risk_factors()\n");
+    fflush(stdout);
     auto &dynamic_model = models_.at(RiskFactorModelType::Dynamic);
+    printf("[DEBUG] Got dynamic model, about to call generate_risk_factors()\n");
+    fflush(stdout);
     dynamic_model->generate_risk_factors(context);
+    printf("[DEBUG] dynamic_model->generate_risk_factors() completed\n");
+    fflush(stdout);
+    
+    printf("[DEBUG] RiskFactorModule::initialise_population() COMPLETED\n");
+    fflush(stdout);
 }
 
 void RiskFactorModule::update_population(RuntimeContext &context) {
