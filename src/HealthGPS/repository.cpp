@@ -2,7 +2,6 @@
 #include "HealthGPS.Input/datamanager.h"
 #include "HealthGPS.Input/pif_data.h"
 #include "converter.h"
-
 #include <fmt/core.h>
 #include <stdexcept>
 
@@ -117,12 +116,15 @@ void CachedRepository::load_disease_definition(const core::DiseaseInfo &info,
             dynamic_cast<hgps::input::DataManager &>(data_manager_.get()).get_root_path();
         pif_config["risk_factor"] = config.population_impact_fraction().risk_factor;
         pif_config["scenario"] = config.population_impact_fraction().scenario;
-
+        fflush(stdout);
+        fmt:printf ("Message 1: Loading PIF data for in repository.cpp ");
         auto pif_result = dynamic_cast<hgps::input::DataManager &>(data_manager_.get())
                               .get_pif_data(info, config.settings().country(), pif_config);
+        fflush(stdout);
         if (pif_result.has_value()) {
             pif_data = std::move(pif_result.value());
         }
+        fflush(stdout);
     }
 
     if (info.group != core::DiseaseGroup::cancer) {

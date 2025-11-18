@@ -13,6 +13,7 @@
 #include <memory>
 #include <oneapi/tbb/parallel_for_each.h>
 #include <stdexcept>
+#include <cstdio>
 
 namespace { // anonymous namespace
 
@@ -55,7 +56,11 @@ adevs::Time Simulation::init(adevs::SimEnv<int> *env) {
     context_.set_current_time(world_time);
     end_time_ = adevs::Time(inputs.stop_time(), 0);
 
+    printf("[DEBUG] About to call initialise_population()\n");
+    fflush(stdout);
     initialise_population();
+    printf("[DEBUG] initialise_population() completed successfully\n");
+    fflush(stdout);
 
     auto stop = std::chrono::steady_clock::now();
     auto elapsed = std::chrono::duration<double, std::milli>(stop - start);
@@ -79,7 +84,11 @@ adevs::Time Simulation::update(adevs::SimEnv<int> *env) {
         auto time_year = world_time.real;
         context_.set_current_time(time_year);
 
+        printf("[DEBUG] About to call update_population() at time_year=%d\n", time_year);
+        fflush(stdout);
         update_population();
+        printf("[DEBUG] update_population() completed at time_year=%d\n", time_year);
+        fflush(stdout);
 
         auto stop = std::chrono::steady_clock::now();
         auto elapsed = std::chrono::duration<double, std::milli>(stop - start);
@@ -112,6 +121,8 @@ void Simulation::fini(adevs::Time clock) {
 
 void Simulation::initialise_population() {
     /* Note: order is very important */
+    printf("[DEBUG] Simulation::initialise_population() STARTED\n");
+    fflush(stdout);
 
     // Create virtual population
     const auto &inputs = context_.inputs();
@@ -122,42 +133,92 @@ void Simulation::initialise_population() {
     context_.reset_population(virtual_pop_size);
 
     // Gender - Age, must be first
+    printf("[DEBUG] About to call demographic_->initialise_population()\n");
+    fflush(stdout);
     demographic_->initialise_population(context_);
+    printf("[DEBUG] demographic_->initialise_population() completed\n");
+    fflush(stdout);
 
     // Social economics status
+    printf("[DEBUG] About to call ses_->initialise_population()\n");
+    fflush(stdout);
     ses_->initialise_population(context_);
+    printf("[DEBUG] ses_->initialise_population() completed\n");
+    fflush(stdout);
 
     // Generate risk factors
+    printf("[DEBUG] About to call risk_factor_->initialise_population()\n");
+    fflush(stdout);
     risk_factor_->initialise_population(context_);
+    printf("[DEBUG] risk_factor_->initialise_population() completed\n");
+    fflush(stdout);
 
     // Initialise diseases
+    printf("[DEBUG] About to call disease_->initialise_population()\n");
+    fflush(stdout);
     disease_->initialise_population(context_);
+    printf("[DEBUG] disease_->initialise_population() completed\n");
+    fflush(stdout);
 
     // Initialise analysis
+    printf("[DEBUG] About to call analysis_->initialise_population()\n");
+    fflush(stdout);
     analysis_->initialise_population(context_);
+    printf("[DEBUG] analysis_->initialise_population() completed\n");
+    fflush(stdout);
     print_initial_population_statistics();
+    printf("[DEBUG] Simulation::initialise_population() COMPLETED\n");
+    fflush(stdout);
 }
 
 void Simulation::update_population() {
     /* Note: order is very important */
+    printf("[DEBUG] Simulation::update_population() STARTED at time=%d\n", context_.time_now());
+    fflush(stdout);
 
     // update basic information: demographics + diseases
+    printf("[DEBUG] About to call demographic_->update_population()\n");
+    fflush(stdout);
     demographic_->update_population(context_, *disease_);
+    printf("[DEBUG] demographic_->update_population() completed\n");
+    fflush(stdout);
 
     // Calculate the net immigration by gender and age, update the population accordingly
+    printf("[DEBUG] About to call update_net_immigration()\n");
+    fflush(stdout);
     update_net_immigration();
+    printf("[DEBUG] update_net_immigration() completed\n");
+    fflush(stdout);
 
     // update population socio-economic status
+    printf("[DEBUG] About to call ses_->update_population()\n");
+    fflush(stdout);
     ses_->update_population(context_);
+    printf("[DEBUG] ses_->update_population() completed\n");
+    fflush(stdout);
 
     // Update population risk factors
+    printf("[DEBUG] About to call risk_factor_->update_population()\n");
+    fflush(stdout);
     risk_factor_->update_population(context_);
+    printf("[DEBUG] risk_factor_->update_population() completed\n");
+    fflush(stdout);
 
     // Update diseases status: remission and incidence
+    printf("[DEBUG] About to call disease_->update_population()\n");
+    fflush(stdout);
     disease_->update_population(context_);
+    printf("[DEBUG] disease_->update_population() completed\n");
+    fflush(stdout);
 
     // Publish results to data logger
+    printf("[DEBUG] About to call analysis_->update_population()\n");
+    fflush(stdout);
     analysis_->update_population(context_);
+    printf("[DEBUG] analysis_->update_population() completed\n");
+    fflush(stdout);
+    printf("[DEBUG] Simulation::update_population() COMPLETED at time=%d\n", context_.time_now());
+    fflush(stdout);
 }
 
 void Simulation::update_net_immigration() {

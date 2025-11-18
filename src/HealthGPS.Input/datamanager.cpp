@@ -10,6 +10,7 @@
 #include <rapidcsv.h>
 
 #include <chrono>
+#include <cstdio>
 #include <cstdlib>
 #include <fstream>
 #include <regex>
@@ -697,7 +698,9 @@ std::optional<PIFData> DataManager::get_pif_data(const DiseaseInfo &disease_info
                 fmt::print("  - File: {}\n", csv_filename);
                 fmt::print("  - Path: {}\n", full_path.string());
                 fmt::print("  - PIF Analysis: ENABLED and READY\n\n");
-
+                fflush(stdout);
+                printf("[DEBUG] PIF data loaded and returning for disease: %s\n", disease_info.code.to_string().c_str());
+                fflush(stdout);
                 return pif_data;
             }
         } catch (const std::exception &e) {
