@@ -14,8 +14,21 @@
 #include <fmt/color.h>
 
 #include <chrono>
+#include <csignal>
+#include <cstdio>
 #include <cstdlib>
+#include <exception>
 #include <oneapi/tbb/global_control.h>
+#include <string>
+#include <typeinfo>
+#if defined(__unix__) || defined(__APPLE__)
+#define HGPS_HAS_EXECINFO 1
+#include <cxxabi.h>
+#include <execinfo.h>
+#include <unistd.h>
+#else
+#define HGPS_HAS_EXECINFO 0
+#endif
 
 namespace {
 /// @brief Get a string representation of current system time
@@ -55,6 +68,84 @@ int exit_application(int exit_code) {
     fmt::print(" {}.\n\n", get_time_now_str());
     return exit_code;
 }
+
+void print_stack_trace() {
+#if HGPS_HAS_EXECINFO
+    void *addresses[64];
+    auto depth = ::backtrace(addresses, static_cast<int>(std::size(addresses)));
+    fmt::print(fg(fmt::color::light_salmon),
+               "\nStack trace ({} frames). Use addr2line or gdb for symbols:\n", depth);
+    char **symbols = ::backtrace_symbols(addresses, depth);
+    if (symbols != nullptr) {
+        for (int i = 0; i < depth; i++) {
+            fmt::print("  [{}] {}\n", i, symbols[i]);
+            // Also print to stderr directly to ensure it's captured
+            std::fprintf(stderr, "  [%d] %s\n", i, symbols[i]);
+        }
+        std::free(symbols);
+    }
+    std::fflush(stdout);
+    std::fflush(stderr);
+#else
+    fmt::print(fg(fmt::color::light_salmon),
+               "\nStack trace unavailable on this platform/build (no execinfo).\n");
+#endif
+}
+
+void install_terminate_handler() {
+    static bool installed = false;
+    if (installed) {
+        return;
+    }
+    installed = true;
+
+#if HGPS_HAS_EXECINFO
+    // Also install signal handler for SIGABRT to catch crashes
+    signal(SIGABRT, [](int) {
+        fmt::print(fg(fmt::color::red), "\n\nSIGABRT received - program aborted.\n");
+        print_stack_trace();
+        std::fflush(stdout);
+        std::fflush(stderr);
+        std::_Exit(1);
+    });
+#endif
+
+    std::set_terminate([] {
+        if (auto current = std::current_exception()) {
+            try {
+                std::rethrow_exception(current);
+            } catch (const std::exception &ex) {
+#if HGPS_HAS_EXECINFO
+                int status = 0;
+                char *demangled = abi::__cxa_demangle(typeid(ex).name(), nullptr, nullptr, &status);
+                std::string readable_type = (status == 0 && demangled != nullptr)
+                                                ? std::string(demangled)
+                                                : std::string(typeid(ex).name());
+                std::free(demangled);
+#else
+                std::string readable_type = typeid(ex).name();
+#endif
+                fmt::print(fg(fmt::color::red), "\n\nUncaught exception: {} (type: {}).\n",
+                           ex.what(), readable_type);
+                std::fflush(stdout);
+                std::fflush(stderr);
+            } catch (...) {
+                fmt::print(fg(fmt::color::red), "\n\nUncaught non-standard exception.\n");
+                std::fflush(stdout);
+                std::fflush(stderr);
+            }
+        } else {
+            fmt::print(fg(fmt::color::red),
+                       "\n\nstd::terminate called without active exception.\n");
+            std::fflush(stdout);
+            std::fflush(stderr);
+        }
+        print_stack_trace();
+        std::fflush(stdout);
+        std::fflush(stderr);
+        std::abort();
+    });
+}
 } // anonymous namespace
 
 /// @brief Health-GPS host application entry point
@@ -64,6 +155,8 @@ int exit_application(int exit_code) {
 int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
     using namespace hgps;
     using namespace hgps::input;
+
+    install_terminate_handler();
 
     // Create CLI options and validate minimum arguments
     auto options = create_options();
@@ -216,6 +309,11 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
 #ifdef CATCH_EXCEPTIONS
     } catch (const std::exception &ex) {
         fmt::print(fg(fmt::color::red), "\n\nFailed with message: {}.\n\n", ex.what());
+        std::fflush(stdout);
+        std::fflush(stderr);
+
+        // Print stack trace before rethrowing
+        print_stack_trace();
 
         // Rethrow exception so it can be handled by OS's default handler
         throw;

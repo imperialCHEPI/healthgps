@@ -8,10 +8,19 @@ double PIFTable::get_pif_value(int age, core::Gender gender, int year_post_inter
     // OPTIMIZATION: Direct array access - no lookups, no searching
     //  Formula: index = ((year - min_year) * age_range * GENDERS) + (gender_index * age_range) +
     //  (age - min_age) Gender mapping: male=0, female=1 (convert from enum: male=1->0, female=2->1)
+    //
+    // NOTE: PIF data may contain ages 0-110, but the simulation may be configured for a smaller
+    // age range (e.g., 0-100). The bounds checks below ensure safe access even when the simulation
+    // age range is smaller than the PIF data range.
 
-    // Early bounds check for performance
+    // Early bounds check for performance (checks against PIF data's actual age range)
     if (age < min_age_ || age > max_age_ || year_post_intervention < min_year_ ||
         year_post_intervention > max_year_) {
+        if (age > max_age_) {
+            std::fprintf(stderr, "[PIF] get_pif_value: age %d > max_age_ %d - returning 0.0\n", age,
+                         max_age_);
+            std::fflush(stderr);
+        }
         return 0.0;
     }
 
@@ -20,7 +29,20 @@ double PIFTable::get_pif_value(int age, core::Gender gender, int year_post_inter
     int index = ((year_post_intervention - min_year_) * age_range_ * GENDERS) +
                 (gender_index * age_range_) + (age - min_age_);
 
-    // Direct access without bounds check (already validated above)
+    // Additional bounds check on calculated index to prevent out-of-range access
+    // This is a critical safety check that prevents crashes if there's any mismatch between
+    // the calculated index and the actual array size (e.g., due to data inconsistencies or
+    // edge cases in index calculation)
+    if (index < 0 || static_cast<std::size_t>(index) >= direct_array_.size()) {
+        std::fprintf(stderr,
+                     "[CRASH LOCATION] pif_data.cpp:31 - index %d >= direct_array_.size() %zu "
+                     "(age=%d, min_age=%d, max_age=%d, age_range=%d)\n",
+                     index, direct_array_.size(), age, min_age_, max_age_, age_range_);
+        std::fflush(stderr);
+        return 0.0;
+    }
+
+    // Direct access with bounds validation
     return direct_array_[index].pif_value;
 }
 
@@ -59,6 +81,17 @@ void PIFTable::build_hash_table() {
     constexpr int GENDERS = 2; // male, female
     int array_size = year_range_ * age_range_ * GENDERS;
 
+    // Print to both stdout (for .o file) and stderr (for .e file) to ensure visibility
+    fmt::print("[PIF] build_hash_table: min_age={}, max_age={}, age_range={}, min_year={}, "
+               "max_year={}, year_range={}, array_size={}\n",
+               min_age, max_age, age_range_, min_year, max_year, year_range_, array_size);
+    std::fprintf(stderr,
+                 "[PIF] build_hash_table: min_age=%d, max_age=%d, age_range=%d, min_year=%d, "
+                 "max_year=%d, year_range=%d, array_size=%d\n",
+                 min_age, max_age, age_range_, min_year, max_year, year_range_, array_size);
+    std::fflush(stdout);
+    std::fflush(stderr);
+
     direct_array_.resize(array_size);
 
     // Populate with actual data using dynamic ranges
@@ -67,9 +100,16 @@ void PIFTable::build_hash_table() {
         int index = ((item.year_post_intervention - min_year_) * age_range_ * GENDERS) +
                     (gender_index * age_range_) + (item.age - min_age_);
 
-        if (index >= 0 && index < array_size) {
-            direct_array_[index] = item;
+        if (index < 0 || static_cast<std::size_t>(index) >= direct_array_.size()) {
+            std::fprintf(stderr,
+                         "[CRASH LOCATION] pif_data.cpp:build_hash_table - index %d out of range "
+                         "[0, %zu) for age=%d, gender=%d, year=%d\n",
+                         index, direct_array_.size(), item.age, gender_index,
+                         item.year_post_intervention);
+            std::fflush(stderr);
+            continue; // Skip invalid index instead of crashing
         }
+        direct_array_[index] = item;
     }
 }
 

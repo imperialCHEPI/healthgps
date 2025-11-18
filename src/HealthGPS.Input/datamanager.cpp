@@ -649,7 +649,8 @@ void DataManager::notify_warning(std::string_view message) const {
 
 std::optional<PIFData> DataManager::get_pif_data(const DiseaseInfo &disease_info,
                                                  const Country &country,
-                                                 const nlohmann::json &pif_config) const {
+                                                 const nlohmann::json &pif_config,
+                                                 int max_age) const {
     // Check if PIF is enabled
     if (!pif_config.contains("enabled") || !pif_config["enabled"].get<bool>()) {
         return std::nullopt;
@@ -675,7 +676,7 @@ std::optional<PIFData> DataManager::get_pif_data(const DiseaseInfo &disease_info
 
     if (std::filesystem::exists(full_path)) {
         try {
-            auto pif_table = load_pif_from_csv(full_path);
+            auto pif_table = load_pif_from_csv(full_path, max_age);
             if (pif_table.has_data()) {
                 PIFData pif_data;
                 pif_data.add_scenario_data(scenario, std::move(pif_table));
@@ -684,19 +685,34 @@ std::optional<PIFData> DataManager::get_pif_data(const DiseaseInfo &disease_info
                 const auto *loaded_pif_table = pif_data.get_scenario_data(scenario);
                 auto file_size = std::filesystem::file_size(full_path);
 
+                std::fprintf(stderr, "[PIF] About to print PIF data for disease: %s\n",
+                             disease_info.code.to_string().c_str());
+                std::fflush(stderr);
+
                 fmt::print(fg(fmt::color::green), "PIF Data Loaded Successfully:\n");
+                std::fflush(stdout);
                 fmt::print("  - Disease: {}\n", disease_info.code.to_string());
+                std::fflush(stdout);
                 fmt::print("  - Country: {} (Code: {})\n", country.name, country_code);
+                std::fflush(stdout);
                 fmt::print("  - Risk Factor: {}\n", risk_factor);
+                std::fflush(stdout);
                 fmt::print("  - Scenario: {}\n", scenario);
+                std::fflush(stdout);
                 fmt::print("  - Total Data Rows: {}\n", loaded_pif_table->size());
+                std::fflush(stdout);
                 fmt::print("  - File Size: {} bytes ({:.2f} KB)\n", file_size, file_size / 1024.0);
+                std::fflush(stdout);
                 fmt::print("  - Memory Usage: {} bytes ({:.2f} KB)\n",
                            loaded_pif_table->size() * sizeof(PIFDataItem),
                            (loaded_pif_table->size() * sizeof(PIFDataItem)) / 1024.0);
+                std::fflush(stdout);
                 fmt::print("  - File: {}\n", csv_filename);
+                std::fflush(stdout);
                 fmt::print("  - Path: {}\n", full_path.string());
+                std::fflush(stdout);
                 fmt::print("  - PIF Analysis: ENABLED and READY\n\n");
+                std::fflush(stdout);
 
                 return pif_data;
             }
@@ -749,14 +765,18 @@ std::string DataManager::expand_environment_variables(const std::string &path) c
     return result;
 }
 
-PIFTable DataManager::load_pif_from_csv(const std::filesystem::path &filepath) const {
+PIFTable DataManager::load_pif_from_csv(const std::filesystem::path &filepath, int max_age) const {
     PIFTable table;
     auto start_time = std::chrono::high_resolution_clock::now();
+    size_t total_rows = 0;
+    size_t filtered_rows = 0;
 
     try {
         rapidcsv::Document doc(filepath.string());
         auto mapping = create_fields_index_mapping(doc.GetColumnNames(),
                                                    {"Gender", "Age", "YearPostInt", "IF_Mean"});
+
+        total_rows = doc.GetRowCount();
 
         for (size_t i = 0; i < doc.GetRowCount(); i++) {
             auto row = doc.GetRow<std::string>(i);
@@ -769,6 +789,13 @@ PIFTable DataManager::load_pif_from_csv(const std::filesystem::path &filepath) c
             item.age = std::stoi(row[mapping["Age"]]);
             item.year_post_intervention = std::stoi(row[mapping["YearPostInt"]]);
             item.pif_value = std::stod(row[mapping["IF_Mean"]]);
+
+            // Filter: Only include ages within the simulation's age range
+            // PIF data may contain ages 0-110, but simulation may be limited to 0-100
+            if (item.age > max_age) {
+                filtered_rows++;
+                continue; // Skip ages beyond simulation's max age
+            }
 
             // Validate PIF value is in range [0.0, 1.0]
             if (item.pif_value < 0.0 || item.pif_value > 1.0) {
@@ -790,8 +817,18 @@ PIFTable DataManager::load_pif_from_csv(const std::filesystem::path &filepath) c
             std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
 
         // Print CSV loading verification with timing
-        fmt::print(fg(fmt::color::cyan), "PIF CSV File Loaded: {} ({} rows) in {}ms\n",
-                   filepath.filename().string(), table.size(), duration.count());
+        // Print to both stdout and stderr for visibility on PBS
+        fmt::print(fg(fmt::color::cyan),
+                   "PIF CSV File Loaded: {} ({} rows, filtered from {} rows, max_age={}) in {}ms\n",
+                   filepath.filename().string(), table.size(), total_rows, max_age,
+                   duration.count());
+        std::fprintf(
+            stderr,
+            "[PIF] CSV File Loaded: %s (%zu rows, filtered from %zu rows, max_age=%d) in %lldms\n",
+            filepath.filename().string().c_str(), table.size(), total_rows, max_age,
+            duration.count());
+        std::fflush(stdout);
+        std::fflush(stderr);
         fmt::print(fg(fmt::color::green),
                    "PIF Hash Table Built: O(1) lookup optimization enabled\n");
 
