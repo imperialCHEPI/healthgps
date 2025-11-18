@@ -24,15 +24,15 @@ double PIFTable::get_pif_value(int age, core::Gender gender, int year_post_inter
 
     // DEBUG: Check for out-of-bounds access
     if (index < 0 || static_cast<std::size_t>(index) >= direct_array_.size()) {
-        fmt::print(fg(fmt::color::red), "[PIF ERROR] Out of bounds access detected!\n");
-        fmt::print("  age={}, gender={}, year_post_int={}\n", age, 
-                   (gender == core::Gender::male ? "male" : "female"), year_post_intervention);
-        fmt::print("  min_age_={}, max_age_={}, min_year_={}, max_year_={}\n",
-                   min_age_, max_age_, min_year_, max_year_);
-        fmt::print("  age_range_={}, year_range_={}\n", age_range_, year_range_);
-        fmt::print("  calculated index={}, array_size={}\n", index, direct_array_.size());
-        fmt::print("  gender_index={}\n", gender_index);
-        std::fflush(stdout);
+        printf("[PIF ERROR] Out of bounds access detected!\n");
+        printf("  age=%d, gender=%s, year_post_int=%d\n", age, 
+               (gender == core::Gender::male ? "male" : "female"), year_post_intervention);
+        printf("  min_age_=%d, max_age_=%d, min_year_=%d, max_year_=%d\n",
+               min_age_, max_age_, min_year_, max_year_);
+        printf("  age_range_=%d, year_range_=%d\n", age_range_, year_range_);
+        printf("  calculated index=%d, array_size=%zu\n", index, direct_array_.size());
+        printf("  gender_index=%d\n", gender_index);
+        fflush(stdout);
         return 0.0; // Return safe default instead of crashing
     }
 

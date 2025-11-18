@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <fmt/format.h>
+#include <cstdio>
 #include <memory>
 #include <sstream>
 #include <stdexcept>
@@ -124,11 +125,18 @@ template <Numerical TYPE> class Array2D {
 
     void check_boundaries(size_t row, size_t column) const {
         if (row >= rows_) {
+            // DEBUG: Print detailed error information
+            printf("[ARRAY2D ERROR] Row %zu is out of array bounds [0, %zu).\n", row, rows_);
+            printf("  Array size: %zu rows x %zu columns\n", rows_, columns_);
+            printf("  Attempted access: row=%zu, column=%zu\n", row, column);
+            fflush(stdout);
             throw std::out_of_range(
                 fmt::format("Row {} is out of array bounds [0, {}).", row, rows_));
         }
 
         if (column >= columns_) {
+            printf("[ARRAY2D ERROR] Column %zu is out of array bounds [0, %zu).\n", column, columns_);
+            fflush(stdout);
             throw std::out_of_range(
                 fmt::format("Column {} is out of array bounds [0, {}).", column, columns_));
         }

@@ -12,6 +12,7 @@
 #include <iostream> // Added for debug prints
 #include <oneapi/tbb/parallel_for_each.h>
 #include <unordered_set>
+#include <cstdio>
 
 namespace hgps {
 
@@ -579,9 +580,19 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
     series.add_channels(channels_);
 
     auto current_time = static_cast<unsigned int>(context.time_now());
+    auto max_age = static_cast<int>(context.age_range().upper());
     for (const auto &person : context.population()) {
         auto age = person.age;
         auto gender = person.gender;
+
+        // SAFETY: Check for age out of bounds before accessing vectors
+        if (age > max_age) {
+            printf("[ANALYSIS ERROR] Person age %d exceeded max_age %d! Skipping.\n", age, max_age);
+            printf("  Person ID: %zu, Gender: %d, Time: %u\n", person.id(), 
+                   static_cast<int>(gender), current_time);
+            fflush(stdout);
+            continue;
+        }
 
         if (!person.is_active()) {
             if (!person.is_alive() && person.time_of_death() == current_time) {
@@ -760,12 +771,22 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
     }
 
     auto current_time = static_cast<unsigned int>(context.time_now());
+    auto max_age = static_cast<int>(context.age_range().upper());
 
     for (const auto &person : context.population()) {
 
         auto age = person.age;
         auto gender = person.gender;
         auto income = person.income;
+
+        // SAFETY: Check for age out of bounds before accessing vectors
+        if (age > max_age) {
+            printf("[ANALYSIS ERROR] Person age %d exceeded max_age %d! Skipping.\n", age, max_age);
+            printf("  Person ID: %zu, Gender: %d, Income: %d, Time: %u\n", person.id(),
+                   static_cast<int>(gender), static_cast<int>(income), current_time);
+            fflush(stdout);
+            continue;
+        }
 
         if (!person.is_active()) {
             if (!person.is_alive() && person.time_of_death() == current_time) {
