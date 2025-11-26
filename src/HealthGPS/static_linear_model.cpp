@@ -730,24 +730,19 @@ StaticLinearModel::compute_linear_models(Person &person,
             try {
                 double value = person.get_risk_factor_value(coefficient_name);
                 factor += coefficient_value * value;
-            } catch (const std::exception &e) {
-                std::cout << "\nERROR: Coefficient '" << coefficient_name.to_string()
-                          << "' not found: " << e.what();
-                std::cout << "\nPerson attributes: Age=" << person.age << ", Gender="
-                          << (person.gender == core::Gender::male ? "male" : "female")
-                          << ", Region=" << person.region << ", Ethnicity=" << person.ethnicity
-                          << ", Income=" << static_cast<int>(person.income);
-                throw;
+            } catch (const std::exception &) {
+                // Coefficient not found - skip it (use 0.0 contribution)
+                // This allows the code to work regardless of which attributes are available
+                // For example, region/ethnicity for FINCH, sector for India/PIF
             }
         }
         for (const auto &[coefficient_name, coefficient_value] : model.log_coefficients) {
             try {
                 double value = person.get_risk_factor_value(coefficient_name);
                 factor += coefficient_value * log(value);
-            } catch (const std::exception &e) {
-                std::cout << "\nERROR: Log coefficient '" << coefficient_name.to_string()
-                          << "' not found: " << e.what();
-                throw;
+            } catch (const std::exception &) {
+                // Log coefficient not found - skip it (use 0.0 contribution)
+                // This allows the code to work regardless of which attributes are available
             }
         }
         linear.emplace_back(factor);

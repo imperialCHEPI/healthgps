@@ -78,9 +78,23 @@ void DataSeries::add_channel(std::string key) {
 }
 
 void DataSeries::add_channels(const std::vector<std::string> &keys) {
-    for (const auto &item : keys) {
-        add_channel(item);
+    std::cout << "\nDEBUG: DataSeries::add_channels - adding " << keys.size() << " channels, sample_size=" << sample_size_;
+    std::cout.flush();
+    for (size_t i = 0; i < keys.size(); i++) {
+        const auto &item = keys[i];
+        if (i < 5 || i % 10 == 0) {
+            std::cout << "\nDEBUG: DataSeries::add_channels - processing channel " << (i+1) << "/" << keys.size() << ": " << item;
+            std::cout.flush();
+        }
+        try {
+            add_channel(item);
+        } catch (const std::exception &e) {
+            std::cout << "\nERROR: DataSeries::add_channels - failed to add channel '" << item << "': " << e.what();
+            throw;
+        }
     }
+    std::cout << "\nDEBUG: DataSeries::add_channels - completed all " << keys.size() << " channels";
+    std::cout.flush();
 }
 
 void DataSeries::add_income_channels(const std::vector<std::string> &keys) {
