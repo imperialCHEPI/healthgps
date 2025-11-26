@@ -408,9 +408,11 @@ void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &conte
     if (first_call) {
         std::cout << "\nStarting region initialization...";
         if (region_prevalence_.empty()) {
-            std::cout << "\n  WARNING: No region data available (this is OK for India/PIF projects)";
+            std::cout
+                << "\n  WARNING: No region data available (this is OK for India/PIF projects)";
         } else {
-            std::cout << "\n  Region data available for " << region_prevalence_.size() << " age groups";
+            std::cout << "\n  Region data available for " << region_prevalence_.size()
+                      << " age groups";
         }
         first_call = false;
     }
@@ -443,9 +445,9 @@ void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &conte
             }
         }
         if (!found_closest) {
-            throw core::HgpsException(fmt::format(
-                "No valid region data found for age: {}. Region data exists but contains no valid age keys.",
-                person.age));
+            throw core::HgpsException(fmt::format("No valid region data found for age: {}. Region "
+                                                  "data exists but contains no valid age keys.",
+                                                  person.age));
         }
     }
 
@@ -509,9 +511,11 @@ void DemographicModule::initialise_ethnicity([[maybe_unused]] RuntimeContext &co
     if (first_call) {
         std::cout << "\nStarting ethnicity initialization...";
         if (ethnicity_prevalence_.empty()) {
-            std::cout << "\n  WARNING: No ethnicity data available (this is OK for India/PIF projects)";
+            std::cout
+                << "\n  WARNING: No ethnicity data available (this is OK for India/PIF projects)";
         } else {
-            std::cout << "\n  Ethnicity data available for " << ethnicity_prevalence_.size() << " age groups";
+            std::cout << "\n  Ethnicity data available for " << ethnicity_prevalence_.size()
+                      << " age groups";
         }
         first_call = false;
     }
@@ -710,17 +714,21 @@ std::unique_ptr<DemographicModule> build_population_module(Repository &repositor
     const auto &region_data = repository.get_region_prevalence();
     if (!region_data.empty()) {
         demographic_module->set_region_prevalence(region_data);
-        std::cout << "\nDEBUG: Region data set in DemographicModule (" << region_data.size() << " age groups)";
+        std::cout << "\nDEBUG: Region data set in DemographicModule (" << region_data.size()
+                  << " age groups)";
     } else {
-        std::cout << "\nDEBUG: No region data available in repository (this is OK for India/PIF projects)";
+        std::cout << "\nDEBUG: No region data available in repository (this is OK for India/PIF "
+                     "projects)";
     }
 
     const auto &ethnicity_data = repository.get_ethnicity_prevalence();
     if (!ethnicity_data.empty()) {
         demographic_module->set_ethnicity_prevalence(ethnicity_data);
-        std::cout << "\nDEBUG: Ethnicity data set in DemographicModule (" << ethnicity_data.size() << " age groups)";
+        std::cout << "\nDEBUG: Ethnicity data set in DemographicModule (" << ethnicity_data.size()
+                  << " age groups)";
     } else {
-        std::cout << "\nDEBUG: No ethnicity data available in repository (this is OK for India/PIF projects)";
+        std::cout << "\nDEBUG: No ethnicity data available in repository (this is OK for India/PIF "
+                     "projects)";
     }
 
     return demographic_module;

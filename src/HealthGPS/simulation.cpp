@@ -363,14 +363,15 @@ void hgps::Simulation::print_initial_population_statistics() {
 
     for (const auto &entity : context_.population()) {
         for (const auto &entry : context_.mapping()) {
-            // Special handling for income_category - it's stored as person.income (enum), not in risk_factors
+            // Special handling for income_category - it's stored as person.income (enum), not in
+            // risk_factors
             if (entry.key().to_string() == "income_category") {
                 if (entity.income != core::Income::unknown) {
                     sim_summary[entry.name()].append(entity.income_to_value());
                 }
                 continue;
             }
-            
+
             try {
                 sim_summary[entry.name()].append(entity.get_risk_factor_value(entry.key()));
             } catch (const std::exception &) {
