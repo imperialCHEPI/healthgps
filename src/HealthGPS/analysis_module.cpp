@@ -93,8 +93,6 @@ void AnalysisModule::initialise_population(RuntimeContext &context) {
     auto expected_count = create_age_gender_table<int>(age_range);
     auto &pop = context.population();
     auto sum_mutex = std::mutex{};
-    std::cout << "\nDEBUG: AnalysisModule::initialise_population - processing " << pop.size()
-              << " people for residual weights";
     std::atomic_size_t processed{0};
     tbb::parallel_for_each(pop.cbegin(), pop.cend(), [&](const auto &entity) {
         if (!entity.is_active()) {
@@ -112,13 +110,8 @@ void AnalysisModule::initialise_population(RuntimeContext &context) {
         auto lock = std::unique_lock{sum_mutex};
         expected_sum(entity.age, entity.gender) += sum;
         expected_count(entity.age, entity.gender)++;
-
-        auto count = ++processed;
-        if (count % 50000 == 0) {
-            std::cout << "\nDEBUG: AnalysisModule residual pass processed " << count << " people";
-        }
+        ++processed;
     });
-    std::cout << "\nDEBUG: AnalysisModule residual pass completed";
 
     for (int age = age_range.lower(); age <= age_range.upper(); age++) {
         residual_disability_weight_(age, core::Gender::male) = calculate_residual_disability_weight(
@@ -128,13 +121,9 @@ void AnalysisModule::initialise_population(RuntimeContext &context) {
             calculate_residual_disability_weight(age, core::Gender::female, expected_sum,
                                                  expected_count);
     }
-    std::cout << "\nDEBUG: AnalysisModule residual disability weights calculated";
 
     initialise_output_channels(context);
-    std::cout << "\nDEBUG: AnalysisModule output channels initialised";
-    std::cout << "\nDEBUG: AnalysisModule about to publish initial results";
     publish_result_message(context);
-    std::cout << "\nDEBUG: AnalysisModule initialisation completed";
 }
 
 void AnalysisModule::update_population(RuntimeContext &context) {
@@ -170,25 +159,19 @@ void AnalysisModule::publish_result_message(RuntimeContext &context) const {
     auto sample_size = context.age_range().upper() + 1u;
     auto result = ModelResult{sample_size};
 
-    std::cout << "\nDEBUG: AnalysisModule publish_result_message - kicking off historical stats";
     auto handle = core::run_async(&AnalysisModule::calculate_historical_statistics, this,
                                   std::ref(context), std::ref(result));
 
-    std::cout << "\nDEBUG: AnalysisModule publish_result_message - calculating population stats";
     calculate_population_statistics(context, result.series);
-    std::cout << "\nDEBUG: AnalysisModule publish_result_message - waiting for historical stats";
     handle.get();
-    std::cout << "\nDEBUG: AnalysisModule publish_result_message - historical stats done";
 
     context.publish(std::make_unique<ResultEventMessage>(
         context.identifier(), context.current_run(), context.time_now(), result));
-    std::cout << "\nDEBUG: AnalysisModule publish_result_message - result sent";
 }
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
 void AnalysisModule::calculate_historical_statistics(RuntimeContext &context,
                                                      ModelResult &result) const {
-    std::cout << "\nDEBUG: AnalysisModule calculate_historical_statistics - start";
     auto risk_factors = std::map<core::Identifier, std::map<core::Gender, double>>();
     for (const auto &item : context.mapping()) {
         if (item.level() > 0) {
@@ -211,7 +194,6 @@ void AnalysisModule::calculate_historical_statistics(RuntimeContext &context,
     auto age_upper_bound = context.age_range().upper();
     auto analysis_time = static_cast<unsigned int>(context.time_now());
 
-    std::cout << "\nDEBUG: AnalysisModule calculate_historical_statistics - launching DALY task";
     auto daly_handle =
         core::run_async(&AnalysisModule::calculate_dalys, this, std::ref(context.population()),
                         age_upper_bound, analysis_time);
@@ -235,10 +217,16 @@ void AnalysisModule::calculate_historical_statistics(RuntimeContext &context,
         gender_age_sum[entity.gender] += entity.age;
         gender_count[entity.gender]++;
         for (auto &item : risk_factors) {
-            auto factor_value = entity.get_risk_factor_value(item.first);
+            // Check if risk factor exists before accessing (some risk factors may not be initialized
+            // for all projects)
+            double factor_value = 0.0;
+            if (entity.risk_factors.find(item.first) != entity.risk_factors.end()) {
+                factor_value = entity.risk_factors.at(item.first);
             if (std::isnan(factor_value)) {
                 factor_value = 0.0;
             }
+            }
+            // If risk factor doesn't exist, factor_value remains 0.0
 
             item.second[entity.gender] += factor_value;
         }
@@ -296,9 +284,7 @@ void AnalysisModule::calculate_historical_statistics(RuntimeContext &context,
                                        .female = item.second.female * 100.0 / females_count});
     }
 
-    std::cout << "\nDEBUG: AnalysisModule calculate_historical_statistics - waiting for DALY task";
     result.indicators = daly_handle.get();
-    std::cout << "\nDEBUG: AnalysisModule calculate_historical_statistics - completed";
 
     // Add income-based analysis if enabled
     if (enable_income_analysis_) {
@@ -330,8 +316,12 @@ void AnalysisModule::calculate_income_based_statistics(RuntimeContext &context,
         // Risk factors by income
         for (const auto &factor : context.mapping().entries()) {
             if (factor.level() > 0) {
+                // Check if risk factor exists before accessing (some risk factors may not be initialized
+                // for all projects)
+                if (person.risk_factors.find(factor.key()) != person.risk_factors.end()) {
                 risk_factors_by_income[factor.key()][income][person.gender] +=
-                    person.get_risk_factor_value(factor.key());
+                        person.risk_factors.at(factor.key());
+                }
             }
         }
 
@@ -569,7 +559,6 @@ double AnalysisModule::calculate_disability_weight(const Person &entity) const {
 
 DALYsIndicator AnalysisModule::calculate_dalys(Population &population, unsigned int max_age,
                                                unsigned int death_year) const {
-    std::cout << "\nDEBUG: AnalysisModule calculate_dalys - start";
     auto yll_sum = 0.0;
     auto yld_sum = 0.0;
     auto count = 0.0;
@@ -596,7 +585,6 @@ DALYsIndicator AnalysisModule::calculate_dalys(Population &population, unsigned 
     auto result = DALYsIndicator{.years_of_life_lost = yll,
                                  .years_lived_with_disability = yld,
                                  .disability_adjusted_life_years = yll + yld};
-    std::cout << "\nDEBUG: AnalysisModule calculate_dalys - completed";
     return result;
 }
 
@@ -637,21 +625,12 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context) {
 // NOLINTBEGIN(readability-function-cognitive-complexity)
 void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
                                                      DataSeries &series) const {
-    std::cout << "\nDEBUG: AnalysisModule calculate_population_statistics(series) - start";
-    std::cout << "\nDEBUG: Checking series size...";
     if (series.size() > 0) {
         throw std::logic_error("This should be a new object!");
     }
-    std::cout << "\nDEBUG: Series size check passed, series.size()=" << series.size();
-    std::cout << "\nDEBUG: About to add " << channels_.size() << " channels";
-    std::cout.flush();
     series.add_channels(channels_);
-    std::cout << "\nDEBUG: AnalysisModule calculate_population_statistics(series) - channels ready";
     auto current_time = static_cast<unsigned int>(context.time_now());
     std::size_t processed = 0;
-    std::size_t total_pop = context.population().size();
-    std::cout << "\nDEBUG: AnalysisModule calculate_population_statistics(series) - processing "
-              << total_pop << " people";
     for (const auto &person : context.population()) {
         auto age = person.age;
         auto gender = person.gender;
@@ -727,8 +706,14 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
                 continue;
             }
 
-            double factor_value = person.get_risk_factor_value(factor.key());
-            series(gender, "mean_" + factor.key().to_string()).at(age) += factor_value;
+            // Check if risk factor exists before accessing (some risk factors may not be initialized
+            // for all projects)
+            if (person.risk_factors.find(factor.key()) != person.risk_factors.end()) {
+                double factor_value = person.risk_factors.at(factor.key());
+                series(gender, "mean_" + factor.key().to_string()).at(age) += factor_value;
+            }
+            // If risk factor doesn't exist, skip it (don't accumulate, will result in NaN if no
+            // values accumulated)
         }
 
         for (const auto &[disease_name, disease_state] : person.diseases) {
@@ -746,24 +731,11 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
         series(gender, "mean_daly").at(age) += yld;
 
         classify_weight(series, person);
-
         processed++;
-        if (processed == 1 || processed == 10 || processed == 100 || processed % 50000 == 0) {
-            std::cout
-                << "\nDEBUG: AnalysisModule calculate_population_statistics(series) processed "
-                << processed << " people";
-        }
     }
-    std::cout
-        << "\nDEBUG: AnalysisModule calculate_population_statistics(series) - completed, processed "
-        << processed << " people";
 
     // For each age group in the analysis...
     const auto age_range = context.age_range();
-    std::cout << "\nDEBUG: AnalysisModule calculate_population_statistics(series) - computing "
-                 "averages for age range ["
-              << age_range.lower() << ", " << age_range.upper() << "]";
-    std::cout.flush();
 
     // Create a set of available channels (lowercase) for safe access
     std::unordered_set<std::string> available_channels;
@@ -782,11 +754,6 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
     };
 
     for (int age = age_range.lower(); age <= age_range.upper(); age++) {
-        if (age == age_range.lower() || age % 10 == 0 || age == age_range.upper()) {
-            std::cout << "\nDEBUG: Computing averages for age " << age;
-            std::cout.flush();
-        }
-
         double count_F = series(core::Gender::female, "count").at(age);
         double count_M = series(core::Gender::male, "count").at(age);
         double deaths_F = series(core::Gender::female, "deaths").at(age);
@@ -839,52 +806,25 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
         series(core::Gender::female, "mean_age3").at(age) = static_cast<double>(age * age * age);
         series(core::Gender::male, "mean_age3").at(age) = static_cast<double>(age * age * age);
     }
-    std::cout << "\nDEBUG: AnalysisModule calculate_population_statistics(series) - averages "
-                 "computation completed";
-    std::cout.flush();
 
     // Calculate standard deviation
     calculate_standard_deviation(context, series);
 
     // Add income-based analysis if enabled
-    std::cout << "\nDEBUG: AnalysisModule calculate_population_statistics(series) - checking "
-                 "income analysis (enabled="
-              << (enable_income_analysis_ ? "true" : "false") << ")";
-    std::cout.flush();
     if (enable_income_analysis_) {
-        std::cout << "\nDEBUG: AnalysisModule calculate_population_statistics(series) - starting "
-                     "income-based analysis";
-        std::cout.flush();
         calculate_income_based_population_statistics(context, series);
-        std::cout << "\nDEBUG: AnalysisModule calculate_population_statistics(series) - "
-                     "income-based analysis completed";
-        std::cout.flush();
     }
-    std::cout << "\nDEBUG: AnalysisModule calculate_population_statistics(series) - ALL COMPLETED";
-    std::cout.flush();
 }
 // NOLINTEND(readability-function-cognitive-complexity)
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext &context,
                                                                   DataSeries &series) const {
-    std::cout << "\nDEBUG: AnalysisModule calculate_income_based_population_statistics - start";
-    std::cout.flush();
-
     if (!enable_income_analysis_) {
-        std::cout << "\nDEBUG: AnalysisModule calculate_income_based_population_statistics - "
-                     "income analysis disabled, returning";
-        std::cout.flush();
         return;
     }
 
-    std::cout << "\nDEBUG: AnalysisModule calculate_income_based_population_statistics - getting "
-                 "available income categories";
-    std::cout.flush();
     auto available_income_categories = get_available_income_categories(context);
-    std::cout << "\nDEBUG: AnalysisModule calculate_income_based_population_statistics - found "
-              << available_income_categories.size() << " income categories";
-    std::cout.flush();
 
     // Create a list of only the channels that are actually used in income-based analysis
     auto income_channels = std::vector<std::string>();
@@ -952,32 +892,32 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
 
     // MAHIMA: Add demographic channels for income analysis (only if data exists)
     if (has_sector) {
-        income_channels.emplace_back("mean_sector");
-        income_channels.emplace_back("std_sector");
+    income_channels.emplace_back("mean_sector");
+    income_channels.emplace_back("std_sector");
     }
     if (has_region) {
-        income_channels.emplace_back("mean_region");
-        income_channels.emplace_back("std_region");
+    income_channels.emplace_back("mean_region");
+    income_channels.emplace_back("std_region");
     }
     if (has_ethnicity) {
-        income_channels.emplace_back("mean_ethnicity");
-        income_channels.emplace_back("std_ethnicity");
+    income_channels.emplace_back("mean_ethnicity");
+    income_channels.emplace_back("std_ethnicity");
     }
 
     // MAHIMA: Add enhanced income channels for income analysis (only if data exists)
     if (has_income_category) {
-        income_channels.emplace_back("mean_income_category");
-        income_channels.emplace_back("std_income_category");
+    income_channels.emplace_back("mean_income_category");
+    income_channels.emplace_back("std_income_category");
     }
     if (has_income_continuous) {
-        income_channels.emplace_back("mean_income_continuous");
-        income_channels.emplace_back("std_income_continuous");
+    income_channels.emplace_back("mean_income_continuous");
+    income_channels.emplace_back("std_income_continuous");
     }
 
     // MAHIMA: Add physical activity channels for income analysis (only if data exists)
     if (has_physical_activity) {
-        income_channels.emplace_back("mean_physical_activity");
-        income_channels.emplace_back("std_physical_activity");
+    income_channels.emplace_back("mean_physical_activity");
+    income_channels.emplace_back("std_physical_activity");
     }
 
     // Add risk factor channels
@@ -997,10 +937,6 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
     income_channels.emplace_back("std_yld");
     income_channels.emplace_back("std_daly");
 
-    std::cout << "\nDEBUG: AnalysisModule calculate_income_based_population_statistics - "
-                 "collecting income categories";
-    std::cout.flush();
-
     // Create income channels for the actual income categories found in the data
     std::vector<core::Income> actual_income_categories;
     for (const auto &person : context.population()) {
@@ -1010,22 +946,8 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
         }
     }
 
-    std::cout << "\nDEBUG: AnalysisModule calculate_income_based_population_statistics - found "
-              << actual_income_categories.size() << " actual income categories";
-    std::cout.flush();
-
-    std::cout << "\nDEBUG: AnalysisModule calculate_income_based_population_statistics - adding "
-                 "income channels";
-    std::cout.flush();
     // Create income channels for the actual categories found
     series.add_income_channels_for_categories(income_channels, actual_income_categories);
-    std::cout << "\nDEBUG: AnalysisModule calculate_income_based_population_statistics - income "
-                 "channels added";
-    std::cout.flush();
-
-    std::cout << "\nDEBUG: AnalysisModule calculate_income_based_population_statistics - "
-                 "initializing std dev channels";
-    std::cout.flush();
 
     // Initialize standard deviation channels with zeros (with safe access)
     const auto age_range = context.age_range();
@@ -1079,14 +1001,6 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
         }
     }
 
-    std::cout << "\nDEBUG: AnalysisModule calculate_income_based_population_statistics - std dev "
-                 "channels initialized";
-    std::cout.flush();
-
-    std::cout << "\nDEBUG: AnalysisModule calculate_income_based_population_statistics - starting "
-                 "main processing loop";
-    std::cout.flush();
-
     auto current_time = static_cast<unsigned int>(context.time_now());
     std::size_t processed_income = 0;
 
@@ -1120,7 +1034,7 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
             if (!person.is_alive() && person.time_of_death() == current_time) {
                 safe_increment_channel(gender, income, "deaths", age);
                 float expcted_life = definition_.life_expectancy().at(context.time_now(), gender);
-                double yll = std::max(expcted_life - age, 0.0f) * DALY_UNITS;
+                    double yll = std::max(expcted_life - age, 0.0f) * DALY_UNITS;
                 safe_add_to_channel(gender, income, "mean_yll", age, yll);
                 safe_add_to_channel(gender, income, "mean_daly", age, yll);
             }
@@ -1145,9 +1059,15 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
                 continue;
             }
 
+            // Check if risk factor exists before accessing (some risk factors may not be initialized
+            // for all projects)
             auto channel_name = "mean_" + factor.key().to_string();
-            double value = person.get_risk_factor_value(factor.key());
-            safe_add_to_channel(gender, income, channel_name, age, value);
+            if (person.risk_factors.find(factor.key()) != person.risk_factors.end()) {
+                double value = person.risk_factors.at(factor.key());
+                safe_add_to_channel(gender, income, channel_name, age, value);
+            }
+            // If risk factor doesn't exist, skip it (don't accumulate, will result in NaN if no
+            // values accumulated)
         }
 
         // Collect demographic data (excluding age and gender)
@@ -1157,31 +1077,31 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
                             static_cast<double>(static_cast<int>(person.sector)));
 
         // NEW: Collect enhanced demographic data by income (only if available)
-        // Region data - check if person has region assigned
-        if (!person.region.empty() && person.region != "unknown") {
+            // Region data - check if person has region assigned
+            if (!person.region.empty() && person.region != "unknown") {
             safe_add_to_channel(gender, income, "mean_region", age, person.region_to_value());
-        }
+            }
 
-        // Ethnicity data - check if person has ethnicity assigned
-        if (!person.ethnicity.empty() && person.ethnicity != "unknown") {
+            // Ethnicity data - check if person has ethnicity assigned
+            if (!person.ethnicity.empty() && person.ethnicity != "unknown") {
             safe_add_to_channel(gender, income, "mean_ethnicity", age, person.ethnicity_to_value());
-        }
+            }
 
-        // Income category - check if person has income assigned
-        if (person.income != core::Income::unknown) {
+            // Income category - check if person has income assigned
+            if (person.income != core::Income::unknown) {
             safe_add_to_channel(gender, income, "mean_income_category", age,
                                 person.income_to_value());
-        }
+            }
 
-        // Continuous income - check if available in risk factors
-        auto it = person.risk_factors.find("income_continuous"_id);
-        if (it != person.risk_factors.end()) {
+            // Continuous income - check if available in risk factors
+            auto it = person.risk_factors.find("income_continuous"_id);
+            if (it != person.risk_factors.end()) {
             safe_add_to_channel(gender, income, "mean_income_continuous", age, it->second);
-        }
+            }
 
-        // Physical activity - check if available in risk factors
-        auto pa_it = person.risk_factors.find("PhysicalActivity"_id);
-        if (pa_it != person.risk_factors.end()) {
+            // Physical activity - check if available in risk factors
+            auto pa_it = person.risk_factors.find("PhysicalActivity"_id);
+            if (pa_it != person.risk_factors.end()) {
             safe_add_to_channel(gender, income, "mean_physical_activity", age, pa_it->second);
         }
 
@@ -1221,23 +1141,7 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
         }
 
         processed_income++;
-        if (processed_income == 1 || processed_income == 10 || processed_income == 100 ||
-            processed_income % 50000 == 0) {
-            std::cout
-                << "\nDEBUG: AnalysisModule calculate_income_based_population_statistics processed "
-                << processed_income << " people";
-            std::cout.flush();
-        }
     }
-
-    std::cout << "\nDEBUG: AnalysisModule calculate_income_based_population_statistics - main loop "
-                 "completed, processed "
-              << processed_income << " people";
-    std::cout.flush();
-
-    std::cout << "\nDEBUG: AnalysisModule calculate_income_based_population_statistics - "
-                 "calculating averages";
-    std::cout.flush();
 
     // Calculate averages for each income category (with safe channel access)
     auto safe_divide_channel_income = [&series, &added_income_channels](
@@ -1316,22 +1220,8 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
         }
     }
 
-    std::cout << "\nDEBUG: AnalysisModule calculate_income_based_population_statistics - averages "
-                 "computation completed";
-    std::cout.flush();
-
-    std::cout << "\nDEBUG: AnalysisModule calculate_income_based_population_statistics - starting "
-                 "standard deviation calculation";
-    std::cout.flush();
     // Calculate standard deviation for income-based data
     calculate_income_based_standard_deviation(context, series);
-    std::cout << "\nDEBUG: AnalysisModule calculate_income_based_population_statistics - standard "
-                 "deviation calculation completed";
-    std::cout.flush();
-
-    std::cout
-        << "\nDEBUG: AnalysisModule calculate_income_based_population_statistics - ALL COMPLETED";
-    std::cout.flush();
 }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
@@ -1453,17 +1343,17 @@ void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &c
     // Accumulate squared deviations from mean for income-based data
     auto accumulate_squared_diffs_income =
         [&series, &added_income_channels](const std::string &chan, core::Gender sex,
-                                          core::Income income, int age, double value) {
+                                                     core::Income income, int age, double value) {
             std::string mean_channel = core::to_lower("mean_" + chan);
             std::string std_channel = core::to_lower("std_" + chan);
             // Only accumulate if both mean and std channels were added
             if (added_income_channels.find(mean_channel) != added_income_channels.end() &&
                 added_income_channels.find(std_channel) != added_income_channels.end()) {
                 const double mean = series.at(sex, income, mean_channel).at(age);
-                const double diff = value - mean;
+        const double diff = value - mean;
                 series.at(sex, income, std_channel).at(age) += diff * diff;
             }
-        };
+    };
 
     auto current_time = static_cast<unsigned int>(context.time_now());
     for (const auto &person : context.population()) {
@@ -1493,13 +1383,18 @@ void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &c
                 if (person.income != core::Income::unknown) {
                     double income_value = person.income_to_value();
                     accumulate_squared_diffs_income("income_category", sex, income, age,
-                                                    income_value);
+                                                     income_value);
                 }
                 continue;
             }
 
-            const double value = person.get_risk_factor_value(factor.key());
+            // Check if risk factor exists before accessing (some risk factors may not be initialized
+            // for all projects)
+            if (person.risk_factors.find(factor.key()) != person.risk_factors.end()) {
+                const double value = person.risk_factors.at(factor.key());
             accumulate_squared_diffs_income(factor.key().to_string(), sex, income, age, value);
+            }
+            // If risk factor doesn't exist, skip it
         }
 
         // Accumulate squared deviations for demographic data (excluding age and gender)
@@ -1548,19 +1443,19 @@ void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &c
     // Calculate in-place standard deviation for income-based data
     auto divide_by_count_sqrt_income =
         [&series, &added_income_channels](const std::string &chan, core::Gender sex,
-                                          core::Income income, int age, double count) {
+                                                 core::Income income, int age, double count) {
             std::string std_channel = core::to_lower("std_" + chan);
             // Only access if channel was added
             if (added_income_channels.find(std_channel) != added_income_channels.end()) {
-                if (count > 0) {
+        if (count > 0) {
                     const double sum = series.at(sex, income, std_channel).at(age);
-                    const double std = std::sqrt(sum / count);
+            const double std = std::sqrt(sum / count);
                     series.at(sex, income, std_channel).at(age) = std;
-                } else {
+        } else {
                     series.at(sex, income, std_channel).at(age) = 0.0;
                 }
-            }
-        };
+        }
+    };
 
     // For each income category and age group
     const auto age_range = context.age_range();
@@ -1628,15 +1523,11 @@ void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &c
             }
         }
     }
-
-    std::cout << "\nDEBUG: AnalysisModule calculate_population_statistics(series) - completed";
 }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
-                                                  DataSeries &series) const {
-    std::cout << "\nDEBUG: AnalysisModule calculate_standard_deviation - start";
-    std::cout.flush();
+                                                 DataSeries &series) const {
 
     // Create a set of available channels (lowercase) for safe access
     std::unordered_set<std::string> available_channels;
@@ -1647,24 +1538,19 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
     // Accumulate squared deviations from mean (with safe channel access).
     auto accumulate_squared_diffs = [&series, &available_channels](const std::string &chan,
                                                                    core::Gender sex, int age,
-                                                                   double value) {
+                                              double value) {
         std::string mean_channel = core::to_lower("mean_" + chan);
         std::string std_channel = core::to_lower("std_" + chan);
         // Only accumulate if both mean and std channels exist
         if (available_channels.find(mean_channel) != available_channels.end() &&
             available_channels.find(std_channel) != available_channels.end()) {
-            const double mean = series(sex, "mean_" + chan).at(age);
-            const double diff = value - mean;
-            series(sex, "std_" + chan).at(age) += diff * diff;
+        const double mean = series(sex, "mean_" + chan).at(age);
+        const double diff = value - mean;
+        series(sex, "std_" + chan).at(age) += diff * diff;
         }
     };
 
     std::size_t processed_std = 0;
-    std::size_t total_pop_std = context.population().size();
-    std::cout << "\nDEBUG: AnalysisModule calculate_standard_deviation - processing "
-              << total_pop_std << " people";
-    std::cout.flush();
-
     auto current_time = static_cast<unsigned int>(context.time_now());
     for (const auto &person : context.population()) {
         unsigned int age = person.age;
@@ -1702,8 +1588,13 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
                 continue;
             }
 
-            const double value = person.get_risk_factor_value(factor.key());
+            // Check if risk factor exists before accessing (some risk factors may not be initialized
+            // for all projects)
+            if (person.risk_factors.find(factor.key()) != person.risk_factors.end()) {
+                const double value = person.risk_factors.at(factor.key());
             accumulate_squared_diffs(factor.key().to_string(), sex, age, value);
+            }
+            // If risk factor doesn't exist, skip it
         }
 
         // NEW: Calculate standard deviation for demographic factors (only if data exists)
@@ -1746,49 +1637,30 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
         }
 
         processed_std++;
-        if (processed_std == 1 || processed_std == 10 || processed_std == 100 ||
-            processed_std % 50000 == 0) {
-            std::cout << "\nDEBUG: AnalysisModule calculate_standard_deviation processed "
-                      << processed_std << " people";
-            std::cout.flush();
-        }
     }
-    std::cout << "\nDEBUG: AnalysisModule calculate_standard_deviation - accumulation completed, "
-                 "processed "
-              << processed_std << " people";
-    std::cout.flush();
 
     // Calculate in-place standard deviation (only if channel exists)
     // Note: available_channels was already created above for accumulate_squared_diffs
     auto divide_by_count_sqrt = [&series, &available_channels](const std::string &chan,
                                                                core::Gender sex, int age,
-                                                               double count) {
+                                          double count) {
         std::string std_channel = core::to_lower("std_" + chan);
         // Only access if channel exists
         if (available_channels.find(std_channel) != available_channels.end()) {
-            if (count > 0) {
-                const double sum = series(sex, "std_" + chan).at(age);
-                const double std = std::sqrt(sum / count);
-                series(sex, "std_" + chan).at(age) = std;
-            } else {
-                series(sex, "std_" + chan).at(age) = 0.0;
+        if (count > 0) {
+            const double sum = series(sex, "std_" + chan).at(age);
+            const double std = std::sqrt(sum / count);
+            series(sex, "std_" + chan).at(age) = std;
+        } else {
+            series(sex, "std_" + chan).at(age) = 0.0;
             }
         }
     };
 
     // For each age group in the analysis...
     const auto age_range = context.age_range();
-    std::cout << "\nDEBUG: AnalysisModule calculate_standard_deviation - computing std dev for age "
-                 "range ["
-              << age_range.lower() << ", " << age_range.upper() << "]";
-    std::cout.flush();
 
     for (int age = age_range.lower(); age <= age_range.upper(); age++) {
-        if (age == age_range.lower() || age % 10 == 0 || age == age_range.upper()) {
-            std::cout << "\nDEBUG: Computing std dev for age " << age;
-            std::cout.flush();
-        }
-
         double count_F = series(core::Gender::female, "count").at(age);
         double count_M = series(core::Gender::male, "count").at(age);
         double deaths_F = series(core::Gender::female, "deaths").at(age);
@@ -1839,8 +1711,6 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
         divide_by_count_sqrt("physical_activity", core::Gender::female, age, count_F);
         divide_by_count_sqrt("physical_activity", core::Gender::male, age, count_M);
     }
-    std::cout << "\nDEBUG: AnalysisModule calculate_standard_deviation - completed";
-    std::cout.flush();
 }
 
 void AnalysisModule::classify_weight(DataSeries &series, const Person &entity) const {
