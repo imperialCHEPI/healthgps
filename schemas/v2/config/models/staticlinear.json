@@ -535,6 +535,47 @@
                                 "delimiter"
                             ],
                             "additionalProperties": false
+                        },
+                        "logistic_regression": {
+                            "type": "object",
+                            "description": "CSV file containing logistic regression coefficients for two-stage modeling (optional). Used to determine zero probability before BoxCox transformation.",
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "description": "CSV file name containing logistic regression coefficients (e.g., logistic_regression.csv)"
+                                },
+                                "format": {
+                                    "type": "string",
+                                    "enum": [
+                                        "csv"
+                                    ],
+                                    "default": "csv"
+                                },
+                                "delimiter": {
+                                    "type": "string",
+                                    "default": ","
+                                },
+                                "encoding": {
+                                    "type": "string",
+                                    "default": "ASCII"
+                                },
+                                "columns": {
+                                    "type": "object",
+                                    "description": "Column definitions for risk factors (columns in CSV)",
+                                    "additionalProperties": {
+                                        "type": "string",
+                                        "enum": [
+                                            "double"
+                                        ]
+                                    }
+                                }
+                            },
+                            "required": [
+                                "name",
+                                "format",
+                                "delimiter"
+                            ],
+                            "additionalProperties": false
                         }
                     },
                     "required": [
