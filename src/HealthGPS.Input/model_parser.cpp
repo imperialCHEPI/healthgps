@@ -439,6 +439,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     std::vector<double> stddev;
     std::vector<LinearModelParams> policy_models;
     std::vector<core::DoubleInterval> policy_ranges;
+    // Two-stage modeling: Logistic regression models (optional)
+    std::vector<LinearModelParams> logistic_models;
     auto trend_models = std::make_unique<std::vector<LinearModelParams>>();
     auto trend_ranges = std::make_unique<std::vector<core::DoubleInterval>>();
     auto trend_lambda = std::make_unique<std::vector<double>>();
@@ -462,6 +464,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     std::unordered_map<std::string, std::unordered_map<std::string, double>> csv_coefficients;
     std::unordered_map<std::string, std::unordered_map<std::string, double>>
         csv_policy_coefficients;
+    std::unordered_map<std::string, std::unordered_map<std::string, double>>
+        csv_logistic_coefficients;
 
     if (is_matrix_based_structure) {
         std::cout << "\nDEBUG: Loading matrix-based CSV coefficients...";
@@ -536,10 +540,54 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             }
         }
 
+        // Load logistic regression coefficients if they exist (for two-stage modeling)
+        if (opt["RiskFactorModels"].contains("logistic_regression")) {
+            const auto &logistic_config = opt["RiskFactorModels"]["logistic_regression"];
+            std::string logistic_filename = logistic_config["name"].get<std::string>();
+            std::string logistic_delimiter =
+                logistic_config.contains("delimiter") ? logistic_config["delimiter"] : ",";
+            if (logistic_delimiter == "\\t") {
+                logistic_delimiter = "\t";
+            }
+
+            std::filesystem::path logistic_path = config.root_path / logistic_filename;
+            rapidcsv::Document logistic_doc(logistic_path.string(), rapidcsv::LabelParams{},
+                                            rapidcsv::SeparatorParams{logistic_delimiter.front()});
+
+            std::cout << "\n  Loading logistic regression coefficients from: " << logistic_filename;
+            std::cout << "\n    CSV dimensions: " << logistic_doc.GetRowCount() << " rows, "
+                      << logistic_doc.GetColumnCount() << " columns";
+
+            // Load logistic coefficients: row names (coefficients) -> column names (risk factors) ->
+            // values
+            // CSV structure: rows = coefficients, columns = risk factors
+            for (size_t row_idx = 0; row_idx < logistic_doc.GetRowCount(); ++row_idx) {
+                std::string coefficient_name = logistic_doc.GetCell<std::string>(0, row_idx);
+                csv_logistic_coefficients[coefficient_name] = {};
+
+                for (size_t col_idx = 1; col_idx < logistic_doc.GetColumnCount(); ++col_idx) {
+                    std::string risk_factor_name = logistic_doc.GetColumnName(col_idx);
+                    // Convert CSV column name to lowercase to match correlation matrix naming
+                    std::transform(risk_factor_name.begin(), risk_factor_name.end(),
+                                   risk_factor_name.begin(), ::tolower);
+                    double coefficient_value = logistic_doc.GetCell<double>(col_idx, row_idx);
+                    csv_logistic_coefficients[coefficient_name][risk_factor_name] =
+                        coefficient_value;
+                }
+            }
+
+            std::cout << "\n    Logistic regression coefficients: "
+                      << csv_logistic_coefficients.size() << " coefficient types";
+        }
+
         std::cout << "\nDEBUG: CSV coefficients loaded successfully";
         std::cout << "\n  BoxCox coefficients: " << csv_coefficients.size() << " coefficient types";
         std::cout << "\n  Policy coefficients: " << csv_policy_coefficients.size()
                   << " coefficient types";
+        if (!csv_logistic_coefficients.empty()) {
+            std::cout << "\n  Logistic regression coefficients: " << csv_logistic_coefficients.size()
+                      << " coefficient types";
+        }
     }
 
     // MAHIMA: Use CSV order instead of JSON iteration order to ensure consistency
@@ -837,6 +885,34 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             policy_ranges.emplace_back((*policy_json_params)["Range"].get<core::DoubleInterval>());
         }
         // Policy covariance matrix already loaded from rapidcsv above
+
+        // MAHIMA: Build logistic regression model for this risk factor (if available)
+        LinearModelParams logistic_model;
+        if (is_matrix_based_structure && !csv_logistic_coefficients.empty()) {
+            // Check if this risk factor has logistic regression data
+            if (csv_logistic_coefficients.find("Intercept") != csv_logistic_coefficients.end() &&
+                csv_logistic_coefficients.at("Intercept").find(csv_risk_factor_name) !=
+                    csv_logistic_coefficients.at("Intercept").end()) {
+                // This risk factor has logistic regression data
+                logistic_model.intercept =
+                    csv_logistic_coefficients.at("Intercept").at(csv_risk_factor_name);
+
+                // Load logistic coefficients from CSV data
+                for (const auto &[coeff_name, coeff_map] : csv_logistic_coefficients) {
+                    if (coeff_name == "Intercept")
+                        continue; // Skip intercept, already handled
+
+                    if (coeff_map.find(csv_risk_factor_name) != coeff_map.end()) {
+                        logistic_model.coefficients[core::Identifier(coeff_name)] =
+                            coeff_map.at(csv_risk_factor_name);
+                    }
+                }
+            }
+            // If no logistic data for this risk factor, logistic_model will be empty (no coefficients)
+            // This is intentional - empty model means skip Stage 1 and use BoxCox only
+        }
+        // For legacy structure, logistic_model remains empty (no logistic regression support)
+        logistic_models.emplace_back(std::move(logistic_model));
 
         // MAHIMA: Trend model parameters
         if (trend_type == hgps::TrendType::Null) {
@@ -1336,9 +1412,10 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             std::move(rural_prevalence), std::move(income_models), physical_activity_stddev,
             trend_type, std::move(expected_income_trend), std::move(expected_income_trend_boxcox),
             std::move(income_trend_steps), std::move(income_trend_models),
-            std::move(income_trend_ranges), std::move(income_trend_lambda),
-            std::move(income_trend_decay_factors), is_continuous_model, continuous_income_model,
-            income_categories, std::move(physical_activity_models));
+        std::move(income_trend_ranges), std::move(income_trend_lambda),
+        std::move(income_trend_decay_factors), is_continuous_model, continuous_income_model,
+        income_categories, std::move(physical_activity_models), has_active_policies,
+        std::move(logistic_models));
 
         std::cout << "\nDEBUG: StaticLinearModelDefinition created successfully";
         return result;

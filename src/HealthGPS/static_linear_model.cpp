@@ -8,6 +8,7 @@
 #include <cmath>
 #include <iostream> // Added for print statements
 #include <ranges>
+#include <unordered_map>
 #include <utility>
 
 namespace hgps {
@@ -39,7 +40,8 @@ StaticLinearModel::StaticLinearModel(
     bool is_continuous_income_model, const LinearModelParams &continuous_income_model,
     const std::string &income_categories,
     const std::unordered_map<core::Identifier, PhysicalActivityModel> &physical_activity_models,
-    bool has_active_policies)
+    bool has_active_policies,
+    const std::vector<LinearModelParams> &logistic_models)
     // NOLINTNEXTLINE(readability-function-cognitive-complexity)
     : RiskFactorAdjustableModel{std::move(expected),       expected_trend, trend_steps, trend_type,
                                 expected_income_trend,       // Pass by value, not moved
@@ -68,7 +70,8 @@ StaticLinearModel::StaticLinearModel(
       physical_activity_stddev_{physical_activity_stddev},
       physical_activity_models_{physical_activity_models},
       has_physical_activity_models_{!physical_activity_models.empty()},
-      has_active_policies_{has_active_policies} {
+      has_active_policies_{has_active_policies},
+      logistic_models_{logistic_models} {
 
     if (names_.empty()) {
         throw core::HgpsException("Risk factor names list is empty");
@@ -436,10 +439,16 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
                                            Random &random) const {
     static int factors_count = 0;
     static bool first_call = true;
+    static bool summary_printed = false;
+    static std::unordered_map<core::Identifier, int> risk_factor_counts;
+    static size_t total_population_size = 0;
+    static size_t initial_generation_count = 0;
     factors_count++;
 
     if (first_call) {
         std::cout << "\nStarting risk factors initialization...";
+        total_population_size = context.population().size();
+        initial_generation_count = total_population_size;
         first_call = false;
     }
     // Correlated residual sampling.
@@ -461,16 +470,61 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
         // Initialise risk factor.
         double expected =
             get_expected(context, person.gender, person.age, names_[i], ranges_[i], false);
+
+        // TWO-STAGE RISK FACTOR MODELING APPROACH- Mahima
+        // =======================================================================
+        // Previous approach: Use BoxCox transformation to calculate risk factor values
+        // New approach: First use logistic regression to determine if the risk factor value should
+        //              be zero
+        //              If non-zero, then use BoxCox transformation to calculate the actual value
+        // =======================================================================
+
+        // MAHIMA: Check if this risk factor has logistic coefficients
+        // Empty logistic model means intentionally skip Stage 1 and use boxcox-only modeling
+        bool has_logistic_model = !(logistic_models_[i].coefficients.empty());
+
+        // STAGE 1: Determine if risk factor should be zero (only if logistic model exists)
+        if (has_logistic_model) {
+            double zero_probability = calculate_zero_probability(person, i);
+
+            // Sample from this probability to determine if risk factor should be zero
+            // if logistic regression output = 1, risk factor value = 0
+            double random_sample = random.next_double(); // Uniform random value between 0 and 1
+            if (random_sample < zero_probability) {
+                // Risk factor should be zero
+                person.risk_factors[names_[i]] = 0.0;
+                // Track assignment count for this risk factor (only during initial generation)
+                if (!summary_printed) {
+                    risk_factor_counts[names_[i]]++;
+                }
+                continue;
+            }
+        }
+
+        // STAGE 2: Calculate non-zero risk factor value using BoxCox transformation
+        // (This code runs whether we have a logistic model or not)
         double factor = linear[i] + residual * stddev_[i];
         factor = expected * inverse_box_cox(factor, lambda_[i]);
         factor = ranges_[i].clamp(factor);
 
-        // Save risk factor.
+        // Save risk factor
         person.risk_factors[names_[i]] = factor;
+        
+        // Track assignment count for this risk factor (only during initial generation)
+        if (!summary_printed) {
+            risk_factor_counts[names_[i]]++;
+        }
     }
 
-    if (factors_count % 5000 == 0) {
-        std::cout << "\nSuccessfully initialized risk factors for " << factors_count << " people";
+    // Print summary once at the end of initial generation (not during updates for newborns)
+    if (!summary_printed && factors_count == initial_generation_count) {
+        std::cout << "\n=== Risk Factor Assignment Summary ===";
+        for (const auto &name : names_) {
+            std::cout << "\nRisk factor " << name.to_string() << " is assigned to "
+                      << risk_factor_counts[name] << " people";
+        }
+        std::cout << "\n======================================";
+        summary_printed = true;
     }
 }
 
@@ -478,7 +532,7 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
                                        Random &random) const {
 
     // Correlated residual sampling.
-    auto residuals = compute_residuals(random, cholesky_);
+    auto new_residuals = compute_residuals(random, cholesky_);
 
     // Approximate risk factors with linear models.
     auto linear = compute_linear_models(person, models_);
@@ -486,23 +540,57 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
     // Update residuals and risk factors (should exist).
     for (size_t i = 0; i < names_.size(); i++) {
 
+        // Get the risk factor name and expected value
+        double expected =
+            get_expected(context, person.gender, person.age, names_[i], ranges_[i], false);
+
+        // Blend old and new residuals
         // Update residual.
         auto residual_name = core::Identifier{names_[i].to_string() + "_residual"};
         double residual_old = person.risk_factors.at(residual_name);
-        double residual = residuals[i] * info_speed_;
+        double residual = new_residuals[i] * info_speed_;
         residual += sqrt(1.0 - info_speed_ * info_speed_) * residual_old;
 
         // Save residual.
         person.risk_factors.at(residual_name) = residual;
 
-        // Update risk factor.
-        double expected =
-            get_expected(context, person.gender, person.age, names_[i], ranges_[i], false);
+        // TWO-STAGE RISK FACTOR MODELING APPROACH- Mahima
+        // =======================================================================
+        // Use both this year's zero probability and previous outcome
+        // =======================================================================
+
+        // MAHIMA: Check if this risk factor has logistic coefficients
+        // Empty logistic model means intentionally skip Stage 1 and use boxcox-only modeling
+        bool has_logistic_model = !(logistic_models_[i].coefficients.empty());
+
+        // STAGE 1: Determine if risk factor should be zero (only if logistic model exists)
+        if (has_logistic_model) {
+            double zero_probability = calculate_zero_probability(person, i);
+
+            // HACK: To maintain longitudinal correlation among people, amend their "probability of
+            // being a zero" according to their current zero-probability...
+            // ... and either 1 if they were a zero, or 0 if they were not.
+            if (person.risk_factors[names_[i]] == 0) {
+                zero_probability = (zero_probability + 1.0) / 2.0;
+            } else {
+                zero_probability = (zero_probability + 0.0) / 2.0;
+            }
+
+            // Draw random number to determine if risk factor should be zero
+            if (random.next_double() < zero_probability) {
+                // Risk factor should be zero
+                person.risk_factors[names_[i]] = 0.0;
+                continue;
+            }
+        }
+
+        // STAGE 2: Calculate non-zero risk factor value using BoxCox transformation
+        // (This code runs whether we have a logistic model or not)
         double factor = linear[i] + residual * stddev_[i];
         factor = expected * inverse_box_cox(factor, lambda_[i]);
         factor = ranges_[i].clamp(factor);
 
-        // Save risk factor.
+        // Save risk factor
         person.risk_factors.at(names_[i]) = factor;
     }
 }
@@ -720,35 +808,96 @@ StaticLinearModel::compute_linear_models(Person &person,
     std::vector<double> linear{};
     linear.reserve(names_.size());
 
-    // Approximate risk factors with linear models.
+    // Pre-calculate capped age values once (outside the model loop)- Mahima
+    constexpr double max_age = 80.0; // Define appropriate maximum age
+    const double capped_age = std::min(static_cast<double>(person.age), max_age);
+    const double capped_age_squared = capped_age * capped_age;
+    const double capped_age_cubed = capped_age_squared * capped_age;
+
+    // Cache common age identifiers for faster comparison using case sensitive approach for Age and
+    // age- Mahima
+    static const core::Identifier age_id("age");
+    static const core::Identifier age2_id("age2");
+    static const core::Identifier age3_id("age3");
+    static const core::Identifier Age_id("Age");
+    static const core::Identifier Age2_id("Age2");
+    static const core::Identifier Age3_id("Age3");
+    static const core::Identifier stddev_id("stddev");
+
+    // Approximate risk factors with linear models
     for (size_t i = 0; i < names_.size(); i++) {
+        if (i >= models.size()) {
+            std::cout << "\nERROR: compute_linear_models - Index " << i
+                      << " is out of bounds for models vector of size " << models.size();
+            linear.push_back(0.0); // Default value
+            continue;
+        }
+
         auto name = names_[i];
         auto model = models[i];
-
         double factor = model.intercept;
+
         for (const auto &[coefficient_name, coefficient_value] : model.coefficients) {
-            try {
+            // Skip the standard deviation entry as it's not a factor
+            if (coefficient_name == stddev_id)
+                continue;
+
+            // Efficiently handle age-related coefficients
+            if (coefficient_name == age_id || coefficient_name == Age_id) {
+                factor += coefficient_value * capped_age;
+            } else if (coefficient_name == age2_id || coefficient_name == Age2_id) {
+                factor += coefficient_value * capped_age_squared;
+            } else if (coefficient_name == age3_id || coefficient_name == Age3_id) {
+                factor += coefficient_value * capped_age_cubed;
+            } else {
+                // Regular coefficient processing
                 double value = person.get_risk_factor_value(coefficient_name);
                 factor += coefficient_value * value;
-            } catch (const std::exception &) {
-                // Coefficient not found - skip it (use 0.0 contribution)
-                // This allows the code to work regardless of which attributes are available
-                // For example, region/ethnicity for FINCH, sector for India/PIF
             }
         }
+
         for (const auto &[coefficient_name, coefficient_value] : model.log_coefficients) {
-            try {
                 double value = person.get_risk_factor_value(coefficient_name);
-                factor += coefficient_value * log(value);
-            } catch (const std::exception &) {
-                // Log coefficient not found - skip it (use 0.0 contribution)
-                // This allows the code to work regardless of which attributes are available
+
+            if (value <= 0) {
+                value = 1e-10; // Avoid log of zero or negative
             }
+                factor += coefficient_value * log(value);
         }
+
         linear.emplace_back(factor);
     }
 
     return linear;
+}
+
+
+// Calculate the probability of a risk factor being zero using logistic regression- Mahima
+double StaticLinearModel::calculate_zero_probability(Person &person,
+                                                     size_t risk_factor_index) const {
+    // Get the logistic model for this risk factor
+    const auto &logistic_model = logistic_models_[risk_factor_index];
+
+    // Calculate the linear predictor using the logistic model
+    double logistic_linear_term = logistic_model.intercept;
+
+    // Add the coefficients
+    for (const auto &[coef_name, coef_value] : logistic_model.coefficients) {
+        logistic_linear_term += coef_value * person.get_risk_factor_value(coef_name);
+    }
+
+    // logistic function: p = 1 / (1 + exp(-linear_term))
+    double probability = 1.0 / (1.0 + std::exp(-logistic_linear_term));
+
+    // Only print if probability is outside the valid range [0,1] coz logistic regression should be
+    // only within 0 and 1 This should never happen with a proper logistic function, but check for
+    // numerical issues
+    if (probability < 0.0 || probability > 1.0) {
+        std::cout << "\nWARNING: Invalid logistic probability for "
+                  << names_[risk_factor_index].to_string() << ": " << probability
+                  << " (should be between 0 and 1)";
+    }
+    return probability;
 }
 
 std::vector<double> StaticLinearModel::compute_residuals(Random &random,
@@ -1232,11 +1381,6 @@ void StaticLinearModel::initialise_physical_activity(RuntimeContext &context, Pe
         simple_model.stddev = physical_activity_stddev_;
         initialise_simple_physical_activity(context, person, random, simple_model);
     }
-
-    if (physical_activity_count % 5000 == 0) {
-        std::cout << "\nSuccessfully initialized physical activity for " << physical_activity_count
-                  << " people";
-    }
 }
 
 // MAHIMA: Function to initialise continuous physical activity model using regression.
@@ -1461,7 +1605,8 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     bool is_continuous_income_model, const LinearModelParams &continuous_income_model,
     const std::string &income_categories,
     std::unordered_map<core::Identifier, PhysicalActivityModel> physical_activity_models,
-    bool has_active_policies)
+    bool has_active_policies,
+    std::vector<LinearModelParams> logistic_models)
     // NOLINTNEXTLINE(readability-function-cognitive-complexity)
     : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend),
                                           std::move(trend_steps), trend_type},
@@ -1512,7 +1657,8 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
       // Continuous income model support (FINCH approach)
       is_continuous_income_model_{is_continuous_income_model},
       continuous_income_model_{continuous_income_model}, income_categories_{income_categories},
-      has_active_policies_{has_active_policies} {
+      has_active_policies_{has_active_policies},
+      logistic_models_{std::move(logistic_models)} {
 
     if (names_.empty()) {
         throw core::HgpsException("Risk factor names list is empty");
@@ -1651,7 +1797,7 @@ std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() con
         expected_income_trend_boxcox_, income_trend_steps_, income_trend_models_,
         income_trend_ranges_, income_trend_lambda_, income_trend_decay_factors_,
         is_continuous_income_model_, continuous_income_model_, income_categories_,
-        physical_activity_models_, has_active_policies_);
+        physical_activity_models_, has_active_policies_, logistic_models_);
 }
 
 } // namespace hgps

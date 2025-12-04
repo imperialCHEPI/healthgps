@@ -113,7 +113,10 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
         /// FINCH (continuous) approaches
         const std::unordered_map<core::Identifier, PhysicalActivityModel>
             &physical_activity_models = {},
-        bool has_active_policies = true);
+        bool has_active_policies = true,
+        /// @param logistic_models Logistic regression models for two-stage modeling (optional)
+        /// Empty models indicate no logistic regression for that risk factor
+        const std::vector<LinearModelParams> &logistic_models = {});
 
     RiskFactorModelType type() const noexcept override;
 
@@ -170,6 +173,12 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
                                               const std::vector<LinearModelParams> &models) const;
 
     std::vector<double> compute_residuals(Random &random, const Eigen::MatrixXd &cholesky) const;
+
+    /// @brief Calculate the probability of a risk factor being zero using logistic regression
+    /// @param person The person to calculate zero probability for
+    /// @param risk_factor_index The index of the risk factor in names_ vector
+    /// @return The probability that the risk factor should be zero (between 0 and 1)
+    double calculate_zero_probability(Person &person, size_t risk_factor_index) const;
 
     /// @brief Initialise the sector of a person
     /// @param person The person to initialise sector for
@@ -287,6 +296,9 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     bool has_physical_activity_models_ = false;
     // Policy optimization flag - Mahima's enhancement
     bool has_active_policies_;
+
+    // Two-stage modeling: Logistic regression for zero probability (optional)
+    const std::vector<LinearModelParams> &logistic_models_;
 };
 
 /// @brief Defines the static linear model data type
@@ -358,7 +370,9 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
         const LinearModelParams &continuous_income_model = LinearModelParams{},
         const std::string &income_categories = "3",
         std::unordered_map<core::Identifier, PhysicalActivityModel> physical_activity_models = {},
-        bool has_active_policies = true);
+        bool has_active_policies = true,
+        /// @param logistic_models Logistic regression models for two-stage modeling (optional)
+        std::vector<LinearModelParams> logistic_models = {});
 
     /// @brief Construct a new StaticLinearModel from this definition
     /// @return A unique pointer to the new StaticLinearModel instance
@@ -402,11 +416,14 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     std::unordered_map<core::Identifier, PhysicalActivityModel> physical_activity_models_;
     bool has_physical_activity_models_ = false;
 
+    // Two-stage modeling: Logistic regression for zero probability (optional)
+    std::vector<LinearModelParams> logistic_models_;
+
     // Continuous income model support (FINCH approach)
     bool is_continuous_income_model_;
     LinearModelParams continuous_income_model_;
     std::string income_categories_;
-    // Policy optimization flag - Mahima's enhancement
+    // Policy optimization flag - Mahima
     bool has_active_policies_;
 };
 
