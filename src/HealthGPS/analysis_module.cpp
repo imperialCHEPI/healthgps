@@ -217,14 +217,14 @@ void AnalysisModule::calculate_historical_statistics(RuntimeContext &context,
         gender_age_sum[entity.gender] += entity.age;
         gender_count[entity.gender]++;
         for (auto &item : risk_factors) {
-            // Check if risk factor exists before accessing (some risk factors may not be initialized
-            // for all projects)
+            // Check if risk factor exists before accessing (some risk factors may not be
+            // initialized for all projects)
             double factor_value = 0.0;
             if (entity.risk_factors.find(item.first) != entity.risk_factors.end()) {
                 factor_value = entity.risk_factors.at(item.first);
-            if (std::isnan(factor_value)) {
-                factor_value = 0.0;
-            }
+                if (std::isnan(factor_value)) {
+                    factor_value = 0.0;
+                }
             }
             // If risk factor doesn't exist, factor_value remains 0.0
 
@@ -316,10 +316,10 @@ void AnalysisModule::calculate_income_based_statistics(RuntimeContext &context,
         // Risk factors by income
         for (const auto &factor : context.mapping().entries()) {
             if (factor.level() > 0) {
-                // Check if risk factor exists before accessing (some risk factors may not be initialized
-                // for all projects)
+                // Check if risk factor exists before accessing (some risk factors may not be
+                // initialized for all projects)
                 if (person.risk_factors.find(factor.key()) != person.risk_factors.end()) {
-                risk_factors_by_income[factor.key()][income][person.gender] +=
+                    risk_factors_by_income[factor.key()][income][person.gender] +=
                         person.risk_factors.at(factor.key());
                 }
             }
@@ -706,8 +706,8 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
                 continue;
             }
 
-            // Check if risk factor exists before accessing (some risk factors may not be initialized
-            // for all projects)
+            // Check if risk factor exists before accessing (some risk factors may not be
+            // initialized for all projects)
             if (person.risk_factors.find(factor.key()) != person.risk_factors.end()) {
                 double factor_value = person.risk_factors.at(factor.key());
                 series(gender, "mean_" + factor.key().to_string()).at(age) += factor_value;
@@ -892,32 +892,32 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
 
     // MAHIMA: Add demographic channels for income analysis (only if data exists)
     if (has_sector) {
-    income_channels.emplace_back("mean_sector");
-    income_channels.emplace_back("std_sector");
+        income_channels.emplace_back("mean_sector");
+        income_channels.emplace_back("std_sector");
     }
     if (has_region) {
-    income_channels.emplace_back("mean_region");
-    income_channels.emplace_back("std_region");
+        income_channels.emplace_back("mean_region");
+        income_channels.emplace_back("std_region");
     }
     if (has_ethnicity) {
-    income_channels.emplace_back("mean_ethnicity");
-    income_channels.emplace_back("std_ethnicity");
+        income_channels.emplace_back("mean_ethnicity");
+        income_channels.emplace_back("std_ethnicity");
     }
 
     // MAHIMA: Add enhanced income channels for income analysis (only if data exists)
     if (has_income_category) {
-    income_channels.emplace_back("mean_income_category");
-    income_channels.emplace_back("std_income_category");
+        income_channels.emplace_back("mean_income_category");
+        income_channels.emplace_back("std_income_category");
     }
     if (has_income_continuous) {
-    income_channels.emplace_back("mean_income_continuous");
-    income_channels.emplace_back("std_income_continuous");
+        income_channels.emplace_back("mean_income_continuous");
+        income_channels.emplace_back("std_income_continuous");
     }
 
     // MAHIMA: Add physical activity channels for income analysis (only if data exists)
     if (has_physical_activity) {
-    income_channels.emplace_back("mean_physical_activity");
-    income_channels.emplace_back("std_physical_activity");
+        income_channels.emplace_back("mean_physical_activity");
+        income_channels.emplace_back("std_physical_activity");
     }
 
     // Add risk factor channels
@@ -1034,7 +1034,7 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
             if (!person.is_alive() && person.time_of_death() == current_time) {
                 safe_increment_channel(gender, income, "deaths", age);
                 float expcted_life = definition_.life_expectancy().at(context.time_now(), gender);
-                    double yll = std::max(expcted_life - age, 0.0f) * DALY_UNITS;
+                double yll = std::max(expcted_life - age, 0.0f) * DALY_UNITS;
                 safe_add_to_channel(gender, income, "mean_yll", age, yll);
                 safe_add_to_channel(gender, income, "mean_daly", age, yll);
             }
@@ -1059,8 +1059,8 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
                 continue;
             }
 
-            // Check if risk factor exists before accessing (some risk factors may not be initialized
-            // for all projects)
+            // Check if risk factor exists before accessing (some risk factors may not be
+            // initialized for all projects)
             auto channel_name = "mean_" + factor.key().to_string();
             if (person.risk_factors.find(factor.key()) != person.risk_factors.end()) {
                 double value = person.risk_factors.at(factor.key());
@@ -1077,31 +1077,31 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
                             static_cast<double>(static_cast<int>(person.sector)));
 
         // NEW: Collect enhanced demographic data by income (only if available)
-            // Region data - check if person has region assigned
-            if (!person.region.empty() && person.region != "unknown") {
+        // Region data - check if person has region assigned
+        if (!person.region.empty() && person.region != "unknown") {
             safe_add_to_channel(gender, income, "mean_region", age, person.region_to_value());
-            }
+        }
 
-            // Ethnicity data - check if person has ethnicity assigned
-            if (!person.ethnicity.empty() && person.ethnicity != "unknown") {
+        // Ethnicity data - check if person has ethnicity assigned
+        if (!person.ethnicity.empty() && person.ethnicity != "unknown") {
             safe_add_to_channel(gender, income, "mean_ethnicity", age, person.ethnicity_to_value());
-            }
+        }
 
-            // Income category - check if person has income assigned
-            if (person.income != core::Income::unknown) {
+        // Income category - check if person has income assigned
+        if (person.income != core::Income::unknown) {
             safe_add_to_channel(gender, income, "mean_income_category", age,
                                 person.income_to_value());
-            }
+        }
 
-            // Continuous income - check if available in risk factors
-            auto it = person.risk_factors.find("income_continuous"_id);
-            if (it != person.risk_factors.end()) {
+        // Continuous income - check if available in risk factors
+        auto it = person.risk_factors.find("income_continuous"_id);
+        if (it != person.risk_factors.end()) {
             safe_add_to_channel(gender, income, "mean_income_continuous", age, it->second);
-            }
+        }
 
-            // Physical activity - check if available in risk factors
-            auto pa_it = person.risk_factors.find("PhysicalActivity"_id);
-            if (pa_it != person.risk_factors.end()) {
+        // Physical activity - check if available in risk factors
+        auto pa_it = person.risk_factors.find("PhysicalActivity"_id);
+        if (pa_it != person.risk_factors.end()) {
             safe_add_to_channel(gender, income, "mean_physical_activity", age, pa_it->second);
         }
 
@@ -1343,17 +1343,17 @@ void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &c
     // Accumulate squared deviations from mean for income-based data
     auto accumulate_squared_diffs_income =
         [&series, &added_income_channels](const std::string &chan, core::Gender sex,
-                                                     core::Income income, int age, double value) {
+                                          core::Income income, int age, double value) {
             std::string mean_channel = core::to_lower("mean_" + chan);
             std::string std_channel = core::to_lower("std_" + chan);
             // Only accumulate if both mean and std channels were added
             if (added_income_channels.find(mean_channel) != added_income_channels.end() &&
                 added_income_channels.find(std_channel) != added_income_channels.end()) {
                 const double mean = series.at(sex, income, mean_channel).at(age);
-        const double diff = value - mean;
+                const double diff = value - mean;
                 series.at(sex, income, std_channel).at(age) += diff * diff;
             }
-    };
+        };
 
     auto current_time = static_cast<unsigned int>(context.time_now());
     for (const auto &person : context.population()) {
@@ -1383,16 +1383,16 @@ void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &c
                 if (person.income != core::Income::unknown) {
                     double income_value = person.income_to_value();
                     accumulate_squared_diffs_income("income_category", sex, income, age,
-                                                     income_value);
+                                                    income_value);
                 }
                 continue;
             }
 
-            // Check if risk factor exists before accessing (some risk factors may not be initialized
-            // for all projects)
+            // Check if risk factor exists before accessing (some risk factors may not be
+            // initialized for all projects)
             if (person.risk_factors.find(factor.key()) != person.risk_factors.end()) {
                 const double value = person.risk_factors.at(factor.key());
-            accumulate_squared_diffs_income(factor.key().to_string(), sex, income, age, value);
+                accumulate_squared_diffs_income(factor.key().to_string(), sex, income, age, value);
             }
             // If risk factor doesn't exist, skip it
         }
@@ -1443,19 +1443,19 @@ void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &c
     // Calculate in-place standard deviation for income-based data
     auto divide_by_count_sqrt_income =
         [&series, &added_income_channels](const std::string &chan, core::Gender sex,
-                                                 core::Income income, int age, double count) {
+                                          core::Income income, int age, double count) {
             std::string std_channel = core::to_lower("std_" + chan);
             // Only access if channel was added
             if (added_income_channels.find(std_channel) != added_income_channels.end()) {
-        if (count > 0) {
+                if (count > 0) {
                     const double sum = series.at(sex, income, std_channel).at(age);
-            const double std = std::sqrt(sum / count);
+                    const double std = std::sqrt(sum / count);
                     series.at(sex, income, std_channel).at(age) = std;
-        } else {
+                } else {
                     series.at(sex, income, std_channel).at(age) = 0.0;
                 }
-        }
-    };
+            }
+        };
 
     // For each income category and age group
     const auto age_range = context.age_range();
@@ -1527,7 +1527,7 @@ void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &c
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
-                                                 DataSeries &series) const {
+                                                  DataSeries &series) const {
 
     // Create a set of available channels (lowercase) for safe access
     std::unordered_set<std::string> available_channels;
@@ -1538,15 +1538,15 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
     // Accumulate squared deviations from mean (with safe channel access).
     auto accumulate_squared_diffs = [&series, &available_channels](const std::string &chan,
                                                                    core::Gender sex, int age,
-                                              double value) {
+                                                                   double value) {
         std::string mean_channel = core::to_lower("mean_" + chan);
         std::string std_channel = core::to_lower("std_" + chan);
         // Only accumulate if both mean and std channels exist
         if (available_channels.find(mean_channel) != available_channels.end() &&
             available_channels.find(std_channel) != available_channels.end()) {
-        const double mean = series(sex, "mean_" + chan).at(age);
-        const double diff = value - mean;
-        series(sex, "std_" + chan).at(age) += diff * diff;
+            const double mean = series(sex, "mean_" + chan).at(age);
+            const double diff = value - mean;
+            series(sex, "std_" + chan).at(age) += diff * diff;
         }
     };
 
@@ -1588,11 +1588,11 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
                 continue;
             }
 
-            // Check if risk factor exists before accessing (some risk factors may not be initialized
-            // for all projects)
+            // Check if risk factor exists before accessing (some risk factors may not be
+            // initialized for all projects)
             if (person.risk_factors.find(factor.key()) != person.risk_factors.end()) {
                 const double value = person.risk_factors.at(factor.key());
-            accumulate_squared_diffs(factor.key().to_string(), sex, age, value);
+                accumulate_squared_diffs(factor.key().to_string(), sex, age, value);
             }
             // If risk factor doesn't exist, skip it
         }
@@ -1643,16 +1643,16 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
     // Note: available_channels was already created above for accumulate_squared_diffs
     auto divide_by_count_sqrt = [&series, &available_channels](const std::string &chan,
                                                                core::Gender sex, int age,
-                                          double count) {
+                                                               double count) {
         std::string std_channel = core::to_lower("std_" + chan);
         // Only access if channel exists
         if (available_channels.find(std_channel) != available_channels.end()) {
-        if (count > 0) {
-            const double sum = series(sex, "std_" + chan).at(age);
-            const double std = std::sqrt(sum / count);
-            series(sex, "std_" + chan).at(age) = std;
-        } else {
-            series(sex, "std_" + chan).at(age) = 0.0;
+            if (count > 0) {
+                const double sum = series(sex, "std_" + chan).at(age);
+                const double std = std::sqrt(sum / count);
+                series(sex, "std_" + chan).at(age) = std;
+            } else {
+                series(sex, "std_" + chan).at(age) = 0.0;
             }
         }
     };
