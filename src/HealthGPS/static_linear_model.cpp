@@ -40,8 +40,7 @@ StaticLinearModel::StaticLinearModel(
     bool is_continuous_income_model, const LinearModelParams &continuous_income_model,
     const std::string &income_categories,
     const std::unordered_map<core::Identifier, PhysicalActivityModel> &physical_activity_models,
-    bool has_active_policies,
-    const std::vector<LinearModelParams> &logistic_models)
+    bool has_active_policies, const std::vector<LinearModelParams> &logistic_models)
     // NOLINTNEXTLINE(readability-function-cognitive-complexity)
     : RiskFactorAdjustableModel{std::move(expected),       expected_trend, trend_steps, trend_type,
                                 expected_income_trend,       // Pass by value, not moved
@@ -70,8 +69,7 @@ StaticLinearModel::StaticLinearModel(
       physical_activity_stddev_{physical_activity_stddev},
       physical_activity_models_{physical_activity_models},
       has_physical_activity_models_{!physical_activity_models.empty()},
-      has_active_policies_{has_active_policies},
-      logistic_models_{logistic_models} {
+      has_active_policies_{has_active_policies}, logistic_models_{logistic_models} {
 
     if (names_.empty()) {
         throw core::HgpsException("Risk factor names list is empty");
@@ -509,7 +507,7 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
 
         // Save risk factor
         person.risk_factors[names_[i]] = factor;
-        
+
         // Track assignment count for this risk factor (only during initial generation)
         if (!summary_printed) {
             risk_factor_counts[names_[i]]++;
@@ -857,12 +855,12 @@ StaticLinearModel::compute_linear_models(Person &person,
         }
 
         for (const auto &[coefficient_name, coefficient_value] : model.log_coefficients) {
-                double value = person.get_risk_factor_value(coefficient_name);
+            double value = person.get_risk_factor_value(coefficient_name);
 
             if (value <= 0) {
                 value = 1e-10; // Avoid log of zero or negative
             }
-                factor += coefficient_value * log(value);
+            factor += coefficient_value * log(value);
         }
 
         linear.emplace_back(factor);
@@ -870,7 +868,6 @@ StaticLinearModel::compute_linear_models(Person &person,
 
     return linear;
 }
-
 
 // Calculate the probability of a risk factor being zero using logistic regression- Mahima
 double StaticLinearModel::calculate_zero_probability(Person &person,
@@ -1605,8 +1602,7 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     bool is_continuous_income_model, const LinearModelParams &continuous_income_model,
     const std::string &income_categories,
     std::unordered_map<core::Identifier, PhysicalActivityModel> physical_activity_models,
-    bool has_active_policies,
-    std::vector<LinearModelParams> logistic_models)
+    bool has_active_policies, std::vector<LinearModelParams> logistic_models)
     // NOLINTNEXTLINE(readability-function-cognitive-complexity)
     : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend),
                                           std::move(trend_steps), trend_type},
@@ -1657,8 +1653,7 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
       // Continuous income model support (FINCH approach)
       is_continuous_income_model_{is_continuous_income_model},
       continuous_income_model_{continuous_income_model}, income_categories_{income_categories},
-      has_active_policies_{has_active_policies},
-      logistic_models_{std::move(logistic_models)} {
+      has_active_policies_{has_active_policies}, logistic_models_{std::move(logistic_models)} {
 
     if (names_.empty()) {
         throw core::HgpsException("Risk factor names list is empty");

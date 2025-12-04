@@ -558,9 +558,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             std::cout << "\n    CSV dimensions: " << logistic_doc.GetRowCount() << " rows, "
                       << logistic_doc.GetColumnCount() << " columns";
 
-            // Load logistic coefficients: row names (coefficients) -> column names (risk factors) ->
-            // values
-            // CSV structure: rows = coefficients, columns = risk factors
+            // Load logistic coefficients: row names (coefficients) -> column names (risk factors)
+            // -> values CSV structure: rows = coefficients, columns = risk factors
             for (size_t row_idx = 0; row_idx < logistic_doc.GetRowCount(); ++row_idx) {
                 std::string coefficient_name = logistic_doc.GetCell<std::string>(0, row_idx);
                 csv_logistic_coefficients[coefficient_name] = {};
@@ -585,8 +584,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         std::cout << "\n  Policy coefficients: " << csv_policy_coefficients.size()
                   << " coefficient types";
         if (!csv_logistic_coefficients.empty()) {
-            std::cout << "\n  Logistic regression coefficients: " << csv_logistic_coefficients.size()
-                      << " coefficient types";
+            std::cout << "\n  Logistic regression coefficients: "
+                      << csv_logistic_coefficients.size() << " coefficient types";
         }
     }
 
@@ -908,8 +907,9 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                     }
                 }
             }
-            // If no logistic data for this risk factor, logistic_model will be empty (no coefficients)
-            // This is intentional - empty model means skip Stage 1 and use BoxCox only
+            // If no logistic data for this risk factor, logistic_model will be empty (no
+            // coefficients) This is intentional - empty model means skip Stage 1 and use BoxCox
+            // only
         }
         // For legacy structure, logistic_model remains empty (no logistic regression support)
         logistic_models.emplace_back(std::move(logistic_model));
@@ -1412,10 +1412,10 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             std::move(rural_prevalence), std::move(income_models), physical_activity_stddev,
             trend_type, std::move(expected_income_trend), std::move(expected_income_trend_boxcox),
             std::move(income_trend_steps), std::move(income_trend_models),
-        std::move(income_trend_ranges), std::move(income_trend_lambda),
-        std::move(income_trend_decay_factors), is_continuous_model, continuous_income_model,
-        income_categories, std::move(physical_activity_models), has_active_policies,
-        std::move(logistic_models));
+            std::move(income_trend_ranges), std::move(income_trend_lambda),
+            std::move(income_trend_decay_factors), is_continuous_model, continuous_income_model,
+            income_categories, std::move(physical_activity_models), has_active_policies,
+            std::move(logistic_models));
 
         std::cout << "\nDEBUG: StaticLinearModelDefinition created successfully";
         return result;
