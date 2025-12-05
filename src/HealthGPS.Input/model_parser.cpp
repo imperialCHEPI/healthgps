@@ -366,7 +366,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     std::filesystem::path csv_path =
         model_dir / "boxcox_coefficients.csv"; // loading of boxcox for RF
     std::filesystem::path policy_csv_path =
-        model_dir / "policyeffect_model.csv"; // loading of policy for RF
+        model_dir / "scenario2_policyeffect_model.csv"; // loading of policy for RF
     std::filesystem::path logistic_csv_path =
         model_dir / "logistic_regression.csv"; // loading of logistic regression for 2 stage- risk
                                                // factor modelling

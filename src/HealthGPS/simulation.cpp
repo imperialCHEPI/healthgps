@@ -145,15 +145,21 @@ Simulation::Simulation(SimulationModuleFactory &factory, std::shared_ptr<const E
         // Capture both male and female, both scenarios, SPECIFIC years in the same file
         // USER CONFIGURATION: Specify which years you want to capture (e.g., 2022 and 2032)
         int target_year_1 = 2022;  // CHANGE THIS to your first target year
-        int target_year_2 = 2032;  // CHANGE THIS to your second target year
+        int target_year_2 = 2033;  // CHANGE THIS to your second target year
         
         std::cout << "\nMAHIMA: Configuring sodium capture for years " << target_year_1 << " and " << target_year_2;
         std::cout << "\n  Both years will be captured in the SAME file";
         std::cout << "\n  Both male and female, both baseline and intervention scenarios";
         
         // Create configurations for both years - they will be combined into ONE file
-        inspector_ref.add_debug_config(true, 30, 30, core::Gender::unknown, "foodalcohol", target_year_1, "");
-        inspector_ref.add_debug_config(true, 30, 30, core::Gender::unknown, "foodalcohol", target_year_2, "");
+        inspector_ref.add_debug_config(true, 11, 50, core::Gender::female, "foodiron", target_year_1, "");
+        inspector_ref.add_debug_config(true, 11, 50, core::Gender::female, "foodiron", target_year_2, "");
+        inspector_ref.add_debug_config(true, 51, 110, core::Gender::female, "foodiron",target_year_1, "");
+        inspector_ref.add_debug_config(true, 51, 110, core::Gender::female, "foodiron",target_year_2, "");
+
+
+        inspector_ref.add_debug_config(true, 11, 18, core::Gender::unknown, "foodcalcium",target_year_1, "");
+        inspector_ref.add_debug_config(true, 11, 18, core::Gender::unknown, "foodcalcium",target_year_2, "");
 
     } catch (const std::exception &e) {
         // MAHIMA: If inspector initialization fails, log the error but don't crash the

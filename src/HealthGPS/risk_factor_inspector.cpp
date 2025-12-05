@@ -871,36 +871,50 @@ void RiskFactorInspector::capture_person_risk_factors(RuntimeContext &context, c
     std::filesystem::path main_output_dir = output_dir_;
     
     // MAHIMA: Ensure the directory exists and is writable
-    try {
-        // Check if directory exists
-        if (!std::filesystem::exists(output_dir_)) {
-            std::cout << "\nMAHIMA: Output directory " << output_dir_.string() << " does not exist, creating it...";
-            std::filesystem::create_directories(output_dir_);
-        }
-        
-        // Test if we can write to the directory by creating a temporary file
-        std::filesystem::path test_file = output_dir_ / "test_write_permissions.tmp";
-        std::ofstream test_stream(test_file);
-        if (!test_stream.is_open()) {
-            throw std::runtime_error("Cannot write to directory");
-        }
-        test_stream.close();
-        std::filesystem::remove(test_file); // Clean up test file
-        
-        // MAHIMA: Only print permission verification once to avoid spam
-        static bool permission_verified = false;
-        if (!permission_verified) {
+    // Only check permissions once to avoid Windows file locking issues
+    static bool permission_verified = false;
+    static bool permission_check_failed = false;
+    
+    if (!permission_verified && !permission_check_failed) {
+        try {
+            // Check if directory exists
+            if (!std::filesystem::exists(output_dir_)) {
+                std::cout << "\nMAHIMA: Output directory " << output_dir_.string() << " does not exist, creating it...";
+                std::filesystem::create_directories(output_dir_);
+            }
+            
+            // Test if we can write to the directory by creating a temporary file
+            std::filesystem::path test_file = output_dir_ / "test_write_permissions.tmp";
+            std::ofstream test_stream(test_file);
+            if (!test_stream.is_open()) {
+                throw std::runtime_error("Cannot write to directory");
+            }
+            test_stream.close();
+            
+            // Try to remove test file, but ignore errors (Windows may still have file locked)
+            // The important part is that we successfully created and closed the file, which confirms write access
+            try {
+                std::filesystem::remove(test_file);
+            } catch (const std::exception&) {
+                // Ignore deletion errors - we've already confirmed write access by creating the file
+                // On Windows, file handles may not be immediately released
+            }
+            
             std::cout << "\nMAHIMA: Successfully verified write access to: " << output_dir_.string();
             permission_verified = true;
+            
+        } catch (const std::exception& e) {
+            // If we can't write to the home directory, this is a serious issue
+            std::cerr << "\nMAHIMA: ERROR - Cannot write to home directory " << output_dir_.string() 
+                      << " (" << e.what() << ")" << std::endl;
+            std::cerr << "\nMAHIMA: This means risk factor inspection files cannot be saved!" << std::endl;
+            std::cerr << "\nMAHIMA: Please check directory permissions or contact system administrator." << std::endl;
+            permission_check_failed = true;
+            return; // Exit without creating files
         }
-        
-    } catch (const std::exception& e) {
-        // If we can't write to the home directory, this is a serious issue
-        std::cerr << "\nMAHIMA: ERROR - Cannot write to home directory " << output_dir_.string() 
-                  << " (" << e.what() << ")" << std::endl;
-        std::cerr << "\nMAHIMA: This means risk factor inspection files cannot be saved!" << std::endl;
-        std::cerr << "\nMAHIMA: Please check directory permissions or contact system administrator." << std::endl;
-        return; // Exit without creating files
+    } else if (permission_check_failed) {
+        // If permission check failed previously, don't try again
+        return;
     }
     
     std::filesystem::path csv_path = main_output_dir / filename;
