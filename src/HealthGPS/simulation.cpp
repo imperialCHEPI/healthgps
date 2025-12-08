@@ -152,14 +152,21 @@ Simulation::Simulation(SimulationModuleFactory &factory, std::shared_ptr<const E
         std::cout << "\n  Both male and female, both baseline and intervention scenarios";
         
         // Create configurations for both years - they will be combined into ONE file
-        inspector_ref.add_debug_config(true, 11, 50, core::Gender::female, "foodiron", target_year_1, "");
-        inspector_ref.add_debug_config(true, 11, 50, core::Gender::female, "foodiron", target_year_2, "");
-        inspector_ref.add_debug_config(true, 51, 110, core::Gender::female, "foodiron",target_year_1, "");
-        inspector_ref.add_debug_config(true, 51, 110, core::Gender::female, "foodiron",target_year_2, "");
+        inspector_ref.add_debug_config(true, 20, 20, core::Gender::unknown, "foodsodium", target_year_1, "");
+        inspector_ref.add_debug_config(true, 20, 20, core::Gender::unknown, "foodsodium", target_year_2, "");
+        inspector_ref.add_debug_config(true, 65, 65, core::Gender::unknown, "foodsodium",target_year_1, "");
+        inspector_ref.add_debug_config(true, 65, 65, core::Gender::unknown, "foodsodium",target_year_2, "");
 
 
-        inspector_ref.add_debug_config(true, 11, 18, core::Gender::unknown, "foodcalcium",target_year_1, "");
-        inspector_ref.add_debug_config(true, 11, 18, core::Gender::unknown, "foodcalcium",target_year_2, "");
+        inspector_ref.add_debug_config(true, 20, 20, core::Gender::unknown, "foodfibre", target_year_1, "");
+        inspector_ref.add_debug_config(true, 20, 20, core::Gender::unknown, "foodfibre", target_year_2, "");
+        inspector_ref.add_debug_config(true, 65, 65, core::Gender::unknown, "foodfibre", target_year_1, "");
+        inspector_ref.add_debug_config(true, 65, 65, core::Gender::unknown, "foodfibre", target_year_2, "");
+
+        inspector_ref.add_debug_config(true, 20, 20, core::Gender::unknown, "foodaddedsugar",target_year_1, "");
+        inspector_ref.add_debug_config(true, 20, 20, core::Gender::unknown, "foodaddedsugar",target_year_1, "");
+        inspector_ref.add_debug_config(true, 65, 65, core::Gender::unknown, "foodaddedsugar",target_year_1, "");
+        inspector_ref.add_debug_config(true, 65, 65, core::Gender::unknown, "foodaddedsugar", target_year_2, "");  
 
     } catch (const std::exception &e) {
         // MAHIMA: If inspector initialization fails, log the error but don't crash the
