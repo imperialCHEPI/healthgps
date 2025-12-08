@@ -495,10 +495,6 @@ void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &conte
         target_age_id.to_string(), (person.gender == core::Gender::male) ? "male" : "female",
         fmt::format("[{}]", fmt::join(region_names, ", ")),
         fmt::format("[{}]", fmt::join(probs, ", ")), cumulative_prob));
-
-    if (region_count % 5000 == 0) {
-        std::cout << "\nSuccessfully initialized region for " << region_count << " people";
-    }
 }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
@@ -616,10 +612,6 @@ void DemographicModule::initialise_ethnicity([[maybe_unused]] RuntimeContext &co
         age_group.to_string(), (person.gender == core::Gender::male) ? "male" : "female",
         person.region, fmt::format("[{}]", fmt::join(ethnicity_names, ", ")),
         fmt::format("[{}]", fmt::join(probs, ", ")), cumulative_prob));
-
-    if (ethnicity_count % 5000 == 0) {
-        std::cout << "\nSuccessfully initialized ethnicity for " << ethnicity_count << " people";
-    }
 }
 
 void DemographicModule::set_region_prevalence(
