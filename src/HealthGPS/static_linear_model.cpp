@@ -515,7 +515,7 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
     }
 
     // Print summary once at the end of initial generation (not during updates for newborns)
-    if (!summary_printed && factors_count == initial_generation_count) {
+    if (!summary_printed && static_cast<size_t>(factors_count) == initial_generation_count) {
         std::cout << "\n=== Risk Factor Assignment Summary ===";
         for (const auto &name : names_) {
             std::cout << "\nRisk factor " << name.to_string() << " is assigned to "
@@ -1601,7 +1601,7 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::unique_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors,
     bool is_continuous_income_model, const LinearModelParams &continuous_income_model,
     const std::string &income_categories,
-    std::unordered_map<core::Identifier, PhysicalActivityModel> physical_activity_models,
+    const std::unordered_map<core::Identifier, PhysicalActivityModel> &physical_activity_models,
     bool has_active_policies, std::vector<LinearModelParams> logistic_models)
     // NOLINTNEXTLINE(readability-function-cognitive-complexity)
     : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend),
@@ -1650,10 +1650,13 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
       physical_activity_stddev_{physical_activity_stddev},
       physical_activity_models_{physical_activity_models},
       has_physical_activity_models_{!physical_activity_models.empty()},
+      // Two-stage modeling: Logistic regression for zero probability (optional)
+      logistic_models_{std::move(logistic_models)},
       // Continuous income model support (FINCH approach)
       is_continuous_income_model_{is_continuous_income_model},
       continuous_income_model_{continuous_income_model}, income_categories_{income_categories},
-      has_active_policies_{has_active_policies}, logistic_models_{std::move(logistic_models)} {
+      // Policy optimization flag - Mahima
+      has_active_policies_{has_active_policies} {
 
     if (names_.empty()) {
         throw core::HgpsException("Risk factor names list is empty");
@@ -1684,7 +1687,7 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     }
 
     // Validate regular trend parameters only if trend type is Trend
-    if (trend_type_ == hgps::TrendType::Trend) {
+    if (trend_type == hgps::TrendType::Trend) {
         if (trend_models_->empty()) {
             throw core::HgpsException("Time trend model list is empty");
         }
@@ -1697,7 +1700,7 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     }
 
     // Validate income trend parameters if income trend is enabled
-    if (trend_type_ == hgps::TrendType::IncomeTrend) {
+    if (trend_type == hgps::TrendType::IncomeTrend) {
         if (!expected_income_trend_) {
             throw core::HgpsException(
                 "Income trend is enabled but expected_income_trend is missing");
@@ -1736,7 +1739,7 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     }
 
     // Validate that all risk factors have income trend parameters
-    if (trend_type_ == hgps::TrendType::IncomeTrend && expected_income_trend_) {
+    if (trend_type == hgps::TrendType::IncomeTrend && expected_income_trend_) {
         for (const auto &name : names_) {
             if (!expected_income_trend_->contains(name)) {
                 throw core::HgpsException(
@@ -1771,7 +1774,7 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     // Policy detection is now done earlier in the model parser for better performance
 
     // Validate regular trend parameters for all risk factors only if trend type is Trend
-    if (trend_type_ == hgps::TrendType::Trend) {
+    if (trend_type == hgps::TrendType::Trend) {
         for (const auto &name : names_) {
             if (!expected_trend_->contains(name)) {
                 throw core::HgpsException("One or more expected trend value is missing");

@@ -369,7 +369,8 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
         bool is_continuous_income_model = false,
         const LinearModelParams &continuous_income_model = LinearModelParams{},
         const std::string &income_categories = "3",
-        std::unordered_map<core::Identifier, PhysicalActivityModel> physical_activity_models = {},
+        const std::unordered_map<core::Identifier, PhysicalActivityModel>
+            &physical_activity_models = {},
         bool has_active_policies = true,
         /// @param logistic_models Logistic regression models for two-stage modeling (optional)
         std::vector<LinearModelParams> logistic_models = {});

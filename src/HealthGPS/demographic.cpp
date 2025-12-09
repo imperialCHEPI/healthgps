@@ -401,9 +401,7 @@ int DemographicModule::update_age_and_death_events(RuntimeContext &context,
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &context, Person &person,
                                           Random &random) {
-    static int region_count = 0;
     static bool first_call = true;
-    region_count++;
 
     if (first_call) {
         std::cout << "\nStarting region initialization...";
@@ -500,9 +498,7 @@ void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &conte
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void DemographicModule::initialise_ethnicity([[maybe_unused]] RuntimeContext &context,
                                              Person &person, Random &random) {
-    static int ethnicity_count = 0;
     static bool first_call = true;
-    ethnicity_count++;
 
     if (first_call) {
         std::cout << "\nStarting ethnicity initialization...";
