@@ -429,28 +429,28 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 
 double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
     double base = (lambda * factor) + 1.0;
-    
+
     // Check for invalid input that would produce NaN
     if (base <= 0.0) {
         std::cout << "\nWARNING: inverse_box_cox received invalid base: " << base
                   << " (lambda=" << lambda << ", factor=" << factor << ")";
         return 0.0; // Return 0 instead of NaN
     }
-    
+
     if (lambda == 0.0) {
         std::cout << "\nWARNING: inverse_box_cox received lambda=0, using exp(factor) instead";
         return std::exp(factor);
     }
-    
+
     double result = pow(base, 1.0 / lambda);
-    
+
     // Check for NaN result
     if (std::isnan(result) || std::isinf(result)) {
         std::cout << "\nWARNING: inverse_box_cox produced invalid result: " << result
                   << " (base=" << base << ", lambda=" << lambda << ", factor=" << factor << ")";
         return 0.0; // Return 0 instead of NaN
     }
-    
+
     return result;
 }
 

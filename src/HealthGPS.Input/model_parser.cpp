@@ -572,12 +572,11 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             // Count unique risk factors that have logistic regression data
             if (!csv_logistic_coefficients.empty() &&
                 csv_logistic_coefficients.find("Intercept") != csv_logistic_coefficients.end()) {
-                logistic_risk_factors_count =
-                    csv_logistic_coefficients.at("Intercept").size();
+                logistic_risk_factors_count = csv_logistic_coefficients.at("Intercept").size();
             }
 
-            std::cout << "\nLoading logistic regression CSV: " << logistic_filename
-                      << " (" << logistic_doc.GetRowCount() << " coefficient types, "
+            std::cout << "\nLoading logistic regression CSV: " << logistic_filename << " ("
+                      << logistic_doc.GetRowCount() << " coefficient types, "
                       << logistic_risk_factors_count << " risk factors)";
         }
     }
@@ -893,7 +892,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             // only
         }
         // For legacy structure, logistic_model remains empty (no logistic regression support)
-        
+
         // Track which risk factors have/don't have logistic regression data
         if (is_matrix_based_structure && !csv_logistic_coefficients.empty()) {
             if (has_logistic_data) {
@@ -905,7 +904,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             // Matrix-based structure but no logistic CSV file - all use BoxCox only
             risk_factors_without_logistic.push_back(csv_name.to_string());
         }
-        
+
         logistic_models.emplace_back(std::move(logistic_model));
 
         // MAHIMA: Trend model parameters
@@ -1064,19 +1063,21 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     if (!csv_logistic_coefficients.empty()) {
         std::cout << "\n  Logistic regression: " << csv_logistic_coefficients.size()
                   << " coefficient types for " << logistic_risk_factors_count << " risk factors";
-        
+
         // Print which risk factors have logistic regression (Stage 1 + Stage 2)
         if (!risk_factors_with_logistic.empty()) {
             std::cout << "\n    Risk factors with logistic regression (2-stage modeling): "
                       << risk_factors_with_logistic.size();
-            std::cout << "\n      " << fmt::format("{}", fmt::join(risk_factors_with_logistic, ", "));
+            std::cout << "\n      "
+                      << fmt::format("{}", fmt::join(risk_factors_with_logistic, ", "));
         }
-        
+
         // Print which risk factors don't have logistic regression (Stage 2 only)
         if (!risk_factors_without_logistic.empty()) {
             std::cout << "\n    Risk factors without logistic regression (BoxCox only): "
                       << risk_factors_without_logistic.size();
-            std::cout << "\n      " << fmt::format("{}", fmt::join(risk_factors_without_logistic, ", "));
+            std::cout << "\n      "
+                      << fmt::format("{}", fmt::join(risk_factors_without_logistic, ", "));
         }
     }
 
