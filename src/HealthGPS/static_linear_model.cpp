@@ -429,7 +429,28 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 
 double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
     double base = (lambda * factor) + 1.0;
+    
+    // Check for invalid input that would produce NaN
+    if (base <= 0.0) {
+        std::cout << "\nWARNING: inverse_box_cox received invalid base: " << base
+                  << " (lambda=" << lambda << ", factor=" << factor << ")";
+        return 0.0; // Return 0 instead of NaN
+    }
+    
+    if (lambda == 0.0) {
+        std::cout << "\nWARNING: inverse_box_cox received lambda=0, using exp(factor) instead";
+        return std::exp(factor);
+    }
+    
     double result = pow(base, 1.0 / lambda);
+    
+    // Check for NaN result
+    if (std::isnan(result) || std::isinf(result)) {
+        std::cout << "\nWARNING: inverse_box_cox produced invalid result: " << result
+                  << " (base=" << base << ", lambda=" << lambda << ", factor=" << factor << ")";
+        return 0.0; // Return 0 instead of NaN
+    }
+    
     return result;
 }
 
@@ -515,7 +536,7 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
     }
 
     // Print summary once at the end of initial generation (not during updates for newborns)
-    if (!summary_printed && static_cast<size_t>(factors_count) == initial_generation_count) {
+    if (!summary_printed && std::cmp_equal(factors_count, initial_generation_count)) {
         std::cout << "\n=== Risk Factor Assignment Summary ===";
         for (const auto &name : names_) {
             std::cout << "\nRisk factor " << name.to_string() << " is assigned to "
@@ -1576,7 +1597,7 @@ void StaticLinearModel::initialise_simple_physical_activity(
 template <typename T> static std::shared_ptr<T> create_shared_from_unique(std::unique_ptr<T> &ptr) {
     return ptr ? std::make_shared<T>(*ptr) : nullptr;
 }
-
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::unique_ptr<RiskFactorSexAgeTable> expected,
     std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend,

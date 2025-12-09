@@ -466,10 +466,12 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         csv_policy_coefficients;
     std::unordered_map<std::string, std::unordered_map<std::string, double>>
         csv_logistic_coefficients;
+    size_t logistic_risk_factors_count = 0;
+    // Track which risk factors have logistic regression data
+    std::vector<std::string> risk_factors_with_logistic;
+    std::vector<std::string> risk_factors_without_logistic;
 
     if (is_matrix_based_structure) {
-        std::cout << "\nDEBUG: Loading matrix-based CSV coefficients...";
-
         // Load boxcox coefficients
         const auto &boxcox_config = opt["RiskFactorModels"]["boxcox_coefficients"];
         std::string boxcox_filename = boxcox_config["name"].get<std::string>();
@@ -518,10 +520,6 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             rapidcsv::Document policy_doc(policy_path.string(), rapidcsv::LabelParams{},
                                           rapidcsv::SeparatorParams{policy_delimiter.front()});
 
-            std::cout << "\n  Loading policy coefficients from: " << policy_filename;
-            std::cout << "\n    CSV dimensions: " << policy_doc.GetRowCount() << " rows, "
-                      << policy_doc.GetColumnCount() << " columns";
-
             // Load policy coefficients: row names (coefficients) -> column names (risk factors) ->
             // values
             // CSV structure: rows = coefficients, columns = risk factors
@@ -554,10 +552,6 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             rapidcsv::Document logistic_doc(logistic_path.string(), rapidcsv::LabelParams{},
                                             rapidcsv::SeparatorParams{logistic_delimiter.front()});
 
-            std::cout << "\n  Loading logistic regression coefficients from: " << logistic_filename;
-            std::cout << "\n    CSV dimensions: " << logistic_doc.GetRowCount() << " rows, "
-                      << logistic_doc.GetColumnCount() << " columns";
-
             // Load logistic coefficients: row names (coefficients) -> column names (risk factors)
             // -> values CSV structure: rows = coefficients, columns = risk factors
             for (size_t row_idx = 0; row_idx < logistic_doc.GetRowCount(); ++row_idx) {
@@ -575,17 +569,16 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                 }
             }
 
-            std::cout << "\n    Logistic regression coefficients: "
-                      << csv_logistic_coefficients.size() << " coefficient types";
-        }
+            // Count unique risk factors that have logistic regression data
+            if (!csv_logistic_coefficients.empty() &&
+                csv_logistic_coefficients.find("Intercept") != csv_logistic_coefficients.end()) {
+                logistic_risk_factors_count =
+                    csv_logistic_coefficients.at("Intercept").size();
+            }
 
-        std::cout << "\nDEBUG: CSV coefficients loaded successfully";
-        std::cout << "\n  BoxCox coefficients: " << csv_coefficients.size() << " coefficient types";
-        std::cout << "\n  Policy coefficients: " << csv_policy_coefficients.size()
-                  << " coefficient types";
-        if (!csv_logistic_coefficients.empty()) {
-            std::cout << "\n  Logistic regression coefficients: "
-                      << csv_logistic_coefficients.size() << " coefficient types";
+            std::cout << "\nLoading logistic regression CSV: " << logistic_filename
+                      << " (" << logistic_doc.GetRowCount() << " coefficient types, "
+                      << logistic_risk_factors_count << " risk factors)";
         }
     }
 
@@ -605,9 +598,6 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
         if (is_matrix_based_structure) {
             // Matrix-based structure: Load coefficients from CSV data
-            std::cout << "\nDEBUG: Processing risk factor " << csv_name.to_string()
-                      << " from CSV data";
-
             // Get intercept from CSV data
 
             if (csv_coefficients.find("Intercept") != csv_coefficients.end() &&
@@ -647,13 +637,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                         coeff_map.at(csv_risk_factor_name);
                 }
             }
-
-            std::cout << "\n  Loaded " << model.coefficients.size() << " coefficients for "
-                      << csv_name.to_string();
         } else {
             // Legacy structure: Load coefficients from JSON
-            std::cout << "\nDEBUG: Processing risk factor " << csv_name.to_string()
-                      << " from JSON data";
 
             // Find the corresponding JSON parameters using case-insensitive lookup
             std::string json_key;
@@ -760,9 +745,6 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             ranges.emplace_back(core::DoubleInterval{min_value, max_value});
             lambda.emplace_back(lambda_value);
             stddev.emplace_back(stddev_value);
-
-            std::cout << "\n  Loaded from matrix structure - Range: [" << min_value << ", "
-                      << max_value << "], Lambda: " << lambda_value << ", StdDev: " << stddev_value;
         } else {
             // Legacy structure: Get values from JSON
             ranges.emplace_back((*json_params)["Range"].get<core::DoubleInterval>());
@@ -876,9 +858,6 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             double policy_max_value = csv_policy_coefficients.at("max").at(csv_risk_factor_name);
 
             policy_ranges.emplace_back(core::DoubleInterval{policy_min_value, policy_max_value});
-
-            std::cout << "\n  Loaded policy range from matrix structure - Range: ["
-                      << policy_min_value << ", " << policy_max_value << "]";
         } else {
             // Legacy structure: Get policy range from JSON
             policy_ranges.emplace_back((*policy_json_params)["Range"].get<core::DoubleInterval>());
@@ -887,12 +866,14 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
         // MAHIMA: Build logistic regression model for this risk factor (if available)
         LinearModelParams logistic_model;
+        bool has_logistic_data = false;
         if (is_matrix_based_structure && !csv_logistic_coefficients.empty()) {
             // Check if this risk factor has logistic regression data
             if (csv_logistic_coefficients.find("Intercept") != csv_logistic_coefficients.end() &&
                 csv_logistic_coefficients.at("Intercept").find(csv_risk_factor_name) !=
                     csv_logistic_coefficients.at("Intercept").end()) {
                 // This risk factor has logistic regression data
+                has_logistic_data = true;
                 logistic_model.intercept =
                     csv_logistic_coefficients.at("Intercept").at(csv_risk_factor_name);
 
@@ -912,12 +893,24 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             // only
         }
         // For legacy structure, logistic_model remains empty (no logistic regression support)
+        
+        // Track which risk factors have/don't have logistic regression data
+        if (is_matrix_based_structure && !csv_logistic_coefficients.empty()) {
+            if (has_logistic_data) {
+                risk_factors_with_logistic.push_back(csv_name.to_string());
+            } else {
+                risk_factors_without_logistic.push_back(csv_name.to_string());
+            }
+        } else if (is_matrix_based_structure) {
+            // Matrix-based structure but no logistic CSV file - all use BoxCox only
+            risk_factors_without_logistic.push_back(csv_name.to_string());
+        }
+        
         logistic_models.emplace_back(std::move(logistic_model));
 
         // MAHIMA: Trend model parameters
         if (trend_type == hgps::TrendType::Null) {
             // No trend data needed for Null type - skip to next risk factor
-            std::cout << "\nTrend Type is NULL";
             continue;
         }
         if (trend_type == hgps::TrendType::Trend) {
@@ -932,7 +925,6 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                 // Legacy structure: Check for trend data in JSON
                 if (json_params && json_params->contains("Trend")) {
                     // UPF trend data exists - use it
-                    std::cout << "\nTrend Type is TREND or UPF TREND";
                     const auto &trend_json_params = (*json_params)["Trend"];
                     LinearModelParams trend_model;
                     trend_model.intercept = trend_json_params["Intercept"].get<double>();
@@ -984,7 +976,6 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         // Income trend model parameters (only if income trend is enabled in the config.json)
         if (trend_type == hgps::TrendType::IncomeTrend) {
             // Create income trend data structures only when income trend is enabled
-            std::cout << "\nTrend Type is INCOME TREND";
             if (!expected_income_trend) {
                 expected_income_trend =
                     std::make_unique<std::unordered_map<core::Identifier, double>>();
@@ -1064,6 +1055,30 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         }
 
     } // NOLINTEND(readability-function-cognitive-complexity)
+
+    // Print summary of loaded data
+    std::cout << "\nLoaded risk factor models: " << names.size() << " risk factors";
+    std::cout << "\n  BoxCox coefficients: " << csv_coefficients.size() << " coefficient types";
+    std::cout << "\n  Policy coefficients: " << csv_policy_coefficients.size()
+              << " coefficient types";
+    if (!csv_logistic_coefficients.empty()) {
+        std::cout << "\n  Logistic regression: " << csv_logistic_coefficients.size()
+                  << " coefficient types for " << logistic_risk_factors_count << " risk factors";
+        
+        // Print which risk factors have logistic regression (Stage 1 + Stage 2)
+        if (!risk_factors_with_logistic.empty()) {
+            std::cout << "\n    Risk factors with logistic regression (2-stage modeling): "
+                      << risk_factors_with_logistic.size();
+            std::cout << "\n      " << fmt::format("{}", fmt::join(risk_factors_with_logistic, ", "));
+        }
+        
+        // Print which risk factors don't have logistic regression (Stage 2 only)
+        if (!risk_factors_without_logistic.empty()) {
+            std::cout << "\n    Risk factors without logistic regression (BoxCox only): "
+                      << risk_factors_without_logistic.size();
+            std::cout << "\n      " << fmt::format("{}", fmt::join(risk_factors_without_logistic, ", "));
+        }
+    }
 
     // Check risk factor correlation matrix column count matches risk factor count.
     if (is_matrix_based_structure) {
@@ -1177,13 +1192,13 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     }
 
     // Print which income category system is being used
-    std::cout << "Using " << income_categories << " income categories system \n";
+    std::cout << "\nUsing " << income_categories << " income categories system \n";
 
     // Check if this is a continuous income model (FINCH approach) or categorical (India approach)
     bool is_continuous_model = false;
     if (opt["IncomeModels"].contains("continuous")) {
         is_continuous_model = true;
-        std::cout << "Detected FINCH continuous income model - will calculate continuous income "
+        std::cout << "\nDetected FINCH continuous income model - will calculate continuous income "
                      "then convert to categories\n";
 
         // For continuous models, we don't need to process IncomeModels here
