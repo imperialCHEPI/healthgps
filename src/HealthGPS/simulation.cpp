@@ -71,6 +71,7 @@ adevs::Time Simulation::init(adevs::SimEnv<int> *env) {
 }
 
 adevs::Time Simulation::update(adevs::SimEnv<int> *env) {
+    std::cout << "\n[UPDATE] Entering update() for year " << env->now().real;
     if (env->now() < end_time_) {
         auto start = std::chrono::steady_clock::now();
         context_.metrics().reset();
@@ -80,7 +81,9 @@ adevs::Time Simulation::update(adevs::SimEnv<int> *env) {
         auto time_year = world_time.real;
         context_.set_current_time(time_year);
 
+        std::cout << "\n[UPDATE] Calling update_population() for year " << time_year;
         update_population();
+        std::cout << "\n[UPDATE] update_population() completed for year " << time_year;
 
         auto stop = std::chrono::steady_clock::now();
         auto elapsed = std::chrono::duration<double, std::milli>(stop - start);
@@ -153,23 +156,37 @@ void Simulation::initialise_population() {
 void Simulation::update_population() {
     /* Note: order is very important */
 
+    std::cout << "\n[UPDATE] Year " << context_.time_now() << " - Starting demographic update...";
     // update basic information: demographics + diseases
     demographic_->update_population(context_, *disease_);
+    std::cout << " [OK]";
 
+    std::cout << "\n[UPDATE] Year " << context_.time_now() << " - Starting net immigration...";
     // Calculate the net immigration by gender and age, update the population accordingly
     update_net_immigration();
+    std::cout << " [OK]";
 
+    std::cout << "\n[UPDATE] Year " << context_.time_now() << " - Starting SES update...";
     // update population socio-economic status
     ses_->update_population(context_);
+    std::cout << " [OK]";
 
+    std::cout << "\n[UPDATE] Year " << context_.time_now() << " - Starting risk factor update...";
     // Update population risk factors
     risk_factor_->update_population(context_);
+    std::cout << " [OK]";
 
+    std::cout << "\n[UPDATE] Year " << context_.time_now() << " - Starting disease update...";
     // Update diseases status: remission and incidence
     disease_->update_population(context_);
+    std::cout << " [OK]";
 
+    std::cout << "\n[UPDATE] Year " << context_.time_now() << " - Starting analysis update...";
     // Publish results to data logger
     analysis_->update_population(context_);
+    std::cout << " [OK]";
+
+    std::cout << "\n[UPDATE] Year " << context_.time_now() << " - Completed all updates";
 }
 
 void Simulation::update_net_immigration() {
