@@ -466,7 +466,8 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
     static std::unordered_map<core::Identifier, int> risk_factor_counts;
     static std::unordered_map<core::Identifier, int> stage1_zero_counts; // Track Stage 1 zeros
     static std::unordered_map<core::Identifier, int> stage2_counts; // Track Stage 2 (BoxCox) usage
-    static std::unordered_map<core::Identifier, bool> has_logistic_tracked; // Track which factors have logistic
+    static std::unordered_map<core::Identifier, bool>
+        has_logistic_tracked; // Track which factors have logistic
     static size_t total_population_size = 0;
     static size_t initial_generation_count = 0;
     factors_count++;
@@ -476,7 +477,7 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
         total_population_size = context.population().size();
         initial_generation_count = total_population_size;
         first_call = false;
-        
+
         // Initialize tracking for which factors have logistic models
         for (size_t i = 0; i < names_.size(); i++) {
             bool has_logistic = !(logistic_models_[i].coefficients.empty());
@@ -532,7 +533,8 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
                 }
                 continue; // Skip Stage 2, risk factor is zero
             }
-            // If we reach here, Stage 1 determined the risk factor should be non-zero, proceed to Stage 2
+            // If we reach here, Stage 1 determined the risk factor should be non-zero, proceed to
+            // Stage 2
         }
         // If no logistic model, skip Stage 1 and go directly to Stage 2
 
@@ -560,38 +562,39 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
                       << risk_factor_counts[name] << " people";
         }
         std::cout << "\n======================================";
-        
+
         // Print 2-stage modeling summary
         std::cout << "\n=== TWO-STAGE MODELING SUMMARY ===";
         std::vector<std::string> two_stage_factors;
         std::vector<std::string> boxcox_only_factors;
-        
+
         for (const auto &name : names_) {
             bool has_logistic = has_logistic_tracked[name];
             if (has_logistic) {
                 two_stage_factors.push_back(name.to_string());
                 int zeros = stage1_zero_counts[name];
                 int non_zeros = stage2_counts[name];
-                std::cout << "\n  " << name.to_string() << " (2-stage): "
-                          << zeros << " zeros from Stage 1, " << non_zeros << " non-zeros from Stage 2";
+                std::cout << "\n  " << name.to_string() << " (2-stage): " << zeros
+                          << " zeros from Stage 1, " << non_zeros << " non-zeros from Stage 2";
             } else {
                 boxcox_only_factors.push_back(name.to_string());
             }
         }
-        
-        std::cout << "\n\nRisk factors using 2-stage modeling (Stage 1: Logistic, Stage 2: BoxCox): "
-                  << two_stage_factors.size();
+
+        std::cout
+            << "\n\nRisk factors using 2-stage modeling (Stage 1: Logistic, Stage 2: BoxCox): "
+            << two_stage_factors.size();
         if (!two_stage_factors.empty()) {
             std::cout << "\n  " << fmt::format("{}", fmt::join(two_stage_factors, ", "));
         }
-        
+
         std::cout << "\n\nRisk factors using BoxCox-only (no logistic regression): "
                   << boxcox_only_factors.size();
         if (!boxcox_only_factors.empty()) {
             std::cout << "\n  " << fmt::format("{}", fmt::join(boxcox_only_factors, ", "));
         }
         std::cout << "\n======================================";
-        
+
         summary_printed = true;
     }
 }
@@ -925,13 +928,13 @@ StaticLinearModel::compute_linear_models(Person &person,
         }
 
         for (const auto &[coefficient_name, coefficient_value] : model.log_coefficients) {
-                double value = person.get_risk_factor_value(coefficient_name);
+            double value = person.get_risk_factor_value(coefficient_name);
 
             if (value <= 0) {
                 value = 1e-10; // Avoid log of zero or negative
             }
-                factor += coefficient_value * log(value);
-            }
+            factor += coefficient_value * log(value);
+        }
 
         linear.emplace_back(factor);
     }
