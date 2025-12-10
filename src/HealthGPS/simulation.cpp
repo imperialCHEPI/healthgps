@@ -164,7 +164,7 @@ Simulation::Simulation(SimulationModuleFactory &factory, std::shared_ptr<const E
         inspector_ref.add_debug_config(true, 65, 65, core::Gender::unknown, "foodfibre", target_year_2, "");
 
         inspector_ref.add_debug_config(true, 20, 20, core::Gender::unknown, "foodaddedsugar",target_year_1, "");
-        inspector_ref.add_debug_config(true, 20, 20, core::Gender::unknown, "foodaddedsugar",target_year_1, "");
+        inspector_ref.add_debug_config(true, 20, 20, core::Gender::unknown, "foodaddedsugar",target_year_2, "");
         inspector_ref.add_debug_config(true, 65, 65, core::Gender::unknown, "foodaddedsugar",target_year_1, "");
         inspector_ref.add_debug_config(true, 65, 65, core::Gender::unknown, "foodaddedsugar", target_year_2, "");  
 
