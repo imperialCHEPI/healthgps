@@ -437,7 +437,7 @@ double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
         if (!std::isfinite(result)) {
             return 0.0; // Return safe value for Inf
         }
-    return result;
+        return result;
     }
     // For non-zero lambda
     double base = (lambda * factor) + 1.0;
@@ -927,13 +927,13 @@ StaticLinearModel::compute_linear_models(Person &person,
         }
 
         for (const auto &[coefficient_name, coefficient_value] : model.log_coefficients) {
-                double value = person.get_risk_factor_value(coefficient_name);
+            double value = person.get_risk_factor_value(coefficient_name);
 
             if (value <= 0) {
                 value = 1e-10; // Avoid log of zero or negative
             }
-                factor += coefficient_value * log(value);
-            }
+            factor += coefficient_value * log(value);
+        }
 
         linear.emplace_back(factor);
     }
