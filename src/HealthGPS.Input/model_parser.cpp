@@ -255,8 +255,6 @@ std::unique_ptr<hgps::StaticLinearModelDefinition>
 load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configuration &config) {
     MEASURE_FUNCTION();
 
-    std::cout << "\nDEBUG: Starting load_staticlinear_risk_model_definition";
-
     // Parse trend_type from config.json- Read which trend type to use (null, trend or income_trend)
     hgps::TrendType trend_type = hgps::TrendType::Null;
     if (config.trend_type == "trend") {
@@ -798,9 +796,6 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
             // For matrix-based structure, we don't have log coefficients in CSV, so use empty map
             policy_model.log_coefficients = {};
-
-            std::cout << "\n  Loaded " << policy_model.coefficients.size()
-                      << " policy coefficients for " << csv_name.to_string();
         } else {
             // Legacy structure: Load policy coefficients from JSON
             policy_json_params = &(*json_params)["Policy"];
@@ -1374,9 +1369,6 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
             // Use rapidcsv directly to load the CSV file (no headers, like physical activity)
             char sep_char = (delimiter == "\\t") ? '\t' : delimiter.front();
-            std::cout << "\n      Using delimiter: '" << sep_char << "' (from '" << delimiter
-                      << "')";
-            std::cout << "\n      File path: " << csv_path.string();
             rapidcsv::Document doc(csv_path.string(), rapidcsv::LabelParams(-1, -1),
                                    rapidcsv::SeparatorParams(sep_char));
 
@@ -1797,7 +1789,7 @@ void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
         }
     }
 
-    std::cout << "\nFINISHED ALL THE LOADING REQUIRED CUTIEPIE :)\n";
+    fmt::print(fmt::fg(fmt::color::cyan), "\nFINISHED ALL THE LOADING REQUIRED CUTIEPIE :)\n");
 }
 
 } // namespace hgps::input

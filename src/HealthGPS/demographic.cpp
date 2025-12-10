@@ -617,7 +617,6 @@ void DemographicModule::set_region_prevalence(
 
     // Print summary of loaded region data
     if (!region_data.empty()) {
-        std::cout << "\n=== REGION DATA LOADED ===" << '\n';
 
         // Get unique region names from the first age entry
         auto first_age = region_data.begin();
@@ -634,8 +633,6 @@ void DemographicModule::set_region_prevalence(
         }
 
         std::cout << "Age groups: " << region_data.size() << '\n';
-        std::cout << "Sample age: " << region_data.begin()->first.to_string() << '\n';
-        std::cout << "=========================" << '\n';
     }
 }
 
@@ -647,7 +644,6 @@ void DemographicModule::set_ethnicity_prevalence(
 
     // Print summary of loaded ethnicity data
     if (!ethnicity_data.empty()) {
-        std::cout << "\n=== ETHNICITY DATA LOADED ===" << '\n';
 
         // Get unique ethnicity names from the first entry
         auto first_age_group = ethnicity_data.begin();
@@ -667,8 +663,6 @@ void DemographicModule::set_ethnicity_prevalence(
         }
 
         std::cout << "Age groups: " << ethnicity_data.size() << '\n';
-        std::cout << "Sample age group: " << ethnicity_data.begin()->first.to_string() << '\n';
-        std::cout << "=============================" << '\n';
     }
 }
 

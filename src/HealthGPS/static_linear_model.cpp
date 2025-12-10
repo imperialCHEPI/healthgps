@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <fmt/core.h>
 #include <iostream> // Added for print statements
 #include <ranges>
 #include <unordered_map>
@@ -428,30 +429,33 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 }
 
 double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
-    double base = (lambda * factor) + 1.0;
+    // Handle extreme lambda values
+    if (std::abs(lambda) < 1e-10) {
+        // For lambda near zero, use exponential
+        double result = std::exp(factor);
+        // Check for Inf
+        if (!std::isfinite(result)) {
+            return 0.0; // Return safe value for Inf
+        }
+        return result;
+    } else {
+        // For non-zero lambda
+        double base = (lambda * factor) + 1.0;
+        // Check if base is valid for power
+        if (base <= 0.0) {
+            return 0.0; // Return safe value for negative/zero base
+        }
 
-    // Check for invalid input that would produce NaN
-    if (base <= 0.0) {
-        std::cout << "\nWARNING: inverse_box_cox received invalid base: " << base
-                  << " (lambda=" << lambda << ", factor=" << factor << ")";
-        return 0.0; // Return 0 instead of NaN
+        // Compute power and check result
+        double result = std::pow(base, 1.0 / lambda);
+        // Validate the result is finite
+        if (!std::isfinite(result)) {
+            return 0.0; // Return safe value for NaN/Inf
+        }
+
+        // Ensure result is non-negative (though power should already guarantee this)
+        return std::max(0.0, result);
     }
-
-    if (lambda == 0.0) {
-        std::cout << "\nWARNING: inverse_box_cox received lambda=0, using exp(factor) instead";
-        return std::exp(factor);
-    }
-
-    double result = pow(base, 1.0 / lambda);
-
-    // Check for NaN result
-    if (std::isnan(result) || std::isinf(result)) {
-        std::cout << "\nWARNING: inverse_box_cox produced invalid result: " << result
-                  << " (base=" << base << ", lambda=" << lambda << ", factor=" << factor << ")";
-        return 0.0; // Return 0 instead of NaN
-    }
-
-    return result;
 }
 
 void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &person,
@@ -460,6 +464,9 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
     static bool first_call = true;
     static bool summary_printed = false;
     static std::unordered_map<core::Identifier, int> risk_factor_counts;
+    static std::unordered_map<core::Identifier, int> stage1_zero_counts; // Track Stage 1 zeros
+    static std::unordered_map<core::Identifier, int> stage2_counts; // Track Stage 2 (BoxCox) usage
+    static std::unordered_map<core::Identifier, bool> has_logistic_tracked; // Track which factors have logistic
     static size_t total_population_size = 0;
     static size_t initial_generation_count = 0;
     factors_count++;
@@ -469,6 +476,12 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
         total_population_size = context.population().size();
         initial_generation_count = total_population_size;
         first_call = false;
+        
+        // Initialize tracking for which factors have logistic models
+        for (size_t i = 0; i < names_.size(); i++) {
+            bool has_logistic = !(logistic_models_[i].coefficients.empty());
+            has_logistic_tracked[names_[i]] = has_logistic;
+        }
     }
     // Correlated residual sampling.
     auto residuals = compute_residuals(random, cholesky_);
@@ -510,15 +523,18 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
             // if logistic regression output = 1, risk factor value = 0
             double random_sample = random.next_double(); // Uniform random value between 0 and 1
             if (random_sample < zero_probability) {
-                // Risk factor should be zero
+                // Risk factor should be zero (Stage 1 result)
                 person.risk_factors[names_[i]] = 0.0;
                 // Track assignment count for this risk factor (only during initial generation)
                 if (!summary_printed) {
                     risk_factor_counts[names_[i]]++;
+                    stage1_zero_counts[names_[i]]++; // Track Stage 1 zeros
                 }
-                continue;
+                continue; // Skip Stage 2, risk factor is zero
             }
+            // If we reach here, Stage 1 determined the risk factor should be non-zero, proceed to Stage 2
         }
+        // If no logistic model, skip Stage 1 and go directly to Stage 2
 
         // STAGE 2: Calculate non-zero risk factor value using BoxCox transformation
         // (This code runs whether we have a logistic model or not)
@@ -532,6 +548,7 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
         // Track assignment count for this risk factor (only during initial generation)
         if (!summary_printed) {
             risk_factor_counts[names_[i]]++;
+            stage2_counts[names_[i]]++; // Track Stage 2 (BoxCox) usage
         }
     }
 
@@ -543,6 +560,38 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
                       << risk_factor_counts[name] << " people";
         }
         std::cout << "\n======================================";
+        
+        // Print 2-stage modeling summary
+        std::cout << "\n=== TWO-STAGE MODELING SUMMARY ===";
+        std::vector<std::string> two_stage_factors;
+        std::vector<std::string> boxcox_only_factors;
+        
+        for (const auto &name : names_) {
+            bool has_logistic = has_logistic_tracked[name];
+            if (has_logistic) {
+                two_stage_factors.push_back(name.to_string());
+                int zeros = stage1_zero_counts[name];
+                int non_zeros = stage2_counts[name];
+                std::cout << "\n  " << name.to_string() << " (2-stage): "
+                          << zeros << " zeros from Stage 1, " << non_zeros << " non-zeros from Stage 2";
+            } else {
+                boxcox_only_factors.push_back(name.to_string());
+            }
+        }
+        
+        std::cout << "\n\nRisk factors using 2-stage modeling (Stage 1: Logistic, Stage 2: BoxCox): "
+                  << two_stage_factors.size();
+        if (!two_stage_factors.empty()) {
+            std::cout << "\n  " << fmt::format("{}", fmt::join(two_stage_factors, ", "));
+        }
+        
+        std::cout << "\n\nRisk factors using BoxCox-only (no logistic regression): "
+                  << boxcox_only_factors.size();
+        if (!boxcox_only_factors.empty()) {
+            std::cout << "\n  " << fmt::format("{}", fmt::join(boxcox_only_factors, ", "));
+        }
+        std::cout << "\n======================================";
+        
         summary_printed = true;
     }
 }
@@ -876,13 +925,13 @@ StaticLinearModel::compute_linear_models(Person &person,
         }
 
         for (const auto &[coefficient_name, coefficient_value] : model.log_coefficients) {
-            double value = person.get_risk_factor_value(coefficient_name);
+                double value = person.get_risk_factor_value(coefficient_name);
 
             if (value <= 0) {
                 value = 1e-10; // Avoid log of zero or negative
             }
-            factor += coefficient_value * log(value);
-        }
+                factor += coefficient_value * log(value);
+            }
 
         linear.emplace_back(factor);
     }
