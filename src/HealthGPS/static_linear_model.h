@@ -108,7 +108,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
             nullptr,
         bool is_continuous_income_model = false,
         const LinearModelParams &continuous_income_model = LinearModelParams{},
-        const std::string &income_categories = "3",
+        std::string income_categories = "3",
         /// @param physical_activity_models Physical activity models for both India (simple) and
         /// FINCH (continuous) approaches
         const std::unordered_map<core::Identifier, PhysicalActivityModel>
@@ -368,7 +368,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
             nullptr,
         bool is_continuous_income_model = false,
         const LinearModelParams &continuous_income_model = LinearModelParams{},
-        const std::string &income_categories = "3",
+        std::string income_categories = "3",
         const std::unordered_map<core::Identifier, PhysicalActivityModel>
             &physical_activity_models = {},
         bool has_active_policies = true,

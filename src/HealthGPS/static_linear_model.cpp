@@ -12,6 +12,15 @@
 #include <unordered_map>
 #include <utility>
 
+namespace { // anonymous namespace
+
+// Helper function to create shared_ptr from unique_ptr before moving
+template <typename T> std::shared_ptr<T> create_shared_from_unique(std::unique_ptr<T> &ptr) {
+    return ptr ? std::make_shared<T>(*ptr) : nullptr;
+}
+
+} // anonymous namespace
+
 namespace hgps {
 
 StaticLinearModel::StaticLinearModel(
@@ -39,7 +48,7 @@ StaticLinearModel::StaticLinearModel(
     std::shared_ptr<std::vector<double>> income_trend_lambda,
     std::shared_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors,
     bool is_continuous_income_model, const LinearModelParams &continuous_income_model,
-    const std::string &income_categories,
+    std::string income_categories,
     const std::unordered_map<core::Identifier, PhysicalActivityModel> &physical_activity_models,
     bool has_active_policies, const std::vector<LinearModelParams> &logistic_models)
     // NOLINTNEXTLINE(readability-function-cognitive-complexity)
@@ -48,7 +57,7 @@ StaticLinearModel::StaticLinearModel(
                                 income_trend_decay_factors}, // Pass by value, not moved
       // Continuous income model support (FINCH approach) - must come first
       is_continuous_income_model_{is_continuous_income_model},
-      continuous_income_model_{continuous_income_model}, income_categories_{income_categories},
+      continuous_income_model_{continuous_income_model}, income_categories_{std::move(income_categories)},
       // Regular trend member variables - these are shared_ptr, so we can move them
       expected_trend_{std::move(expected_trend)},
       expected_trend_boxcox_{std::move(expected_trend_boxcox)},
@@ -437,7 +446,7 @@ double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
         if (!std::isfinite(result)) {
             return 0.0; // Return safe value for Inf
         }
-        return result;
+    return result;
     }
     // For non-zero lambda
     double base = (lambda * factor) + 1.0;
@@ -909,8 +918,9 @@ StaticLinearModel::compute_linear_models(Person &person,
 
         for (const auto &[coefficient_name, coefficient_value] : model.coefficients) {
             // Skip the standard deviation entry as it's not a factor
-            if (coefficient_name == stddev_id)
+            if (coefficient_name == stddev_id) {
                 continue;
+            }
 
             // Efficiently handle age-related coefficients
             if (coefficient_name == age_id || coefficient_name == Age_id) {
@@ -927,13 +937,13 @@ StaticLinearModel::compute_linear_models(Person &person,
         }
 
         for (const auto &[coefficient_name, coefficient_value] : model.log_coefficients) {
-            double value = person.get_risk_factor_value(coefficient_name);
+                double value = person.get_risk_factor_value(coefficient_name);
 
             if (value <= 0) {
                 value = 1e-10; // Avoid log of zero or negative
             }
-            factor += coefficient_value * log(value);
-        }
+                factor += coefficient_value * log(value);
+            }
 
         linear.emplace_back(factor);
     }
@@ -1377,7 +1387,7 @@ core::Income StaticLinearModel::convert_income_continuous_to_category(double con
             return core::Income::uppermiddle;
         }
         return core::Income::high;
-    } else {
+    }
         // 3-category system: low, middle, high
         // For 3 categories, we'll use the 33rd and 67th percentiles
         if (continuous_income <= quartile_thresholds[0]) {
@@ -1387,7 +1397,6 @@ core::Income StaticLinearModel::convert_income_continuous_to_category(double con
             return core::Income::middle;
         }
         return core::Income::high;
-    }
 }
 
 // Optimized version: uses pre-calculated quartiles (no population scan)
@@ -1405,7 +1414,7 @@ core::Income StaticLinearModel::convert_income_to_category(
             return core::Income::uppermiddle;
         }
         return core::Income::high;
-    } else {
+    }
         // 3-category system: low, middle, high
         if (continuous_income <= quartile_thresholds[0]) {
             return core::Income::low;
@@ -1414,14 +1423,11 @@ core::Income StaticLinearModel::convert_income_to_category(
             return core::Income::middle;
         }
         return core::Income::high;
-    }
 }
 
 void StaticLinearModel::initialise_physical_activity(RuntimeContext &context, Person &person,
                                                      Random &random) const {
-    static int physical_activity_count = 0;
     static bool first_call = true;
-    physical_activity_count++;
 
     if (first_call) {
         std::cout << "\nStarting physical activity initialization...";
@@ -1644,10 +1650,6 @@ void StaticLinearModel::initialise_simple_physical_activity(
     person.risk_factors["PhysicalActivity"_id] = factor;
 }
 
-// Helper function to create shared_ptr from unique_ptr before moving
-template <typename T> static std::shared_ptr<T> create_shared_from_unique(std::unique_ptr<T> &ptr) {
-    return ptr ? std::make_shared<T>(*ptr) : nullptr;
-}
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::unique_ptr<RiskFactorSexAgeTable> expected,
@@ -1672,7 +1674,7 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::unique_ptr<std::vector<double>> income_trend_lambda,
     std::unique_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors,
     bool is_continuous_income_model, const LinearModelParams &continuous_income_model,
-    const std::string &income_categories,
+    std::string income_categories,
     const std::unordered_map<core::Identifier, PhysicalActivityModel> &physical_activity_models,
     bool has_active_policies, std::vector<LinearModelParams> logistic_models)
     // NOLINTNEXTLINE(readability-function-cognitive-complexity)
@@ -1726,7 +1728,7 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
       logistic_models_{std::move(logistic_models)},
       // Continuous income model support (FINCH approach)
       is_continuous_income_model_{is_continuous_income_model},
-      continuous_income_model_{continuous_income_model}, income_categories_{income_categories},
+      continuous_income_model_{continuous_income_model}, income_categories_{std::move(income_categories)},
       // Policy optimization flag - Mahima
       has_active_policies_{has_active_policies} {
 
