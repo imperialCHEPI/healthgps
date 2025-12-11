@@ -4,6 +4,7 @@
 #include "converter.h"
 #include "info_message.h"
 #include "mtrandom.h"
+#include "static_linear_model.h"
 #include "sync_message.h"
 #include "univariate_visitor.h"
 
@@ -70,6 +71,7 @@ adevs::Time Simulation::init(adevs::SimEnv<int> *env) {
 }
 
 adevs::Time Simulation::update(adevs::SimEnv<int> *env) {
+    std::cout << "\n[UPDATE] Entering update() for year " << env->now().real;
     if (env->now() < end_time_) {
         auto start = std::chrono::steady_clock::now();
         context_.metrics().reset();
@@ -79,7 +81,9 @@ adevs::Time Simulation::update(adevs::SimEnv<int> *env) {
         auto time_year = world_time.real;
         context_.set_current_time(time_year);
 
+        std::cout << "\n[UPDATE] Calling update_population() for year " << time_year;
         update_population();
+        std::cout << "\n[UPDATE] update_population() completed for year " << time_year;
 
         auto stop = std::chrono::steady_clock::now();
         auto elapsed = std::chrono::duration<double, std::milli>(stop - start);
@@ -115,10 +119,12 @@ void Simulation::initialise_population() {
 
     // Create virtual population
     const auto &inputs = context_.inputs();
+
     auto model_start_year = inputs.start_time();
     auto total_year_pop_size = demographic_->get_total_population_size(model_start_year);
     float size_fraction = inputs.settings().size_fraction();
     auto virtual_pop_size = static_cast<int>(size_fraction * total_year_pop_size);
+
     context_.reset_population(virtual_pop_size);
 
     // Gender - Age, must be first
@@ -127,37 +133,60 @@ void Simulation::initialise_population() {
     // Social economics status
     ses_->initialise_population(context_);
 
-    // Generate risk factors
+    // Generate risk factors;
     risk_factor_->initialise_population(context_);
 
     // Initialise diseases
+    std::cout << "\nDEBUG: Starting disease initialization...";
     disease_->initialise_population(context_);
+    std::cout << "\nDEBUG: Disease initialization completed";
 
     // Initialise analysis
+    std::cout << "\nDEBUG: Starting analysis initialization...";
     analysis_->initialise_population(context_);
+    std::cout << "\nDEBUG: Analysis initialization completed";
+
+    std::cout << "\nDEBUG: Starting print_initial_population_statistics...";
     print_initial_population_statistics();
+    std::cout << "\nDEBUG: print_initial_population_statistics completed";
+
+    std::cout << "\nDEBUG: Simulation::initialise_population completed successfully";
 }
 
 void Simulation::update_population() {
     /* Note: order is very important */
 
+    std::cout << "\n[UPDATE] Year " << context_.time_now() << " - Starting demographic update...";
     // update basic information: demographics + diseases
     demographic_->update_population(context_, *disease_);
+    std::cout << " [OK]";
 
+    std::cout << "\n[UPDATE] Year " << context_.time_now() << " - Starting net immigration...";
     // Calculate the net immigration by gender and age, update the population accordingly
     update_net_immigration();
+    std::cout << " [OK]";
 
+    std::cout << "\n[UPDATE] Year " << context_.time_now() << " - Starting SES update...";
     // update population socio-economic status
     ses_->update_population(context_);
+    std::cout << " [OK]";
 
+    std::cout << "\n[UPDATE] Year " << context_.time_now() << " - Starting risk factor update...";
     // Update population risk factors
     risk_factor_->update_population(context_);
+    std::cout << " [OK]";
 
+    std::cout << "\n[UPDATE] Year " << context_.time_now() << " - Starting disease update...";
     // Update diseases status: remission and incidence
     disease_->update_population(context_);
+    std::cout << " [OK]";
 
+    std::cout << "\n[UPDATE] Year " << context_.time_now() << " - Starting analysis update...";
     // Publish results to data logger
     analysis_->update_population(context_);
+    std::cout << " [OK]";
+
+    std::cout << "\n[UPDATE] Year " << context_.time_now() << " - Completed all updates";
 }
 
 void Simulation::update_net_immigration() {
@@ -351,7 +380,20 @@ void hgps::Simulation::print_initial_population_statistics() {
 
     for (const auto &entity : context_.population()) {
         for (const auto &entry : context_.mapping()) {
-            sim_summary[entry.name()].append(entity.get_risk_factor_value(entry.key()));
+            // Special handling for income_category - it's stored as person.income (enum), not in
+            // risk_factors
+            if (entry.key().to_string() == "income_category") {
+                if (entity.income != core::Income::unknown) {
+                    sim_summary[entry.name()].append(entity.income_to_value());
+                }
+                continue;
+            }
+
+            try {
+                sim_summary[entry.name()].append(entity.get_risk_factor_value(entry.key()));
+            } catch (const std::exception &) {
+                // Factor not found - skip it
+            }
         }
     }
 

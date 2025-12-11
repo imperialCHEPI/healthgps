@@ -14,8 +14,22 @@ std::map<core::Identifier, std::function<double(const Person &)>> Person::curren
     {"Age3"_id, [](const Person &p) { return pow(p.age, 3); }},
     {"Over18"_id, [](const Person &p) { return static_cast<double>(p.over_18()); }},
     {"Sector"_id, [](const Person &p) { return p.sector_to_value(); }},
+    {"Region"_id, [](const Person &p) { return p.region_to_value(); }},
+    {"Ethnicity"_id, [](const Person &p) { return p.ethnicity_to_value(); }},
     {"Income"_id, [](const Person &p) { return p.income_to_value(); }},
     {"SES"_id, [](const Person &p) { return p.ses; }},
+
+    // FINCH-specific coefficient mappings (lowercase with numbers)
+    {"gender2"_id, [](const Person &p) { return p.gender_to_value(); }},
+    {"age1"_id, [](const Person &p) { return static_cast<double>(p.age); }},
+    {"age2"_id, [](const Person &p) { return pow(p.age, 2); }},
+    {"ethnicity2"_id, [](const Person &p) { return p.ethnicity_to_value() == 2.0 ? 1.0 : 0.0; }},
+    {"ethnicity3"_id, [](const Person &p) { return p.ethnicity_to_value() == 3.0 ? 1.0 : 0.0; }},
+    {"ethnicity4"_id, [](const Person &p) { return p.ethnicity_to_value() == 4.0 ? 1.0 : 0.0; }},
+    {"income"_id, [](const Person &p) { return p.income_to_value(); }},
+    {"region2"_id, [](const Person &p) { return p.region_to_value() == 2.0 ? 1.0 : 0.0; }},
+    {"region3"_id, [](const Person &p) { return p.region_to_value() == 3.0 ? 1.0 : 0.0; }},
+    {"region4"_id, [](const Person &p) { return p.region_to_value() == 4.0 ? 1.0 : 0.0; }},
 };
 
 Person::Person() : id_{++Person::newUID} {}
@@ -80,14 +94,55 @@ float Person::income_to_value() const {
     switch (income) {
     case core::Income::low:
         return 1.0f; // Low income
+    case core::Income::lowermiddle:
     case core::Income::middle:
-        return 2.0f; // Middle income
+        return 2.0f; // Both middle income categories map to same value for consistency
+    case core::Income::uppermiddle:
+        return 3.0f; // Upper middle income
     case core::Income::high:
-        return 3.0f; // High income
+        return 4.0f; // High income
     case core::Income::unknown:
     default:
         throw core::HgpsException("Unknown income category");
     }
+}
+
+float Person::region_to_value() const {
+    if (region == "unknown") {
+        throw core::HgpsException(
+            "Region is unknown - CSV data may not have been loaded properly.");
+    }
+
+    // Parse numeric value from region string (e.g., "region1" -> 1, "region2" -> 2)
+    if (region.substr(0, 6) == "region") {
+        try {
+            std::string num_str = region.substr(6); // Get the number part
+            return static_cast<float>(std::stoi(num_str));
+        } catch (const std::exception &) {
+            throw core::HgpsException("Invalid region format: " + region);
+        }
+    }
+
+    throw core::HgpsException("Unknown region format: " + region);
+}
+
+float Person::ethnicity_to_value() const {
+    if (ethnicity == "unknown") {
+        throw core::HgpsException(
+            "Ethnicity is unknown - CSV data may not have been loaded properly.");
+    }
+
+    // Parse numeric value from ethnicity string (e.g., "ethnicity1" -> 1, "ethnicity2" -> 2)
+    if (ethnicity.substr(0, 9) == "ethnicity") {
+        try {
+            std::string num_str = ethnicity.substr(9); // Get the number part
+            return static_cast<float>(std::stoi(num_str));
+        } catch (const std::exception &) {
+            throw core::HgpsException("Invalid ethnicity format: " + ethnicity);
+        }
+    }
+
+    throw core::HgpsException("Unknown ethnicity format: " + ethnicity);
 }
 
 void Person::emigrate(const unsigned int time) {

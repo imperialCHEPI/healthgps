@@ -57,6 +57,32 @@ class Repository {
     /// @brief Gets the LMS (lambda-mu-sigma) definition
     /// @return The LMS definition
     virtual LmsDefinition &get_lms_definition() = 0;
+
+    /// @brief Register region prevalence data
+    /// @param region_data Map of age-specific region probabilities by gender
+    virtual void register_region_prevalence(
+        const std::map<core::Identifier, std::map<core::Gender, std::map<std::string, double>>>
+            &region_data) = 0;
+
+    /// @brief Register ethnicity prevalence data
+    /// @param ethnicity_data Map of age group, gender, and region-specific ethnicity probabilities
+    virtual void register_ethnicity_prevalence(
+        const std::map<core::Identifier,
+                       std::map<core::Gender, std::map<std::string, std::map<std::string, double>>>>
+            &ethnicity_data) = 0;
+
+    /// @brief Gets region prevalence data
+    /// @return Map of age-specific region probabilities by gender
+    virtual const std::map<core::Identifier,
+                           std::map<core::Gender, std::map<std::string, double>>> &
+    get_region_prevalence() const = 0;
+
+    /// @brief Gets ethnicity prevalence data
+    /// @return Map of age group, gender, and region-specific ethnicity probabilities
+    virtual const std::map<
+        core::Identifier,
+        std::map<core::Gender, std::map<std::string, std::map<std::string, double>>>> &
+    get_ethnicity_prevalence() const = 0;
 };
 
 /// @brief Implements the cached data repository for input datasets and back-end storage
@@ -92,6 +118,22 @@ class CachedRepository final : public Repository {
 
     LmsDefinition &get_lms_definition() override;
 
+    void register_region_prevalence(
+        const std::map<core::Identifier, std::map<core::Gender, std::map<std::string, double>>>
+            &region_data) override;
+
+    void register_ethnicity_prevalence(
+        const std::map<core::Identifier,
+                       std::map<core::Gender, std::map<std::string, std::map<std::string, double>>>>
+            &ethnicity_data) override;
+
+    const std::map<core::Identifier, std::map<core::Gender, std::map<std::string, double>>> &
+    get_region_prevalence() const override;
+
+    const std::map<core::Identifier,
+                   std::map<core::Gender, std::map<std::string, std::map<std::string, double>>>> &
+    get_ethnicity_prevalence() const override;
+
     void clear_cache() noexcept;
 
   private:
@@ -101,6 +143,15 @@ class CachedRepository final : public Repository {
     std::vector<core::DiseaseInfo> diseases_info_;
     std::map<core::Identifier, DiseaseDefinition> diseases_;
     LmsDefinition lms_parameters_;
+
+    /// @brief Region assignment probabilities by age and gender
+    std::map<core::Identifier, std::map<core::Gender, std::map<std::string, double>>>
+        region_prevalence_;
+
+    /// @brief Ethnicity assignment probabilities by age group, gender, and region
+    std::map<core::Identifier,
+             std::map<core::Gender, std::map<std::string, std::map<std::string, double>>>>
+        ethnicity_prevalence_;
 
     void load_disease_definition(const core::DiseaseInfo &info, const ModelInput &config);
 };
