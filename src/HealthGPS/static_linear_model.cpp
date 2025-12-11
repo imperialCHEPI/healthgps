@@ -57,7 +57,8 @@ StaticLinearModel::StaticLinearModel(
                                 income_trend_decay_factors}, // Pass by value, not moved
       // Continuous income model support (FINCH approach) - must come first
       is_continuous_income_model_{is_continuous_income_model},
-      continuous_income_model_{continuous_income_model}, income_categories_{std::move(income_categories)},
+      continuous_income_model_{continuous_income_model},
+      income_categories_{std::move(income_categories)},
       // Regular trend member variables - these are shared_ptr, so we can move them
       expected_trend_{std::move(expected_trend)},
       expected_trend_boxcox_{std::move(expected_trend_boxcox)},
@@ -446,7 +447,7 @@ double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
         if (!std::isfinite(result)) {
             return 0.0; // Return safe value for Inf
         }
-    return result;
+        return result;
     }
     // For non-zero lambda
     double base = (lambda * factor) + 1.0;
@@ -937,13 +938,13 @@ StaticLinearModel::compute_linear_models(Person &person,
         }
 
         for (const auto &[coefficient_name, coefficient_value] : model.log_coefficients) {
-                double value = person.get_risk_factor_value(coefficient_name);
+            double value = person.get_risk_factor_value(coefficient_name);
 
             if (value <= 0) {
                 value = 1e-10; // Avoid log of zero or negative
             }
-                factor += coefficient_value * log(value);
-            }
+            factor += coefficient_value * log(value);
+        }
 
         linear.emplace_back(factor);
     }
@@ -1388,15 +1389,15 @@ core::Income StaticLinearModel::convert_income_continuous_to_category(double con
         }
         return core::Income::high;
     }
-        // 3-category system: low, middle, high
-        // For 3 categories, we'll use the 33rd and 67th percentiles
-        if (continuous_income <= quartile_thresholds[0]) {
-            return core::Income::low;
-        }
-        if (continuous_income <= quartile_thresholds[2]) {
-            return core::Income::middle;
-        }
-        return core::Income::high;
+    // 3-category system: low, middle, high
+    // For 3 categories, we'll use the 33rd and 67th percentiles
+    if (continuous_income <= quartile_thresholds[0]) {
+        return core::Income::low;
+    }
+    if (continuous_income <= quartile_thresholds[2]) {
+        return core::Income::middle;
+    }
+    return core::Income::high;
 }
 
 // Optimized version: uses pre-calculated quartiles (no population scan)
@@ -1415,14 +1416,14 @@ core::Income StaticLinearModel::convert_income_to_category(
         }
         return core::Income::high;
     }
-        // 3-category system: low, middle, high
-        if (continuous_income <= quartile_thresholds[0]) {
-            return core::Income::low;
-        }
-        if (continuous_income <= quartile_thresholds[2]) {
-            return core::Income::middle;
-        }
-        return core::Income::high;
+    // 3-category system: low, middle, high
+    if (continuous_income <= quartile_thresholds[0]) {
+        return core::Income::low;
+    }
+    if (continuous_income <= quartile_thresholds[2]) {
+        return core::Income::middle;
+    }
+    return core::Income::high;
 }
 
 void StaticLinearModel::initialise_physical_activity(RuntimeContext &context, Person &person,
@@ -1728,7 +1729,8 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
       logistic_models_{std::move(logistic_models)},
       // Continuous income model support (FINCH approach)
       is_continuous_income_model_{is_continuous_income_model},
-      continuous_income_model_{continuous_income_model}, income_categories_{std::move(income_categories)},
+      continuous_income_model_{continuous_income_model},
+      income_categories_{std::move(income_categories)},
       // Policy optimization flag - Mahima
       has_active_policies_{has_active_policies} {
 
