@@ -207,9 +207,31 @@ IntegerAgeGenderTable Simulation::get_current_expected_population() const {
 IntegerAgeGenderTable Simulation::get_current_simulated_population() {
     auto simulated_population = create_age_gender_table<int>(context_.age_range());
     auto &pop = context_.population();
+    const auto max_age = static_cast<unsigned int>(context_.age_range().upper());
     auto count_mutex = std::mutex{};
     tbb::parallel_for_each(pop.cbegin(), pop.cend(), [&](const auto &entity) {
         if (!entity.is_active()) {
+            return;
+        }
+
+        // Bounds check: skip if age exceeds simulation's max age
+        // (table is sized for ages 0-max_age, so age > max_age would cause out-of-range access)
+        if (entity.age > max_age) {
+            std::fprintf(
+                stderr,
+                "[ERROR] get_current_simulated_population: entity.age %u > max_age %u - skipping\n",
+                entity.age, max_age);
+            std::fflush(stderr);
+            return;
+        }
+
+        // Additional safety check using contains()
+        if (!simulated_population.contains(entity.age, entity.gender)) {
+            std::fprintf(
+                stderr,
+                "[ERROR] get_current_simulated_population: age %u not in table - skipping\n",
+                entity.age);
+            std::fflush(stderr);
             return;
         }
 

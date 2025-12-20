@@ -87,12 +87,35 @@ void AnalysisModule::set_income_analysis_enabled(bool enabled) noexcept {
 
 void AnalysisModule::initialise_population(RuntimeContext &context) {
     const auto &age_range = context.age_range();
+    const auto max_age = static_cast<unsigned int>(age_range.upper());
     auto expected_sum = create_age_gender_table<double>(age_range);
     auto expected_count = create_age_gender_table<int>(age_range);
     auto &pop = context.population();
     auto sum_mutex = std::mutex{};
     tbb::parallel_for_each(pop.cbegin(), pop.cend(), [&](const auto &entity) {
         if (!entity.is_active()) {
+            return;
+        }
+
+        // Bounds check: skip if age exceeds simulation's max age
+        // (tables are sized for ages 0-max_age, so age > max_age would cause out-of-range access)
+        if (entity.age > max_age) {
+            std::fprintf(stderr,
+                         "[ERROR] AnalysisModule::initialise_population: entity.age %u > max_age "
+                         "%u - skipping\n",
+                         entity.age, max_age);
+            std::fflush(stderr);
+            return;
+        }
+
+        // Additional safety check using contains()
+        if (!expected_sum.contains(entity.age, entity.gender) ||
+            !expected_count.contains(entity.age, entity.gender)) {
+            std::fprintf(
+                stderr,
+                "[ERROR] AnalysisModule::initialise_population: age %u not in tables - skipping\n",
+                entity.age);
+            std::fflush(stderr);
             return;
         }
 
@@ -153,6 +176,10 @@ AnalysisModule::calculate_residual_disability_weight(int age, const core::Gender
 
 void AnalysisModule::publish_result_message(RuntimeContext &context) const {
     auto sample_size = context.age_range().upper() + 1u;
+    std::fprintf(stderr,
+                 "[DEBUG] AnalysisModule::calculate_result: age_range=[%d,%d] sample_size=%u\n",
+                 context.age_range().lower(), context.age_range().upper(), sample_size);
+    std::fflush(stderr);
     auto result = ModelResult{sample_size};
 
     auto handle = core::run_async(&AnalysisModule::calculate_historical_statistics, this,
@@ -499,6 +526,11 @@ double AnalysisModule::calculate_disability_weight(const Person &entity) const {
         }
     }
 
+    // Bounds check to prevent out-of-range access
+    if (!residual_disability_weight_.contains(entity.age, entity.gender)) {
+        return 0.0;
+    }
+
     auto residual_dw = residual_disability_weight_.at(entity.age, entity.gender);
     residual_dw = std::min(1.0, std::max(residual_dw, 0.0));
     sum *= (1.0 - residual_dw);
@@ -579,37 +611,110 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
     series.add_channels(channels_);
 
     auto current_time = static_cast<unsigned int>(context.time_now());
+    const auto age_range = context.age_range();
+    const auto max_age = static_cast<unsigned int>(age_range.upper());
+
+    std::fprintf(
+        stderr,
+        "[DEBUG] calculate_population_statistics: age_range=[%d,%d] max_age=%u series_size=%zu\n",
+        age_range.lower(), age_range.upper(), max_age, series.sample_size());
+    std::fflush(stderr);
+
     for (const auto &person : context.population()) {
         auto age = person.age;
         auto gender = person.gender;
 
+        // Skip if age is outside valid range (prevents out-of-bounds vector access)
+        if (age > max_age) {
+            std::fprintf(stderr, "[ERROR] Person age %u exceeds max_age %u - skipping\n", age,
+                         max_age);
+            std::fflush(stderr);
+            continue;
+        }
+
         if (!person.is_active()) {
             if (!person.is_alive() && person.time_of_death() == current_time) {
+                if (age > max_age || age >= series.sample_size()) {
+                    std::fprintf(stderr,
+                                 "[CRASH LOCATION] analysis_module.cpp:607 - series.at(%u) "
+                                 "max_age=%u size=%zu\n",
+                                 age, max_age, series.sample_size());
+                    std::fflush(stderr);
+                    continue;
+                }
                 series(gender, "deaths").at(age)++;
                 float expcted_life = definition_.life_expectancy().at(context.time_now(), gender);
                 double yll = std::max(expcted_life - age, 0.0f) * DALY_UNITS;
+                if (age > max_age || age >= series.sample_size()) {
+                    std::fprintf(stderr,
+                                 "[CRASH LOCATION] analysis_module.cpp:610-611 - series.at(%u) "
+                                 "max_age=%u size=%zu\n",
+                                 age, max_age, series.sample_size());
+                    std::fflush(stderr);
+                    continue;
+                }
                 series(gender, "mean_yll").at(age) += yll;
                 series(gender, "mean_daly").at(age) += yll;
             }
 
             if (person.has_emigrated() && person.time_of_migration() == current_time) {
+                if (age > max_age || age >= series.sample_size()) {
+                    std::fprintf(stderr,
+                                 "[CRASH LOCATION] analysis_module.cpp:615 - series.at(%u) "
+                                 "max_age=%u size=%zu\n",
+                                 age, max_age, series.sample_size());
+                    std::fflush(stderr);
+                    continue;
+                }
                 series(gender, "emigrations").at(age)++;
             }
 
             continue;
         }
 
-        series(gender, "count").at(age)++;
+        if (age > max_age || age >= series.sample_size()) {
+            std::fprintf(
+                stderr,
+                "[CRASH LOCATION] analysis_module.cpp:625 - series.at(%u) max_age=%u size=%zu\n",
+                age, max_age, series.sample_size());
+            std::fflush(stderr);
+            continue;
+        }
+        DataSeries::safe_at(series(gender, "count"), age, "count++") += 1;
 
         for (const auto &factor : context.mapping().entries()) {
+            if (age > max_age || age >= series.sample_size()) {
+                std::fprintf(stderr,
+                             "[CRASH LOCATION] analysis_module.cpp:632 - series.at(%u) max_age=%u "
+                             "size=%zu\n",
+                             age, max_age, series.sample_size());
+                std::fflush(stderr);
+                continue;
+            }
             series(gender, "mean_" + factor.key().to_string()).at(age) +=
                 person.get_risk_factor_value(factor.key());
         }
 
         for (const auto &[disease_name, disease_state] : person.diseases) {
             if (disease_state.status == DiseaseStatus::active) {
+                if (age > max_age || age >= series.sample_size()) {
+                    std::fprintf(stderr,
+                                 "[CRASH LOCATION] analysis_module.cpp:642 - series.at(%u) "
+                                 "max_age=%u size=%zu\n",
+                                 age, max_age, series.sample_size());
+                    std::fflush(stderr);
+                    continue;
+                }
                 series(gender, "prevalence_" + disease_name.to_string()).at(age)++;
                 if (disease_state.start_time == context.time_now()) {
+                    if (age > max_age || age >= series.sample_size()) {
+                        std::fprintf(stderr,
+                                     "[CRASH LOCATION] analysis_module.cpp:648 - series.at(%u) "
+                                     "max_age=%u size=%zu\n",
+                                     age, max_age, series.sample_size());
+                        std::fflush(stderr);
+                        continue;
+                    }
                     series(gender, "incidence_" + disease_name.to_string()).at(age)++;
                 }
             }
@@ -617,6 +722,14 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
 
         double dw = calculate_disability_weight(person);
         double yld = dw * DALY_UNITS;
+        if (age > max_age || age >= series.sample_size()) {
+            std::fprintf(stderr,
+                         "[CRASH LOCATION] analysis_module.cpp:659-660 - series.at(%u) max_age=%u "
+                         "size=%zu\n",
+                         age, max_age, series.sample_size());
+            std::fflush(stderr);
+            continue;
+        }
         series(gender, "mean_yld").at(age) += yld;
         series(gender, "mean_daly").at(age) += yld;
 
@@ -624,8 +737,16 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
     }
 
     // For each age group in the analysis...
-    const auto age_range = context.age_range();
     for (int age = age_range.lower(); age <= age_range.upper(); age++) {
+        // Safety check before accessing vectors
+        if (age < 0 || static_cast<std::size_t>(age) >= series.sample_size()) {
+            std::fprintf(stderr,
+                         "[CRASH LOCATION] analysis_module.cpp:723 - age %d out of range [0, %zu) "
+                         "in final loop\n",
+                         age, series.sample_size());
+            std::fflush(stderr);
+            continue;
+        }
         double count_F = series(core::Gender::female, "count").at(age);
         double count_M = series(core::Gender::male, "count").at(age);
         double deaths_F = series(core::Gender::female, "deaths").at(age);
@@ -760,6 +881,13 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
     }
 
     auto current_time = static_cast<unsigned int>(context.time_now());
+    const auto max_age = static_cast<unsigned int>(age_range.upper());
+
+    std::fprintf(
+        stderr,
+        "[DEBUG] calculate_income_statistics: age_range=[%d,%d] max_age=%u series_size=%zu\n",
+        age_range.lower(), age_range.upper(), max_age, series.sample_size());
+    std::fflush(stderr);
 
     for (const auto &person : context.population()) {
 
@@ -767,9 +895,25 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
         auto gender = person.gender;
         auto income = person.income;
 
+        // Skip if age is outside valid range (prevents out-of-bounds vector access)
+        if (age > max_age) {
+            std::fprintf(stderr,
+                         "[ERROR] Person age %u exceeds max_age %u in income stats - skipping\n",
+                         age, max_age);
+            std::fflush(stderr);
+            continue;
+        }
+
         if (!person.is_active()) {
             if (!person.is_alive() && person.time_of_death() == current_time) {
                 try {
+                    if (age > max_age) {
+                        std::fprintf(stderr,
+                                     "[CRASH LOCATION] analysis_module.cpp:787 - "
+                                     "series.at(income).at(%u) with max_age=%u\n",
+                                     age, max_age);
+                        std::fflush(stderr);
+                    }
                     series.at(gender, income, "deaths").at(age)++;
                     float expcted_life =
                         definition_.life_expectancy().at(context.time_now(), gender);
@@ -793,8 +937,17 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
         }
 
         try {
+            if (age > max_age) {
+                std::fprintf(stderr,
+                             "[CRASH LOCATION] analysis_module.cpp:796 - series.at(income).at(%u) "
+                             "with max_age=%u\n",
+                             age, max_age);
+                std::fflush(stderr);
+            }
             series.at(gender, income, "count").at(age)++;
-        } catch (const std::exception &) {
+        } catch (const std::exception &e) {
+            std::fprintf(stderr, "[EXCEPTION] analysis_module.cpp:796 - %s\n", e.what());
+            std::fflush(stderr);
             throw;
         }
 
@@ -1096,16 +1249,45 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
 }
 
 void AnalysisModule::classify_weight(DataSeries &series, const Person &entity) const {
+    // Skip if age is outside valid range (prevents out-of-bounds vector access)
+    if (static_cast<unsigned int>(entity.age) >= series.sample_size()) {
+        std::fprintf(stderr, "[ERROR] classify_weight: entity.age %u >= series.sample_size() %zu\n",
+                     entity.age, series.sample_size());
+        std::fflush(stderr);
+        return;
+    }
+
     auto weight_class = weight_classifier_.classify_weight(entity);
     switch (weight_class) {
     case WeightCategory::normal:
+        if (static_cast<unsigned int>(entity.age) >= series.sample_size()) {
+            std::fprintf(stderr,
+                         "[CRASH LOCATION] analysis_module.cpp:1121 - classify_weight "
+                         "series.at(%u) with size=%zu\n",
+                         entity.age, series.sample_size());
+            std::fflush(stderr);
+        }
         series(entity.gender, "normal_weight").at(entity.age)++;
         break;
     case WeightCategory::overweight:
+        if (static_cast<unsigned int>(entity.age) >= series.sample_size()) {
+            std::fprintf(stderr,
+                         "[CRASH LOCATION] analysis_module.cpp:1125-1126 - classify_weight "
+                         "series.at(%u) with size=%zu\n",
+                         entity.age, series.sample_size());
+            std::fflush(stderr);
+        }
         series(entity.gender, "over_weight").at(entity.age)++;
         series(entity.gender, "above_weight").at(entity.age)++;
         break;
     case WeightCategory::obese:
+        if (static_cast<unsigned int>(entity.age) >= series.sample_size()) {
+            std::fprintf(stderr,
+                         "[CRASH LOCATION] analysis_module.cpp:1129-1130 - classify_weight "
+                         "series.at(%u) with size=%zu\n",
+                         entity.age, series.sample_size());
+            std::fflush(stderr);
+        }
         series(entity.gender, "obese_weight").at(entity.age)++;
         series(entity.gender, "above_weight").at(entity.age)++;
         break;

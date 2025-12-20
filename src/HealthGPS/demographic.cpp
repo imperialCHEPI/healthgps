@@ -4,6 +4,8 @@
 #include "sync_message.h"
 #include <algorithm>
 #include <cassert>
+#include <cstdio>
+#include <fmt/core.h>
 #include <mutex>
 
 #include <oneapi/tbb/parallel_for_each.h>
@@ -123,10 +125,27 @@ double DemographicModule::get_residual_death_rate(int age, core::Gender gender) 
 
 void DemographicModule::initialise_population(RuntimeContext &context) {
     auto age_gender_dist = get_age_gender_distribution(context.start_time());
+    const auto max_age = static_cast<unsigned int>(context.age_range().upper());
     auto index = 0;
     auto pop_size = static_cast<int>(context.population().size());
     auto entry_total = static_cast<int>(age_gender_dist.size());
     for (auto entry_count = 1; auto &entry : age_gender_dist) {
+        // Bounds check: skip ages beyond simulation's max age
+        // (population data may contain ages 0-110, but simulation may be limited to 0-100)
+        if (entry.first > static_cast<int>(max_age)) {
+            // Print to both stdout (for .o file) and stderr (for .e file) to ensure visibility on
+            // PBS
+            fmt::print(
+                "[ERROR] DemographicModule::initialise_population: skipping age {} > max_age {}\n",
+                entry.first, max_age);
+            std::fprintf(
+                stderr,
+                "[ERROR] DemographicModule::initialise_population: skipping age %d > max_age %u\n",
+                entry.first, max_age);
+            std::fflush(stdout);
+            std::fflush(stderr);
+            continue;
+        }
         auto num_males = static_cast<int>(std::round(pop_size * entry.second.males));
         auto num_females = static_cast<int>(std::round(pop_size * entry.second.females));
         auto num_required = index + num_males + num_females;
@@ -371,7 +390,14 @@ int DemographicModule::update_age_and_death_events(RuntimeContext &context,
         }
 
         if (entity.is_active()) {
-            entity.age = entity.age + 1;
+            // Prevent age from exceeding maximum age range
+            if (entity.age < max_age) {
+                entity.age = entity.age + 1;
+            } else {
+                // Age already at or above maximum, ensure person dies
+                entity.die(context.time_now());
+                number_of_deaths++;
+            }
         }
     }
 
