@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/config/models/staticlinear.json",
+    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v2/config/models/staticlinear.json",
     "type": "object",
     "properties": {
         "$schema": {
@@ -30,29 +30,178 @@
                         "type": "number"
                     }
                 },
+                "required": [
+                    "Name",
+                    "Female",
+                    "Male"
+                ],
                 "additionalProperties": false
             }
         },
+        "RegionFile": {
+            "$ref": "../../../v1/config/csv_file.json",
+            "description": "CSV file containing region assignment probabilities by age and gender"
+        },
+        "EthnicityFile": {
+            "$ref": "../../../v1/config/csv_file.json",
+            "description": "CSV file containing ethnicity assignment probabilities by age group, gender, and region"
+        },
         "IncomeModels": {
             "type": "object",
-            "additionalProperties": {
-                "type": "object",
-                "properties": {
-                    "Intercept": {
-                        "type": "number"
-                    },
-                    "Coefficients": {
-                        "type": "object",
-                        "additionalProperties": {
-                            "type": "number"
+            "properties": {
+                "continuous": {
+                    "oneOf": [
+                        {
+                            "type": "object",
+                            "description": "JSON-based continuous income model",
+                            "properties": {
+                                "Intercept": {
+                                    "type": "number"
+                                },
+                                "Coefficients": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "type": "number"
+                                    }
+                                },
+                                "IncomeContinuousStdDev": {
+                                    "type": "number",
+                                    "description": "Standard deviation for continuous income calculation"
+                                }
+                            },
+                            "required": [
+                                "Intercept",
+                                "Coefficients",
+                                "IncomeContinuousStdDev"
+                            ],
+                            "additionalProperties": false
+                        },
+                        {
+                            "type": "object",
+                            "description": "CSV-based continuous income model",
+                            "properties": {
+                                "csv_file": {
+                                    "type": "string",
+                                    "description": "CSV file containing income model coefficients"
+                                },
+                                "format": {
+                                    "type": "string",
+                                    "enum": [
+                                        "csv"
+                                    ],
+                                    "default": "csv"
+                                },
+                                "delimiter": {
+                                    "type": "string",
+                                    "default": ","
+                                },
+                                "encoding": {
+                                    "type": "string",
+                                    "default": "ASCII"
+                                },
+                                "columns": {
+                                    "type": "object",
+                                    "description": "Column definitions for the income model CSV",
+                                    "properties": {
+                                        "Factor": {
+                                            "type": "string",
+                                            "description": "Factor name column (e.g., Intercept, gender2, age1, age2, ethnicity2-4, region2-4, min, max, etc.)"
+                                        },
+                                        "Coefficient": {
+                                            "type": "string",
+                                            "description": "Coefficient value column"
+                                        }
+                                    },
+                                    "required": [
+                                        "Factor",
+                                        "Coefficient"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            },
+                            "required": [
+                                "csv_file"
+                            ],
+                            "additionalProperties": false
                         }
+                    ]
+                }
+            },
+            "additionalProperties": false
+        },
+        "PhysicalActivityModels": {
+            "type": "object",
+            "propertyNames": {
+                "enum": [
+                    "simple",
+                    "continuous"
+                ]
+            },
+            "additionalProperties": {
+                "oneOf": [
+                    {
+                        "type": "object",
+                        "description": "Simple physical activity model (India approach) - uses standard deviation only",
+                        "properties": {
+                            "PhysicalActivityStdDev": {
+                                "type": "number",
+                                "description": "Standard deviation for physical activity calculation"
+                            }
+                        },
+                        "required": [
+                            "PhysicalActivityStdDev"
+                        ],
+                        "additionalProperties": false
+                    },
+                    {
+                        "type": "object",
+                        "description": "Continuous physical activity model (FINCH approach) - uses CSV file with coefficients",
+                        "properties": {
+                            "csv_file": {
+                                "type": "string",
+                                "description": "CSV file containing physical activity model coefficients"
+                            },
+                            "format": {
+                                "type": "string",
+                                "enum": [
+                                    "csv"
+                                ],
+                                "default": "csv"
+                            },
+                            "delimiter": {
+                                "type": "string",
+                                "default": ","
+                            },
+                            "encoding": {
+                                "type": "string",
+                                "default": "ASCII"
+                            },
+                            "columns": {
+                                "type": "object",
+                                "description": "Column definitions for the physical activity model CSV",
+                                "properties": {
+                                    "Factor": {
+                                        "type": "string",
+                                        "description": "Factor name column (e.g., Intercept, age, gender, region names, ethnicity names, etc.)"
+                                    },
+                                    "Coefficient": {
+                                        "type": "string",
+                                        "description": "Coefficient value column"
+                                    }
+                                },
+                                "required": [
+                                    "Factor",
+                                    "Coefficient"
+                                ],
+                                "additionalProperties": false
+                            }
+                        },
+                        "required": [
+                            "csv_file"
+                        ],
+                        "additionalProperties": false
                     }
-                },
-                "required": [
-                    "Intercept",
-                    "Coefficients"
-                ],
-                "additionalProperties": false
+                ]
             }
         },
         "RiskFactorModels": {
@@ -119,45 +268,15 @@
                                 "type": "object",
                                 "additionalProperties": {
                                     "type": "number"
-                                }
+                                },
+                                "minItems": 1
                             },
                             "LogCoefficients": {
                                 "type": "object",
                                 "additionalProperties": {
-                                    "type": "number"
-                                }
-                            },
-                            "Range": {
-                                "type": "array",
-                                "items": {
                                     "type": "number"
                                 },
-                                "minItems": 2,
-                                "maxItems": 2
-                            },
-                            "Lambda": {
-                                "type": "number"
-                            }
-                        },
-                        "additionalProperties": true
-                    },
-                    "IncomeTrend": {
-                        "type": "object",
-                        "properties": {
-                            "Intercept": {
-                                "type": "number"
-                            },
-                            "Coefficients": {
-                                "type": "object",
-                                "additionalProperties": {
-                                    "type": "number"
-                                }
-                            },
-                            "LogCoefficients": {
-                                "type": "object",
-                                "additionalProperties": {
-                                    "type": "number"
-                                }
+                                "minItems": 1
                             },
                             "Range": {
                                 "type": "array",
@@ -200,11 +319,34 @@
             }
         },
         "RiskFactorCorrelationFile": {
-            "$ref": "../csv_file.json"
+            "$ref": "../../../v1/config/csv_file.json"
         },
         "PolicyCovarianceFile": {
-            "$ref": "../csv_file.json"
+            "$ref": "../../../v1/config/csv_file.json"
         }
     },
+    "required": [
+        "ModelName",
+        "InformationSpeed",
+        "RiskFactorModels",
+        "RiskFactorCorrelationFile",
+        "PolicyCovarianceFile"
+    ],
+    "allOf": [
+        {
+            "if": {
+                "not": {
+                    "required": [
+                        "PhysicalActivityModels"
+                    ]
+                }
+            },
+            "then": {
+                "required": [
+                    "PhysicalActivityStdDev"
+                ]
+            }
+        }
+    ],
     "additionalProperties": true
 }

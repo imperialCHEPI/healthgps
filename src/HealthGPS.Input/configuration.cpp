@@ -100,7 +100,7 @@ Configuration get_configuration(const std::string &config_source,
     // Base dir for relative paths
     config.root_path = config_file.parent_path();
 
-    // Read trend_type from JSON file (optional, defaults to "null")
+    // Read trend_type from JSON file (defaults to "null")
     if (opt.contains("trend_type")) {
         config.trend_type = opt["trend_type"].get<std::string>();
         // Validate trend_type value
@@ -112,6 +112,8 @@ Configuration get_configuration(const std::string &config_source,
         }
     }
 
+    // Store the original config.json data for accessing additional fields
+    config.config_data = opt;
     // Read PIF configuration from JSON file (if available)
     if (opt.contains("population_impact_fraction")) {
         const auto &pif_json = opt["population_impact_fraction"];
@@ -123,7 +125,6 @@ Configuration get_configuration(const std::string &config_source,
     }
 
     // Read data source from JSON file. For now, this is optional, but in future it will be
-    // mandatory.
     if (opt.contains("data")) {
         config.data_source = get_data_source_from_json(opt["data"], config.root_path);
     }
