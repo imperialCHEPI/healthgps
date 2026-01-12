@@ -78,7 +78,8 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
         std::shared_ptr<std::vector<core::DoubleInterval>> income_trend_ranges = nullptr,
         std::shared_ptr<std::vector<double>> income_trend_lambda = nullptr,
         std::shared_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors =
-            nullptr);
+            nullptr,
+        bool has_active_policies = true);
 
     RiskFactorModelType type() const noexcept override;
 
@@ -177,6 +178,9 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
         &rural_prevalence_;
     const std::unordered_map<core::Income, LinearModelParams> &income_models_;
     const double physical_activity_stddev_;
+
+    // Policy optimization flag - Mahima's enhancement
+    bool has_active_policies_;
 };
 
 /// @brief Defines the static linear model data type
@@ -238,7 +242,8 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
         std::unique_ptr<std::vector<core::DoubleInterval>> income_trend_ranges = nullptr,
         std::unique_ptr<std::vector<double>> income_trend_lambda = nullptr,
         std::unique_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors =
-            nullptr);
+            nullptr,
+        bool has_active_policies = true);
 
     /// @brief Construct a new StaticLinearModel from this definition
     /// @return A unique pointer to the new StaticLinearModel instance
@@ -276,6 +281,9 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
         rural_prevalence_;
     std::unordered_map<core::Income, LinearModelParams> income_models_;
     double physical_activity_stddev_;
+
+    // Policy optimization flag - Mahima's enhancement
+    bool has_active_policies_;
 };
 
 } // namespace hgps

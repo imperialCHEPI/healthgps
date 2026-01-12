@@ -1,8 +1,12 @@
 #include "default_disease_model.h"
+#include "HealthGPS.Input/pif_data.h"
 #include "person.h"
 #include "runtime_context.h"
 
+#include <fmt/color.h>
+#include <iostream>
 #include <oneapi/tbb/parallel_for_each.h>
+#include <set>
 
 namespace hgps {
 
@@ -207,8 +211,46 @@ void DefaultDiseaseModel::update_remission_cases(RuntimeContext &context) {
     }
 }
 
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
     int incidence_id = definition_.get().table().at(MeasureKey::incidence);
+
+    std::cout << "Start update_incidence_cases: " << disease_type() << "\n";
+    fflush(stderr);
+    fflush(stdout);
+
+    const auto &table = definition_.get().table();
+    const auto disease_code = disease_type();
+    const bool apply_pif =
+        definition_.get().has_pif_data() && context.scenario().type() == ScenarioType::intervention;
+
+    const int year_post_intervention = apply_pif ? (context.time_now() - context.start_time()) : 0;
+    const auto *pif_table = [&]() -> const input::PIFTable * {
+        if (!apply_pif) {
+            return nullptr;
+        }
+        const auto &pif_data = definition_.get().pif_data();
+        const auto &pif_config = context.inputs().population_impact_fraction();
+        return pif_data.get_scenario_data(pif_config.scenario);
+    }();
+
+    if (apply_pif && pif_table) {
+        static std::once_flag pif_once_flag;
+        std::call_once(pif_once_flag, []() {
+            fmt::print(fg(fmt::color::green), "PIF Analysis: Applying Population Impact Fraction "
+                                              "adjustments to disease incidence calculations\n");
+        });
+
+        // Optional: one-off debug snapshot per call (no per-person lookups)
+        // int debug_age = 55;
+        // auto debug_gender = core::Gender::female;
+        // int debug_year = 17;
+        // double debug_pif = pif_table->get_pif_value(debug_age, debug_gender, debug_year);
+        // std::cout << "PIF Debug: Disease=" << disease_code.to_string()
+        //           << ", Age=" << debug_age << ", Gender="
+        //           << (debug_gender == core::Gender::male ? "Male" : "Female")
+        //           << ", YearPostInt=" << debug_year << ", PIFValue=" << debug_pif << '\n';
+    }
 
     for (auto &person : context.population()) {
         // Skip if person is inactive.
@@ -223,8 +265,8 @@ void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
         }
 
         // Skip if the person already has the disease.
-        if (person.diseases.contains(disease_type()) &&
-            person.diseases.at(disease_type()).status == DiseaseStatus::active) {
+        if (auto it = person.diseases.find(disease_code);
+            it != person.diseases.end() && it->second.status == DiseaseStatus::active) {
             continue;
         }
 
@@ -234,14 +276,25 @@ void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
 
         double average_relative_risk = average_relative_risk_.at(person.age, person.gender);
 
-        double incidence = definition_.get().table()(person.age, person.gender).at(incidence_id);
+        double incidence = table(person.age, person.gender).at(incidence_id);
         double probability = incidence * relative_risk / average_relative_risk;
+
+        // Apply PIF adjustment if available (lookups cached outside loop)
+        if (apply_pif && pif_table) {
+            double pif_value =
+                pif_table->get_pif_value(person.age, person.gender, year_post_intervention);
+            probability *= (1.0 - pif_value);
+        }
+
         double hazard = context.random().next_double();
         if (hazard < probability) {
-            person.diseases[disease_type()] =
+            person.diseases[disease_code] =
                 Disease{.status = DiseaseStatus::active, .start_time = context.time_now()};
         }
     }
+    std::cout << "End update_incidence_cases: " << disease_type() << "\n";
+    fflush(stderr);
+    fflush(stdout);
 }
 
 } // namespace hgps
