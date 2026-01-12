@@ -1679,19 +1679,26 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     const std::unordered_map<core::Identifier, PhysicalActivityModel> &physical_activity_models,
     bool has_active_policies, std::vector<LinearModelParams> logistic_models)
     // NOLINTNEXTLINE(readability-function-cognitive-complexity)
-    : RiskFactorAdjustableModelDefinition{
-          std::move(expected),
-          expected_trend ? std::make_unique<std::unordered_map<core::Identifier, double>>(*expected_trend)
-                        : nullptr,
-          trend_steps ? std::make_unique<std::unordered_map<core::Identifier, int>>(*trend_steps)
-                      : nullptr,
-          trend_type},
-      expected_trend_{expected_trend ? std::make_shared<std::unordered_map<core::Identifier, double>>(
-                                           *expected_trend)
-                                     : nullptr},
-      expected_trend_boxcox_{expected_trend_boxcox ? std::make_shared<std::unordered_map<core::Identifier, double>>(
-                                           *expected_trend_boxcox)
-                                     : nullptr},
+    : RiskFactorAdjustableModelDefinition{std::move(expected),
+                                          expected_trend
+                                              ? std::make_unique<
+                                                    std::unordered_map<core::Identifier, double>>(
+                                                    *expected_trend)
+                                              : nullptr,
+                                          trend_steps
+                                              ? std::make_unique<
+                                                    std::unordered_map<core::Identifier, int>>(
+                                                    *trend_steps)
+                                              : nullptr,
+                                          trend_type},
+      expected_trend_{
+          expected_trend
+              ? std::make_shared<std::unordered_map<core::Identifier, double>>(*expected_trend)
+              : nullptr},
+      expected_trend_boxcox_{expected_trend_boxcox
+                                 ? std::make_shared<std::unordered_map<core::Identifier, double>>(
+                                       *expected_trend_boxcox)
+                                 : nullptr},
       trend_models_{create_shared_from_unique(trend_models)},
       trend_ranges_{create_shared_from_unique(trend_ranges)},
       trend_lambda_{create_shared_from_unique(trend_lambda)},
