@@ -666,24 +666,36 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
         // Calculate in-place factor averages.
         for (const auto &factor : context.mapping().entries()) {
             std::string column = "mean_" + factor.key().to_string();
-            series(core::Gender::female, column).at(age) /= count_F;
-            series(core::Gender::male, column).at(age) /= count_M;
+            if (count_F > 0) {
+                series(core::Gender::female, column).at(age) /= count_F;
+            }
+            if (count_M > 0) {
+                series(core::Gender::male, column).at(age) /= count_M;
+            }
         }
 
         // Calculate in-place disease prevalence and incidence rates.
         for (const auto &disease : context.diseases()) {
             std::string column_prevalence = "prevalence_" + disease.code.to_string();
-            series(core::Gender::female, column_prevalence).at(age) /= count_F;
-            series(core::Gender::male, column_prevalence).at(age) /= count_M;
             std::string column_incidence = "incidence_" + disease.code.to_string();
-            series(core::Gender::female, column_incidence).at(age) /= count_F;
-            series(core::Gender::male, column_incidence).at(age) /= count_M;
+            if (count_F > 0) {
+                series(core::Gender::female, column_prevalence).at(age) /= count_F;
+                series(core::Gender::female, column_incidence).at(age) /= count_F;
+            }
+            if (count_M > 0) {
+                series(core::Gender::male, column_prevalence).at(age) /= count_M;
+                series(core::Gender::male, column_incidence).at(age) /= count_M;
+            }
         }
 
         // Calculate in-place YLL/YLD/DALY averages.
         for (const auto &column : {"mean_yll", "mean_yld", "mean_daly"}) {
-            series(core::Gender::female, column).at(age) /= (count_F + deaths_F);
-            series(core::Gender::male, column).at(age) /= (count_M + deaths_M);
+            if ((count_F + deaths_F) > 0) {
+                series(core::Gender::female, column).at(age) /= (count_F + deaths_F);
+            }
+            if ((count_M + deaths_M) > 0) {
+                series(core::Gender::male, column).at(age) /= (count_M + deaths_M);
+            }
         }
     }
 
@@ -697,6 +709,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
 }
 // NOLINTEND(readability-function-cognitive-complexity)
 
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext &context,
                                                                   DataSeries &series) const {
     if (!enable_income_analysis_) {
@@ -718,11 +731,11 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
     income_channels.emplace_back("obese_weight");
     income_channels.emplace_back("above_weight");
 
-    // Add demographic channels
-    income_channels.emplace_back("mean_age");
-    income_channels.emplace_back("std_age");
-    income_channels.emplace_back("mean_gender");
-    income_channels.emplace_back("std_gender");
+    // Add demographic channels (excluding mean_age, std_age, mean_gender, std_gender)
+    // income_channels.emplace_back("mean_age");
+    // income_channels.emplace_back("std_age");
+    // income_channels.emplace_back("mean_gender");
+    // income_channels.emplace_back("std_gender");
     income_channels.emplace_back("mean_income");
     income_channels.emplace_back("std_income");
     income_channels.emplace_back("mean_sector");
@@ -771,7 +784,7 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
                 series.at(core::Gender::female, income, column).at(age) = 0.0;
                 series.at(core::Gender::male, income, column).at(age) = 0.0;
             }
-            for (const auto &column : {"std_age", "std_gender", "std_income", "std_sector"}) {
+            for (const auto &column : {"std_income", "std_sector"}) {
                 series.at(core::Gender::female, income, column).at(age) = 0.0;
                 series.at(core::Gender::male, income, column).at(age) = 0.0;
             }
@@ -827,10 +840,10 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
             }
         }
 
-        // Collect demographic data
+        // Collect demographic data (excluding age and gender)
         try {
-            series.at(gender, income, "mean_age").at(age) += person.age;
-            series.at(gender, income, "mean_gender").at(age) += static_cast<int>(person.gender);
+            // series.at(gender, income, "mean_age").at(age) += person.age;
+            // series.at(gender, income, "mean_gender").at(age) += static_cast<int>(person.gender);
             series.at(gender, income, "mean_income").at(age) += static_cast<int>(person.income);
             series.at(gender, income, "mean_sector").at(age) += static_cast<int>(person.sector);
         } catch (const std::exception &) {
@@ -893,16 +906,17 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
                 }
             }
 
-            // Calculate in-place demographic averages for this income category
+            // Calculate in-place demographic averages for this income category (excluding age and
+            // gender)
             if (count_F > 0) {
-                series.at(core::Gender::female, income, "mean_age").at(age) /= count_F;
-                series.at(core::Gender::female, income, "mean_gender").at(age) /= count_F;
+                // series.at(core::Gender::female, income, "mean_age").at(age) /= count_F;
+                // series.at(core::Gender::female, income, "mean_gender").at(age) /= count_F;
                 series.at(core::Gender::female, income, "mean_income").at(age) /= count_F;
                 series.at(core::Gender::female, income, "mean_sector").at(age) /= count_F;
             }
             if (count_M > 0) {
-                series.at(core::Gender::male, income, "mean_age").at(age) /= count_M;
-                series.at(core::Gender::male, income, "mean_gender").at(age) /= count_M;
+                // series.at(core::Gender::male, income, "mean_age").at(age) /= count_M;
+                // series.at(core::Gender::male, income, "mean_gender").at(age) /= count_M;
                 series.at(core::Gender::male, income, "mean_income").at(age) /= count_M;
                 series.at(core::Gender::male, income, "mean_sector").at(age) /= count_M;
             }
@@ -978,10 +992,10 @@ void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &c
             accumulate_squared_diffs_income(factor.key().to_string(), sex, income, age, value);
         }
 
-        // Accumulate squared deviations for demographic data
-        accumulate_squared_diffs_income("age", sex, income, age, person.age);
-        accumulate_squared_diffs_income("gender", sex, income, age,
-                                        static_cast<int>(person.gender));
+        // Accumulate squared deviations for demographic data (excluding age and gender)
+        // accumulate_squared_diffs_income("age", sex, income, age, person.age);
+        // accumulate_squared_diffs_income("gender", sex, income, age,
+        // static_cast<int>(person.gender));
         accumulate_squared_diffs_income("income", sex, income, age,
                                         static_cast<int>(person.income));
         accumulate_squared_diffs_income("sector", sex, income, age,
@@ -991,9 +1005,13 @@ void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &c
     // Calculate in-place standard deviation for income-based data
     auto divide_by_count_sqrt_income = [&series](const std::string &chan, core::Gender sex,
                                                  core::Income income, int age, double count) {
-        const double sum = series.at(sex, income, "std_" + chan).at(age);
-        const double std = std::sqrt(sum / count);
-        series.at(sex, income, "std_" + chan).at(age) = std;
+        if (count > 0) {
+            const double sum = series.at(sex, income, "std_" + chan).at(age);
+            const double std = std::sqrt(sum / count);
+            series.at(sex, income, "std_" + chan).at(age) = std;
+        } else {
+            series.at(sex, income, "std_" + chan).at(age) = 0.0;
+        }
     };
 
     // For each income category and age group
@@ -1015,11 +1033,12 @@ void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &c
                                             age, count_M);
             }
 
-            // Calculate in-place demographic standard deviation for this income category
-            divide_by_count_sqrt_income("age", core::Gender::female, income, age, count_F);
-            divide_by_count_sqrt_income("age", core::Gender::male, income, age, count_M);
-            divide_by_count_sqrt_income("gender", core::Gender::female, income, age, count_F);
-            divide_by_count_sqrt_income("gender", core::Gender::male, income, age, count_M);
+            // Calculate in-place demographic standard deviation for this income category (excluding
+            // age and gender) divide_by_count_sqrt_income("age", core::Gender::female, income, age,
+            // count_F); divide_by_count_sqrt_income("age", core::Gender::male, income, age,
+            // count_M); divide_by_count_sqrt_income("gender", core::Gender::female, income, age,
+            // count_F); divide_by_count_sqrt_income("gender", core::Gender::male, income, age,
+            // count_M);
             divide_by_count_sqrt_income("income", core::Gender::female, income, age, count_F);
             divide_by_count_sqrt_income("income", core::Gender::male, income, age, count_M);
             divide_by_count_sqrt_income("sector", core::Gender::female, income, age, count_F);
@@ -1077,9 +1096,13 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
     // Calculate in-place standard deviation.
     auto divide_by_count_sqrt = [&series](const std::string &chan, core::Gender sex, int age,
                                           double count) {
-        const double sum = series(sex, "std_" + chan).at(age);
-        const double std = std::sqrt(sum / count);
-        series(sex, "std_" + chan).at(age) = std;
+        if (count > 0) {
+            const double sum = series(sex, "std_" + chan).at(age);
+            const double std = std::sqrt(sum / count);
+            series(sex, "std_" + chan).at(age) = std;
+        } else {
+            series(sex, "std_" + chan).at(age) = 0.0;
+        }
     };
 
     // For each age group in the analysis...

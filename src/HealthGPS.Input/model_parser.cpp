@@ -249,6 +249,7 @@ load_hlm_risk_model_definition(const nlohmann::json &opt) {
 // NOLINTBEGIN(readability-function-cognitive-complexity)
 // NOLINTBEGIN(readability-function-cognitive-complexity)
 std::unique_ptr<hgps::StaticLinearModelDefinition>
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configuration &config) {
     MEASURE_FUNCTION();
 
@@ -494,6 +495,31 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                                               "policy covariance matrix column count ({})",
                                               opt["RiskFactorModels"].size(),
                                               policy_covariance_table.num_columns())};
+    }
+    // Mahima's enhancement: Detect if all policy values are zero for early optimization
+    bool has_active_policies = false;
+    for (const auto &policy_model : policy_models) {
+        if (policy_model.intercept != 0.0) {
+            has_active_policies = true;
+            break;
+        }
+        for (const auto &[coeff_name, coeff_value] : policy_model.coefficients) {
+            if (coeff_value != 0.0) {
+                has_active_policies = true;
+                break;
+            }
+        }
+        for (const auto &[coeff_name, coeff_value] : policy_model.log_coefficients) {
+            if (coeff_value != 0.0) {
+                has_active_policies = true;
+                break;
+            }
+        }
+    }
+
+    if (!has_active_policies) {
+        std::cout << "\nPolicy Detection (MAHIMA): All policy values are zero - will skip ALL "
+                     "policy operations for maximum performance\n";
     }
 
     // Compute Cholesky decomposition of the intervention policy covariance matrix.

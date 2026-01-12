@@ -223,6 +223,9 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
         &rural_prevalence_;
     const std::unordered_map<core::Income, LinearModelParams> &income_models_;
     const double physical_activity_stddev_;
+
+    // Policy optimization flag - Mahima's enhancement
+    bool has_active_policies_;
 };
 
 /// @brief Defines the static linear model data type
@@ -289,10 +292,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
         std::unique_ptr<std::vector<core::DoubleInterval>> income_trend_ranges = nullptr,
         std::unique_ptr<std::vector<double>> income_trend_lambda = nullptr,
         std::unique_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors =
-            nullptr,
-        bool is_continuous_income_model = false,
-        const LinearModelParams &continuous_income_model = LinearModelParams{},
-        const std::string &income_categories = "3");
+            nullptr);
 
     /// @brief Construct a new StaticLinearModel from this definition
     /// @return A unique pointer to the new StaticLinearModel instance
@@ -330,11 +330,6 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
         rural_prevalence_;
     std::unordered_map<core::Income, LinearModelParams> income_models_;
     double physical_activity_stddev_;
-
-    // Continuous income model support (FINCH approach)
-    bool is_continuous_income_model_;
-    LinearModelParams continuous_income_model_;
-    std::string income_categories_;
 };
 
 } // namespace hgps
