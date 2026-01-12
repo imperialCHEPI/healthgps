@@ -68,6 +68,12 @@ struct Person {
     /// @brief Income category
     core::Income income{core::Income::unknown};
 
+    /// @brief Continuous income value (for FINCH approach)
+    double income_continuous{0.0};
+
+    /// @brief Physical activity level
+    double physical_activity{0.0};
+
     /// @brief Social-economic status (SES) assigned value
     double ses{};
 

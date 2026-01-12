@@ -1,13 +1,25 @@
 #include "static_linear_model.h"
 #include "HealthGPS.Core/exception.h"
 #include "population.h"
+#include "risk_factor_adjustable_model.h"
 #include "runtime_context.h"
 
 #include <algorithm>
 #include <cmath>
+#include <fmt/core.h>
 #include <iostream> // Added for print statements
 #include <ranges>
+#include <unordered_map>
 #include <utility>
+
+namespace { // anonymous namespace
+
+// Helper function to create shared_ptr from unique_ptr before moving
+template <typename T> std::shared_ptr<T> create_shared_from_unique(std::unique_ptr<T> &ptr) {
+    return ptr ? std::make_shared<T>(*ptr) : nullptr;
+}
+
+} // anonymous namespace
 
 namespace hgps {
 
@@ -36,15 +48,19 @@ StaticLinearModel::StaticLinearModel(
     std::shared_ptr<std::vector<double>> income_trend_lambda,
     std::shared_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors,
     bool is_continuous_income_model, const LinearModelParams &continuous_income_model,
-    const std::string &income_categories)
-    : RiskFactorAdjustableModel{std::move(expected),       std::move(expected_trend),
-                                std::move(trend_steps),    trend_type,
+    std::string income_categories,
+    const std::unordered_map<core::Identifier, PhysicalActivityModel> &physical_activity_models,
+    bool has_active_policies, const std::vector<LinearModelParams> &logistic_models)
+    // NOLINTNEXTLINE(readability-function-cognitive-complexity)
+    : RiskFactorAdjustableModel{std::move(expected),       expected_trend, trend_steps, trend_type,
                                 expected_income_trend,       // Pass by value, not moved
                                 income_trend_decay_factors}, // Pass by value, not moved
       // Continuous income model support (FINCH approach) - must come first
       is_continuous_income_model_{is_continuous_income_model},
-      continuous_income_model_{continuous_income_model}, income_categories_{income_categories},
-      // Regular trend member variables
+      continuous_income_model_{continuous_income_model},
+      income_categories_{std::move(income_categories)},
+      // Regular trend member variables - these are shared_ptr, so we can move them
+      expected_trend_{std::move(expected_trend)},
       expected_trend_boxcox_{std::move(expected_trend_boxcox)},
       trend_models_{std::move(trend_models)}, trend_ranges_{std::move(trend_ranges)},
       trend_lambda_{std::move(trend_lambda)},
@@ -62,26 +78,245 @@ StaticLinearModel::StaticLinearModel(
       policy_cholesky_{policy_cholesky}, info_speed_{info_speed},
       rural_prevalence_{rural_prevalence}, income_models_{income_models},
       physical_activity_stddev_{physical_activity_stddev},
-      has_active_policies_{has_active_policies} {}
+      physical_activity_models_{physical_activity_models},
+      has_physical_activity_models_{!physical_activity_models.empty()},
+      has_active_policies_{has_active_policies}, logistic_models_{logistic_models} {
+
+    if (names_.empty()) {
+        throw core::HgpsException("Risk factor names list is empty");
+    }
+
+    if (models_.empty()) {
+        throw core::HgpsException("Risk factor model list is empty");
+    }
+
+    if (ranges_.empty()) {
+        throw core::HgpsException("Risk factor ranges list is empty");
+    }
+
+    if (lambda_.empty()) {
+        throw core::HgpsException("Risk factor lambda list is empty");
+    }
+
+    if (stddev_.empty()) {
+        throw core::HgpsException("Risk factor standard deviation list is empty");
+    }
+
+    if (!cholesky_.allFinite()) {
+        throw core::HgpsException("Risk factor Cholesky matrix contains non-finite values");
+    }
+
+    if (policy_models_.empty()) {
+        throw core::HgpsException("Intervention policy model list is empty");
+    }
+
+    if (policy_ranges_.empty()) {
+        throw core::HgpsException("Intervention policy ranges list is empty");
+    }
+
+    if (!policy_cholesky_.allFinite()) {
+        throw core::HgpsException("Intervention policy Cholesky matrix contains non-finite values");
+    }
+
+    // Validate regular trend parameters only if trend type is Trend
+    if (trend_type_ == TrendType::Trend) {
+        std::cout << "\nDEBUG: Validating UPF trend parameters...";
+        if (trend_models_->empty()) {
+            throw core::HgpsException("Time trend model list is empty");
+        }
+        if (trend_ranges_->empty()) {
+            throw core::HgpsException("Time trend ranges list is empty");
+        }
+        if (trend_lambda_->empty()) {
+            throw core::HgpsException("Time trend lambda list is empty");
+        }
+    } else {
+        std::cout << "\nDEBUG: Skipping UPF trend validation (trend_type_ != Trend)";
+    }
+
+    // Validate income trend parameters if income trend is enabled
+    if (trend_type_ == TrendType::IncomeTrend) {
+        std::cout << "\nDEBUG: Validating income trend parameters...";
+        if (!expected_income_trend_) {
+            throw core::HgpsException(
+                "Income trend is enabled but expected_income_trend is missing");
+        }
+        if (!expected_income_trend_boxcox_) {
+            throw core::HgpsException(
+                "Income trend is enabled but expected_income_trend_boxcox is missing");
+        }
+        if (!income_trend_steps_) {
+            throw core::HgpsException("Income trend is enabled but income_trend_steps is missing");
+        }
+        if (!income_trend_models_) {
+            throw core::HgpsException("Income trend is enabled but income_trend_models is missing");
+        }
+        if (!income_trend_ranges_) {
+            throw core::HgpsException("Income trend is enabled but income_trend_ranges is missing");
+        }
+        if (!income_trend_lambda_) {
+            throw core::HgpsException("Income trend is enabled but income_trend_lambda is missing");
+        }
+        if (!income_trend_decay_factors_) {
+            throw core::HgpsException(
+                "Income trend is enabled but income_trend_decay_factors is missing");
+        }
+    } else {
+        std::cout << "\nDEBUG: Skipping income trend validation (trend_type_ != IncomeTrend)";
+    }
+
+    // Validate income trend data consistency
+    if (income_trend_models_ && income_trend_models_->empty()) {
+        throw core::HgpsException("Income trend model list is empty");
+    }
+    if (income_trend_ranges_ && income_trend_ranges_->empty()) {
+        throw core::HgpsException("Income trend ranges list is empty");
+    }
+    if (income_trend_lambda_ && income_trend_lambda_->empty()) {
+        throw core::HgpsException("Income trend lambda list is empty");
+    }
+
+    // Validate that all risk factors have income trend parameters
+    // Only validate income trend parameters if income trend is enabled
+    if (trend_type_ == TrendType::IncomeTrend && expected_income_trend_) {
+        for (const auto &name : names_) {
+            std::cout << "\nDEBUG: Checking risk factor: " << name.to_string();
+            if (!expected_income_trend_->contains(name)) {
+                throw core::HgpsException(
+                    "One or more expected income trend value is missing for risk factor: " +
+                    name.to_string());
+            }
+            if (!expected_income_trend_boxcox_->contains(name)) {
+                throw core::HgpsException("One or more expected income trend BoxCox value is "
+                                          "missing for risk factor: " +
+                                          name.to_string());
+            }
+
+            if (!income_trend_steps_->contains(name)) {
+                throw core::HgpsException(
+                    "One or more income trend steps value is missing for risk factor: " +
+                    name.to_string());
+            }
+
+            if (!income_trend_decay_factors_->contains(name)) {
+                throw core::HgpsException(
+                    "One or more income trend decay factor is missing for risk factor: " +
+                    name.to_string());
+            }
+        }
+        std::cout << "\nDEBUG: All risk factor income trend parameters validated successfully";
+    } else {
+        std::cout << "\nDEBUG: Skipping risk factor income trend parameter validation (trend_type_ "
+                     "!= IncomeTrend or expected_income_trend_ is null)";
+    }
+    if (rural_prevalence_.empty()) {
+        throw core::HgpsException("Rural prevalence mapping is empty");
+    }
+    if (income_models_.empty()) {
+        throw core::HgpsException("Income models mapping is empty");
+    }
+
+    // Validate regular trend parameters for all risk factors only if trend type is Trend
+    if (trend_type_ == TrendType::Trend) {
+        for (const auto &name : names_) {
+            if (!expected_trend_->contains(name)) {
+                throw core::HgpsException("One or more expected trend value is missing");
+            }
+            if (!expected_trend_boxcox_->contains(name)) {
+                throw core::HgpsException("One or more expected trend BoxCox value is missing");
+            }
+        }
+    }
+    std::cout << "\nDEBUG: StaticLinearModel constructor completed successfully";
+}
 
 RiskFactorModelType StaticLinearModel::type() const noexcept { return RiskFactorModelType::Static; }
 
 std::string StaticLinearModel::name() const noexcept { return "Static"; }
 
+bool StaticLinearModel::is_continuous_income_model() const noexcept {
+    return is_continuous_income_model_;
+}
+
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
-    // Initialise everyone.
+    std::cout << "\n=== STATIC LINEAR MODEL: GENERATING RISK FACTORS ===";
+
+    // MAHIMA: Initialise everyone. Order is important here.
+    // STEP 1: Age and gender initialized in demographic.cpp
+    // STEP 2: Region and ethnicity initialized in demographic.cpp (if available)
+    // STEP 3: Sector initialized in static_linear_model.cpp (if available)
+    // STEP 4: Income initialized in static_linear_model.cpp (batch processing for continuous
+    // income) STEP 5: Risk factors and physical activity initialized in static_linear_model.cpp
+    // (below) STEP 6: Risk factors adjusted to expected means in static_linear_model.cpp (below)
+    // STEP 7: Policies in static_linear_model.cpp (below)
+    // STEP 8: Trends in static_linear_model.cpp (below) depends on whether trends are enabled
+    // STEP 9: Risk factors adjusted to trended expected means in static_linear_model.cpp
+    // (below)
+
+    // STEP 3: Initialize sector for all people (if sector info is available)
+    std::cout << "\nInitializing sector for all people...";
     for (auto &person : context.population()) {
         initialise_sector(person, context.random());
-        initialise_income(context, person, context.random());
+    }
+
+    // STEP 4: Initialize income (batch processing for continuous income model)
+    if (is_continuous_income_model_) {
+        std::cout << "\nInitializing continuous income for all people...";
+        // Phase 1: Calculate continuous income for all people
+        for (auto &person : context.population()) {
+            double continuous_income = calculate_continuous_income(person, context.random());
+            person.risk_factors["income_continuous"_id] = continuous_income;
+            person.income_continuous = continuous_income;
+        }
+        // Phase 2: Calculate quartiles once
+        std::vector<double> quartile_thresholds = calculate_income_quartiles(context.population());
+        // Phase 3: Assign categories using pre-calculated quartiles
+        for (auto &person : context.population()) {
+            double continuous_income = person.risk_factors.at("income_continuous"_id);
+            person.income = convert_income_to_category(continuous_income, quartile_thresholds);
+        }
+        std::cout << "\nSuccessfully initialized continuous income for all people";
+    } else {
+        std::cout << "\nInitializing categorical income for all people...";
+        for (auto &person : context.population()) {
+            initialise_categorical_income(person, context.random());
+        }
+        std::cout << "\nSuccessfully initialized categorical income for all people";
+    }
+
+    // STEP 5: Initialize risk factors and physical activity
+    std::cout << "\nInitializing risk factors and physical activity...";
+    for (auto &person : context.population()) {
         initialise_factors(context, person, context.random());
         initialise_physical_activity(context, person, context.random());
     }
+    std::cout << "\nInitialization order completed: Age -> Gender -> Region -> Ethnicity -> Sector "
+                 "-> Income -> Risk Factors -> Physical Activity";
+
+    // Verify that all attributes are properly initialized
+    std::cout << "\nVerifying person attributes...";
+    int verified_count = 0;
+    for (const auto &person : context.population()) {
+        if (verified_count < 3) { // Check first 3 people
+            std::cout << "\nPerson " << verified_count + 1 << ": Age=" << person.age
+                      << ", Gender=" << (person.gender == core::Gender::male ? "male" : "female")
+                      << ", Region=" << person.region << ", Ethnicity=" << person.ethnicity
+                      << ", Sector=" << (person.sector == core::Sector::urban ? "urban" : "rural")
+                      << ", Income=" << static_cast<int>(person.income)
+                      << ", RiskFactors=" << person.risk_factors.size()
+                      << ", PhysicalActivity=" << person.physical_activity;
+        }
+        verified_count++;
+    }
 
     // Adjust such that risk factor means match expected values.
+    std::cout << "\nStarting risk factor adjustment...";
     adjust_risk_factors(context, names_, ranges_, false);
+    std::cout << "\nRisk factor adjustment completed";
 
     // Initialise everyone with appropriate trend type.
+    std::cout << "\nStarting trend initialization...";
     for (auto &person : context.population()) {
         if (has_active_policies_) {
             initialise_policies(person, context.random(), false);
@@ -100,12 +335,19 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
             break;
         }
     }
+    std::cout << "\nTrend initialization completed";
 
     // Adjust such that trended risk factor means match trended expected values.
     // Only apply trend adjustment if we have a trend type
     if (trend_type_ != TrendType::Null) {
+        std::cout << "\nStarting trended risk factor adjustment...";
         adjust_risk_factors(context, names_, ranges_, true);
+        std::cout << "\nTrended risk factor adjustment completed";
+    } else {
+        std::cout << "\nSkipping trended adjustment (trend_type_ is Null)";
     }
+
+    std::cout << "\n=== STATIC LINEAR MODEL: RISK FACTOR GENERATION COMPLETED ===";
 }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
@@ -132,7 +374,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
         }
     }
 
-    // Adjust such that risk factor means match expected values.
+    // Adjust such that risk factor means match expected values(factor mean).
     adjust_risk_factors(context, names_, ranges_, false);
 
     // Initialise newborns and update others with appropriate trend type.
@@ -197,14 +439,60 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 }
 
 double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
+    // Handle extreme lambda values
+    if (std::abs(lambda) < 1e-10) {
+        // For lambda near zero, use exponential
+        double result = std::exp(factor);
+        // Check for Inf
+        if (!std::isfinite(result)) {
+            return 0.0; // Return safe value for Inf
+        }
+        return result;
+    }
+    // For non-zero lambda
     double base = (lambda * factor) + 1.0;
-    double result = pow(base, 1.0 / lambda);
-    return result;
+    // Check if base is valid for power
+    if (base <= 0.0) {
+        return 0.0; // Return safe value for negative/zero base
+    }
+
+    // Compute power and check result
+    double result = std::pow(base, 1.0 / lambda);
+    // Validate the result is finite
+    if (!std::isfinite(result)) {
+        return 0.0; // Return safe value for NaN/Inf
+    }
+
+    // Ensure result is non-negative (though power should already guarantee this)
+    return std::max(0.0, result);
 }
 
 void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &person,
                                            Random &random) const {
+    static int factors_count = 0;
+    static bool first_call = true;
+    static bool summary_printed = false;
+    static std::unordered_map<core::Identifier, int> risk_factor_counts;
+    static std::unordered_map<core::Identifier, int> stage1_zero_counts; // Track Stage 1 zeros
+    static std::unordered_map<core::Identifier, int> stage2_counts; // Track Stage 2 (BoxCox) usage
+    static std::unordered_map<core::Identifier, bool>
+        has_logistic_tracked; // Track which factors have logistic
+    static size_t total_population_size = 0;
+    static size_t initial_generation_count = 0;
+    factors_count++;
 
+    if (first_call) {
+        std::cout << "\nStarting risk factors initialization...";
+        total_population_size = context.population().size();
+        initial_generation_count = total_population_size;
+        first_call = false;
+
+        // Initialize tracking for which factors have logistic models
+        for (size_t i = 0; i < names_.size(); i++) {
+            bool has_logistic = !(logistic_models_[i].coefficients.empty());
+            has_logistic_tracked[names_[i]] = has_logistic;
+        }
+    }
     // Correlated residual sampling.
     auto residuals = compute_residuals(random, cholesky_);
 
@@ -224,12 +512,99 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
         // Initialise risk factor.
         double expected =
             get_expected(context, person.gender, person.age, names_[i], ranges_[i], false);
+
+        // TWO-STAGE RISK FACTOR MODELING APPROACH- Mahima
+        // =======================================================================
+        // Previous approach: Use BoxCox transformation to calculate risk factor values
+        // New approach: First use logistic regression to determine if the risk factor value should
+        //              be zero
+        //              If non-zero, then use BoxCox transformation to calculate the actual value
+        // =======================================================================
+
+        // MAHIMA: Check if this risk factor has logistic coefficients
+        // Empty logistic model means intentionally skip Stage 1 and use boxcox-only modeling
+        bool has_logistic_model = !(logistic_models_[i].coefficients.empty());
+
+        // STAGE 1: Determine if risk factor should be zero (only if logistic model exists)
+        if (has_logistic_model) {
+            double zero_probability = calculate_zero_probability(person, i);
+
+            // Sample from this probability to determine if risk factor should be zero
+            // if logistic regression output = 1, risk factor value = 0
+            double random_sample = random.next_double(); // Uniform random value between 0 and 1
+            if (random_sample < zero_probability) {
+                // Risk factor should be zero (Stage 1 result)
+                person.risk_factors[names_[i]] = 0.0;
+                // Track assignment count for this risk factor (only during initial generation)
+                if (!summary_printed) {
+                    risk_factor_counts[names_[i]]++;
+                    stage1_zero_counts[names_[i]]++; // Track Stage 1 zeros
+                }
+                continue; // Skip Stage 2, risk factor is zero
+            }
+            // If we reach here, Stage 1 determined the risk factor should be non-zero, proceed to
+            // Stage 2
+        }
+        // If no logistic model, skip Stage 1 and go directly to Stage 2
+
+        // STAGE 2: Calculate non-zero risk factor value using BoxCox transformation
+        // (This code runs whether we have a logistic model or not)
         double factor = linear[i] + residual * stddev_[i];
         factor = expected * inverse_box_cox(factor, lambda_[i]);
         factor = ranges_[i].clamp(factor);
 
-        // Save risk factor.
+        // Save risk factor
         person.risk_factors[names_[i]] = factor;
+
+        // Track assignment count for this risk factor (only during initial generation)
+        if (!summary_printed) {
+            risk_factor_counts[names_[i]]++;
+            stage2_counts[names_[i]]++; // Track Stage 2 (BoxCox) usage
+        }
+    }
+
+    // Print summary once at the end of initial generation (not during updates for newborns)
+    if (!summary_printed && std::cmp_equal(factors_count, initial_generation_count)) {
+        std::cout << "\n=== Risk Factor Assignment Summary ===";
+        for (const auto &name : names_) {
+            std::cout << "\nRisk factor " << name.to_string() << " is assigned to "
+                      << risk_factor_counts[name] << " people";
+        }
+        std::cout << "\n======================================";
+
+        // Print 2-stage modeling summary
+        std::cout << "\n=== TWO-STAGE MODELING SUMMARY ===";
+        std::vector<std::string> two_stage_factors;
+        std::vector<std::string> boxcox_only_factors;
+
+        for (const auto &name : names_) {
+            bool has_logistic = has_logistic_tracked[name];
+            if (has_logistic) {
+                two_stage_factors.push_back(name.to_string());
+                int zeros = stage1_zero_counts[name];
+                int non_zeros = stage2_counts[name];
+                std::cout << "\n  " << name.to_string() << " (2-stage): " << zeros
+                          << " zeros from Stage 1, " << non_zeros << " non-zeros from Stage 2";
+            } else {
+                boxcox_only_factors.push_back(name.to_string());
+            }
+        }
+
+        std::cout
+            << "\n\nRisk factors using 2-stage modeling (Stage 1: Logistic, Stage 2: BoxCox): "
+            << two_stage_factors.size();
+        if (!two_stage_factors.empty()) {
+            std::cout << "\n  " << fmt::format("{}", fmt::join(two_stage_factors, ", "));
+        }
+
+        std::cout << "\n\nRisk factors using BoxCox-only (no logistic regression): "
+                  << boxcox_only_factors.size();
+        if (!boxcox_only_factors.empty()) {
+            std::cout << "\n  " << fmt::format("{}", fmt::join(boxcox_only_factors, ", "));
+        }
+        std::cout << "\n======================================";
+
+        summary_printed = true;
     }
 }
 
@@ -237,7 +612,7 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
                                        Random &random) const {
 
     // Correlated residual sampling.
-    auto residuals = compute_residuals(random, cholesky_);
+    auto new_residuals = compute_residuals(random, cholesky_);
 
     // Approximate risk factors with linear models.
     auto linear = compute_linear_models(person, models_);
@@ -245,23 +620,57 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
     // Update residuals and risk factors (should exist).
     for (size_t i = 0; i < names_.size(); i++) {
 
+        // Get the risk factor name and expected value
+        double expected =
+            get_expected(context, person.gender, person.age, names_[i], ranges_[i], false);
+
+        // Blend old and new residuals
         // Update residual.
         auto residual_name = core::Identifier{names_[i].to_string() + "_residual"};
         double residual_old = person.risk_factors.at(residual_name);
-        double residual = residuals[i] * info_speed_;
+        double residual = new_residuals[i] * info_speed_;
         residual += sqrt(1.0 - info_speed_ * info_speed_) * residual_old;
 
         // Save residual.
         person.risk_factors.at(residual_name) = residual;
 
-        // Update risk factor.
-        double expected =
-            get_expected(context, person.gender, person.age, names_[i], ranges_[i], false);
+        // TWO-STAGE RISK FACTOR MODELING APPROACH- Mahima
+        // =======================================================================
+        // Use both this year's zero probability and previous outcome
+        // =======================================================================
+
+        // MAHIMA: Check if this risk factor has logistic coefficients
+        // Empty logistic model means intentionally skip Stage 1 and use boxcox-only modeling
+        bool has_logistic_model = !(logistic_models_[i].coefficients.empty());
+
+        // STAGE 1: Determine if risk factor should be zero (only if logistic model exists)
+        if (has_logistic_model) {
+            double zero_probability = calculate_zero_probability(person, i);
+
+            // HACK: To maintain longitudinal correlation among people, amend their "probability of
+            // being a zero" according to their current zero-probability...
+            // ... and either 1 if they were a zero, or 0 if they were not.
+            if (person.risk_factors[names_[i]] == 0) {
+                zero_probability = (zero_probability + 1.0) / 2.0;
+            } else {
+                zero_probability = (zero_probability + 0.0) / 2.0;
+            }
+
+            // Draw random number to determine if risk factor should be zero
+            if (random.next_double() < zero_probability) {
+                // Risk factor should be zero
+                person.risk_factors[names_[i]] = 0.0;
+                continue;
+            }
+        }
+
+        // STAGE 2: Calculate non-zero risk factor value using BoxCox transformation
+        // (This code runs whether we have a logistic model or not)
         double factor = linear[i] + residual * stddev_[i];
         factor = expected * inverse_box_cox(factor, lambda_[i]);
         factor = ranges_[i].clamp(factor);
 
-        // Save risk factor.
+        // Save risk factor
         person.risk_factors.at(names_[i]) = factor;
     }
 }
@@ -479,21 +888,96 @@ StaticLinearModel::compute_linear_models(Person &person,
     std::vector<double> linear{};
     linear.reserve(names_.size());
 
-    // Approximate risk factors with linear models.
+    // Pre-calculate capped age values once (outside the model loop)- Mahima
+    constexpr double max_age = 80.0; // Define appropriate maximum age
+    const double capped_age = std::min(static_cast<double>(person.age), max_age);
+    const double capped_age_squared = capped_age * capped_age;
+    const double capped_age_cubed = capped_age_squared * capped_age;
+
+    // Cache common age identifiers for faster comparison using case sensitive approach for Age and
+    // age- Mahima
+    static const core::Identifier age_id("age");
+    static const core::Identifier age2_id("age2");
+    static const core::Identifier age3_id("age3");
+    static const core::Identifier Age_id("Age");
+    static const core::Identifier Age2_id("Age2");
+    static const core::Identifier Age3_id("Age3");
+    static const core::Identifier stddev_id("stddev");
+
+    // Approximate risk factors with linear models
     for (size_t i = 0; i < names_.size(); i++) {
+        if (i >= models.size()) {
+            std::cout << "\nERROR: compute_linear_models - Index " << i
+                      << " is out of bounds for models vector of size " << models.size();
+            linear.push_back(0.0); // Default value
+            continue;
+        }
+
         auto name = names_[i];
         auto model = models[i];
         double factor = model.intercept;
+
         for (const auto &[coefficient_name, coefficient_value] : model.coefficients) {
-            factor += coefficient_value * person.get_risk_factor_value(coefficient_name);
+            // Skip the standard deviation entry as it's not a factor
+            if (coefficient_name == stddev_id) {
+                continue;
+            }
+
+            // Efficiently handle age-related coefficients
+            if (coefficient_name == age_id || coefficient_name == Age_id) {
+                factor += coefficient_value * capped_age;
+            } else if (coefficient_name == age2_id || coefficient_name == Age2_id) {
+                factor += coefficient_value * capped_age_squared;
+            } else if (coefficient_name == age3_id || coefficient_name == Age3_id) {
+                factor += coefficient_value * capped_age_cubed;
+            } else {
+                // Regular coefficient processing
+                double value = person.get_risk_factor_value(coefficient_name);
+                factor += coefficient_value * value;
+            }
         }
+
         for (const auto &[coefficient_name, coefficient_value] : model.log_coefficients) {
-            factor += coefficient_value * log(person.get_risk_factor_value(coefficient_name));
+            double value = person.get_risk_factor_value(coefficient_name);
+
+            if (value <= 0) {
+                value = 1e-10; // Avoid log of zero or negative
+            }
+            factor += coefficient_value * log(value);
         }
+
         linear.emplace_back(factor);
     }
 
     return linear;
+}
+
+// Calculate the probability of a risk factor being zero using logistic regression- Mahima
+double StaticLinearModel::calculate_zero_probability(Person &person,
+                                                     size_t risk_factor_index) const {
+    // Get the logistic model for this risk factor
+    const auto &logistic_model = logistic_models_[risk_factor_index];
+
+    // Calculate the linear predictor using the logistic model
+    double logistic_linear_term = logistic_model.intercept;
+
+    // Add the coefficients
+    for (const auto &[coef_name, coef_value] : logistic_model.coefficients) {
+        logistic_linear_term += coef_value * person.get_risk_factor_value(coef_name);
+    }
+
+    // logistic function: p = 1 / (1 + exp(-linear_term))
+    double probability = 1.0 / (1.0 + std::exp(-logistic_linear_term));
+
+    // Only print if probability is outside the valid range [0,1] coz logistic regression should be
+    // only within 0 and 1 This should never happen with a proper logistic function, but check for
+    // numerical issues
+    if (probability < 0.0 || probability > 1.0) {
+        std::cout << "\nWARNING: Invalid logistic probability for "
+                  << names_[risk_factor_index].to_string() << ": " << probability
+                  << " (should be between 0 and 1)";
+    }
+    return probability;
 }
 
 std::vector<double> StaticLinearModel::compute_residuals(Random &random,
@@ -515,6 +999,10 @@ std::vector<double> StaticLinearModel::compute_residuals(Random &random,
 }
 
 void StaticLinearModel::initialise_sector(Person &person, Random &random) const {
+    // If no rural prevalence data is available, skip sector assignment
+    if (rural_prevalence_.empty()) {
+        return;
+    }
 
     // Get rural prevalence for age group and sex.
     double prevalence;
@@ -531,6 +1019,10 @@ void StaticLinearModel::initialise_sector(Person &person, Random &random) const 
 }
 
 void StaticLinearModel::update_sector(Person &person, Random &random) const {
+    // If no rural prevalence data is available, skip sector update
+    if (rural_prevalence_.empty()) {
+        return;
+    }
 
     // Only update rural sector 18 year olds.
     if ((person.age != 18) || (person.sector != core::Sector::rural)) {
@@ -551,8 +1043,13 @@ void StaticLinearModel::update_sector(Person &person, Random &random) const {
 
 void StaticLinearModel::initialise_income(RuntimeContext &context, Person &person, Random &random) {
     if (is_continuous_income_model_) {
-        // FINCH approach: Use continuous income calculation
-        initialise_continuous_income(context, person, random);
+        // FINCH approach: Calculate continuous income for a single person (e.g., newborns)
+        double continuous_income = calculate_continuous_income(person, context.random());
+        person.risk_factors["income_continuous"_id] = continuous_income;
+        person.income_continuous = continuous_income;
+        // Recalculate quartiles for updated population and assign category
+        std::vector<double> quartile_thresholds = calculate_income_quartiles(context.population());
+        person.income = convert_income_to_category(continuous_income, quartile_thresholds);
     } else {
         // India approach: Use direct categorical assignment
         initialise_categorical_income(person, random);
@@ -566,9 +1063,11 @@ void StaticLinearModel::update_income(RuntimeContext &context, Person &person, R
     }
 }
 
+// MAHIMA: This is the India approach for categorical income assignment
+// In the static_model.json, we have a set of IncomeModels as categories (e.g., low, medium,
+// high)
 void StaticLinearModel::initialise_categorical_income(Person &person, Random &random) {
     // India approach: Direct categorical assignment using logits and softmax
-
     // Compute logits for each income category
     auto logits = std::unordered_map<core::Income, double>{};
     for (const auto &[income, params] : income_models_) {
@@ -606,14 +1105,17 @@ void StaticLinearModel::initialise_categorical_income(Person &person, Random &ra
     throw core::HgpsException("Logic Error: failed to initialise categorical income category");
 }
 
+// MAHIMA: This is the FINCH approach for continuous income calculation
+// In the static_model.json, we have a IncomeModel with intercept, regression values (age,
+// gender, region, ethnicity etc) If is_continuous_income_model_ is true, we use this approach-
+// the order for this is- calculate continuous income, calculate quartiles, assign category
 void StaticLinearModel::initialise_continuous_income(RuntimeContext &context, Person &person,
                                                      Random &random) {
     // FINCH approach: Calculate continuous income, then convert to category
-
     // Step 1: Calculate continuous income
     double continuous_income = calculate_continuous_income(person, random);
 
-    // Store continuous income in risk factors for potential future use
+    // Store continuous income in risk factors for future use
     person.risk_factors["income_continuous"_id] = continuous_income;
 
     // Step 2: Convert to income category based on population quartiles
@@ -621,6 +1123,7 @@ void StaticLinearModel::initialise_continuous_income(RuntimeContext &context, Pe
         convert_income_continuous_to_category(continuous_income, context.population(), random);
 }
 
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 double StaticLinearModel::calculate_continuous_income(Person &person, Random &random) {
     // Calculate continuous income using the continuous income model
     double income = continuous_income_model_.intercept;
@@ -629,41 +1132,158 @@ double StaticLinearModel::calculate_continuous_income(Person &person, Random &ra
     for (const auto &[factor, coefficient] : continuous_income_model_.coefficients) {
         std::string factor_name = factor.to_string();
 
-        if (factor_name == "IncomeContinuousStdDev") {
-            // Skip - this is used for standard deviation, not as a coefficient
+        // Skip special coefficients that are not part of the regression
+        if (factor_name == "IncomeContinuousStdDev" || factor_name == "stddev" ||
+            factor_name == "min" || factor_name == "max") {
             continue;
         }
 
-        if (factor_name == "Gender") {
-            // Male = 1, Female = 0
-            income += coefficient * (person.gender == core::Gender::male ? 1.0 : 0.0);
-        } else if (factor_name == "Age") {
-            income += coefficient * person.age;
-        } else if (factor_name == "Age2") {
-            income += coefficient * (person.age * person.age);
-        } else if (factor_name == "Age3") {
-            income += coefficient * (person.age * person.age * person.age);
-        } else if (factor_name == "Sector") {
-            // Rural = 1, Urban = 0
-            income += coefficient * (person.sector == core::Sector::rural ? 1.0 : 0.0);
-        } else if (factor_name == person.region) {
-            // Region effect - only apply if the region matches
-            income += coefficient;
-        } else if (factor_name == person.ethnicity) {
-            // Ethnicity effect - only apply if the ethnicity matches
-            income += coefficient;
-        } else if (factor_name == "min" || factor_name == "max") {
-            // Skip min/max bounds - they're handled separately
-            continue;
-        } else {
-            // For any other factors, try to get from risk factors
+        // Dynamic coefficient matching based on factor name patterns
+        double factor_value = 0.0;
+
+        // Age effects - handle age, age2, age3, etc. dynamically
+        if (factor_name.starts_with("age")) {
+            if (factor_name == "age") {
+                factor_value = static_cast<double>(person.age);
+            } else if (factor_name == "age2") {
+                factor_value = person.age * person.age;
+            } else if (factor_name == "age3") {
+                factor_value = person.age * person.age * person.age;
+            } else {
+                // Handle age4, age5, etc. dynamically
+                int power = 1;
+                if (factor_name.length() > 3) {
+                    try {
+                        power = std::stoi(factor_name.substr(3));
+                    } catch (...) {
+                        std::cout << "Warning: Could not parse age power from factor name: "
+                                  << factor_name << '\n';
+                        continue;
+                    }
+                }
+                factor_value = std::pow(person.age, power);
+            }
+        }
+        // Gender effects - handle gender, gender2, etc. dynamically
+        else if (factor_name.starts_with("gender")) {
+            if (factor_name == "gender") {
+                factor_value = person.gender_to_value();
+            } else if (factor_name == "gender2") {
+                factor_value = person.gender == core::Gender::male ? 1.0 : 0.0;
+            } else {
+                // Handle gender3, gender4, etc. dynamically
+                int power = 1;
+                if (factor_name.length() > 6) {
+                    try {
+                        power = std::stoi(factor_name.substr(6));
+                    } catch (...) {
+                        std::cout << "Warning: Could not parse gender power from factor name: "
+                                  << factor_name << '\n';
+                        continue;
+                    }
+                }
+                double base_value = person.gender == core::Gender::male ? 1.0 : 0.0;
+                factor_value = std::pow(base_value, power);
+            }
+        }
+        // Region effects - handle region2, region3, region56, etc. dynamically
+        else if (factor_name.starts_with("region")) {
+            if (factor_name == "region") {
+                // If person.region is a number, use it directly
+                try {
+                    factor_value = std::stod(person.region);
+                } catch (...) {
+                    // If not a number, check if it matches the factor name
+                    factor_value =
+                        (person.region == factor_name)
+                            ? 1.0
+                            : 0.0; // this shows if the factor value is 1 (available )then use
+                                   // else if it is 0 (not available) then move on.
+                }
+            } else {
+                // Handle region2, region3, region56, etc. dynamically
+                // std::string region_number = factor_name.substr(6); // Remove "region" prefix
+                factor_value = (person.region == factor_name) ? 1.0 : 0.0;
+            }
+        }
+        // Ethnicity effects - handle ethnicity2, ethnicity3, ethnicity90, etc. dynamically
+        else if (factor_name.starts_with("ethnicity")) {
+            if (factor_name == "ethnicity") {
+                // If person.ethnicity is a number, use it directly
+                try {
+                    factor_value = std::stod(person.ethnicity);
+                } catch (...) {
+                    // If not a number, check if it matches the factor name
+                    factor_value = (person.ethnicity == factor_name) ? 1.0 : 0.0;
+                }
+            } else {
+                // Handle ethnicity2, ethnicity3, ethnicity90, etc. dynamically
+                // std::string ethnicity_number = factor_name.substr(9); // Remove "ethnicity"
+                // prefix
+                factor_value = (person.ethnicity == factor_name) ? 1.0 : 0.0;
+            }
+        }
+        // Sector effects - handle sector, sector2, etc. dynamically
+        else if (factor_name.starts_with("sector")) {
+            if (factor_name == "sector") {
+                factor_value = person.sector_to_value();
+            } else {
+                // Handle sector2, sector3, etc. dynamically
+                int power = 1;
+                if (factor_name.length() > 6) {
+                    try {
+                        power = std::stoi(factor_name.substr(6));
+                    } catch (...) {
+                        std::cout << "Warning: Could not parse sector power from factor name: "
+                                  << factor_name << '\n';
+                        continue;
+                    }
+                }
+                double base_value = person.sector_to_value();
+                factor_value = std::pow(base_value, power);
+            }
+        }
+        // Income effects - handle income, income2, etc. dynamically
+        else if (factor_name.starts_with("income")) {
+            if (factor_name == "income") {
+                factor_value = static_cast<double>(person.income);
+            } else if (factor_name == "income_continuous") {
+                factor_value = person.income_continuous;
+            } else {
+                // Handle income2, income3, etc. dynamically
+                int power = 1;
+                if (factor_name.length() > 6) {
+                    try {
+                        power = std::stoi(factor_name.substr(6));
+                    } catch (...) {
+                        std::cout << "Warning: Could not parse income power from factor name: "
+                                  << factor_name << '\n';
+                        continue;
+                    }
+                }
+                auto base_value = static_cast<double>(person.income);
+                factor_value = std::pow(base_value, power);
+            }
+        }
+        // Region value effects - handle any region values dynamically
+        else if (factor_name == person.region || factor_name == person.ethnicity) {
+            // Check if person's region or ethnicity matches this factor name exactly
+            factor_value = 1.0;
+        }
+        // Risk factor effects - try to get from risk factors
+        else {
             try {
-                income += coefficient * person.get_risk_factor_value(factor);
+                factor_value = person.get_risk_factor_value(factor);
             } catch (...) {
                 // Factor not found, skip it
+                std::cout << "Warning: Factor " << factor_name
+                          << " not found for continuous income calculation, skipping.\n";
                 continue;
             }
         }
+
+        // Add the coefficient contribution
+        income += coefficient * factor_value;
     }
 
     // Add random noise based on standard deviation
@@ -698,8 +1318,7 @@ double StaticLinearModel::calculate_continuous_income(Person &person, Random &ra
     return income;
 }
 
-std::vector<double>
-StaticLinearModel::calculate_income_quartiles(const Population &population) const {
+std::vector<double> StaticLinearModel::calculate_income_quartiles(const Population &population) {
     // Collect all valid continuous income values from the population
     std::vector<double> sorted_incomes;
     sorted_incomes.reserve(population.size());
@@ -761,35 +1380,278 @@ core::Income StaticLinearModel::convert_income_continuous_to_category(double con
         // 4-category system: low, lowermiddle, uppermiddle, high
         if (continuous_income <= quartile_thresholds[0]) {
             return core::Income::low;
-        } else if (continuous_income <= quartile_thresholds[1]) {
-            return core::Income::lowermiddle;
-        } else if (continuous_income <= quartile_thresholds[2]) {
-            return core::Income::uppermiddle;
-        } else {
-            return core::Income::high;
         }
-    } else {
-        // 3-category system: low, middle, high
-        // For 3 categories, we'll use the 33rd and 67th percentiles
+        if (continuous_income <= quartile_thresholds[1]) {
+            return core::Income::lowermiddle;
+        }
+        if (continuous_income <= quartile_thresholds[2]) {
+            return core::Income::uppermiddle;
+        }
+        return core::Income::high;
+    }
+    // 3-category system: low, middle, high
+    // For 3 categories, we'll use the 33rd and 67th percentiles
+    if (continuous_income <= quartile_thresholds[0]) {
+        return core::Income::low;
+    }
+    if (continuous_income <= quartile_thresholds[2]) {
+        return core::Income::middle;
+    }
+    return core::Income::high;
+}
+
+// Optimized version: uses pre-calculated quartiles (no population scan)
+core::Income StaticLinearModel::convert_income_to_category(
+    double continuous_income, const std::vector<double> &quartile_thresholds) const {
+    if (income_categories_ == "4") {
+        // 4-category system: low, lowermiddle, uppermiddle, high
         if (continuous_income <= quartile_thresholds[0]) {
             return core::Income::low;
-        } else if (continuous_income <= quartile_thresholds[2]) {
-            return core::Income::middle;
-        } else {
-            return core::Income::high;
         }
+        if (continuous_income <= quartile_thresholds[1]) {
+            return core::Income::lowermiddle;
+        }
+        if (continuous_income <= quartile_thresholds[2]) {
+            return core::Income::uppermiddle;
+        }
+        return core::Income::high;
     }
+    // 3-category system: low, middle, high
+    if (continuous_income <= quartile_thresholds[0]) {
+        return core::Income::low;
+    }
+    if (continuous_income <= quartile_thresholds[2]) {
+        return core::Income::middle;
+    }
+    return core::Income::high;
 }
 
 void StaticLinearModel::initialise_physical_activity(RuntimeContext &context, Person &person,
                                                      Random &random) const {
+    static bool first_call = true;
+
+    if (first_call) {
+        std::cout << "\nStarting physical activity initialization...";
+        first_call = false;
+    }
+
+    // Check if we have physical activity models
+    if (has_physical_activity_models_) {
+        // Check which type of model we have
+        auto simple_model = physical_activity_models_.find(core::Identifier("simple"));
+        auto continuous_model = physical_activity_models_.find(core::Identifier("continuous"));
+
+        if (simple_model != physical_activity_models_.end()) {
+            // India approach: Simple model with standard deviation
+            initialise_simple_physical_activity(context, person, random, simple_model->second);
+        } else if (continuous_model != physical_activity_models_.end()) {
+            // FINCH approach: Continuous model with CSV file loading
+            initialise_continuous_physical_activity(context, person, random,
+                                                    continuous_model->second);
+        }
+    } else {
+        // No physical activity models configured - use simple approach with global stddev (India
+        // approach)
+        PhysicalActivityModel simple_model;
+        simple_model.model_type = "simple";
+        simple_model.stddev = physical_activity_stddev_;
+        initialise_simple_physical_activity(context, person, random, simple_model);
+    }
+}
+
+// MAHIMA: Function to initialise continuous physical activity model using regression.
+// This is for Finch or any project that has region, ethnicity, income continuous etc in the CSV
+// file.
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
+void StaticLinearModel::initialise_continuous_physical_activity(
+    [[maybe_unused]] RuntimeContext &context, Person &person, Random &random,
+    const PhysicalActivityModel &model) {
+    // Start with the intercept
+    double value = model.intercept;
+
+    // Process coefficients dynamically from CSV file
+    for (const auto &[factor_name, coefficient] : model.coefficients) {
+        std::string factor_name_str = factor_name.to_string();
+
+        // Skip special coefficients that are not part of the regression
+        if (factor_name_str == "stddev" || factor_name_str == "min" || factor_name_str == "max") {
+            continue;
+        }
+
+        // Dynamic coefficient matching based on factor name patterns
+        double factor_value = 0.0;
+
+        // Age effects - handle age, age2, age3, etc. dynamically
+        if (factor_name_str.starts_with("age")) {
+            if (factor_name_str == "age") {
+                factor_value = static_cast<double>(person.age);
+            } else if (factor_name_str == "age2") {
+                factor_value = person.age * person.age;
+            } else if (factor_name_str == "age3") {
+                factor_value = person.age * person.age * person.age;
+            } else {
+                // Handle age4, age5, etc. dynamically
+                int power = 1;
+                if (factor_name_str.length() > 3) {
+                    try {
+                        power = std::stoi(factor_name_str.substr(3));
+                    } catch (...) {
+                        std::cout << "Warning: Could not parse age power from factor name: "
+                                  << factor_name_str << '\n';
+                        continue;
+                    }
+                }
+                factor_value = std::pow(person.age, power);
+            }
+        }
+        // Gender effects - handle gender, gender2, etc. dynamically
+        else if (factor_name_str.starts_with("gender")) {
+            if (factor_name_str == "gender") {
+                factor_value = person.gender_to_value();
+            } else if (factor_name_str == "gender2") {
+                factor_value = person.gender == core::Gender::male ? 1.0 : 0.0;
+            } else {
+                // Handle gender3, gender4, etc. dynamically
+                int power = 1;
+                if (factor_name_str.length() > 6) {
+                    try {
+                        power = std::stoi(factor_name_str.substr(6));
+                    } catch (...) {
+                        std::cout << "Warning: Could not parse gender power from factor name: "
+                                  << factor_name_str << '\n';
+                        continue;
+                    }
+                }
+                double base_value = person.gender == core::Gender::male ? 1.0 : 0.0;
+                factor_value = std::pow(base_value, power);
+            }
+        }
+        // Region effects - handle region2, region3, region56, etc. dynamically
+        else if (factor_name_str.starts_with("region")) {
+            if (factor_name_str == "region") {
+                // If person.region is a number, use it directly
+                try {
+                    factor_value = std::stod(person.region);
+                } catch (...) {
+                    // If not a number, check if it matches the factor name
+                    factor_value = (person.region == factor_name_str) ? 1.0 : 0.0;
+                }
+            } else {
+                // Handle region2, region3,.... region56, etc. dynamically
+                factor_value = (person.region == factor_name_str) ? 1.0 : 0.0;
+            }
+        }
+        // Ethnicity effects - handle ethnicity2, ethnicity3, ethnicity90, etc. dynamically
+        else if (factor_name_str.starts_with("ethnicity")) {
+            if (factor_name_str == "ethnicity") {
+                // If person.ethnicity is a number, use it directly
+                try {
+                    factor_value = std::stod(person.ethnicity);
+                } catch (...) {
+                    // If not a number, check if it matches the factor name
+                    factor_value = (person.ethnicity == factor_name_str) ? 1.0 : 0.0;
+                }
+            } else {
+                // Handle ethnicity2, ethnicity3, ethnicity90, etc. dynamically
+                // std::string ethnicity_number =
+                //     factor_name_str.substr(9); // Remove "ethnicity" prefix
+                factor_value = (person.ethnicity == factor_name_str) ? 1.0 : 0.0;
+            }
+        }
+        // Sector effects - handle sector, sector2, etc. dynamically
+        else if (factor_name_str.starts_with("sector")) {
+            if (factor_name_str == "sector") {
+                factor_value = person.sector_to_value();
+            } else {
+                // Handle sector2, sector3, etc. dynamically
+                int power = 1;
+                if (factor_name_str.length() > 6) {
+                    try {
+                        power = std::stoi(factor_name_str.substr(6));
+                    } catch (...) {
+                        std::cout << "Warning: Could not parse sector power from factor name: "
+                                  << factor_name_str << '\n';
+                        continue;
+                    }
+                }
+                double base_value = person.sector_to_value();
+                factor_value = std::pow(base_value, power);
+            }
+        }
+        // Income effects - handle income, income2, etc. dynamically
+        else if (factor_name_str.starts_with("income")) {
+            if (factor_name_str == "income") {
+                factor_value = static_cast<double>(person.income);
+            } else if (factor_name_str == "income_continuous") {
+                factor_value = person.income_continuous;
+            } else {
+                // Handle income2, income3, etc. dynamically
+                int power = 1;
+                if (factor_name_str.length() > 6) {
+                    try {
+                        power = std::stoi(factor_name_str.substr(6));
+                    } catch (...) {
+                        std::cout << "Warning: Could not parse income power from factor name: "
+                                  << factor_name_str << '\n';
+                        continue;
+                    }
+                }
+                auto base_value = static_cast<double>(person.income);
+                factor_value = std::pow(base_value, power);
+            }
+        }
+        // Region value effects - handle any region values dynamically
+        else if (factor_name_str == person.region || factor_name_str == person.ethnicity) {
+            // Check if person's region or ethnicity matches this factor name exactly
+            factor_value = 1.0;
+        }
+        // Risk factor effects - try to get from risk factors
+        else {
+            try {
+                factor_value = person.get_risk_factor_value(factor_name);
+            } catch (...) {
+                // Factor not found, skip it
+                std::cout << "Warning: Factor " << factor_name_str
+                          << " not found for continuous physical activity calculation, skipping.\n";
+                continue;
+            }
+        }
+
+        // Add the coefficient contribution
+        value += coefficient * factor_value;
+    }
+
+    // Add random noise using the model's standard deviation
+    double rand_noise = random.next_normal(0.0, model.stddev);
+    double final_value = value + rand_noise;
+
+    // Apply min/max constraints
+    final_value = std::max(model.min_value, std::min(final_value, model.max_value));
+
+    // Set the physical activity value (store in both member variable and risk_factors for
+    // compatibility)
+    person.physical_activity = final_value;
+    person.risk_factors["PhysicalActivity"_id] = final_value;
+}
+
+// MAHIMA: Function to initialise simple physical activity model using log-normal distribution
+// This is for India or any project that does not have region, ethncity, income continuous etc
+// in the CSV
+void StaticLinearModel::initialise_simple_physical_activity(
+    RuntimeContext &context, Person &person, Random &random,
+    const PhysicalActivityModel &model) const {
+    // India approach: Simple model with standard deviation from the model
     double expected = get_expected(context, person.gender, person.age, "PhysicalActivity"_id,
                                    std::nullopt, false);
-    double rand = random.next_normal(0.0, physical_activity_stddev_);
-    double factor = expected * exp(rand - 0.5 * pow(physical_activity_stddev_, 2));
+    double rand = random.next_normal(0.0, model.stddev);
+    double factor = expected * exp(rand - (0.5 * pow(model.stddev, 2)));
+
+    // Store in both physical_activity and risk_factors for compatibility
+    person.physical_activity = factor;
     person.risk_factors["PhysicalActivity"_id] = factor;
 }
 
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::unique_ptr<RiskFactorSexAgeTable> expected,
     std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
@@ -811,24 +1673,49 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::unique_ptr<std::vector<LinearModelParams>> income_trend_models,
     std::unique_ptr<std::vector<core::DoubleInterval>> income_trend_ranges,
     std::unique_ptr<std::vector<double>> income_trend_lambda,
-    std::unique_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors)
+    std::unique_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors,
+    bool is_continuous_income_model, const LinearModelParams &continuous_income_model,
+    std::string income_categories,
+    const std::unordered_map<core::Identifier, PhysicalActivityModel> &physical_activity_models,
+    bool has_active_policies, std::vector<LinearModelParams> logistic_models)
+    // NOLINTNEXTLINE(readability-function-cognitive-complexity)
     : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend),
                                           std::move(trend_steps), trend_type},
-      // Continuous income model support (FINCH approach) - must come first
-      is_continuous_income_model_{is_continuous_income_model},
-      continuous_income_model_{continuous_income_model}, income_categories_{income_categories},
-      // Regular trend member variables
-      expected_trend_boxcox_{std::move(expected_trend_boxcox)},
-      trend_models_{std::move(trend_models)}, trend_ranges_{std::move(trend_ranges)},
-      trend_lambda_{std::move(trend_lambda)},
+      expected_trend_{create_shared_from_unique(expected_trend)},
+      expected_trend_boxcox_{create_shared_from_unique(expected_trend_boxcox)},
+      trend_models_{create_shared_from_unique(trend_models)},
+      trend_ranges_{create_shared_from_unique(trend_ranges)},
+      trend_lambda_{create_shared_from_unique(trend_lambda)},
       // Income trend member variables
-      trend_type_{trend_type}, expected_income_trend_{std::move(expected_income_trend)},
-      expected_income_trend_boxcox_{std::move(expected_income_trend_boxcox)},
-      income_trend_steps_{std::move(income_trend_steps)},
-      income_trend_models_{std::move(income_trend_models)},
-      income_trend_ranges_{std::move(income_trend_ranges)},
-      income_trend_lambda_{std::move(income_trend_lambda)},
-      income_trend_decay_factors_{std::move(income_trend_decay_factors)},
+      trend_type_{trend_type},
+      expected_income_trend_{expected_income_trend
+                                 ? std::make_shared<std::unordered_map<core::Identifier, double>>(
+                                       std::move(*expected_income_trend))
+                                 : nullptr},
+      expected_income_trend_boxcox_{
+          expected_income_trend_boxcox
+              ? std::make_shared<std::unordered_map<core::Identifier, double>>(
+                    std::move(*expected_income_trend_boxcox))
+              : nullptr},
+      income_trend_steps_{income_trend_steps
+                              ? std::make_shared<std::unordered_map<core::Identifier, int>>(
+                                    std::move(*income_trend_steps))
+                              : nullptr},
+      income_trend_models_{income_trend_models ? std::make_shared<std::vector<LinearModelParams>>(
+                                                     std::move(*income_trend_models))
+                                               : nullptr},
+      income_trend_ranges_{
+          income_trend_ranges
+              ? std::make_shared<std::vector<core::DoubleInterval>>(std::move(*income_trend_ranges))
+              : nullptr},
+      income_trend_lambda_{income_trend_lambda ? std::make_shared<std::vector<double>>(
+                                                     std::move(*income_trend_lambda))
+                                               : nullptr},
+      income_trend_decay_factors_{
+          income_trend_decay_factors
+              ? std::make_shared<std::unordered_map<core::Identifier, double>>(
+                    std::move(*income_trend_decay_factors))
+              : nullptr},
       // Common member variables
       names_{std::move(names)}, models_{std::move(models)}, ranges_{std::move(ranges)},
       lambda_{std::move(lambda)}, stddev_{std::move(stddev)}, cholesky_{std::move(cholesky)},
@@ -836,6 +1723,15 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
       policy_cholesky_{std::move(policy_cholesky)}, info_speed_{info_speed},
       rural_prevalence_{std::move(rural_prevalence)}, income_models_{std::move(income_models)},
       physical_activity_stddev_{physical_activity_stddev},
+      physical_activity_models_{physical_activity_models},
+      has_physical_activity_models_{!physical_activity_models.empty()},
+      // Two-stage modeling: Logistic regression for zero probability (optional)
+      logistic_models_{std::move(logistic_models)},
+      // Continuous income model support (FINCH approach)
+      is_continuous_income_model_{is_continuous_income_model},
+      continuous_income_model_{continuous_income_model},
+      income_categories_{std::move(income_categories)},
+      // Policy optimization flag - Mahima
       has_active_policies_{has_active_policies} {
 
     if (names_.empty()) {
@@ -865,8 +1761,9 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     if (!policy_cholesky_.allFinite()) {
         throw core::HgpsException("Intervention policy Cholesky matrix contains non-finite values");
     }
+
     // Validate regular trend parameters only if trend type is Trend
-    if (trend_type_ == TrendType::Trend) {
+    if (trend_type == hgps::TrendType::Trend) {
         if (trend_models_->empty()) {
             throw core::HgpsException("Time trend model list is empty");
         }
@@ -879,7 +1776,7 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     }
 
     // Validate income trend parameters if income trend is enabled
-    if (trend_type_ == TrendType::IncomeTrend) {
+    if (trend_type == hgps::TrendType::IncomeTrend) {
         if (!expected_income_trend_) {
             throw core::HgpsException(
                 "Income trend is enabled but expected_income_trend is missing");
@@ -904,19 +1801,21 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
             throw core::HgpsException(
                 "Income trend is enabled but income_trend_decay_factors is missing");
         }
+    }
 
-        // Validate income trend data consistency
-        if (income_trend_models_->empty()) {
-            throw core::HgpsException("Income trend model list is empty");
-        }
-        if (income_trend_ranges_->empty()) {
-            throw core::HgpsException("Income trend ranges list is empty");
-        }
-        if (income_trend_lambda_->empty()) {
-            throw core::HgpsException("Income trend lambda list is empty");
-        }
+    // Validate income trend data consistency
+    if (income_trend_models_ && income_trend_models_->empty()) {
+        throw core::HgpsException("Income trend model list is empty");
+    }
+    if (income_trend_ranges_ && income_trend_ranges_->empty()) {
+        throw core::HgpsException("Income trend ranges list is empty");
+    }
+    if (income_trend_lambda_ && income_trend_lambda_->empty()) {
+        throw core::HgpsException("Income trend lambda list is empty");
+    }
 
-        // Validate that all risk factors have income trend parameters
+    // Validate that all risk factors have income trend parameters
+    if (trend_type == hgps::TrendType::IncomeTrend && expected_income_trend_) {
         for (const auto &name : names_) {
             if (!expected_income_trend_->contains(name)) {
                 throw core::HgpsException(
@@ -924,9 +1823,9 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
                     name.to_string());
             }
             if (!expected_income_trend_boxcox_->contains(name)) {
-                throw core::HgpsException(
-                    "One or more expected income trend BoxCox value is missing for risk factor: " +
-                    name.to_string());
+                throw core::HgpsException("One or more expected income trend BoxCox value is "
+                                          "missing for risk factor: " +
+                                          name.to_string());
             }
             if (!income_trend_steps_->contains(name)) {
                 throw core::HgpsException(
@@ -951,7 +1850,7 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     // Policy detection is now done earlier in the model parser for better performance
 
     // Validate regular trend parameters for all risk factors only if trend type is Trend
-    if (trend_type_ == TrendType::Trend) {
+    if (trend_type == hgps::TrendType::Trend) {
         for (const auto &name : names_) {
             if (!expected_trend_->contains(name)) {
                 throw core::HgpsException("One or more expected trend value is missing");
@@ -970,7 +1869,9 @@ std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() con
         trend_models_, trend_ranges_, trend_lambda_, info_speed_, rural_prevalence_, income_models_,
         physical_activity_stddev_, trend_type_, expected_income_trend_,
         expected_income_trend_boxcox_, income_trend_steps_, income_trend_models_,
-        income_trend_ranges_, income_trend_lambda_, income_trend_decay_factors_);
+        income_trend_ranges_, income_trend_lambda_, income_trend_decay_factors_,
+        is_continuous_income_model_, continuous_income_model_, income_categories_,
+        physical_activity_models_, has_active_policies_, logistic_models_);
 }
 
 } // namespace hgps

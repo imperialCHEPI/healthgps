@@ -29,6 +29,14 @@ enum class TrendType {
     IncomeTrend ///< Income-based trends applied to factors mean adjustment
 };
 
+/// @brief Equality comparison operator for TrendType
+inline bool operator==(TrendType lhs, TrendType rhs) noexcept {
+    return static_cast<int>(lhs) == static_cast<int>(rhs);
+}
+
+/// @brief Inequality comparison operator for TrendType
+inline bool operator!=(TrendType lhs, TrendType rhs) noexcept { return !(lhs == rhs); }
+
 /// @brief Defines a table type for double values by sex and age
 using RiskFactorSexAgeTable = UnorderedMap2d<core::Gender, core::Identifier, std::vector<double>>;
 
@@ -77,6 +85,13 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
     /// @returns The number of time steps to apply the trend
     int get_trend_steps(const core::Identifier &factor) const;
 
+    /// @brief Gets the expected trend values
+    /// @returns The expected trend values
+    const std::shared_ptr<std::unordered_map<core::Identifier, double>> &
+    get_expected_trend() const noexcept {
+        return expected_trend_;
+    }
+
   private:
     /// @brief Adjust risk factors such that mean sim value matches expected value
     /// @param context The simulation run-time context
@@ -107,6 +122,9 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
 /// @brief Risk factor adjustable model definition interface
 class RiskFactorAdjustableModelDefinition : public RiskFactorModelDefinition {
   public:
+    /// @brief Destroys a RiskFactorAdjustableModelDefinition instance
+    virtual ~RiskFactorAdjustableModelDefinition() = default;
+
     /// @brief Constructs a new RiskFactorAdjustableModelDefinition instance
     /// @param expected The expected risk factor values by sex and age
     /// @param expected_trend The expected trend of risk factor values

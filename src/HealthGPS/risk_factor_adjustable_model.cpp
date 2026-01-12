@@ -4,6 +4,7 @@
 #include "sync_message.h"
 
 #include <cmath>
+#include <iostream>
 #include <oneapi/tbb/parallel_for_each.h>
 #include <utility>
 
@@ -150,6 +151,13 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
         context.scenario().channel().send(std::make_unique<RiskFactorAdjustmentMessage>(
             context.current_run(), context.time_now(), std::move(adjustments)));
     }
+    // Print which risk factors are being adjusted to their factors mean
+    std::cout << "\n=== RISK FACTORS BEING ADJUSTED TO FACTORS MEAN ===";
+    std::cout << "\nTotal factors: " << factors.size();
+    for (size_t i = 0; i < factors.size(); i++) {
+        std::cout << "\n  " << (i + 1) << ". " << factors[i].to_string();
+    }
+    std::cout << "\n===================================================\n";
 }
 
 int RiskFactorAdjustableModel::get_trend_steps(const core::Identifier &factor) const {

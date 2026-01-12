@@ -17,6 +17,28 @@ struct LinearModelParams {
     std::unordered_map<core::Identifier, double> log_coefficients{};
 };
 
+/// @brief Defines the physical activity model parameters
+/// @details Supports both simple (India) and continuous (FINCH) approaches
+struct PhysicalActivityModel {
+    /// @brief Model type: "simple" for India approach, "continuous" for FINCH approach
+    std::string model_type{"simple"};
+
+    /// @brief Intercept value for the linear model
+    double intercept{};
+
+    /// @brief Coefficients for each factor (age, gender, region, ethnicity, etc.)
+    std::unordered_map<core::Identifier, double> coefficients;
+
+    /// @brief Minimum allowed value for physical activity
+    double min_value = 0.0;
+
+    /// @brief Maximum allowed value for physical activity
+    double max_value = std::numeric_limits<double>::max();
+
+    /// @brief Standard deviation for simple models (India approach)
+    double stddev = 0.06;
+};
+
 /// @brief Implements the static linear model type
 /// @details The static model is used to initialise the virtual population.
 class StaticLinearModel final : public RiskFactorAdjustableModel {
@@ -86,11 +108,23 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
             nullptr,
         bool is_continuous_income_model = false,
         const LinearModelParams &continuous_income_model = LinearModelParams{},
-        const std::string &income_categories = "3");
+        std::string income_categories = "3",
+        /// @param physical_activity_models Physical activity models for both India (simple) and
+        /// FINCH (continuous) approaches
+        const std::unordered_map<core::Identifier, PhysicalActivityModel>
+            &physical_activity_models = {},
+        bool has_active_policies = true,
+        /// @param logistic_models Logistic regression models for two-stage modeling (optional)
+        /// Empty models indicate no logistic regression for that risk factor
+        const std::vector<LinearModelParams> &logistic_models = {});
 
     RiskFactorModelType type() const noexcept override;
 
     std::string name() const noexcept override;
+
+    /// @brief Check if using continuous income model (FINCH approach)
+    /// @return true if continuous income model is enabled
+    bool is_continuous_income_model() const noexcept;
 
     void generate_risk_factors(RuntimeContext &context) override;
 
@@ -140,6 +174,12 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
 
     std::vector<double> compute_residuals(Random &random, const Eigen::MatrixXd &cholesky) const;
 
+    /// @brief Calculate the probability of a risk factor being zero using logistic regression
+    /// @param person The person to calculate zero probability for
+    /// @param risk_factor_index The index of the risk factor in names_ vector
+    /// @return The probability that the risk factor should be zero (between 0 and 1)
+    double calculate_zero_probability(Person &person, size_t risk_factor_index) const;
+
     /// @brief Initialise the sector of a person
     /// @param person The person to initialise sector for
     /// @param random The random number generator from the runtime context
@@ -170,10 +210,18 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
                                                        const Population &population,
                                                        Random &random) const;
 
+    /// @brief Convert continuous income to income category using pre-calculated quartiles
+    /// (optimized)
+    /// @param continuous_income The continuous income value
+    /// @param quartile_thresholds Pre-calculated quartile thresholds [Q1, Q2, Q3]
+    /// @return The assigned income category
+    core::Income convert_income_to_category(double continuous_income,
+                                            const std::vector<double> &quartile_thresholds) const;
+
     /// @brief Calculate income quartiles from population data
     /// @param population The population to calculate quartiles from
     /// @return Vector of quartile thresholds [Q1, Q2, Q3]
-    std::vector<double> calculate_income_quartiles(const Population &population) const;
+    static std::vector<double> calculate_income_quartiles(const Population &population);
 
     /// @brief Initialise income using categorical approach (India method)
     /// @param person The person to initialise income for
@@ -192,7 +240,26 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     void initialise_physical_activity(RuntimeContext &context, Person &person,
                                       Random &random) const;
 
+    /// @brief Initialise physical activity using continuous model approach (FINCH method)
+    /// @param context The runtime context
+    /// @param person The person to initialise physical activity for
+    /// @param random Random number generator
+    /// @param model The physical activity model to use
+    static void initialise_continuous_physical_activity(RuntimeContext &context, Person &person,
+                                                        Random &random,
+                                                        const PhysicalActivityModel &model);
+
+    /// @brief Initialise physical activity using simple model approach (India method)
+    /// @param context The runtime context
+    /// @param person The person to initialise physical activity for
+    /// @param random Random number generator
+    /// @param model The physical activity model to use
+    void initialise_simple_physical_activity(RuntimeContext &context, Person &person,
+                                             Random &random,
+                                             const PhysicalActivityModel &model) const;
+
     // Regular trend member variables
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_;
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox_;
     std::shared_ptr<std::vector<LinearModelParams>> trend_models_;
     std::shared_ptr<std::vector<core::DoubleInterval>> trend_ranges_;
@@ -224,8 +291,14 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     const std::unordered_map<core::Income, LinearModelParams> &income_models_;
     const double physical_activity_stddev_;
 
+    // Physical activity model support (both India and FINCH approaches)
+    std::unordered_map<core::Identifier, PhysicalActivityModel> physical_activity_models_;
+    bool has_physical_activity_models_ = false;
     // Policy optimization flag - Mahima's enhancement
     bool has_active_policies_;
+
+    // Two-stage modeling: Logistic regression for zero probability (optional)
+    const std::vector<LinearModelParams> &logistic_models_;
 };
 
 /// @brief Defines the static linear model data type
@@ -292,7 +365,15 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
         std::unique_ptr<std::vector<core::DoubleInterval>> income_trend_ranges = nullptr,
         std::unique_ptr<std::vector<double>> income_trend_lambda = nullptr,
         std::unique_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors =
-            nullptr);
+            nullptr,
+        bool is_continuous_income_model = false,
+        const LinearModelParams &continuous_income_model = LinearModelParams{},
+        std::string income_categories = "3",
+        const std::unordered_map<core::Identifier, PhysicalActivityModel>
+            &physical_activity_models = {},
+        bool has_active_policies = true,
+        /// @param logistic_models Logistic regression models for two-stage modeling (optional)
+        std::vector<LinearModelParams> logistic_models = {});
 
     /// @brief Construct a new StaticLinearModel from this definition
     /// @return A unique pointer to the new StaticLinearModel instance
@@ -300,6 +381,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
 
   private:
     // Regular trend member variables
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_;
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox_;
     std::shared_ptr<std::vector<LinearModelParams>> trend_models_;
     std::shared_ptr<std::vector<core::DoubleInterval>> trend_ranges_;
@@ -330,6 +412,20 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
         rural_prevalence_;
     std::unordered_map<core::Income, LinearModelParams> income_models_;
     double physical_activity_stddev_;
+
+    // Physical activity model support (FINCH approach)
+    std::unordered_map<core::Identifier, PhysicalActivityModel> physical_activity_models_;
+    bool has_physical_activity_models_ = false;
+
+    // Two-stage modeling: Logistic regression for zero probability (optional)
+    std::vector<LinearModelParams> logistic_models_;
+
+    // Continuous income model support (FINCH approach)
+    bool is_continuous_income_model_;
+    LinearModelParams continuous_income_model_;
+    std::string income_categories_;
+    // Policy optimization flag - Mahima
+    bool has_active_policies_;
 };
 
 } // namespace hgps
