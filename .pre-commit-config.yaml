@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: fix-byte-order-marker
       - id: check-merge-conflict
@@ -13,23 +13,23 @@ repos:
         exclude: .vscode/settings.json
         args: [--autofix, --indent, '4', --no-sort]
   - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
-    rev: v2.14.0
+    rev: v2.16.0
     hooks:
       - id: pretty-format-yaml
         args: [--autofix, --indent, '2', --offset, '2']
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.30.0
+    rev: 0.36.0
     hooks:
       - id: check-github-workflows
       - id: check-metaschema
         files: schemas/.*
   - repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: v19.1.6
+    rev: v21.1.8
     hooks:
       - id: clang-format
         files: .*\.(h|cpp)
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.43.0
+    rev: v0.47.0
     hooks:
       - id: markdownlint-fix
   - repo: https://github.com/cheshirekow/cmake-format-precommit
