@@ -1679,10 +1679,19 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     const std::unordered_map<core::Identifier, PhysicalActivityModel> &physical_activity_models,
     bool has_active_policies, std::vector<LinearModelParams> logistic_models)
     // NOLINTNEXTLINE(readability-function-cognitive-complexity)
-    : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend),
-                                          std::move(trend_steps), trend_type},
-      expected_trend_{create_shared_from_unique(expected_trend)},
-      expected_trend_boxcox_{create_shared_from_unique(expected_trend_boxcox)},
+    : RiskFactorAdjustableModelDefinition{
+          std::move(expected),
+          expected_trend ? std::make_unique<std::unordered_map<core::Identifier, double>>(*expected_trend)
+                        : nullptr,
+          trend_steps ? std::make_unique<std::unordered_map<core::Identifier, int>>(*trend_steps)
+                      : nullptr,
+          trend_type},
+      expected_trend_{expected_trend ? std::make_shared<std::unordered_map<core::Identifier, double>>(
+                                           *expected_trend)
+                                     : nullptr},
+      expected_trend_boxcox_{expected_trend_boxcox ? std::make_shared<std::unordered_map<core::Identifier, double>>(
+                                           *expected_trend_boxcox)
+                                     : nullptr},
       trend_models_{create_shared_from_unique(trend_models)},
       trend_ranges_{create_shared_from_unique(trend_ranges)},
       trend_lambda_{create_shared_from_unique(trend_lambda)},
@@ -1726,12 +1735,13 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
       physical_activity_models_{physical_activity_models},
       has_physical_activity_models_{!physical_activity_models.empty()},
       // Two-stage modeling: Logistic regression for zero probability (optional)
+      // Must be initialized before continuous income model fields (declaration order)
       logistic_models_{std::move(logistic_models)},
-      // Continuous income model support (FINCH approach)
+      // Continuous income model support (FINCH approach) - must be in declaration order
       is_continuous_income_model_{is_continuous_income_model},
       continuous_income_model_{continuous_income_model},
       income_categories_{std::move(income_categories)},
-      // Policy optimization flag - Mahima
+      // Policy optimization flag - Mahima - must be last (declaration order)
       has_active_policies_{has_active_policies} {
 
     if (names_.empty()) {
