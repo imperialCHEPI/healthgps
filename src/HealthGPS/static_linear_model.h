@@ -145,12 +145,20 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param context The runtime context
     /// @param person The person to initialise income for
     /// @param random Random number generator
+    /// @param quartile_thresholds Optional pre-calculated quartile thresholds for continuous income
+    /// @brief Initialise income for a person using dynamic quartile calculation
+    /// @details For continuous income models, calculates quartiles from the population once and
+    /// caches them for efficient reuse. Divides population into 3 or 4 categories based on
+    /// income_categories_ setting.
     void initialise_income(RuntimeContext &context, Person &person, Random &random);
 
     /// @brief Update income for a person (only for 18-year-olds)
     /// @param context The runtime context
     /// @param person The person to update income for
     /// @param random Random number generator
+    /// @param quartile_thresholds Optional pre-calculated quartile thresholds for continuous income
+    /// @brief Update income for a person (only for 18-year-olds)
+    /// @details Uses dynamic quartile calculation with caching for optimal performance
     void update_income(RuntimeContext &context, Person &person, Random &random);
 
     /// @brief Update income trends for a person

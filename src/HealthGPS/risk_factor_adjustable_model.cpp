@@ -103,16 +103,23 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
 
     // Baseline scenatio: compute adjustments.
     if (context.scenario().type() == ScenarioType::baseline) {
+        std::cout << "\n[SYNC] Baseline: computing adjustments...";
         adjustments = calculate_adjustments(context, factors, ranges, apply_trend);
+        std::cout << "\n[SYNC] Baseline: adjustments computed, about to send...";
     }
 
     // Intervention scenario: receive adjustments from baseline scenario.
     else {
+        std::cout << "\n[SYNC] Intervention: waiting for baseline message (timeout: " 
+                  << context.sync_timeout_millis() << "ms)...";
         auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
+        std::cout << "\n[SYNC] Intervention: try_receive returned";
         if (!message.has_value()) {
+            std::cout << "\n[SYNC] Intervention: Message not received, timeout occurred!";
             throw core::HgpsException(
                 "Simulation out of sync, receive baseline adjustments message has timed out");
         }
+        std::cout << "\n[SYNC] Intervention: Message received!";
 
         auto &basePtr = message.value();
         auto *messagePrt = dynamic_cast<RiskFactorAdjustmentMessage *>(basePtr.get());
