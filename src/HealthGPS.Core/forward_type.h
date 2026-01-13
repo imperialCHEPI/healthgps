@@ -55,12 +55,22 @@ enum class Income : uint8_t {
     /// @brief Low income
     low,
 
-    /// @brief Middle income
+    /// @brief Lower middle income (4-category system)
+    lowermiddle,
+
+    /// @brief Middle income (3-category system)
     middle,
+
+    /// @brief Upper middle income (4-category system)
+    uppermiddle,
 
     /// @brief High income
     high
 };
+
+// Note: Region and Ethnicity are now dynamic string-based identifiers
+// They are read from CSV files and can support any number of categories
+// The system will automatically adapt to the CSV structure
 
 /// @brief C++20 concept for numeric columns types
 template <typename T>

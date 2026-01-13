@@ -4,6 +4,7 @@
 #include "sync_message.h"
 
 #include <cmath>
+#include <iostream>
 #include <oneapi/tbb/parallel_for_each.h>
 #include <utility>
 
@@ -102,16 +103,23 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
 
     // Baseline scenatio: compute adjustments.
     if (context.scenario().type() == ScenarioType::baseline) {
+        std::cout << "\n[SYNC] Baseline: computing adjustments...";
         adjustments = calculate_adjustments(context, factors, ranges, apply_trend);
+        std::cout << "\n[SYNC] Baseline: adjustments computed, about to send...";
     }
 
     // Intervention scenario: receive adjustments from baseline scenario.
     else {
+        std::cout << "\n[SYNC] Intervention: waiting for baseline message (timeout: "
+                  << context.sync_timeout_millis() << "ms)...";
         auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
+        std::cout << "\n[SYNC] Intervention: try_receive returned";
         if (!message.has_value()) {
+            std::cout << "\n[SYNC] Intervention: Message not received, timeout occurred!";
             throw core::HgpsException(
                 "Simulation out of sync, receive baseline adjustments message has timed out");
         }
+        std::cout << "\n[SYNC] Intervention: Message received!";
 
         auto &basePtr = message.value();
         auto *messagePrt = dynamic_cast<RiskFactorAdjustmentMessage *>(basePtr.get());
@@ -150,6 +158,13 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
         context.scenario().channel().send(std::make_unique<RiskFactorAdjustmentMessage>(
             context.current_run(), context.time_now(), std::move(adjustments)));
     }
+    // Print which risk factors are being adjusted to their factors mean
+    std::cout << "\n=== RISK FACTORS BEING ADJUSTED TO FACTORS MEAN ===";
+    std::cout << "\nTotal factors: " << factors.size();
+    for (size_t i = 0; i < factors.size(); i++) {
+        std::cout << "\n  " << (i + 1) << ". " << factors[i].to_string();
+    }
+    std::cout << "\n===================================================\n";
 }
 
 int RiskFactorAdjustableModel::get_trend_steps(const core::Identifier &factor) const {

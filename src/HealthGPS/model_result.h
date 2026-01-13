@@ -23,8 +23,12 @@ struct ResultByGender {
 struct ResultByIncome {
     /// @brief Low income value
     double low{};
-    /// @brief Middle income value
+    /// @brief Lower middle income value (4-category system)
+    double lowermiddle{};
+    /// @brief Middle income value (3-category system)
     double middle{};
+    /// @brief Upper middle income value (4-category system)
+    double uppermiddle{};
     /// @brief High income value
     double high{};
 };
@@ -33,8 +37,12 @@ struct ResultByIncome {
 struct ResultByIncomeGender {
     /// @brief Low income values by gender
     ResultByGender low{};
-    /// @brief Middle income values by gender
+    /// @brief Lower middle income values by gender (4-category system)
+    ResultByGender lowermiddle{};
+    /// @brief Middle income values by gender (3-category system)
     ResultByGender middle{};
+    /// @brief Upper middle income values by gender (4-category system)
+    ResultByGender uppermiddle{};
     /// @brief High income values by gender
     ResultByGender high{};
 };
