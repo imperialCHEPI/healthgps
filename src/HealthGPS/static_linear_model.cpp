@@ -246,9 +246,9 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     // STEP 1: Age and gender initialized in demographic.cpp
     // STEP 2: Region and ethnicity initialized in demographic.cpp (if available)
     // STEP 3: Sector initialized in static_linear_model.cpp (if available)
-    // STEP 4: Income initialized in static_linear_model.cpp (batch processing for continuous income) 
-    // STEP 5: Risk factors and physical activity initialized in static_linear_model.cpp (below) 
-    // STEP 6: Risk factors adjusted to expected means in static_linear_model.cpp (below)
+    // STEP 4: Income initialized in static_linear_model.cpp (batch processing for continuous
+    // income) STEP 5: Risk factors and physical activity initialized in static_linear_model.cpp
+    // (below) STEP 6: Risk factors adjusted to expected means in static_linear_model.cpp (below)
     // STEP 7: Policies in static_linear_model.cpp (below)
     // STEP 8: Trends in static_linear_model.cpp (below) depends on whether trends are enabled
     // STEP 9: Risk factors adjusted to trended expected means in static_linear_model.cpp (below)
@@ -357,22 +357,27 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 
     // Initialise newborns and update others.
     std::cout << "\n[UPDATE] Processing people for income updates (year " << context.time_now()
-              << ", scenario: " << (context.scenario().type() == ScenarioType::baseline ? "baseline" : "intervention") << ")...";
+              << ", scenario: "
+              << (context.scenario().type() == ScenarioType::baseline ? "baseline" : "intervention")
+              << ")...";
     size_t processed_count = 0;
     size_t newborn_count = 0;
     size_t age18_count = 0;
     size_t other_age_count = 0;
     size_t iteration_count = 0;
     std::cout << "\n[LOOP] Starting loop, population size: " << context.population().size()
-              << " (scenario: " << (context.scenario().type() == ScenarioType::baseline ? "baseline" : "intervention") << ")";
+              << " (scenario: "
+              << (context.scenario().type() == ScenarioType::baseline ? "baseline" : "intervention")
+              << ")";
     for (auto &person : context.population()) {
         iteration_count++;
-        
+
         // Debug: Track iterations near where it hangs
         if (iteration_count >= 68000 && iteration_count % 10 == 0) {
-            std::cout << "\n[ITER] Iteration: " << iteration_count << ", active: " << person.is_active();
+            std::cout << "\n[ITER] Iteration: " << iteration_count
+                      << ", active: " << person.is_active();
         }
-        
+
         if (!person.is_active()) {
             continue;
         }
@@ -398,12 +403,17 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             } else {
                 // Debug: First person who is not age 0 or 18
                 if (other_age_count == 0) {
-                    std::cout << "\n[UPDATE] Starting to process other ages (first person age: " << person.age 
-                              << ", scenario: " << (context.scenario().type() == ScenarioType::baseline ? "baseline" : "intervention") << ")...";
+                    std::cout << "\n[UPDATE] Starting to process other ages (first person age: "
+                              << person.age << ", scenario: "
+                              << (context.scenario().type() == ScenarioType::baseline
+                                      ? "baseline"
+                                      : "intervention")
+                              << ")...";
                 }
                 other_age_count++;
                 if (other_age_count == 1 || other_age_count % 10000 == 0) {
-                    std::cout << "\n[UPDATE] Processing other ages: " << other_age_count << " (current age " << person.age << ")...";
+                    std::cout << "\n[UPDATE] Processing other ages: " << other_age_count
+                              << " (current age " << person.age << ")...";
                 }
                 update_sector(person, context.random());
                 // update_income only updates 18-year-olds, so this is a no-op for other ages
@@ -412,30 +422,35 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             }
         }
         processed_count++;
-        
+
         // Debug: Print every 10000 to track if loop is still running
         if (processed_count % 10000 == 0) {
-            std::cout << "\n[LOOP] Still in loop, processed: " << processed_count 
-                      << " (scenario: " << (context.scenario().type() == ScenarioType::baseline ? "baseline" : "intervention") << ")";
+            std::cout << "\n[LOOP] Still in loop, processed: " << processed_count << " (scenario: "
+                      << (context.scenario().type() == ScenarioType::baseline ? "baseline"
+                                                                              : "intervention")
+                      << ")";
         }
-        
+
         // Debug: Check if we're near the end of population
         if (processed_count >= 60000 && processed_count % 100 == 0) {
-            std::cout << "\n[LOOP] Near end - processed: " << processed_count 
-                      << ", population size: " << context.population().size()
-                      << " (scenario: " << (context.scenario().type() == ScenarioType::baseline ? "baseline" : "intervention") << ")";
+            std::cout << "\n[LOOP] Near end - processed: " << processed_count
+                      << ", population size: " << context.population().size() << " (scenario: "
+                      << (context.scenario().type() == ScenarioType::baseline ? "baseline"
+                                                                              : "intervention")
+                      << ")";
         }
-        
     }
-    std::cout << "\n[LOOP] *** LOOP EXITED *** Iterations: " << iteration_count 
-              << ", Processed: " << processed_count << " people ("
-              << newborn_count << " newborns, " << age18_count << " 18-year-olds, " 
-              << other_age_count << " other ages)"
-              << " (scenario: " << (context.scenario().type() == ScenarioType::baseline ? "baseline" : "intervention") << ")";
+    std::cout << "\n[LOOP] *** LOOP EXITED *** Iterations: " << iteration_count
+              << ", Processed: " << processed_count << " people (" << newborn_count << " newborns, "
+              << age18_count << " 18-year-olds, " << other_age_count << " other ages)"
+              << " (scenario: "
+              << (context.scenario().type() == ScenarioType::baseline ? "baseline" : "intervention")
+              << ")";
 
     // Adjust such that risk factor means match expected values(factor mean).
-    std::cout << "\n[UPDATE] About to call adjust_risk_factors (scenario: " 
-              << (context.scenario().type() == ScenarioType::baseline ? "baseline" : "intervention") << ")...";
+    std::cout << "\n[UPDATE] About to call adjust_risk_factors (scenario: "
+              << (context.scenario().type() == ScenarioType::baseline ? "baseline" : "intervention")
+              << ")...";
     adjust_risk_factors(context, names_, ranges_, false);
     std::cout << "\n[UPDATE] adjust_risk_factors returned";
 
@@ -740,7 +755,7 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
         // Save risk factor
         person.risk_factors.at(names_[i]) = factor;
     }
-    
+
     static bool printed_end = false;
     if (!printed_end) {
         std::cout << "\n[FUNC] Finished update_factors -> Loop continues";
@@ -1097,7 +1112,7 @@ void StaticLinearModel::update_sector(Person &person, Random &random) const {
         std::cout << "\n[FUNC] Inside update_sector";
         printed_start = true;
     }
-    
+
     // If no rural prevalence data is available, skip sector update
     if (rural_prevalence_.empty()) {
         static bool printed_end = false;
@@ -1128,7 +1143,7 @@ void StaticLinearModel::update_sector(Person &person, Random &random) const {
     if (rand < p_rural_to_urban) {
         person.sector = core::Sector::urban;
     }
-    
+
     static bool printed_end = false;
     if (!printed_end) {
         std::cout << "\n[FUNC] Finished update_sector -> Next: update_income";
@@ -1150,20 +1165,21 @@ void StaticLinearModel::initialise_income(RuntimeContext &context, Person &perso
         thread_local static std::vector<double> cached_quartiles;
         thread_local static size_t cached_population_size = 0;
         thread_local static int cached_year = -1;
-        
+
         // Recalculate quartiles if cache is empty, population size changed, or year changed
         // (income values change each year, so quartiles must be recalculated annually)
         size_t current_pop_size = context.population().size();
         int current_year = static_cast<int>(context.time_now());
-        if (cached_quartiles.empty() || cached_population_size != current_pop_size || 
+        if (cached_quartiles.empty() || cached_population_size != current_pop_size ||
             cached_year != current_year) {
             cached_quartiles = calculate_income_quartiles(context.population());
             cached_population_size = current_pop_size;
             cached_year = current_year;
         }
-        
+
         // Use cached quartiles - calculated once, reused for all people
-        // Divides population into categories: 3 (low, middle, high) or 4 (low, lowermiddle, uppermiddle, high)
+        // Divides population into categories: 3 (low, middle, high) or 4 (low, lowermiddle,
+        // uppermiddle, high)
         person.income = convert_income_to_category(continuous_income, cached_quartiles);
     } else {
         // India approach: Use direct categorical assignment
@@ -1177,12 +1193,12 @@ void StaticLinearModel::update_income(RuntimeContext &context, Person &person, R
         std::cout << "\n[FUNC] Inside update_income";
         printed_start = true;
     }
-    
+
     // Only update 18 year olds
     if (person.age == 18) {
         initialise_income(context, person, random);
     }
-    
+
     static bool printed_end = false;
     if (!printed_end) {
         std::cout << "\n[FUNC] Finished update_income -> Next: update_factors";

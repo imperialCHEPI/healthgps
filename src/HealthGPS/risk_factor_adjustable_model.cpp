@@ -110,7 +110,7 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
 
     // Intervention scenario: receive adjustments from baseline scenario.
     else {
-        std::cout << "\n[SYNC] Intervention: waiting for baseline message (timeout: " 
+        std::cout << "\n[SYNC] Intervention: waiting for baseline message (timeout: "
                   << context.sync_timeout_millis() << "ms)...";
         auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
         std::cout << "\n[SYNC] Intervention: try_receive returned";
