@@ -333,6 +333,8 @@ Person Simulation::partial_clone_entity(const Person &source) noexcept {
     auto clone = Person{};
     clone.age = source.age;
     clone.gender = source.gender;
+    clone.region = source.region;
+    clone.ethnicity = source.ethnicity;
     clone.ses = source.ses;
     clone.sector = source.sector;
     clone.income = source.income;

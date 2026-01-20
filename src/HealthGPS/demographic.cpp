@@ -225,6 +225,35 @@ void DemographicModule::update_population(RuntimeContext &context,
     context.population().add_newborn_babies(number_of_boys, core::Gender::male, context.time_now());
     context.population().add_newborn_babies(number_of_girls, core::Gender::female,
                                             context.time_now());
+    
+    // Initialize region and ethnicity for newborns (age == 0) created during updates
+    // This ensures all newborns have region/ethnicity assigned before risk factor initialization
+    int newborn_count = 0;
+    for (auto &person : context.population()) {
+        if (person.is_active() && person.age == 0) {
+            newborn_count++;
+            std::string region_before = person.region;
+            initialise_region(context, person, context.random());
+            std::string region_after = person.region;
+            initialise_ethnicity(context, person, context.random());
+            
+            // Verify region and ethnicity were actually set (throw if not, as this indicates a data loading issue)
+            if (person.region == "unknown" || person.region.empty()) {
+                throw core::HgpsException(
+                    fmt::format("Newborn #{} region was not initialized (was: '{}', after init: '{}'). "
+                               "Region data may not be available for age 0, or region_prevalence_ is empty. "
+                               "Check that region CSV data includes age_0 entries. "
+                               "region_prevalence_ size: {}", 
+                               newborn_count, region_before, region_after, region_prevalence_.size()));
+            }
+            if (person.ethnicity == "unknown" || person.ethnicity.empty()) {
+                throw core::HgpsException(
+                    fmt::format("Newborn #{} ethnicity was not initialized. Ethnicity data may not be available for age 0, "
+                               "or ethnicity_prevalence_ is empty. Check that ethnicity CSV data includes Under18 entries.",
+                               newborn_count));
+            }
+        }
+    }
 
     // Calculate statistics.
     auto simulated_death_rate = number_of_deaths * 1000.0 / initial_pop_size;
@@ -417,6 +446,12 @@ void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &conte
     // If no region data is available, skip region assignment
     if (region_prevalence_.empty()) {
         // Region data not available for this project (e.g., India/PIF) - leave as "unknown"
+        // BUT: For FINCH, region data should be available - this is an error
+        if (person.age == 0) {
+            throw core::HgpsException(
+                "Region data is required for newborns but region_prevalence_ is empty. "
+                "Check that region CSV file is loaded and contains data.");
+        }
         return;
     }
 
@@ -426,7 +461,18 @@ void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &conte
     // Find the closest age in region_prevalence_ if exact age doesn't exist
     core::Identifier target_age_id = age_id;
     if (!region_prevalence_.contains(age_id)) {
-        // Find closest age
+        // For newborns (age 0), require exact match - don't use closest age
+        if (person.age == 0) {
+            std::vector<std::string> available_ages;
+            for (const auto &[age_key, _] : region_prevalence_) {
+                available_ages.push_back(age_key.to_string());
+            }
+            throw core::HgpsException(fmt::format(
+                "Region data for age_0 (newborns) is missing. Available age keys: [{}]. "
+                "Region CSV file must include a row with Age=0.",
+                fmt::join(available_ages, ", ")));
+        }
+        // Find closest age for non-newborns
         int min_diff = std::numeric_limits<int>::max();
         bool found_closest = false;
         for (const auto &[age_key, _] : region_prevalence_) {

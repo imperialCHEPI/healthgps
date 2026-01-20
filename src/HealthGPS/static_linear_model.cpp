@@ -19,6 +19,19 @@ template <typename T> std::shared_ptr<T> create_shared_from_unique(std::unique_p
     return ptr ? std::make_shared<T>(*ptr) : nullptr;
 }
 
+// Shared thread-local cache for income quartiles (shared across all StaticLinearModel functions)
+struct QuartileCache {
+    std::vector<double> quartiles;
+    size_t population_size = 0;
+    int year = -1;
+};
+
+// Helper function to get shared thread-local quartile cache
+QuartileCache &get_quartile_cache() {
+    thread_local static QuartileCache cache;
+    return cache;
+}
+
 } // anonymous namespace
 
 namespace hgps {
@@ -355,97 +368,50 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
     bool intervene = (context.scenario().type() == ScenarioType::intervention &&
                       (context.time_now() - context.start_time()) >= 2);
 
+    // OPTIMIZATION: For continuous income model, calculate quartiles ONCE before processing people.
+    // This prevents the expensive O(N log N) quartile calculation from being called inside the loop
+    // (which was causing hangs when scanning population while it's being modified).
+    // Quartiles are calculated from existing income values in the population.
+    auto &cache = get_quartile_cache();
+    
+    if (is_continuous_income_model_) {
+        size_t current_pop_size = context.population().size();
+        int current_year = static_cast<int>(context.time_now());
+        
+        // Recalculate quartiles if cache is empty, population size changed, or year changed
+        if (cache.quartiles.empty() || cache.population_size != current_pop_size || 
+            cache.year != current_year) {
+            std::cout << "\n[UPDATE] Calculating income quartiles for year " << context.time_now()
+                      << " (scenario: " 
+                      << (context.scenario().type() == ScenarioType::baseline ? "baseline" : "intervention")
+                      << ")...";
+            cache.quartiles = calculate_income_quartiles(context.population());
+            cache.population_size = current_pop_size;
+            cache.year = current_year;
+            std::cout << " [OK]";
+        }
+    }
+
     // Initialise newborns and update others.
-    std::cout << "\n[UPDATE] Processing people for income updates (year " << context.time_now()
-              << ", scenario: "
-              << (context.scenario().type() == ScenarioType::baseline ? "baseline" : "intervention")
-              << ")...";
-    size_t processed_count = 0;
-    size_t newborn_count = 0;
-    size_t age18_count = 0;
-    size_t other_age_count = 0;
-    size_t iteration_count = 0;
-    std::cout << "\n[LOOP] Starting loop, population size: " << context.population().size()
-              << " (scenario: "
-              << (context.scenario().type() == ScenarioType::baseline ? "baseline" : "intervention")
-              << ")";
     for (auto &person : context.population()) {
-        iteration_count++;
-
-        // Debug: Track iterations near where it hangs
-        if (iteration_count >= 68000 && iteration_count % 10 == 0) {
-            std::cout << "\n[ITER] Iteration: " << iteration_count
-                      << ", active: " << person.is_active();
-        }
-
-        if (!person.is_active()) {
-            continue;
-        }
-
         if (person.age == 0) {
-            newborn_count++;
-            if (newborn_count % 1000 == 0) {
-                std::cout << "\n[UPDATE] Processed " << newborn_count << " newborns...";
-            }
             initialise_sector(person, context.random());
             initialise_income(context, person, context.random());
             initialise_factors(context, person, context.random());
             initialise_physical_activity(context, person, context.random());
         } else {
             if (person.age == 18) {
-                age18_count++;
-                if (age18_count % 100 == 0) {
-                    std::cout << "\n[UPDATE] Processed " << age18_count << " 18-year-olds...";
-                }
                 update_sector(person, context.random());
                 update_income(context, person, context.random());
                 update_factors(context, person, context.random());
             } else {
-                // Debug: First person who is not age 0 or 18
-                if (other_age_count == 0) {
-                    std::cout << "\n[UPDATE] Starting to process other ages (first person age: "
-                              << person.age << ", scenario: "
-                              << (context.scenario().type() == ScenarioType::baseline
-                                      ? "baseline"
-                                      : "intervention")
-                              << ")...";
-                }
-                other_age_count++;
-                if (other_age_count == 1 || other_age_count % 10000 == 0) {
-                    std::cout << "\n[UPDATE] Processing other ages: " << other_age_count
-                              << " (current age " << person.age << ")...";
-                }
                 update_sector(person, context.random());
                 // update_income only updates 18-year-olds, so this is a no-op for other ages
                 update_income(context, person, context.random());
                 update_factors(context, person, context.random());
             }
         }
-        processed_count++;
-
-        // Debug: Print every 10000 to track if loop is still running
-        if (processed_count % 10000 == 0) {
-            std::cout << "\n[LOOP] Still in loop, processed: " << processed_count << " (scenario: "
-                      << (context.scenario().type() == ScenarioType::baseline ? "baseline"
-                                                                              : "intervention")
-                      << ")";
-        }
-
-        // Debug: Check if we're near the end of population
-        if (processed_count >= 60000 && processed_count % 100 == 0) {
-            std::cout << "\n[LOOP] Near end - processed: " << processed_count
-                      << ", population size: " << context.population().size() << " (scenario: "
-                      << (context.scenario().type() == ScenarioType::baseline ? "baseline"
-                                                                              : "intervention")
-                      << ")";
-        }
     }
-    std::cout << "\n[LOOP] *** LOOP EXITED *** Iterations: " << iteration_count
-              << ", Processed: " << processed_count << " people (" << newborn_count << " newborns, "
-              << age18_count << " 18-year-olds, " << other_age_count << " other ages)"
-              << " (scenario: "
-              << (context.scenario().type() == ScenarioType::baseline ? "baseline" : "intervention")
-              << ")";
 
     // Adjust such that risk factor means match expected values(factor mean).
     std::cout << "\n[UPDATE] About to call adjust_risk_factors (scenario: "
@@ -556,6 +522,7 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
         has_logistic_tracked; // Track which factors have logistic
     static size_t total_population_size = 0;
     static size_t initial_generation_count = 0;
+    static bool debug_enabled = false;
     factors_count++;
 
     if (first_call) {
@@ -570,6 +537,7 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
             has_logistic_tracked[names_[i]] = has_logistic;
         }
     }
+    
     // Correlated residual sampling.
     auto residuals = compute_residuals(random, cholesky_);
 
@@ -589,6 +557,9 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
         // Initialise risk factor.
         double expected =
             get_expected(context, person.gender, person.age, names_[i], ranges_[i], false);
+        if (debug_enabled && factors_count >= 68180 && factors_count <= 68200 && i % 5 == 0) {
+            std::cout << "\n[FACTORS] get_expected returned: " << expected;
+        }
 
         // TWO-STAGE RISK FACTOR MODELING APPROACH- Mahima
         // =======================================================================
@@ -1020,18 +991,27 @@ StaticLinearModel::compute_linear_models(Person &person,
                 factor += coefficient_value * capped_age_cubed;
             } else {
                 // Regular coefficient processing
-                double value = person.get_risk_factor_value(coefficient_name);
-                factor += coefficient_value * value;
+                try {
+                    double value = person.get_risk_factor_value(coefficient_name);
+                    factor += coefficient_value * value;
+                } catch (const std::exception& e) {
+                    std::cout << "\n[MISSING_FACTOR] Factor missing: " << coefficient_name.to_string() << " for model " << name.to_string() << " (i=" << i << ") - " << e.what();
+                    throw;
+                }
             }
         }
 
         for (const auto &[coefficient_name, coefficient_value] : model.log_coefficients) {
-            double value = person.get_risk_factor_value(coefficient_name);
-
-            if (value <= 0) {
-                value = 1e-10; // Avoid log of zero or negative
+            try {
+                double value = person.get_risk_factor_value(coefficient_name);
+                if (value <= 0) {
+                    value = 1e-10; // Avoid log of zero or negative
+                }
+                factor += coefficient_value * log(value);
+            } catch (const std::exception& e) {
+                std::cout << "\n[MISSING_FACTOR] Factor missing (log): " << coefficient_name.to_string() << " for model " << name.to_string() << " (i=" << i << ") - " << e.what();
+                throw;
             }
-            factor += coefficient_value * log(value);
         }
 
         linear.emplace_back(factor);
@@ -1158,29 +1138,29 @@ void StaticLinearModel::initialise_income(RuntimeContext &context, Person &perso
         person.risk_factors["income_continuous"_id] = continuous_income;
         person.income_continuous = continuous_income;
 
-        // OPTIMIZATION: Calculate quartiles once and cache them (thread-local for thread safety)
-        // This prevents recalculating quartiles for each person. Quartiles are calculated from
-        // the entire population and divide it into 3 or 4 categories based on income_categories_.
-        // Cache is invalidated each year since income values change annually.
-        thread_local static std::vector<double> cached_quartiles;
-        thread_local static size_t cached_population_size = 0;
-        thread_local static int cached_year = -1;
+        // OPTIMIZATION: Use pre-calculated quartiles from update_risk_factors (calculated once
+        // before the loop). This avoids scanning the population while it's being modified.
+        // Uses shared thread-local cache via get_quartile_cache() helper function.
+        auto &cache = get_quartile_cache();
 
-        // Recalculate quartiles if cache is empty, population size changed, or year changed
-        // (income values change each year, so quartiles must be recalculated annually)
+        // Get cached quartiles (should be pre-calculated in update_risk_factors before the loop)
         size_t current_pop_size = context.population().size();
         int current_year = static_cast<int>(context.time_now());
-        if (cached_quartiles.empty() || cached_population_size != current_pop_size ||
-            cached_year != current_year) {
-            cached_quartiles = calculate_income_quartiles(context.population());
-            cached_population_size = current_pop_size;
-            cached_year = current_year;
+        
+        // Quartiles should already be cached from update_risk_factors
+        // If cache is invalid, this is a programming error - quartiles should be calculated before
+        // the loop starts
+        if (cache.quartiles.empty() || cache.population_size != current_pop_size ||
+            cache.year != current_year) {
+            throw core::HgpsException(
+                "Income quartiles cache is invalid in initialise_income(). "
+                "Quartiles should be calculated in update_risk_factors() before processing people.");
         }
 
-        // Use cached quartiles - calculated once, reused for all people
+        // Use cached quartiles - calculated once in update_risk_factors, reused for all people
         // Divides population into categories: 3 (low, middle, high) or 4 (low, lowermiddle,
         // uppermiddle, high)
-        person.income = convert_income_to_category(continuous_income, cached_quartiles);
+        person.income = convert_income_to_category(continuous_income, cache.quartiles);
     } else {
         // India approach: Use direct categorical assignment
         initialise_categorical_income(person, random);
@@ -1466,14 +1446,28 @@ std::vector<double> StaticLinearModel::calculate_income_quartiles(const Populati
     std::vector<double> sorted_incomes;
     sorted_incomes.reserve(population.size());
 
+    size_t pop_size = population.size();
+    size_t processed = 0;
+    size_t found_count = 0;
+    
     for (const auto &person : population) {
+        processed++;
+        if (processed % 10000 == 0) {
+            std::cout << "\n[QUARTILES] Scanning person " << processed << "/" << pop_size 
+                      << ", found " << found_count << " income values...";
+        }
+        
         if (person.is_active()) {
             auto it = person.risk_factors.find("income_continuous"_id);
             if (it != person.risk_factors.end()) {
                 sorted_incomes.push_back(it->second);
+                found_count++;
             }
         }
     }
+
+    std::cout << "\n[QUARTILES] Finished scanning: found " << found_count 
+              << " income values from " << processed << " people. Sorting...";
 
     if (sorted_incomes.empty()) {
         throw core::HgpsException(
@@ -1482,6 +1476,7 @@ std::vector<double> StaticLinearModel::calculate_income_quartiles(const Populati
 
     // Sort to find quartile thresholds
     std::ranges::sort(sorted_incomes);
+    std::cout << "\n[QUARTILES] Sorting completed. Calculating thresholds...";
 
     size_t n = sorted_incomes.size();
     std::vector<double> quartile_thresholds(3);
@@ -1509,6 +1504,13 @@ std::vector<double> StaticLinearModel::calculate_income_quartiles(const Populati
     } else {
         quartile_thresholds[2] = sorted_incomes.back();
     }
+
+    // Q4 is the 100th percentile (maximum value)
+    double q4_value = sorted_incomes.back();
+
+    std::cout << "\n[QUARTILES] Thresholds calculated: Q1=" << quartile_thresholds[0] 
+              << ", Q2=" << quartile_thresholds[1] << ", Q3=" << quartile_thresholds[2]
+              << ", Q4=" << q4_value;
 
     return quartile_thresholds;
 }
