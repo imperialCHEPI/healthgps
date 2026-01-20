@@ -174,6 +174,11 @@ int RiskFactorAdjustableModel::get_trend_steps(const core::Identifier &factor) c
     return 0; // Default to no trend steps if trend data is not available
 }
 
+void RiskFactorAdjustableModel::set_logistic_factors(
+    const std::unordered_set<core::Identifier> &logistic_factors) {
+    logistic_factors_ = logistic_factors;
+}
+
 RiskFactorSexAgeTable
 RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context,
                                                  const std::vector<core::Identifier> &factors,
@@ -182,13 +187,21 @@ RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context,
     auto age_count = age_range.upper() + 1;
 
     // Compute simulated means.
-    auto simulated_means = calculate_simulated_mean(context.population(), age_range, factors);
+    auto simulated_means = calculate_simulated_mean(context.population(), age_range, factors, logistic_factors_);
 
     // Compute adjustments.
     auto adjustments = RiskFactorSexAgeTable{};
     for (const auto &[sex, simulated_means_by_sex] : simulated_means) {
         for (size_t i = 0; i < factors.size(); i++) {
             const core::Identifier &factor = factors[i];
+            
+            // Check if this factor exists in the expected table
+            if (!expected_->contains(sex, factor)) {
+                std::cout << "\nWARNING - Factor " << factor.to_string()
+                          << " not found in expected table for gender "
+                          << (sex == core::Gender::male ? "Male" : "Female") << " - skipping";
+                continue;
+            }
 
             OptionalRange range;
             if (ranges.has_value()) {
@@ -216,14 +229,23 @@ RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context,
     return adjustments;
 }
 
-RiskFactorSexAgeTable
-RiskFactorAdjustableModel::calculate_simulated_mean(Population &population,
-                                                    const core::IntegerInterval age_range,
-                                                    const std::vector<core::Identifier> &factors) {
+RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_simulated_mean(
+    Population &population, const core::IntegerInterval age_range,
+    const std::vector<core::Identifier> &factors,
+    const std::unordered_set<core::Identifier> &logistic_factors) {
     auto age_count = age_range.upper() + 1;
+
+    // MAHIMA: Track excluded values for debugging
+    std::unordered_map<core::Identifier, int> excluded_counts;
+    std::unordered_map<core::Identifier, int> total_counts;
+    for (const auto &factor : factors) {
+        excluded_counts[factor] = 0;
+        total_counts[factor] = 0;
+    }
 
     // Compute first moments.
     auto moments = UnorderedMap2d<core::Gender, core::Identifier, std::vector<FirstMoment>>{};
+
     for (const auto &person : population) {
         if (!person.is_active()) {
             continue;
@@ -233,8 +255,41 @@ RiskFactorAdjustableModel::calculate_simulated_mean(Population &population,
             if (!moments.contains(person.gender, factor)) {
                 moments.emplace(person.gender, factor, std::vector<FirstMoment>(age_count));
             }
-            double value = person.risk_factors.at(factor);
-            moments.at(person.gender, factor).at(person.age).append(value);
+
+            double value = 0.0;
+            bool has_value = false;
+
+            // Special handling for income and physical activity
+            if (factor.to_string() == "income") {
+                value = person.income_continuous;
+                has_value = true;
+            } else if (factor.to_string() == "physicalactivity") {
+                value = person.physical_activity;
+                has_value = true;
+            } else if (person.risk_factors.contains(factor)) {
+                value = person.risk_factors.at(factor);
+                has_value = true;
+            }
+            // MAHIMA: Apply logistic model logic for simulated mean calculation
+            // For factors WITH logistic models: only include non-zero values
+            // For factors WITHOUT logistic models: include all values (including zeros)
+            if (has_value) {
+                total_counts[factor]++;
+                bool should_include = true;
+                if (logistic_factors.contains(factor)) {
+                    // Factor has logistic model - only include non-zero values
+                    if (value == 0)
+                        should_include = false;
+                    if (!should_include) {
+                        excluded_counts[factor]++;
+                    }
+                }
+                // If factor doesn't have logistic model, include all values (including zeros)
+
+                if (should_include) {
+                    moments.at(person.gender, factor).at(person.age).append(value);
+                }
+            }
         }
     }
 
@@ -249,6 +304,35 @@ RiskFactorAdjustableModel::calculate_simulated_mean(Population &population,
             }
         }
     }
+
+    // MAHIMA: Print excluded values summary (print every time for debugging)
+    std::cout << "\n=== SIMULATED MEAN CALCULATION - EXCLUDED VALUES SUMMARY ===";
+    std::cout << "\nLogistic factors set size: " << logistic_factors.size();
+    for (const auto &factor : factors) {
+        if (logistic_factors.contains(factor)) {
+            std::cout << "\n"
+                      << factor.to_string()
+                      << " (HAS logistic model): " << excluded_counts[factor]
+                      << " zero values excluded out of " << total_counts[factor]
+                      << " total values (" << std::fixed << std::setprecision(1)
+                      << (total_counts[factor] > 0
+                              ? (100.0 * excluded_counts[factor] / total_counts[factor])
+                              : 0.0)
+                      << "% excluded)";
+        } else {
+            std::cout << "\n"
+                      << factor.to_string()
+                      << " (NO logistic model): " << excluded_counts[factor]
+                      << " zero values excluded out of " << total_counts[factor]
+                      << " total values (" << std::fixed << std::setprecision(1)
+                      << (total_counts[factor] > 0
+                              ? (100.0 * excluded_counts[factor] / total_counts[factor])
+                              : 0.0)
+                      << "% excluded)";
+        }
+    }
+    std::cout << "\n===============================================================";
+    std::cout.flush(); // Ensure output is flushed
 
     return means;
 }

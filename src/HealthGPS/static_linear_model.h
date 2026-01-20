@@ -171,13 +171,13 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param person The person to initialise income trends for
     void initialise_income_trends(RuntimeContext &context, Person &person) const;
 
-    void initialise_policies(Person &person, Random &random, bool intervene) const;
+    void initialise_policies(RuntimeContext &context, Person &person, Random &random, bool intervene) const;
 
-    void update_policies(Person &person, bool intervene) const;
+    void update_policies(RuntimeContext &context, Person &person, bool intervene) const;
 
     void apply_policies(Person &person, bool intervene) const;
 
-    std::vector<double> compute_linear_models(Person &person,
+    std::vector<double> compute_linear_models(RuntimeContext &context, Person &person,
                                               const std::vector<LinearModelParams> &models) const;
 
     std::vector<double> compute_residuals(Random &random, const Eigen::MatrixXd &cholesky) const;

@@ -9,6 +9,7 @@
 
 #include <functional>
 #include <optional>
+#include <unordered_set>
 #include <vector>
 
 namespace { // anonymous namespace
@@ -92,6 +93,11 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
         return expected_trend_;
     }
 
+    /// @brief Sets the logistic factors for simulated mean calculation
+    /// @param logistic_factors Set of factors that have logistic models
+    void set_logistic_factors(const std::unordered_set<core::Identifier> &logistic_factors);
+
+
   private:
     /// @brief Adjust risk factors such that mean sim value matches expected value
     /// @param context The simulation run-time context
@@ -104,7 +110,8 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
 
     static RiskFactorSexAgeTable
     calculate_simulated_mean(Population &population, core::IntegerInterval age_range,
-                             const std::vector<core::Identifier> &factors);
+                             const std::vector<core::Identifier> &factors,
+                             const std::unordered_set<core::Identifier> &logistic_factors = {});
 
     std::shared_ptr<RiskFactorSexAgeTable> expected_;
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_;
@@ -117,6 +124,9 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend_;
     std::shared_ptr<std::unordered_map<core::Identifier, double>>
         expected_income_trend_decay_factors_;
+
+    // Logistic factors for simulated mean calculation (factors that use 2-stage modeling)
+    std::unordered_set<core::Identifier> logistic_factors_;
 };
 
 /// @brief Risk factor adjustable model definition interface

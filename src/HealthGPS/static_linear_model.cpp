@@ -11,6 +11,7 @@
 #include <ranges>
 #include <unordered_map>
 #include <utility>
+#include <cctype>
 
 namespace { // anonymous namespace
 
@@ -322,6 +323,17 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         verified_count++;
     }
 
+    // Set logistic factors for simulated mean calculation (exclude zeros for factors with logistic models)
+    std::unordered_set<core::Identifier> logistic_factors_set;
+    for (size_t i = 0; i < names_.size(); i++) {
+        bool has_logistic = !(logistic_models_[i].coefficients.empty());
+        if (has_logistic) {
+            logistic_factors_set.insert(names_[i]);
+        }
+    }
+    set_logistic_factors(logistic_factors_set);
+    std::cout << "\nSet " << logistic_factors_set.size() << " logistic factors for simulated mean calculation";
+
     // Adjust such that risk factor means match expected values.
     std::cout << "\nStarting risk factor adjustment...";
     adjust_risk_factors(context, names_, ranges_, false);
@@ -331,7 +343,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     std::cout << "\nStarting trend initialization...";
     for (auto &person : context.population()) {
         if (has_active_policies_) {
-            initialise_policies(person, context.random(), false);
+            initialise_policies(context, person, context.random(), false);
         }
 
         // Apply trend based on trend_type
@@ -429,7 +441,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 
         if (person.age == 0) {
             if (has_active_policies_) {
-                initialise_policies(person, context.random(), intervene);
+                initialise_policies(context, person, context.random(), intervene);
             }
 
             // Apply trend based on trend_type
@@ -446,7 +458,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             }
         } else {
             if (has_active_policies_) {
-                update_policies(person, intervene);
+                update_policies(context, person, intervene);
             }
 
             // Apply trend based on trend_type
@@ -543,7 +555,7 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
     auto residuals = compute_residuals(random, cholesky_);
 
     // Approximate risk factors with linear models.
-    auto linear = compute_linear_models(person, models_);
+    auto linear = compute_linear_models(context, person, models_);
 
     // Initialise residuals and risk factors (do not exist yet).
     for (size_t i = 0; i < names_.size(); i++) {
@@ -669,7 +681,7 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
     auto new_residuals = compute_residuals(random, cholesky_);
 
     // Approximate risk factors with linear models.
-    auto linear = compute_linear_models(person, models_);
+    auto linear = compute_linear_models(context, person, models_);
 
     // Update residuals and risk factors (should exist).
     for (size_t i = 0; i < names_.size(); i++) {
@@ -739,7 +751,7 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
 void StaticLinearModel::initialise_UPF_trends(RuntimeContext &context, Person &person) const {
 
     // Approximate trends with linear models.
-    auto linear = compute_linear_models(person, *trend_models_);
+    auto linear = compute_linear_models(context, person, *trend_models_);
 
     // Initialise and apply trends (do not exist yet).
     for (size_t i = 0; i < names_.size(); i++) {
@@ -793,7 +805,7 @@ void StaticLinearModel::initialise_income_trends(RuntimeContext &context, Person
     }
 
     // Approximate income trends with linear models.
-    auto linear = compute_linear_models(person, *income_trend_models_);
+    auto linear = compute_linear_models(context, person, *income_trend_models_);
 
     // Initialise and apply income trends
     for (size_t i = 0; i < names_.size(); i++) {
@@ -857,7 +869,7 @@ void StaticLinearModel::update_income_trends(RuntimeContext &context, Person &pe
     }
 }
 
-void StaticLinearModel::initialise_policies(Person &person, Random &random, bool intervene) const {
+void StaticLinearModel::initialise_policies(RuntimeContext &context, Person &person, Random &random, bool intervene) const {
     // Mahima's enhancement: Skip ALL policy initialization if policies are zero
     if (!has_active_policies_) {
         return; // Skip Cholesky decomposition, residual storage, everything!
@@ -876,10 +888,10 @@ void StaticLinearModel::initialise_policies(Person &person, Random &random, bool
     }
 
     // Compute policies.
-    update_policies(person, intervene);
+    update_policies(context, person, intervene);
 }
 
-void StaticLinearModel::update_policies(Person &person, bool intervene) const {
+void StaticLinearModel::update_policies(RuntimeContext &context, Person &person, bool intervene) const {
     // Mahima's enhancement: Skip policy computation if all policies are zero
     if (!has_active_policies_) {
         return;
@@ -895,7 +907,7 @@ void StaticLinearModel::update_policies(Person &person, bool intervene) const {
     }
 
     // Intervention policy linear components.
-    auto linear = compute_linear_models(person, policy_models_);
+    auto linear = compute_linear_models(context, person, policy_models_);
 
     // Compute all intervention policies.
     for (size_t i = 0; i < names_.size(); i++) {
@@ -943,7 +955,7 @@ void StaticLinearModel::apply_policies(Person &person, bool intervene) const {
 }
 
 std::vector<double>
-StaticLinearModel::compute_linear_models(Person &person,
+StaticLinearModel::compute_linear_models(RuntimeContext &context, Person &person,
                                          const std::vector<LinearModelParams> &models) const {
     std::vector<double> linear{};
     linear.reserve(names_.size());
@@ -995,11 +1007,20 @@ StaticLinearModel::compute_linear_models(Person &person,
                 try {
                     double value = person.get_risk_factor_value(coefficient_name);
                     factor += coefficient_value * value;
-                } catch (const std::exception &e) {
-                    std::cout << "\n[MISSING_FACTOR] Factor missing: "
-                              << coefficient_name.to_string() << " for model " << name.to_string()
-                              << " (i=" << i << ") - " << e.what();
-                    throw;
+                } catch (const std::exception &) {
+                    // If factor is missing, try to use expected value as fallback
+                    // This is needed for factors like energyintake that are calculated later (e.g., in KevinHallModel)
+                    try {
+                        double expected_value = get_expected(context, person.gender, person.age, 
+                                                             coefficient_name, std::nullopt, false);
+                        factor += coefficient_value * expected_value;
+                    } catch (const std::exception &e) {
+                        // If expected value also fails, throw the original error
+                        std::cout << "\n[MISSING_FACTOR] Factor missing: "
+                                  << coefficient_name.to_string() << " for model " << name.to_string()
+                                  << " (i=" << i << ") - " << e.what();
+                        throw;
+                    }
                 }
             }
         }
@@ -1011,11 +1032,23 @@ StaticLinearModel::compute_linear_models(Person &person,
                     value = 1e-10; // Avoid log of zero or negative
                 }
                 factor += coefficient_value * log(value);
-            } catch (const std::exception &e) {
-                std::cout << "\n[MISSING_FACTOR] Factor missing (log): "
-                          << coefficient_name.to_string() << " for model " << name.to_string()
-                          << " (i=" << i << ") - " << e.what();
-                throw;
+            } catch (const std::exception &) {
+                // If factor is missing, try to use expected value as fallback
+                // This is needed for factors like energyintake that are calculated later (e.g., in KevinHallModel)
+                try {
+                    double expected_value = get_expected(context, person.gender, person.age, 
+                                                         coefficient_name, std::nullopt, false);
+                    if (expected_value <= 0) {
+                        expected_value = 1e-10; // Avoid log of zero or negative
+                    }
+                    factor += coefficient_value * log(expected_value);
+                } catch (const std::exception &e) {
+                    // If expected value also fails, throw the original error
+                    std::cout << "\n[MISSING_FACTOR] Factor missing (log): "
+                              << coefficient_name.to_string() << " for model " << name.to_string()
+                              << " (i=" << i << ") - " << e.what();
+                    throw;
+                }
             }
         }
 
