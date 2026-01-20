@@ -227,10 +227,15 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     core::Income convert_income_to_category(double continuous_income,
                                             const std::vector<double> &quartile_thresholds) const;
 
-    /// @brief Calculate income quartiles from population data
+    /// @brief Calculate income quartiles from population data (for 4 categories)
     /// @param population The population to calculate quartiles from
-    /// @return Vector of quartile thresholds [Q1, Q2, Q3]
+    /// @return Vector of quartile thresholds [Q1 (25th), Q2 (50th), Q3 (75th)]
     static std::vector<double> calculate_income_quartiles(const Population &population);
+
+    /// @brief Calculate income tertiles from population data (for 3 categories)
+    /// @param population The population to calculate tertiles from
+    /// @return Vector of tertile thresholds [T1 (33rd), T2 (67th)]
+    static std::vector<double> calculate_income_tertiles(const Population &population);
 
     /// @brief Initialise income using categorical approach (India method)
     /// @param person The person to initialise income for
