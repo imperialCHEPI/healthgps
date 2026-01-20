@@ -20,9 +20,11 @@ template <typename T> std::shared_ptr<T> create_shared_from_unique(std::unique_p
     return ptr ? std::make_shared<T>(*ptr) : nullptr;
 }
 
-// Shared thread-local cache for income thresholds (quartiles for 4 categories, tertiles for 3 categories)
+// Shared thread-local cache for income thresholds (quartiles for 4 categories, tertiles for 3
+// categories)
 struct IncomeThresholdCache {
-    std::vector<double> thresholds; // Quartiles [Q1, Q2, Q3] for 4 categories, or tertiles [T1, T2] for 3 categories
+    std::vector<double> thresholds; // Quartiles [Q1, Q2, Q3] for 4 categories, or tertiles [T1, T2]
+                                    // for 3 categories
     size_t population_size = 0;
     int year = -1;
     std::string income_categories; // "3" or "4" to know which type of thresholds we have
@@ -282,7 +284,8 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
                                    // continuous or as logits, it is still income
             person.income_continuous = continuous_income;
         }
-        // Phase 2: Calculate thresholds once (quartiles for 4 categories, tertiles for 3 categories)
+        // Phase 2: Calculate thresholds once (quartiles for 4 categories, tertiles for 3
+        // categories)
         std::vector<double> thresholds;
         if (income_categories_ == "4") {
             thresholds = calculate_income_quartiles(context.population());
@@ -401,8 +404,8 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
     bool intervene = (context.scenario().type() == ScenarioType::intervention &&
                       (context.time_now() - context.start_time()) >= 2);
 
-    // OPTIMIZATION: For continuous income model, calculate thresholds ONCE before processing people.
-    // This prevents the expensive O(N log N) calculation from being called inside the loop
+    // OPTIMIZATION: For continuous income model, calculate thresholds ONCE before processing
+    // people. This prevents the expensive O(N log N) calculation from being called inside the loop
     // (which was causing hangs when scanning population while it's being modified).
     // Thresholds are calculated from existing income values in the population.
     // For 4 categories: calculate quartiles (25th, 50th, 75th percentiles)
@@ -413,7 +416,8 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
         size_t current_pop_size = context.population().size();
         int current_year = static_cast<int>(context.time_now());
 
-        // Recalculate thresholds if cache is empty, population size changed, year changed, or income_categories changed
+        // Recalculate thresholds if cache is empty, population size changed, year changed, or
+        // income_categories changed
         if (cache.thresholds.empty() || cache.population_size != current_pop_size ||
             cache.year != current_year || cache.income_categories != income_categories_) {
             std::cout << "\n[UPDATE] Calculating income thresholds for year " << context.time_now()
@@ -443,9 +447,9 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             initialise_physical_activity(context, person, context.random());
         } else {
             if (person.age == 18) {
-            update_sector(person, context.random());
-            update_income(context, person, context.random());
-            update_factors(context, person, context.random());
+                update_sector(person, context.random());
+                update_income(context, person, context.random());
+                update_factors(context, person, context.random());
             } else {
                 update_sector(person, context.random());
                 // update_income only updates 18-year-olds, so this is a no-op for other ages
@@ -1035,8 +1039,8 @@ StaticLinearModel::compute_linear_models(RuntimeContext &context, Person &person
             } else {
                 // Regular coefficient processing
                 try {
-                double value = person.get_risk_factor_value(coefficient_name);
-                factor += coefficient_value * value;
+                    double value = person.get_risk_factor_value(coefficient_name);
+                    factor += coefficient_value * value;
                 } catch (const std::exception &) {
                     // If factor is missing, try to use expected value as fallback
                     // This is needed for factors like energyintake that are calculated later (e.g.,
@@ -1058,11 +1062,11 @@ StaticLinearModel::compute_linear_models(RuntimeContext &context, Person &person
 
         for (const auto &[coefficient_name, coefficient_value] : model.log_coefficients) {
             try {
-            double value = person.get_risk_factor_value(coefficient_name);
-            if (value <= 0) {
-                value = 1e-10; // Avoid log of zero or negative
-            }
-            factor += coefficient_value * log(value);
+                double value = person.get_risk_factor_value(coefficient_name);
+                if (value <= 0) {
+                    value = 1e-10; // Avoid log of zero or negative
+                }
+                factor += coefficient_value * log(value);
             } catch (const std::exception &) {
                 // If factor is missing, try to use expected value as fallback
                 // This is needed for factors like energyintake that are calculated later (e.g., in
@@ -1520,18 +1524,21 @@ std::vector<double> StaticLinearModel::calculate_income_quartiles(const Populati
     // Q1 (25th percentile): value at which 25% of population is <= Q1
     // Q2 (50th percentile/median): value at which 50% of population is <= Q2
     // Q3 (75th percentile): value at which 75% of population is <= Q3
-    
+
     // Calculate indices for quartiles using proper percentile calculation
     // For n sorted elements, the p-th percentile is at index = (n-1) * p
     // We use rounding to nearest integer for better accuracy
-    size_t q1_index = static_cast<size_t>(std::round((n - 1) * 0.25));  // 25th percentile
-    size_t q2_index = static_cast<size_t>(std::round((n - 1) * 0.50));  // 50th percentile (median)
-    size_t q3_index = static_cast<size_t>(std::round((n - 1) * 0.75));  // 75th percentile
+    size_t q1_index = static_cast<size_t>(std::round((n - 1) * 0.25)); // 25th percentile
+    size_t q2_index = static_cast<size_t>(std::round((n - 1) * 0.50)); // 50th percentile (median)
+    size_t q3_index = static_cast<size_t>(std::round((n - 1) * 0.75)); // 75th percentile
 
     // Ensure indices are within bounds
-    if (q1_index >= n) q1_index = n - 1;
-    if (q2_index >= n) q2_index = n - 1;
-    if (q3_index >= n) q3_index = n - 1;
+    if (q1_index >= n)
+        q1_index = n - 1;
+    if (q2_index >= n)
+        q2_index = n - 1;
+    if (q3_index >= n)
+        q3_index = n - 1;
 
     // Set quartile thresholds
     quartile_thresholds[0] = sorted_incomes[q1_index]; // Q1: 25th percentile
@@ -1586,16 +1593,18 @@ std::vector<double> StaticLinearModel::calculate_income_tertiles(const Populatio
     // For tertiles, we use the value at which X% of the population is at or below that value
     // T1 (33rd percentile): value at which 33% of population is <= T1
     // T2 (67th percentile): value at which 67% of population is <= T2
-    
+
     // Calculate indices for tertiles using proper percentile calculation
     // For n sorted elements, the p-th percentile is at index = (n-1) * p
     // We use rounding to nearest integer for better accuracy
-    size_t t1_index = static_cast<size_t>(std::round((n - 1) * 0.33));  // 33rd percentile
-    size_t t2_index = static_cast<size_t>(std::round((n - 1) * 0.67));  // 67th percentile
+    size_t t1_index = static_cast<size_t>(std::round((n - 1) * 0.33)); // 33rd percentile
+    size_t t2_index = static_cast<size_t>(std::round((n - 1) * 0.67)); // 67th percentile
 
     // Ensure indices are within bounds
-    if (t1_index >= n) t1_index = n - 1;
-    if (t2_index >= n) t2_index = n - 1;
+    if (t1_index >= n)
+        t1_index = n - 1;
+    if (t2_index >= n)
+        t2_index = n - 1;
 
     // Set tertile thresholds
     tertile_thresholds[0] = sorted_incomes[t1_index]; // T1: 33rd percentile
@@ -1642,8 +1651,9 @@ core::Income StaticLinearModel::convert_income_continuous_to_category(double con
 // Optimized version: uses pre-calculated thresholds (no population scan)
 // For 4 categories: thresholds contains quartiles [Q1, Q2, Q3] (25th, 50th, 75th percentiles)
 // For 3 categories: thresholds contains tertiles [T1, T2] (33rd, 67th percentiles)
-core::Income StaticLinearModel::convert_income_to_category(
-    double continuous_income, const std::vector<double> &thresholds) const {
+core::Income
+StaticLinearModel::convert_income_to_category(double continuous_income,
+                                              const std::vector<double> &thresholds) const {
     if (income_categories_ == "4") {
         // 4-category system: low, lowermiddle, uppermiddle, high
         // Use quartiles: 0-25% (low), 26-50% (lowermiddle), 51-75% (uppermiddle), above 75% (high)
@@ -1651,7 +1661,8 @@ core::Income StaticLinearModel::convert_income_to_category(
         // thresholds should contain [Q1, Q2, Q3]
         if (thresholds.size() < 3) {
             throw core::HgpsException("Invalid quartile thresholds for 4-category income system. "
-                                      "Expected 3 thresholds, got " + std::to_string(thresholds.size()));
+                                      "Expected 3 thresholds, got " +
+                                      std::to_string(thresholds.size()));
         }
         if (continuous_income <= thresholds[0]) {
             return core::Income::low; // 0-25%: income <= Q1
@@ -1669,7 +1680,8 @@ core::Income StaticLinearModel::convert_income_to_category(
     // thresholds should contain [T1, T2]
     if (thresholds.size() < 2) {
         throw core::HgpsException("Invalid tertile thresholds for 3-category income system. "
-                                  "Expected 2 thresholds, got " + std::to_string(thresholds.size()));
+                                  "Expected 2 thresholds, got " +
+                                  std::to_string(thresholds.size()));
     }
     if (continuous_income <= thresholds[0]) {
         return core::Income::low; // 0-33%
