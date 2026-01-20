@@ -225,7 +225,7 @@ void DemographicModule::update_population(RuntimeContext &context,
     context.population().add_newborn_babies(number_of_boys, core::Gender::male, context.time_now());
     context.population().add_newborn_babies(number_of_girls, core::Gender::female,
                                             context.time_now());
-    
+
     // Initialize region and ethnicity for newborns (age == 0) created during updates
     // This ensures all newborns have region/ethnicity assigned before risk factor initialization
     int newborn_count = 0;
@@ -236,21 +236,24 @@ void DemographicModule::update_population(RuntimeContext &context,
             initialise_region(context, person, context.random());
             std::string region_after = person.region;
             initialise_ethnicity(context, person, context.random());
-            
-            // Verify region and ethnicity were actually set (throw if not, as this indicates a data loading issue)
+
+            // Verify region and ethnicity were actually set (throw if not, as this indicates a data
+            // loading issue)
             if (person.region == "unknown" || person.region.empty()) {
-                throw core::HgpsException(
-                    fmt::format("Newborn #{} region was not initialized (was: '{}', after init: '{}'). "
-                               "Region data may not be available for age 0, or region_prevalence_ is empty. "
-                               "Check that region CSV data includes age_0 entries. "
-                               "region_prevalence_ size: {}", 
-                               newborn_count, region_before, region_after, region_prevalence_.size()));
+                throw core::HgpsException(fmt::format(
+                    "Newborn #{} region was not initialized (was: '{}', after init: '{}'). "
+                    "Region data may not be available for age 0, or region_prevalence_ is empty. "
+                    "Check that region CSV data includes age_0 entries. "
+                    "region_prevalence_ size: {}",
+                    newborn_count, region_before, region_after, region_prevalence_.size()));
             }
             if (person.ethnicity == "unknown" || person.ethnicity.empty()) {
                 throw core::HgpsException(
-                    fmt::format("Newborn #{} ethnicity was not initialized. Ethnicity data may not be available for age 0, "
-                               "or ethnicity_prevalence_ is empty. Check that ethnicity CSV data includes Under18 entries.",
-                               newborn_count));
+                    fmt::format("Newborn #{} ethnicity was not initialized. Ethnicity data may not "
+                                "be available for age 0, "
+                                "or ethnicity_prevalence_ is empty. Check that ethnicity CSV data "
+                                "includes Under18 entries.",
+                                newborn_count));
             }
         }
     }

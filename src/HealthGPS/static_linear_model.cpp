@@ -373,17 +373,18 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
     // (which was causing hangs when scanning population while it's being modified).
     // Quartiles are calculated from existing income values in the population.
     auto &cache = get_quartile_cache();
-    
+
     if (is_continuous_income_model_) {
         size_t current_pop_size = context.population().size();
         int current_year = static_cast<int>(context.time_now());
-        
+
         // Recalculate quartiles if cache is empty, population size changed, or year changed
-        if (cache.quartiles.empty() || cache.population_size != current_pop_size || 
+        if (cache.quartiles.empty() || cache.population_size != current_pop_size ||
             cache.year != current_year) {
             std::cout << "\n[UPDATE] Calculating income quartiles for year " << context.time_now()
-                      << " (scenario: " 
-                      << (context.scenario().type() == ScenarioType::baseline ? "baseline" : "intervention")
+                      << " (scenario: "
+                      << (context.scenario().type() == ScenarioType::baseline ? "baseline"
+                                                                              : "intervention")
                       << ")...";
             cache.quartiles = calculate_income_quartiles(context.population());
             cache.population_size = current_pop_size;
@@ -537,7 +538,7 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
             has_logistic_tracked[names_[i]] = has_logistic;
         }
     }
-    
+
     // Correlated residual sampling.
     auto residuals = compute_residuals(random, cholesky_);
 
@@ -994,8 +995,10 @@ StaticLinearModel::compute_linear_models(Person &person,
                 try {
                     double value = person.get_risk_factor_value(coefficient_name);
                     factor += coefficient_value * value;
-                } catch (const std::exception& e) {
-                    std::cout << "\n[MISSING_FACTOR] Factor missing: " << coefficient_name.to_string() << " for model " << name.to_string() << " (i=" << i << ") - " << e.what();
+                } catch (const std::exception &e) {
+                    std::cout << "\n[MISSING_FACTOR] Factor missing: "
+                              << coefficient_name.to_string() << " for model " << name.to_string()
+                              << " (i=" << i << ") - " << e.what();
                     throw;
                 }
             }
@@ -1008,8 +1011,10 @@ StaticLinearModel::compute_linear_models(Person &person,
                     value = 1e-10; // Avoid log of zero or negative
                 }
                 factor += coefficient_value * log(value);
-            } catch (const std::exception& e) {
-                std::cout << "\n[MISSING_FACTOR] Factor missing (log): " << coefficient_name.to_string() << " for model " << name.to_string() << " (i=" << i << ") - " << e.what();
+            } catch (const std::exception &e) {
+                std::cout << "\n[MISSING_FACTOR] Factor missing (log): "
+                          << coefficient_name.to_string() << " for model " << name.to_string()
+                          << " (i=" << i << ") - " << e.what();
                 throw;
             }
         }
@@ -1146,15 +1151,15 @@ void StaticLinearModel::initialise_income(RuntimeContext &context, Person &perso
         // Get cached quartiles (should be pre-calculated in update_risk_factors before the loop)
         size_t current_pop_size = context.population().size();
         int current_year = static_cast<int>(context.time_now());
-        
+
         // Quartiles should already be cached from update_risk_factors
         // If cache is invalid, this is a programming error - quartiles should be calculated before
         // the loop starts
         if (cache.quartiles.empty() || cache.population_size != current_pop_size ||
             cache.year != current_year) {
-            throw core::HgpsException(
-                "Income quartiles cache is invalid in initialise_income(). "
-                "Quartiles should be calculated in update_risk_factors() before processing people.");
+            throw core::HgpsException("Income quartiles cache is invalid in initialise_income(). "
+                                      "Quartiles should be calculated in update_risk_factors() "
+                                      "before processing people.");
         }
 
         // Use cached quartiles - calculated once in update_risk_factors, reused for all people
@@ -1449,14 +1454,14 @@ std::vector<double> StaticLinearModel::calculate_income_quartiles(const Populati
     size_t pop_size = population.size();
     size_t processed = 0;
     size_t found_count = 0;
-    
+
     for (const auto &person : population) {
         processed++;
         if (processed % 10000 == 0) {
-            std::cout << "\n[QUARTILES] Scanning person " << processed << "/" << pop_size 
+            std::cout << "\n[QUARTILES] Scanning person " << processed << "/" << pop_size
                       << ", found " << found_count << " income values...";
         }
-        
+
         if (person.is_active()) {
             auto it = person.risk_factors.find("income_continuous"_id);
             if (it != person.risk_factors.end()) {
@@ -1466,8 +1471,8 @@ std::vector<double> StaticLinearModel::calculate_income_quartiles(const Populati
         }
     }
 
-    std::cout << "\n[QUARTILES] Finished scanning: found " << found_count 
-              << " income values from " << processed << " people. Sorting...";
+    std::cout << "\n[QUARTILES] Finished scanning: found " << found_count << " income values from "
+              << processed << " people. Sorting...";
 
     if (sorted_incomes.empty()) {
         throw core::HgpsException(
@@ -1508,7 +1513,7 @@ std::vector<double> StaticLinearModel::calculate_income_quartiles(const Populati
     // Q4 is the 100th percentile (maximum value)
     double q4_value = sorted_incomes.back();
 
-    std::cout << "\n[QUARTILES] Thresholds calculated: Q1=" << quartile_thresholds[0] 
+    std::cout << "\n[QUARTILES] Thresholds calculated: Q1=" << quartile_thresholds[0]
               << ", Q2=" << quartile_thresholds[1] << ", Q3=" << quartile_thresholds[2]
               << ", Q4=" << q4_value;
 
