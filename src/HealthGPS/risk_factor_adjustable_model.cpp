@@ -145,15 +145,17 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
             std::string factor_name = factor.to_string();
             std::string factor_name_lower = factor_name;
             std::transform(factor_name_lower.begin(), factor_name_lower.end(),
-                          factor_name_lower.begin(), ::tolower);
+                           factor_name_lower.begin(), ::tolower);
 
-            //MAHIMA: Special handling for income and physical activity
-            // These are stored in member variables, not just in risk_factors map
-            // Note: Factor name in expected table is "income" (canonical), but internally stored as income_continuous
-            //       Factor name in expected table is "PhysicalActivity" (canonical), but internally stored as physical_activity
+            // MAHIMA: Special handling for income and physical activity
+            //  These are stored in member variables, not just in risk_factors map
+            //  Note: Factor name in expected table is "income" (canonical), but internally stored
+            //  as income_continuous
+            //        Factor name in expected table is "PhysicalActivity" (canonical), but
+            //        internally stored as physical_activity
             if (factor_name_lower == "income") {
-                // Factor name "income" from expected table maps to person.income_continuous internally
-                // Get current value from member variable
+                // Factor name "income" from expected table maps to person.income_continuous
+                // internally Get current value from member variable
                 double current_value = person.income_continuous;
                 const core::Identifier income_continuous_id("income_continuous");
                 if (person.risk_factors.contains(income_continuous_id)) {
@@ -171,13 +173,15 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
                 }
 
                 // Update both member variable and risk_factors map for consistency
-                // Store under both "income_continuous" (internal) and "income" (canonical name for mapping/output)
+                // Store under both "income_continuous" (internal) and "income" (canonical name for
+                // mapping/output)
                 person.income_continuous = adjusted_value;
                 person.risk_factors[income_continuous_id] = adjusted_value;
-                person.risk_factors[factor] = adjusted_value; // Also store as "income" for mapping lookup
+                person.risk_factors[factor] =
+                    adjusted_value; // Also store as "income" for mapping lookup
             } else if (factor_name == "PhysicalActivity") {
-                // Factor name "PhysicalActivity" from expected table maps to person.physical_activity internally
-                // Get current value from member variable
+                // Factor name "PhysicalActivity" from expected table maps to
+                // person.physical_activity internally Get current value from member variable
                 double current_value = person.physical_activity;
                 const core::Identifier physical_activity_id("PhysicalActivity");
                 if (person.risk_factors.contains(physical_activity_id)) {
@@ -322,8 +326,10 @@ RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_simulated_mean(
             bool has_value = false;
 
             // Special handling for income and physical activity
-            // Note: Factor name "income" from expected table maps to person.income_continuous internally
-            //       Factor name "PhysicalActivity" from expected table maps to person.physical_activity internally
+            // Note: Factor name "income" from expected table maps to person.income_continuous
+            // internally
+            //       Factor name "PhysicalActivity" from expected table maps to
+            //       person.physical_activity internally
             if (factor.to_string() == "income") {
                 value = person.income_continuous;
                 has_value = true;

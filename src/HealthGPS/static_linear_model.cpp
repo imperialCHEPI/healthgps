@@ -277,7 +277,8 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
             person.risk_factors["income_continuous"_id] = continuous_income;
             person.risk_factors["income"_id] =
                 continuous_income; // Also store as "income" for mapping lookup. This is for user
-                                   // convenience as irrespective of how income is assigned as continuous or as logits, it is still income
+                                   // convenience as irrespective of how income is assigned as
+                                   // continuous or as logits, it is still income
             person.income_continuous = continuous_income;
         }
         // Phase 2: Calculate quartiles once
@@ -327,18 +328,20 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     std::cout << "\nSet " << logistic_factors_set.size()
               << " logistic factors for simulated mean calculation";
 
-    // Build extended factors list including income and physical activity if they exist in expected table
+    // Build extended factors list including income and physical activity if they exist in expected
+    // table
     auto [extended_factors, extended_ranges] =
         build_extended_factors_list(context, names_, ranges_);
-    
-    // Adjust such that risk factor means match expected values (including income/physical activity if available)
+
+    // Adjust such that risk factor means match expected values (including income/physical activity
+    // if available)
     if (extended_factors.size() > names_.size()) {
         std::cout << "\nIncluding income/physical activity in adjustment (extended from "
                   << names_.size() << " to " << extended_factors.size() << " factors)";
     }
-    adjust_risk_factors(context, extended_factors, 
-                       extended_ranges.empty() ? std::nullopt : OptionalRanges{extended_ranges}, 
-                       false);
+    adjust_risk_factors(context, extended_factors,
+                        extended_ranges.empty() ? std::nullopt : OptionalRanges{extended_ranges},
+                        false);
     std::cout << "\nRisk factor adjustment completed";
 
     // Initialise everyone with appropriate trend type.
@@ -367,15 +370,18 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         // Rebuild extended factors list for trended adjustment (income/PA might have trends too)
         auto [trended_extended_factors, trended_extended_ranges] =
             build_extended_factors_list(context, names_, ranges_);
-        
+
         std::cout << "\nStarting trended risk factor adjustment...";
         if (trended_extended_factors.size() > names_.size()) {
-            std::cout << "\nIncluding income/physical activity in trended adjustment (extended from "
-                      << names_.size() << " to " << trended_extended_factors.size() << " factors)";
+            std::cout
+                << "\nIncluding income/physical activity in trended adjustment (extended from "
+                << names_.size() << " to " << trended_extended_factors.size() << " factors)";
         }
         adjust_risk_factors(context, trended_extended_factors,
-                           trended_extended_ranges.empty() ? std::nullopt : OptionalRanges{trended_extended_ranges},
-                           true);
+                            trended_extended_ranges.empty()
+                                ? std::nullopt
+                                : OptionalRanges{trended_extended_ranges},
+                            true);
         std::cout << "\nTrended risk factor adjustment completed";
     } else {
         std::cout << "\nSkipping trended adjustment (trend_type_ is Null)";
@@ -428,18 +434,19 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
         }
     }
 
-    // Build extended factors list including income and physical activity if they exist in expected table
+    // Build extended factors list including income and physical activity if they exist in expected
+    // table
     auto [extended_factors, extended_ranges] =
         build_extended_factors_list(context, names_, ranges_);
-    
+
     // Adjust such that risk factor means match expected values(factor mean).
     if (extended_factors.size() > names_.size()) {
         std::cout << "\n[UPDATE] Including income/physical activity in adjustment (extended from "
                   << names_.size() << " to " << extended_factors.size() << " factors)";
     }
     adjust_risk_factors(context, extended_factors,
-                       extended_ranges.empty() ? std::nullopt : OptionalRanges{extended_ranges},
-                       false);
+                        extended_ranges.empty() ? std::nullopt : OptionalRanges{extended_ranges},
+                        false);
 
     // Initialise newborns and update others with appropriate trend type.
     for (auto &person : context.population()) {
@@ -490,10 +497,12 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
         // Rebuild extended factors list for trended adjustment (income/PA might have trends too)
         auto [trended_extended_factors, trended_extended_ranges] =
             build_extended_factors_list(context, names_, ranges_);
-        
+
         adjust_risk_factors(context, trended_extended_factors,
-                           trended_extended_ranges.empty() ? std::nullopt : OptionalRanges{trended_extended_ranges},
-                           true);
+                            trended_extended_ranges.empty()
+                                ? std::nullopt
+                                : OptionalRanges{trended_extended_ranges},
+                            true);
     }
 
     // Apply policies if intervening.
@@ -1155,7 +1164,8 @@ void StaticLinearModel::initialise_income(RuntimeContext &context, Person &perso
         // FINCH approach: Calculate continuous income for a single person (e.g., newborns)
         double continuous_income = calculate_continuous_income(person, context.random());
         person.risk_factors["income_continuous"_id] = continuous_income;
-        person.risk_factors["income"_id] = continuous_income; // Also store as "income" for mapping lookup
+        person.risk_factors["income"_id] =
+            continuous_income; // Also store as "income" for mapping lookup
         person.income_continuous = continuous_income;
 
         // OPTIMIZATION: Use pre-calculated quartiles from update_risk_factors (calculated once
@@ -1249,7 +1259,8 @@ void StaticLinearModel::initialise_continuous_income(RuntimeContext &context, Pe
 
     // Store continuous income in risk factors for future use
     person.risk_factors["income_continuous"_id] = continuous_income;
-    person.risk_factors["income"_id] = continuous_income; // Also store as "income" for mapping lookup
+    person.risk_factors["income"_id] =
+        continuous_income; // Also store as "income" for mapping lookup
 
     // Step 2: Convert to income category based on population quartiles
     person.income =
@@ -1804,8 +1815,8 @@ StaticLinearModel::build_extended_factors_list(
     // Note: Canonical name in expected table is "income" (not "income_continuous")
     //       Internally, we store it as person.income_continuous, but the factor name is "income"
     const core::Identifier income_id("income");
-    bool income_in_base = std::find(base_factors.begin(), base_factors.end(), income_id) !=
-                          base_factors.end();
+    bool income_in_base =
+        std::find(base_factors.begin(), base_factors.end(), income_id) != base_factors.end();
 
     // Check if income exists in expected table (canonical name is "income")
     if (!income_in_base) {
@@ -1826,7 +1837,8 @@ StaticLinearModel::build_extended_factors_list(
 
     // Check if physical activity exists in expected table and should be adjusted
     // Note: Canonical name in expected table is "PhysicalActivity" (capital P, capital A)
-    //       Internally, we store it as person.physical_activity, but the factor name is "PhysicalActivity"
+    //       Internally, we store it as person.physical_activity, but the factor name is
+    //       "PhysicalActivity"
     const core::Identifier PhysicalActivity_id("PhysicalActivity");
     bool pa_in_base = std::find(base_factors.begin(), base_factors.end(), PhysicalActivity_id) !=
                       base_factors.end();
