@@ -187,14 +187,15 @@ RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context,
     auto age_count = age_range.upper() + 1;
 
     // Compute simulated means.
-    auto simulated_means = calculate_simulated_mean(context.population(), age_range, factors, logistic_factors_);
+    auto simulated_means =
+        calculate_simulated_mean(context.population(), age_range, factors, logistic_factors_);
 
     // Compute adjustments.
     auto adjustments = RiskFactorSexAgeTable{};
     for (const auto &[sex, simulated_means_by_sex] : simulated_means) {
         for (size_t i = 0; i < factors.size(); i++) {
             const core::Identifier &factor = factors[i];
-            
+
             // Check if this factor exists in the expected table
             if (!expected_->contains(sex, factor)) {
                 std::cout << "\nWARNING - Factor " << factor.to_string()
@@ -311,8 +312,7 @@ RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_simulated_mean(
     for (const auto &factor : factors) {
         if (logistic_factors.contains(factor)) {
             std::cout << "\n"
-                      << factor.to_string()
-                      << " (HAS logistic model): " << excluded_counts[factor]
+                      << factor.to_string() << " (HAS logistic model): " << excluded_counts[factor]
                       << " zero values excluded out of " << total_counts[factor]
                       << " total values (" << std::fixed << std::setprecision(1)
                       << (total_counts[factor] > 0
@@ -321,8 +321,7 @@ RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_simulated_mean(
                       << "% excluded)";
         } else {
             std::cout << "\n"
-                      << factor.to_string()
-                      << " (NO logistic model): " << excluded_counts[factor]
+                      << factor.to_string() << " (NO logistic model): " << excluded_counts[factor]
                       << " zero values excluded out of " << total_counts[factor]
                       << " total values (" << std::fixed << std::setprecision(1)
                       << (total_counts[factor] > 0

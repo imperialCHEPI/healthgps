@@ -5,13 +5,13 @@
 #include "runtime_context.h"
 
 #include <algorithm>
+#include <cctype>
 #include <cmath>
 #include <fmt/core.h>
 #include <iostream> // Added for print statements
 #include <ranges>
 #include <unordered_map>
 #include <utility>
-#include <cctype>
 
 namespace { // anonymous namespace
 
@@ -323,7 +323,8 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         verified_count++;
     }
 
-    // Set logistic factors for simulated mean calculation (exclude zeros for factors with logistic models)
+    // Set logistic factors for simulated mean calculation (exclude zeros for factors with logistic
+    // models)
     std::unordered_set<core::Identifier> logistic_factors_set;
     for (size_t i = 0; i < names_.size(); i++) {
         bool has_logistic = !(logistic_models_[i].coefficients.empty());
@@ -332,7 +333,8 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         }
     }
     set_logistic_factors(logistic_factors_set);
-    std::cout << "\nSet " << logistic_factors_set.size() << " logistic factors for simulated mean calculation";
+    std::cout << "\nSet " << logistic_factors_set.size()
+              << " logistic factors for simulated mean calculation";
 
     // Adjust such that risk factor means match expected values.
     std::cout << "\nStarting risk factor adjustment...";
@@ -869,7 +871,8 @@ void StaticLinearModel::update_income_trends(RuntimeContext &context, Person &pe
     }
 }
 
-void StaticLinearModel::initialise_policies(RuntimeContext &context, Person &person, Random &random, bool intervene) const {
+void StaticLinearModel::initialise_policies(RuntimeContext &context, Person &person, Random &random,
+                                            bool intervene) const {
     // Mahima's enhancement: Skip ALL policy initialization if policies are zero
     if (!has_active_policies_) {
         return; // Skip Cholesky decomposition, residual storage, everything!
@@ -891,7 +894,8 @@ void StaticLinearModel::initialise_policies(RuntimeContext &context, Person &per
     update_policies(context, person, intervene);
 }
 
-void StaticLinearModel::update_policies(RuntimeContext &context, Person &person, bool intervene) const {
+void StaticLinearModel::update_policies(RuntimeContext &context, Person &person,
+                                        bool intervene) const {
     // Mahima's enhancement: Skip policy computation if all policies are zero
     if (!has_active_policies_) {
         return;
@@ -1009,16 +1013,17 @@ StaticLinearModel::compute_linear_models(RuntimeContext &context, Person &person
                     factor += coefficient_value * value;
                 } catch (const std::exception &) {
                     // If factor is missing, try to use expected value as fallback
-                    // This is needed for factors like energyintake that are calculated later (e.g., in KevinHallModel)
+                    // This is needed for factors like energyintake that are calculated later (e.g.,
+                    // in KevinHallModel)
                     try {
-                        double expected_value = get_expected(context, person.gender, person.age, 
+                        double expected_value = get_expected(context, person.gender, person.age,
                                                              coefficient_name, std::nullopt, false);
                         factor += coefficient_value * expected_value;
                     } catch (const std::exception &e) {
                         // If expected value also fails, throw the original error
                         std::cout << "\n[MISSING_FACTOR] Factor missing: "
-                                  << coefficient_name.to_string() << " for model " << name.to_string()
-                                  << " (i=" << i << ") - " << e.what();
+                                  << coefficient_name.to_string() << " for model "
+                                  << name.to_string() << " (i=" << i << ") - " << e.what();
                         throw;
                     }
                 }
@@ -1034,9 +1039,10 @@ StaticLinearModel::compute_linear_models(RuntimeContext &context, Person &person
                 factor += coefficient_value * log(value);
             } catch (const std::exception &) {
                 // If factor is missing, try to use expected value as fallback
-                // This is needed for factors like energyintake that are calculated later (e.g., in KevinHallModel)
+                // This is needed for factors like energyintake that are calculated later (e.g., in
+                // KevinHallModel)
                 try {
-                    double expected_value = get_expected(context, person.gender, person.age, 
+                    double expected_value = get_expected(context, person.gender, person.age,
                                                          coefficient_name, std::nullopt, false);
                     if (expected_value <= 0) {
                         expected_value = 1e-10; // Avoid log of zero or negative

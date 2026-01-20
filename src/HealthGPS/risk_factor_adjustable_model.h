@@ -97,7 +97,6 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
     /// @param logistic_factors Set of factors that have logistic models
     void set_logistic_factors(const std::unordered_set<core::Identifier> &logistic_factors);
 
-
   private:
     /// @brief Adjust risk factors such that mean sim value matches expected value
     /// @param context The simulation run-time context
