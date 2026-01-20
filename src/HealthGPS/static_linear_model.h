@@ -249,6 +249,16 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     void initialise_physical_activity(RuntimeContext &context, Person &person,
                                       Random &random) const;
 
+    /// @brief Build extended factors list including income and physical activity if they exist in expected table
+    /// @param context The runtime context (needed to check expected table)
+    /// @param base_factors The base list of factors (names_)
+    /// @param base_ranges The base list of ranges (ranges_)
+    /// @return Pair of (extended_factors, extended_ranges) with income/physical activity added if available
+    std::pair<std::vector<core::Identifier>, std::vector<core::DoubleInterval>>
+    build_extended_factors_list(RuntimeContext &context,
+                                const std::vector<core::Identifier> &base_factors,
+                                const std::vector<core::DoubleInterval> &base_ranges) const;
+
     /// @brief Initialise physical activity using continuous model approach (FINCH method)
     /// @param context The runtime context
     /// @param person The person to initialise physical activity for

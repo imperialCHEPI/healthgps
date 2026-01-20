@@ -3,6 +3,7 @@
 #include "risk_factor_adjustable_model.h"
 #include "sync_message.h"
 
+#include <algorithm>
 #include <cmath>
 #include <iostream>
 #include <oneapi/tbb/parallel_for_each.h>
@@ -139,17 +140,77 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
         }
 
         for (size_t i = 0; i < factors.size(); i++) {
-            double delta = adjustments.at(person.gender, factors[i]).at(person.age);
-            double value = person.risk_factors.at(factors[i]) + delta;
+            const core::Identifier &factor = factors[i];
+            double delta = adjustments.at(person.gender, factor).at(person.age);
+            std::string factor_name = factor.to_string();
+            std::string factor_name_lower = factor_name;
+            std::transform(factor_name_lower.begin(), factor_name_lower.end(),
+                          factor_name_lower.begin(), ::tolower);
 
-            // Clamp value to an optionally specified range.
-            if (ranges.has_value()) {
-                const auto &range = ranges.value().get()[i];
-                value = range.clamp(value);
+            //MAHIMA: Special handling for income and physical activity
+            // These are stored in member variables, not just in risk_factors map
+            // Note: Factor name in expected table is "income" (canonical), but internally stored as income_continuous
+            //       Factor name in expected table is "PhysicalActivity" (canonical), but internally stored as physical_activity
+            if (factor_name_lower == "income") {
+                // Factor name "income" from expected table maps to person.income_continuous internally
+                // Get current value from member variable
+                double current_value = person.income_continuous;
+                const core::Identifier income_continuous_id("income_continuous");
+                if (person.risk_factors.contains(income_continuous_id)) {
+                    // Use risk_factors value if it exists (may be more up-to-date)
+                    current_value = person.risk_factors.at(income_continuous_id);
+                }
+
+                // Apply adjustment: new_value = current_value + delta
+                double adjusted_value = current_value + delta;
+
+                // Clamp value to an optionally specified range
+                if (ranges.has_value() && i < ranges.value().get().size()) {
+                    const auto &range = ranges.value().get()[i];
+                    adjusted_value = range.clamp(adjusted_value);
+                }
+
+                // Update both member variable and risk_factors map for consistency
+                // Store under both "income_continuous" (internal) and "income" (canonical name for mapping/output)
+                person.income_continuous = adjusted_value;
+                person.risk_factors[income_continuous_id] = adjusted_value;
+                person.risk_factors[factor] = adjusted_value; // Also store as "income" for mapping lookup
+            } else if (factor_name == "PhysicalActivity") {
+                // Factor name "PhysicalActivity" from expected table maps to person.physical_activity internally
+                // Get current value from member variable
+                double current_value = person.physical_activity;
+                const core::Identifier physical_activity_id("PhysicalActivity");
+                if (person.risk_factors.contains(physical_activity_id)) {
+                    // Use risk_factors value if it exists (may be more up-to-date)
+                    current_value = person.risk_factors.at(physical_activity_id);
+                }
+
+                // Apply adjustment: new_value = current_value + delta
+                double adjusted_value = current_value + delta;
+
+                // Clamp value to an optionally specified range
+                if (ranges.has_value() && i < ranges.value().get().size()) {
+                    const auto &range = ranges.value().get()[i];
+                    adjusted_value = range.clamp(adjusted_value);
+                }
+
+                // Update both member variable and risk_factors map for consistency
+                person.physical_activity = adjusted_value;
+                person.risk_factors[physical_activity_id] = adjusted_value;
+            } else {
+                // Regular risk factor: stored only in risk_factors map
+                // Get current value from risk_factors
+                double value = person.risk_factors.at(factor) + delta;
+
+                // Clamp value to an optionally specified range
+                if (ranges.has_value() && i < ranges.value().get().size()) {
+                    const auto &range = ranges.value().get()[i];
+                    value = range.clamp(value);
+                }
+
+                // Set the adjusted value
+                person.risk_factors.at(factor) = value;
             }
-
-            // Set the adjusted value.
-            person.risk_factors.at(factors[i]) = value;
         }
     });
 
@@ -261,10 +322,12 @@ RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_simulated_mean(
             bool has_value = false;
 
             // Special handling for income and physical activity
+            // Note: Factor name "income" from expected table maps to person.income_continuous internally
+            //       Factor name "PhysicalActivity" from expected table maps to person.physical_activity internally
             if (factor.to_string() == "income") {
                 value = person.income_continuous;
                 has_value = true;
-            } else if (factor.to_string() == "physicalactivity") {
+            } else if (factor.to_string() == "PhysicalActivity") {
                 value = person.physical_activity;
                 has_value = true;
             } else if (person.risk_factors.contains(factor)) {
