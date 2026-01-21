@@ -679,14 +679,6 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
             series(gender, "mean_income_category").at(age) += person.income_to_value();
         }
 
-        // Continuous income - check if available in risk factors
-        auto income_continuous = 0.0;
-        auto it = person.risk_factors.find("income_continuous"_id);
-        if (it != person.risk_factors.end()) {
-            income_continuous = it->second;
-            series(gender, "mean_income_continuous").at(age) += income_continuous;
-        }
-
         // NEW: Collect physical activity data (only if available)
         auto physical_activity = 0.0;
         auto pa_it = person.risk_factors.find("PhysicalActivity"_id);
@@ -702,6 +694,16 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
                 if (person.income != core::Income::unknown) {
                     double income_value = person.income_to_value();
                     series(gender, "mean_income_category").at(age) += income_value;
+                }
+                continue;
+            }
+
+            // Special handling for income - stored in risk_factors["income"] for both assignment
+            // methods
+            if (factor.key().to_string() == "income") {
+                if (person.risk_factors.find(factor.key()) != person.risk_factors.end()) {
+                    double income_value = person.risk_factors.at(factor.key());
+                    series(gender, "mean_" + factor.key().to_string()).at(age) += income_value;
                 }
                 continue;
             }
@@ -776,8 +778,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
         safe_divide_channel(core::Gender::male, "mean_sector", age, count_M);
         safe_divide_channel(core::Gender::female, "mean_income_category", age, count_F);
         safe_divide_channel(core::Gender::male, "mean_income_category", age, count_M);
-        safe_divide_channel(core::Gender::female, "mean_income_continuous", age, count_F);
-        safe_divide_channel(core::Gender::male, "mean_income_continuous", age, count_M);
+        // Note: "income" is handled via mapping system above, no need for separate income_continuous
         safe_divide_channel(core::Gender::female, "mean_physical_activity", age, count_F);
         safe_divide_channel(core::Gender::male, "mean_physical_activity", age, count_M);
 
@@ -852,7 +853,7 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
     bool has_ethnicity = false;
     bool has_sector = false;
     bool has_income_category = false;
-    bool has_income_continuous = false;
+    bool has_income = false;
     bool has_physical_activity = false;
 
     // Sample a subset of the population to check for attribute availability
@@ -876,8 +877,8 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
         if (person.income != core::Income::unknown) {
             has_income_category = true;
         }
-        if (person.risk_factors.find("income_continuous"_id) != person.risk_factors.end()) {
-            has_income_continuous = true;
+        if (person.risk_factors.find("income"_id) != person.risk_factors.end()) {
+            has_income = true;
         }
         if (person.risk_factors.find("PhysicalActivity"_id) != person.risk_factors.end()) {
             has_physical_activity = true;
@@ -885,7 +886,7 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
 
         // Early exit if all attributes found
         if (has_region && has_ethnicity && has_sector && has_income_category &&
-            has_income_continuous && has_physical_activity) {
+            has_income && has_physical_activity) {
             break;
         }
     }
@@ -909,10 +910,7 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
         income_channels.emplace_back("mean_income_category");
         income_channels.emplace_back("std_income_category");
     }
-    if (has_income_continuous) {
-        income_channels.emplace_back("mean_income_continuous");
-        income_channels.emplace_back("std_income_continuous");
-    }
+    // Note: "income" is handled via mapping system, no need for separate income_continuous channel
 
     // MAHIMA: Add physical activity channels for income analysis (only if data exists)
     if (has_physical_activity) {
@@ -993,8 +991,10 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
 
             // NEW: Initialize enhanced demographic standard deviation channels with zeros (only if
             // data exists)
+            // Note: "income" std is handled via mapping system, no need for separate
+            // income_continuous
             for (const auto &column : {"std_region", "std_ethnicity", "std_income_category",
-                                       "std_income_continuous", "std_physical_activity"}) {
+                                       "std_physical_activity"}) {
                 safe_init_channel(core::Gender::female, income, column, age);
                 safe_init_channel(core::Gender::male, income, column, age);
             }
@@ -1093,11 +1093,8 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
                                 person.income_to_value());
         }
 
-        // Continuous income - check if available in risk factors
-        auto it = person.risk_factors.find("income_continuous"_id);
-        if (it != person.risk_factors.end()) {
-            safe_add_to_channel(gender, income, "mean_income_continuous", age, it->second);
-        }
+        // Note: "income" is handled via mapping system above, no need for separate
+        // income_continuous
 
         // Physical activity - check if available in risk factors
         auto pa_it = person.risk_factors.find("PhysicalActivity"_id);
@@ -1182,16 +1179,16 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
                                        count_F);
             safe_divide_channel_income(core::Gender::female, income, "mean_income_category", age,
                                        count_F);
-            safe_divide_channel_income(core::Gender::female, income, "mean_income_continuous", age,
-                                       count_F);
+            // Note: "income" is handled via mapping system above, no need for separate
+            // income_continuous
             safe_divide_channel_income(core::Gender::female, income, "mean_physical_activity", age,
                                        count_F);
             safe_divide_channel_income(core::Gender::male, income, "mean_region", age, count_M);
             safe_divide_channel_income(core::Gender::male, income, "mean_ethnicity", age, count_M);
             safe_divide_channel_income(core::Gender::male, income, "mean_income_category", age,
                                        count_M);
-            safe_divide_channel_income(core::Gender::male, income, "mean_income_continuous", age,
-                                       count_M);
+            // Note: "income" is handled via mapping system above, no need for separate
+            // income_continuous
             safe_divide_channel_income(core::Gender::male, income, "mean_physical_activity", age,
                                        count_M);
 
@@ -1249,7 +1246,7 @@ void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &c
     bool has_ethnicity = false;
     bool has_sector = false;
     bool has_income_category = false;
-    bool has_income_continuous = false;
+    bool has_income = false;
     bool has_physical_activity = false;
 
     // Sample a subset of the population to check for attribute availability
@@ -1273,8 +1270,8 @@ void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &c
         if (person.income != core::Income::unknown) {
             has_income_category = true;
         }
-        if (person.risk_factors.find("income_continuous"_id) != person.risk_factors.end()) {
-            has_income_continuous = true;
+        if (person.risk_factors.find("income"_id) != person.risk_factors.end()) {
+            has_income = true;
         }
         if (person.risk_factors.find("PhysicalActivity"_id) != person.risk_factors.end()) {
             has_physical_activity = true;
@@ -1282,7 +1279,7 @@ void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &c
 
         // Early exit if all attributes found
         if (has_region && has_ethnicity && has_sector && has_income_category &&
-            has_income_continuous && has_physical_activity) {
+            has_income && has_physical_activity) {
             break;
         }
     }
@@ -1306,10 +1303,7 @@ void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &c
         income_channels.emplace_back("mean_income_category");
         income_channels.emplace_back("std_income_category");
     }
-    if (has_income_continuous) {
-        income_channels.emplace_back("mean_income_continuous");
-        income_channels.emplace_back("std_income_continuous");
-    }
+    // Note: "income" is handled via mapping system, no need for separate income_continuous channel
 
     // MAHIMA: Add physical activity channels for income analysis (only if data exists)
     if (has_physical_activity) {
@@ -1425,12 +1419,8 @@ void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &c
             accumulate_squared_diffs_income("income_category", sex, income, age, value);
         }
 
-        // Income continuous standard deviation
-        auto it = person.risk_factors.find("income_continuous"_id);
-        if (it != person.risk_factors.end()) {
-            const double value = it->second;
-            accumulate_squared_diffs_income("income_continuous", sex, income, age, value);
-        }
+        // Note: "income" standard deviation is handled via mapping system above, no need for
+        // separate income_continuous
 
         // Physical activity standard deviation
         auto pa_it = person.risk_factors.find("PhysicalActivity"_id);
@@ -1502,11 +1492,8 @@ void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &c
             divide_by_count_sqrt_income("income_category", core::Gender::male, income, age,
                                         count_M);
 
-            // Income continuous standard deviation
-            divide_by_count_sqrt_income("income_continuous", core::Gender::female, income, age,
-                                        count_F);
-            divide_by_count_sqrt_income("income_continuous", core::Gender::male, income, age,
-                                        count_M);
+            // Note: "income" standard deviation is handled via mapping system above, no need for
+            // separate income_continuous
 
             // Physical activity standard deviation
             divide_by_count_sqrt_income("physical_activity", core::Gender::female, income, age,
@@ -1622,12 +1609,8 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
             accumulate_squared_diffs("income_category", sex, age, value);
         }
 
-        // Income continuous standard deviation
-        auto it = person.risk_factors.find("income_continuous"_id);
-        if (it != person.risk_factors.end()) {
-            const double value = it->second;
-            accumulate_squared_diffs("income_continuous", sex, age, value);
-        }
+        // Note: "income" standard deviation is handled via mapping system above, no need for
+        // separate income_continuous
 
         // Physical activity standard deviation
         auto pa_it = person.risk_factors.find("PhysicalActivity"_id);
@@ -1703,9 +1686,8 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
         divide_by_count_sqrt("income_category", core::Gender::female, age, count_F);
         divide_by_count_sqrt("income_category", core::Gender::male, age, count_M);
 
-        // Income continuous standard deviation
-        divide_by_count_sqrt("income_continuous", core::Gender::female, age, count_F);
-        divide_by_count_sqrt("income_continuous", core::Gender::male, age, count_M);
+        // Note: "income" standard deviation is handled via mapping system above, no need for
+        // separate income_continuous
 
         // Physical activity standard deviation
         divide_by_count_sqrt("physical_activity", core::Gender::female, age, count_F);
@@ -1766,7 +1748,7 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
     bool has_ethnicity = false;
     bool has_sector = false;
     bool has_income_category = false;
-    bool has_income_continuous = false;
+    bool has_income = false;
     bool has_physical_activity = false;
 
     // Sample a subset of the population to check for attribute availability
@@ -1790,8 +1772,8 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
         if (person.income != core::Income::unknown) {
             has_income_category = true;
         }
-        if (person.risk_factors.find("income_continuous"_id) != person.risk_factors.end()) {
-            has_income_continuous = true;
+        if (person.risk_factors.find("income"_id) != person.risk_factors.end()) {
+            has_income = true;
         }
         if (person.risk_factors.find("PhysicalActivity"_id) != person.risk_factors.end()) {
             has_physical_activity = true;
@@ -1799,7 +1781,7 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
 
         // Early exit if all attributes found
         if (has_region && has_ethnicity && has_sector && has_income_category &&
-            has_income_continuous && has_physical_activity) {
+            has_income && has_physical_activity) {
             break;
         }
     }
@@ -1823,10 +1805,7 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
         add_channel_if_new("mean_income_category");
         add_channel_if_new("std_income_category");
     }
-    if (has_income_continuous) {
-        add_channel_if_new("mean_income_continuous");
-        add_channel_if_new("std_income_continuous");
-    }
+    // Note: "income" is handled via mapping system, no need for separate income_continuous channel
 
     // NEW: Add physical activity channels (only if data exists)
     if (has_physical_activity) {

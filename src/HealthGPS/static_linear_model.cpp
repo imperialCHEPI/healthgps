@@ -277,12 +277,9 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         // Phase 1: Calculate continuous income for all people
         for (auto &person : context.population()) {
             double continuous_income = calculate_continuous_income(person, context.random());
-            person.risk_factors["income_continuous"_id] = continuous_income;
-            person.risk_factors["income"_id] =
-                continuous_income; // Also store as "income" for mapping lookup. This is for user
-                                   // convenience as irrespective of how income is assigned as
-                                   // continuous or as logits, it is still income
-            person.income_continuous = continuous_income;
+            // Store as "income" only (removed "income_continuous" storage)
+            person.risk_factors["income"_id] = continuous_income;
+            person.income_continuous = continuous_income; // Keep for internal use (adjustment)
         }
         // Phase 2: Calculate thresholds once (quartiles for 4 categories, tertiles for 3
         // categories)
@@ -295,7 +292,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         }
         // Phase 3: Assign categories using pre-calculated thresholds
         for (auto &person : context.population()) {
-            double continuous_income = person.risk_factors.at("income_continuous"_id);
+            double continuous_income = person.risk_factors.at("income"_id);
             person.income = convert_income_to_category(continuous_income, thresholds);
         }
     } else {
@@ -573,7 +570,6 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
         has_logistic_tracked; // Track which factors have logistic
     static size_t total_population_size = 0;
     static size_t initial_generation_count = 0;
-    static bool debug_enabled = false;
     factors_count++;
 
     if (first_call) {
@@ -1178,10 +1174,9 @@ void StaticLinearModel::initialise_income(RuntimeContext &context, Person &perso
     if (is_continuous_income_model_) {
         // FINCH approach: Calculate continuous income for a single person (e.g., newborns)
         double continuous_income = calculate_continuous_income(person, context.random());
-        person.risk_factors["income_continuous"_id] = continuous_income;
-        person.risk_factors["income"_id] =
-            continuous_income; // Also store as "income" for mapping lookup
-        person.income_continuous = continuous_income;
+        // Store as "income" only (removed "income_continuous" storage)
+        person.risk_factors["income"_id] = continuous_income;
+        person.income_continuous = continuous_income; // Keep for internal use (adjustment)
 
         // OPTIMIZATION: Use pre-calculated thresholds from update_risk_factors (calculated once
         // before the loop). This avoids scanning the population while it's being modified.
@@ -1209,6 +1204,7 @@ void StaticLinearModel::initialise_income(RuntimeContext &context, Person &perso
     } else {
         // India approach: Use direct categorical assignment
         initialise_categorical_income(person, random);
+        // Note: initialise_categorical_income() already stores in risk_factors["income"]
     }
 }
 
@@ -1255,6 +1251,9 @@ void StaticLinearModel::initialise_categorical_income(Person &person, Random &ra
         cumulative_prob += probability;
         if (rand < cumulative_prob) {
             person.income = income;
+            // Store category number as double in risk_factors["income"] for mapping system
+            // This allows income to be read via mapping regardless of assignment method
+            person.risk_factors["income"_id] = static_cast<double>(person.income_to_value());
             return;
         }
     }
@@ -1488,7 +1487,7 @@ std::vector<double> StaticLinearModel::calculate_income_quartiles(const Populati
         processed++;
 
         if (person.is_active()) {
-            auto it = person.risk_factors.find("income_continuous"_id);
+            auto it = person.risk_factors.find("income"_id);
             if (it != person.risk_factors.end()) {
                 sorted_incomes.push_back(it->second);
                 found_count++;
@@ -1556,7 +1555,7 @@ std::vector<double> StaticLinearModel::calculate_income_tertiles(const Populatio
         processed++;
 
         if (person.is_active()) {
-            auto it = person.risk_factors.find("income_continuous"_id);
+            auto it = person.risk_factors.find("income"_id);
             if (it != person.risk_factors.end()) {
                 sorted_incomes.push_back(it->second);
                 found_count++;

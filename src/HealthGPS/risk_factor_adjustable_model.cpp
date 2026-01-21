@@ -143,18 +143,18 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
 
             // MAHIMA: Special handling for income and physical activity
             //  These are stored in member variables, not just in risk_factors map
-            //  Note: Factor name in expected table is "income" (canonical), but internally stored
-            //  as income_continuous
+            //  Note: Factor name in expected table is "income" (canonical)
             //        Factor name in expected table is "PhysicalActivity" (canonical), but
             //        internally stored as physical_activity
             if (factor_name_lower == "income") {
-                // Factor name "income" from expected table maps to person.income_continuous
-                // internally Get current value from member variable
-                double current_value = person.income_continuous;
-                const core::Identifier income_continuous_id("income_continuous");
-                if (person.risk_factors.contains(income_continuous_id)) {
-                    // Use risk_factors value if it exists (may be more up-to-date)
-                    current_value = person.risk_factors.at(income_continuous_id);
+                // Get current value from risk_factors["income"] or person.income_continuous (for
+                // continuous model)
+                double current_value = 0.0;
+                if (person.risk_factors.contains(factor)) {
+                    current_value = person.risk_factors.at(factor);
+                } else if (person.income_continuous > 0.0) {
+                    // Fallback: use member variable if risk_factors doesn't have it (continuous model)
+                    current_value = person.income_continuous;
                 }
 
                 // Apply adjustment: new_value = current_value + delta
@@ -166,13 +166,12 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
                     adjusted_value = range.clamp(adjusted_value);
                 }
 
-                // Update both member variable and risk_factors map for consistency
-                // Store under both "income_continuous" (internal) and "income" (canonical name for
-                // mapping/output)
-                person.income_continuous = adjusted_value;
-                person.risk_factors[income_continuous_id] = adjusted_value;
-                person.risk_factors[factor] =
-                    adjusted_value; // Also store as "income" for mapping lookup
+                // Update risk_factors["income"] (canonical name for mapping/output)
+                person.risk_factors[factor] = adjusted_value;
+                // Also update person.income_continuous if it was previously set (continuous model)
+                if (person.income_continuous > 0.0) {
+                    person.income_continuous = adjusted_value;
+                }
             } else if (factor_name == "PhysicalActivity") {
                 // Factor name "PhysicalActivity" from expected table maps to
                 // person.physical_activity internally Get current value from member variable
@@ -320,13 +319,16 @@ RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_simulated_mean(
             bool has_value = false;
 
             // Special handling for income and physical activity
-            // Note: Factor name "income" from expected table maps to person.income_continuous
-            // internally
+            // Note: Factor name "income" is stored in risk_factors["income"] for both continuous
+            // and categorical models
             //       Factor name "PhysicalActivity" from expected table maps to
             //       person.physical_activity internally
             if (factor.to_string() == "income") {
-                value = person.income_continuous;
-                has_value = true;
+                // Read from risk_factors["income"] (works for both assignment methods)
+                if (person.risk_factors.contains(factor)) {
+                    value = person.risk_factors.at(factor);
+                    has_value = true;
+                }
             } else if (factor.to_string() == "PhysicalActivity") {
                 value = person.physical_activity;
                 has_value = true;
