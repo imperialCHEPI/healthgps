@@ -108,7 +108,13 @@ double DefaultCancerModel::get_excess_mortality(const Person &person) const noex
         return 0.0;
     }
 
-    double excess_mortality = definition_.get().table()(person.age, person.gender).at(mortality_id);
+    // Bounds check to prevent out-of-range access (critical for noexcept function)
+    const auto &table = definition_.get().table();
+    if (!table.contains(person.age)) {
+        return 0.0;
+    }
+
+    double excess_mortality = table(person.age, person.gender).at(mortality_id);
     const auto &sex_death_weights =
         definition_.get().parameters().death_weight.at(disease_info.time_since_onset);
     double death_weight =
@@ -286,16 +292,46 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
         relative_risk *= calculate_relative_risk_for_risk_factors(person);
         relative_risk *= calculate_relative_risk_for_diseases(person);
 
+        // Skip if person's age is outside the valid age range for the tables
+        if (!average_relative_risk_.contains(person.age, person.gender) ||
+            !table.contains(person.age)) {
+            std::fprintf(stderr,
+                         "[CANCER] default_cancer_model: person.age %u not in tables - skipping\n",
+                         person.age);
+            std::fflush(stderr);
+            continue;
+        }
+
+        if (person.age > 100) {
+            std::fprintf(stderr,
+                         "[CRASH LOCATION] default_cancer_model.cpp:301 - "
+                         "average_relative_risk_.at(%u, gender) age > 100\n",
+                         person.age);
+            std::fflush(stderr);
+        }
         double average_relative_risk = average_relative_risk_.at(person.age, person.gender);
 
+        if (person.age > 100) {
+            std::fprintf(stderr,
+                         "[CRASH LOCATION] default_cancer_model.cpp:303 - table(%u, gender).at() "
+                         "age > 100\n",
+                         person.age);
+            std::fflush(stderr);
+        }
         double incidence = table(person.age, person.gender).at(incidence_id);
         double probability = incidence * relative_risk / average_relative_risk;
 
         // Apply PIF adjustment if available (lookups cached outside loop)
+        // Only apply PIF if person's age is within the simulation's age range
+        // (PIF data may contain ages 0-110, but simulation may be limited to 0-100)
         if (apply_pif && pif_table) {
-            double pif_value =
-                pif_table->get_pif_value(person.age, person.gender, year_post_intervention);
-            probability *= (1.0 - pif_value);
+            const auto &sim_age_range = context.age_range();
+            if (person.age <= static_cast<unsigned int>(sim_age_range.upper())) {
+                double pif_value =
+                    pif_table->get_pif_value(person.age, person.gender, year_post_intervention);
+                probability *= (1.0 - pif_value);
+            }
+            // If person.age > sim_age_range.upper(), skip PIF adjustment (use probability as-is)
         }
 
         double hazard = context.random().next_double();
