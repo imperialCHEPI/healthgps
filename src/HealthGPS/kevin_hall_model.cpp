@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <iterator>
+#include <oneapi/tbb/parallel_for_each.h>
 #include <utility>
 
 namespace { // anonymous namespace
@@ -49,11 +50,12 @@ std::string KevinHallModel::name() const noexcept { return "Dynamic"; }
 void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
 
     // Initialise everyone.
-    for (auto &person : context.population()) {
+    auto &pop = context.population();
+    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         initialise_nutrient_intakes(person);
         initialise_energy_intake(person);
         initialise_weight(context, person);
-    }
+    });
 
     // Adjust weight mean to match expected.
     adjust_risk_factors(context, {"Weight"_id}, std::nullopt, true);
@@ -62,12 +64,12 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
     auto W_power_means = compute_mean_weight(context.population(), height_slope_);
 
     // Initialise everyone.
-    for (auto &person : context.population()) {
+    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         double W_power_mean = W_power_means.at(person.gender, person.age);
         initialise_height(context, person, W_power_mean, context.random());
         initialise_kevin_hall_state(person);
         compute_bmi(person);
-    }
+    });
 }
 
 void KevinHallModel::update_risk_factors(RuntimeContext &context) {
@@ -79,90 +81,79 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
     update_non_newborns(context);
 
     // Compute BMI values for everyone.
-    for (auto &person : context.population()) {
+    auto &pop = context.population();
+    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         // Ignore if inactive.
         if (!person.is_active()) {
-            continue;
+            return;
         }
 
         compute_bmi(person);
-    }
+    });
 }
 
 void KevinHallModel::update_newborns(RuntimeContext &context) const {
 
     // Initialise nutrient and energy intake and weight for newborns.
-    for (auto &person : context.population()) {
+    auto &pop = context.population();
+    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         // Ignore if inactive or not newborn.
         if (!person.is_active() || (person.age != 0)) {
-            continue;
+            return;
         }
 
         initialise_nutrient_intakes(person);
         initialise_energy_intake(person);
         initialise_weight(context, person);
-    }
-
-    // TODO: This newborn adjustment needs sending to intervention scenario -- see #266.
-
-    // NOTE: FOR REFACTORING: This block should eventually be replaced by a call to
-    // `adjust_risk_factors(context, {"Weight"_id}, IntegerInterval{0, 0});` once age_range
-    // is implemented in the adjustment method, as it is redundant and does not communicate
-    // the newborn weight adjustment to the intervention (see #266).
-
-    // NOTE: FOR REFACTORING: Then, this whole method can be replaced with a generalised
-    // initialise method, which accepts an age range, and both the `generate_risk_factors`
-    // (on `context.age_range()`) and `update_risk_factors` (on `IntegerInterval{0, 0}`)
-    // can call this new method.
+    });
 
     // Adjust newborn weight to match expected.
     auto adjustments = compute_weight_adjustments(context, 0);
-    for (auto &person : context.population()) {
+    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         // Ignore if inactive or not newborn.
         if (!person.is_active() || (person.age != 0)) {
-            continue;
+            return;
         }
 
         double adjustment = adjustments.at(person.gender, person.age);
         person.risk_factors.at("Weight"_id) += adjustment;
-    }
-
-    // NOTE: FOR REFACTORING: End of semi-redundant block.
+    });
 
     // Compute newborn weight power means by sex.
     auto W_power_means = compute_mean_weight(context.population(), height_slope_, 0);
 
     // Initialise height and other Kevin Hall state for newborns.
-    for (auto &person : context.population()) {
+    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         // Ignore if inactive or not newborn.
         if (!person.is_active() || (person.age != 0)) {
-            continue;
+            return;
         }
 
         double W_power_mean = W_power_means.at(person.gender, person.age);
         initialise_height(context, person, W_power_mean, context.random());
         initialise_kevin_hall_state(person);
-    }
+    });
 }
 
 void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
 
     // Update nutrient and energy intake for non-newborns.
-    for (auto &person : context.population()) {
+    auto &pop = context.population();
+    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         // Ignore if inactive or newborn.
         if (!person.is_active() || (person.age == 0)) {
-            continue;
+            return;
         }
 
         update_nutrient_intakes(person);
         update_energy_intake(person);
-    }
+    });
 
     // Update weight for non-newborns.
-    for (auto &person : context.population()) {
+    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         // Ignore if inactive or newborn.
         if (!person.is_active() || (person.age == 0)) {
-            continue;
+            return;
         }
 
         if (person.age < kevin_hall_age_min) {
@@ -170,16 +161,16 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
         } else {
             kevin_hall_run(person);
         }
-    }
+    });
 
     // Compute (baseline) or receive (intervention) weight adjustments from baseline scenario.
     auto adjustments = receive_weight_adjustments(context);
 
     // Adjust weight and other Kevin Hall state for non-newborns.
-    for (auto &person : context.population()) {
+    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         // Ignore if inactive or newborn.
         if (!person.is_active() || (person.age == 0)) {
-            continue;
+            return;
         }
 
         double adjustment;
@@ -194,7 +185,7 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
         } else {
             adjust_weight(person, adjustment);
         }
-    }
+    });
 
     // Send (baseline) weight adjustments to intervention scenario.
     send_weight_adjustments(context, std::move(adjustments));
@@ -203,15 +194,15 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
     auto W_power_means = compute_mean_weight(context.population(), height_slope_);
 
     // Update: (no newborns or at least the Kevin Hall minimum age).
-    for (auto &person : context.population()) {
+    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         // Ignore if inactive or newborn or at least the Kevin Hall minimum age.
         if (!person.is_active() || ((person.age == 0) || (person.age >= kevin_hall_age_min))) {
-            continue;
+            return;
         }
 
         double W_power_mean = W_power_means.at(person.gender, person.age);
         update_height(context, person, W_power_mean);
-    }
+    });
 }
 
 KevinHallAdjustmentTable KevinHallModel::receive_weight_adjustments(RuntimeContext &context) const {
