@@ -153,7 +153,8 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
                 if (person.risk_factors.contains(factor)) {
                     current_value = person.risk_factors.at(factor);
                 } else if (person.income_continuous > 0.0) {
-                    // Fallback: use member variable if risk_factors doesn't have it (continuous model)
+                    // Fallback: use member variable if risk_factors doesn't have it (continuous
+                    // model)
                     current_value = person.income_continuous;
                 }
 

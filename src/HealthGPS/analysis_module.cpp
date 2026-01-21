@@ -778,7 +778,8 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
         safe_divide_channel(core::Gender::male, "mean_sector", age, count_M);
         safe_divide_channel(core::Gender::female, "mean_income_category", age, count_F);
         safe_divide_channel(core::Gender::male, "mean_income_category", age, count_M);
-        // Note: "income" is handled via mapping system above, no need for separate income_continuous
+        // Note: "income" is handled via mapping system above, no need for separate
+        // income_continuous
         safe_divide_channel(core::Gender::female, "mean_physical_activity", age, count_F);
         safe_divide_channel(core::Gender::male, "mean_physical_activity", age, count_M);
 
@@ -885,8 +886,8 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
         }
 
         // Early exit if all attributes found
-        if (has_region && has_ethnicity && has_sector && has_income_category &&
-            has_income && has_physical_activity) {
+        if (has_region && has_ethnicity && has_sector && has_income_category && has_income &&
+            has_physical_activity) {
             break;
         }
     }
@@ -993,8 +994,8 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
             // data exists)
             // Note: "income" std is handled via mapping system, no need for separate
             // income_continuous
-            for (const auto &column : {"std_region", "std_ethnicity", "std_income_category",
-                                       "std_physical_activity"}) {
+            for (const auto &column :
+                 {"std_region", "std_ethnicity", "std_income_category", "std_physical_activity"}) {
                 safe_init_channel(core::Gender::female, income, column, age);
                 safe_init_channel(core::Gender::male, income, column, age);
             }
@@ -1278,8 +1279,8 @@ void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &c
         }
 
         // Early exit if all attributes found
-        if (has_region && has_ethnicity && has_sector && has_income_category &&
-            has_income && has_physical_activity) {
+        if (has_region && has_ethnicity && has_sector && has_income_category && has_income &&
+            has_physical_activity) {
             break;
         }
     }
@@ -1780,8 +1781,8 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
         }
 
         // Early exit if all attributes found
-        if (has_region && has_ethnicity && has_sector && has_income_category &&
-            has_income && has_physical_activity) {
+        if (has_region && has_ethnicity && has_sector && has_income_category && has_income &&
+            has_physical_activity) {
             break;
         }
     }
