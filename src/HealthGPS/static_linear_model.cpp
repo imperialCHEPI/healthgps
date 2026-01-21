@@ -420,11 +420,6 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
         // income_categories changed
         if (cache.thresholds.empty() || cache.population_size != current_pop_size ||
             cache.year != current_year || cache.income_categories != income_categories_) {
-            std::cout << "\n[UPDATE] Calculating income thresholds for year " << context.time_now()
-                      << " (scenario: "
-                      << (context.scenario().type() == ScenarioType::baseline ? "baseline"
-                                                                              : "intervention")
-                      << ", categories: " << income_categories_ << ")...";
             if (income_categories_ == "4") {
                 cache.thresholds = calculate_income_quartiles(context.population());
             } else {
@@ -434,7 +429,6 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             cache.population_size = current_pop_size;
             cache.year = current_year;
             cache.income_categories = income_categories_;
-            std::cout << " [OK]";
         }
     }
 
@@ -464,11 +458,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
     auto [extended_factors, extended_ranges] =
         build_extended_factors_list(context, names_, ranges_);
 
-    // Adjust such that risk factor means match expected values(factor mean).
-    if (extended_factors.size() > names_.size()) {
-        std::cout << "\n[UPDATE] Including income/physical activity in adjustment (extended from "
-                  << names_.size() << " to " << extended_factors.size() << " factors)";
-    }
+    // Adjust such that risk factor means match expected values(factor mean)
     adjust_risk_factors(context, extended_factors,
                         extended_ranges.empty() ? std::nullopt : OptionalRanges{extended_ranges},
                         false);
@@ -1548,11 +1538,7 @@ std::vector<double> StaticLinearModel::calculate_income_quartiles(const Populati
     // Q4 is the 100th percentile (maximum value) - not used in thresholds but useful for display
     double q4_value = sorted_incomes.back();
 
-    std::cout << "\n[QUARTILES] Thresholds calculated: Q1=" << quartile_thresholds[0]
-              << " (25th percentile, index " << q1_index << "), Q2=" << quartile_thresholds[1]
-              << " (50th percentile, index " << q2_index << "), Q3=" << quartile_thresholds[2]
-              << " (75th percentile, index " << q3_index << "), Q4=" << q4_value
-              << " (100th percentile, max value)";
+    std::cout << "\n[QUARTILES] Thresholds calculated: Q1=" << quartile_thresholds[0]<< q1_index << "Q2=" << quartile_thresholds[1] << q2_index << "Q3=" << quartile_thresholds[2] << q3_index << "), Q4=" << q4_value;
 
     return quartile_thresholds;
 }

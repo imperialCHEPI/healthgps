@@ -43,43 +43,30 @@ RiskFactorModel &RiskFactorModule::at(const RiskFactorModelType &model_type) con
 }
 
 void RiskFactorModule::initialise_population(RuntimeContext &context) {
-    std::cout << "\nDEBUG: RiskFactorModule::initialise_population called - START";
     if (!models_.contains(RiskFactorModelType::Static)) {
         std::cout << " ERROR: Static model not found!";
         throw std::runtime_error("Static model not found in RiskFactorModule");
     }
     try {
         auto &static_model = models_.at(RiskFactorModelType::Static);
-
-        std::cout << "\nDEBUG: Calling static_model->generate_risk_factors...";
         static_model->generate_risk_factors(context);
-        std::cout << " OK, static model generate_risk_factors completed";
     } catch (const std::exception &e) {
         std::cout << " ERROR: Exception in static model: " << e.what();
         throw;
     }
 
-    std::cout << "\nDEBUG: Checking if dynamic model exists...";
     if (!models_.contains(RiskFactorModelType::Dynamic)) {
         std::cout << " ERROR: Dynamic model not found!";
         throw std::runtime_error("Dynamic model not found in RiskFactorModule");
     }
-    std::cout << " OK, dynamic model exists";
 
-    std::cout << "\nDEBUG: Getting dynamic model...";
     try {
         auto &dynamic_model = models_.at(RiskFactorModelType::Dynamic);
-        std::cout << " OK, dynamic model obtained";
-
-        std::cout << "\nDEBUG: Calling dynamic_model->generate_risk_factors...";
         dynamic_model->generate_risk_factors(context);
-        std::cout << " OK, dynamic model generate_risk_factors completed";
     } catch (const std::exception &e) {
         std::cout << " ERROR: Exception in dynamic model: " << e.what();
         throw;
     }
-
-    std::cout << "\nDEBUG: RiskFactorModule::initialise_population completed successfully";
 }
 
 void RiskFactorModule::update_population(RuntimeContext &context) {

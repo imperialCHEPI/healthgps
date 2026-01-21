@@ -104,23 +104,17 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
 
     // Baseline scenatio: compute adjustments.
     if (context.scenario().type() == ScenarioType::baseline) {
-        std::cout << "\n[SYNC] Baseline: computing adjustments...";
         adjustments = calculate_adjustments(context, factors, ranges, apply_trend);
-        std::cout << "\n[SYNC] Baseline: adjustments computed, about to send...";
     }
 
     // Intervention scenario: receive adjustments from baseline scenario.
     else {
-        std::cout << "\n[SYNC] Intervention: waiting for baseline message (timeout: "
-                  << context.sync_timeout_millis() << "ms)...";
         auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
-        std::cout << "\n[SYNC] Intervention: try_receive returned";
         if (!message.has_value()) {
             std::cout << "\n[SYNC] Intervention: Message not received, timeout occurred!";
             throw core::HgpsException(
                 "Simulation out of sync, receive baseline adjustments message has timed out");
         }
-        std::cout << "\n[SYNC] Intervention: Message received!";
 
         auto &basePtr = message.value();
         auto *messagePrt = dynamic_cast<RiskFactorAdjustmentMessage *>(basePtr.get());
@@ -224,12 +218,12 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
             context.current_run(), context.time_now(), std::move(adjustments)));
     }
     // Print which risk factors are being adjusted to their factors mean
-    std::cout << "\n=== RISK FACTORS BEING ADJUSTED TO FACTORS MEAN ===";
+    /* std::cout << "\n=== RISK FACTORS BEING ADJUSTED TO FACTORS MEAN ===";
     std::cout << "\nTotal factors: " << factors.size();
     for (size_t i = 0; i < factors.size(); i++) {
         std::cout << "\n  " << (i + 1) << ". " << factors[i].to_string();
     }
-    std::cout << "\n===================================================\n";
+    std::cout << "\n===================================================\n";*/
 }
 
 int RiskFactorAdjustableModel::get_trend_steps(const core::Identifier &factor) const {
@@ -375,32 +369,36 @@ RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_simulated_mean(
         }
     }
 
-    // MAHIMA: Print excluded values summary (print every time for debugging)
-    std::cout << "\n=== SIMULATED MEAN CALCULATION - EXCLUDED VALUES SUMMARY ===";
-    std::cout << "\nLogistic factors set size: " << logistic_factors.size();
-    for (const auto &factor : factors) {
-        if (logistic_factors.contains(factor)) {
-            std::cout << "\n"
-                      << factor.to_string() << " (HAS logistic model): " << excluded_counts[factor]
-                      << " zero values excluded out of " << total_counts[factor]
-                      << " total values (" << std::fixed << std::setprecision(1)
-                      << (total_counts[factor] > 0
-                              ? (100.0 * excluded_counts[factor] / total_counts[factor])
-                              : 0.0)
-                      << "% excluded)";
-        } else {
-            std::cout << "\n"
-                      << factor.to_string() << " (NO logistic model): " << excluded_counts[factor]
-                      << " zero values excluded out of " << total_counts[factor]
-                      << " total values (" << std::fixed << std::setprecision(1)
-                      << (total_counts[factor] > 0
-                              ? (100.0 * excluded_counts[factor] / total_counts[factor])
-                              : 0.0)
-                      << "% excluded)";
+    // MAHIMA: Print excluded values summary (print once for verification)
+    thread_local static bool summary_printed = false;
+    if (!summary_printed) {
+        std::cout << "\n=== SIMULATED MEAN CALCULATION - EXCLUDED VALUES SUMMARY ===";
+        std::cout << "\nLogistic factors set size: " << logistic_factors.size();
+        for (const auto &factor : factors) {
+            if (logistic_factors.contains(factor)) {
+                std::cout << "\n"
+                          << factor.to_string() << " (HAS logistic model): " << excluded_counts[factor]
+                          << " zero values excluded out of " << total_counts[factor]
+                          << " total values (" << std::fixed << std::setprecision(1)
+                          << (total_counts[factor] > 0
+                                  ? (100.0 * excluded_counts[factor] / total_counts[factor])
+                                  : 0.0)
+                          << "% excluded)";
+            } else {
+                std::cout << "\n"
+                          << factor.to_string() << " (NO logistic model): " << excluded_counts[factor]
+                          << " zero values excluded out of " << total_counts[factor]
+                          << " total values (" << std::fixed << std::setprecision(1)
+                          << (total_counts[factor] > 0
+                                  ? (100.0 * excluded_counts[factor] / total_counts[factor])
+                                  : 0.0)
+                          << "% excluded)";
+            }
         }
+        std::cout << "\n===============================================================";
+        std::cout.flush(); // Ensure output is flushed
+        summary_printed = true;
     }
-    std::cout << "\n===============================================================";
-    std::cout.flush(); // Ensure output is flushed
 
     return means;
 }
