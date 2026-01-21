@@ -149,16 +149,16 @@ void Simulation::update_population() {
 
     // Calculate the net immigration by gender and age, update the population accordingly
     update_net_immigration();
-    
+
     // update population socio-economic status
     ses_->update_population(context_);
-    
+
     // Update population risk factors
     risk_factor_->update_population(context_);
-    
+
     // Update diseases status: remission and incidence
     disease_->update_population(context_);
-    
+
     // Publish results to data logger
     analysis_->update_population(context_);
 }

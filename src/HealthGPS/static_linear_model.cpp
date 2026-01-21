@@ -1538,7 +1538,9 @@ std::vector<double> StaticLinearModel::calculate_income_quartiles(const Populati
     // Q4 is the 100th percentile (maximum value) - not used in thresholds but useful for display
     double q4_value = sorted_incomes.back();
 
-    std::cout << "\n[QUARTILES] Thresholds calculated: Q1=" << quartile_thresholds[0]<< q1_index << "Q2=" << quartile_thresholds[1] << q2_index << "Q3=" << quartile_thresholds[2] << q3_index << "), Q4=" << q4_value;
+    std::cout << "\n[QUARTILES] Thresholds calculated: Q1=" << quartile_thresholds[0] << q1_index
+              << "Q2=" << quartile_thresholds[1] << q2_index << "Q3=" << quartile_thresholds[2]
+              << q3_index << "), Q4=" << q4_value;
 
     return quartile_thresholds;
 }

@@ -377,7 +377,8 @@ RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_simulated_mean(
         for (const auto &factor : factors) {
             if (logistic_factors.contains(factor)) {
                 std::cout << "\n"
-                          << factor.to_string() << " (HAS logistic model): " << excluded_counts[factor]
+                          << factor.to_string()
+                          << " (HAS logistic model): " << excluded_counts[factor]
                           << " zero values excluded out of " << total_counts[factor]
                           << " total values (" << std::fixed << std::setprecision(1)
                           << (total_counts[factor] > 0
@@ -386,7 +387,8 @@ RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_simulated_mean(
                           << "% excluded)";
             } else {
                 std::cout << "\n"
-                          << factor.to_string() << " (NO logistic model): " << excluded_counts[factor]
+                          << factor.to_string()
+                          << " (NO logistic model): " << excluded_counts[factor]
                           << " zero values excluded out of " << total_counts[factor]
                           << " total values (" << std::fixed << std::setprecision(1)
                           << (total_counts[factor] > 0
