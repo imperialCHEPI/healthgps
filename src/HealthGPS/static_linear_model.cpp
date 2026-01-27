@@ -277,7 +277,8 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     // tertiles and category assignment happen AFTER adjustment to factors mean (see below).
     // Categorical: logits + softmax -> 3 categories; no adjustment to factors mean.
     if (is_continuous_income_model_) {
-        std::cout << "\n[INCOME] generate_risk_factors: continuous Phase 1 - assigning regression for all...";
+        std::cout << "\n[INCOME] generate_risk_factors: continuous Phase 1 - assigning regression "
+                     "for all...";
         // Phase 1 only: assign continuous income via regression for all people.
         for (auto &person : context.population()) {
             double continuous_income = calculate_continuous_income(person, context.random());
@@ -289,7 +290,8 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         // Phase 2 (quartiles/tertiles) and Phase 3 (assign categories) are done after
         // adjust_risk_factors below, so thresholds are computed from adjusted income.
     } else {
-        std::cout << "\n[INCOME] generate_risk_factors: categorical - assigning via logits/softmax for all...";
+        std::cout << "\n[INCOME] generate_risk_factors: categorical - assigning via logits/softmax "
+                     "for all...";
         for (auto &person : context.population()) {
             initialise_categorical_income(person, context.random());
         }
@@ -345,9 +347,11 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
                         extended_ranges.empty() ? std::nullopt : OptionalRanges{extended_ranges},
                         false);
 
-    // Continuous income only: after adjustment, sort ascending and assign income_categories (3 or 4).
+    // Continuous income only: after adjustment, sort ascending and assign income_categories (3 or
+    // 4).
     if (is_continuous_income_model_) {
-        std::cout << "\n[INCOME] generate_risk_factors: continuous - computing quartiles/tertiles from adjusted income...";
+        std::cout << "\n[INCOME] generate_risk_factors: continuous - computing quartiles/tertiles "
+                     "from adjusted income...";
         std::vector<double> thresholds;
         if (income_categories_ == "4") {
             thresholds = calculate_income_quartiles(context.population());
@@ -400,9 +404,11 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
                                 : OptionalRanges{trended_extended_ranges},
                             true);
 
-        // Continuous income only: after trended adjustment, recalc thresholds and assign categories.
+        // Continuous income only: after trended adjustment, recalc thresholds and assign
+        // categories.
         if (is_continuous_income_model_) {
-            std::cout << "\n[INCOME] generate_risk_factors: continuous (after trend) - computing quartiles/tertiles...";
+            std::cout << "\n[INCOME] generate_risk_factors: continuous (after trend) - computing "
+                         "quartiles/tertiles...";
             std::vector<double> thresholds;
             if (income_categories_ == "4") {
                 thresholds = calculate_income_quartiles(context.population());
@@ -469,7 +475,8 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
     // For 4 categories: calculate quartiles (25th, 50th, 75th percentiles)
     // For 3 categories: calculate tertiles (33rd, 67th percentiles)
     if (is_continuous_income_model_) {
-        std::cout << "\n[INCOME] update_risk_factors: adjust done. Continuous - computing thresholds from adjusted income...";
+        std::cout << "\n[INCOME] update_risk_factors: adjust done. Continuous - computing "
+                     "thresholds from adjusted income...";
         size_t current_pop_size = context.population().size();
         int current_year = static_cast<int>(context.time_now());
 
@@ -560,7 +567,8 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 
         // Recalculate thresholds after trend adjustment if income might have been adjusted
         if (is_continuous_income_model_) {
-            std::cout << "\n[INCOME] update_risk_factors: trend adjustment done. Continuous - recalc thresholds and categories...";
+            std::cout << "\n[INCOME] update_risk_factors: trend adjustment done. Continuous - "
+                         "recalc thresholds and categories...";
             size_t current_pop_size = context.population().size();
             int current_year = static_cast<int>(context.time_now());
 
