@@ -272,33 +272,28 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         initialise_sector(person, context.random());
     }
 
-    // STEP 4: Initialize income (batch processing for continuous income model)
+    // STEP 4: Initialize income
+    // Continuous: regression (age, gender, region, ethnicity + random) for all. Quartiles/
+    // tertiles and category assignment happen AFTER adjustment to factors mean (see below).
+    // Categorical: logits + softmax -> 3 categories; no adjustment to factors mean.
     if (is_continuous_income_model_) {
-        // Phase 1: Calculate continuous income for all people
+        std::cout << "\n[INCOME] generate_risk_factors: continuous Phase 1 - assigning regression for all...";
+        // Phase 1 only: assign continuous income via regression for all people.
         for (auto &person : context.population()) {
             double continuous_income = calculate_continuous_income(person, context.random());
-            // Store as "income" only (removed "income_continuous" storage)
             person.risk_factors["income"_id] = continuous_income;
-            person.income_continuous = continuous_income; // Keep for internal use (adjustment)
+            person.income_continuous = continuous_income;
+            person.income = core::Income::unknown; // set after adjustment + quartiles below
         }
-        // Phase 2: Calculate thresholds once (quartiles for 4 categories, tertiles for 3
-        // categories)
-        std::vector<double> thresholds;
-        if (income_categories_ == "4") {
-            thresholds = calculate_income_quartiles(context.population());
-        } else {
-            // 3 categories: use tertiles
-            thresholds = calculate_income_tertiles(context.population());
-        }
-        // Phase 3: Assign categories using pre-calculated thresholds
-        for (auto &person : context.population()) {
-            double continuous_income = person.risk_factors.at("income"_id);
-            person.income = convert_income_to_category(continuous_income, thresholds);
-        }
+        std::cout << " done. Next: adjust then quartiles.";
+        // Phase 2 (quartiles/tertiles) and Phase 3 (assign categories) are done after
+        // adjust_risk_factors below, so thresholds are computed from adjusted income.
     } else {
+        std::cout << "\n[INCOME] generate_risk_factors: categorical - assigning via logits/softmax for all...";
         for (auto &person : context.population()) {
             initialise_categorical_income(person, context.random());
         }
+        std::cout << " done.";
     }
 
     // STEP 5: Initialize risk factors and physical activity
@@ -350,6 +345,22 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
                         extended_ranges.empty() ? std::nullopt : OptionalRanges{extended_ranges},
                         false);
 
+    // Continuous income only: after adjustment, sort ascending and assign income_categories (3 or 4).
+    if (is_continuous_income_model_) {
+        std::cout << "\n[INCOME] generate_risk_factors: continuous - computing quartiles/tertiles from adjusted income...";
+        std::vector<double> thresholds;
+        if (income_categories_ == "4") {
+            thresholds = calculate_income_quartiles(context.population());
+        } else {
+            thresholds = calculate_income_tertiles(context.population());
+        }
+        for (auto &person : context.population()) {
+            double continuous_income = person.risk_factors.at("income"_id);
+            person.income = convert_income_to_category(continuous_income, thresholds);
+        }
+        std::cout << " categories assigned. Next: trends.";
+    }
+
     // Initialise everyone with appropriate trend type.
     for (auto &person : context.population()) {
         if (has_active_policies_) {
@@ -388,6 +399,22 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
                                 ? std::nullopt
                                 : OptionalRanges{trended_extended_ranges},
                             true);
+
+        // Continuous income only: after trended adjustment, recalc thresholds and assign categories.
+        if (is_continuous_income_model_) {
+            std::cout << "\n[INCOME] generate_risk_factors: continuous (after trend) - computing quartiles/tertiles...";
+            std::vector<double> thresholds;
+            if (income_categories_ == "4") {
+                thresholds = calculate_income_quartiles(context.population());
+            } else {
+                thresholds = calculate_income_tertiles(context.population());
+            }
+            for (auto &person : context.population()) {
+                double continuous_income = person.risk_factors.at("income"_id);
+                person.income = convert_income_to_category(continuous_income, thresholds);
+            }
+            std::cout << " categories assigned.";
+        }
         std::cout << "\nTrended risk factor adjustment completed";
     } else {
         std::cout << "\nSkipping trended adjustment (trend_type_ is Null)";
@@ -396,38 +423,14 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
+    std::cout << "\n[INCOME] update_risk_factors: entered.";
     // HACK: start intervening two years into the simulation.
     bool intervene = (context.scenario().type() == ScenarioType::intervention &&
                       (context.time_now() - context.start_time()) >= 2);
 
-    // OPTIMIZATION: For continuous income model, calculate thresholds ONCE before processing
-    // people. This prevents the expensive O(N log N) calculation from being called inside the loop
-    // (which was causing hangs when scanning population while it's being modified).
-    // Thresholds are calculated from existing income values in the population.
-    // For 4 categories: calculate quartiles (25th, 50th, 75th percentiles)
-    // For 3 categories: calculate tertiles (33rd, 67th percentiles)
     auto &cache = get_income_threshold_cache();
 
-    if (is_continuous_income_model_) {
-        size_t current_pop_size = context.population().size();
-        int current_year = static_cast<int>(context.time_now());
-
-        // Recalculate thresholds if cache is empty, population size changed, year changed, or
-        // income_categories changed
-        if (cache.thresholds.empty() || cache.population_size != current_pop_size ||
-            cache.year != current_year || cache.income_categories != income_categories_) {
-            if (income_categories_ == "4") {
-                cache.thresholds = calculate_income_quartiles(context.population());
-            } else {
-                // 3 categories: use tertiles
-                cache.thresholds = calculate_income_tertiles(context.population());
-            }
-            cache.population_size = current_pop_size;
-            cache.year = current_year;
-            cache.income_categories = income_categories_;
-        }
-    }
-
+    std::cout << "\n[INCOME] update_risk_factors: initialising newborns / updating others...";
     // Initialise newborns and update others.
     for (auto &person : context.population()) {
         if (person.age == 0) {
@@ -448,6 +451,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             }
         }
     }
+    std::cout << " done. Next: adjust_risk_factors.";
 
     // Build extended factors list including income and physical activity if they exist in expected
     // table
@@ -458,6 +462,45 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
     adjust_risk_factors(context, extended_factors,
                         extended_ranges.empty() ? std::nullopt : OptionalRanges{extended_ranges},
                         false);
+
+    // OPTIMIZATION: For continuous income model, calculate thresholds AFTER income is adjusted.
+    // This ensures thresholds are calculated from the correct adjusted income values.
+    // Thresholds are calculated from adjusted income values in the population.
+    // For 4 categories: calculate quartiles (25th, 50th, 75th percentiles)
+    // For 3 categories: calculate tertiles (33rd, 67th percentiles)
+    if (is_continuous_income_model_) {
+        std::cout << "\n[INCOME] update_risk_factors: adjust done. Continuous - computing thresholds from adjusted income...";
+        size_t current_pop_size = context.population().size();
+        int current_year = static_cast<int>(context.time_now());
+
+        // Recalculate thresholds if cache is empty, population size changed, year changed, or
+        // income_categories changed
+        if (cache.thresholds.empty() || cache.population_size != current_pop_size ||
+            cache.year != current_year || cache.income_categories != income_categories_) {
+            if (income_categories_ == "4") {
+                cache.thresholds = calculate_income_quartiles(context.population());
+            } else {
+                // 3 categories: use tertiles
+                cache.thresholds = calculate_income_tertiles(context.population());
+            }
+            cache.population_size = current_pop_size;
+            cache.year = current_year;
+            cache.income_categories = income_categories_;
+        }
+
+        // Now assign income categories using the calculated thresholds
+        // This must happen after thresholds are calculated from adjusted income
+        for (auto &person : context.population()) {
+            if (!person.is_active()) {
+                continue;
+            }
+            if (person.risk_factors.contains("income"_id)) {
+                double continuous_income = person.risk_factors.at("income"_id);
+                person.income = convert_income_to_category(continuous_income, cache.thresholds);
+            }
+        }
+        std::cout << " categories assigned. Next: trends.";
+    }
 
     // Initialise newborns and update others with appropriate trend type.
     for (auto &person : context.population()) {
@@ -514,6 +557,37 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
                                 ? std::nullopt
                                 : OptionalRanges{trended_extended_ranges},
                             true);
+
+        // Recalculate thresholds after trend adjustment if income might have been adjusted
+        if (is_continuous_income_model_) {
+            std::cout << "\n[INCOME] update_risk_factors: trend adjustment done. Continuous - recalc thresholds and categories...";
+            size_t current_pop_size = context.population().size();
+            int current_year = static_cast<int>(context.time_now());
+
+            // Always recalculate thresholds after trend adjustment to ensure they're based on
+            // trend-adjusted income values
+            if (income_categories_ == "4") {
+                cache.thresholds = calculate_income_quartiles(context.population());
+            } else {
+                // 3 categories: use tertiles
+                cache.thresholds = calculate_income_tertiles(context.population());
+            }
+            cache.population_size = current_pop_size;
+            cache.year = current_year;
+            cache.income_categories = income_categories_;
+
+            // Reassign income categories using the recalculated thresholds
+            for (auto &person : context.population()) {
+                if (!person.is_active()) {
+                    continue;
+                }
+                if (person.risk_factors.contains("income"_id)) {
+                    double continuous_income = person.risk_factors.at("income"_id);
+                    person.income = convert_income_to_category(continuous_income, cache.thresholds);
+                }
+            }
+            std::cout << " continuous (after trend) categories assigned.";
+        }
     }
 
     // Apply policies if intervening.
@@ -526,6 +600,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             apply_policies(person, intervene);
         }
     }
+    std::cout << "\n[INCOME] update_risk_factors: left.";
 }
 
 double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
@@ -1177,29 +1252,10 @@ void StaticLinearModel::initialise_income(RuntimeContext &context, Person &perso
         person.risk_factors["income"_id] = continuous_income;
         person.income_continuous = continuous_income; // Keep for internal use (adjustment)
 
-        // OPTIMIZATION: Use pre-calculated thresholds from update_risk_factors (calculated once
-        // before the loop). This avoids scanning the population while it's being modified.
-        // Uses shared thread-local cache via get_income_threshold_cache() helper function.
-        auto &cache = get_income_threshold_cache();
-
-        // Get cached thresholds (should be pre-calculated in update_risk_factors before the loop)
-        size_t current_pop_size = context.population().size();
-        int current_year = static_cast<int>(context.time_now());
-
-        // Thresholds should already be cached from update_risk_factors
-        // If cache is invalid, this is a programming error - thresholds should be calculated before
-        // the loop starts
-        if (cache.thresholds.empty() || cache.population_size != current_pop_size ||
-            cache.year != current_year || cache.income_categories != income_categories_) {
-            throw core::HgpsException("Income thresholds cache is invalid in initialise_income(). "
-                                      "Thresholds should be calculated in update_risk_factors() "
-                                      "before processing people.");
-        }
-
-        // Use cached thresholds - calculated once in update_risk_factors, reused for all people
-        // Divides population into categories: 3 (low, middle, high) or 4 (low, lowermiddle,
-        // uppermiddle, high)
-        person.income = convert_income_to_category(continuous_income, cache.thresholds);
+        // Category assignment will happen after income is adjusted and thresholds are recalculated
+        // in update_risk_factors(). For now, just set a temporary category (will be updated later).
+        // This ensures thresholds are calculated from adjusted income values.
+        person.income = core::Income::unknown; // Temporary, will be assigned after adjustment
     } else {
         // India approach: Use direct categorical assignment
         initialise_categorical_income(person, random);

@@ -50,6 +50,13 @@ unsigned int Person::time_of_migration() const noexcept { return time_of_migrati
 bool Person::is_active() const noexcept { return is_alive_ && !has_emigrated_; }
 
 double Person::get_risk_factor_value(const core::Identifier &key) const {
+    // Income: use stored value when present, so continuous income works before categories are set.
+    // Dispatcher would call income_to_value() which throws for Income::unknown.
+    const core::Identifier income_id("income");
+    if (risk_factors.contains(income_id) &&
+        (key == income_id || key == core::Identifier("Income"))) {
+        return risk_factors.at(income_id);
+    }
     if (current_dispatcher.contains(key)) {
         // Static properties
         return current_dispatcher.at(key)(*this);
