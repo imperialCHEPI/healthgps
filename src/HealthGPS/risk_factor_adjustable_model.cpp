@@ -161,11 +161,10 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
                 // Apply adjustment: new_value = current_value + delta
                 double adjusted_value = current_value + delta;
 
-                // Clamp value to an optionally specified range
-                if (ranges.has_value() && i < ranges.value().get().size()) {
-                    const auto &range = ranges.value().get()[i];
-                    adjusted_value = range.clamp(adjusted_value);
-                }
+                // Do not clamp income to a range: income is continuous and should match factors-mean
+                // scale (e.g. ~621 for age 0). Using another factor's range (e.g. 0–42.7) would
+                // cap everyone at 42.7 and collapse quartiles, leaving only low/lowermiddle.
+                // (Ranges passed in are for base risk factors; income uses a different scale.)
 
                 // Update risk_factors["income"] (canonical name for mapping/output)
                 person.risk_factors[factor] = adjusted_value;
@@ -282,6 +281,29 @@ RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context,
                 }
 
                 adjustments.at(sex, factor).at(age) = delta;
+
+                // Debug for income: expected vs simulated_mean vs delta (age 0 and 1 for both sexes)
+                if (factor.to_string() == "income"
+                    && (age == age_range.lower()
+                        || (age == age_range.lower() + 1 && age <= age_range.upper()))) {
+                    std::cout << "\n[INCOME ADJUST] " << (sex == core::Gender::male ? "male" : "female")
+                              << " age" << age << " expected=" << expect
+                              << " simulated_mean=" << sim_mean << " delta=" << delta;
+                    if (expect < 100.0 && sim_mean > 200.0) {
+                        static bool warned = false;
+                        if (!warned) {
+                            std::cout << "\n[INCOME] WARNING: factors mean 'income' column has "
+                                         "expected="
+                                      << expect
+                                      << " but simulated mean is ~"
+                                      << sim_mean
+                                      << ". For continuous income use values in the same scale "
+                                         "(e.g. ~600 for age 0) in factorsmean_male/female CSV, "
+                                         "not category (1-4) or another variable.";
+                            warned = true;
+                        }
+                    }
+                }
             }
         }
     }
@@ -324,7 +346,7 @@ RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_simulated_mean(
             // and categorical models
             //       Factor name "PhysicalActivity" from expected table maps to
             //       person.physical_activity internally
-            if (factor.to_string() == "income") {
+            if (factor.to_string() == "income" || factor.to_string() == "Income") {
                 // Read from risk_factors["income"] (works for both assignment methods)
                 if (person.risk_factors.contains(factor)) {
                     value = person.risk_factors.at(factor);

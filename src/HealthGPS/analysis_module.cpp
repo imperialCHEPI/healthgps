@@ -11,7 +11,7 @@
 #include <cmath>
 #include <functional>
 #include <future>
-#include <iostream> // Added for debug prints
+#include <iostream>
 #include <oneapi/tbb/parallel_for_each.h>
 #include <unordered_set>
 
@@ -657,6 +657,9 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
         // Note: mean_age, mean_age2, mean_age3 will be set to age values AFTER division loop
         // Don't set them here to avoid being divided
 
+        // mean_gender: 0 = male, 1 = female (per person)
+        series(gender, "mean_gender").at(age) += static_cast<double>(person.gender_to_value());
+
         // NEW: Collect demographic data (only if available)
         // Region data - check if person has region assigned
         if (!person.region.empty() && person.region != "unknown") {
@@ -678,6 +681,10 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
         if (person.income != core::Income::unknown) {
             series(gender, "mean_income_category").at(age) += person.income_to_value();
         }
+        // Continuous income (risk_factors["income"]) when present
+        if (person.risk_factors.find("income"_id) != person.risk_factors.end()) {
+            series(gender, "mean_income").at(age) += person.risk_factors.at("income"_id);
+        }
 
         // NEW: Collect physical activity data (only if available)
         auto physical_activity = 0.0;
@@ -688,34 +695,35 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
         }
 
         for (const auto &factor : context.mapping().entries()) {
+            std::string fkey = factor.key().to_string();
+            std::string fkey_lower = core::to_lower(fkey);
+            // Skip factors already handled in demographic block (region, ethnicity, sector,
+            // income_category, income) to avoid double-add or wrong source
+            if (fkey_lower == "region" || fkey_lower == "ethnicity" || fkey_lower == "sector" ||
+                fkey_lower == "income_category" || fkey_lower == "income") {
+                continue;
+            }
             // Special handling for income_category - it's stored as person.income (enum), not in
-            // risk_factors
-            if (factor.key().to_string() == "income_category") {
+            // risk_factors (redundant with skip above, kept for clarity)
+            if (fkey_lower == "income_category") {
                 if (person.income != core::Income::unknown) {
-                    double income_value = person.income_to_value();
-                    series(gender, "mean_income_category").at(age) += income_value;
+                    series(gender, "mean_income_category").at(age) += person.income_to_value();
                 }
                 continue;
             }
-
             // Special handling for income - stored in risk_factors["income"] for both assignment
-            // methods
-            if (factor.key().to_string() == "income") {
+            // methods (redundant with skip above, kept for clarity)
+            if (fkey_lower == "income") {
                 if (person.risk_factors.find(factor.key()) != person.risk_factors.end()) {
-                    double income_value = person.risk_factors.at(factor.key());
-                    series(gender, "mean_" + factor.key().to_string()).at(age) += income_value;
+                    series(gender, "mean_income").at(age) += person.risk_factors.at(factor.key());
                 }
                 continue;
             }
-
-            // Check if risk factor exists before accessing (some risk factors may not be
-            // initialized for all projects)
+            // Check if risk factor exists before accessing (channel keys stored lowercase)
             if (person.risk_factors.find(factor.key()) != person.risk_factors.end()) {
                 double factor_value = person.risk_factors.at(factor.key());
-                series(gender, "mean_" + factor.key().to_string()).at(age) += factor_value;
+                series(gender, core::to_lower("mean_" + fkey)).at(age) += factor_value;
             }
-            // If risk factor doesn't exist, skip it (don't accumulate, will result in NaN if no
-            // values accumulated)
         }
 
         for (const auto &[disease_name, disease_state] : person.diseases) {
@@ -755,6 +763,12 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
         }
     };
 
+    // Channels divided only in the demographic block below; skip them in the mapping loop to
+    // avoid double division (sum/count^2).
+    const std::unordered_set<std::string> demographic_mean_channels = {
+        "mean_gender", "mean_region", "mean_ethnicity", "mean_sector", "mean_income",
+        "mean_income_category"};
+
     for (int age = age_range.lower(); age <= age_range.upper(); age++) {
         double count_F = series(core::Gender::female, "count").at(age);
         double count_M = series(core::Gender::male, "count").at(age);
@@ -762,20 +776,30 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
         double deaths_M = series(core::Gender::male, "deaths").at(age);
 
         // Calculate in-place factor averages.
+        // Skip demographic channels here: they are divided once in the block below. If we divided
+        // them here too we would get sum/count^2 (e.g. mean_region ~0.003 instead of 1–4).
         for (const auto &factor : context.mapping().entries()) {
             std::string column = "mean_" + factor.key().to_string();
+            std::string col_lower = core::to_lower(column);
+            if (demographic_mean_channels.find(col_lower) != demographic_mean_channels.end()) {
+                continue;
+            }
             safe_divide_channel(core::Gender::female, column, age, count_F);
             safe_divide_channel(core::Gender::male, column, age, count_M);
         }
 
         // MAHIMA: Calculate in-place demographic averages (only if data exists)
         // These channels may not exist if data wasn't populated - use safe access
+        safe_divide_channel(core::Gender::female, "mean_gender", age, count_F);
+        safe_divide_channel(core::Gender::male, "mean_gender", age, count_M);
         safe_divide_channel(core::Gender::female, "mean_region", age, count_F);
         safe_divide_channel(core::Gender::male, "mean_region", age, count_M);
         safe_divide_channel(core::Gender::female, "mean_ethnicity", age, count_F);
         safe_divide_channel(core::Gender::male, "mean_ethnicity", age, count_M);
         safe_divide_channel(core::Gender::female, "mean_sector", age, count_F);
         safe_divide_channel(core::Gender::male, "mean_sector", age, count_M);
+        safe_divide_channel(core::Gender::female, "mean_income", age, count_F);
+        safe_divide_channel(core::Gender::male, "mean_income", age, count_M);
         safe_divide_channel(core::Gender::female, "mean_income_category", age, count_F);
         safe_divide_channel(core::Gender::male, "mean_income_category", age, count_M);
         // Note: "income" is handled via mapping system above, no need for separate
@@ -1072,10 +1096,15 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
         }
 
         // Collect demographic data (excluding age and gender)
-        safe_add_to_channel(gender, income, "mean_income", age,
-                            static_cast<double>(static_cast<int>(person.income)));
-        safe_add_to_channel(gender, income, "mean_sector", age,
-                            static_cast<double>(static_cast<int>(person.sector)));
+        // mean_income: use continuous value from risk_factors["income"], not income category enum
+        if (person.risk_factors.contains("income"_id)) {
+            safe_add_to_channel(gender, income, "mean_income", age,
+                                person.risk_factors.at("income"_id));
+        }
+        if (person.sector != core::Sector::unknown) {
+            safe_add_to_channel(gender, income, "mean_sector", age,
+                                static_cast<double>(person.sector_to_value()));
+        }
 
         // NEW: Collect enhanced demographic data by income (only if available)
         // Region data - check if person has region assigned
@@ -1152,6 +1181,10 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
         }
     };
 
+    const std::unordered_set<std::string> income_demo_mean_channels = {
+        "mean_gender", "mean_region", "mean_ethnicity", "mean_sector", "mean_income",
+        "mean_income_category"};
+
     for (const auto &income : available_income_categories) {
         for (int age = age_range.lower(); age <= age_range.upper(); age++) {
             double count_F = series.at(core::Gender::female, income, "count").at(age);
@@ -1159,9 +1192,13 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
             double deaths_F = series.at(core::Gender::female, income, "deaths").at(age);
             double deaths_M = series.at(core::Gender::male, income, "deaths").at(age);
 
-            // Calculate in-place factor averages for this income category
+            // Calculate in-place factor averages for this income category.
+            // Skip demographic channels here; they are divided once in the block below.
             for (const auto &factor : context.mapping().entries()) {
                 std::string column = "mean_" + factor.key().to_string();
+                if (income_demo_mean_channels.count(core::to_lower(column))) {
+                    continue;
+                }
                 safe_divide_channel_income(core::Gender::female, income, column, age, count_F);
                 safe_divide_channel_income(core::Gender::male, income, column, age, count_M);
             }
@@ -1393,13 +1430,15 @@ void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &c
         }
 
         // Accumulate squared deviations for demographic data (excluding age and gender)
-        // accumulate_squared_diffs_income("age", sex, income, age, person.age);
-        // accumulate_squared_diffs_income("gender", sex, income, age,
-        // static_cast<int>(person.gender));
-        accumulate_squared_diffs_income("income", sex, income, age,
-                                        static_cast<int>(person.income));
-        accumulate_squared_diffs_income("sector", sex, income, age,
-                                        static_cast<int>(person.sector));
+        // mean_income / std_income: use continuous value from risk_factors["income"] when present
+        if (person.risk_factors.contains("income"_id)) {
+            accumulate_squared_diffs_income("income", sex, income, age,
+                                            person.risk_factors.at("income"_id));
+        }
+        if (person.sector != core::Sector::unknown) {
+            accumulate_squared_diffs_income("sector", sex, income, age,
+                                            static_cast<double>(person.sector_to_value()));
+        }
 
         // NEW: Accumulate squared deviations for enhanced demographic data (only if available)
         // Region standard deviation
@@ -1564,6 +1603,7 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
         accumulate_squared_diffs("age", sex, age, person.age);
         accumulate_squared_diffs("age2", sex, age, (person.age * person.age));
         accumulate_squared_diffs("age3", sex, age, (person.age * person.age * person.age));
+        accumulate_squared_diffs("gender", sex, age, static_cast<double>(person.gender_to_value()));
 
         for (const auto &factor : context.mapping().entries()) {
             // Special handling for income_category - it's stored as person.income (enum), not in
@@ -1663,6 +1703,8 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
         divide_by_count_sqrt("age2", core::Gender::male, age, count_M);
         divide_by_count_sqrt("age3", core::Gender::female, age, count_F);
         divide_by_count_sqrt("age3", core::Gender::male, age, count_M);
+        divide_by_count_sqrt("gender", core::Gender::female, age, count_F);
+        divide_by_count_sqrt("gender", core::Gender::male, age, count_M);
 
         // Calculate in-place YLL/YLD/DALY standard deviation.
         for (const auto &column : {"yll", "yld", "daly"}) {
@@ -1743,6 +1785,8 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
     add_channel_if_new("std_age2");
     add_channel_if_new("mean_age3");
     add_channel_if_new("std_age3");
+    add_channel_if_new("mean_gender");
+    add_channel_if_new("std_gender");
 
     // Check population to see which attributes are actually assigned
     bool has_region = false;
@@ -1806,7 +1850,10 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
         add_channel_if_new("mean_income_category");
         add_channel_if_new("std_income_category");
     }
-    // Note: "income" is handled via mapping system, no need for separate income_continuous channel
+    if (has_income) {
+        add_channel_if_new("mean_income");
+        add_channel_if_new("std_income");
+    }
 
     // NEW: Add physical activity channels (only if data exists)
     if (has_physical_activity) {

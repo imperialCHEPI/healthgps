@@ -3,9 +3,11 @@
 #include "HealthGPS.Core/forward_type.h"
 #include "HealthGPS/data_series.h"
 
+#include <chrono>
 #include <fmt/chrono.h>
 #include <fmt/color.h>
 #include <fmt/core.h>
+#include <fstream>
 #include <nlohmann/json.hpp>
 #include <sstream>
 #include <unordered_set>

@@ -8,7 +8,8 @@
 #include <cctype>
 #include <cmath>
 #include <fmt/core.h>
-#include <iostream> // Added for print statements
+#include <iostream>
+#include <limits>
 #include <ranges>
 #include <unordered_map>
 #include <utility>
@@ -350,6 +351,31 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     // Continuous income only: after adjustment, sort ascending and assign income_categories (3 or
     // 4).
     if (is_continuous_income_model_) {
+        // Diagnostic: confirm adjusted income range (should be near factors mean, e.g. ~621 for
+        // age 0; if min/max are ~11–42, adjustment may not have been applied or expected table
+        // may use different scale/column)
+        double min_inc = std::numeric_limits<double>::max();
+        double max_inc = std::numeric_limits<double>::lowest();
+        double sum_inc = 0.0;
+        size_t n_inc = 0;
+        for (const auto &person : context.population()) {
+            if (!person.is_active()) continue;
+            auto it = person.risk_factors.find("income"_id);
+            if (it != person.risk_factors.end()) {
+                double v = it->second;
+                min_inc = std::min(min_inc, v);
+                max_inc = std::max(max_inc, v);
+                sum_inc += v;
+                n_inc++;
+            }
+        }
+        if (n_inc > 0) {
+            std::cout << "\n[INCOME] After adjustment, income stats: min=" << min_inc
+                      << " max=" << max_inc << " mean=" << (sum_inc / static_cast<double>(n_inc))
+                      << " n=" << n_inc
+                      << " (expect near factors-mean values, e.g. ~621 for age 0; if ~11–42 check "
+                         "factorsmean CSV 'income' column and [INCOME ADJUST] expected/sim_mean)";
+        }
         std::cout << "\n[INCOME] generate_risk_factors: continuous - computing quartiles/tertiles "
                      "from adjusted income...";
         std::vector<double> thresholds;
@@ -1600,9 +1626,9 @@ std::vector<double> StaticLinearModel::calculate_income_quartiles(const Populati
     // Q4 is the 100th percentile (maximum value) - not used in thresholds but useful for display
     double q4_value = sorted_incomes.back();
 
-    std::cout << "\n[QUARTILES] Thresholds calculated: \nQ1=" << quartile_thresholds[0] << q1_index
-              << "\nQ2=" << quartile_thresholds[1] << q2_index << "\nQ3=" << quartile_thresholds[2]
-              << q3_index << "\nQ4=" << q4_value;
+    std::cout << "\n[QUARTILES] Thresholds calculated:\n  Q1=" << quartile_thresholds[0]
+              << " (idx=" << q1_index << ")\n  Q2=" << quartile_thresholds[1] << " (idx=" << q2_index
+              << ")\n  Q3=" << quartile_thresholds[2] << " (idx=" << q3_index << ")\n  Q4=" << q4_value;
 
     return quartile_thresholds;
 }
@@ -1983,10 +2009,11 @@ StaticLinearModel::build_extended_factors_list(
             // If it doesn't throw, income exists in expected table
             get_expected(context, core::Gender::male, 0, income_id, std::nullopt, false);
             extended_factors.push_back(income_id);
-            // Add default range (no clamping) for income if ranges provided
+            // Income uses continuous scale (e.g. ~621); do not use another factor's range
+            // (e.g. 0–42.7) or adjusted income would be clamped and quartiles would collapse.
             if (!base_ranges.empty()) {
-                // Use a wide range that won't clamp (or use last range as default)
-                extended_ranges.push_back(base_ranges.back());
+                extended_ranges.push_back(
+                    core::DoubleInterval(0.0, 1e9)); // no effective clamp for continuous income
             }
         } catch (...) {
             // Income not in expected table - skip
