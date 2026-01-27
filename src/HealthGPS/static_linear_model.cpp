@@ -309,13 +309,14 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     int verified_count = 0;
     for (const auto &person : context.population()) {
         if (verified_count < 3) { // Check first 3 people
-            std::cout << "\nPerson " << verified_count + 1 << ": Age=" << person.age
-                      << ", Gender=" << (person.gender == core::Gender::male ? "male" : "female")
-                      << ", Region=" << person.region << ", Ethnicity=" << person.ethnicity
-                      << ", Sector=" << (person.sector == core::Sector::urban ? "urban" : "rural")
-                      << ", Income=" << static_cast<int>(person.income)
-                      << ", RiskFactors=" << person.risk_factors.size()
-                      << ", PhysicalActivity=" << person.physical_activity;
+            std::cout << fmt::format("\nPerson {}: Age={}, Gender={}, Region={}, Ethnicity={}, "
+                                     "Sector={}, Income={}, RiskFactors={}, PhysicalActivity={}",
+                                     verified_count + 1, person.age,
+                                     person.gender == core::Gender::male ? "male" : "female",
+                                     person.region, person.ethnicity,
+                                     person.sector == core::Sector::urban ? "urban" : "rural",
+                                     static_cast<int>(person.income), person.risk_factors.size(),
+                                     person.physical_activity);
         }
         verified_count++;
     }
@@ -359,8 +360,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         double sum_inc = 0.0;
         size_t n_inc = 0;
         for (const auto &person : context.population()) {
-            if (!person.is_active())
-                continue;
+            if (!person.is_active()) continue;
             auto it = person.risk_factors.find("income"_id);
             if (it != person.risk_factors.end()) {
                 double v = it->second;
@@ -1628,9 +1628,8 @@ std::vector<double> StaticLinearModel::calculate_income_quartiles(const Populati
     double q4_value = sorted_incomes.back();
 
     std::cout << "\n[QUARTILES] Thresholds calculated:\n  Q1=" << quartile_thresholds[0]
-              << " (idx=" << q1_index << ")\n  Q2=" << quartile_thresholds[1]
-              << " (idx=" << q2_index << ")\n  Q3=" << quartile_thresholds[2]
-              << " (idx=" << q3_index << ")\n  Q4=" << q4_value;
+              << " (idx=" << q1_index << ")\n  Q2=" << quartile_thresholds[1] << " (idx=" << q2_index
+              << ")\n  Q3=" << quartile_thresholds[2] << " (idx=" << q3_index << ")\n  Q4=" << q4_value;
 
     return quartile_thresholds;
 }

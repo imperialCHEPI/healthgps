@@ -14,6 +14,26 @@
 #include <utility>
 
 namespace hgps {
+namespace {
+/// Numeric value for mean_income_category column (matches Person::income_to_value).
+/// Each income-stratified file contains only that category, so mean_income_category is fixed.
+double income_category_numeric(core::Income inc) {
+    switch (inc) {
+    case core::Income::low:
+        return 1.0;
+    case core::Income::lowermiddle:
+    case core::Income::middle:
+        return 2.0;
+    case core::Income::uppermiddle:
+        return 3.0;
+    case core::Income::high:
+        return 4.0;
+    default:
+        return 0.0;
+    }
+}
+} // namespace
+
 ResultFileWriter::ResultFileWriter(const std::filesystem::path &file_name, ExperimentInfo info)
     : info_{std::move(info)}, base_filename_{file_name} {
     stream_.open(file_name, std::ofstream::out | std::ofstream::app);
@@ -300,13 +320,43 @@ void ResultFileWriter::write_income_csv_data(const hgps::ResultEventMessage &mes
         fss << message.source << sep << message.run_number << sep << message.model_time << sep
             << "female" << sep << index;
 
+        // If stratum has 0 people at this age, use main-series values so we don't output zeros.
+        double count_m = 0.0;
+        double count_f = 0.0;
+        try {
+            count_m = series.at(Gender::male, income, "count").at(index);
+            count_f = series.at(Gender::female, income, "count").at(index);
+        } catch (const std::out_of_range &) {
+            // count not in income data – will fallback per-channel below
+        }
+
+        const double file_income_category_value = income_category_numeric(income);
+
         for (const auto &key : series.channels()) {
-            // Use income-based data if available, otherwise use regular data
+            // Each file is one income category; mean_income_category is always that category (1–4),
+            // and std_income_category is 0 (no variance within one category).
+            if (key == "mean_income_category") {
+                mss << sep << file_income_category_value;
+                fss << sep << file_income_category_value;
+                continue;
+            }
+            if (key == "std_income_category") {
+                mss << sep << 0.0;
+                fss << sep << 0.0;
+                continue;
+            }
             try {
-                mss << sep << series.at(Gender::male, income, key).at(index);
-                fss << sep << series.at(Gender::female, income, key).at(index);
+                double male_val = series.at(Gender::male, income, key).at(index);
+                double female_val = series.at(Gender::female, income, key).at(index);
+                // When stratum is empty, show main-series value instead of 0
+                if (count_m == 0)
+                    male_val = series.at(Gender::male, key).at(index);
+                if (count_f == 0)
+                    female_val = series.at(Gender::female, key).at(index);
+                mss << sep << male_val;
+                fss << sep << female_val;
             } catch (const std::out_of_range &) {
-                // Fallback to regular data if income-based data not available
+                // Channel not in income data – use main series
                 mss << sep << series.at(Gender::male, key).at(index);
                 fss << sep << series.at(Gender::female, key).at(index);
             }
@@ -314,10 +364,8 @@ void ResultFileWriter::write_income_csv_data(const hgps::ResultEventMessage &mes
 
         income_csv << mss.str() << '\n' << fss.str() << '\n';
 
-        // Reset row streams
         mss.str(std::string{});
         mss.clear();
-
         fss.str(std::string{});
         fss.clear();
     }
