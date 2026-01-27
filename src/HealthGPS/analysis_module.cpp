@@ -766,8 +766,8 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
     // Channels divided only in the demographic block below; skip them in the mapping loop to
     // avoid double division (sum/count^2).
     const std::unordered_set<std::string> demographic_mean_channels = {
-        "mean_gender", "mean_region", "mean_ethnicity", "mean_sector", "mean_income",
-        "mean_income_category"};
+        "mean_gender", "mean_region", "mean_ethnicity",
+        "mean_sector", "mean_income", "mean_income_category"};
 
     for (int age = age_range.lower(); age <= age_range.upper(); age++) {
         double count_F = series(core::Gender::female, "count").at(age);
@@ -1182,8 +1182,8 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
     };
 
     const std::unordered_set<std::string> income_demo_mean_channels = {
-        "mean_gender", "mean_region", "mean_ethnicity", "mean_sector", "mean_income",
-        "mean_income_category"};
+        "mean_gender", "mean_region", "mean_ethnicity",
+        "mean_sector", "mean_income", "mean_income_category"};
 
     for (const auto &income : available_income_categories) {
         for (int age = age_range.lower(); age <= age_range.upper(); age++) {
