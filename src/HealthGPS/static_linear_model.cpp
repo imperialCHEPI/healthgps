@@ -360,7 +360,8 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         double sum_inc = 0.0;
         size_t n_inc = 0;
         for (const auto &person : context.population()) {
-            if (!person.is_active()) continue;
+            if (!person.is_active())
+                continue;
             auto it = person.risk_factors.find("income"_id);
             if (it != person.risk_factors.end()) {
                 double v = it->second;
@@ -1628,8 +1629,9 @@ std::vector<double> StaticLinearModel::calculate_income_quartiles(const Populati
     double q4_value = sorted_incomes.back();
 
     std::cout << "\n[QUARTILES] Thresholds calculated:\n  Q1=" << quartile_thresholds[0]
-              << " (idx=" << q1_index << ")\n  Q2=" << quartile_thresholds[1] << " (idx=" << q2_index
-              << ")\n  Q3=" << quartile_thresholds[2] << " (idx=" << q3_index << ")\n  Q4=" << q4_value;
+              << " (idx=" << q1_index << ")\n  Q2=" << quartile_thresholds[1]
+              << " (idx=" << q2_index << ")\n  Q3=" << quartile_thresholds[2]
+              << " (idx=" << q3_index << ")\n  Q4=" << q4_value;
 
     return quartile_thresholds;
 }

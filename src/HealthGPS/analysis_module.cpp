@@ -766,8 +766,8 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
     // Channels divided only in the demographic block below; skip them in the mapping loop to
     // avoid double division (sum/count^2).
     const std::unordered_set<std::string> demographic_mean_channels = {
-        "mean_gender", "mean_region", "mean_ethnicity", "mean_sector", "mean_income",
-        "mean_income_category"};
+        "mean_gender", "mean_region", "mean_ethnicity",
+        "mean_sector", "mean_income", "mean_income_category"};
 
     for (int age = age_range.lower(); age <= age_range.upper(); age++) {
         double count_F = series(core::Gender::female, "count").at(age);
@@ -1192,8 +1192,8 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
     };
 
     const std::unordered_set<std::string> income_demo_mean_channels = {
-        "mean_gender", "mean_region", "mean_ethnicity", "mean_sector", "mean_income",
-        "mean_income_category"};
+        "mean_gender", "mean_region", "mean_ethnicity",
+        "mean_sector", "mean_income", "mean_income_category"};
 
     for (const auto &income : available_income_categories) {
         for (int age = age_range.lower(); age <= age_range.upper(); age++) {
@@ -1229,11 +1229,9 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
             }
             if (added_income_channels.count("mean_age3") > 0) {
                 series.at(core::Gender::female, income, "mean_age3").at(age) =
-                    static_cast<double>(age) * static_cast<double>(age) *
-                    static_cast<double>(age);
+                    static_cast<double>(age) * static_cast<double>(age) * static_cast<double>(age);
                 series.at(core::Gender::male, income, "mean_age3").at(age) =
-                    static_cast<double>(age) * static_cast<double>(age) *
-                    static_cast<double>(age);
+                    static_cast<double>(age) * static_cast<double>(age) * static_cast<double>(age);
             }
             // mean_gender is the average 0/1 in this stratum
             safe_divide_channel_income(core::Gender::female, income, "mean_gender", age, count_F);
@@ -1516,9 +1514,11 @@ void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &c
         // Age and gender standard deviation (active persons only)
         accumulate_squared_diffs_income("age", sex, income, age, static_cast<double>(person.age));
         accumulate_squared_diffs_income("age2", sex, income, age,
-                                        static_cast<double>(person.age) * static_cast<double>(person.age));
+                                        static_cast<double>(person.age) *
+                                            static_cast<double>(person.age));
         accumulate_squared_diffs_income("age3", sex, income, age,
-                                        static_cast<double>(person.age) * static_cast<double>(person.age) *
+                                        static_cast<double>(person.age) *
+                                            static_cast<double>(person.age) *
                                             static_cast<double>(person.age));
         accumulate_squared_diffs_income("gender", sex, income, age,
                                         static_cast<double>(person.gender_to_value()));
