@@ -1094,6 +1094,13 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
                 continue;
             }
 
+            // Skip "income" here: mean_income is added once explicitly below from
+            // risk_factors["income"] (continuous value). Adding it in the loop too would
+            // double-count and make income-based CSV mean_income ~2x the true value.
+            if (factor.key().to_string() == "income" || factor.key().to_string() == "Income") {
+                continue;
+            }
+
             // Check if risk factor exists before accessing (some risk factors may not be
             // initialized for all projects)
             auto channel_name = "mean_" + factor.key().to_string();

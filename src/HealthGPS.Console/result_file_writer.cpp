@@ -311,63 +311,46 @@ void ResultFileWriter::write_income_csv_data(const hgps::ResultEventMessage &mes
 
     const auto *sep = ",";
     const auto &series = message.content.series;
-    std::stringstream mss;
-    std::stringstream fss;
+    const double file_income_category_value = income_category_numeric(income);
 
+    // Write only rows for (age, gender) strata that have at least one person in this income
+    // category. No fallback, no zeros: each file has one row per stratum that has people in that
+    // category (e.g. low-income file has one entry per age/gender cell that has low-income people).
     for (auto index = 0u; index < series.sample_size(); index++) {
-        mss << message.source << sep << message.run_number << sep << message.model_time << sep
-            << "male" << sep << index;
-        fss << message.source << sep << message.run_number << sep << message.model_time << sep
-            << "female" << sep << index;
-
-        // If stratum has 0 people at this age, use main-series values so we don't output zeros.
         double count_m = 0.0;
         double count_f = 0.0;
         try {
             count_m = series.at(Gender::male, income, "count").at(index);
             count_f = series.at(Gender::female, income, "count").at(index);
         } catch (const std::out_of_range &) {
-            // count not in income data – will fallback per-channel below
+            // No count for this income stratum – skip this index (no rows)
         }
 
-        const double file_income_category_value = income_category_numeric(income);
-
-        for (const auto &key : series.channels()) {
-            // Each file is one income category; mean_income_category is always that category (1–4),
-            // and std_income_category is 0 (no variance within one category).
-            if (key == "mean_income_category") {
-                mss << sep << file_income_category_value;
-                fss << sep << file_income_category_value;
-                continue;
+        auto write_row = [&](Gender gender, double count) {
+            if (count <= 0.0) return;
+            std::stringstream ss;
+            ss << message.source << sep << message.run_number << sep << message.model_time << sep
+               << (gender == Gender::male ? "male" : "female") << sep << index;
+            for (const auto &key : series.channels()) {
+                if (key == "mean_income_category") {
+                    ss << sep << file_income_category_value;
+                    continue;
+                }
+                if (key == "std_income_category") {
+                    ss << sep << 0.0;
+                    continue;
+                }
+                double val = 0.0;
+                try {
+                    val = series.at(gender, income, key).at(index);
+                } catch (const std::out_of_range &) {}
+                ss << sep << val;
             }
-            if (key == "std_income_category") {
-                mss << sep << 0.0;
-                fss << sep << 0.0;
-                continue;
-            }
-            try {
-                double male_val = series.at(Gender::male, income, key).at(index);
-                double female_val = series.at(Gender::female, income, key).at(index);
-                // When stratum is empty, show main-series value instead of 0
-                if (count_m == 0)
-                    male_val = series.at(Gender::male, key).at(index);
-                if (count_f == 0)
-                    female_val = series.at(Gender::female, key).at(index);
-                mss << sep << male_val;
-                fss << sep << female_val;
-            } catch (const std::out_of_range &) {
-                // Channel not in income data – use main series
-                mss << sep << series.at(Gender::male, key).at(index);
-                fss << sep << series.at(Gender::female, key).at(index);
-            }
-        }
+            income_csv << ss.str() << '\n';
+        };
 
-        income_csv << mss.str() << '\n' << fss.str() << '\n';
-
-        mss.str(std::string{});
-        mss.clear();
-        fss.str(std::string{});
-        fss.clear();
+        write_row(Gender::male, count_m);
+        write_row(Gender::female, count_f);
     }
 }
 
