@@ -327,7 +327,8 @@ void ResultFileWriter::write_income_csv_data(const hgps::ResultEventMessage &mes
         }
 
         auto write_row = [&](Gender gender, double count) {
-            if (count <= 0.0) return;
+            if (count <= 0.0)
+                return;
             std::stringstream ss;
             ss << message.source << sep << message.run_number << sep << message.model_time << sep
                << (gender == Gender::male ? "male" : "female") << sep << index;
@@ -343,7 +344,8 @@ void ResultFileWriter::write_income_csv_data(const hgps::ResultEventMessage &mes
                 double val = 0.0;
                 try {
                     val = series.at(gender, income, key).at(index);
-                } catch (const std::out_of_range &) {}
+                } catch (const std::out_of_range &) {
+                }
                 ss << sep << val;
             }
             income_csv << ss.str() << '\n';

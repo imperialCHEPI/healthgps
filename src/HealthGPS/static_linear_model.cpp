@@ -370,7 +370,8 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         }
         if (income_min <= income_max) {
             for (auto &person : context.population()) {
-                if (!person.is_active()) continue;
+                if (!person.is_active())
+                    continue;
                 if (person.risk_factors.contains(income_id)) {
                     double v = person.risk_factors.at(income_id);
                     v = std::clamp(v, income_min, income_max);
@@ -388,7 +389,8 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         double sum_inc = 0.0;
         size_t n_inc = 0;
         for (const auto &person : context.population()) {
-            if (!person.is_active()) continue;
+            if (!person.is_active())
+                continue;
             auto it = person.risk_factors.find("income"_id);
             if (it != person.risk_factors.end()) {
                 double v = it->second;
@@ -469,9 +471,9 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
             if (s.count == 0) {
                 return;
             }
-            std::cout << "\n[INCOME SUMMARY] Year " << static_cast<int>(context.time_now())
-                      << " - " << label << " (category " << cat_value << "): [" << s.min << " - "
-                      << s.max << "], count=" << s.count;
+            std::cout << "\n[INCOME SUMMARY] Year " << static_cast<int>(context.time_now()) << " - "
+                      << label << " (category " << cat_value << "): [" << s.min << " - " << s.max
+                      << "], count=" << s.count;
         };
 
         // For 4-category continuous income: 1=low, 2=lower middle, 3=upper middle, 4=high.
@@ -537,17 +539,20 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
                         double e = get_expected(context, sex, age, income_id, std::nullopt, false);
                         income_min = std::min(income_min, e);
                         income_max = std::max(income_max, e);
-                    } catch (...) {}
+                    } catch (...) {
+                    }
                 }
             }
             if (income_min <= income_max) {
                 for (auto &person : context.population()) {
-                    if (!person.is_active()) continue;
+                    if (!person.is_active())
+                        continue;
                     if (person.risk_factors.contains(income_id)) {
                         double v = person.risk_factors.at(income_id);
                         v = std::clamp(v, income_min, income_max);
                         person.risk_factors[income_id] = v;
-                        if (person.income_continuous > 0.0) person.income_continuous = v;
+                        if (person.income_continuous > 0.0)
+                            person.income_continuous = v;
                     }
                 }
             }
@@ -625,17 +630,20 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
                     double e = get_expected(context, sex, age, income_id, std::nullopt, false);
                     income_min = std::min(income_min, e);
                     income_max = std::max(income_max, e);
-                } catch (...) {}
+                } catch (...) {
+                }
             }
         }
         if (income_min <= income_max) {
             for (auto &person : context.population()) {
-                if (!person.is_active()) continue;
+                if (!person.is_active())
+                    continue;
                 if (person.risk_factors.contains(income_id)) {
                     double v = person.risk_factors.at(income_id);
                     v = std::clamp(v, income_min, income_max);
                     person.risk_factors[income_id] = v;
-                    if (person.income_continuous > 0.0) person.income_continuous = v;
+                    if (person.income_continuous > 0.0)
+                        person.income_continuous = v;
                 }
             }
         }
@@ -742,17 +750,20 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
                         double e = get_expected(context, sex, age, income_id, std::nullopt, false);
                         income_min = std::min(income_min, e);
                         income_max = std::max(income_max, e);
-                    } catch (...) {}
+                    } catch (...) {
+                    }
                 }
             }
             if (income_min <= income_max) {
                 for (auto &person : context.population()) {
-                    if (!person.is_active()) continue;
+                    if (!person.is_active())
+                        continue;
                     if (person.risk_factors.contains(income_id)) {
                         double v = person.risk_factors.at(income_id);
                         v = std::clamp(v, income_min, income_max);
                         person.risk_factors[income_id] = v;
-                        if (person.income_continuous > 0.0) person.income_continuous = v;
+                        if (person.income_continuous > 0.0)
+                            person.income_continuous = v;
                     }
                 }
             }
@@ -1790,8 +1801,9 @@ std::vector<double> StaticLinearModel::calculate_income_quartiles(const Populati
     double q4_value = sorted_incomes.back();
 
     std::cout << "\n[QUARTILES] Thresholds calculated:\n  Q1=" << quartile_thresholds[0]
-              << " (idx=" << q1_index << ")\n  Q2=" << quartile_thresholds[1] << " (idx=" << q2_index
-              << ")\n  Q3=" << quartile_thresholds[2] << " (idx=" << q3_index << ")\n  Q4=" << q4_value;
+              << " (idx=" << q1_index << ")\n  Q2=" << quartile_thresholds[1]
+              << " (idx=" << q2_index << ")\n  Q3=" << quartile_thresholds[2]
+              << " (idx=" << q3_index << ")\n  Q4=" << q4_value;
 
     return quartile_thresholds;
 }
