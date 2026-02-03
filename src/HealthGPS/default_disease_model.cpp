@@ -215,9 +215,9 @@ void DefaultDiseaseModel::update_remission_cases(RuntimeContext &context) {
 void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
     int incidence_id = definition_.get().table().at(MeasureKey::incidence);
 
-    std::cout << "Start update_incidence_cases: " << disease_type() << "\n";
-    fflush(stderr);
-    fflush(stdout);
+    //std::cout << "Start update_incidence_cases: " << disease_type() << "\n";
+    //fflush(stderr);
+    //fflush(stdout);
 
     const auto &table = definition_.get().table();
     const auto disease_code = disease_type();
@@ -292,9 +292,9 @@ void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
                 Disease{.status = DiseaseStatus::active, .start_time = context.time_now()};
         }
     }
-    std::cout << "End update_incidence_cases: " << disease_type() << "\n";
-    fflush(stderr);
-    fflush(stdout);
+    //std::cout << "End update_incidence_cases: " << disease_type() << "\n";
+    //fflush(stderr);
+    //fflush(stdout);
 }
 
 } // namespace hgps

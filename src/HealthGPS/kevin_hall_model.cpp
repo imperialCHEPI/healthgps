@@ -272,7 +272,7 @@ KevinHallModel::compute_weight_adjustments(RuntimeContext &context,
 
 double KevinHallModel::get_expected(RuntimeContext &context, core::Gender sex, int age,
                                     const core::Identifier &factor, OptionalRange range,
-                                    bool apply_trend) const noexcept {
+                                    bool apply_trend) const {
 
     // Compute expected nutrient intakes from expected food intakes.
     if (energy_equation_.contains(factor)) {

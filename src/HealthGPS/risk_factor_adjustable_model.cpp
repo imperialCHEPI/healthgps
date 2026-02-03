@@ -1,6 +1,8 @@
 #include "HealthGPS.Core/exception.h"
 
 #include "risk_factor_adjustable_model.h"
+
+#include <fmt/core.h>
 #include "sync_message.h"
 
 #include <algorithm>
@@ -48,7 +50,13 @@ RiskFactorAdjustableModel::RiskFactorAdjustableModel(
 
 double RiskFactorAdjustableModel::get_expected(RuntimeContext &context, core::Gender sex, int age,
                                                const core::Identifier &factor, OptionalRange range,
-                                               bool apply_trend) const noexcept {
+                                               bool apply_trend) const {
+    if (!expected_->contains(sex, factor)) {
+        throw core::HgpsException(fmt::format(
+            "Expected value not found for factor '{}' (sex={}) in factors mean table. "
+            "Ensure FactorsMean.Male.csv and FactorsMean.Female.csv have a column for this factor.",
+            factor.to_string(), sex == core::Gender::male ? "male" : "female"));
+    }
     double expected = expected_->at(sex, factor).at(age);
 
     // Apply trend to expected value based on trend type

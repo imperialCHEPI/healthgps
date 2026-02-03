@@ -159,4 +159,45 @@ struct PIFInfo {
 
     auto operator<=>(const PIFInfo &rhs) const = default;
 };
+
+//! Per-project requirements: demographics, income, PA, risk factors, trend, two-stage.
+//! Code uses these flags instead of project-specific hacks. Required in config.
+struct ProjectRequirements {
+    struct Demographics {
+        bool age{true};
+        bool gender{true};
+        bool region{true};
+        bool ethnicity{true};
+    } demographics;
+
+    struct Income {
+        bool enabled{true};
+        std::string type{"continuous"};   // "continuous" | "categorical"
+        std::string categories{"4"};      // "3" | "4"
+        bool adjust_to_factors_mean{true};
+        bool trended{false};
+    } income;
+
+    struct PhysicalActivity {
+        bool enabled{true};
+        std::string type{"continuous"};   // "simple" | "continuous"
+        bool adjust_to_factors_mean{true};
+        bool trended{false};
+    } physical_activity;
+
+    struct RiskFactors {
+        bool adjust_to_factors_mean{true};
+        bool trended{true};
+    } risk_factors;
+
+    struct Trend {
+        bool enabled{false};
+        std::string type{"null"};        // "null" | "trend" | "income_trend"
+    } trend;
+
+    struct TwoStage {
+        bool use_logistic{false};
+        std::string logistic_file{};
+    } two_stage;
+};
 } // namespace hgps::input

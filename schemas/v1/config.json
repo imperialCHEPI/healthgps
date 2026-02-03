@@ -6,6 +6,10 @@
         "$schema": {
             "type": "string"
         },
+        "project_requirements": {
+            "$ref": "config/project_requirements.json",
+            "description": "Per-project requirements: demographics, income, PA, risk factors, trend, two-stage. Code uses these flags instead of project-specific hacks. Optional; if absent, behaviour is inferred from existing fields."
+        },
         "version": {
             "const": 2
         },
@@ -80,6 +84,7 @@
     },
     "required": [
         "version",
+        "project_requirements",
         "trend_type",
         "data",
         "inputs",

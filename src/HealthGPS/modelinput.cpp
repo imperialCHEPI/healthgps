@@ -6,10 +6,13 @@ namespace hgps {
 
 ModelInput::ModelInput(core::DataTable &data, Settings settings, const RunInfo &run_info,
                        SESDefinition ses_info, HierarchicalMapping risk_mapping,
-                       std::vector<core::DiseaseInfo> diseases, hgps::input::PIFInfo pif_info)
+                       std::vector<core::DiseaseInfo> diseases,
+                       hgps::input::ProjectRequirements project_requirements,
+                       hgps::input::PIFInfo pif_info)
     : input_data_{data}, settings_{std::move(settings)}, run_info_{run_info},
       ses_definition_{std::move(ses_info)}, risk_mapping_{std::move(risk_mapping)},
-      diseases_{std::move(diseases)}, pif_info_{std::move(pif_info)} {}
+      diseases_{std::move(diseases)}, project_requirements_{std::move(project_requirements)},
+      pif_info_{std::move(pif_info)} {}
 
 const Settings &ModelInput::settings() const noexcept { return settings_; }
 
@@ -38,6 +41,10 @@ bool ModelInput::enable_income_analysis() const noexcept {
 
 const hgps::input::PIFInfo &ModelInput::population_impact_fraction() const noexcept {
     return pif_info_;
+}
+
+const hgps::input::ProjectRequirements &ModelInput::project_requirements() const noexcept {
+    return project_requirements_;
 }
 
 } // namespace hgps

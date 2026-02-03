@@ -100,6 +100,45 @@ Configuration get_configuration(const std::string &config_source,
     // Base dir for relative paths
     config.root_path = config_file.parent_path();
 
+    // project_requirements is required: no fallback; user must specify per-project requirements
+    if (!opt.contains("project_requirements")) {
+        throw ConfigurationError{
+            "Config must contain 'project_requirements' (demographics, income, physical_activity, "
+            "risk_factors, trend, two_stage). Add this section to your config.json. See "
+            "PROJECT_REQUIREMENTS_PLAN.md and schemas/v1/config/project_requirements.json."};
+    }
+    {
+        const auto &pr = opt["project_requirements"];
+        auto &req = config.project_requirements;
+        const auto &d = pr["demographics"];
+        req.demographics.age = d["age"].get<bool>();
+        req.demographics.gender = d["gender"].get<bool>();
+        req.demographics.region = d["region"].get<bool>();
+        req.demographics.ethnicity = d["ethnicity"].get<bool>();
+        const auto &inc = pr["income"];
+        req.income.enabled = inc["enabled"].get<bool>();
+        req.income.type = inc["type"].get<std::string>();
+        req.income.categories = inc["categories"].get<std::string>();
+        req.income.adjust_to_factors_mean = inc["adjust_to_factors_mean"].get<bool>();
+        req.income.trended = inc["trended"].get<bool>();
+        const auto &pa = pr["physical_activity"];
+        req.physical_activity.enabled = pa["enabled"].get<bool>();
+        req.physical_activity.type = pa["type"].get<std::string>();
+        req.physical_activity.adjust_to_factors_mean = pa["adjust_to_factors_mean"].get<bool>();
+        req.physical_activity.trended = pa["trended"].get<bool>();
+        const auto &rf = pr["risk_factors"];
+        req.risk_factors.adjust_to_factors_mean = rf["adjust_to_factors_mean"].get<bool>();
+        req.risk_factors.trended = rf["trended"].get<bool>();
+        const auto &tr = pr["trend"];
+        req.trend.enabled = tr["enabled"].get<bool>();
+        req.trend.type = tr["type"].get<std::string>();
+        const auto &ts = pr["two_stage"];
+        req.two_stage.use_logistic = ts["use_logistic"].get<bool>();
+        if (ts.contains("logistic_file") && !ts["logistic_file"].is_null()) {
+            req.two_stage.logistic_file = ts["logistic_file"].get<std::string>();
+        }
+    }
+
     // Read trend_type from JSON file (defaults to "null")
     if (opt.contains("trend_type")) {
         config.trend_type = opt["trend_type"].get<std::string>();
@@ -221,6 +260,7 @@ ModelInput create_model_input(core::DataTable &input_table, core::Country countr
             ses_mapping,
             HierarchicalMapping(std::move(mapping)),
             std::move(diseases),
+            config.project_requirements,
             config.population_impact_fraction};
 }
 

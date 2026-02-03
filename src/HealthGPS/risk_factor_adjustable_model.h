@@ -71,7 +71,7 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
     /// @returns The person's expected risk factor value
     virtual double get_expected(RuntimeContext &context, core::Gender sex, int age,
                                 const core::Identifier &factor, OptionalRange range,
-                                bool apply_trend) const noexcept;
+                                bool apply_trend) const;
 
     /// @brief Adjust risk factors such that mean sim value matches expected value
     /// @param context The simulation run-time context

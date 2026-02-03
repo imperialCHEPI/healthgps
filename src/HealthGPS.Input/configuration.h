@@ -82,6 +82,10 @@ struct Configuration {
     /// @brief Type of trend to apply to risk factors (null, trend, income_trend)
     std::string trend_type = "null";
 
+    /// @brief Per-project requirements (demographics, income, PA, risk factors, trend, two-stage).
+    /// Required: config must contain project_requirements; no fallback.
+    ProjectRequirements project_requirements{};
+
     /// @brief Original config.json data for accessing additional fields like income_categories
     nlohmann::json config_data;
     /// @brief Population Impact Fraction (PIF) configuration

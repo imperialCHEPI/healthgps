@@ -221,7 +221,6 @@ StaticLinearModel::StaticLinearModel(
                     name.to_string());
             }
         }
-        std::cout << "\nDEBUG: All risk factor income trend parameters validated successfully";
     } else {
         std::cout << "\nDEBUG: Skipping risk factor income trend parameter validation (trend_type_ "
                      "!= IncomeTrend or expected_income_trend_ is null)";
@@ -278,8 +277,6 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     // tertiles and category assignment happen AFTER adjustment to factors mean (see below).
     // Categorical: logits + softmax -> 3 categories; no adjustment to factors mean.
     if (is_continuous_income_model_) {
-        std::cout << "\n[INCOME] generate_risk_factors: continuous Phase 1 - assigning regression "
-                     "for all...";
         // Phase 1 only: assign continuous income via regression for all people.
         for (auto &person : context.population()) {
             double continuous_income = calculate_continuous_income(person, context.random());
@@ -287,12 +284,9 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
             person.income_continuous = continuous_income;
             person.income = core::Income::unknown; // set after adjustment + quartiles below
         }
-        std::cout << " done. Next: adjust then quartiles.";
         // Phase 2 (quartiles/tertiles) and Phase 3 (assign categories) are done after
         // adjust_risk_factors below, so thresholds are computed from adjusted income.
     } else {
-        std::cout << "\n[INCOME] generate_risk_factors: categorical - assigning via logits/softmax "
-                     "for all...";
         for (auto &person : context.population()) {
             initialise_categorical_income(person, context.random());
         }
@@ -303,22 +297,6 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     for (auto &person : context.population()) {
         initialise_factors(context, person, context.random());
         initialise_physical_activity(context, person, context.random());
-    }
-
-    // Verify that all attributes are properly initialized
-    int verified_count = 0;
-    for (const auto &person : context.population()) {
-        if (verified_count < 3) { // Check first 3 people
-            std::cout << fmt::format("\nPerson {}: Age={}, Gender={}, Region={}, Ethnicity={}, "
-                                     "Sector={}, Income={}, RiskFactors={}, PhysicalActivity={}",
-                                     verified_count + 1, person.age,
-                                     person.gender == core::Gender::male ? "male" : "female",
-                                     person.region, person.ethnicity,
-                                     person.sector == core::Sector::urban ? "urban" : "rural",
-                                     static_cast<int>(person.income), person.risk_factors.size(),
-                                     person.physical_activity);
-        }
-        verified_count++;
     }
 
     // Set logistic factors for simulated mean calculation (exclude zeros for factors with logistic
@@ -405,8 +383,6 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
                       << " max=" << max_inc << " mean=" << (sum_inc / static_cast<double>(n_inc))
                       << " n=" << n_inc;
         }
-        std::cout << "\n[INCOME] generate_risk_factors: continuous - computing quartiles/tertiles "
-                     "from adjusted income...";
         std::vector<double> thresholds;
         if (income_categories_ == "4") {
             thresholds = calculate_income_quartiles(context.population());
@@ -483,8 +459,6 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         print_summary("Middle income", 2, mid_sum);
         print_summary("Upper middle income", 3, upmid_sum);
         print_summary("High income", income_categories_ == "4" ? 4 : 3, high_sum);
-
-        std::cout << " categories assigned. Next: trends.";
     }
 
     // Initialise everyone with appropriate trend type.
@@ -510,16 +484,9 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     // Adjust such that trended risk factor means match trended expected values.
     // Only apply trend adjustment if we have a trend type
     if (trend_type_ != TrendType::Null) {
-        // Rebuild extended factors list for trended adjustment (income/PA might have trends too)
+        // Trended adjustment uses base factors only (no income/PA when assigned continuous)
         auto [trended_extended_factors, trended_extended_ranges] =
-            build_extended_factors_list(context, names_, ranges_);
-
-        std::cout << "\nStarting trended risk factor adjustment...";
-        if (trended_extended_factors.size() > names_.size()) {
-            std::cout
-                << "\nIncluding income/physical activity in trended adjustment (extended from "
-                << names_.size() << " to " << trended_extended_factors.size() << " factors)";
-        }
+            build_extended_factors_list(context, names_, ranges_, true);
         adjust_risk_factors(context, trended_extended_factors,
                             trended_extended_ranges.empty()
                                 ? std::nullopt
@@ -556,8 +523,6 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
                     }
                 }
             }
-            std::cout << "\n[INCOME] generate_risk_factors: continuous (after trend) - computing "
-                         "quartiles/tertiles...";
             std::vector<double> thresholds;
             if (income_categories_ == "4") {
                 thresholds = calculate_income_quartiles(context.population());
@@ -568,9 +533,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
                 double continuous_income = person.risk_factors.at("income"_id);
                 person.income = convert_income_to_category(continuous_income, thresholds);
             }
-            std::cout << " categories assigned.";
         }
-        std::cout << "\nTrended risk factor adjustment completed";
     } else {
         std::cout << "\nSkipping trended adjustment (trend_type_ is Null)";
     }
@@ -578,14 +541,11 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
-    std::cout << "\n[INCOME] update_risk_factors: entered.";
     // HACK: start intervening two years into the simulation.
     bool intervene = (context.scenario().type() == ScenarioType::intervention &&
                       (context.time_now() - context.start_time()) >= 2);
 
     auto &cache = get_income_threshold_cache();
-
-    std::cout << "\n[INCOME] update_risk_factors: initialising newborns / updating others...";
     // Initialise newborns and update others.
     for (auto &person : context.population()) {
         if (person.age == 0) {
@@ -606,7 +566,6 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             }
         }
     }
-    std::cout << " done. Next: adjust_risk_factors.";
 
     // Build extended factors list including income and physical activity if they exist in expected
     // table
@@ -647,9 +606,6 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
                 }
             }
         }
-
-        std::cout << "\n[INCOME] update_risk_factors: adjust done. Continuous - computing "
-                     "thresholds from adjusted income...";
         size_t current_pop_size = context.population().size();
         int current_year = static_cast<int>(context.time_now());
 
@@ -679,7 +635,6 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
                 person.income = convert_income_to_category(continuous_income, cache.thresholds);
             }
         }
-        std::cout << " categories assigned. Next: trends.";
     }
 
     // Initialise newborns and update others with appropriate trend type.
@@ -728,9 +683,9 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
     // Adjust such that trended risk factor means match trended expected values.
     // Only apply trend adjustment if we have a trend type
     if (trend_type_ != TrendType::Null) {
-        // Rebuild extended factors list for trended adjustment (income/PA might have trends too)
+        // Trended adjustment uses base factors only (no income/PA when assigned continuous)
         auto [trended_extended_factors, trended_extended_ranges] =
-            build_extended_factors_list(context, names_, ranges_);
+            build_extended_factors_list(context, names_, ranges_, true);
 
         adjust_risk_factors(context, trended_extended_factors,
                             trended_extended_ranges.empty()
@@ -767,8 +722,6 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
                     }
                 }
             }
-            std::cout << "\n[INCOME] update_risk_factors: trend adjustment done. Continuous - "
-                         "recalc thresholds and categories...";
             size_t current_pop_size = context.population().size();
             int current_year = static_cast<int>(context.time_now());
 
@@ -794,7 +747,6 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
                     person.income = convert_income_to_category(continuous_income, cache.thresholds);
                 }
             }
-            std::cout << " continuous (after trend) categories assigned.";
         }
     }
 
@@ -808,7 +760,6 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             apply_policies(person, intervene);
         }
     }
-    std::cout << "\n[INCOME] update_risk_factors: left.";
 }
 
 double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
@@ -886,7 +837,7 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
         double expected =
             get_expected(context, person.gender, person.age, names_[i], ranges_[i], false);
 
-        // TWO-STAGE RISK FACTOR MODELING APPROACH- Mahima
+        // MAHIMA: TWO-STAGE RISK FACTOR MODELING APPROACH
         // =======================================================================
         // Previous approach: Use BoxCox transformation to calculate risk factor values
         // New approach: First use logistic regression to determine if the risk factor value should
@@ -938,13 +889,6 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
 
     // Print summary once at the end of initial generation (not during updates for newborns)
     if (!summary_printed && std::cmp_equal(factors_count, initial_generation_count)) {
-        std::cout << "\n=== Risk Factor Assignment Summary ===";
-        for (const auto &name : names_) {
-            std::cout << "\nRisk factor " << name.to_string() << " is assigned to "
-                      << risk_factor_counts[name] << " people";
-        }
-        std::cout << "\n======================================";
-
         // Print 2-stage modeling summary
         std::cout << "\n=== TWO-STAGE MODELING SUMMARY ===";
         std::vector<std::string> two_stage_factors;
@@ -1007,7 +951,7 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
         // Save residual.
         person.risk_factors.at(residual_name) = residual;
 
-        // TWO-STAGE RISK FACTOR MODELING APPROACH- Mahima
+        // MAHIMA: TWO-STAGE RISK FACTOR MODELING APPROACH
         // =======================================================================
         // Use both this year's zero probability and previous outcome
         // =======================================================================
@@ -1278,6 +1222,8 @@ StaticLinearModel::compute_linear_models(RuntimeContext &context, Person &person
     static const core::Identifier Age2_id("Age2");
     static const core::Identifier Age3_id("Age3");
     static const core::Identifier stddev_id("stddev");
+    static const core::Identifier log_energy_intake_id("log_energy_intake");
+    static const core::Identifier energyintake_id("energyintake");
 
     // Approximate risk factors with linear models
     for (size_t i = 0; i < names_.size(); i++) {
@@ -1310,19 +1256,30 @@ StaticLinearModel::compute_linear_models(RuntimeContext &context, Person &person
                     double value = person.get_risk_factor_value(coefficient_name);
                     factor += coefficient_value * value;
                 } catch (const std::exception &) {
-                    // If factor is missing, try to use expected value as fallback
-                    // This is needed for factors like energyintake that are calculated later (e.g.,
-                    // in KevinHallModel)
-                    try {
-                        double expected_value = get_expected(context, person.gender, person.age,
-                                                             coefficient_name, std::nullopt, false);
-                        factor += coefficient_value * expected_value;
-                    } catch (const std::exception &e) {
-                        // If expected value also fails, throw the original error
-                        std::cout << "\n[MISSING_FACTOR] Factor missing: "
-                                  << coefficient_name.to_string() << " for model "
-                                  << name.to_string() << " (i=" << i << ") - " << e.what();
-                        throw;
+                    // If factor is missing, try to use expected value as fallback.
+                    // Policy CSV row "EnergyIntake" is mapped to log_energy_intake; factors mean has
+                    // "energyintake" (raw). Use expected raw energy and apply log so we never call
+                    // get_expected("log_energy_intake") which would terminate if key is missing.
+                    double expected_value = 0.0;
+                    if (coefficient_name == log_energy_intake_id) {
+                        expected_value =
+                            get_expected(context, person.gender, person.age, energyintake_id,
+                                         std::nullopt, false);
+                        if (expected_value <= 0) {
+                            expected_value = 1e-10;
+                        }
+                        factor += coefficient_value * std::log(expected_value);
+                    } else {
+                        try {
+                            expected_value = get_expected(context, person.gender, person.age,
+                                                          coefficient_name, std::nullopt, false);
+                            factor += coefficient_value * expected_value;
+                        } catch (const std::exception &e) {
+                            std::cout << "\n[MISSING_FACTOR] Factor missing: "
+                                      << coefficient_name.to_string() << " for model "
+                                      << name.to_string() << " (i=" << i << ") - " << e.what();
+                            throw;
+                        }
                     }
                 }
             }
@@ -1336,23 +1293,29 @@ StaticLinearModel::compute_linear_models(RuntimeContext &context, Person &person
                 }
                 factor += coefficient_value * log(value);
             } catch (const std::exception &) {
-                // If factor is missing, try to use expected value as fallback
-                // This is needed for factors like energyintake that are calculated later (e.g., in
-                // KevinHallModel)
-                try {
-                    double expected_value = get_expected(context, person.gender, person.age,
-                                                         coefficient_name, std::nullopt, false);
-                    if (expected_value <= 0) {
-                        expected_value = 1e-10; // Avoid log of zero or negative
+                // If factor is missing, try expected value. For log_energy_intake use expected
+                // "energyintake" (raw) and apply log, since factors mean has energyintake not
+                // log_energy_intake.
+                double expected_value = 0.0;
+                if (coefficient_name == log_energy_intake_id) {
+                    expected_value =
+                        get_expected(context, person.gender, person.age, energyintake_id,
+                                     std::nullopt, false);
+                } else {
+                    try {
+                        expected_value = get_expected(context, person.gender, person.age,
+                                                      coefficient_name, std::nullopt, false);
+                    } catch (const std::exception &e) {
+                        std::cout << "\n[MISSING_FACTOR] Factor missing (log): "
+                                  << coefficient_name.to_string() << " for model "
+                                  << name.to_string() << " (i=" << i << ") - " << e.what();
+                        throw;
                     }
-                    factor += coefficient_value * log(expected_value);
-                } catch (const std::exception &e) {
-                    // If expected value also fails, throw the original error
-                    std::cout << "\n[MISSING_FACTOR] Factor missing (log): "
-                              << coefficient_name.to_string() << " for model " << name.to_string()
-                              << " (i=" << i << ") - " << e.what();
-                    throw;
                 }
+                if (expected_value <= 0) {
+                    expected_value = 1e-10;
+                }
+                factor += coefficient_value * log(expected_value);
             }
         }
 
@@ -1757,10 +1720,6 @@ std::vector<double> StaticLinearModel::calculate_income_quartiles(const Populati
             }
         }
     }
-
-    std::cout << "\n[QUARTILES] Finished scanning: found " << found_count << " income values from "
-              << processed << " people. Sorting...";
-
     if (sorted_incomes.empty()) {
         throw core::HgpsException(
             "No continuous income values found in population for quartile calculation");
@@ -1800,10 +1759,10 @@ std::vector<double> StaticLinearModel::calculate_income_quartiles(const Populati
     // Q4 is the 100th percentile (maximum value) - not used in thresholds but useful for display
     double q4_value = sorted_incomes.back();
 
-    std::cout << "\n[QUARTILES] Thresholds calculated:\n  Q1=" << quartile_thresholds[0]
-              << " (idx=" << q1_index << ")\n  Q2=" << quartile_thresholds[1]
-              << " (idx=" << q2_index << ")\n  Q3=" << quartile_thresholds[2]
-              << " (idx=" << q3_index << ")\n  Q4=" << q4_value;
+    std::cout << "\n[QUARTILES] Thresholds calculated:\n Q1=" << quartile_thresholds[0]
+              << "\n  Q2=" << quartile_thresholds[1]
+              << "\n  Q3=" << quartile_thresholds[2]
+              << "\n  Q4=" << q4_value;
 
     return quartile_thresholds;
 }
@@ -1826,10 +1785,6 @@ std::vector<double> StaticLinearModel::calculate_income_tertiles(const Populatio
             }
         }
     }
-
-    std::cout << "\n[TERTILES] Finished scanning: found " << found_count << " income values from "
-              << processed << " people. Sorting...";
-
     if (sorted_incomes.empty()) {
         throw core::HgpsException(
             "No continuous income values found in population for tertile calculation");
@@ -1945,27 +1900,30 @@ StaticLinearModel::convert_income_to_category(double continuous_income,
 
 void StaticLinearModel::initialise_physical_activity(RuntimeContext &context, Person &person,
                                                      Random &random) const {
-    // Check if we have physical activity models
-    if (has_physical_activity_models_) {
-        // Check which type of model we have
-        auto simple_model = physical_activity_models_.find(core::Identifier("simple"));
-        auto continuous_model = physical_activity_models_.find(core::Identifier("continuous"));
-
-        if (simple_model != physical_activity_models_.end()) {
-            // India approach: Simple model with standard deviation
-            initialise_simple_physical_activity(context, person, random, simple_model->second);
-        } else if (continuous_model != physical_activity_models_.end()) {
-            // FINCH approach: Continuous model with CSV file loading
-            initialise_continuous_physical_activity(context, person, random,
-                                                    continuous_model->second);
+    const auto &pa_req = context.inputs().project_requirements().physical_activity;
+    if (!pa_req.enabled) {
+        return;
+    }
+    // Use project_requirements.physical_activity.type to choose simple vs continuous (no inference)
+    if (pa_req.type == "simple") {
+        auto it = physical_activity_models_.find(core::Identifier("simple"));
+        if (it != physical_activity_models_.end()) {
+            initialise_simple_physical_activity(context, person, random, it->second);
+        } else {
+            PhysicalActivityModel simple_model;
+            simple_model.model_type = "simple";
+            simple_model.stddev = physical_activity_stddev_;
+            initialise_simple_physical_activity(context, person, random, simple_model);
         }
     } else {
-        // No physical activity models configured - use simple approach with global stddev (India
-        // approach)
-        PhysicalActivityModel simple_model;
-        simple_model.model_type = "simple";
-        simple_model.stddev = physical_activity_stddev_;
-        initialise_simple_physical_activity(context, person, random, simple_model);
+        auto it = physical_activity_models_.find(core::Identifier("continuous"));
+        if (it == physical_activity_models_.end()) {
+            throw core::HgpsException{
+                "project_requirements.physical_activity.type is \"continuous\" but no continuous "
+                "physical activity model is loaded. Add PhysicalActivityModels.continuous in "
+                "static_model.json or set physical_activity.type to \"simple\" in config.json."};
+        }
+        initialise_continuous_physical_activity(context, person, random, it->second);
     }
 }
 
@@ -2165,27 +2123,25 @@ void StaticLinearModel::initialise_simple_physical_activity(
 std::pair<std::vector<core::Identifier>, std::vector<core::DoubleInterval>>
 StaticLinearModel::build_extended_factors_list(
     RuntimeContext &context, const std::vector<core::Identifier> &base_factors,
-    const std::vector<core::DoubleInterval> &base_ranges) const {
-    // Start with base factors and ranges
+    const std::vector<core::DoubleInterval> &base_ranges,
+    bool for_trended_adjustment) const {
+    const auto &req = context.inputs().project_requirements();
     std::vector<core::Identifier> extended_factors = base_factors;
     std::vector<core::DoubleInterval> extended_ranges = base_ranges;
 
-    // Check if income exists in expected table and should be adjusted
-    // Note: Canonical name in expected table is "income" (not "income_continuous")
-    //       Internally, we store it as person.income_continuous, but the factor name is "income"
     const core::Identifier income_id("income");
+    const core::Identifier PhysicalActivity_id("PhysicalActivity");
     bool income_in_base =
         std::find(base_factors.begin(), base_factors.end(), income_id) != base_factors.end();
+    bool pa_in_base = std::find(base_factors.begin(), base_factors.end(), PhysicalActivity_id) !=
+                      base_factors.end();
 
-    // Check if income exists in expected table (canonical name is "income")
-    if (!income_in_base) {
+    bool add_income =
+        for_trended_adjustment ? req.income.trended : req.income.adjust_to_factors_mean;
+    if (!income_in_base && req.income.enabled && add_income) {
         try {
-            // Try to get expected value for income (use male, age 0 as test)
-            // If it doesn't throw, income exists in expected table
             get_expected(context, core::Gender::male, 0, income_id, std::nullopt, false);
             extended_factors.push_back(income_id);
-            // Income uses continuous scale (e.g. ~621); do not use another factor's range
-            // (e.g. 0–42.7) or adjusted income would be clamped and quartiles would collapse.
             if (!base_ranges.empty()) {
                 extended_ranges.push_back(
                     core::DoubleInterval(0.0, 1e9)); // no effective clamp for continuous income
@@ -2195,18 +2151,10 @@ StaticLinearModel::build_extended_factors_list(
         }
     }
 
-    // Check if physical activity exists in expected table and should be adjusted
-    // Note: Canonical name in expected table is "PhysicalActivity" (capital P, capital A)
-    //       Internally, we store it as person.physical_activity, but the factor name is
-    //       "PhysicalActivity"
-    const core::Identifier PhysicalActivity_id("PhysicalActivity");
-    bool pa_in_base = std::find(base_factors.begin(), base_factors.end(), PhysicalActivity_id) !=
-                      base_factors.end();
-
-    // Check if physical activity exists in expected table (canonical name is "PhysicalActivity")
-    if (!pa_in_base) {
+    bool add_pa = for_trended_adjustment ? req.physical_activity.trended
+                                         : req.physical_activity.adjust_to_factors_mean;
+    if (!pa_in_base && req.physical_activity.enabled && add_pa) {
         try {
-            // Try to get expected value for physical activity (use male, age 0 as test)
             get_expected(context, core::Gender::male, 0, PhysicalActivity_id, std::nullopt, false);
             extended_factors.push_back(PhysicalActivity_id);
             if (!base_ranges.empty()) {

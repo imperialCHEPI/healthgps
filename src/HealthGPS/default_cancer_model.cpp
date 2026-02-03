@@ -227,9 +227,9 @@ void DefaultCancerModel::update_remission_cases(RuntimeContext &context) {
 void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
     int incidence_id = definition_.get().table().at(MeasureKey::incidence);
 
-    std::cout << "Start update_incidence_cases: " << disease_type() << "\n";
-    fflush(stderr);
-    fflush(stdout);
+    //std::cout << "Start update_incidence_cases: " << disease_type() << "\n";
+    //fflush(stderr);
+    //fflush(stdout);
 
     const auto &table = definition_.get().table();
     const auto disease_code = disease_type();
@@ -305,9 +305,9 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
                                                     .time_since_onset = 0};
         }
     }
-    std::cout << "End update_incidence_cases: " << disease_type() << "\n";
-    fflush(stderr);
-    fflush(stdout);
+    //std::cout << "End update_incidence_cases: " << disease_type() << "\n";
+    //fflush(stderr);
+    //fflush(stdout);
 }
 
 int DefaultCancerModel::calculate_time_since_onset(RuntimeContext &context,

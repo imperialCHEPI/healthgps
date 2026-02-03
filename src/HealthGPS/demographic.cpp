@@ -201,8 +201,7 @@ void DemographicModule::initialise_population(RuntimeContext &context) {
     }
 
     assert(index == pop_size);
-    std::cout << "\n=== DEMOGRAPHIC MODULE: POPULATION INITIALIZATION COMPLETED ===";
-    std::cout << "\nDemographic initialization order: Age -> Gender -> Region -> Ethnicity";
+    //std::cout << "\n=== DEMOGRAPHIC MODULE: POPULATION INITIALIZATION COMPLETED ===";
 }
 
 void DemographicModule::update_population(RuntimeContext &context,
@@ -431,30 +430,22 @@ int DemographicModule::update_age_and_death_events(RuntimeContext &context,
 }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
-void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &context, Person &person,
-                                          Random &random) {
+void DemographicModule::initialise_region(RuntimeContext &context, Person &person, Random &random) {
+    if (!context.inputs().project_requirements().demographics.region) {
+        return;
+    }
     static bool first_call = true;
-
     if (first_call) {
         std::cout << "\nStarting region initialization...";
         if (region_prevalence_.empty()) {
-            std::cout
-                << "\n  WARNING: No region data available (this is OK for India/PIF projects)";
+            std::cout << "\n  WARNING: No region data available (region=true but no data loaded)";
         } else {
             std::cout << "\n  Region data available for " << region_prevalence_.size()
                       << " age groups";
         }
         first_call = false;
     }
-    // If no region data is available, skip region assignment
     if (region_prevalence_.empty()) {
-        // Region data not available for this project (e.g., India/PIF) - leave as "unknown"
-        // BUT: For FINCH, region data should be available - this is an error
-        if (person.age == 0) {
-            throw core::HgpsException(
-                "Region data is required for newborns but region_prevalence_ is empty. "
-                "Check that region CSV file is loaded and contains data.");
-        }
         return;
     }
 
@@ -545,24 +536,23 @@ void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &conte
 }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
-void DemographicModule::initialise_ethnicity([[maybe_unused]] RuntimeContext &context,
-                                             Person &person, Random &random) {
+void DemographicModule::initialise_ethnicity(RuntimeContext &context, Person &person,
+                                             Random &random) {
+    if (!context.inputs().project_requirements().demographics.ethnicity) {
+        return;
+    }
     static bool first_call = true;
-
     if (first_call) {
         std::cout << "\nStarting ethnicity initialization...";
         if (ethnicity_prevalence_.empty()) {
-            std::cout
-                << "\n  WARNING: No ethnicity data available (this is OK for India/PIF projects)";
+            std::cout << "\n  WARNING: No ethnicity data available (ethnicity=true but no data)";
         } else {
             std::cout << "\n  Ethnicity data available for " << ethnicity_prevalence_.size()
                       << " age groups";
         }
         first_call = false;
     }
-    // If no ethnicity data is available, skip ethnicity assignment
     if (ethnicity_prevalence_.empty()) {
-        // Ethnicity data not available for this project (e.g., India/PIF) - leave as "unknown"
         return;
     }
 
@@ -758,8 +748,7 @@ std::unique_ptr<DemographicModule> build_population_module(Repository &repositor
         std::cout << "\nDEBUG: Ethnicity data set in DemographicModule (" << ethnicity_data.size()
                   << " age groups)";
     } else {
-        std::cout << "\nDEBUG: No ethnicity data available in repository (this is OK for India/PIF "
-                     "projects)";
+        std::cout << "\nDEBUG: No ethnicity data in repository (project_requirements.demographics.ethnicity may be false)";
     }
 
     return demographic_module;

@@ -52,10 +52,12 @@ class ModelInput {
     /// @param ses_info Socio-economic status (SES) model information
     /// @param risk_mapping Hierarchical risk factors model mappings
     /// @param diseases Selected diseases to include in experiment
+    /// @param project_requirements Per-project requirements (demographics, income, PA, etc.)
     /// @param pif_info Population Impact Fraction configuration
     ModelInput(core::DataTable &data, Settings settings, const RunInfo &run_info,
                SESDefinition ses_info, HierarchicalMapping risk_mapping,
                std::vector<core::DiseaseInfo> diseases,
+               hgps::input::ProjectRequirements project_requirements,
                hgps::input::PIFInfo pif_info = hgps::input::PIFInfo{});
 
     /// @brief Gets the simulation experiment settings definition
@@ -106,6 +108,11 @@ class ModelInput {
     /// @return PIF configuration
     const hgps::input::PIFInfo &population_impact_fraction() const noexcept;
 
+    /// @brief Gets the per-project requirements (demographics, income, PA, risk factors, trend,
+    /// two-stage)
+    /// @return Project requirements
+    const hgps::input::ProjectRequirements &project_requirements() const noexcept;
+
   private:
     std::reference_wrapper<core::DataTable> input_data_;
     Settings settings_;
@@ -113,6 +120,7 @@ class ModelInput {
     SESDefinition ses_definition_;
     HierarchicalMapping risk_mapping_;
     std::vector<core::DiseaseInfo> diseases_;
+    hgps::input::ProjectRequirements project_requirements_{};
     bool enable_income_analysis_{
         true}; // This is to set if results be categorised by income or not. Set to TRUE for now.
     hgps::input::PIFInfo pif_info_;

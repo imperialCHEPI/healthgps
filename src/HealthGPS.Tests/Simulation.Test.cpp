@@ -76,7 +76,9 @@ std::shared_ptr<hgps::ModelInput> create_test_configuration(hgps::core::DataTabl
                     .name = "Colorectal cancer"},
     };
 
-    return std::make_shared<hgps::ModelInput>(data, settings, info, ses, mapping, diseases);
+    auto project_requirements = hgps::input::ProjectRequirements{};
+    return std::make_shared<hgps::ModelInput>(data, settings, info, ses, mapping, diseases,
+                                              project_requirements, hgps::input::PIFInfo{});
 }
 
 TEST(TestSimulation, RandomBitGenerator) {
@@ -252,7 +254,9 @@ TEST(TestSimulation, ModuleFactoryRegistry) {
                                                                .code = core::Identifier{"diabetes"},
                                                                .name = "Diabetes Mellitus"}};
 
-    auto inputs = std::make_shared<ModelInput>(data, settings, info, ses, mapping, diseases);
+    auto project_requirements = hgps::input::ProjectRequirements{};
+    auto inputs = std::make_shared<ModelInput>(data, settings, info, ses, mapping, diseases,
+                                              project_requirements, hgps::input::PIFInfo{});
 
     auto manager = DataManager(test_datastore_path);
     auto repository = CachedRepository(manager);
@@ -470,12 +474,13 @@ TEST(TestSimulation, DiseaseModuleUpdateWithInterventionAndPIFConfig) {
                           .code = core::Identifier{"colorectalcancer"},
                           .name = "Colorectal cancer"},
     };
+    auto project_requirements = hgps::input::ProjectRequirements{};
     auto pif_info = PIFInfo{.enabled = true,
                             .data_root_path = "data",
                             .risk_factor = "Smoking",
                             .scenario = "Scenario1"};
-    auto inputs =
-        std::make_shared<ModelInput>(data, settings, run, ses, mapping, diseases, pif_info);
+    auto inputs = std::make_shared<ModelInput>(data, settings, run, ses, mapping, diseases,
+                                               project_requirements, pif_info);
 
     auto manager = DataManager(test_datastore_path);
     auto repository = CachedRepository(manager);

@@ -263,14 +263,12 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         trend_type = hgps::TrendType::IncomeTrend;
     }
 
-    // Detect whether we're using legacy structure (India/PIF) or new matrix-based CSV structure
-    // (FINCH)
+    // CSV structure (matrix-based vs legacy) for loading risk factor models only
     bool is_matrix_based_structure = opt["RiskFactorModels"].contains("boxcox_coefficients");
-
     if (is_matrix_based_structure) {
-        std::cout << "\nDEBUG: Detected matrix-based CSV structure (FINCH approach)";
+        std::cout << "\nDEBUG: Using matrix-based CSV structure for risk factors";
     } else {
-        std::cout << "\nDEBUG: Detected legacy individual structure (India/PIF approach)";
+        std::cout << "\nDEBUG: Using legacy CSV structure for risk factors";
     }
 
     // MAHIMA: Auto-detect income trend data if present in static_model.json
@@ -521,8 +519,13 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             // Load policy coefficients: row names (coefficients) -> column names (risk factors) ->
             // values
             // CSV structure: rows = coefficients, columns = risk factors
+            // Normalise EnergyIntake -> log_energy_intake so policy uses the same factor name as
+            // correlation/BoxCox (log energy intake is stored under "log_energy_intake").
             for (size_t row_idx = 0; row_idx < policy_doc.GetRowCount(); ++row_idx) {
                 std::string coefficient_name = policy_doc.GetCell<std::string>(0, row_idx);
+                if (core::case_insensitive::equals(coefficient_name, "EnergyIntake")) {
+                    coefficient_name = "log_energy_intake";
+                }
                 csv_policy_coefficients[coefficient_name] = {};
 
                 for (size_t col_idx = 1; col_idx < policy_doc.GetColumnCount(); ++col_idx) {
@@ -1176,39 +1179,33 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     // Income models for different income classifications.
     std::unordered_map<core::Income, LinearModelParams> income_models;
 
-    // Read income_categories from config.json to determine which system to use
-    std::string income_categories = "3"; // Default to 3-category system
-    if (config.config_data.contains("income_categories")) {
-        income_categories = config.config_data["income_categories"].get<std::string>();
-        // Validate income_categories value
-        if (income_categories != "3" && income_categories != "4") {
-            throw core::HgpsException{fmt::format(
-                "Invalid income_categories: {}. Must be one of: 3, 4", income_categories)};
-        }
+    // Income: use project_requirements (required in config); no fallback
+    const auto &inc_req = config.project_requirements.income;
+    std::string income_categories = inc_req.categories;
+    if (income_categories != "3" && income_categories != "4") {
+        throw core::HgpsException{fmt::format(
+            "project_requirements.income.categories must be \"3\" or \"4\". Got: \"{}\"",
+            income_categories)};
     }
+    std::cout << "\nUsing " << income_categories << " income categories (from project_requirements)\n";
 
-    // Print which income category system is being used
-    std::cout << "\nUsing " << income_categories << " income categories system \n";
+    bool is_continuous_model = (inc_req.type == "continuous");
+    bool model_has_continuous = opt["IncomeModels"].contains("continuous");
 
-    // Check if this is a continuous income model (FINCH approach) or categorical (India approach)
-    bool is_continuous_model = false;
-    if (opt["IncomeModels"].contains("continuous")) {
-        is_continuous_model = true;
-        std::cout << "\nDetected FINCH continuous income model - will calculate continuous income "
-                     "then convert to categories\n";
-
-        // For continuous models, we don't need to process IncomeModels here
-        // The continuous income calculation will be handled separately
-        // We just need to ensure the continuous model exists
+    if (is_continuous_model) {
+        if (!model_has_continuous) {
+            throw core::HgpsException{
+                "project_requirements.income.type is \"continuous\" but static_model.json "
+                "IncomeModels has no \"continuous\" entry. Add a continuous income model or set "
+                "income.type to \"categorical\" in config.json."};
+        }
         if (!opt["IncomeModels"]["continuous"].contains("Intercept") &&
             !opt["IncomeModels"]["continuous"].contains("csv_file")) {
-            throw core::HgpsException("Continuous income model missing required fields: "
-                                      "Intercept/Coefficients or csv_file");
+            throw core::HgpsException(
+                "Continuous income model missing required fields: Intercept/Coefficients or csv_file");
         }
+        std::cout << "\nIncome type from project_requirements: continuous (regression then categories)\n";
 
-        // Create placeholder income models for the categories (these will be filled by the
-        // continuous calculation) For now, create empty models - they'll be populated when
-        // continuous income is calculated
         income_models.emplace(core::Income::low, LinearModelParams{});
         if (income_categories == "4") {
             income_models.emplace(core::Income::lowermiddle, LinearModelParams{});
@@ -1217,60 +1214,66 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             income_models.emplace(core::Income::middle, LinearModelParams{});
         }
         income_models.emplace(core::Income::high, LinearModelParams{});
-
     } else {
-        // This is a categorical income model (India approach)
-        std::cout
-            << "Detected India categorical income model - directly assigning income categories\n";
+        if (model_has_continuous && opt["IncomeModels"].size() == 1u) {
+            throw core::HgpsException{
+                "project_requirements.income.type is \"categorical\" but static_model.json "
+                "IncomeModels only has \"continuous\". Add categorical income models or set "
+                "income.type to \"continuous\" in config.json."};
+        }
+        std::cout << "\nIncome type from project_requirements: categorical (direct category assignment)\n";
 
         for (const auto &[key, json_params] : opt["IncomeModels"].items()) {
-            // Skip if this is a simple/continuous model (already handled above)
             if (key == "simple" || key == "continuous") {
                 continue;
             }
-
-            // Get income category using the helper function
             core::Income category = map_income_category(key, income_categories);
-
-            // Get income model parameters.
             LinearModelParams model;
             model.intercept = json_params["Intercept"].get<double>();
             model.coefficients =
                 json_params["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
-
-            // Insert income model.
             income_models.emplace(category, std::move(model));
         }
     }
 
-    // MAHIMA: Load physical activity models if present
-    // These can be either simple (India approach) or continuous (FINCH approach) or vice versa
+    // Physical activity: load only the type specified in project_requirements (no fallback)
+    const auto &pa_req = config.project_requirements.physical_activity;
     std::unordered_map<core::Identifier, PhysicalActivityModel> physical_activity_models;
-    double physical_activity_stddev = 0.0; // Default value
+    double physical_activity_stddev = 0.0;
 
-    if (opt.contains("PhysicalActivityModels")) {
-        std::cout << "\nLoading PhysicalActivityModels...";
+    if (pa_req.enabled && opt.contains("PhysicalActivityModels")) {
+        const std::string &pa_type = pa_req.type; // "simple" or "continuous"
+        if (!opt["PhysicalActivityModels"].contains(pa_type)) {
+            throw core::HgpsException{fmt::format(
+                "project_requirements.physical_activity.type is \"{}\" but static_model.json "
+                "PhysicalActivityModels has no \"{}\" entry. Add it or set physical_activity.type "
+                "in config.json.",
+                pa_type, pa_type)};
+        }
+        std::cout << "\nLoading PhysicalActivityModels (from project_requirements: type=" << pa_type << ")...";
 
-        for (const auto &[model_name, model_config] : opt["PhysicalActivityModels"].items()) {
-            PhysicalActivityModel model;
-            model.model_type = model_name; // "simple" or "continuous"
+        const auto &model_config = opt["PhysicalActivityModels"][pa_type];
+        const std::string model_name = pa_type;
+        PhysicalActivityModel model;
+        model.model_type = model_name;
 
-            if (model_name == "simple") {
-                // India approach: Simple model with standard deviation
-                std::cout << "\n  Loading simple model '" << model_name << "' (India approach)";
+        if (model_name == "simple") {
+            std::cout << "\n  Loading simple PA model";
 
-                if (model_config.contains("PhysicalActivityStdDev")) {
-                    model.stddev = model_config["PhysicalActivityStdDev"].get<double>();
-                    std::cout << "\n    Standard deviation: " << model.stddev;
-                } else {
-                    // Use the global PhysicalActivityStdDev as fallback
-                    model.stddev = physical_activity_stddev;
-                    std::cout << "\n    Using global standard deviation: " << model.stddev;
-                }
+            if (model_config.contains("PhysicalActivityStdDev")) {
+                model.stddev = model_config["PhysicalActivityStdDev"].get<double>();
+                std::cout << "\n    Standard deviation: " << model.stddev;
+            } else {
+                physical_activity_stddev = opt.contains("PhysicalActivityStdDev")
+                    ? opt["PhysicalActivityStdDev"].get<double>()
+                    : 0.0;
+                model.stddev = physical_activity_stddev;
+                std::cout << "\n    Using global standard deviation: " << model.stddev;
+            }
+            physical_activity_models[core::Identifier(model_name)] = std::move(model);
 
-            } else if (model_name == "continuous") {
-                // FINCH approach: Continuous model with CSV file loading
-                std::cout << "\n  Loading continuous model '" << model_name << "' (FINCH approach)";
+        } else if (model_name == "continuous") {
+            std::cout << "\n  Loading continuous PA model";
 
                 if (model_config.contains("csv_file")) {
                     std::string csv_filename = model_config["csv_file"].get<std::string>();
@@ -1332,17 +1335,15 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                         "Continuous physical activity model '{}' must specify 'csv_file'",
                         model_name)};
                 }
-            } else {
-                throw core::HgpsException{fmt::format(
-                    "Unknown physical activity model type: '{}'. Must be 'simple' or 'continuous'",
-                    model_name)};
-            }
-
             physical_activity_models[core::Identifier(model_name)] = std::move(model);
         }
+    } else if (!pa_req.enabled) {
+        std::cout << "\nPhysical activity disabled in project_requirements, skipping PA models";
     } else {
-        std::cout << "\nNo PhysicalActivityModels found, using PhysicalActivityStdDev approach";
-        physical_activity_stddev = opt["PhysicalActivityStdDev"].get<double>();
+        std::cout << "\nNo PhysicalActivityModels in static_model.json, using PhysicalActivityStdDev";
+        physical_activity_stddev = opt.contains("PhysicalActivityStdDev")
+            ? opt["PhysicalActivityStdDev"].get<double>()
+            : 0.0;
     }
 
     std::cout << "\nDEBUG: Physical activity models loading completed successfully";

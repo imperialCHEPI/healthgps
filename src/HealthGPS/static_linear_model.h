@@ -264,7 +264,8 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     std::pair<std::vector<core::Identifier>, std::vector<core::DoubleInterval>>
     build_extended_factors_list(RuntimeContext &context,
                                 const std::vector<core::Identifier> &base_factors,
-                                const std::vector<core::DoubleInterval> &base_ranges) const;
+                                const std::vector<core::DoubleInterval> &base_ranges,
+                                bool for_trended_adjustment = false) const;
 
     /// @brief Initialise physical activity using continuous model approach (FINCH method)
     /// @param context The runtime context
