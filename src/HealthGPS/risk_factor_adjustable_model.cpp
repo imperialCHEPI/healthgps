@@ -2,8 +2,8 @@
 
 #include "risk_factor_adjustable_model.h"
 
-#include <fmt/core.h>
 #include "sync_message.h"
+#include <fmt/core.h>
 
 #include <algorithm>
 #include <cmath>

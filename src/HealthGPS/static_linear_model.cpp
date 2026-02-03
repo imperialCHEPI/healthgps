@@ -1257,14 +1257,14 @@ StaticLinearModel::compute_linear_models(RuntimeContext &context, Person &person
                     factor += coefficient_value * value;
                 } catch (const std::exception &) {
                     // If factor is missing, try to use expected value as fallback.
-                    // Policy CSV row "EnergyIntake" is mapped to log_energy_intake; factors mean has
-                    // "energyintake" (raw). Use expected raw energy and apply log so we never call
-                    // get_expected("log_energy_intake") which would terminate if key is missing.
+                    // Policy CSV row "EnergyIntake" is mapped to log_energy_intake; factors mean
+                    // has "energyintake" (raw). Use expected raw energy and apply log so we never
+                    // call get_expected("log_energy_intake") which would terminate if key is
+                    // missing.
                     double expected_value = 0.0;
                     if (coefficient_name == log_energy_intake_id) {
-                        expected_value =
-                            get_expected(context, person.gender, person.age, energyintake_id,
-                                         std::nullopt, false);
+                        expected_value = get_expected(context, person.gender, person.age,
+                                                      energyintake_id, std::nullopt, false);
                         if (expected_value <= 0) {
                             expected_value = 1e-10;
                         }
@@ -1298,9 +1298,8 @@ StaticLinearModel::compute_linear_models(RuntimeContext &context, Person &person
                 // log_energy_intake.
                 double expected_value = 0.0;
                 if (coefficient_name == log_energy_intake_id) {
-                    expected_value =
-                        get_expected(context, person.gender, person.age, energyintake_id,
-                                     std::nullopt, false);
+                    expected_value = get_expected(context, person.gender, person.age,
+                                                  energyintake_id, std::nullopt, false);
                 } else {
                     try {
                         expected_value = get_expected(context, person.gender, person.age,
@@ -1760,8 +1759,7 @@ std::vector<double> StaticLinearModel::calculate_income_quartiles(const Populati
     double q4_value = sorted_incomes.back();
 
     std::cout << "\n[QUARTILES] Thresholds calculated:\n Q1=" << quartile_thresholds[0]
-              << "\n  Q2=" << quartile_thresholds[1]
-              << "\n  Q3=" << quartile_thresholds[2]
+              << "\n  Q2=" << quartile_thresholds[1] << "\n  Q3=" << quartile_thresholds[2]
               << "\n  Q4=" << q4_value;
 
     return quartile_thresholds;
@@ -2121,10 +2119,10 @@ void StaticLinearModel::initialise_simple_physical_activity(
 
 // MAHIMA: Function to build extended factors list by checking for income and physical activity
 std::pair<std::vector<core::Identifier>, std::vector<core::DoubleInterval>>
-StaticLinearModel::build_extended_factors_list(
-    RuntimeContext &context, const std::vector<core::Identifier> &base_factors,
-    const std::vector<core::DoubleInterval> &base_ranges,
-    bool for_trended_adjustment) const {
+StaticLinearModel::build_extended_factors_list(RuntimeContext &context,
+                                               const std::vector<core::Identifier> &base_factors,
+                                               const std::vector<core::DoubleInterval> &base_ranges,
+                                               bool for_trended_adjustment) const {
     const auto &req = context.inputs().project_requirements();
     std::vector<core::Identifier> extended_factors = base_factors;
     std::vector<core::DoubleInterval> extended_ranges = base_ranges;

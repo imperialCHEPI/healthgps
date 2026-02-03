@@ -172,15 +172,15 @@ struct ProjectRequirements {
 
     struct Income {
         bool enabled{true};
-        std::string type{"continuous"};   // "continuous" | "categorical"
-        std::string categories{"4"};      // "3" | "4"
+        std::string type{"continuous"}; // "continuous" | "categorical"
+        std::string categories{"4"};    // "3" | "4"
         bool adjust_to_factors_mean{true};
         bool trended{false};
     } income;
 
     struct PhysicalActivity {
         bool enabled{true};
-        std::string type{"continuous"};   // "simple" | "continuous"
+        std::string type{"continuous"}; // "simple" | "continuous"
         bool adjust_to_factors_mean{true};
         bool trended{false};
     } physical_activity;
@@ -192,7 +192,7 @@ struct ProjectRequirements {
 
     struct Trend {
         bool enabled{false};
-        std::string type{"null"};        // "null" | "trend" | "income_trend"
+        std::string type{"null"}; // "null" | "trend" | "income_trend"
     } trend;
 
     struct TwoStage {

@@ -201,7 +201,7 @@ void DemographicModule::initialise_population(RuntimeContext &context) {
     }
 
     assert(index == pop_size);
-    //std::cout << "\n=== DEMOGRAPHIC MODULE: POPULATION INITIALIZATION COMPLETED ===";
+    // std::cout << "\n=== DEMOGRAPHIC MODULE: POPULATION INITIALIZATION COMPLETED ===";
 }
 
 void DemographicModule::update_population(RuntimeContext &context,
@@ -748,7 +748,8 @@ std::unique_ptr<DemographicModule> build_population_module(Repository &repositor
         std::cout << "\nDEBUG: Ethnicity data set in DemographicModule (" << ethnicity_data.size()
                   << " age groups)";
     } else {
-        std::cout << "\nDEBUG: No ethnicity data in repository (project_requirements.demographics.ethnicity may be false)";
+        std::cout << "\nDEBUG: No ethnicity data in repository "
+                     "(project_requirements.demographics.ethnicity may be false)";
     }
 
     return demographic_module;

@@ -8,27 +8,53 @@
             "type": "object",
             "description": "Which demographic dimensions this project uses",
             "properties": {
-                "age": { "type": "boolean", "description": "Use age (typically true)" },
-                "gender": { "type": "boolean", "description": "Use gender (typically true)" },
-                "region": { "type": "boolean", "description": "Use region (FINCH/PIF: true, India: false)" },
-                "ethnicity": { "type": "boolean", "description": "Use ethnicity (FINCH/PIF: true, India: false)" }
+                "age": {
+                    "type": "boolean",
+                    "description": "Use age (typically true)"
+                },
+                "gender": {
+                    "type": "boolean",
+                    "description": "Use gender (typically true)"
+                },
+                "region": {
+                    "type": "boolean",
+                    "description": "Use region (FINCH/PIF: true, India: false)"
+                },
+                "ethnicity": {
+                    "type": "boolean",
+                    "description": "Use ethnicity (FINCH/PIF: true, India: false)"
+                }
             },
-            "required": ["age", "gender", "region", "ethnicity"],
+            "required": [
+                "age",
+                "gender",
+                "region",
+                "ethnicity"
+            ],
             "additionalProperties": false
         },
         "income": {
             "type": "object",
             "description": "Income assignment and adjustment",
             "properties": {
-                "enabled": { "type": "boolean", "description": "Use income in the model" },
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Use income in the model"
+                },
                 "type": {
                     "type": "string",
-                    "enum": ["continuous", "categorical"],
+                    "enum": [
+                        "continuous",
+                        "categorical"
+                    ],
                     "description": "continuous = regression then categories; categorical = logits/softmax only"
                 },
                 "categories": {
                     "type": "string",
-                    "enum": ["3", "4"],
+                    "enum": [
+                        "3",
+                        "4"
+                    ],
                     "description": "Number of income categories (3 or 4)"
                 },
                 "adjust_to_factors_mean": {
@@ -40,17 +66,29 @@
                     "description": "Include income in trended adjustment"
                 }
             },
-            "required": ["enabled", "type", "categories", "adjust_to_factors_mean", "trended"],
+            "required": [
+                "enabled",
+                "type",
+                "categories",
+                "adjust_to_factors_mean",
+                "trended"
+            ],
             "additionalProperties": false
         },
         "physical_activity": {
             "type": "object",
             "description": "Physical activity assignment and adjustment",
             "properties": {
-                "enabled": { "type": "boolean", "description": "Use physical activity (have PA models)" },
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Use physical activity (have PA models)"
+                },
                 "type": {
                     "type": "string",
-                    "enum": ["simple", "continuous"],
+                    "enum": [
+                        "simple",
+                        "continuous"
+                    ],
                     "description": "simple = log-normal from factors mean; continuous = region/ethnicity/income model"
                 },
                 "adjust_to_factors_mean": {
@@ -62,41 +100,71 @@
                     "description": "Include PA in trended adjustment"
                 }
             },
-            "required": ["enabled", "type", "adjust_to_factors_mean", "trended"],
+            "required": [
+                "enabled",
+                "type",
+                "adjust_to_factors_mean",
+                "trended"
+            ],
             "additionalProperties": false
         },
         "risk_factors": {
             "type": "object",
             "description": "Base risk factors (e.g. food nutrients) adjustment",
             "properties": {
-                "adjust_to_factors_mean": { "type": "boolean" },
-                "trended": { "type": "boolean" }
+                "adjust_to_factors_mean": {
+                    "type": "boolean"
+                },
+                "trended": {
+                    "type": "boolean"
+                }
             },
-            "required": ["adjust_to_factors_mean", "trended"],
+            "required": [
+                "adjust_to_factors_mean",
+                "trended"
+            ],
             "additionalProperties": false
         },
         "trend": {
             "type": "object",
             "description": "Time trend for expected values",
             "properties": {
-                "enabled": { "type": "boolean", "description": "Use any trend" },
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Use any trend"
+                },
                 "type": {
                     "type": "string",
-                    "enum": ["null", "trend", "income_trend"],
+                    "enum": [
+                        "null",
+                        "trend",
+                        "income_trend"
+                    ],
                     "description": "null = no trend; trend = UPF; income_trend = income-based"
                 }
             },
-            "required": ["enabled", "type"],
+            "required": [
+                "enabled",
+                "type"
+            ],
             "additionalProperties": false
         },
         "two_stage": {
             "type": "object",
             "description": "Two-stage modelling (logistic for zero vs non-zero, then BoxCox)",
             "properties": {
-                "use_logistic": { "type": "boolean", "description": "Use logistic regression (Stage 1); if false, BoxCox only" },
-                "logistic_file": { "type": "string", "description": "Optional; CSV name when use_logistic is true" }
+                "use_logistic": {
+                    "type": "boolean",
+                    "description": "Use logistic regression (Stage 1); if false, BoxCox only"
+                },
+                "logistic_file": {
+                    "type": "string",
+                    "description": "Optional; CSV name when use_logistic is true"
+                }
             },
-            "required": ["use_logistic"],
+            "required": [
+                "use_logistic"
+            ],
             "additionalProperties": false
         }
     },

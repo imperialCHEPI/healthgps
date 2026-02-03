@@ -256,7 +256,7 @@ TEST(TestSimulation, ModuleFactoryRegistry) {
 
     auto project_requirements = hgps::input::ProjectRequirements{};
     auto inputs = std::make_shared<ModelInput>(data, settings, info, ses, mapping, diseases,
-                                              project_requirements, hgps::input::PIFInfo{});
+                                               project_requirements, hgps::input::PIFInfo{});
 
     auto manager = DataManager(test_datastore_path);
     auto repository = CachedRepository(manager);
