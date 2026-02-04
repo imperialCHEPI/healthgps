@@ -1,9 +1,9 @@
 #include "static_linear_model.h"
 #include "HealthGPS.Core/exception.h"
-#include "HealthGPS.Input/poco.h"
 #include "population.h"
 #include "risk_factor_adjustable_model.h"
 #include "runtime_context.h"
+#include "HealthGPS.Input/poco.h"
 
 #include <algorithm>
 #include <cctype>
@@ -310,47 +310,44 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         }
     }
     set_logistic_factors(logistic_factors_set);
-    std::cout << "\nSet " << logistic_factors_set.size()
-              << " logistic factors for simulated mean calculation";
+    std::cout << "\nSet " << logistic_factors_set.size() << " logistic factors for simulated mean calculation";
 
-    // MAHIMA: Initial factors-mean adjustment only when user sets
-    // risk_factors.adjust_to_factors_mean to true in project_requirements. No hardcoded true/false
-    // – we use config only.
+    // MAHIMA: Initial factors-mean adjustment only when user sets risk_factors.adjust_to_factors_mean
+    // to true in project_requirements. No hardcoded true/false – we use config only.
     const auto &req = context.inputs().project_requirements();
     if (req.risk_factors.adjust_to_factors_mean) {
-        // Build extended list: adds income/PA to adjustement for factors mean only when
-        // project_requirements say adjust_to_factors_mean
-        auto [extended_factors, extended_ranges] =
-            build_extended_factors_list(context, names_, ranges_);
+        // Build extended list: adds income/PA to adjustement for factors mean only when project_requirements say adjust_to_factors_mean
+    auto [extended_factors, extended_ranges] =
+        build_extended_factors_list(context, names_, ranges_);
 
-        if (extended_factors.size() > names_.size()) {
+    if (extended_factors.size() > names_.size()) {
             std::vector<std::string> added;
             const core::Identifier income_id("income");
             const core::Identifier pa_id("PhysicalActivity");
             auto in_base = [&names = names_](const core::Identifier &id) {
                 return std::find(names.begin(), names.end(), id) != names.end();
             };
-            if (!in_base(income_id) && std::find(extended_factors.begin(), extended_factors.end(),
-                                                 income_id) != extended_factors.end()) {
+            if (!in_base(income_id) &&
+                std::find(extended_factors.begin(), extended_factors.end(), income_id) !=
+                    extended_factors.end()) {
                 added.push_back("income");
             }
-            if (!in_base(pa_id) && std::find(extended_factors.begin(), extended_factors.end(),
-                                             pa_id) != extended_factors.end()) {
+            if (!in_base(pa_id) &&
+                std::find(extended_factors.begin(), extended_factors.end(), pa_id) !=
+                    extended_factors.end()) {
                 added.push_back("physical_activity");
             }
             std::string list_str;
             for (size_t i = 0; i < added.size(); ++i) {
-                if (i > 0)
-                    list_str += ", ";
+                if (i > 0) list_str += ", ";
                 list_str += added[i];
             }
             std::cout << "\nIncluding " << (list_str.empty() ? "additional factors" : list_str)
                       << " in adjustment (extended from " << names_.size() << " to "
                       << extended_factors.size() << " factors)";
-        }
-        adjust_risk_factors(context, extended_factors,
-                            extended_ranges.empty() ? std::nullopt
-                                                    : OptionalRanges{extended_ranges},
+    }
+    adjust_risk_factors(context, extended_factors,
+                        extended_ranges.empty() ? std::nullopt : OptionalRanges{extended_ranges},
                             false); // false = initial adjustment, not trended
     }
 
@@ -497,15 +494,15 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         // MAHIMA: Apply trend only when user sets project_requirements.trend.enabled true.
         // trend_type_ is set from project_requirements.trend.type in model_parser (no override).
         if (req.trend.enabled) {
-            switch (trend_type_) {
-            case TrendType::Null:
-                break;
+        switch (trend_type_) {
+        case TrendType::Null:
+            break;
             case TrendType::UPFTrend:
-                initialise_UPF_trends(context, person);
-                break;
-            case TrendType::IncomeTrend:
-                initialise_income_trends(context, person);
-                break;
+            initialise_UPF_trends(context, person);
+            break;
+        case TrendType::IncomeTrend:
+            initialise_income_trends(context, person);
+            break;
             }
         }
     }
@@ -555,7 +552,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
             std::vector<double> thresholds;
             if (income_categories_ == "4") {
                 thresholds = calculate_income_quartiles(context.population());
-            } else {
+    } else {
                 thresholds = calculate_income_tertiles(context.population());
             }
             for (auto &person : context.population()) {
@@ -564,10 +561,8 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
             }
         }
     } else {
-        // MAHIMA: Skipped because user set trend.enabled or risk_factors.trended false in
-        // project_requirements.
-        std::cout << "\nSkipping trended adjustment (project_requirements.trend.enabled or "
-                     "risk_factors.trended is false)";
+        // MAHIMA: Skipped because user set trend.enabled or risk_factors.trended false in project_requirements.
+        std::cout << "\nSkipping trended adjustment (project_requirements.trend.enabled or risk_factors.trended is false)";
     }
 }
 
@@ -599,16 +594,14 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
         }
     }
 
-    // MAHIMA: Initial factors-mean adjustment only when user sets
-    // risk_factors.adjust_to_factors_mean true. We use project_requirements only – no hardcoded
-    // true/false.
+    // MAHIMA: Initial factors-mean adjustment only when user sets risk_factors.adjust_to_factors_mean
+    // true. We use project_requirements only – no hardcoded true/false.
     const auto &req = context.inputs().project_requirements();
     if (req.risk_factors.adjust_to_factors_mean) {
-        auto [extended_factors, extended_ranges] =
-            build_extended_factors_list(context, names_, ranges_);
-        adjust_risk_factors(context, extended_factors,
-                            extended_ranges.empty() ? std::nullopt
-                                                    : OptionalRanges{extended_ranges},
+    auto [extended_factors, extended_ranges] =
+        build_extended_factors_list(context, names_, ranges_);
+    adjust_risk_factors(context, extended_factors,
+                        extended_ranges.empty() ? std::nullopt : OptionalRanges{extended_ranges},
                             false); // false = initial adjustment, not trended
     }
 
@@ -685,15 +678,15 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 
             // MAHIMA: Apply trend only when user sets project_requirements.trend.enabled true.
             if (req.trend.enabled) {
-                switch (trend_type_) {
-                case TrendType::Null:
-                    break;
+            switch (trend_type_) {
+            case TrendType::Null:
+                break;
                 case TrendType::UPFTrend:
-                    initialise_UPF_trends(context, person);
-                    break;
-                case TrendType::IncomeTrend:
-                    initialise_income_trends(context, person);
-                    break;
+                initialise_UPF_trends(context, person);
+                break;
+            case TrendType::IncomeTrend:
+                initialise_income_trends(context, person);
+                break;
                 }
             }
         } else {
@@ -703,15 +696,15 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 
             // MAHIMA: Apply trend only when project_requirements.trend.enabled is true.
             if (req.trend.enabled) {
-                switch (trend_type_) {
-                case TrendType::Null:
-                    break;
+            switch (trend_type_) {
+            case TrendType::Null:
+                break;
                 case TrendType::UPFTrend:
-                    update_UPF_trends(context, person);
-                    break;
-                case TrendType::IncomeTrend:
-                    update_income_trends(context, person);
-                    break;
+                update_UPF_trends(context, person);
+                break;
+            case TrendType::IncomeTrend:
+                update_income_trends(context, person);
+                break;
                 }
             }
         }
@@ -1297,8 +1290,7 @@ StaticLinearModel::compute_linear_models(RuntimeContext &context, Person &person
                 continue;
             }
 
-            // Efficiently handle age-related coefficients (use age_for_models: capped if user set
-            // max)
+            // Efficiently handle age-related coefficients (use age_for_models: capped if user set max)
             if (coefficient_name == age_id || coefficient_name == Age_id) {
                 factor += coefficient_value * age_for_models;
             } else if (coefficient_name == age2_id || coefficient_name == Age2_id) {
@@ -1327,13 +1319,13 @@ StaticLinearModel::compute_linear_models(RuntimeContext &context, Person &person
                     } else {
                         try {
                             expected_value = get_expected(context, person.gender, person.age,
-                                                          coefficient_name, std::nullopt, false);
-                            factor += coefficient_value * expected_value;
-                        } catch (const std::exception &e) {
-                            std::cout << "\n[MISSING_FACTOR] Factor missing: "
-                                      << coefficient_name.to_string() << " for model "
-                                      << name.to_string() << " (i=" << i << ") - " << e.what();
-                            throw;
+                                                             coefficient_name, std::nullopt, false);
+                        factor += coefficient_value * expected_value;
+                    } catch (const std::exception &e) {
+                        std::cout << "\n[MISSING_FACTOR] Factor missing: "
+                                  << coefficient_name.to_string() << " for model "
+                                  << name.to_string() << " (i=" << i << ") - " << e.what();
+                        throw;
                         }
                     }
                 }
@@ -1358,13 +1350,13 @@ StaticLinearModel::compute_linear_models(RuntimeContext &context, Person &person
                 } else {
                     try {
                         expected_value = get_expected(context, person.gender, person.age,
-                                                      coefficient_name, std::nullopt, false);
-                    } catch (const std::exception &e) {
-                        std::cout << "\n[MISSING_FACTOR] Factor missing (log): "
+                                                         coefficient_name, std::nullopt, false);
+                } catch (const std::exception &e) {
+                    std::cout << "\n[MISSING_FACTOR] Factor missing (log): "
                                   << coefficient_name.to_string() << " for model "
                                   << name.to_string() << " (i=" << i << ") - " << e.what();
-                        throw;
-                    }
+                    throw;
+                }
                 }
                 if (expected_value <= 0) {
                     expected_value = 1e-10;
@@ -1962,11 +1954,11 @@ void StaticLinearModel::initialise_physical_activity(RuntimeContext &context, Pe
         auto it = physical_activity_models_.find(core::Identifier("simple"));
         if (it != physical_activity_models_.end()) {
             initialise_simple_physical_activity(context, person, random, it->second);
-        } else {
-            PhysicalActivityModel simple_model;
-            simple_model.model_type = "simple";
-            simple_model.stddev = physical_activity_stddev_;
-            initialise_simple_physical_activity(context, person, random, simple_model);
+    } else {
+        PhysicalActivityModel simple_model;
+        simple_model.model_type = "simple";
+        simple_model.stddev = physical_activity_stddev_;
+        initialise_simple_physical_activity(context, person, random, simple_model);
         }
     } else {
         auto it = physical_activity_models_.find(core::Identifier("continuous"));
@@ -2173,10 +2165,9 @@ void StaticLinearModel::initialise_simple_physical_activity(
 }
 
 // MAHIMA: Build extended factors list from project_requirements only.
-// For initial adjustment: adds income/PA only if
-// project_requirements.income/pa.adjust_to_factors_mean is true. For trended adjustment: adds
-// income/PA only if project_requirements.income/pa.trended is true. No hardcoded true/false – we
-// use config only so the user controls behaviour explicitly.
+// For initial adjustment: adds income/PA only if project_requirements.income/pa.adjust_to_factors_mean
+// is true. For trended adjustment: adds income/PA only if project_requirements.income/pa.trended is true.
+// No hardcoded true/false – we use config only so the user controls behaviour explicitly.
 std::pair<std::vector<core::Identifier>, std::vector<core::DoubleInterval>>
 StaticLinearModel::build_extended_factors_list(RuntimeContext &context,
                                                const std::vector<core::Identifier> &base_factors,
