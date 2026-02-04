@@ -36,7 +36,7 @@ double income_category_numeric(core::Income inc) {
 
 ResultFileWriter::ResultFileWriter(const std::filesystem::path &file_name, ExperimentInfo info,
                                    bool write_income_csv)
-    : info_{std::move(info)}, base_filename_{file_name}, write_income_csv_{write_income_csv} {
+    : info_{std::move(info)}, write_income_csv_{write_income_csv}, base_filename_{file_name} {
     stream_.open(file_name, std::ofstream::out | std::ofstream::app);
     if (stream_.fail() || !stream_.is_open()) {
         throw std::invalid_argument(fmt::format("Cannot open output file: {}", file_name.string()));
@@ -57,7 +57,7 @@ ResultFileWriter::ResultFileWriter(ResultFileWriter &&other) noexcept
     : stream_{std::move(other.stream_)}, csvstream_{std::move(other.csvstream_)},
       income_csvstreams_{std::move(other.income_csvstreams_)},
       income_first_row_{std::move(other.income_first_row_)}, info_{std::move(other.info_)},
-      base_filename_{std::move(other.base_filename_)}, write_income_csv_{other.write_income_csv_} {}
+      write_income_csv_{other.write_income_csv_}, base_filename_{std::move(other.base_filename_)} {}
 
 ResultFileWriter &ResultFileWriter::operator=(ResultFileWriter &&other) noexcept {
     stream_.close();
