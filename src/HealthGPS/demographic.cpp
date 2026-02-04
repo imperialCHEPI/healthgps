@@ -236,8 +236,9 @@ void DemographicModule::update_population(RuntimeContext &context,
             std::string region_after = person.region;
             initialise_ethnicity(context, person, context.random());
 
-            // Only require region/ethnicity to be set when the project uses them (project_requirements).
-            // For India etc. where demographics.region/ethnicity are false, "unknown" is allowed.
+            // Only require region/ethnicity to be set when the project uses them
+            // (project_requirements). For India etc. where demographics.region/ethnicity are false,
+            // "unknown" is allowed.
             const auto &demographics = context.inputs().project_requirements().demographics;
             if (demographics.region && (person.region == "unknown" || person.region.empty())) {
                 throw core::HgpsException(fmt::format(
@@ -247,7 +248,8 @@ void DemographicModule::update_population(RuntimeContext &context,
                     "region_prevalence_ size: {}",
                     newborn_count, region_before, region_after, region_prevalence_.size()));
             }
-            if (demographics.ethnicity && (person.ethnicity == "unknown" || person.ethnicity.empty())) {
+            if (demographics.ethnicity &&
+                (person.ethnicity == "unknown" || person.ethnicity.empty())) {
                 throw core::HgpsException(
                     fmt::format("Newborn #{} ethnicity was not initialized. Ethnicity data may not "
                                 "be available for age 0, "
