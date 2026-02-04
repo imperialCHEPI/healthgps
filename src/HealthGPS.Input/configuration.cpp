@@ -124,6 +124,9 @@ Configuration get_configuration(const std::string &config_source,
         req.income.categories = inc["categories"].get<std::string>();
         req.income.adjust_to_factors_mean = inc["adjust_to_factors_mean"].get<bool>();
         req.income.trended = inc["trended"].get<bool>();
+        if (inc.contains("income_based_csv_output")) {
+            req.income.income_based_csv_output = inc["income_based_csv_output"].get<bool>();
+        }
         const auto &pa = pr["physical_activity"];
         req.physical_activity.enabled = pa["enabled"].get<bool>();
         req.physical_activity.type = pa["type"].get<std::string>();

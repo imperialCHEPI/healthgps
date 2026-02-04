@@ -170,7 +170,7 @@ struct ProjectRequirements {
         bool ethnicity{true};
         /// Optional. If set and > 0, cap age to this value in linear models (age/age2/age3). Else
         /// no cap.
-        std::optional<int> max_age_for_linear_models{};
+        std::optional<int> max_age_for_linear_models;
     } demographics;
 
     struct Income {
@@ -179,6 +179,8 @@ struct ProjectRequirements {
         std::string categories{"4"};    // "3" | "4"
         bool adjust_to_factors_mean{true};
         bool trended{false};
+        /// When true, write income-based CSV files (categorize results by income_category). When false, do not.
+        bool income_based_csv_output{true};
     } income;
 
     struct PhysicalActivity {

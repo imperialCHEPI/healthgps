@@ -36,6 +36,7 @@ void print_app_title() {
 
 hgps::ResultFileWriter create_results_file_logger(const hgps::input::Configuration &config,
                                                   const hgps::ModelInput &input) {
+    const bool write_income_csv = input.project_requirements().income.income_based_csv_output;
     return {create_output_file_name(config.output, config.job_id),
             hgps::ExperimentInfo{.model = config.app_name,
                                  .version = config.app_version,
@@ -43,7 +44,8 @@ hgps::ResultFileWriter create_results_file_logger(const hgps::input::Configurati
                                                      ? config.active_intervention->identifier
                                                      : "",
                                  .job_id = config.job_id,
-                                 .seed = input.seed().value_or(0u)}};
+                                 .seed = input.seed().value_or(0u)},
+            write_income_csv};
 }
 
 /// @brief Prints application exit message

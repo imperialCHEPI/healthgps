@@ -236,9 +236,8 @@ void DemographicModule::update_population(RuntimeContext &context,
             std::string region_after = person.region;
             initialise_ethnicity(context, person, context.random());
 
-            // Only require region/ethnicity to be set when the project uses them
-            // (project_requirements). For India etc. where demographics.region/ethnicity are false,
-            // "unknown" is allowed.
+            // Only require region/ethnicity to be set when the project uses them (project_requirements).
+            // For India etc. where demographics.region/ethnicity are false, "unknown" is allowed.
             const auto &demographics = context.inputs().project_requirements().demographics;
             if (demographics.region && (person.region == "unknown" || person.region.empty())) {
                 throw core::HgpsException(fmt::format(
@@ -248,8 +247,7 @@ void DemographicModule::update_population(RuntimeContext &context,
                     "region_prevalence_ size: {}",
                     newborn_count, region_before, region_after, region_prevalence_.size()));
             }
-            if (demographics.ethnicity &&
-                (person.ethnicity == "unknown" || person.ethnicity.empty())) {
+            if (demographics.ethnicity && (person.ethnicity == "unknown" || person.ethnicity.empty())) {
                 throw core::HgpsException(
                     fmt::format("Newborn #{} ethnicity was not initialized. Ethnicity data may not "
                                 "be available for age 0, "
@@ -461,6 +459,7 @@ void DemographicModule::initialise_region(RuntimeContext &context, Person &perso
         // For newborns (age 0), require exact match - don't use closest age
         if (person.age == 0) {
             std::vector<std::string> available_ages;
+            available_ages.reserve(region_prevalence_.size());
             for (const auto &[age_key, _] : region_prevalence_) {
                 available_ages.push_back(age_key.to_string());
             }
@@ -475,7 +474,7 @@ void DemographicModule::initialise_region(RuntimeContext &context, Person &perso
         for (const auto &[age_key, _] : region_prevalence_) {
             // Parse age from "age_X" format
             std::string age_str = age_key.to_string();
-            if (age_str.substr(0, 4) == "age_") {
+            if (age_str.starts_with("age_")) {
                 int age_val = std::stoi(age_str.substr(4));
                 int diff = std::abs(static_cast<int>(person.age) - age_val);
                 if (diff < min_diff) {

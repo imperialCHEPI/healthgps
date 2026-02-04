@@ -69,6 +69,11 @@
                 "trended": {
                     "type": "boolean",
                     "description": "Include income in trended adjustment"
+                },
+                "income_based_csv_output": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "When true, write income-based CSV files (categorize results by income_category, one file per category). When false, do not write these files."
                 }
             },
             "required": [

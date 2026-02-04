@@ -7,8 +7,10 @@
 
 #include <algorithm>
 #include <cmath>
+#include <iomanip>
 #include <iostream>
 #include <oneapi/tbb/parallel_for_each.h>
+#include <optional>
 #include <utility>
 
 namespace { // anonymous namespace
@@ -31,6 +33,65 @@ struct FirstMoment {
     int count_{};
     double sum_{};
 };
+
+/// @brief Get factor value from person for simulated mean (income, PA, or risk_factors).
+std::optional<double> get_factor_value_for_person(const hgps::Person &person,
+                                                  const hgps::core::Identifier &factor) {
+    const std::string key = factor.to_string();
+    if (key == "income" || key == "Income") {
+        if (person.risk_factors.contains(factor)) {
+            return person.risk_factors.at(factor);
+        }
+        return std::nullopt;
+    }
+    if (key == "PhysicalActivity") {
+        return person.physical_activity;
+    }
+    if (person.risk_factors.contains(factor)) {
+        return person.risk_factors.at(factor);
+    }
+    return std::nullopt;
+}
+
+/// @brief Whether to include this value in simulated mean (exclude zeros for logistic factors).
+bool should_include_in_simulated_mean(double value, const hgps::core::Identifier &factor,
+                                     const std::unordered_set<hgps::core::Identifier> &logistic_factors) {
+    if (!logistic_factors.contains(factor)) {
+        return true;
+    }
+    return value != 0;
+}
+
+/// @brief Print excluded-values summary once (thread-local).
+void print_excluded_summary_once(
+    const std::vector<hgps::core::Identifier> &factors,
+    const std::unordered_set<hgps::core::Identifier> &logistic_factors,
+    const std::unordered_map<hgps::core::Identifier, int> &excluded_counts,
+    const std::unordered_map<hgps::core::Identifier, int> &total_counts) {
+    thread_local static bool summary_printed = false;
+    if (summary_printed) {
+        return;
+    }
+    const hgps::core::Identifier income_id("income");
+    const hgps::core::Identifier pa_id("PhysicalActivity");
+    std::cout << "\n=== SIMULATED MEAN CALCULATION - EXCLUDED VALUES SUMMARY ===";
+    std::cout << "\nLogistic factors set size: " << logistic_factors.size();
+    for (const auto &factor : factors) {
+        if (factor == income_id || factor == pa_id) {
+            continue;
+        }
+        const int excluded = excluded_counts.at(factor);
+        const int total = total_counts.at(factor);
+        const double pct = (total > 0) ? (100.0 * excluded / total) : 0.0;
+        const char *tag = logistic_factors.contains(factor) ? "HAS logistic model" : "NO logistic model";
+        std::cout << "\n" << factor.to_string() << " (" << tag << "): " << excluded
+                  << " zero values excluded out of " << total << " total values ("
+                  << std::fixed << std::setprecision(1) << pct << "% excluded)";
+    }
+    std::cout << "\n===============================================================";
+    std::cout.flush();
+    summary_printed = true;
+}
 
 } // anonymous namespace
 
@@ -347,47 +408,17 @@ RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_simulated_mean(
                 moments.emplace(person.gender, factor, std::vector<FirstMoment>(age_count));
             }
 
-            double value = 0.0;
-            bool has_value = false;
-
-            // Special handling for income and physical activity
-            // Note: Factor name "income" is stored in risk_factors["income"] for both continuous
-            // and categorical models
-            //       Factor name "PhysicalActivity" from expected table maps to
-            //       person.physical_activity internally
-            if (factor.to_string() == "income" || factor.to_string() == "Income") {
-                // Read from risk_factors["income"] (works for both assignment methods)
-                if (person.risk_factors.contains(factor)) {
-                    value = person.risk_factors.at(factor);
-                    has_value = true;
-                }
-            } else if (factor.to_string() == "PhysicalActivity") {
-                value = person.physical_activity;
-                has_value = true;
-            } else if (person.risk_factors.contains(factor)) {
-                value = person.risk_factors.at(factor);
-                has_value = true;
+            std::optional<double> opt_value = get_factor_value_for_person(person, factor);
+            if (!opt_value.has_value()) {
+                continue;
             }
-            // MAHIMA: Apply logistic model logic for simulated mean calculation
-            // For factors WITH logistic models: only include non-zero values
-            // For factors WITHOUT logistic models: include all values (including zeros)
-            if (has_value) {
-                total_counts[factor]++;
-                bool should_include = true;
-                if (logistic_factors.contains(factor)) {
-                    // Factor has logistic model - only include non-zero values
-                    if (value == 0)
-                        should_include = false;
-                    if (!should_include) {
-                        excluded_counts[factor]++;
-                    }
-                }
-                // If factor doesn't have logistic model, include all values (including zeros)
-
-                if (should_include) {
-                    moments.at(person.gender, factor).at(person.age).append(value);
-                }
+            const double value = *opt_value;
+            total_counts[factor]++;
+            if (!should_include_in_simulated_mean(value, factor, logistic_factors)) {
+                excluded_counts[factor]++;
+                continue;
             }
+            moments.at(person.gender, factor).at(person.age).append(value);
         }
     }
 
@@ -403,45 +434,7 @@ RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_simulated_mean(
         }
     }
 
-    // MAHIMA: Print excluded values summary (print once for verification).
-    // Only list base BoxCox/logistic risk factors; skip income and PhysicalActivity
-    // (they are assigned separately, not via 2-stage/BoxCox).
-    thread_local static bool summary_printed = false;
-    const core::Identifier income_id("income");
-    const core::Identifier pa_id("PhysicalActivity");
-    if (!summary_printed) {
-        std::cout << "\n=== SIMULATED MEAN CALCULATION - EXCLUDED VALUES SUMMARY ===";
-        std::cout << "\nLogistic factors set size: " << logistic_factors.size();
-        for (const auto &factor : factors) {
-            if (factor == income_id || factor == pa_id) {
-                continue; // not BoxCox/2-stage factors
-            }
-            if (logistic_factors.contains(factor)) {
-                std::cout << "\n"
-                          << factor.to_string()
-                          << " (HAS logistic model): " << excluded_counts[factor]
-                          << " zero values excluded out of " << total_counts[factor]
-                          << " total values (" << std::fixed << std::setprecision(1)
-                          << (total_counts[factor] > 0
-                                  ? (100.0 * excluded_counts[factor] / total_counts[factor])
-                                  : 0.0)
-                          << "% excluded)";
-            } else {
-                std::cout << "\n"
-                          << factor.to_string()
-                          << " (NO logistic model): " << excluded_counts[factor]
-                          << " zero values excluded out of " << total_counts[factor]
-                          << " total values (" << std::fixed << std::setprecision(1)
-                          << (total_counts[factor] > 0
-                                  ? (100.0 * excluded_counts[factor] / total_counts[factor])
-                                  : 0.0)
-                          << "% excluded)";
-            }
-        }
-        std::cout << "\n===============================================================";
-        std::cout.flush(); // Ensure output is flushed
-        summary_printed = true;
-    }
+    print_excluded_summary_once(factors, logistic_factors, excluded_counts, total_counts);
 
     return means;
 }

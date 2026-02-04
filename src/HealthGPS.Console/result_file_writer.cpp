@@ -34,8 +34,9 @@ double income_category_numeric(core::Income inc) {
 }
 } // namespace
 
-ResultFileWriter::ResultFileWriter(const std::filesystem::path &file_name, ExperimentInfo info)
-    : info_{std::move(info)}, base_filename_{file_name} {
+ResultFileWriter::ResultFileWriter(const std::filesystem::path &file_name, ExperimentInfo info,
+                                   bool write_income_csv)
+    : info_{std::move(info)}, base_filename_{file_name}, write_income_csv_{write_income_csv} {
     stream_.open(file_name, std::ofstream::out | std::ofstream::app);
     if (stream_.fail() || !stream_.is_open()) {
         throw std::invalid_argument(fmt::format("Cannot open output file: {}", file_name.string()));
@@ -56,7 +57,7 @@ ResultFileWriter::ResultFileWriter(ResultFileWriter &&other) noexcept
     : stream_{std::move(other.stream_)}, csvstream_{std::move(other.csvstream_)},
       income_csvstreams_{std::move(other.income_csvstreams_)},
       income_first_row_{std::move(other.income_first_row_)}, info_{std::move(other.info_)},
-      base_filename_{std::move(other.base_filename_)} {}
+      base_filename_{std::move(other.base_filename_)}, write_income_csv_{other.write_income_csv_} {}
 
 ResultFileWriter &ResultFileWriter::operator=(ResultFileWriter &&other) noexcept {
     stream_.close();
@@ -76,6 +77,7 @@ ResultFileWriter &ResultFileWriter::operator=(ResultFileWriter &&other) noexcept
 
     info_ = std::move(other.info_);
     base_filename_ = std::move(other.base_filename_);
+    write_income_csv_ = other.write_income_csv_;
     return *this;
 }
 
@@ -112,8 +114,8 @@ void ResultFileWriter::write(const hgps::ResultEventMessage &message) {
     stream_ << to_json_string(message);
     write_csv_channels(message);
 
-    // Initialize income streams on first use and write income-based CSV data
-    if (message.content.population_by_income.has_value()) {
+    // Write income-based CSV data only when user has enabled it (project_requirements.income.income_based_csv_output)
+    if (write_income_csv_ && message.content.population_by_income.has_value()) {
         if (income_csvstreams_.empty()) {
             initialize_income_streams(message);
         }
