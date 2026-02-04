@@ -20,7 +20,8 @@ class ResultFileWriter final : public ResultWriter {
     /// @brief Initialises an instance of the hgps::ResultFileWriter class.
     /// @param file_name The JSON output file full name
     /// @param info The associated experiment information
-    /// @param write_income_csv When true, write income-based CSV files (one per category). When false, do not.
+    /// @param write_income_csv When true, write income-based CSV files (one per category). When
+    /// false, do not.
     ResultFileWriter(const std::filesystem::path &file_name, ExperimentInfo info,
                      bool write_income_csv = true);
 

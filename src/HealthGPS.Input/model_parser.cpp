@@ -907,36 +907,31 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             }
             // Legacy structure: Check for trend data in JSON
             if (!(json_params && json_params->contains("Trend"))) {
-                throw core::HgpsException{fmt::format(
-                    "Trend is enabled but Trend data is missing for risk factor: {}",
-                    csv_name.to_string())};
+                throw core::HgpsException{
+                    fmt::format("Trend is enabled but Trend data is missing for risk factor: {}",
+                                csv_name.to_string())};
             }
             const auto &trend_json_params = (*json_params)["Trend"];
             LinearModelParams trend_model;
             trend_model.intercept = trend_json_params["Intercept"].get<double>();
-            trend_model.coefficients =
-                trend_json_params["Coefficients"]
-                    .get<std::unordered_map<core::Identifier, double>>();
-            trend_model.log_coefficients =
-                trend_json_params["LogCoefficients"]
-                    .get<std::unordered_map<core::Identifier, double>>();
+            trend_model.coefficients = trend_json_params["Coefficients"]
+                                           .get<std::unordered_map<core::Identifier, double>>();
+            trend_model.log_coefficients = trend_json_params["LogCoefficients"]
+                                               .get<std::unordered_map<core::Identifier, double>>();
 
             trend_models->emplace_back(std::move(trend_model));
-            trend_ranges->emplace_back(
-                trend_json_params["Range"].get<core::DoubleInterval>());
+            trend_ranges->emplace_back(trend_json_params["Range"].get<core::DoubleInterval>());
             trend_lambda->emplace_back(trend_json_params["Lambda"].get<double>());
 
-            (*expected_trend)[csv_name] =
-                json_params->contains("ExpectedTrend")
-                    ? (*json_params)["ExpectedTrend"].get<double>()
-                    : 1.0;
+            (*expected_trend)[csv_name] = json_params->contains("ExpectedTrend")
+                                              ? (*json_params)["ExpectedTrend"].get<double>()
+                                              : 1.0;
             (*expected_trend_boxcox)[csv_name] =
                 json_params->contains("ExpectedTrendBoxCox")
                     ? (*json_params)["ExpectedTrendBoxCox"].get<double>()
                     : 1.0;
-            (*trend_steps)[csv_name] = json_params->contains("TrendSteps")
-                                           ? (*json_params)["TrendSteps"].get<int>()
-                                           : 0;
+            (*trend_steps)[csv_name] =
+                json_params->contains("TrendSteps") ? (*json_params)["TrendSteps"].get<int>() : 0;
         } else {
             // For Null or IncomeTrend types, we don't need regular trend data
             // Add empty trend data structures to maintain consistency

@@ -114,7 +114,8 @@ void ResultFileWriter::write(const hgps::ResultEventMessage &message) {
     stream_ << to_json_string(message);
     write_csv_channels(message);
 
-    // Write income-based CSV data only when user has enabled it (project_requirements.income.income_based_csv_output)
+    // Write income-based CSV data only when user has enabled it
+    // (project_requirements.income.income_based_csv_output)
     if (write_income_csv_ && message.content.population_by_income.has_value()) {
         if (income_csvstreams_.empty()) {
             initialize_income_streams(message);

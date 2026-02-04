@@ -54,8 +54,9 @@ std::optional<double> get_factor_value_for_person(const hgps::Person &person,
 }
 
 /// @brief Whether to include this value in simulated mean (exclude zeros for logistic factors).
-bool should_include_in_simulated_mean(double value, const hgps::core::Identifier &factor,
-                                     const std::unordered_set<hgps::core::Identifier> &logistic_factors) {
+bool should_include_in_simulated_mean(
+    double value, const hgps::core::Identifier &factor,
+    const std::unordered_set<hgps::core::Identifier> &logistic_factors) {
     if (!logistic_factors.contains(factor)) {
         return true;
     }
@@ -83,10 +84,12 @@ void print_excluded_summary_once(
         const int excluded = excluded_counts.at(factor);
         const int total = total_counts.at(factor);
         const double pct = (total > 0) ? (100.0 * excluded / total) : 0.0;
-        const char *tag = logistic_factors.contains(factor) ? "HAS logistic model" : "NO logistic model";
-        std::cout << "\n" << factor.to_string() << " (" << tag << "): " << excluded
-                  << " zero values excluded out of " << total << " total values ("
-                  << std::fixed << std::setprecision(1) << pct << "% excluded)";
+        const char *tag =
+            logistic_factors.contains(factor) ? "HAS logistic model" : "NO logistic model";
+        std::cout << "\n"
+                  << factor.to_string() << " (" << tag << "): " << excluded
+                  << " zero values excluded out of " << total << " total values (" << std::fixed
+                  << std::setprecision(1) << pct << "% excluded)";
     }
     std::cout << "\n===============================================================";
     std::cout.flush();

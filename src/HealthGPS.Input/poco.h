@@ -179,7 +179,8 @@ struct ProjectRequirements {
         std::string categories{"4"};    // "3" | "4"
         bool adjust_to_factors_mean{true};
         bool trended{false};
-        /// When true, write income-based CSV files (categorize results by income_category). When false, do not.
+        /// When true, write income-based CSV files (categorize results by income_category). When
+        /// false, do not.
         bool income_based_csv_output{true};
     } income;
 
