@@ -23,6 +23,11 @@
                 "ethnicity": {
                     "type": "boolean",
                     "description": "Use ethnicity (FINCH/PIF: true, India: false)"
+                },
+                "max_age_for_linear_models": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "Optional. If set, cap age to this value when computing linear models (age/age2/age3 terms). If omitted or 0, age is not capped."
                 }
             },
             "required": [
@@ -138,9 +143,11 @@
                     "enum": [
                         "null",
                         "trend",
+                        "upf_trend",
+                        "UPFTrend",
                         "income_trend"
                     ],
-                    "description": "null = no trend; trend = UPF; income_trend = income-based"
+                    "description": "null = no trend; trend, upf_trend or UPFTrend = UPF trends; income_trend = income-based"
                 }
             },
             "required": [

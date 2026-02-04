@@ -64,7 +64,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param rural_prevalence Rural sector prevalence for age groups and sex
     /// @param income_models The income models for each income category
     /// @param physical_activity_stddev The standard deviation of the physical activity
-    /// @param trend_type The type of trend to apply (None, Regular, or Income)
+    /// @param trend_type The type of trend to apply (Null, UPFTrend, or IncomeTrend)
     /// @param expected_income_trend The expected income trend of risk factor values
     /// @param expected_income_trend_boxcox The expected income trend boxcox factor
     /// @param income_trend_steps The number of time steps to apply the income trend
@@ -352,7 +352,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     /// @param rural_prevalence Rural sector prevalence for age groups and sex
     /// @param income_models The income models for each income category
     /// @param physical_activity_stddev The standard deviation of the physical activity
-    /// @param trend_type The type of trend to apply (None, Regular, or Income)
+    /// @param trend_type The type of trend to apply (Null, UPFTrend, or IncomeTrend)
     /// @param expected_income_trend The expected income trend of risk factor values
     /// @param expected_income_trend_boxcox The expected income trend boxcox factor
     /// @param income_trend_steps The number of time steps to apply the income trend

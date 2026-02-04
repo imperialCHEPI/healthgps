@@ -115,6 +115,9 @@ Configuration get_configuration(const std::string &config_source,
         req.demographics.gender = d["gender"].get<bool>();
         req.demographics.region = d["region"].get<bool>();
         req.demographics.ethnicity = d["ethnicity"].get<bool>();
+        if (d.contains("max_age_for_linear_models") && !d["max_age_for_linear_models"].is_null()) {
+            req.demographics.max_age_for_linear_models = d["max_age_for_linear_models"].get<int>();
+        }
         const auto &inc = pr["income"];
         req.income.enabled = inc["enabled"].get<bool>();
         req.income.type = inc["type"].get<std::string>();
@@ -144,9 +147,10 @@ Configuration get_configuration(const std::string &config_source,
         config.trend_type = opt["trend_type"].get<std::string>();
         // Validate trend_type value
         if (config.trend_type != "null" && config.trend_type != "trend" &&
+            config.trend_type != "upf_trend" && config.trend_type != "UPFTrend" &&
             config.trend_type != "income_trend") {
             throw ConfigurationError{
-                fmt::format("Invalid trend_type: {}. Must be one of: null, trend, income_trend",
+                fmt::format("Invalid trend_type: {}. Must be one of: null, trend, upf_trend, UPFTrend, income_trend",
                             config.trend_type)};
         }
     }

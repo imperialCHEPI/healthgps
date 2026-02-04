@@ -18,10 +18,12 @@
             "enum": [
                 "null",
                 "trend",
+                "upf_trend",
+                "UPFTrend",
                 "income_trend"
             ],
             "default": "null",
-            "description": "Type of trend to apply to risk factors. 'null' = no trends, 'trend' = standard trends, 'income_trend' = income-based trends"
+            "description": "Type of trend to apply to risk factors. 'null' = no trends, 'trend'/'upf_trend'/'UPFTrend' = UPF trends, 'income_trend' = income-based trends"
         },
         "income_categories": {
             "type": "string",

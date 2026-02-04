@@ -255,13 +255,19 @@ std::unique_ptr<hgps::StaticLinearModelDefinition>
 load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configuration &config) {
     MEASURE_FUNCTION();
 
-    // Parse trend_type from config.json- Read which trend type to use (null, trend or income_trend)
+    // MAHIMA: Trend type from project_requirements. If trend.enabled is false, use Null so no trend
+    // data is required (trends are optional). When enabled, use trend.type (trend/upf_trend/income_trend).
     hgps::TrendType trend_type = hgps::TrendType::Null;
-    if (config.trend_type == "trend") {
-        trend_type = hgps::TrendType::Trend;
-    } else if (config.trend_type == "income_trend") {
-        trend_type = hgps::TrendType::IncomeTrend;
+    if (config.project_requirements.trend.enabled) {
+        const std::string &trend_type_str = config.project_requirements.trend.type;
+        if (trend_type_str == "trend" || trend_type_str == "upf_trend" ||
+            trend_type_str == "UPFTrend") {
+            trend_type = hgps::TrendType::UPFTrend;
+        } else if (trend_type_str == "income_trend") {
+            trend_type = hgps::TrendType::IncomeTrend;
+        }
     }
+    // else trend.enabled false or type "null" -> Null
 
     // CSV structure (matrix-based vs legacy) for loading risk factor models only
     bool is_matrix_based_structure = opt["RiskFactorModels"].contains("boxcox_coefficients");
@@ -269,27 +275,6 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         std::cout << "\nDEBUG: Using matrix-based CSV structure for risk factors";
     } else {
         std::cout << "\nDEBUG: Using legacy CSV structure for risk factors";
-    }
-
-    // MAHIMA: Auto-detect income trend data if present in static_model.json
-    // This overrides the config.json setting if income trend data is found
-    bool has_income_trend_data = false;
-    if (is_matrix_based_structure) {
-        // For matrix-based structure, check if trend_coefficients exists
-        has_income_trend_data = opt["RiskFactorModels"].contains("trend_coefficients");
-    } else {
-        // For legacy structure, check individual risk factors
-        for (const auto &[key, json_params] : opt["RiskFactorModels"].items()) {
-            if (json_params.contains("IncomeTrend")) {
-                has_income_trend_data = true;
-                break;
-            }
-        }
-    }
-
-    if (has_income_trend_data && trend_type == hgps::TrendType::Null) {
-        trend_type = hgps::TrendType::IncomeTrend;
-        std::cout << "\nAuto-detected income trend data, setting trend_type to IncomeTrend";
     }
 
     // Risk factor correlation matrix.
@@ -910,13 +895,13 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             // No trend data needed for Null type - skip to next risk factor
             continue;
         }
-        if (trend_type == hgps::TrendType::Trend) {
+        if (trend_type == hgps::TrendType::UPFTrend) {
             // Only require trend data if trend type is Trend
             if (is_matrix_based_structure) {
                 // For matrix-based structure, trend data should be loaded from CSV
                 throw core::HgpsException{
                     fmt::format("Matrix-based structure requires trend data to be loaded from CSV. "
-                                "Risk factor: {}. Trend type: TREND. This needs to be implemented.",
+                                "Risk factor: {}. Trend type: UPF_TREND. This needs to be implemented.",
                                 csv_name.to_string())};
             } else {
                 // Legacy structure: Check for trend data in JSON

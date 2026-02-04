@@ -68,7 +68,7 @@ double RiskFactorAdjustableModel::get_expected(RuntimeContext &context, core::Ge
             // No trends applied to factors mean adjustment
             break;
 
-        case TrendType::Trend: {
+        case TrendType::UPFTrend: {
             // Apply regular UPF trend to factors mean adjustment
             // Formula: factors_mean_T = factors_mean × ExpectedTrend^(T-T0)
             if (expected_trend_) {
@@ -403,12 +403,19 @@ RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_simulated_mean(
         }
     }
 
-    // MAHIMA: Print excluded values summary (print once for verification)
+    // MAHIMA: Print excluded values summary (print once for verification).
+    // Only list base BoxCox/logistic risk factors; skip income and PhysicalActivity
+    // (they are assigned separately, not via 2-stage/BoxCox).
     thread_local static bool summary_printed = false;
+    const core::Identifier income_id("income");
+    const core::Identifier pa_id("PhysicalActivity");
     if (!summary_printed) {
         std::cout << "\n=== SIMULATED MEAN CALCULATION - EXCLUDED VALUES SUMMARY ===";
         std::cout << "\nLogistic factors set size: " << logistic_factors.size();
         for (const auto &factor : factors) {
+            if (factor == income_id || factor == pa_id) {
+                continue; // not BoxCox/2-stage factors
+            }
             if (logistic_factors.contains(factor)) {
                 std::cout << "\n"
                           << factor.to_string()

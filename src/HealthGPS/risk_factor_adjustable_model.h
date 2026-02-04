@@ -26,7 +26,7 @@ namespace hgps {
 /// @brief Defines the trend type enumeration for factors mean adjustment
 enum class TrendType {
     Null,       ///< No trends applied to factors mean adjustment
-    Trend,      ///< Regular UPF trends applied to factors mean adjustment
+    UPFTrend,   ///< UPF (ultra-processed food) trends; config: "upf_trend", "trend" or "UPFTrend"
     IncomeTrend ///< Income-based trends applied to factors mean adjustment
 };
 
