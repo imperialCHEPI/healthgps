@@ -256,7 +256,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     MEASURE_FUNCTION();
 
     // MAHIMA: Trend type from project_requirements. If trend.enabled is false, use Null so no trend
-    // data is required (trends are optional). When enabled, use trend.type (trend/upf_trend/income_trend).
+    // data is required (trends are optional). When enabled, use trend.type
+    // (trend/upf_trend/income_trend).
     hgps::TrendType trend_type = hgps::TrendType::Null;
     if (config.project_requirements.trend.enabled) {
         const std::string &trend_type_str = config.project_requirements.trend.type;
@@ -899,10 +900,10 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             // Only require trend data if trend type is Trend
             if (is_matrix_based_structure) {
                 // For matrix-based structure, trend data should be loaded from CSV
-                throw core::HgpsException{
-                    fmt::format("Matrix-based structure requires trend data to be loaded from CSV. "
-                                "Risk factor: {}. Trend type: UPF_TREND. This needs to be implemented.",
-                                csv_name.to_string())};
+                throw core::HgpsException{fmt::format(
+                    "Matrix-based structure requires trend data to be loaded from CSV. "
+                    "Risk factor: {}. Trend type: UPF_TREND. This needs to be implemented.",
+                    csv_name.to_string())};
             } else {
                 // Legacy structure: Check for trend data in JSON
                 if (json_params && json_params->contains("Trend")) {

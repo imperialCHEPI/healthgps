@@ -16,7 +16,6 @@
                     }
                 }
             },
-
             "additionalProperties": false
         },
         "demographic_models": {
@@ -191,7 +190,6 @@
                         }
                     }
                 },
-
                 "additionalProperties": false
             }
         },
@@ -240,7 +238,6 @@
                     "additionalProperties": false
                 }
             },
-
             "additionalProperties": false
         }
     },

@@ -149,9 +149,9 @@ Configuration get_configuration(const std::string &config_source,
         if (config.trend_type != "null" && config.trend_type != "trend" &&
             config.trend_type != "upf_trend" && config.trend_type != "UPFTrend" &&
             config.trend_type != "income_trend") {
-            throw ConfigurationError{
-                fmt::format("Invalid trend_type: {}. Must be one of: null, trend, upf_trend, UPFTrend, income_trend",
-                            config.trend_type)};
+            throw ConfigurationError{fmt::format("Invalid trend_type: {}. Must be one of: null, "
+                                                 "trend, upf_trend, UPFTrend, income_trend",
+                                                 config.trend_type)};
         }
     }
 

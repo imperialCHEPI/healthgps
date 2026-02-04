@@ -168,7 +168,8 @@ struct ProjectRequirements {
         bool gender{true};
         bool region{true};
         bool ethnicity{true};
-        /// Optional. If set and > 0, cap age to this value in linear models (age/age2/age3). Else no cap.
+        /// Optional. If set and > 0, cap age to this value in linear models (age/age2/age3). Else
+        /// no cap.
         std::optional<int> max_age_for_linear_models{};
     } demographics;
 
