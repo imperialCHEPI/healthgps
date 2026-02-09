@@ -573,8 +573,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
-    const auto policy_start_year =
-        static_cast<int>(context.inputs().run().policy_start_year);
+    const auto policy_start_year = static_cast<int>(context.inputs().run().policy_start_year);
     bool intervene = (context.scenario().type() == ScenarioType::intervention &&
                       context.time_now() >= policy_start_year);
 

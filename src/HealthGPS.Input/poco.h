@@ -66,7 +66,8 @@ struct ModellingInfo {
     std::vector<RiskFactorInfo> risk_factors;
     std::unordered_map<std::string, std::filesystem::path> risk_factor_models;
     BaselineInfo baseline_adjustment;
-    /// Calendar year when intervention policies start (e.g. 2024). If 0, uses start_time + 2 for backward compatibility.
+    /// Calendar year when intervention policies start (e.g. 2024). If 0, uses start_time + 2 for
+    /// backward compatibility.
     unsigned int policy_start_year{0};
 };
 
