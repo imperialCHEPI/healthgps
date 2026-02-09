@@ -219,7 +219,8 @@ void load_modelling_info(const json &j, Configuration &config) {
         fmt::print(fmt::fg(fmt::color::red), "Could not load SES mappings");
     }
 
-    get_to(modelling, "policy_start_year", info.policy_start_year, success);
+    // policy_start_year is optional (schema default 0); missing key must not fail load
+    get_to(modelling, "policy_start_year", info.policy_start_year);
 
     if (!success) {
         throw ConfigurationError("Could not load modelling info");
