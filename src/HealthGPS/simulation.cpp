@@ -368,7 +368,7 @@ void hgps::Simulation::print_initial_population_statistics() {
             try {
                 sim_summary[entry.name()].append(entity.get_risk_factor_value(entry.key()));
             } catch (const std::exception &) {
-                // Factor not found - skip it
+                // NOLINTNEXTLINE(bugprone-empty-catch) factor not present – skip
             }
         }
     }

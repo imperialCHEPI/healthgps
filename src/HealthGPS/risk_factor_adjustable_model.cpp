@@ -37,7 +37,7 @@ struct FirstMoment {
 /// @brief Get factor value from person for simulated mean (income, PA, or risk_factors).
 std::optional<double> get_factor_value_for_person(const hgps::Person &person,
                                                   const hgps::core::Identifier &factor) {
-    const std::string key = factor.to_string();
+    const std::string &key = factor.to_string();
     if (key == "income" || key == "Income") {
         if (person.risk_factors.contains(factor)) {
             return person.risk_factors.at(factor);
@@ -169,6 +169,7 @@ double RiskFactorAdjustableModel::get_expected(RuntimeContext &context, core::Ge
     return expected;
 }
 
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
                                                     const std::vector<core::Identifier> &factors,
                                                     OptionalRanges ranges, bool apply_trend) const {
@@ -208,10 +209,9 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
         for (size_t i = 0; i < factors.size(); i++) {
             const core::Identifier &factor = factors[i];
             double delta = adjustments.at(person.gender, factor).at(person.age);
-            std::string factor_name = factor.to_string();
+            const std::string &factor_name = factor.to_string();
             std::string factor_name_lower = factor_name;
-            std::transform(factor_name_lower.begin(), factor_name_lower.end(),
-                           factor_name_lower.begin(), ::tolower);
+            std::ranges::transform(factor_name_lower, factor_name_lower.begin(), ::tolower);
 
             // MAHIMA: Special handling for income and physical activity
             //  These are stored in member variables, not just in risk_factors map
@@ -310,6 +310,7 @@ void RiskFactorAdjustableModel::set_logistic_factors(
     logistic_factors_ = logistic_factors;
 }
 
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 RiskFactorSexAgeTable
 RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context,
                                                  const std::vector<core::Identifier> &factors,

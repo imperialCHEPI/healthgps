@@ -206,7 +206,7 @@ struct ProjectRequirements {
 
     struct TwoStage {
         bool use_logistic{false};
-        std::string logistic_file{};
+        std::string logistic_file;
     } two_stage;
 };
 } // namespace hgps::input

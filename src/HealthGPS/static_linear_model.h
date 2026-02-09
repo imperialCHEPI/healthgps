@@ -325,6 +325,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     bool has_active_policies_;
 
     // Two-stage modeling: Logistic regression for zero probability (optional)
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-const-or-ref-data-members) reference to model data
     const std::vector<LinearModelParams> &logistic_models_;
 };
 

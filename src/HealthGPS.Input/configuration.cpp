@@ -16,10 +16,10 @@
 #include "HealthGPS.Core/poco.h"
 #include "HealthGPS.Core/scoped_timer.h"
 
-#include <fmt/chrono.h>
 #include <fmt/color.h>
 
 #include <chrono>
+#include <ctime>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -279,7 +279,11 @@ std::string create_output_file_name(const OutputInfo &info, int job_id) {
 
     fs::path output_folder = expand_environment_variables(info.folder);
     auto tp = std::chrono::system_clock::now();
-    auto timestamp_tk = fmt::format("{0:%F_%H-%M-}{1:%S}", tp, tp.time_since_epoch());
+    auto t = std::chrono::system_clock::to_time_t(tp);
+    std::tm *tm = std::gmtime(&t);
+    char buf[32];
+    std::strftime(buf, sizeof(buf), "%F_%H-%M-%S", tm);
+    std::string timestamp_tk{buf};
 
     // filename token replacement
     auto file_name = info.file_name;

@@ -475,15 +475,14 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         // values
         // CSV structure: rows = coefficients, columns = risk factors
         for (size_t row_idx = 0; row_idx < boxcox_doc.GetRowCount(); ++row_idx) {
-            std::string coefficient_name = boxcox_doc.GetCell<std::string>(0, row_idx);
+            auto coefficient_name = boxcox_doc.GetCell<std::string>(0, row_idx);
             csv_coefficients[coefficient_name] = {};
 
             for (size_t col_idx = 1; col_idx < boxcox_doc.GetColumnCount(); ++col_idx) {
                 std::string risk_factor_name = boxcox_doc.GetColumnName(col_idx);
                 // Convert CSV column name to lowercase to match correlation matrix naming
-                std::transform(risk_factor_name.begin(), risk_factor_name.end(),
-                               risk_factor_name.begin(), ::tolower);
-                double coefficient_value = boxcox_doc.GetCell<double>(col_idx, row_idx);
+                std::ranges::transform(risk_factor_name, risk_factor_name.begin(), ::tolower);
+                auto coefficient_value = boxcox_doc.GetCell<double>(col_idx, row_idx);
                 csv_coefficients[coefficient_name][risk_factor_name] = coefficient_value;
             }
         }
@@ -508,7 +507,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             // Normalise EnergyIntake -> log_energy_intake so policy uses the same factor name as
             // correlation/BoxCox (log energy intake is stored under "log_energy_intake").
             for (size_t row_idx = 0; row_idx < policy_doc.GetRowCount(); ++row_idx) {
-                std::string coefficient_name = policy_doc.GetCell<std::string>(0, row_idx);
+                auto coefficient_name = policy_doc.GetCell<std::string>(0, row_idx);
                 if (core::case_insensitive::equals(coefficient_name, "EnergyIntake")) {
                     coefficient_name = "log_energy_intake";
                 }
@@ -517,9 +516,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                 for (size_t col_idx = 1; col_idx < policy_doc.GetColumnCount(); ++col_idx) {
                     std::string risk_factor_name = policy_doc.GetColumnName(col_idx);
                     // Convert CSV column name to lowercase to match correlation matrix naming
-                    std::transform(risk_factor_name.begin(), risk_factor_name.end(),
-                                   risk_factor_name.begin(), ::tolower);
-                    double coefficient_value = policy_doc.GetCell<double>(col_idx, row_idx);
+                    std::ranges::transform(risk_factor_name, risk_factor_name.begin(), ::tolower);
+                    auto coefficient_value = policy_doc.GetCell<double>(col_idx, row_idx);
                     csv_policy_coefficients[coefficient_name][risk_factor_name] = coefficient_value;
                 }
             }
@@ -542,15 +540,14 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             // Load logistic coefficients: row names (coefficients) -> column names (risk factors)
             // -> values CSV structure: rows = coefficients, columns = risk factors
             for (size_t row_idx = 0; row_idx < logistic_doc.GetRowCount(); ++row_idx) {
-                std::string coefficient_name = logistic_doc.GetCell<std::string>(0, row_idx);
+                auto coefficient_name = logistic_doc.GetCell<std::string>(0, row_idx);
                 csv_logistic_coefficients[coefficient_name] = {};
 
                 for (size_t col_idx = 1; col_idx < logistic_doc.GetColumnCount(); ++col_idx) {
                     std::string risk_factor_name = logistic_doc.GetColumnName(col_idx);
                     // Convert CSV column name to lowercase to match correlation matrix naming
-                    std::transform(risk_factor_name.begin(), risk_factor_name.end(),
-                                   risk_factor_name.begin(), ::tolower);
-                    double coefficient_value = logistic_doc.GetCell<double>(col_idx, row_idx);
+                    std::ranges::transform(risk_factor_name, risk_factor_name.begin(), ::tolower);
+                    auto coefficient_value = logistic_doc.GetCell<double>(col_idx, row_idx);
                     csv_logistic_coefficients[coefficient_name][risk_factor_name] =
                         coefficient_value;
                 }
@@ -558,7 +555,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
             // Count unique risk factors that have logistic regression data
             if (!csv_logistic_coefficients.empty() &&
-                csv_logistic_coefficients.find("Intercept") != csv_logistic_coefficients.end()) {
+                csv_logistic_coefficients.contains("Intercept")) {
                 logistic_risk_factors_count = csv_logistic_coefficients.at("Intercept").size();
             }
 
@@ -586,9 +583,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             // Matrix-based structure: Load coefficients from CSV data
             // Get intercept from CSV data
 
-            if (csv_coefficients.find("Intercept") != csv_coefficients.end() &&
-                csv_coefficients.at("Intercept").find(csv_risk_factor_name) !=
-                    csv_coefficients.at("Intercept").end()) {
+            if (csv_coefficients.contains("Intercept") &&
+                csv_coefficients.at("Intercept").contains(csv_risk_factor_name)) {
                 model.intercept = csv_coefficients.at("Intercept").at(csv_risk_factor_name);
             } else {
                 throw core::HgpsException{fmt::format(
@@ -596,7 +592,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                     "Available risk factors: {}",
                     csv_name.to_string(), csv_risk_factor_name, [&]() {
                         std::vector<std::string> risk_factors;
-                        if (csv_coefficients.find("Intercept") != csv_coefficients.end()) {
+                        if (csv_coefficients.contains("Intercept")) {
                             for (const auto &[rf, _] : csv_coefficients.at("Intercept")) {
                                 risk_factors.push_back(rf);
                             }
@@ -607,18 +603,23 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
             // Load coefficients from CSV data
             for (const auto &[coeff_name, coeff_map] : csv_coefficients) {
-                if (coeff_name == "Intercept")
+                if (coeff_name == "Intercept") {
                     continue; // Skip intercept, already handled
-                if (coeff_name == "lambda")
+                }
+                if (coeff_name == "lambda") {
                     continue; // Skip lambda, handled separately
-                if (coeff_name == "stddev")
+                }
+                if (coeff_name == "stddev") {
                     continue; // Skip stddev, handled separately
-                if (coeff_name == "min")
+                }
+                if (coeff_name == "min") {
                     continue; // Skip min, handled separately
-                if (coeff_name == "max")
+                }
+                if (coeff_name == "max") {
                     continue; // Skip max, handled separately
+                }
 
-                if (coeff_map.find(csv_risk_factor_name) != coeff_map.end()) {
+                if (coeff_map.contains(csv_risk_factor_name)) {
                     model.coefficients[core::Identifier(coeff_name)] =
                         coeff_map.at(csv_risk_factor_name);
                 }
@@ -675,13 +676,12 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             // For matrix-based structure, load these values from CSV data
 
             // Load lambda from CSV data
-            if (csv_coefficients.find("lambda") == csv_coefficients.end()) {
+            if (!csv_coefficients.contains("lambda")) {
                 throw core::HgpsException{
                     fmt::format("Lambda row not found in BoxCox CSV data for risk factor '{}'",
                                 csv_risk_factor_name)};
             }
-            if (csv_coefficients.at("lambda").find(csv_risk_factor_name) ==
-                csv_coefficients.at("lambda").end()) {
+            if (!csv_coefficients.at("lambda").contains(csv_risk_factor_name)) {
                 throw core::HgpsException{
                     fmt::format("Lambda not found for risk factor '{}' in BoxCox CSV data",
                                 csv_risk_factor_name)};
@@ -689,13 +689,12 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             double lambda_value = csv_coefficients.at("lambda").at(csv_risk_factor_name);
 
             // Load stddev from CSV data
-            if (csv_coefficients.find("stddev") == csv_coefficients.end()) {
+            if (!csv_coefficients.contains("stddev")) {
                 throw core::HgpsException{
                     fmt::format("StdDev row not found in BoxCox CSV data for risk factor '{}'",
                                 csv_risk_factor_name)};
             }
-            if (csv_coefficients.at("stddev").find(csv_risk_factor_name) ==
-                csv_coefficients.at("stddev").end()) {
+            if (!csv_coefficients.at("stddev").contains(csv_risk_factor_name)) {
                 throw core::HgpsException{
                     fmt::format("StdDev not found for risk factor '{}' in BoxCox CSV data",
                                 csv_risk_factor_name)};
@@ -703,32 +702,30 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             double stddev_value = csv_coefficients.at("stddev").at(csv_risk_factor_name);
 
             // Load min from CSV data
-            if (csv_coefficients.find("min") == csv_coefficients.end()) {
+            if (!csv_coefficients.contains("min")) {
                 throw core::HgpsException{
                     fmt::format("Min row not found in BoxCox CSV data for risk factor '{}'",
                                 csv_risk_factor_name)};
             }
-            if (csv_coefficients.at("min").find(csv_risk_factor_name) ==
-                csv_coefficients.at("min").end()) {
+            if (!csv_coefficients.at("min").contains(csv_risk_factor_name)) {
                 throw core::HgpsException{fmt::format(
                     "Min not found for risk factor '{}' in BoxCox CSV data", csv_risk_factor_name)};
             }
             double min_value = csv_coefficients.at("min").at(csv_risk_factor_name);
 
             // Load max from CSV data
-            if (csv_coefficients.find("max") == csv_coefficients.end()) {
+            if (!csv_coefficients.contains("max")) {
                 throw core::HgpsException{
                     fmt::format("Max row not found in BoxCox CSV data for risk factor '{}'",
                                 csv_risk_factor_name)};
             }
-            if (csv_coefficients.at("max").find(csv_risk_factor_name) ==
-                csv_coefficients.at("max").end()) {
+            if (!csv_coefficients.at("max").contains(csv_risk_factor_name)) {
                 throw core::HgpsException{fmt::format(
                     "Max not found for risk factor '{}' in BoxCox CSV data", csv_risk_factor_name)};
             }
             double max_value = csv_coefficients.at("max").at(csv_risk_factor_name);
 
-            ranges.emplace_back(core::DoubleInterval{min_value, max_value});
+            ranges.emplace_back(min_value, max_value);
             lambda.emplace_back(lambda_value);
             stddev.emplace_back(stddev_value);
         } else {
@@ -746,9 +743,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         if (is_matrix_based_structure) {
             // Matrix-based structure: Load policy coefficients from CSV data
             // Use the same csv_risk_factor_name that was calculated above
-            if (csv_policy_coefficients.find("Intercept") != csv_policy_coefficients.end() &&
-                csv_policy_coefficients.at("Intercept").find(csv_risk_factor_name) !=
-                    csv_policy_coefficients.at("Intercept").end()) {
+            if (csv_policy_coefficients.contains("Intercept") &&
+                csv_policy_coefficients.at("Intercept").contains(csv_risk_factor_name)) {
                 policy_model.intercept =
                     csv_policy_coefficients.at("Intercept").at(csv_risk_factor_name);
             } else {
@@ -758,8 +754,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                     "Available intercepts: {}",
                     csv_name.to_string(), csv_risk_factor_name, [&]() {
                         std::vector<std::string> intercepts;
-                        if (csv_policy_coefficients.find("Intercept") !=
-                            csv_policy_coefficients.end()) {
+                        if (csv_policy_coefficients.contains("Intercept")) {
                             for (const auto &[rf, _] : csv_policy_coefficients.at("Intercept")) {
                                 intercepts.push_back(rf);
                             }
@@ -770,14 +765,17 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
             // Load policy coefficients from CSV data
             for (const auto &[coeff_name, coeff_map] : csv_policy_coefficients) {
-                if (coeff_name == "Intercept")
+                if (coeff_name == "Intercept") {
                     continue; // Skip intercept, already handled
-                if (coeff_name == "min")
+                }
+                if (coeff_name == "min") {
                     continue; // Skip min, handled separately
-                if (coeff_name == "max")
+                }
+                if (coeff_name == "max") {
                     continue; // Skip max, handled separately
+                }
 
-                if (coeff_map.find(csv_risk_factor_name) != coeff_map.end()) {
+                if (coeff_map.contains(csv_risk_factor_name)) {
                     policy_model.coefficients[core::Identifier(coeff_name)] =
                         coeff_map.at(csv_risk_factor_name);
                 }
@@ -813,13 +811,12 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             // For matrix-based structure, load policy ranges from CSV data
 
             // Load policy min from CSV data
-            if (csv_policy_coefficients.find("min") == csv_policy_coefficients.end()) {
+            if (!csv_policy_coefficients.contains("min")) {
                 throw core::HgpsException{
                     fmt::format("Policy min row not found in policy CSV data for risk factor '{}'",
                                 csv_risk_factor_name)};
             }
-            if (csv_policy_coefficients.at("min").find(csv_risk_factor_name) ==
-                csv_policy_coefficients.at("min").end()) {
+            if (!csv_policy_coefficients.at("min").contains(csv_risk_factor_name)) {
                 throw core::HgpsException{
                     fmt::format("Policy min not found for risk factor '{}' in policy CSV data",
                                 csv_risk_factor_name)};
@@ -827,20 +824,19 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             double policy_min_value = csv_policy_coefficients.at("min").at(csv_risk_factor_name);
 
             // Load policy max from CSV data
-            if (csv_policy_coefficients.find("max") == csv_policy_coefficients.end()) {
+            if (!csv_policy_coefficients.contains("max")) {
                 throw core::HgpsException{
                     fmt::format("Policy max row not found in policy CSV data for risk factor '{}'",
                                 csv_risk_factor_name)};
             }
-            if (csv_policy_coefficients.at("max").find(csv_risk_factor_name) ==
-                csv_policy_coefficients.at("max").end()) {
+            if (!csv_policy_coefficients.at("max").contains(csv_risk_factor_name)) {
                 throw core::HgpsException{
                     fmt::format("Policy max not found for risk factor '{}' in policy CSV data",
                                 csv_risk_factor_name)};
             }
             double policy_max_value = csv_policy_coefficients.at("max").at(csv_risk_factor_name);
 
-            policy_ranges.emplace_back(core::DoubleInterval{policy_min_value, policy_max_value});
+            policy_ranges.emplace_back(policy_min_value, policy_max_value);
         } else {
             // Legacy structure: Get policy range from JSON
             policy_ranges.emplace_back((*policy_json_params)["Range"].get<core::DoubleInterval>());
@@ -852,9 +848,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         bool has_logistic_data = false;
         if (is_matrix_based_structure && !csv_logistic_coefficients.empty()) {
             // Check if this risk factor has logistic regression data
-            if (csv_logistic_coefficients.find("Intercept") != csv_logistic_coefficients.end() &&
-                csv_logistic_coefficients.at("Intercept").find(csv_risk_factor_name) !=
-                    csv_logistic_coefficients.at("Intercept").end()) {
+            if (csv_logistic_coefficients.contains("Intercept") &&
+                csv_logistic_coefficients.at("Intercept").contains(csv_risk_factor_name)) {
                 // This risk factor has logistic regression data
                 has_logistic_data = true;
                 logistic_model.intercept =
@@ -862,10 +857,11 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
                 // Load logistic coefficients from CSV data
                 for (const auto &[coeff_name, coeff_map] : csv_logistic_coefficients) {
-                    if (coeff_name == "Intercept")
+                    if (coeff_name == "Intercept") {
                         continue; // Skip intercept, already handled
+                    }
 
-                    if (coeff_map.find(csv_risk_factor_name) != coeff_map.end()) {
+                    if (coeff_map.contains(csv_risk_factor_name)) {
                         logistic_model.coefficients[core::Identifier(coeff_name)] =
                             coeff_map.at(csv_risk_factor_name);
                     }
@@ -968,7 +964,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                     "Matrix-based structure requires income trend data to be loaded from CSV. "
                     "Risk factor: {}. Trend type: IncomeTrend. This needs to be implemented.",
                     csv_name.to_string())};
-            } else {
+            } else {  // NOLINT(readability-else-after-return) keep symmetric structure
                 // Legacy structure: Check for income trend data in JSON
                 if (json_params && json_params->contains("IncomeTrend")) {
                     // Read income trend data from static_model.json
@@ -1160,7 +1156,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     std::string income_categories = inc_req.categories;
     if (income_categories != "3" && income_categories != "4") {
         throw core::HgpsException{fmt::format(
-            "project_requirements.income.categories must be \"3\" or \"4\". Got: \"{}\"",
+            R"(project_requirements.income.categories must be "3" or "4". Got: "{}")",
             income_categories)};
     }
     std::cout << "\nUsing " << income_categories
@@ -1642,6 +1638,7 @@ load_risk_model_definition(hgps::RiskFactorModelType model_type,
     }
 }
 
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
                                             const Configuration &config) {
     MEASURE_FUNCTION();
@@ -1688,7 +1685,7 @@ void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
                 std::vector<std::string> region_columns;
                 for (size_t col = 0; col < region_table.num_columns(); col++) {
                     std::string col_name = region_table.column(col).name();
-                    if (col_name.substr(0, 6) == "region") {
+                    if (col_name.starts_with("region")) {
                         region_columns.push_back(col_name);
                     }
                 }
@@ -1735,7 +1732,7 @@ void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
                 std::vector<std::string> region_columns;
                 for (size_t col = 0; col < ethnicity_table.num_columns(); col++) {
                     std::string col_name = ethnicity_table.column(col).name();
-                    if (col_name.substr(0, 6) == "region") {
+                    if (col_name.starts_with("region")) {
                         region_columns.push_back(col_name);
                     }
                 }

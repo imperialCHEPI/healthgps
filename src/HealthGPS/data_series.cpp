@@ -79,8 +79,7 @@ void DataSeries::add_channel(std::string key) {
 
 void DataSeries::add_channels(const std::vector<std::string> &keys) {
     std::cout.flush();
-    for (size_t i = 0; i < keys.size(); i++) {
-        const auto &item = keys[i];
+    for (const auto &item : keys) {
         try {
             add_channel(item);
         } catch (const std::exception &e) {

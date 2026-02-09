@@ -121,7 +121,7 @@ float Person::region_to_value() const {
     }
 
     // Parse numeric value from region string (e.g., "region1" -> 1, "region2" -> 2)
-    if (region.substr(0, 6) == "region") {
+    if (region.starts_with("region")) {
         try {
             std::string num_str = region.substr(6); // Get the number part
             return static_cast<float>(std::stoi(num_str));
@@ -140,7 +140,7 @@ float Person::ethnicity_to_value() const {
     }
 
     // Parse numeric value from ethnicity string (e.g., "ethnicity1" -> 1, "ethnicity2" -> 2)
-    if (ethnicity.substr(0, 9) == "ethnicity") {
+    if (ethnicity.starts_with("ethnicity")) {
         try {
             std::string num_str = ethnicity.substr(9); // Get the number part
             return static_cast<float>(std::stoi(num_str));

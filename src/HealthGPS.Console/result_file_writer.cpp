@@ -4,7 +4,7 @@
 #include "HealthGPS/data_series.h"
 
 #include <chrono>
-#include <fmt/chrono.h>
+#include <ctime>
 #include <fmt/color.h>
 #include <fmt/core.h>
 #include <fstream>
@@ -135,7 +135,13 @@ void ResultFileWriter::write_json_begin(const std::filesystem::path &output) {
           {"intervention", info_.intervention},
           {"job_id", info_.job_id},
           {"custom_seed", info_.seed},
-          {"time_of_day", fmt::format("{0:%F %H:%M:}{1:%S} {0:%Z}", tp, tp.time_since_epoch())},
+          {"time_of_day", [tp]() {
+              auto t = std::chrono::system_clock::to_time_t(tp);
+              std::tm *tm = std::gmtime(&t);
+              char buf[64];
+              std::strftime(buf, sizeof(buf), "%F %H:%M:%S UTC", tm);
+              return std::string{buf};
+          }()},
           {"output_filename", output.filename().string()}}},
         {"result", {1, 2}}};
 
@@ -327,11 +333,13 @@ void ResultFileWriter::write_income_csv_data(const hgps::ResultEventMessage &mes
             count_f = series.at(Gender::female, income, "count").at(index);
         } catch (const std::out_of_range &) {
             // No count for this income stratum – skip this index (no rows)
+            continue;
         }
 
         auto write_row = [&](Gender gender, double count) {
-            if (count <= 0.0)
+            if (count <= 0.0) {
                 return;
+            }
             std::stringstream ss;
             ss << message.source << sep << message.run_number << sep << message.model_time << sep
                << (gender == Gender::male ? "male" : "female") << sep << index;
@@ -348,6 +356,7 @@ void ResultFileWriter::write_income_csv_data(const hgps::ResultEventMessage &mes
                 try {
                     val = series.at(gender, income, key).at(index);
                 } catch (const std::out_of_range &) {
+                    // NOLINTNEXTLINE(bugprone-empty-catch) missing value → use 0.0
                 }
                 ss << sep << val;
             }

@@ -220,7 +220,7 @@ void AnalysisModule::calculate_historical_statistics(RuntimeContext &context,
             // Check if risk factor exists before accessing (some risk factors may not be
             // initialized for all projects)
             double factor_value = 0.0;
-            if (entity.risk_factors.find(item.first) != entity.risk_factors.end()) {
+            if (entity.risk_factors.contains(item.first)) {
                 factor_value = entity.risk_factors.at(item.first);
                 if (std::isnan(factor_value)) {
                     factor_value = 0.0;
@@ -293,6 +293,7 @@ void AnalysisModule::calculate_historical_statistics(RuntimeContext &context,
 }
 // NOLINTEND(readability-function-cognitive-complexity)
 
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void AnalysisModule::calculate_income_based_statistics(RuntimeContext &context,
                                                        ModelResult &result) const {
     auto available_income_categories = get_available_income_categories(context);
@@ -318,7 +319,7 @@ void AnalysisModule::calculate_income_based_statistics(RuntimeContext &context,
             if (factor.level() > 0) {
                 // Check if risk factor exists before accessing (some risk factors may not be
                 // initialized for all projects)
-                if (person.risk_factors.find(factor.key()) != person.risk_factors.end()) {
+                if (person.risk_factors.contains(factor.key())) {
                     risk_factors_by_income[factor.key()][income][person.gender] +=
                         person.risk_factors.at(factor.key());
                 }
@@ -630,7 +631,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
     }
     series.add_channels(channels_);
     auto current_time = static_cast<unsigned int>(context.time_now());
-    std::size_t processed = 0;
+    std::size_t processed = 0;  // NOLINT(clang-diagnostic-unused-but-set-variable)
     for (const auto &person : context.population()) {
         auto age = person.age;
         auto gender = person.gender;
@@ -682,7 +683,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
             series(gender, "mean_income_category").at(age) += person.income_to_value();
         }
         // Continuous income (risk_factors["income"]) when present
-        if (person.risk_factors.find("income"_id) != person.risk_factors.end()) {
+        if (person.risk_factors.contains("income"_id)) {
             series(gender, "mean_income").at(age) += person.risk_factors.at("income"_id);
         }
 
@@ -714,13 +715,13 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
             // Special handling for income - stored in risk_factors["income"] for both assignment
             // methods (redundant with skip above, kept for clarity)
             if (fkey_lower == "income") {
-                if (person.risk_factors.find(factor.key()) != person.risk_factors.end()) {
+                if (person.risk_factors.contains(factor.key())) {
                     series(gender, "mean_income").at(age) += person.risk_factors.at(factor.key());
                 }
                 continue;
             }
             // Check if risk factor exists before accessing (channel keys stored lowercase)
-            if (person.risk_factors.find(factor.key()) != person.risk_factors.end()) {
+            if (person.risk_factors.contains(factor.key())) {
                 double factor_value = person.risk_factors.at(factor.key());
                 series(gender, core::to_lower("mean_" + fkey)).at(age) += factor_value;
             }
@@ -758,7 +759,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
                                    double count) {
         std::string channel_key = core::to_lower(channel_name);
         // Only access if channel exists
-        if (count > 0 && available_channels.find(channel_key) != available_channels.end()) {
+        if (count > 0 && available_channels.contains(channel_key)) {
             series(gender, channel_name).at(age) /= count;
         }
     };
@@ -781,7 +782,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
         for (const auto &factor : context.mapping().entries()) {
             std::string column = "mean_" + factor.key().to_string();
             std::string col_lower = core::to_lower(column);
-            if (demographic_mean_channels.find(col_lower) != demographic_mean_channels.end()) {
+            if (demographic_mean_channels.contains(col_lower)) {
                 continue;
             }
             safe_divide_channel(core::Gender::female, column, age, count_F);
@@ -907,10 +908,10 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
         if (person.income != core::Income::unknown) {
             has_income_category = true;
         }
-        if (person.risk_factors.find("income"_id) != person.risk_factors.end()) {
+        if (person.risk_factors.contains("income"_id)) {
             has_income = true;
         }
-        if (person.risk_factors.find("PhysicalActivity"_id) != person.risk_factors.end()) {
+        if (person.risk_factors.contains("PhysicalActivity"_id)) {
             has_physical_activity = true;
         }
 
@@ -991,7 +992,7 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
                                                       const std::string &channel, int age) {
         std::string channel_key = core::to_lower(channel);
         // Only initialize if channel was added
-        if (added_income_channels.find(channel_key) != added_income_channels.end()) {
+        if (added_income_channels.contains(channel_key)) {
             series.at(gender, income, channel_key).at(age) = 0.0;
         }
     };
@@ -1032,14 +1033,14 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
     }
 
     auto current_time = static_cast<unsigned int>(context.time_now());
-    std::size_t processed_income = 0;
+    std::size_t processed_income = 0;  // NOLINT(clang-diagnostic-unused-but-set-variable)
 
     auto safe_add_to_channel =
         [&series, &added_income_channels](core::Gender gender, core::Income income,
                                           const std::string &channel, int age, double value) {
             std::string channel_key = core::to_lower(channel);
             // Only access if channel was added
-            if (added_income_channels.find(channel_key) != added_income_channels.end()) {
+            if (added_income_channels.contains(channel_key)) {
                 series.at(gender, income, channel_key).at(age) += value;
             }
         };
@@ -1049,7 +1050,7 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
                                                            const std::string &channel, int age) {
         std::string channel_key = core::to_lower(channel);
         // Only access if channel was added
-        if (added_income_channels.find(channel_key) != added_income_channels.end()) {
+        if (added_income_channels.contains(channel_key)) {
             series.at(gender, income, channel_key).at(age)++;
         }
     };
@@ -1104,7 +1105,7 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
             // Check if risk factor exists before accessing (some risk factors may not be
             // initialized for all projects)
             auto channel_name = "mean_" + factor.key().to_string();
-            if (person.risk_factors.find(factor.key()) != person.risk_factors.end()) {
+            if (person.risk_factors.contains(factor.key())) {
                 double value = person.risk_factors.at(factor.key());
                 safe_add_to_channel(gender, income, channel_name, age, value);
             }
@@ -1193,7 +1194,7 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
                                           const std::string &channel, int age, double count) {
         std::string channel_key = core::to_lower(channel);
         // Only access if channel was added
-        if (count > 0 && added_income_channels.find(channel_key) != added_income_channels.end()) {
+        if (count > 0 && added_income_channels.contains(channel_key)) {
             series.at(gender, income, channel_key).at(age) /= count;
         }
     };
@@ -1213,7 +1214,7 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
             // Skip demographic channels here; they are divided once in the block below.
             for (const auto &factor : context.mapping().entries()) {
                 std::string column = "mean_" + factor.key().to_string();
-                if (income_demo_mean_channels.count(core::to_lower(column))) {
+                if (income_demo_mean_channels.contains(core::to_lower(column))) {
                     continue;
                 }
                 safe_divide_channel_income(core::Gender::female, income, column, age, count_F);
@@ -1222,19 +1223,19 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
 
             // Set mean_age, mean_age2, mean_age3 to age, age², age³ (same as main series), not
             // averages
-            if (added_income_channels.count("mean_age") > 0) {
+            if (added_income_channels.contains("mean_age")) {
                 series.at(core::Gender::female, income, "mean_age").at(age) =
                     static_cast<double>(age);
                 series.at(core::Gender::male, income, "mean_age").at(age) =
                     static_cast<double>(age);
             }
-            if (added_income_channels.count("mean_age2") > 0) {
+            if (added_income_channels.contains("mean_age2")) {
                 series.at(core::Gender::female, income, "mean_age2").at(age) =
                     static_cast<double>(age) * static_cast<double>(age);
                 series.at(core::Gender::male, income, "mean_age2").at(age) =
                     static_cast<double>(age) * static_cast<double>(age);
             }
-            if (added_income_channels.count("mean_age3") > 0) {
+            if (added_income_channels.contains("mean_age3")) {
                 series.at(core::Gender::female, income, "mean_age3").at(age) =
                     static_cast<double>(age) * static_cast<double>(age) * static_cast<double>(age);
                 series.at(core::Gender::male, income, "mean_age3").at(age) =
@@ -1357,10 +1358,10 @@ void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &c
         if (person.income != core::Income::unknown) {
             has_income_category = true;
         }
-        if (person.risk_factors.find("income"_id) != person.risk_factors.end()) {
+        if (person.risk_factors.contains("income"_id)) {
             has_income = true;
         }
-        if (person.risk_factors.find("PhysicalActivity"_id) != person.risk_factors.end()) {
+        if (person.risk_factors.contains("PhysicalActivity"_id)) {
             has_physical_activity = true;
         }
 
@@ -1428,8 +1429,8 @@ void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &c
             std::string mean_channel = core::to_lower("mean_" + chan);
             std::string std_channel = core::to_lower("std_" + chan);
             // Only accumulate if both mean and std channels were added
-            if (added_income_channels.find(mean_channel) != added_income_channels.end() &&
-                added_income_channels.find(std_channel) != added_income_channels.end()) {
+            if (added_income_channels.contains(mean_channel) &&
+                added_income_channels.contains(std_channel)) {
                 const double mean = series.at(sex, income, mean_channel).at(age);
                 const double diff = value - mean;
                 series.at(sex, income, std_channel).at(age) += diff * diff;
@@ -1471,7 +1472,7 @@ void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &c
 
             // Check if risk factor exists before accessing (some risk factors may not be
             // initialized for all projects)
-            if (person.risk_factors.find(factor.key()) != person.risk_factors.end()) {
+            if (person.risk_factors.contains(factor.key())) {
                 const double value = person.risk_factors.at(factor.key());
                 accumulate_squared_diffs_income(factor.key().to_string(), sex, income, age, value);
             }
@@ -1537,7 +1538,7 @@ void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &c
                                           core::Income income, int age, double count) {
             std::string std_channel = core::to_lower("std_" + chan);
             // Only access if channel was added
-            if (added_income_channels.find(std_channel) != added_income_channels.end()) {
+            if (added_income_channels.contains(std_channel)) {
                 if (count > 0) {
                     const double sum = series.at(sex, income, std_channel).at(age);
                     const double std = std::sqrt(sum / count);
@@ -1636,15 +1637,15 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
         std::string mean_channel = core::to_lower("mean_" + chan);
         std::string std_channel = core::to_lower("std_" + chan);
         // Only accumulate if both mean and std channels exist
-        if (available_channels.find(mean_channel) != available_channels.end() &&
-            available_channels.find(std_channel) != available_channels.end()) {
+        if (available_channels.contains(mean_channel) &&
+            available_channels.contains(std_channel)) {
             const double mean = series(sex, "mean_" + chan).at(age);
             const double diff = value - mean;
             series(sex, "std_" + chan).at(age) += diff * diff;
         }
     };
 
-    std::size_t processed_std = 0;
+    std::size_t processed_std = 0;  // NOLINT(clang-diagnostic-unused-but-set-variable)
     auto current_time = static_cast<unsigned int>(context.time_now());
     for (const auto &person : context.population()) {
         unsigned int age = person.age;
@@ -1685,7 +1686,7 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
 
             // Check if risk factor exists before accessing (some risk factors may not be
             // initialized for all projects)
-            if (person.risk_factors.find(factor.key()) != person.risk_factors.end()) {
+            if (person.risk_factors.contains(factor.key())) {
                 const double value = person.risk_factors.at(factor.key());
                 accumulate_squared_diffs(factor.key().to_string(), sex, age, value);
             }
@@ -1737,7 +1738,7 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
                                                                double count) {
         std::string std_channel = core::to_lower("std_" + chan);
         // Only access if channel exists
-        if (available_channels.find(std_channel) != available_channels.end()) {
+        if (available_channels.contains(std_channel)) {
             if (count > 0) {
                 const double sum = series(sex, "std_" + chan).at(age);
                 const double std = std::sqrt(sum / count);
@@ -1825,6 +1826,7 @@ void AnalysisModule::classify_weight(DataSeries &series, const Person &entity) c
     }
 }
 
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
     if (!channels_.empty()) {
         return;
@@ -1835,7 +1837,7 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
 
     auto add_channel_if_new = [&](const std::string &channel_name) {
         std::string lower_channel = core::to_lower(channel_name);
-        if (added_channels.find(lower_channel) == added_channels.end()) {
+        if (!added_channels.contains(lower_channel)) {
             channels_.emplace_back(channel_name);
             added_channels.insert(lower_channel);
         }
@@ -1884,10 +1886,10 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
         if (person.income != core::Income::unknown) {
             has_income_category = true;
         }
-        if (person.risk_factors.find("income"_id) != person.risk_factors.end()) {
+        if (person.risk_factors.contains("income"_id)) {
             has_income = true;
         }
-        if (person.risk_factors.find("PhysicalActivity"_id) != person.risk_factors.end()) {
+        if (person.risk_factors.contains("PhysicalActivity"_id)) {
             has_physical_activity = true;
         }
 

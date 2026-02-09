@@ -10,11 +10,11 @@
 #include "model_info.h"
 #include "result_file_writer.h"
 
-#include <fmt/chrono.h>
 #include <fmt/color.h>
 
 #include <chrono>
 #include <cstdlib>
+#include <ctime>
 #include <oneapi/tbb/global_control.h>
 
 namespace {
@@ -22,7 +22,11 @@ namespace {
 /// @return The system time as string
 std::string get_time_now_str() {
     auto tp = std::chrono::system_clock::now();
-    return fmt::format("{0:%F %H:%M:}{1:%S} {0:%Z}", tp, tp.time_since_epoch());
+    auto t = std::chrono::system_clock::to_time_t(tp);
+    std::tm *tm = std::gmtime(&t);
+    char buf[64];
+    std::strftime(buf, sizeof(buf), "%F %H:%M:%S UTC", tm);
+    return std::string{buf};
 }
 
 /// @brief Prints application start-up messages
