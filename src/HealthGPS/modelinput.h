@@ -29,6 +29,9 @@ struct RunInfo {
 
     /// @brief Maximum number of comorbidities to include in results
     unsigned int comorbidities{};
+
+    /// @brief Calendar year when intervention policies start (e.g. 2024)
+    unsigned int policy_start_year{0};
 };
 
 /// @brief Defines the socio-economic status (SES) model data type

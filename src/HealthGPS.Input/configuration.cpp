@@ -251,6 +251,9 @@ ModelInput create_model_input(core::DataTable &input_table, core::Country countr
         .seed = job_custom_seed,
         .verbosity = config.verbosity,
         .comorbidities = comorbidities,
+        .policy_start_year = config.modelling.policy_start_year != 0
+            ? config.modelling.policy_start_year
+            : static_cast<unsigned int>(config.start_time + 2),
     };
 
     auto ses_mapping =

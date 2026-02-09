@@ -573,9 +573,10 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
-    // HACK: start intervening two years into the simulation.
+    const auto policy_start_year =
+        static_cast<int>(context.inputs().run().policy_start_year);
     bool intervene = (context.scenario().type() == ScenarioType::intervention &&
-                      (context.time_now() - context.start_time()) >= 2);
+                      context.time_now() >= policy_start_year);
 
     auto &cache = get_income_threshold_cache();
     // Initialise newborns and update others.
