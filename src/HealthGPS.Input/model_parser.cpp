@@ -964,7 +964,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                     "Matrix-based structure requires income trend data to be loaded from CSV. "
                     "Risk factor: {}. Trend type: IncomeTrend. This needs to be implemented.",
                     csv_name.to_string())};
-            } else {  // NOLINT(readability-else-after-return) keep symmetric structure
+            } else { // NOLINT(readability-else-after-return) keep symmetric structure
                 // Legacy structure: Check for income trend data in JSON
                 if (json_params && json_params->contains("IncomeTrend")) {
                     // Read income trend data from static_model.json
@@ -1155,9 +1155,9 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     const auto &inc_req = config.project_requirements.income;
     std::string income_categories = inc_req.categories;
     if (income_categories != "3" && income_categories != "4") {
-        throw core::HgpsException{fmt::format(
-            R"(project_requirements.income.categories must be "3" or "4". Got: "{}")",
-            income_categories)};
+        throw core::HgpsException{
+            fmt::format(R"(project_requirements.income.categories must be "3" or "4". Got: "{}")",
+                        income_categories)};
     }
     std::cout << "\nUsing " << income_categories
               << " income categories (from project_requirements)\n";

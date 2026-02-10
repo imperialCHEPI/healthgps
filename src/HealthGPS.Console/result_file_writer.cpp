@@ -128,22 +128,22 @@ void ResultFileWriter::write_json_begin(const std::filesystem::path &output) {
     using json = nlohmann::ordered_json;
 
     auto tp = std::chrono::system_clock::now();
-    json msg = {
-        {"experiment",
-         {{"model", info_.model},
-          {"version", info_.version},
-          {"intervention", info_.intervention},
-          {"job_id", info_.job_id},
-          {"custom_seed", info_.seed},
-          {"time_of_day", [tp]() {
-              auto t = std::chrono::system_clock::to_time_t(tp);
-              std::tm *tm = std::gmtime(&t);
-              char buf[64];
-              std::strftime(buf, sizeof(buf), "%F %H:%M:%S UTC", tm);
-              return std::string{buf};
-          }()},
-          {"output_filename", output.filename().string()}}},
-        {"result", {1, 2}}};
+    json msg = {{"experiment",
+                 {{"model", info_.model},
+                  {"version", info_.version},
+                  {"intervention", info_.intervention},
+                  {"job_id", info_.job_id},
+                  {"custom_seed", info_.seed},
+                  {"time_of_day",
+                   [tp]() {
+                       auto t = std::chrono::system_clock::to_time_t(tp);
+                       std::tm *tm = std::gmtime(&t);
+                       char buf[64];
+                       std::strftime(buf, sizeof(buf), "%F %H:%M:%S UTC", tm);
+                       return std::string{buf};
+                   }()},
+                  {"output_filename", output.filename().string()}}},
+                {"result", {1, 2}}};
 
     auto json_header = msg.dump();
     auto array_start = json_header.find_last_of('[');

@@ -631,7 +631,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
     }
     series.add_channels(channels_);
     auto current_time = static_cast<unsigned int>(context.time_now());
-    std::size_t processed = 0;  // NOLINT(clang-diagnostic-unused-but-set-variable)
+    std::size_t processed = 0; // NOLINT(clang-diagnostic-unused-but-set-variable)
     for (const auto &person : context.population()) {
         auto age = person.age;
         auto gender = person.gender;
@@ -1033,7 +1033,7 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
     }
 
     auto current_time = static_cast<unsigned int>(context.time_now());
-    std::size_t processed_income = 0;  // NOLINT(clang-diagnostic-unused-but-set-variable)
+    std::size_t processed_income = 0; // NOLINT(clang-diagnostic-unused-but-set-variable)
 
     auto safe_add_to_channel =
         [&series, &added_income_channels](core::Gender gender, core::Income income,
@@ -1189,15 +1189,15 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
     }
 
     // Calculate averages for each income category (with safe channel access)
-    auto safe_divide_channel_income = [&series, &added_income_channels](
-                                          core::Gender gender, core::Income income,
+    auto safe_divide_channel_income =
+        [&series, &added_income_channels](core::Gender gender, core::Income income,
                                           const std::string &channel, int age, double count) {
-        std::string channel_key = core::to_lower(channel);
-        // Only access if channel was added
-        if (count > 0 && added_income_channels.contains(channel_key)) {
-            series.at(gender, income, channel_key).at(age) /= count;
-        }
-    };
+            std::string channel_key = core::to_lower(channel);
+            // Only access if channel was added
+            if (count > 0 && added_income_channels.contains(channel_key)) {
+                series.at(gender, income, channel_key).at(age) /= count;
+            }
+        };
 
     const std::unordered_set<std::string> income_demo_mean_channels = {
         "mean_gender", "mean_region", "mean_ethnicity",
@@ -1637,15 +1637,14 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
         std::string mean_channel = core::to_lower("mean_" + chan);
         std::string std_channel = core::to_lower("std_" + chan);
         // Only accumulate if both mean and std channels exist
-        if (available_channels.contains(mean_channel) &&
-            available_channels.contains(std_channel)) {
+        if (available_channels.contains(mean_channel) && available_channels.contains(std_channel)) {
             const double mean = series(sex, "mean_" + chan).at(age);
             const double diff = value - mean;
             series(sex, "std_" + chan).at(age) += diff * diff;
         }
     };
 
-    std::size_t processed_std = 0;  // NOLINT(clang-diagnostic-unused-but-set-variable)
+    std::size_t processed_std = 0; // NOLINT(clang-diagnostic-unused-but-set-variable)
     auto current_time = static_cast<unsigned int>(context.time_now());
     for (const auto &person : context.population()) {
         unsigned int age = person.age;
