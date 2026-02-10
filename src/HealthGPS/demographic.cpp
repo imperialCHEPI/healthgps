@@ -75,6 +75,7 @@ std::size_t DemographicModule::get_total_population_size(int time_year) const no
     return static_cast<std::size_t>(total);
 }
 
+//Get total deaths
 double DemographicModule::get_total_deaths(int time_year) const noexcept {
     if (life_table_.contains_time(time_year)) {
         return life_table_.get_total_deaths_at(time_year);
@@ -108,6 +109,7 @@ DemographicModule::get_age_gender_distribution(int time_year) const noexcept {
     return result;
 }
 
+//get birth rates
 DoubleGenderValue DemographicModule::get_birth_rate(int time_year) const noexcept {
     if (birth_rates_.contains(time_year)) {
         return DoubleGenderValue{birth_rates_(time_year, core::Gender::male),
