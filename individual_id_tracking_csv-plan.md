@@ -33,8 +33,6 @@ sequenceDiagram
     Monitor->>TrackWriter: write(IndividualTrackingEventMessage)
 ```
 
-
-
 ## 1. Config schema and POCO
 
 - **Schema**: Extend [schemas/v1/config/output.json](schemas/v1/config/output.json) with an optional `individual_id_tracking` object (all properties optional for backward compatibility):

@@ -25,9 +25,10 @@ EventMonitor::EventMonitor(hgps::EventAggregator &event_bus, ResultWriter &resul
         result_event_handler(std::forward<decltype(PH1)>(PH1));
     }));
 
-    handlers_.emplace_back(event_bus.subscribe(hgps::EventType::individual_tracking, [this](auto &&PH1) {
-        result_event_handler(std::forward<decltype(PH1)>(PH1));
-    }));
+    handlers_.emplace_back(
+        event_bus.subscribe(hgps::EventType::individual_tracking, [this](auto &&PH1) {
+            result_event_handler(std::forward<decltype(PH1)>(PH1));
+        }));
 
     handlers_.emplace_back(event_bus.subscribe(hgps::EventType::error, [this](auto &&PH1) {
         error_event_handler(std::forward<decltype(PH1)>(PH1));

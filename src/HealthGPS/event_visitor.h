@@ -38,7 +38,8 @@ class EventMessageVisitor {
     /// @param message The message instance to visit
     virtual void visit(const ResultEventMessage &message) = 0;
 
-    /// @brief MAHIMA: Visits IndividualTrackingEventMessage (per-person CSV rows for same-person ID tracking)
+    /// @brief MAHIMA: Visits IndividualTrackingEventMessage (per-person CSV rows for same-person ID
+    /// tracking)
     /// @param message The message instance to visit
     virtual void visit(const IndividualTrackingEventMessage &message) = 0;
 };

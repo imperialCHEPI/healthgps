@@ -8,8 +8,8 @@
 #include "lms_model.h"
 #include "weight_model.h"
 
-#include <atomic>
 #include <algorithm>
+#include <atomic>
 #include <cmath>
 #include <functional>
 #include <future>
@@ -194,7 +194,8 @@ void AnalysisModule::publish_individual_tracking_if_enabled(RuntimeContext &cont
         }
     }
 
-    // Scenario filter: baseline | intervention | both (case-insensitive match to context.identifier())
+    // Scenario filter: baseline | intervention | both (case-insensitive match to
+    // context.identifier())
     std::string scenario_lower = context.identifier();
     std::ranges::transform(scenario_lower, scenario_lower.begin(), [](unsigned char c) {
         return static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
@@ -270,8 +271,8 @@ void AnalysisModule::publish_individual_tracking_if_enabled(RuntimeContext &cont
 
     if (!rows.empty()) {
         context.publish(std::make_unique<IndividualTrackingEventMessage>(
-            context.identifier(), context.current_run(), context.time_now(),
-            context.identifier(), std::move(rows)));
+            context.identifier(), context.current_run(), context.time_now(), context.identifier(),
+            std::move(rows)));
     }
 }
 

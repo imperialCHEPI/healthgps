@@ -2,8 +2,8 @@
 // across baseline and intervention in the _IndividualIDTracking.csv file.
 #include "individual_id_tracking_writer.h"
 
-#include <fmt/format.h>
 #include <algorithm>
+#include <fmt/format.h>
 #include <sstream>
 
 namespace hgps {
@@ -25,8 +25,8 @@ std::string csv_escape(const std::string &s) {
 }
 } // namespace
 
-std::filesystem::path IndividualIDTrackingWriter::make_tracking_path(
-    const std::filesystem::path &base_result_path) {
+std::filesystem::path
+IndividualIDTrackingWriter::make_tracking_path(const std::filesystem::path &base_result_path) {
     auto path_str = base_result_path.string();
     auto dot_pos = path_str.find_last_of('.');
     if (dot_pos != std::string::npos) {
@@ -37,12 +37,10 @@ std::filesystem::path IndividualIDTrackingWriter::make_tracking_path(
 
 IndividualIDTrackingWriter::IndividualIDTrackingWriter(
     const std::filesystem::path &base_result_path)
-    : stream_{make_tracking_path(base_result_path),
-              std::ofstream::out | std::ofstream::app} {
+    : stream_{make_tracking_path(base_result_path), std::ofstream::out | std::ofstream::app} {
     if (stream_.fail() || !stream_.is_open()) {
-        throw std::invalid_argument(
-            fmt::format("Cannot open IndividualIDTracking file: {}",
-                        make_tracking_path(base_result_path).string()));
+        throw std::invalid_argument(fmt::format("Cannot open IndividualIDTracking file: {}",
+                                                make_tracking_path(base_result_path).string()));
     }
 }
 
@@ -67,12 +65,11 @@ void IndividualIDTrackingWriter::write_header(const IndividualTrackingEventMessa
     header_written_ = true;
 }
 
-void IndividualIDTrackingWriter::write_row(unsigned int run, int time,
-                                            const std::string &scenario,
-                                            const IndividualTrackingRow &row,
-                                            const std::vector<std::string> &risk_factor_columns) {
-    stream_ << run << ',' << time << ',' << csv_escape(scenario) << ',' << row.id << ','
-            << row.age << ',' << csv_escape(row.gender) << ',' << csv_escape(row.region) << ','
+void IndividualIDTrackingWriter::write_row(unsigned int run, int time, const std::string &scenario,
+                                           const IndividualTrackingRow &row,
+                                           const std::vector<std::string> &risk_factor_columns) {
+    stream_ << run << ',' << time << ',' << csv_escape(scenario) << ',' << row.id << ',' << row.age
+            << ',' << csv_escape(row.gender) << ',' << csv_escape(row.region) << ','
             << csv_escape(row.ethnicity) << ',' << csv_escape(row.income_category);
     for (const auto &col : risk_factor_columns) {
         auto it = row.risk_factors.find(col);

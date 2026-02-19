@@ -212,12 +212,9 @@ void from_json(const json &j, PolicyScenarioInfo &p) {
 
 // Individual ID tracking config (MAHIMA: per-person CSV for same-person tracking)
 void to_json(json &j, const IndividualIdTrackingConfig &p) {
-    j = json{{"enabled", p.enabled},
-             {"gender", p.gender},
-             {"regions", p.regions},
-             {"ethnicities", p.ethnicities},
-             {"risk_factors", p.risk_factors},
-             {"years", p.years},
+    j = json{{"enabled", p.enabled},           {"gender", p.gender},
+             {"regions", p.regions},           {"ethnicities", p.ethnicities},
+             {"risk_factors", p.risk_factors}, {"years", p.years},
              {"scenarios", p.scenarios}};
     if (p.age_min.has_value()) {
         j["age_min"] = p.age_min.value();
