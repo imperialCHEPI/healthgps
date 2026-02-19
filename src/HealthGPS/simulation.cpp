@@ -58,7 +58,8 @@ adevs::Time Simulation::init(adevs::SimEnv<int> *env) {
 
     initialise_population();
 
-    // MAHIMA: Same-person ID tracking verification – same index has same ID in baseline and intervention
+    // MAHIMA: Same-person ID tracking verification – same index has same ID in baseline and
+    // intervention
     {
         const auto &pop = context_.population();
         const auto n = pop.initial_size();

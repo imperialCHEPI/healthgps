@@ -19,14 +19,12 @@ Make the same logical person have the **same ID** in both baseline and intervent
 
 ## Design: ID assignment rules
 
-
 | Context                                      | ID assigned                           |
 | -------------------------------------------- | ------------------------------------- |
 | Initial population slot `i`                  | `i + 1`                               |
 | Newborn replacing slot `i`                   | `i + 1` (slot keeps its ID)           |
 | Newborn added via `emplace_back` (new slot)  | `people_.size()` (new index + 1)      |
 | Person added via `add()` (immigration clone) | Set to slot index + 1 after placement |
-
 
 ```mermaid
 flowchart LR
@@ -44,8 +42,6 @@ flowchart LR
   B1 -.same logical person.-> I1
   Bi -.same logical person.-> Ii
 ```
-
-
 
 ## Implementation plan
 
@@ -94,7 +90,6 @@ flowchart LR
 
 ## File change summary
 
-
 | File                                                           | Changes                                                                                                                                         |
 | -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | [person.h](src/HealthGPS/person.h)                             | Add `Person(std::size_t id)`, `Person(core::Gender, std::size_t id)`, `void set_id(std::size_t id)`; MAHIMA block for index-based ID.           |
@@ -102,11 +97,9 @@ flowchart LR
 | [population.cpp](src/HealthGPS/population.cpp)                 | Constructor: build vector with `Person(i+1)`; add_newborn_babies: use ID = slot+1 or size+1; add: call set_id after placement; MAHIMA comments. |
 | [Population.Test.cpp](src/HealthGPS.Tests/Population.Test.cpp) | Add test verifying ID == index + 1 for initial and after add/newborns; MAHIMA comment.                                                          |
 
-
 ## Order of implementation
 
 1. Person: add constructors and `set_id`, with comments.
 2. Population: constructor, then add_newborn_babies, then add, with comments.
 3. Run existing tests; fix any that assume previous ID behaviour (only Population tests might need a new case).
 4. Add the new Population test for index-based ID.
-

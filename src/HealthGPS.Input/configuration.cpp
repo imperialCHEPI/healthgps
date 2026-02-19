@@ -138,8 +138,8 @@ Configuration get_configuration(const std::string &config_source,
             req.two_stage.logistic_file = ts["logistic_file"].get<std::string>();
         }
     } else {
-        // Mahima: Legacy configs without project_requirements: use categorical income so static models
-        // that only define categorical IncomeModels (e.g. India) work without change.
+        // Mahima: Legacy configs without project_requirements: use categorical income so static
+        // models that only define categorical IncomeModels (e.g. India) work without change.
         config.project_requirements.income.type = "categorical";
         config.project_requirements.income.type = "simple";
     }
