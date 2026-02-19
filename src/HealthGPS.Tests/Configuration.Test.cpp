@@ -634,7 +634,7 @@ TEST_F(ConfigParsingFixture, LoadRunningInfo) {
 
 TEST_F(ConfigParsingFixture, LoadOutputInfo) {
     const OutputInfo output_info{
-        .comorbidities = 3, .folder = "/home/test", .file_name = "filename.txt"};
+        .comorbidities = 3, .folder = "/home/test", .file_name = "filename.txt", .individual_id_tracking = std::nullopt};
     const auto valid_output_info = [&]() {
         json j;
         j["output"] = output_info;
