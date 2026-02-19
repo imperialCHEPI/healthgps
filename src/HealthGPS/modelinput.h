@@ -65,8 +65,8 @@ class ModelInput {
                std::vector<core::DiseaseInfo> diseases,
                hgps::input::ProjectRequirements project_requirements,
                hgps::input::PIFInfo pif_info = hgps::input::PIFInfo{},
-               std::optional<hgps::input::IndividualIdTrackingConfig> individual_id_tracking_config =
-                   std::nullopt);
+               std::optional<hgps::input::IndividualIdTrackingConfig>
+                   individual_id_tracking_config = std::nullopt);
 
     /// @brief Gets the simulation experiment settings definition
     /// @return Experiment settings definition

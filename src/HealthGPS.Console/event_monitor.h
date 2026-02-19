@@ -23,7 +23,8 @@ class EventMonitor final : public hgps::EventMessageVisitor {
     /// @brief Initialises a new instance of the hgps::EventMonitor class.
     /// @param event_bus The message bus instance to monitor
     /// @param result_writer The results message writer instance
-    /// @param individual_tracking_writer Optional writer for IndividualIDTracking CSV (nullptr if disabled)
+    /// @param individual_tracking_writer Optional writer for IndividualIDTracking CSV (nullptr if
+    /// disabled)
     EventMonitor(hgps::EventAggregator &event_bus, ResultWriter &result_writer,
                  IndividualIDTrackingWriter *individual_tracking_writer = nullptr);
 

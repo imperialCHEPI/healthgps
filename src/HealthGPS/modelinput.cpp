@@ -5,13 +5,11 @@
 
 namespace hgps {
 
-ModelInput::ModelInput(core::DataTable &data, Settings settings, const RunInfo &run_info,
-                       SESDefinition ses_info, HierarchicalMapping risk_mapping,
-                       std::vector<core::DiseaseInfo> diseases,
-                       hgps::input::ProjectRequirements project_requirements,
-                       hgps::input::PIFInfo pif_info,
-                       std::optional<hgps::input::IndividualIdTrackingConfig>
-                           individual_id_tracking_config)
+ModelInput::ModelInput(
+    core::DataTable &data, Settings settings, const RunInfo &run_info, SESDefinition ses_info,
+    HierarchicalMapping risk_mapping, std::vector<core::DiseaseInfo> diseases,
+    hgps::input::ProjectRequirements project_requirements, hgps::input::PIFInfo pif_info,
+    std::optional<hgps::input::IndividualIdTrackingConfig> individual_id_tracking_config)
     : input_data_{data}, settings_{std::move(settings)}, run_info_{run_info},
       ses_definition_{std::move(ses_info)}, risk_mapping_{std::move(risk_mapping)},
       diseases_{std::move(diseases)}, project_requirements_{std::move(project_requirements)},

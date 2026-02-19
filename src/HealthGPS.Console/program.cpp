@@ -194,9 +194,9 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
             individual_tracking_writer.emplace(
                 create_output_file_name(config.output, config.job_id));
         }
-        auto event_monitor = EventMonitor{
-            *event_bus, json_file_logger,
-            individual_tracking_writer ? &*individual_tracking_writer : nullptr};
+        auto event_monitor =
+            EventMonitor{*event_bus, json_file_logger,
+                         individual_tracking_writer ? &*individual_tracking_writer : nullptr};
 
         // Create simulation executive instance with master seed generator
         auto seed_generator = std::make_unique<hgps::MTRandom32>();

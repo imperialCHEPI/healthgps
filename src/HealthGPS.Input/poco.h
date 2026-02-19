@@ -78,12 +78,12 @@ struct IndividualIdTrackingConfig {
     bool enabled{false};
     std::optional<int> age_min;
     std::optional<int> age_max;
-    std::string gender{"all"};   // "male" | "female" | "all"
+    std::string gender{"all"}; // "male" | "female" | "all"
     std::vector<std::string> regions{};
     std::vector<std::string> ethnicities{};
-    std::vector<std::string> risk_factors{};  // empty = all from mapping
+    std::vector<std::string> risk_factors{}; // empty = all from mapping
     std::vector<int> years{};                // empty = all years
-    std::string scenarios{"both"};          // "baseline" | "intervention" | "both"
+    std::string scenarios{"both"};           // "baseline" | "intervention" | "both"
 
     auto operator<=>(const IndividualIdTrackingConfig &rhs) const = default;
 };
