@@ -78,6 +78,10 @@ void from_json(const json &j, PolicyAdjustmentInfo &p);
 void to_json(json &j, const PolicyScenarioInfo &p);
 void from_json(const json &j, PolicyScenarioInfo &p);
 
+// Individual ID tracking config (MAHIMA: per-person CSV for same-person tracking)
+void to_json(json &j, const IndividualIdTrackingConfig &p);
+void from_json(const json &j, IndividualIdTrackingConfig &p);
+
 // Output information
 void to_json(json &j, const OutputInfo &p);
 void from_json(const json &j, OutputInfo &p);

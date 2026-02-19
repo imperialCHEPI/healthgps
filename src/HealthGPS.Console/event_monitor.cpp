@@ -1,6 +1,7 @@
 #include "event_monitor.h"
 
 #include "HealthGPS/error_message.h"
+#include "HealthGPS/individual_tracking_message.h"
 #include "HealthGPS/info_message.h"
 #include "HealthGPS/runner_message.h"
 
@@ -8,8 +9,10 @@
 #include <fmt/core.h>
 
 namespace hgps {
-EventMonitor::EventMonitor(hgps::EventAggregator &event_bus, ResultWriter &result_writer)
-    : result_writer_{result_writer}, tg_{tg_context_} {
+EventMonitor::EventMonitor(hgps::EventAggregator &event_bus, ResultWriter &result_writer,
+                           IndividualIDTrackingWriter *individual_tracking_writer)
+    : result_writer_{result_writer}, individual_tracking_writer_{individual_tracking_writer},
+      tg_{tg_context_} {
     handlers_.emplace_back(event_bus.subscribe(hgps::EventType::runner, [this](auto &&PH1) {
         info_event_handler(std::forward<decltype(PH1)>(PH1));
     }));
@@ -19,6 +22,10 @@ EventMonitor::EventMonitor(hgps::EventAggregator &event_bus, ResultWriter &resul
     }));
 
     handlers_.emplace_back(event_bus.subscribe(hgps::EventType::result, [this](auto &&PH1) {
+        result_event_handler(std::forward<decltype(PH1)>(PH1));
+    }));
+
+    handlers_.emplace_back(event_bus.subscribe(hgps::EventType::individual_tracking, [this](auto &&PH1) {
         result_event_handler(std::forward<decltype(PH1)>(PH1));
     }));
 
@@ -56,6 +63,12 @@ void EventMonitor::visit(const hgps::ErrorEventMessage &message) {
 }
 
 void EventMonitor::visit(const hgps::ResultEventMessage &message) { result_writer_.write(message); }
+
+void EventMonitor::visit(const hgps::IndividualTrackingEventMessage &message) {
+    if (individual_tracking_writer_) {
+        individual_tracking_writer_->write(message);
+    }
+}
 
 void EventMonitor::info_event_handler(std::shared_ptr<hgps::EventMessage> message) {
     info_queue_.emplace(std::move(message));

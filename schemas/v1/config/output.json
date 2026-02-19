@@ -1,17 +1,27 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/config.json",
+    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/config/output.json",
     "type": "object",
     "properties": {
-        "comorbidities": {
-            "type": "integer"
-        },
-        "folder": {
-            "type": "string"
-        },
-        "file_name": {
-            "type": "string"
+        "comorbidities": {"type": "integer"},
+        "folder": {"type": "string"},
+        "file_name": {"type": "string"},
+        "individual_id_tracking": {
+            "type": "object",
+            "description": "MAHIMA: Per-person CSV for same-person ID tracking across baseline/intervention",
+            "properties": {
+                "enabled": {"type": "boolean", "default": false},
+                "age_min": {"type": ["integer", "null"]},
+                "age_max": {"type": ["integer", "null"]},
+                "gender": {"type": "string", "enum": ["male", "female", "all"], "default": "all"},
+                "regions": {"type": "array", "items": {"type": "string"}},
+                "ethnicities": {"type": "array", "items": {"type": "string"}},
+                "risk_factors": {"type": "array", "items": {"type": "string"}},
+                "years": {"type": "array", "items": {"type": "integer"}},
+                "scenarios": {"type": "string", "enum": ["baseline", "intervention", "both"], "default": "both"}
+            },
+            "additionalProperties": true
         }
     },
-    "additionalProperties": false
+    "additionalProperties": true
 }

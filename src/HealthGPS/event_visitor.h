@@ -5,6 +5,7 @@ struct RunnerEventMessage;
 struct InfoEventMessage;
 struct ErrorEventMessage;
 struct ResultEventMessage;
+struct IndividualTrackingEventMessage;
 
 /// @brief Event message types visitor interface (double dispatcher)
 class EventMessageVisitor {
@@ -36,5 +37,9 @@ class EventMessageVisitor {
     /// @brief Visits a hgps::ResultEventMessage message  type
     /// @param message The message instance to visit
     virtual void visit(const ResultEventMessage &message) = 0;
+
+    /// @brief MAHIMA: Visits IndividualTrackingEventMessage (per-person CSV rows for same-person ID tracking)
+    /// @param message The message instance to visit
+    virtual void visit(const IndividualTrackingEventMessage &message) = 0;
 };
 } // namespace hgps

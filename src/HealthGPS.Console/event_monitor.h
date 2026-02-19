@@ -6,6 +6,7 @@
 
 #include "HealthGPS/event_aggregator.h"
 
+#include "individual_id_tracking_writer.h"
 #include "result_writer.h"
 
 namespace hgps {
@@ -13,6 +14,8 @@ namespace hgps {
 ///
 /// All notification messages are written to the terminal, while the results messages are
 /// queued to be processed by the hgps::ResultWriter instance provide at construction.
+/// MAHIMA: When individual_id_tracking is enabled, optional IndividualIDTrackingWriter writes
+/// per-person CSV rows for same-person ID tracking across baseline/intervention.
 class EventMonitor final : public hgps::EventMessageVisitor {
   public:
     EventMonitor() = delete;
@@ -20,7 +23,9 @@ class EventMonitor final : public hgps::EventMessageVisitor {
     /// @brief Initialises a new instance of the hgps::EventMonitor class.
     /// @param event_bus The message bus instance to monitor
     /// @param result_writer The results message writer instance
-    EventMonitor(hgps::EventAggregator &event_bus, ResultWriter &result_writer);
+    /// @param individual_tracking_writer Optional writer for IndividualIDTracking CSV (nullptr if disabled)
+    EventMonitor(hgps::EventAggregator &event_bus, ResultWriter &result_writer,
+                 IndividualIDTrackingWriter *individual_tracking_writer = nullptr);
 
     /// @brief Destroys a hgps::EventMonitor instance
     ~EventMonitor() noexcept;
@@ -32,9 +37,11 @@ class EventMonitor final : public hgps::EventMessageVisitor {
     void visit(const hgps::InfoEventMessage &message) override;
     void visit(const hgps::ErrorEventMessage &message) override;
     void visit(const hgps::ResultEventMessage &message) override;
+    void visit(const hgps::IndividualTrackingEventMessage &message) override;
 
   private:
     ResultWriter &result_writer_;
+    IndividualIDTrackingWriter *individual_tracking_writer_{nullptr};
     tbb::task_group_context tg_context_;
     tbb::task_group tg_;
     std::vector<std::unique_ptr<hgps::EventSubscriber>> handlers_;

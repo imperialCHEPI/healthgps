@@ -17,6 +17,9 @@ enum struct EventType : uint8_t {
     /// @brief Simulation result message
     result,
 
+    /// @brief MAHIMA: Per-person tracking rows for IndividualIDTracking CSV (same-person ID across scenarios)
+    individual_tracking,
+
     /// @brief General error reporting message
     error
 };

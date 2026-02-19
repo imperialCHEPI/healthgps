@@ -270,7 +270,8 @@ ModelInput create_model_input(core::DataTable &input_table, core::Country countr
             HierarchicalMapping(std::move(mapping)),
             std::move(diseases),
             config.project_requirements,
-            config.population_impact_fraction};
+            config.population_impact_fraction,
+            config.output.individual_id_tracking};
 }
 
 std::string create_output_file_name(const OutputInfo &info, int job_id) {

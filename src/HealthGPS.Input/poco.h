@@ -71,11 +71,29 @@ struct ModellingInfo {
     unsigned int policy_start_year{0};
 };
 
+// MAHIMA: Per-person CSV output for same-person tracking across baseline/intervention (by ID).
+//! Optional config for individual ID tracking CSV: filter by age, gender, region, ethnicity,
+//! risk factors, years, scenario; output columns include id, demographics, selected risk factors.
+struct IndividualIdTrackingConfig {
+    bool enabled{false};
+    std::optional<int> age_min;
+    std::optional<int> age_max;
+    std::string gender{"all"};   // "male" | "female" | "all"
+    std::vector<std::string> regions{};
+    std::vector<std::string> ethnicities{};
+    std::vector<std::string> risk_factors{};  // empty = all from mapping
+    std::vector<int> years{};                // empty = all years
+    std::string scenarios{"both"};          // "baseline" | "intervention" | "both"
+
+    auto operator<=>(const IndividualIdTrackingConfig &rhs) const = default;
+};
+
 //! Experiment output folder and file information
 struct OutputInfo {
     unsigned int comorbidities{};
     std::string folder{};
     std::string file_name{};
+    std::optional<IndividualIdTrackingConfig> individual_id_tracking;
 
     auto operator<=>(const OutputInfo &rhs) const = default;
 };

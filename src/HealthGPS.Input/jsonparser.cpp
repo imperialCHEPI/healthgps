@@ -210,9 +210,59 @@ void from_json(const json &j, PolicyScenarioInfo &p) {
     j.at("impacts").get_to(p.impacts);
 }
 
+// Individual ID tracking config (MAHIMA: per-person CSV for same-person tracking)
+void to_json(json &j, const IndividualIdTrackingConfig &p) {
+    j = json{{"enabled", p.enabled},
+             {"gender", p.gender},
+             {"regions", p.regions},
+             {"ethnicities", p.ethnicities},
+             {"risk_factors", p.risk_factors},
+             {"years", p.years},
+             {"scenarios", p.scenarios}};
+    if (p.age_min.has_value()) {
+        j["age_min"] = p.age_min.value();
+    }
+    if (p.age_max.has_value()) {
+        j["age_max"] = p.age_max.value();
+    }
+}
+
+void from_json(const json &j, IndividualIdTrackingConfig &p) {
+    if (j.contains("enabled")) {
+        j.at("enabled").get_to(p.enabled);
+    }
+    if (j.contains("age_min") && !j.at("age_min").is_null()) {
+        p.age_min = j.at("age_min").get<int>();
+    }
+    if (j.contains("age_max") && !j.at("age_max").is_null()) {
+        p.age_max = j.at("age_max").get<int>();
+    }
+    if (j.contains("gender")) {
+        j.at("gender").get_to(p.gender);
+    }
+    if (j.contains("regions")) {
+        j.at("regions").get_to(p.regions);
+    }
+    if (j.contains("ethnicities")) {
+        j.at("ethnicities").get_to(p.ethnicities);
+    }
+    if (j.contains("risk_factors")) {
+        j.at("risk_factors").get_to(p.risk_factors);
+    }
+    if (j.contains("years")) {
+        j.at("years").get_to(p.years);
+    }
+    if (j.contains("scenarios")) {
+        j.at("scenarios").get_to(p.scenarios);
+    }
+}
+
 // Result information
 void to_json(json &j, const OutputInfo &p) {
     j = json{{"folder", p.folder}, {"file_name", p.file_name}, {"comorbidities", p.comorbidities}};
+    if (p.individual_id_tracking.has_value()) {
+        to_json(j["individual_id_tracking"], p.individual_id_tracking.value());
+    }
 }
 
 void from_json(const json &j, OutputInfo &p) {
@@ -221,5 +271,9 @@ void from_json(const json &j, OutputInfo &p) {
     }
     j.at("file_name").get_to(p.file_name);
     j.at("comorbidities").get_to(p.comorbidities);
+    if (j.contains("individual_id_tracking")) {
+        p.individual_id_tracking = IndividualIdTrackingConfig{};
+        from_json(j.at("individual_id_tracking"), *p.individual_id_tracking);
+    }
 }
 } // namespace hgps::input

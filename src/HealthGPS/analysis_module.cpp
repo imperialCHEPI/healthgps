@@ -4,10 +4,12 @@
 
 #include "analysis_module.h"
 #include "converter.h"
+#include "individual_tracking_message.h"
 #include "lms_model.h"
 #include "weight_model.h"
 
 #include <atomic>
+#include <algorithm>
 #include <cmath>
 #include <functional>
 #include <future>
@@ -155,6 +157,11 @@ AnalysisModule::calculate_residual_disability_weight(int age, const core::Gender
     return residual_value;
 }
 
+void AnalysisModule::set_individual_id_tracking_config(
+    std::optional<hgps::input::IndividualIdTrackingConfig> config) noexcept {
+    individual_id_tracking_config_ = std::move(config);
+}
+
 void AnalysisModule::publish_result_message(RuntimeContext &context) const {
     auto sample_size = context.age_range().upper() + 1u;
     auto result = ModelResult{sample_size};
@@ -167,6 +174,105 @@ void AnalysisModule::publish_result_message(RuntimeContext &context) const {
 
     context.publish(std::make_unique<ResultEventMessage>(
         context.identifier(), context.current_run(), context.time_now(), result));
+
+    // MAHIMA: Same-person ID tracking output – publish filtered per-person rows for
+    // IndividualIDTracking CSV when enabled.
+    publish_individual_tracking_if_enabled(context);
+}
+
+void AnalysisModule::publish_individual_tracking_if_enabled(RuntimeContext &context) const {
+    if (!individual_id_tracking_config_.has_value() || !individual_id_tracking_config_->enabled) {
+        return;
+    }
+    const auto &cfg = *individual_id_tracking_config_;
+
+    // Year filter: if years specified, include only when current time is in the list
+    const int current_year = context.time_now();
+    if (!cfg.years.empty()) {
+        if (std::find(cfg.years.begin(), cfg.years.end(), current_year) == cfg.years.end()) {
+            return;
+        }
+    }
+
+    // Scenario filter: baseline | intervention | both (case-insensitive match to context.identifier())
+    std::string scenario_lower = context.identifier();
+    std::ranges::transform(scenario_lower, scenario_lower.begin(), [](unsigned char c) {
+        return static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+    });
+    if (cfg.scenarios == "baseline" && scenario_lower != "baseline") {
+        return;
+    }
+    if (cfg.scenarios == "intervention" && scenario_lower != "intervention") {
+        return;
+    }
+
+    // Risk factor column names: use config list if non-empty, else all from mapping (level > 0)
+    std::vector<std::string> risk_factor_names;
+    if (!cfg.risk_factors.empty()) {
+        risk_factor_names = cfg.risk_factors;
+    } else {
+        for (const auto &entry : context.mapping().entries()) {
+            if (entry.level() > 0) {
+                risk_factor_names.push_back(entry.name());
+            }
+        }
+    }
+
+    std::vector<IndividualTrackingRow> rows;
+    for (const auto &entity : context.population()) {
+        if (!entity.is_active()) {
+            continue;
+        }
+        if (cfg.age_min.has_value() && entity.age < static_cast<unsigned int>(*cfg.age_min)) {
+            continue;
+        }
+        if (cfg.age_max.has_value() && entity.age > static_cast<unsigned int>(*cfg.age_max)) {
+            continue;
+        }
+        if (cfg.gender != "all") {
+            const std::string g = entity.gender_to_string();
+            std::string g_lower = g;
+            std::ranges::transform(g_lower, g_lower.begin(), [](unsigned char c) {
+                return static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+            });
+            if (g_lower != cfg.gender) {
+                continue;
+            }
+        }
+        if (!cfg.regions.empty()) {
+            if (std::find(cfg.regions.begin(), cfg.regions.end(), entity.region) ==
+                cfg.regions.end()) {
+                continue;
+            }
+        }
+        if (!cfg.ethnicities.empty()) {
+            if (std::find(cfg.ethnicities.begin(), cfg.ethnicities.end(), entity.ethnicity) ==
+                cfg.ethnicities.end()) {
+                continue;
+            }
+        }
+
+        IndividualTrackingRow row{};
+        row.id = entity.id();
+        row.age = entity.age;
+        row.gender = entity.gender_to_string();
+        row.region = entity.region;
+        row.ethnicity = entity.ethnicity;
+        row.income_category = income_category_to_string(entity.income);
+        for (const auto &name : risk_factor_names) {
+            core::Identifier key(name);
+            if (entity.risk_factors.contains(key)) {
+                row.risk_factors[name] = entity.risk_factors.at(key);
+            }
+        }
+        rows.push_back(std::move(row));
+    }
+
+    if (!rows.empty()) {
+        context.publish(std::make_unique<IndividualTrackingEventMessage>(
+            context.identifier(), context.current_run(), context.time_now(),
+            context.identifier(), std::move(rows)));
+    }
 }
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
@@ -1979,6 +2085,9 @@ std::unique_ptr<AnalysisModule> build_analysis_module(Repository &repository,
 
     // Set income analysis flag from config - forces recompilation
     module->set_income_analysis_enabled(config.enable_income_analysis());
+
+    // MAHIMA: Optional individual ID tracking config for per-person CSV output
+    module->set_individual_id_tracking_config(config.individual_id_tracking_config());
 
     return module;
 }

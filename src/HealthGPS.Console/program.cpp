@@ -7,6 +7,7 @@
 #include "HealthGPS/event_bus.h"
 #include "command_options.h"
 #include "event_monitor.h"
+#include "individual_id_tracking_writer.h"
 #include "model_info.h"
 #include "result_file_writer.h"
 
@@ -16,6 +17,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <oneapi/tbb/global_control.h>
+#include <optional>
 
 namespace {
 /// @brief Get a string representation of current system time
@@ -186,7 +188,15 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
         // Create event bus and event monitor with a results file writer
         auto event_bus = std::make_shared<DefaultEventBus>();
         auto json_file_logger = create_results_file_logger(config, *model_input);
-        auto event_monitor = EventMonitor{*event_bus, json_file_logger};
+        std::optional<hgps::IndividualIDTrackingWriter> individual_tracking_writer;
+        if (config.output.individual_id_tracking.has_value() &&
+            config.output.individual_id_tracking->enabled) {
+            individual_tracking_writer.emplace(
+                create_output_file_name(config.output, config.job_id));
+        }
+        auto event_monitor = EventMonitor{
+            *event_bus, json_file_logger,
+            individual_tracking_writer ? &*individual_tracking_writer : nullptr};
 
         // Create simulation executive instance with master seed generator
         auto seed_generator = std::make_unique<hgps::MTRandom32>();
