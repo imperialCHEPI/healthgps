@@ -409,9 +409,19 @@ void hgps::Simulation::print_initial_population_statistics() {
     auto orig_summary = original_future.get();
     for (const auto &entry : context_.mapping()) {
         const auto &col = entry.name();
-        ss << fmt::format("| {:{}} : {:14.4f} : {:14.5f} : {:14.5f} : {:14.5f} |\n", col, pad,
-                          orig_summary[col].average(), sim_summary[col].average(),
-                          orig_summary[col].std_deviation(), sim_summary[col].std_deviation());
+        // Real (input CSV) may lack this column (e.g. India has Carbohydrate not FoodCarbohydrate);
+        // avoid showing 0/NaN for missing columns by printing "n/a" when not in input data.
+        const auto it = orig_summary.find(col);
+        const bool has_real = (it != orig_summary.end() && !it->second.is_empty());
+        if (has_real) {
+            ss << fmt::format("| {:{}} : {:14.4f} : {:14.5f} : {:14.5f} : {:14.5f} |\n", col, pad,
+                              it->second.average(), sim_summary[col].average(),
+                              it->second.std_deviation(), sim_summary[col].std_deviation());
+        } else {
+            ss << fmt::format("| {:{}} : {:>14} : {:14.5f} : {:>14} : {:14.5f} |\n", col, pad,
+                              "n/a", sim_summary[col].average(), "n/a",
+                              sim_summary[col].std_deviation());
+        }
     }
 
     ss << fmt::format("|{:_<{}}|\n\n", '_', width);
