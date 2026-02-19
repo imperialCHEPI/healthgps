@@ -164,13 +164,13 @@ struct PIFInfo {
 };
 
 //! Per-project requirements: demographics, income, PA, risk factors, trend, two-stage.
-//! Code uses these flags instead of project-specific hacks. Required in config.
+//! Code uses these flags instead of project-specific hacks. Optional in config; defaults if absent.
 struct ProjectRequirements {
     struct Demographics {
         bool age{true};
         bool gender{true};
-        bool region{true};
-        bool ethnicity{true};
+        bool region{false};
+        bool ethnicity{false};
         /// Optional. If set and > 0, cap age to this value in linear models (age/age2/age3). Else
         /// no cap.
         std::optional<int> max_age_for_linear_models;
@@ -178,9 +178,9 @@ struct ProjectRequirements {
 
     struct Income {
         bool enabled{true};
-        std::string type{"continuous"}; // "continuous" | "categorical"
-        std::string categories{"4"};    // "3" | "4"
-        bool adjust_to_factors_mean{true};
+        std::string type{"categorical"}; // "continuous" | "categorical"
+        std::string categories{"3"};    // "3" | "4"
+        bool adjust_to_factors_mean{false};
         bool trended{false};
         /// When true, write income-based CSV files (categorize results by income_category). When
         /// false, do not.
@@ -189,8 +189,8 @@ struct ProjectRequirements {
 
     struct PhysicalActivity {
         bool enabled{true};
-        std::string type{"continuous"}; // "simple" | "continuous"
-        bool adjust_to_factors_mean{true};
+        std::string type{"simple"}; // "simple" | "continuous"
+        bool adjust_to_factors_mean{false};
         bool trended{false};
     } physical_activity;
 

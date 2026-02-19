@@ -45,6 +45,23 @@ struct Person {
     /// @param gender The new person gender
     Person(const core::Gender gender) noexcept;
 
+    // MAHIMA: Index-based ID for same-person tracking across baseline and intervention.
+    // When a Person is created by Population (initial slot, newborn, or add), ID = slot index + 1
+    // so the same logical person has the same ID in both baseline and intervention runs.
+
+    /// @brief Initialise a new instance with an explicit ID (for Population slot assignment).
+    /// @param id The identifier to assign (typically slot index + 1).
+    Person(std::size_t id) noexcept;
+
+    /// @brief Initialise a new instance with gender and explicit ID (for Population newborns).
+    /// @param gender The new person gender
+    /// @param id The identifier to assign (typically slot index + 1).
+    Person(const core::Gender gender, std::size_t id) noexcept;
+
+    /// @brief Set the person identifier (internal use by Population when placing clones).
+    /// @param id The identifier to assign (slot index + 1 after placement).
+    void set_id(std::size_t id) noexcept;
+
     /// @brief Gets this instance unique identifier
     /// @note The identifier is unique within a virtual population only, not global unique.
     /// @return Unique identifier

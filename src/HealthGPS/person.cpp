@@ -37,6 +37,17 @@ Person::Person() : id_{++Person::newUID} {}
 Person::Person(const core::Gender birth_gender) noexcept
     : gender{birth_gender}, id_{++Person::newUID} {}
 
+// MAHIMA: Index-based ID constructors for Population; same logical person gets same ID in
+// baseline and intervention (ID = slot index + 1).
+Person::Person(std::size_t id) noexcept : id_{id} {}
+
+Person::Person(const core::Gender birth_gender, std::size_t id) noexcept
+    : gender{birth_gender}, id_{id} {}
+
+void Person::set_id(std::size_t id) noexcept {
+    id_ = id;
+}
+
 std::size_t Person::id() const noexcept { return id_; }
 
 bool Person::is_alive() const noexcept { return is_alive_; }

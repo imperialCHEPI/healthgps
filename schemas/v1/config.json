@@ -86,7 +86,6 @@
     },
     "required": [
         "version",
-        "project_requirements",
         "trend_type",
         "data",
         "inputs",

@@ -58,6 +58,23 @@ adevs::Time Simulation::init(adevs::SimEnv<int> *env) {
 
     initialise_population();
 
+    // MAHIMA: Same-person ID tracking verification – same index has same ID in baseline and intervention
+    {
+        const auto &pop = context_.population();
+        const auto n = pop.initial_size();
+        std::string sample;
+        for (std::size_t idx : {0u, 1u, 2u}) {
+            if (idx < n)
+                sample += fmt::format(" ({},{})", idx, pop[idx].id());
+        }
+        if (n > 100u)
+            sample += fmt::format(" (100,{})", pop[100].id());
+        else if (n > 3u)
+            sample += fmt::format(" ({},{})", n - 1, pop[n - 1].id());
+        std::cout << "MAHIMA: Same-person ID tracking | scenario=" << context_.identifier()
+                  << " | sample (index,id):" << sample << "\n";
+    }
+
     auto stop = std::chrono::steady_clock::now();
     auto elapsed = std::chrono::duration<double, std::milli>(stop - start);
 

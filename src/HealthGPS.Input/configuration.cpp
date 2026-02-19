@@ -100,14 +100,8 @@ Configuration get_configuration(const std::string &config_source,
     // Base dir for relative paths
     config.root_path = config_file.parent_path();
 
-    // project_requirements is required: no fallback; user must specify per-project requirements
-    if (!opt.contains("project_requirements")) {
-        throw ConfigurationError{
-            "Config must contain 'project_requirements' (demographics, income, physical_activity, "
-            "risk_factors, trend, two_stage). Add this section to your config.json. See "
-            "PROJECT_REQUIREMENTS_PLAN.md and schemas/v1/config/project_requirements.json."};
-    }
-    {
+    // project_requirements is optional; if absent, use default-constructed values for older configs
+    if (opt.contains("project_requirements")) {
         const auto &pr = opt["project_requirements"];
         auto &req = config.project_requirements;
         const auto &d = pr["demographics"];
@@ -143,6 +137,11 @@ Configuration get_configuration(const std::string &config_source,
         if (ts.contains("logistic_file") && !ts["logistic_file"].is_null()) {
             req.two_stage.logistic_file = ts["logistic_file"].get<std::string>();
         }
+    } else {
+        // Mahima: Legacy configs without project_requirements: use categorical income so static models
+        // that only define categorical IncomeModels (e.g. India) work without change.
+        config.project_requirements.income.type = "categorical";
+        config.project_requirements.income.type = "simple";
     }
 
     // Read trend_type from JSON file (defaults to "null")

@@ -229,6 +229,36 @@ TEST(TestHealthGPS_Population, AddMultipleNewEntities) {
     ASSERT_TRUE(p[start_size].is_active());
 }
 
+// MAHIMA: Verifies index-based ID so the same logical person has the same ID in baseline and
+// intervention (ID = slot index + 1).
+TEST(TestHealthGPS_Population, PersonIdEqualsSlotIndexPlusOne) {
+    using namespace hgps;
+
+    constexpr auto init_size = 10u;
+
+    auto pop = Population{init_size};
+    for (std::size_t i = 0; i < init_size; ++i) {
+        ASSERT_EQ(pop[i].id(), i + 1) << "Initial slot " << i << " should have id " << (i + 1);
+    }
+
+    auto time_now = 2022u;
+    pop[3].die(time_now);
+    pop[7].emigrate(time_now);
+    ASSERT_FALSE(pop[3].is_active());
+    ASSERT_FALSE(pop[7].is_active());
+
+    time_now++;
+    pop.add_newborn_babies(2, core::Gender::female, time_now);
+    ASSERT_TRUE(pop[3].is_active());
+    ASSERT_TRUE(pop[7].is_active());
+    ASSERT_EQ(pop[3].id(), 4u);
+    ASSERT_EQ(pop[7].id(), 8u);
+
+    pop.add_newborn_babies(1, core::Gender::male, time_now);
+    ASSERT_EQ(pop.size(), init_size + 1u);
+    ASSERT_EQ(pop[pop.size() - 1].id(), pop.size());
+}
+
 TEST(TestHealthGPS_Population, PersonIncomeValues) {
     using namespace hgps;
 

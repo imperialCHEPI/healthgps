@@ -83,7 +83,7 @@ struct Configuration {
     std::string trend_type = "null";
 
     /// @brief Per-project requirements (demographics, income, PA, risk factors, trend, two-stage).
-    /// Required: config must contain project_requirements; no fallback.
+    /// Optional in config; if absent, default-constructed values are used for older configs.
     ProjectRequirements project_requirements{};
 
     /// @brief Original config.json data for accessing additional fields like income_categories
