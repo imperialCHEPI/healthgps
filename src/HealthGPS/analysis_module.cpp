@@ -209,9 +209,8 @@ void AnalysisModule::publish_individual_tracking_if_enabled(RuntimeContext &cont
     // Scenario filter: baseline | intervention | both (case-insensitive match to
     // context.identifier())
     std::string scenario_lower = context.identifier();
-    std::ranges::transform(scenario_lower, scenario_lower.begin(), [](unsigned char c) {
-        return static_cast<char>(std::tolower(c));
-    });
+    std::ranges::transform(scenario_lower, scenario_lower.begin(),
+                           [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
     if (cfg.scenarios == "baseline" && scenario_lower != "baseline") {
         return;
     }
@@ -653,8 +652,7 @@ void AnalysisModule::calculate_income_based_statistics(RuntimeContext &context,
     }
 }
 
-std::vector<core::Income>
-AnalysisModule::get_available_income_categories(RuntimeContext &context) {
+std::vector<core::Income> AnalysisModule::get_available_income_categories(RuntimeContext &context) {
     std::vector<core::Income> categories;
     std::unordered_set<core::Income> seen;
 

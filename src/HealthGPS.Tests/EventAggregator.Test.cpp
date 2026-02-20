@@ -2,8 +2,8 @@
 
 #include "HealthGPS/error_message.h"
 #include "HealthGPS/event_bus.h"
-#include "HealthGPS/info_message.h"
 #include "HealthGPS/individual_tracking_message.h"
+#include "HealthGPS/info_message.h"
 #include "HealthGPS/result_message.h"
 #include "HealthGPS/runner_message.h"
 
@@ -242,13 +242,13 @@ TEST(TestHealthGPS_EventBus, PublishIndividualTrackingToSubscribers) {
         [&tracking_count](const std::shared_ptr<EventMessage> &) { tracking_count++; });
 
     std::vector<IndividualTrackingRow> rows;
-    hub.publish(std::make_unique<IndividualTrackingEventMessage>(
-        "Scenario", 1, 2025, "Baseline", std::move(rows)));
+    hub.publish(std::make_unique<IndividualTrackingEventMessage>("Scenario", 1, 2025, "Baseline",
+                                                                 std::move(rows)));
     ASSERT_EQ(1, tracking_count);
 
     rows.push_back(IndividualTrackingRow{});
-    hub.publish(std::make_unique<IndividualTrackingEventMessage>(
-        "Scenario", 2, 2030, "Intervention", std::move(rows)));
+    hub.publish(std::make_unique<IndividualTrackingEventMessage>("Scenario", 2, 2030,
+                                                                 "Intervention", std::move(rows)));
     ASSERT_EQ(2, tracking_count);
 }
 

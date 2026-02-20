@@ -677,9 +677,10 @@ TEST_F(ConfigParsingFixture, LoadModellingInfoOptionalPolicyStartYear) {
         RiskFactorInfo{.name = "Age", .level = 1, .range = std::nullopt}};
     const std::unordered_map<std::string, std::filesystem::path> risk_factor_models{
         {"a", create_file_absolute()}};
-    const BaselineInfo baseline_info{
-        .format = "csv", .delimiter = ",", .encoding = "UTF8",
-        .file_names = {{"a", create_file_absolute()}}};
+    const BaselineInfo baseline_info{.format = "csv",
+                                     .delimiter = ",",
+                                     .encoding = "UTF8",
+                                     .file_names = {{"a", create_file_absolute()}}};
     const SESInfo ses_info{.function = "normal", .parameters = {0.0}};
     json j;
     j["modelling"]["risk_factors"] = risk_factors;

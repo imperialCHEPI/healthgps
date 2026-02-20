@@ -144,9 +144,8 @@ TEST(ConfigSchemaExpanded, GetToSuccessFlagSetFalseOnFailure) {
 
 // --- IntegerInterval (config uses it for settings) ---
 TEST(ConfigSchemaExpanded, SettingsInfoAgeRangeFromJson) {
-    json j = {{"country_code", "UK"},
-              {"size_fraction", 0.01f},
-              {"age_range", json::array({18, 65})}};
+    json j = {
+        {"country_code", "UK"}, {"size_fraction", 0.01f}, {"age_range", json::array({18, 65})}};
     SettingsInfo s = j.get<SettingsInfo>();
     EXPECT_EQ(18, s.age_range.lower());
     EXPECT_EQ(65, s.age_range.upper());
@@ -169,10 +168,7 @@ TEST(ConfigSchemaExpanded, RiskFactorInfoWithRange) {
 }
 
 TEST(ConfigSchemaExpanded, PolicyImpactInfoAllFields) {
-    json j = {{"risk_factor", "BMI"},
-              {"impact_value", -0.5},
-              {"from_age", 10u},
-              {"to_age", 18u}};
+    json j = {{"risk_factor", "BMI"}, {"impact_value", -0.5}, {"from_age", 10u}, {"to_age", 18u}};
     PolicyImpactInfo p = j.get<PolicyImpactInfo>();
     EXPECT_EQ("BMI", p.risk_factor);
     EXPECT_DOUBLE_EQ(-0.5, p.impact_value);

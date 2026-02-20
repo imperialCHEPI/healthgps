@@ -49,7 +49,7 @@ TEST(JsonParser, SettingsInfoRoundTrip) {
 }
 
 TEST(JsonParser, SettingsInfoFromJsonMissingKeyThrows) {
-    json j = {{"country_code", "X"}, {"size_fraction", 0.5}};  // missing age_range
+    json j = {{"country_code", "X"}, {"size_fraction", 0.5}}; // missing age_range
     EXPECT_THROW(j.get<SettingsInfo>(), json::out_of_range);
 }
 
@@ -81,7 +81,7 @@ TEST(JsonParser, SESInfoRoundTrip) {
 }
 
 TEST(JsonParser, SESInfoFromJsonMissingKeyThrows) {
-    json j = {{"function_name", "normal"}};  // missing function_parameters
+    json j = {{"function_name", "normal"}}; // missing function_parameters
     EXPECT_THROW(j.get<SESInfo>(), json::out_of_range);
 }
 
@@ -113,7 +113,8 @@ TEST(JsonParser, PolicyImpactInfoFromJsonWithToAge) {
 }
 
 TEST(JsonParser, PolicyImpactInfoFromJsonNullToAge) {
-    json j = {{"risk_factor", "BMI"}, {"impact_value", -0.1}, {"from_age", 19}, {"to_age", nullptr}};
+    json j = {
+        {"risk_factor", "BMI"}, {"impact_value", -0.1}, {"from_age", 19}, {"to_age", nullptr}};
     PolicyImpactInfo q = j.get<PolicyImpactInfo>();
     EXPECT_FALSE(q.to_age.has_value());
 }
@@ -132,9 +133,9 @@ TEST(JsonParser, PolicyScenarioInfoFromJsonMinimal) {
     // Build JSON with numeric finish_time and one impact (to_json uses string for optionals)
     json j = {{"active_period", json::object({{"start_time", 2025}, {"finish_time", nullptr}})},
               {"impacts", json::array({{{"risk_factor", "BMI"},
-                                       {"impact_value", -0.1},
-                                       {"from_age", 0},
-                                       {"to_age", nullptr}}})}};
+                                        {"impact_value", -0.1},
+                                        {"from_age", 0},
+                                        {"to_age", nullptr}}})}};
     PolicyScenarioInfo q = j.get<PolicyScenarioInfo>();
     EXPECT_EQ(2025, q.active_period.start_time);
     EXPECT_EQ(1u, q.impacts.size());
