@@ -3,6 +3,8 @@
 #include "HealthGPS.Core/forward_type.h"
 #include "HealthGPS/data_series.h"
 
+#include <oneapi/tbb/parallel_for_each.h>
+
 #include <chrono>
 #include <ctime>
 #include <fmt/color.h>
@@ -56,7 +58,8 @@ ResultFileWriter::ResultFileWriter(const std::filesystem::path &file_name, Exper
 ResultFileWriter::ResultFileWriter(ResultFileWriter &&other) noexcept
     : stream_{std::move(other.stream_)}, csvstream_{std::move(other.csvstream_)},
       income_csvstreams_{std::move(other.income_csvstreams_)},
-      income_first_row_{std::move(other.income_first_row_)}, info_{std::move(other.info_)},
+      income_first_row_{std::move(other.income_first_row_)},
+      income_mutexes_{std::move(other.income_mutexes_)}, info_{std::move(other.info_)},
       write_income_csv_{other.write_income_csv_}, base_filename_{std::move(other.base_filename_)} {}
 
 ResultFileWriter &ResultFileWriter::operator=(ResultFileWriter &&other) noexcept {
@@ -74,6 +77,7 @@ ResultFileWriter &ResultFileWriter::operator=(ResultFileWriter &&other) noexcept
     }
     income_csvstreams_ = std::move(other.income_csvstreams_);
     income_first_row_ = std::move(other.income_first_row_);
+    income_mutexes_ = std::move(other.income_mutexes_);
 
     info_ = std::move(other.info_);
     base_filename_ = std::move(other.base_filename_);
@@ -102,25 +106,52 @@ ResultFileWriter::~ResultFileWriter() {
     }
 }
 
+// MAHIMA: Write order and parallelism. (1) Under one lock we write JSON + main CSV, then
+// release. (2) Income CSVs are then written in parallel (TBB: one task per income category).
+// (3) The EventMonitor uses two dispatch threads: result_dispatch_thread runs this write();
+// tracking_dispatch_thread writes the IndividualIDTracking CSV. So main result and tracking
+// CSV are written in parallel; within this write(), income CSV files are written in parallel.
 void ResultFileWriter::write(const hgps::ResultEventMessage &message) {
-    std::scoped_lock lock(lock_mutex_);
-    if (first_row_.load()) {
-        first_row_ = false;
-        write_csv_header(message);
-    } else {
-        stream_ << ",";
+    std::vector<core::Income> income_categories;
+    {
+        std::scoped_lock lock(lock_mutex_);
+        if (first_row_.load()) {
+            first_row_ = false;
+            write_csv_header(message);
+        } else {
+            stream_ << ",";
+        }
+
+        stream_ << to_json_string(message);
+        write_csv_channels(message);
+
+        // MAHIMA: Initialize income streams under main lock; then release lock and write
+        // income CSVs in parallel (one thread per income category) for faster output.
+        if (write_income_csv_ && message.content.population_by_income.has_value()) {
+            if (income_csvstreams_.empty()) {
+                initialize_income_streams(message);
+                for (const auto &[income, stream] : income_csvstreams_) {
+                    (void)stream;
+                    income_mutexes_[income] = std::make_unique<std::mutex>();
+                }
+            }
+            income_categories = get_available_income_categories(message);
+        }
     }
 
-    stream_ << to_json_string(message);
-    write_csv_channels(message);
-
-    // Write income-based CSV data only when user has enabled it
-    // (project_requirements.income.income_based_csv_output)
-    if (write_income_csv_ && message.content.population_by_income.has_value()) {
-        if (income_csvstreams_.empty()) {
-            initialize_income_streams(message);
-        }
-        write_income_csv_channels(message);
+    // MAHIMA: Write each income CSV file in parallel; each stream has its own mutex so no
+    // conflict with main result writer or other income files.
+    if (!income_categories.empty()) {
+        tbb::parallel_for_each(income_categories, [&](core::Income income) {
+            std::scoped_lock ilock(*income_mutexes_[income]);
+            auto &income_stream = income_csvstreams_[income];
+            auto &is_first_row = income_first_row_[income];
+            if (is_first_row) {
+                is_first_row = false;
+                write_income_csv_header(message, income_stream);
+            }
+            write_income_csv_data(message, income, income_stream);
+        });
     }
 }
 

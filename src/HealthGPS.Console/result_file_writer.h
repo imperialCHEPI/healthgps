@@ -2,6 +2,8 @@
 #include <atomic>
 #include <filesystem>
 #include <fstream>
+#include <map>
+#include <memory>
 #include <mutex>
 
 #include "model_info.h"
@@ -39,6 +41,9 @@ class ResultFileWriter final : public ResultWriter {
     std::ofstream csvstream_;
     std::map<core::Income, std::ofstream> income_csvstreams_;
     std::map<core::Income, bool> income_first_row_;
+    // MAHIMA: One mutex per income stream so income CSV files can be written in parallel.
+    // unique_ptr so the map is movable (std::mutex is not movable).
+    std::map<core::Income, std::unique_ptr<std::mutex>> income_mutexes_;
     ExperimentInfo info_;
     bool write_income_csv_{true};
     std::filesystem::path base_filename_;

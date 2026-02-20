@@ -94,26 +94,37 @@ void AnalysisModule::initialise_population(RuntimeContext &context) {
     auto expected_sum = create_age_gender_table<double>(age_range);
     auto expected_count = create_age_gender_table<int>(age_range);
     auto &pop = context.population();
+    // MAHIMA: Build is_active cache once in parallel (each index written by one task; no races).
+    std::vector<bool> is_active(pop.size());
+    if (pop.size() > 0) {
+        core::parallel_for(size_t{0}, pop.size() - 1, [&](size_t i) {
+            is_active[i] = pop[i].is_active();
+        });
+    }
     auto sum_mutex = std::mutex{};
     std::atomic_size_t processed{0};
-    tbb::parallel_for_each(pop.cbegin(), pop.cend(), [&](const auto &entity) {
-        if (!entity.is_active()) {
-            return;
-        }
-
-        auto sum = 1.0;
-        for (const auto &disease : entity.diseases) {
-            if (disease.second.status == DiseaseStatus::active &&
-                definition_.disability_weights().contains(disease.first)) {
-                sum *= (1.0 - definition_.disability_weights().at(disease.first));
+    const size_t n = pop.size();
+    if (n > 0) {
+        core::parallel_for(size_t{0}, n - 1, [&](size_t i) {
+            if (!is_active[i]) {
+                return;
             }
-        }
+            const auto &entity = pop[i];
 
-        auto lock = std::unique_lock{sum_mutex};
-        expected_sum(entity.age, entity.gender) += sum;
-        expected_count(entity.age, entity.gender)++;
-        ++processed;
-    });
+            auto sum = 1.0;
+            for (const auto &disease : entity.diseases) {
+                if (disease.second.status == DiseaseStatus::active &&
+                    definition_.disability_weights().contains(disease.first)) {
+                    sum *= (1.0 - definition_.disability_weights().at(disease.first));
+                }
+            }
+
+            auto lock = std::unique_lock{sum_mutex};
+            expected_sum(entity.age, entity.gender) += sum;
+            expected_count(entity.age, entity.gender)++;
+            ++processed;
+        });
+    }
 
     for (int age = age_range.lower(); age <= age_range.upper(); age++) {
         residual_disability_weight_(age, core::Gender::male) = calculate_residual_disability_weight(
@@ -219,11 +230,21 @@ void AnalysisModule::publish_individual_tracking_if_enabled(RuntimeContext &cont
         }
     }
 
+    // MAHIMA: Cache is_active once in parallel (each index written by one task; no races).
+    const auto &pop_track = context.population();
+    std::vector<bool> is_active_track(pop_track.size());
+    if (pop_track.size() > 0) {
+        core::parallel_for(size_t{0}, pop_track.size() - 1, [&](size_t i) {
+            is_active_track[i] = pop_track[i].is_active();
+        });
+    }
+
     std::vector<IndividualTrackingRow> rows;
-    for (const auto &entity : context.population()) {
-        if (!entity.is_active()) {
+    for (size_t i = 0; i < pop_track.size(); ++i) {
+        if (!is_active_track[i]) {
             continue;
         }
+        const auto &entity = pop_track[i];
         if (cfg.age_min.has_value() && entity.age < static_cast<unsigned int>(*cfg.age_min)) {
             continue;
         }
@@ -305,11 +326,20 @@ void AnalysisModule::calculate_historical_statistics(RuntimeContext &context,
         core::run_async(&AnalysisModule::calculate_dalys, this, std::ref(context.population()),
                         age_upper_bound, analysis_time);
 
-    auto population_size = static_cast<int>(context.population().size());
+    const auto &pop_hist = context.population();
+    auto population_size = static_cast<int>(pop_hist.size());
     auto population_dead = 0;
     auto population_migrated = 0;
-    for (const auto &entity : context.population()) {
-        if (!entity.is_active()) {
+    // MAHIMA: Cache is_active once in parallel (each index written by one task; no races).
+    std::vector<bool> is_active_hist(pop_hist.size());
+    if (pop_hist.size() > 0) {
+        core::parallel_for(size_t{0}, pop_hist.size() - 1, [&](size_t idx) {
+            is_active_hist[idx] = pop_hist[idx].is_active();
+        });
+    }
+    for (size_t idx = 0; idx < pop_hist.size(); ++idx) {
+        if (!is_active_hist[idx]) {
+            const auto &entity = pop_hist[idx];
             if (entity.has_emigrated() && entity.time_of_migration() == analysis_time) {
                 population_migrated++;
             }
@@ -321,6 +351,7 @@ void AnalysisModule::calculate_historical_statistics(RuntimeContext &context,
             continue;
         }
 
+        const auto &entity = pop_hist[idx];
         gender_age_sum[entity.gender] += entity.age;
         gender_count[entity.gender]++;
         for (auto &item : risk_factors) {
@@ -413,11 +444,21 @@ void AnalysisModule::calculate_income_based_statistics(RuntimeContext &context,
     auto comorbidity_by_income = std::map<unsigned int, std::map<core::Income, ResultByGender>>();
     auto population_by_income = std::map<core::Income, int>();
 
-    // Aggregate statistics by income category
-    for (const auto &person : context.population()) {
-        if (!person.is_active())
-            continue;
+    // MAHIMA: Cache is_active once in parallel (each index written by one task; no races).
+    const auto &pop_inc = context.population();
+    std::vector<bool> is_active_inc(pop_inc.size());
+    if (pop_inc.size() > 0) {
+        core::parallel_for(size_t{0}, pop_inc.size() - 1, [&](size_t i) {
+            is_active_inc[i] = pop_inc[i].is_active();
+        });
+    }
 
+    // Aggregate statistics by income category
+    for (size_t i = 0; i < pop_inc.size(); ++i) {
+        if (!is_active_inc[i]) {
+            continue;
+        }
+        const auto &person = pop_inc[i];
         auto income = person.income;
         population_by_income[income]++;
 
@@ -621,10 +662,18 @@ AnalysisModule::get_available_income_categories(RuntimeContext &context) const {
     std::vector<core::Income> categories;
     std::unordered_set<core::Income> seen;
 
-    for (const auto &person : context.population()) {
-        if (person.is_active() && !seen.contains(person.income)) {
-            categories.emplace_back(person.income);
-            seen.insert(person.income);
+    // MAHIMA: Cache is_active once in parallel (each index written by one task; no races).
+    const auto &pop_cat = context.population();
+    std::vector<bool> is_active_cat(pop_cat.size());
+    if (pop_cat.size() > 0) {
+        core::parallel_for(size_t{0}, pop_cat.size() - 1, [&](size_t i) {
+            is_active_cat[i] = pop_cat[i].is_active();
+        });
+    }
+    for (size_t i = 0; i < pop_cat.size(); ++i) {
+        if (is_active_cat[i] && !seen.contains(pop_cat[i].income)) {
+            categories.emplace_back(pop_cat[i].income);
+            seen.insert(pop_cat[i].income);
         }
     }
     return categories;
@@ -670,7 +719,16 @@ DALYsIndicator AnalysisModule::calculate_dalys(Population &population, unsigned 
     auto yll_sum = 0.0;
     auto yld_sum = 0.0;
     auto count = 0.0;
-    for (const auto &entity : population) {
+    // MAHIMA: Cache is_active once in parallel (each index written by one task; no races).
+    const size_t pop_size = population.size();
+    std::vector<bool> is_active_daly(pop_size);
+    if (pop_size > 0) {
+        core::parallel_for(size_t{0}, pop_size - 1, [&](size_t i) {
+            is_active_daly[i] = population[i].is_active();
+        });
+    }
+    for (size_t i = 0; i < pop_size; ++i) {
+        const auto &entity = population[i];
         if (entity.time_of_death() == death_year && entity.age <= max_age) {
             auto male_reference_age =
                 definition_.life_expectancy().at(death_year, core::Gender::male);
@@ -682,7 +740,7 @@ DALYsIndicator AnalysisModule::calculate_dalys(Population &population, unsigned 
             yll_sum += lifeExpectancy;
         }
 
-        if (entity.is_active()) {
+        if (is_active_daly[i]) {
             yld_sum += calculate_disability_weight(entity);
             count++;
         }
@@ -739,11 +797,20 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
     series.add_channels(channels_);
     auto current_time = static_cast<unsigned int>(context.time_now());
     std::size_t processed = 0; // NOLINT(clang-diagnostic-unused-but-set-variable)
-    for (const auto &person : context.population()) {
+    // MAHIMA: Cache is_active once in parallel (each index written by one task; no races).
+    const auto &pop_series = context.population();
+    std::vector<bool> is_active_series(pop_series.size());
+    if (pop_series.size() > 0) {
+        core::parallel_for(size_t{0}, pop_series.size() - 1, [&](size_t i) {
+            is_active_series[i] = pop_series[i].is_active();
+        });
+    }
+    for (size_t i = 0; i < pop_series.size(); ++i) {
+        const auto &person = pop_series[i];
         auto age = person.age;
         auto gender = person.gender;
 
-        if (!person.is_active()) {
+        if (!is_active_series[i]) {
             if (!person.is_alive() && person.time_of_death() == current_time) {
                 series(gender, "deaths").at(age)++;
                 float expcted_life = definition_.life_expectancy().at(context.time_now(), gender);
@@ -994,14 +1061,22 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
     bool has_income = false;
     bool has_physical_activity = false;
 
-    // Sample a subset of the population to check for attribute availability
+    // MAHIMA: Cache is_active once in parallel (each index written by one task; no races).
     const auto &pop = context.population();
+    std::vector<bool> is_active(pop.size());
+    if (pop.size() > 0) {
+        core::parallel_for(size_t{0}, pop.size() - 1, [&](size_t i) {
+            is_active[i] = pop[i].is_active();
+        });
+    }
+
+    // Sample a subset of the population to check for attribute availability
     size_t sample_size = std::min(pop.size(), static_cast<size_t>(1000));
     for (size_t i = 0; i < sample_size; i++) {
-        const auto &person = pop[i];
-        if (!person.is_active()) {
+        if (!is_active[i]) {
             continue;
         }
+        const auto &person = pop[i];
 
         if (!person.region.empty() && person.region != "unknown") {
             has_region = true;
@@ -1162,13 +1237,14 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
         }
     };
 
-    for (const auto &person : context.population()) {
-
+    // MAHIMA: Use cached is_active[i] instead of person.is_active() to avoid repeated calls.
+    for (size_t i = 0; i < pop.size(); ++i) {
+        const auto &person = pop[i];
         auto age = person.age;
         auto gender = person.gender;
         auto income = person.income;
 
-        if (!person.is_active()) {
+        if (!is_active[i]) {
             if (!person.is_alive() && person.time_of_death() == current_time) {
                 safe_increment_channel(gender, income, "deaths", age);
                 float expcted_life = definition_.life_expectancy().at(context.time_now(), gender);
@@ -1444,14 +1520,22 @@ void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &c
     bool has_income = false;
     bool has_physical_activity = false;
 
-    // Sample a subset of the population to check for attribute availability
+    // MAHIMA: Cache is_active once in parallel (each index written by one task; no races).
     const auto &pop = context.population();
+    std::vector<bool> is_active_std_inc(pop.size());
+    if (pop.size() > 0) {
+        core::parallel_for(size_t{0}, pop.size() - 1, [&](size_t ii) {
+            is_active_std_inc[ii] = pop[ii].is_active();
+        });
+    }
+
+    // Sample a subset of the population to check for attribute availability
     size_t sample_size = std::min(pop.size(), static_cast<size_t>(1000));
     for (size_t i = 0; i < sample_size; i++) {
-        const auto &person = pop[i];
-        if (!person.is_active()) {
+        if (!is_active_std_inc[i]) {
             continue;
         }
+        const auto &person = pop[i];
 
         if (!person.region.empty() && person.region != "unknown") {
             has_region = true;
@@ -1545,12 +1629,13 @@ void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &c
         };
 
     auto current_time = static_cast<unsigned int>(context.time_now());
-    for (const auto &person : context.population()) {
+    for (size_t ii = 0; ii < pop.size(); ++ii) {
+        const auto &person = pop[ii];
         unsigned int age = person.age;
         core::Gender sex = person.gender;
         core::Income income = person.income;
 
-        if (!person.is_active()) {
+        if (!is_active_std_inc[ii]) {
             if (!person.is_alive() && person.time_of_death() == current_time) {
                 float expcted_life = definition_.life_expectancy().at(context.time_now(), sex);
                 double yll = std::max(expcted_life - age, 0.0f) * DALY_UNITS;
@@ -1753,11 +1838,20 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
 
     std::size_t processed_std = 0; // NOLINT(clang-diagnostic-unused-but-set-variable)
     auto current_time = static_cast<unsigned int>(context.time_now());
-    for (const auto &person : context.population()) {
+    // MAHIMA: Cache is_active once in parallel (each index written by one task; no races).
+    const auto &pop_std = context.population();
+    std::vector<bool> is_active_std(pop_std.size());
+    if (pop_std.size() > 0) {
+        core::parallel_for(size_t{0}, pop_std.size() - 1, [&](size_t i) {
+            is_active_std[i] = pop_std[i].is_active();
+        });
+    }
+    for (size_t i = 0; i < pop_std.size(); ++i) {
+        const auto &person = pop_std[i];
         unsigned int age = person.age;
         core::Gender sex = person.gender;
 
-        if (!person.is_active()) {
+        if (!is_active_std[i]) {
             if (!person.is_alive() && person.time_of_death() == current_time) {
                 float expcted_life = definition_.life_expectancy().at(context.time_now(), sex);
                 double yll = std::max(expcted_life - age, 0.0f) * DALY_UNITS;
@@ -1971,14 +2065,22 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
     bool has_income = false;
     bool has_physical_activity = false;
 
-    // Sample a subset of the population to check for attribute availability
+    // MAHIMA: Cache is_active once in parallel (each index written by one task; no races).
     const auto &pop = context.population();
+    std::vector<bool> is_active_out(pop.size());
+    if (pop.size() > 0) {
+        core::parallel_for(size_t{0}, pop.size() - 1, [&](size_t i) {
+            is_active_out[i] = pop[i].is_active();
+        });
+    }
+
+    // Sample a subset of the population to check for attribute availability
     size_t sample_size = std::min(pop.size(), static_cast<size_t>(1000));
     for (size_t i = 0; i < sample_size; i++) {
-        const auto &person = pop[i];
-        if (!person.is_active()) {
+        if (!is_active_out[i]) {
             continue;
         }
+        const auto &person = pop[i];
 
         if (!person.region.empty() && person.region != "unknown") {
             has_region = true;

@@ -403,8 +403,9 @@ void hgps::Simulation::print_initial_population_statistics() {
                       "Mean (Real)", "Mean (Sim)", "StdDev (Real)", "StdDev (Sim)");
     ss << fmt::format("|{:-<{}}|\n", '-', width);
 
-    ss << fmt::format("| {:{}} : {:14} : {:14} : {:14} : {:14} |\n", population, pad, orig_pop,
-                      sim_pop, orig_pop, sim_pop);
+    // Population row: show counts as Mean (Real/Sim) and 0 as StdDev so column headers match
+    ss << fmt::format("| {:{}} : {:14.0f} : {:14.0f} : {:14.0f} : {:14.0f} |\n", population, pad,
+                      static_cast<double>(orig_pop), static_cast<double>(sim_pop), 0.0, 0.0);
 
     auto orig_summary = original_future.get();
     for (const auto &entry : context_.mapping()) {
