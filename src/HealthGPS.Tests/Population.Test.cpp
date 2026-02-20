@@ -305,3 +305,82 @@ TEST(TestHealthGPS_Population, PersonDefaultIsActive) {
     Person p{};
     ASSERT_TRUE(p.is_active());
 }
+
+TEST(TestHealthGPS_Population, PersonRegionToValue) {
+    using namespace hgps;
+    Person p{};
+    p.region = "region1";
+    ASSERT_FLOAT_EQ(1.0f, p.region_to_value());
+    p.region = "region10";
+    ASSERT_FLOAT_EQ(10.0f, p.region_to_value());
+}
+
+TEST(TestHealthGPS_Population, PersonRegionToValueUnknownThrows) {
+    using namespace hgps;
+    Person p{};
+    p.region = "unknown";
+    ASSERT_THROW(p.region_to_value(), core::HgpsException);
+}
+
+TEST(TestHealthGPS_Population, PersonEthnicityToValue) {
+    using namespace hgps;
+    Person p{};
+    p.ethnicity = "ethnicity1";
+    ASSERT_FLOAT_EQ(1.0f, p.ethnicity_to_value());
+    p.ethnicity = "ethnicity2";
+    ASSERT_FLOAT_EQ(2.0f, p.ethnicity_to_value());
+}
+
+TEST(TestHealthGPS_Population, PersonEthnicityToValueUnknownThrows) {
+    using namespace hgps;
+    Person p{};
+    p.ethnicity = "unknown";
+    ASSERT_THROW(p.ethnicity_to_value(), core::HgpsException);
+}
+
+TEST(TestHealthGPS_Population, PersonGetRiskFactorValue) {
+    using namespace hgps;
+    Person p{};
+    p.risk_factors[core::Identifier{"bmi"}] = 22.5;
+    ASSERT_DOUBLE_EQ(22.5, p.get_risk_factor_value(core::Identifier{"bmi"}));
+}
+
+TEST(TestHealthGPS_Population, PersonGetRiskFactorValueMissingThrows) {
+    using namespace hgps;
+    Person p{};
+    ASSERT_THROW(p.get_risk_factor_value(core::Identifier{"bmi"}), std::out_of_range);
+}
+
+TEST(TestHealthGPS_Population, PersonDieMakesInactive) {
+    using namespace hgps;
+    Person p{};
+    ASSERT_TRUE(p.is_active());
+    p.die(2020u);
+    ASSERT_FALSE(p.is_alive());
+    ASSERT_FALSE(p.is_active());
+    ASSERT_EQ(2020u, p.time_of_death());
+}
+
+TEST(TestHealthGPS_Population, PersonEmigrateMakesInactive) {
+    using namespace hgps;
+    Person p{};
+    ASSERT_TRUE(p.is_active());
+    p.emigrate(2025u);
+    ASSERT_TRUE(p.has_emigrated());
+    ASSERT_FALSE(p.is_active());
+    ASSERT_EQ(2025u, p.time_of_migration());
+}
+
+TEST(TestHealthGPS_Population, PersonDieWhenNotActiveThrows) {
+    using namespace hgps;
+    Person p{};
+    p.die(2020u);
+    ASSERT_THROW(p.die(2021u), std::logic_error);
+}
+
+TEST(TestHealthGPS_Population, PersonEmigrateWhenNotActiveThrows) {
+    using namespace hgps;
+    Person p{};
+    p.emigrate(2020u);
+    ASSERT_THROW(p.emigrate(2021u), std::logic_error);
+}

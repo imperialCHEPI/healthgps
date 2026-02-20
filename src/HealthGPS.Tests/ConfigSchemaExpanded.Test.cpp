@@ -302,3 +302,39 @@ TEST(ConfigSchemaExpanded, IntegerIntervalRoundTrip) {
     EXPECT_EQ(a.lower(), b.lower());
     EXPECT_EQ(a.upper(), b.upper());
 }
+
+// --- ProjectRequirements default values (single-stage vs two-stage, demographics) ---
+TEST(ConfigSchemaExpanded, ProjectRequirementsDefaultDemographics) {
+    ProjectRequirements req{};
+    EXPECT_TRUE(req.demographics.age);
+    EXPECT_TRUE(req.demographics.gender);
+    EXPECT_FALSE(req.demographics.region);
+    EXPECT_FALSE(req.demographics.ethnicity);
+    EXPECT_FALSE(req.demographics.max_age_for_linear_models.has_value());
+}
+
+TEST(ConfigSchemaExpanded, ProjectRequirementsDefaultTwoStage) {
+    ProjectRequirements req{};
+    EXPECT_FALSE(req.two_stage.use_logistic);
+    EXPECT_TRUE(req.two_stage.logistic_file.empty());
+}
+
+TEST(ConfigSchemaExpanded, ProjectRequirementsDefaultIncome) {
+    ProjectRequirements req{};
+    EXPECT_TRUE(req.income.enabled);
+    EXPECT_EQ("categorical", req.income.type);
+    EXPECT_EQ("3", req.income.categories);
+    EXPECT_TRUE(req.income.income_based_csv_output);
+}
+
+TEST(ConfigSchemaExpanded, ProjectRequirementsDefaultRiskFactors) {
+    ProjectRequirements req{};
+    EXPECT_TRUE(req.risk_factors.adjust_to_factors_mean);
+    EXPECT_TRUE(req.risk_factors.trended);
+}
+
+TEST(ConfigSchemaExpanded, ProjectRequirementsDefaultTrend) {
+    ProjectRequirements req{};
+    EXPECT_FALSE(req.trend.enabled);
+    EXPECT_EQ("null", req.trend.type);
+}
