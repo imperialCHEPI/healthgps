@@ -31,17 +31,17 @@ isProject: false
 - Add `tbb::concurrent_queue<std::shared_ptr<hgps::EventMessage>> tracking_results_queue_` and a `tracking_dispatch_thread()` that loops popping from this queue and calling `m->accept(*this)` (same visitor; only `IndividualTrackingEventMessage` will be pushed here).
 - Keep `results_queue_` and `result_dispatch_thread()` for `ResultEventMessage` only.
 
-2. **Route messages by type**:
+1. **Route messages by type**:
 
 - In the **result** subscriber callback: keep pushing to `results_queue_` (unchanged).
 - In the **individual_tracking** subscriber callback: push to `tracking_results_queue_` instead of `results_queue_`.
 
-3. **Start and stop both threads**:
+1. **Start and stop both threads**:
 
 - In the ctor: besides `tg_.run([this] { result_dispatch_thread(); })`, add `tg_.run([this] { tracking_dispatch_thread(); })`.
 - In `stop()` / dtor: `tg_context_.cancel_group_execution()` and `tg_.wait()` already wait for all tasks, so both threads will finish.
 
-4. **Optional (later): parallelize inside ResultFileWriter::write()**
+1. **Optional (later): parallelize inside ResultFileWriter::write()**
 
 - Keep one mutex for the main writer (order of JSON + main CSV + income must stay consistent).
 - Optionally build the JSON string and the main-CSV/income string chunks in parallel (e.g. TBB `parallel_invoke`) before taking the lock and writing; this reduces CPU before I/O but does not parallelize I/O itself. Can be a follow-up.
