@@ -27,17 +27,24 @@ isProject: false
 **Approach: two queues, two dispatch threads.**
 
 1. **Add a second queue and thread in EventMonitor** ([event_monitor.h](src/HealthGPS.Console/event_monitor.h), [event_monitor.cpp](src/HealthGPS.Console/event_monitor.cpp)):
-  - Add `tbb::concurrent_queue<std::shared_ptr<hgps::EventMessage>> tracking_results_queue_` and a `tracking_dispatch_thread()` that loops popping from this queue and calling `m->accept(*this)` (same visitor; only `IndividualTrackingEventMessage` will be pushed here).
-  - Keep `results_queue_` and `result_dispatch_thread()` for `ResultEventMessage` only.
+
+- Add `tbb::concurrent_queue<std::shared_ptr<hgps::EventMessage>> tracking_results_queue_` and a `tracking_dispatch_thread()` that loops popping from this queue and calling `m->accept(*this)` (same visitor; only `IndividualTrackingEventMessage` will be pushed here).
+- Keep `results_queue_` and `result_dispatch_thread()` for `ResultEventMessage` only.
+
 2. **Route messages by type**:
-  - In the **result** subscriber callback: keep pushing to `results_queue_` (unchanged).
-  - In the **individual_tracking** subscriber callback: push to `tracking_results_queue_` instead of `results_queue_`.
+
+- In the **result** subscriber callback: keep pushing to `results_queue_` (unchanged).
+- In the **individual_tracking** subscriber callback: push to `tracking_results_queue_` instead of `results_queue_`.
+
 3. **Start and stop both threads**:
-  - In the ctor: besides `tg_.run([this] { result_dispatch_thread(); })`, add `tg_.run([this] { tracking_dispatch_thread(); })`.
-  - In `stop()` / dtor: `tg_context_.cancel_group_execution()` and `tg_.wait()` already wait for all tasks, so both threads will finish.
+
+- In the ctor: besides `tg_.run([this] { result_dispatch_thread(); })`, add `tg_.run([this] { tracking_dispatch_thread(); })`.
+- In `stop()` / dtor: `tg_context_.cancel_group_execution()` and `tg_.wait()` already wait for all tasks, so both threads will finish.
+
 4. **Optional (later): parallelize inside ResultFileWriter::write()**
-  - Keep one mutex for the main writer (order of JSON + main CSV + income must stay consistent).
-  - Optionally build the JSON string and the main-CSV/income string chunks in parallel (e.g. TBB `parallel_invoke`) before taking the lock and writing; this reduces CPU before I/O but does not parallelize I/O itself. Can be a follow-up.
+
+- Keep one mutex for the main writer (order of JSON + main CSV + income must stay consistent).
+- Optionally build the JSON string and the main-CSV/income string chunks in parallel (e.g. TBB `parallel_invoke`) before taking the lock and writing; this reduces CPU before I/O but does not parallelize I/O itself. Can be a follow-up.
 
 **Result:** Main result file(s) and individual-tracking file are written by two threads in parallel; ordering within each file is unchanged.
 
@@ -66,12 +73,10 @@ isProject: false
 
 ## File change summary (Phase 1)
 
-
 | File                                                         | Change                                                                                                                                                                                                       |
 | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | [event_monitor.h](src/HealthGPS.Console/event_monitor.h)     | Add `tracking_results_queue`_, declare `tracking_dispatch_thread()`, and second `tg_.run()` for it.                                                                                                          |
 | [event_monitor.cpp](src/HealthGPS.Console/event_monitor.cpp) | individual_tracking subscriber pushes to `tracking_results_queue`_; implement `tracking_dispatch_thread()` (same loop as result_dispatch_thread but pop from tracking queue); start tracking thread in ctor. |
-
 
 No changes to [result_file_writer.cpp](src/HealthGPS.Console/result_file_writer.cpp) or [individual_id_tracking_writer.cpp](src/HealthGPS.Console/individual_id_tracking_writer.cpp) for Phase 1; each writer stays single-threaded from its own dispatch thread.
 
@@ -79,11 +84,9 @@ No changes to [result_file_writer.cpp](src/HealthGPS.Console/result_file_writer.
 
 ## File change summary (Phase 2)
 
-
 | File                                                     | Change                                                                                                                                                                                                                                                                  |
 | -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [analysis_module.cpp](src/HealthGPS/analysis_module.cpp) | In one or two hot functions that do multiple population passes (e.g. `calculate_historical_statistics`), add a single initial pass that builds a cache of active flags (or active indices), then use that cache in later loops instead of calling `person.is_active()`. |
-
 
 ---
 
@@ -91,4 +94,3 @@ No changes to [result_file_writer.cpp](src/HealthGPS.Console/result_file_writer.
 
 1. Phase 1: EventMonitor two-queue, two-thread parallel writes.
 2. Phase 2: In analysis_module, add is_active cache (or active index list) in the heaviest multi-pass function and replace repeated `is_active()` checks with the cache.
-
