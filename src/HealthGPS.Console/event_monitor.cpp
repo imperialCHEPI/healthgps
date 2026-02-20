@@ -38,7 +38,8 @@ EventMonitor::EventMonitor(hgps::EventAggregator &event_bus, ResultWriter &resul
 
     tg_.run([this] { info_dispatch_thread(); });
     tg_.run([this] { result_dispatch_thread(); });
-    // MAHIMA: Start tracking dispatch thread so main result and tracking CSV writes run in parallel.
+    // MAHIMA: Start tracking dispatch thread so main result and tracking CSV writes run in
+    // parallel.
     tg_.run([this] { tracking_dispatch_thread(); });
 }
 

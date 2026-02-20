@@ -60,7 +60,8 @@ class EventMonitor final : public hgps::EventMessageVisitor {
 
     void info_dispatch_thread();
     void result_dispatch_thread();
-    // MAHIMA: Dedicated dispatch thread for tracking CSV; runs in parallel with result_dispatch_thread.
+    // MAHIMA: Dedicated dispatch thread for tracking CSV; runs in parallel with
+    // result_dispatch_thread.
     void tracking_dispatch_thread();
 };
 } // namespace hgps
