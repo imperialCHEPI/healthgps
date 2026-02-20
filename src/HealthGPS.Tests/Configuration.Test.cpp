@@ -449,6 +449,39 @@ TEST(ConfigParsing, CheckVersion) {
     }
 }
 
+TEST(ConfigParsing, CheckVersionRejectsOldAndInvalidVersions) {
+    // Old config: version 1 is rejected (only v2 supported)
+    {
+        json j;
+        j["version"] = 1;
+        EXPECT_THROW(check_version(j), ConfigurationError);
+    }
+    // Version 0 rejected
+    {
+        json j;
+        j["version"] = 0;
+        EXPECT_THROW(check_version(j), ConfigurationError);
+    }
+    // Version 3 rejected (future/unsupported)
+    {
+        json j;
+        j["version"] = 3;
+        EXPECT_THROW(check_version(j), ConfigurationError);
+    }
+    // Version null rejected
+    {
+        json j;
+        j["version"] = nullptr;
+        EXPECT_THROW(check_version(j), ConfigurationError);
+    }
+    // Version string rejected (must be int)
+    {
+        json j;
+        j["version"] = "2";
+        EXPECT_THROW(check_version(j), ConfigurationError);
+    }
+}
+
 TEST_F(ConfigParsingFixture, LoadInputInfo) {
     const FileInfo file_info{.name = create_file_absolute(),
                              .format = "csv",
@@ -632,6 +665,37 @@ TEST_F(ConfigParsingFixture, LoadRunningInfo) {
     }
 }
 
+TEST_F(ConfigParsingFixture, LoadRunningInfoMissingRunningThrows) {
+    json j;
+    j["other"] = 1;
+    auto config = create_config();
+    EXPECT_THROW(load_running_info(j, config), ConfigurationError);
+}
+
+TEST_F(ConfigParsingFixture, LoadModellingInfoOptionalPolicyStartYear) {
+    const std::vector<RiskFactorInfo> risk_factors{
+        RiskFactorInfo{.name = "Age", .level = 1, .range = std::nullopt}};
+    const std::unordered_map<std::string, std::filesystem::path> risk_factor_models{
+        {"a", create_file_absolute()}};
+    const BaselineInfo baseline_info{
+        .format = "csv", .delimiter = ",", .encoding = "UTF8",
+        .file_names = {{"a", create_file_absolute()}}};
+    const SESInfo ses_info{.function = "normal", .parameters = {0.0}};
+    json j;
+    j["modelling"]["risk_factors"] = risk_factors;
+    j["modelling"]["risk_factor_models"] = risk_factor_models;
+    j["modelling"]["baseline_adjustments"] = baseline_info;
+    j["modelling"]["ses_model"] = ses_info;
+    // policy_start_year omitted -> default 0
+    auto config = create_config();
+    EXPECT_NO_THROW(load_modelling_info(j, config));
+    EXPECT_EQ(0u, config.modelling.policy_start_year);
+    j["modelling"]["policy_start_year"] = 2024u;
+    config = create_config();
+    EXPECT_NO_THROW(load_modelling_info(j, config));
+    EXPECT_EQ(2024u, config.modelling.policy_start_year);
+}
+
 TEST_F(ConfigParsingFixture, LoadOutputInfo) {
     const OutputInfo output_info{.comorbidities = 3,
                                  .folder = "/home/test",
@@ -656,5 +720,79 @@ TEST_F(ConfigParsingFixture, LoadOutputInfo) {
         auto j = valid_output_info;
         j["output"][key] = nullptr; // None of the values should be null
         EXPECT_THROW(load_output_info(j, config, std::nullopt), ConfigurationError);
+    }
+}
+
+TEST_F(ConfigParsingFixture, LoadOutputInfoWithIndividualIdTracking) {
+    json j;
+    j["output"] = {{"comorbidities", 3},
+                   {"folder", "/home/test"},
+                   {"file_name", "filename.txt"},
+                   {"individual_id_tracking",
+                    {{"enabled", true},
+                     {"age_min", 25},
+                     {"age_max", 60},
+                     {"gender", "all"},
+                     {"regions", json::array()},
+                     {"ethnicities", json::array()},
+                     {"risk_factors", json::array({"bmi", "smoking"})},
+                     {"years", json::array({2030, 2040})},
+                     {"scenarios", "both"}}}};
+
+    Configuration config = create_config();
+    EXPECT_NO_THROW(load_output_info(j, config, std::nullopt));
+    ASSERT_TRUE(config.output.individual_id_tracking.has_value());
+    EXPECT_TRUE(config.output.individual_id_tracking->enabled);
+    EXPECT_EQ(25, config.output.individual_id_tracking->age_min);
+    EXPECT_EQ(60, config.output.individual_id_tracking->age_max);
+    EXPECT_EQ("all", config.output.individual_id_tracking->gender);
+    EXPECT_EQ(2u, config.output.individual_id_tracking->risk_factors.size());
+    EXPECT_EQ(2u, config.output.individual_id_tracking->years.size());
+    EXPECT_EQ("both", config.output.individual_id_tracking->scenarios);
+}
+
+TEST_F(ConfigParsingFixture, LoadOutputInfoWithIndividualIdTrackingDisabled) {
+    json j;
+    j["output"] = {{"comorbidities", 2},
+                   {"folder", "/tmp/out"},
+                   {"file_name", "out.txt"},
+                   {"individual_id_tracking", {{"enabled", false}}}};
+    Configuration config = create_config();
+    EXPECT_NO_THROW(load_output_info(j, config, std::nullopt));
+    ASSERT_TRUE(config.output.individual_id_tracking.has_value());
+    EXPECT_FALSE(config.output.individual_id_tracking->enabled);
+}
+
+TEST_F(ConfigParsingFixture, LoadOutputInfoOutputFolderFromCli) {
+    json j;
+    j["output"] = {{"comorbidities", 3}, {"folder", ""}, {"file_name", "f.txt"}};
+    Configuration config = create_config();
+    EXPECT_NO_THROW(load_output_info(j, config, std::string("/cli/folder")));
+    EXPECT_EQ(config.output.folder, "/cli/folder");
+}
+
+TEST_F(ConfigParsingFixture, LoadOutputInfoOutputFolderBothSpecifiedThrows) {
+    json j;
+    j["output"] = {{"comorbidities", 3}, {"folder", "/config/folder"}, {"file_name", "f.txt"}};
+    Configuration config = create_config();
+    EXPECT_THROW(load_output_info(j, config, std::string("/cli/folder")), ConfigurationError);
+}
+
+TEST_F(ConfigParsingFixture, LoadOutputInfoOutputFolderNeitherSpecifiedThrows) {
+    json j;
+    j["output"] = {{"comorbidities", 3}, {"folder", ""}, {"file_name", "f.txt"}};
+    Configuration config = create_config();
+    EXPECT_THROW(load_output_info(j, config, std::nullopt), ConfigurationError);
+}
+
+TEST(ConfigParsing, GetThrowsWithKeyInMessage) {
+    json j;
+    j["present"] = 1;
+    try {
+        get(j, "missing_key");
+        FAIL() << "expected ConfigurationError";
+    } catch (const ConfigurationError &e) {
+        std::string msg = e.what();
+        EXPECT_TRUE(msg.find("missing_key") != std::string::npos) << "message: " << msg;
     }
 }

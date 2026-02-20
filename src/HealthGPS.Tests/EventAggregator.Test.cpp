@@ -3,6 +3,7 @@
 #include "HealthGPS/error_message.h"
 #include "HealthGPS/event_bus.h"
 #include "HealthGPS/info_message.h"
+#include "HealthGPS/individual_tracking_message.h"
 #include "HealthGPS/result_message.h"
 #include "HealthGPS/runner_message.h"
 
@@ -229,4 +230,60 @@ TEST(TestHealthGPS_EventBus, PublishToFilteredSubscribers) {
     ASSERT_EQ(count_expected, runner_count);
     ASSERT_EQ(count_expected, error_count);
     ASSERT_EQ(count_expected, result_count);
+}
+
+TEST(TestHealthGPS_EventBus, PublishIndividualTrackingToSubscribers) {
+    using namespace hgps;
+
+    auto tracking_count = 0;
+    auto hub = DefaultEventBus{};
+    auto sub = hub.subscribe(
+        EventType::individual_tracking,
+        [&tracking_count](const std::shared_ptr<EventMessage> &) { tracking_count++; });
+
+    std::vector<IndividualTrackingRow> rows;
+    hub.publish(std::make_unique<IndividualTrackingEventMessage>(
+        "Scenario", 1, 2025, "Baseline", std::move(rows)));
+    ASSERT_EQ(1, tracking_count);
+
+    rows.push_back(IndividualTrackingRow{});
+    hub.publish(std::make_unique<IndividualTrackingEventMessage>(
+        "Scenario", 2, 2030, "Intervention", std::move(rows)));
+    ASSERT_EQ(2, tracking_count);
+}
+
+TEST(TestHealthGPS_EventBus, IndividualTrackingEventMessageIdAndToString) {
+    using namespace hgps;
+
+    std::vector<IndividualTrackingRow> rows;
+    auto msg = IndividualTrackingEventMessage("Sender", 1, 2025, "Baseline", std::move(rows));
+
+    ASSERT_EQ(static_cast<int>(EventType::individual_tracking), msg.id());
+    std::string str = msg.to_string();
+    ASSERT_TRUE(str.find("Sender") != std::string::npos);
+    ASSERT_TRUE(str.find("Baseline") != std::string::npos);
+    ASSERT_TRUE(str.find("rows: 0") != std::string::npos);
+
+    std::vector<IndividualTrackingRow> rows2(2);
+    auto msg2 = IndividualTrackingEventMessage("S2", 2, 2030, "Intervention", std::move(rows2));
+    ASSERT_TRUE(msg2.to_string().find("rows: 2") != std::string::npos);
+}
+
+TEST(TestHealthGPS_EventBus, IndividualTrackingEventMessageAccept) {
+    using namespace hgps;
+
+    struct TrackingVisitor : EventMessageVisitor {
+        int tracking_visits = 0;
+        void visit(const RunnerEventMessage &) override {}
+        void visit(const InfoEventMessage &) override {}
+        void visit(const ErrorEventMessage &) override {}
+        void visit(const ResultEventMessage &) override {}
+        void visit(const IndividualTrackingEventMessage &) override { tracking_visits++; }
+    };
+
+    std::vector<IndividualTrackingRow> rows(1);
+    auto msg = IndividualTrackingEventMessage("S", 1, 2025, "Baseline", std::move(rows));
+    TrackingVisitor v;
+    msg.accept(v);
+    ASSERT_EQ(1, v.tracking_visits);
 }

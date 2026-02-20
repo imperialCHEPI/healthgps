@@ -16,6 +16,7 @@
 #include <iostream>
 #include <oneapi/tbb/parallel_for_each.h>
 #include <unordered_set>
+#include <utility>
 
 namespace hgps {
 
@@ -190,6 +191,7 @@ void AnalysisModule::publish_result_message(RuntimeContext &context) const {
     publish_individual_tracking_if_enabled(context);
 }
 
+// NOLINTNEXTLINE(readability-function-cognitive-complexity) many filter branches by design
 void AnalysisModule::publish_individual_tracking_if_enabled(RuntimeContext &context) const {
     if (!individual_id_tracking_config_.has_value() || !individual_id_tracking_config_->enabled) {
         return;
@@ -199,7 +201,7 @@ void AnalysisModule::publish_individual_tracking_if_enabled(RuntimeContext &cont
     // Year filter: if years specified, include only when current time is in the list
     const int current_year = context.time_now();
     if (!cfg.years.empty()) {
-        if (std::find(cfg.years.begin(), cfg.years.end(), current_year) == cfg.years.end()) {
+        if (std::ranges::find(cfg.years, current_year) == cfg.years.end()) {
             return;
         }
     }
@@ -208,7 +210,7 @@ void AnalysisModule::publish_individual_tracking_if_enabled(RuntimeContext &cont
     // context.identifier())
     std::string scenario_lower = context.identifier();
     std::ranges::transform(scenario_lower, scenario_lower.begin(), [](unsigned char c) {
-        return static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+        return static_cast<char>(std::tolower(c));
     });
     if (cfg.scenarios == "baseline" && scenario_lower != "baseline") {
         return;
@@ -243,31 +245,29 @@ void AnalysisModule::publish_individual_tracking_if_enabled(RuntimeContext &cont
             continue;
         }
         const auto &entity = pop_track[i];
-        if (cfg.age_min.has_value() && entity.age < static_cast<unsigned int>(*cfg.age_min)) {
+        if (cfg.age_min.has_value() && std::cmp_less(entity.age, *cfg.age_min)) {
             continue;
         }
-        if (cfg.age_max.has_value() && entity.age > static_cast<unsigned int>(*cfg.age_max)) {
+        if (cfg.age_max.has_value() && std::cmp_greater(entity.age, *cfg.age_max)) {
             continue;
         }
         if (cfg.gender != "all") {
             const std::string g = entity.gender_to_string();
             std::string g_lower = g;
             std::ranges::transform(g_lower, g_lower.begin(), [](unsigned char c) {
-                return static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+                return static_cast<char>(std::tolower(c));
             });
             if (g_lower != cfg.gender) {
                 continue;
             }
         }
         if (!cfg.regions.empty()) {
-            if (std::find(cfg.regions.begin(), cfg.regions.end(), entity.region) ==
-                cfg.regions.end()) {
+            if (std::ranges::find(cfg.regions, entity.region) == cfg.regions.end()) {
                 continue;
             }
         }
         if (!cfg.ethnicities.empty()) {
-            if (std::find(cfg.ethnicities.begin(), cfg.ethnicities.end(), entity.ethnicity) ==
-                cfg.ethnicities.end()) {
+            if (std::ranges::find(cfg.ethnicities, entity.ethnicity) == cfg.ethnicities.end()) {
                 continue;
             }
         }
@@ -654,7 +654,7 @@ void AnalysisModule::calculate_income_based_statistics(RuntimeContext &context,
 }
 
 std::vector<core::Income>
-AnalysisModule::get_available_income_categories(RuntimeContext &context) const {
+AnalysisModule::get_available_income_categories(RuntimeContext &context) {
     std::vector<core::Income> categories;
     std::unordered_set<core::Income> seen;
 
@@ -674,7 +674,7 @@ AnalysisModule::get_available_income_categories(RuntimeContext &context) const {
     return categories;
 }
 
-std::string AnalysisModule::income_category_to_string(core::Income income) const {
+std::string AnalysisModule::income_category_to_string(core::Income income) {
     switch (income) {
     case core::Income::low:
         return "LowIncome";

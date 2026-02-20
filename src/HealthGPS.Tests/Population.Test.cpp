@@ -275,3 +275,33 @@ TEST(TestHealthGPS_Population, PersonIncomeValues) {
     p.income = core::Income::unknown;
     ASSERT_THROW(p.income_to_value(), core::HgpsException);
 }
+
+TEST(TestHealthGPS_Population, PersonIncomeValuesLowerMiddle) {
+    using namespace hgps;
+    Person p{};
+    p.income = core::Income::lowermiddle;
+    ASSERT_EQ(2.0f, p.income_to_value()); // lowermiddle maps to 2.0 (same as middle)
+}
+
+TEST(TestHealthGPS_Population, PersonIncomeValuesUpperMiddle) {
+    using namespace hgps;
+    Person p{};
+    p.income = core::Income::uppermiddle;
+    ASSERT_EQ(3.0f, p.income_to_value());
+}
+
+TEST(TestHealthGPS_Population, PersonDefaultAgeAndGender) {
+    using namespace hgps;
+    Person p{};
+    ASSERT_EQ(0, p.age);
+    Person male(core::Gender::male);
+    ASSERT_EQ(core::Gender::male, male.gender);
+    Person female(core::Gender::female);
+    ASSERT_EQ(core::Gender::female, female.gender);
+}
+
+TEST(TestHealthGPS_Population, PersonDefaultIsActive) {
+    using namespace hgps;
+    Person p{};
+    ASSERT_TRUE(p.is_active());
+}

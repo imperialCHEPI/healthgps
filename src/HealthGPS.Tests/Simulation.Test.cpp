@@ -2,6 +2,7 @@
 #include "pch.h"
 
 #include "HealthGPS.Input/api.h"
+#include "HealthGPS/analysis_module.h"
 #include "HealthGPS/api.h"
 #include "HealthGPS/event_bus.h"
 #include "HealthGPS/random_algorithm.h"
@@ -522,4 +523,50 @@ TEST(TestSimulation, CreateAnalysisModule) {
     auto analysis_module = build_analysis_module(repository, *inputs);
     ASSERT_EQ(SimulationModuleType::Analysis, analysis_module->type());
     ASSERT_EQ("Analysis", analysis_module->name());
+}
+
+TEST(TestSimulation, IncomeCategoryToString) {
+    using namespace hgps;
+
+    EXPECT_EQ("LowIncome", AnalysisModule::income_category_to_string(core::Income::low));
+    EXPECT_EQ("HighIncome", AnalysisModule::income_category_to_string(core::Income::high));
+    EXPECT_EQ("UnknownIncome", AnalysisModule::income_category_to_string(core::Income::unknown));
+    EXPECT_EQ("MiddleIncome", AnalysisModule::income_category_to_string(core::Income::middle));
+    EXPECT_EQ("LowerMiddleIncome",
+              AnalysisModule::income_category_to_string(core::Income::lowermiddle));
+    EXPECT_EQ("UpperMiddleIncome",
+              AnalysisModule::income_category_to_string(core::Income::uppermiddle));
+}
+
+TEST(TestSimulation, GetAvailableIncomeCategoriesEmptyPopulation) {
+    using namespace hgps;
+    using namespace hgps::input;
+
+    DataTable data;
+    create_test_datatable(data);
+    auto bus = std::make_shared<DefaultEventBus>();
+    auto channel = SyncChannel{};
+    auto scenario = std::make_unique<BaselineScenario>(channel);
+    auto inputs = create_test_configuration(data);
+    auto context = RuntimeContext(bus, inputs, std::move(scenario));
+
+    auto categories = AnalysisModule::get_available_income_categories(context);
+    EXPECT_TRUE(categories.empty());
+}
+
+TEST(TestSimulation, GetAvailableIncomeCategoriesWithPopulation) {
+    using namespace hgps;
+    using namespace hgps::input;
+
+    DataTable data;
+    create_test_datatable(data);
+    auto bus = std::make_shared<DefaultEventBus>();
+    auto channel = SyncChannel{};
+    auto scenario = std::make_unique<BaselineScenario>(channel);
+    auto inputs = create_test_configuration(data);
+    auto context = RuntimeContext(bus, inputs, std::move(scenario));
+    context.reset_population(10);
+
+    auto categories = AnalysisModule::get_available_income_categories(context);
+    EXPECT_FALSE(categories.empty());
 }

@@ -93,3 +93,34 @@ TEST(TestCore_Interval, ParseDouble) {
     ASSERT_EQ(animal, cat);
     ASSERT_THROW(parse_double_interval(any_str), std::invalid_argument);
 }
+
+TEST(TestCore_Interval, IntegerIntervalContainsBoundary) {
+    using namespace hgps::core;
+    IntegerInterval iv(5, 10);
+    ASSERT_TRUE(iv.contains(5));
+    ASSERT_TRUE(iv.contains(10));
+    ASSERT_FALSE(iv.contains(4));
+    ASSERT_FALSE(iv.contains(11));
+}
+
+TEST(TestCore_Interval, IntegerIntervalSinglePoint) {
+    using namespace hgps::core;
+    IntegerInterval iv(7, 7);
+    ASSERT_EQ(0, iv.length());
+    ASSERT_TRUE(iv.contains(7));
+}
+
+TEST(TestCore_Interval, DoubleIntervalContains) {
+    using namespace hgps::core;
+    DoubleInterval iv(18.0, 65.0);
+    ASSERT_TRUE(iv.contains(18.0));
+    ASSERT_TRUE(iv.contains(65.0));
+    ASSERT_TRUE(iv.contains(40.0));
+    ASSERT_FALSE(iv.contains(17.9));
+}
+
+TEST(TestCore_Interval, FloatIntervalLength) {
+    using namespace hgps::core;
+    FloatInterval iv(0.0f, 10.0f);
+    ASSERT_FLOAT_EQ(10.0f, iv.length());
+}

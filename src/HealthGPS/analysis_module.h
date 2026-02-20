@@ -52,6 +52,12 @@ class AnalysisModule final : public UpdatableModule {
     void set_individual_id_tracking_config(
         std::optional<hgps::input::IndividualIdTrackingConfig> config) noexcept;
 
+    /// @brief Gets available income categories from the runtime context (for tests and callers).
+    static std::vector<core::Income> get_available_income_categories(RuntimeContext &context);
+
+    /// @brief Converts income category enum to string representation (for tests and callers).
+    static std::string income_category_to_string(core::Income income);
+
   private:
     AnalysisDefinition definition_;
     WeightModel weight_classifier_;
@@ -98,16 +104,6 @@ class AnalysisModule final : public UpdatableModule {
     /// @param context The runtime context
     /// @param series The data series containing factor means
     void calculate_standard_deviation(RuntimeContext &context, DataSeries &series) const;
-
-    /// @brief Gets available income categories from the runtime context
-    /// @param context The runtime context
-    /// @return Vector of available income categories
-    std::vector<core::Income> get_available_income_categories(RuntimeContext &context) const;
-
-    /// @brief Converts income category enum to string representation
-    /// @param income The income category
-    /// @return String representation of the income category
-    std::string income_category_to_string(core::Income income) const;
 };
 
 /// @brief Builds a new instance of the AnalysisModule using the given data infrastructure
