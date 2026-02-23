@@ -330,10 +330,12 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
             auto in_base = [&names = names_](const core::Identifier &id) {
                 return std::ranges::find(names, id) != names.end();
             };
-            if (!in_base(income_id) && std::ranges::find(extended_factors, income_id) != extended_factors.end()) {
+            if (!in_base(income_id) &&
+                std::ranges::find(extended_factors, income_id) != extended_factors.end()) {
                 added.push_back("income");
             }
-            if (!in_base(pa_id) && std::ranges::find(extended_factors, pa_id) != extended_factors.end()) {
+            if (!in_base(pa_id) &&
+                std::ranges::find(extended_factors, pa_id) != extended_factors.end()) {
                 added.push_back("physical_activity");
             }
             std::string list_str;
@@ -2193,8 +2195,7 @@ StaticLinearModel::build_extended_factors_list(RuntimeContext &context,
 
     const core::Identifier income_id("income");
     const core::Identifier PhysicalActivity_id("PhysicalActivity");
-    bool income_in_base =
-        std::ranges::find(base_factors, income_id) != base_factors.end();
+    bool income_in_base = std::ranges::find(base_factors, income_id) != base_factors.end();
     bool pa_in_base = std::ranges::find(base_factors, PhysicalActivity_id) != base_factors.end();
 
     bool add_income =
