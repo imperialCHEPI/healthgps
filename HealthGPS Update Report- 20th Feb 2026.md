@@ -45,6 +45,8 @@ flowchart LR
     DIS --> IO[Read/write to files]
 ```
 
+
+
 **Caption:** High-level workflow: host application entry, configuration and data loading, simulation composition, run loop (trials and time steps), module execution order, and output. Where to look: `program.cpp` (main), `runner.cpp` (run loop), `simulation.cpp` (init/update, initialise_population, update_population).
 
 ```mermaid
@@ -119,7 +121,10 @@ flowchart TB
     A_UPD --> PUB
 ```
 
+
+
 **Where to look for what (developer map):**
+
 
 | Area                                           | Entry / main files                                                                                                                                                                                                                 |
 | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -134,6 +139,7 @@ flowchart TB
 | Result and ID-tracking output                  | [result_file_writer.cpp](src/HealthGPS.Console/result_file_writer.cpp), [individual_id_tracking_writer.cpp](src/HealthGPS.Console/individual_id_tracking_writer.cpp), [event_monitor.cpp](src/HealthGPS.Console/event_monitor.cpp) |
 | Config and schema                              | [configuration.cpp](src/HealthGPS.Input/configuration.cpp), [configuration_parsing.cpp](src/HealthGPS.Input/configuration_parsing.cpp), [schema.cpp](src/HealthGPS.Input/schema.cpp)                                               |
 
+
 ---
 
 ## Parallelization: where we parallelize and where we don’t
@@ -141,6 +147,7 @@ flowchart TB
 Add a **Parallelization** subsection to the final document (e.g. after the overall workflow / developer map, or as its own section) so developers and users know where concurrency is used and why some code stays sequential.
 
 ### Where we parallelize
+
 
 | Location                                                                                                                                                                                         | What                                                                                                                                                                                                                                                      | Why                                                                                                                                                                         |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -155,7 +162,9 @@ Add a **Parallelization** subsection to the final document (e.g. after the overa
 | **Event bus** ([event_bus.cpp](src/HealthGPS/event_bus.cpp))                                                                                                                                     | `publish_async`: subscribers notified via `core::run_async`.                                                                                                                                                                                              | Non-blocking publish; subscribers run in worker threads.                                                                                                                    |
 | **EventMonitor** ([event_monitor.cpp](src/HealthGPS.Console/event_monitor.cpp), [event_monitor.h](src/HealthGPS.Console/event_monitor.h))                                                        | Separate **queues and dispatch threads** for result vs individual-tracking messages (`tbb::concurrent_queue`, dedicated threads).                                                                                                                         | Main result writes and ID-tracking writes can proceed in parallel (see [parallelize_output_writes_and_is_active-plan.md](parallelize_output_writes_and_is_active-plan.md)). |
 
+
 ### Where we do *not* parallelize (and why)
+
 
 | Location                                                                                                                             | What                                                                                                                              | Why                                                                                                                                                                             |
 | ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -164,6 +173,7 @@ Add a **Parallelization** subsection to the final document (e.g. after the overa
 | **Simulation module order** ([simulation.cpp](src/HealthGPS/simulation.cpp))                                                         | `initialise_population` and `update_population` call **Demographic → SES → Risk factor → Disease → Analysis** in strict sequence. | Data dependencies: each module expects the previous one to have run (e.g. risk factors need demographics and income).                                                           |
 | **Repository / data loading** ([repository.cpp](src/HealthGPS/repository.cpp), [model_parser](src/HealthGPS.Input/model_parser.cpp)) | Loads and caches protected by a **single mutex**; no parallel iteration over load steps.                                          | Consistency of cached data and simple correctness; parallel loads would require finer-grained locking or lock-free structures.                                                  |
 | **SyncChannel** (baseline ↔ intervention)                                                                                            | Sending net immigration (etc.) from baseline to intervention is **synchronous** (blocking send/receive).                          | Deterministic coupling between scenarios; parallelizing would complicate ordering and reproducibility.                                                                          |
+
 
 ### Concurrency primitives and thread control
 
@@ -258,7 +268,7 @@ Reference: [configuration.cpp](src/HealthGPS.Input/configuration.cpp), [configur
 
 ### 11. Data loading and model parser
 
-- `**names`_vector**: Risk factor correlation and covariance matrix data keep a consistent order. `names`_ contains risk factor names (e.g. carb, sugar, protein) and **excludes** weight, height, BMI, income, physical activity, and energy intake – i.e. quantities used in [kevin_hall_model.cpp](src/HealthGPS/kevin_hall_model.cpp) and supplied via dynamic_model.json.
+- `**names`_ vector**: Risk factor correlation and covariance matrix data keep a consistent order. `names`_ contains risk factor names (e.g. carb, sugar, protein) and **excludes** weight, height, BMI, income, physical activity, and energy intake – i.e. quantities used in [kevin_hall_model.cpp](src/HealthGPS/kevin_hall_model.cpp) and supplied via dynamic_model.json.
 
 Reference: [model_parser.cpp](src/HealthGPS.Input/model_parser.cpp).
 
@@ -267,6 +277,7 @@ Reference: [model_parser.cpp](src/HealthGPS.Input/model_parser.cpp).
 Include the exact sequence (as a numbered list or flowchart description):
 
 **Written sequence:**
+
 Age → Gender → Region (if available) → Ethnicity (if available) → Sector (if available) → Income → [Categorical: direct assignment (e.g. India) OR Continuous: compute value, quartiles, assign categories (e.g. FINCH)] → **Risk factors** → [If two-stage (logistic): Stage 1 logistic regression, then Stage 2 Box-Cox; else Box-Cox only] → **Physical activity** → [Simple: random probability, constant mean, small std OR Continuous: regression on age, gender, region, ethnicity, income_continuous, noise] → **Adjust to factors mean (user choice: enabled or not in config, same as other adjustments)** → Policies (if enabled) → Trends (if enabled) → [UPF trends: multiplicative over time; Income trends: exponential decay] → Trended Risk Factor Adjustment → Disease Model.
 
 Flowchart (no internal function names):
@@ -301,6 +312,8 @@ flowchart TB
     O --> P
     P --> Q[Disease Model]
 ```
+
+
 
 ### 13. Progress as of 20 February 2026
 
@@ -344,3 +357,4 @@ flowchart TB
 - **Single file**: `docs/PROJECT_UPDATES_AND_CHANGES.md` (or root, per your preference).
 - **Length**: Proportional to the summary (roughly 3–6 pages when rendered, depending on appendices).
 - **Outcome**: A document to upload to the GitHub repo and point to from README or docs index so users and developers have one place for “what changed and how it works now.”
+
