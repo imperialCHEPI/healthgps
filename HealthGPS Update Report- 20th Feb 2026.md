@@ -258,7 +258,7 @@ Reference: [configuration.cpp](src/HealthGPS.Input/configuration.cpp), [configur
 
 ### 11. Data loading and model parser
 
-- `**names`_vector**: Risk factor correlation and covariance matrix data keep a consistent order. `names`_ contains risk factor names (e.g. carb, sugar, protein) and **excludes** weight, height, BMI, income, physical activity, and energy intake – i.e. quantities used in [kevin_hall_model.cpp](src/HealthGPS/kevin_hall_model.cpp) and supplied via dynamic_model.json.
+- **names_** vector: Risk factor correlation and covariance matrix data keep a consistent order. **names_** contains risk factor names (e.g. carb, sugar, protein) and **excludes** weight, height, BMI, income, physical activity, and energy intake – i.e. quantities used in [kevin_hall_model.cpp](src/HealthGPS/kevin_hall_model.cpp) and supplied via dynamic_model.json.
 
 Reference: [model_parser.cpp](src/HealthGPS.Input/model_parser.cpp).
 
