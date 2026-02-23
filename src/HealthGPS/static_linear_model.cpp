@@ -328,20 +328,19 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
             const core::Identifier income_id("income");
             const core::Identifier pa_id("PhysicalActivity");
             auto in_base = [&names = names_](const core::Identifier &id) {
-                return std::find(names.begin(), names.end(), id) != names.end();
+                return std::ranges::find(names, id) != names.end();
             };
-            if (!in_base(income_id) && std::find(extended_factors.begin(), extended_factors.end(),
-                                                 income_id) != extended_factors.end()) {
+            if (!in_base(income_id) && std::ranges::find(extended_factors, income_id) != extended_factors.end()) {
                 added.push_back("income");
             }
-            if (!in_base(pa_id) && std::find(extended_factors.begin(), extended_factors.end(),
-                                             pa_id) != extended_factors.end()) {
+            if (!in_base(pa_id) && std::ranges::find(extended_factors, pa_id) != extended_factors.end()) {
                 added.push_back("physical_activity");
             }
             std::string list_str;
             for (size_t i = 0; i < added.size(); ++i) {
-                if (i > 0)
+                if (i > 0) {
                     list_str += ", ";
+                }
                 list_str += added[i];
             }
             std::cout << "\nIncluding " << (list_str.empty() ? "additional factors" : list_str)
@@ -369,14 +368,15 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
                     income_min = std::min(income_min, e);
                     income_max = std::max(income_max, e);
                 } catch (...) {
-                    // income not in expected table for this (sex, age)
+                    // income not in expected table for this (sex, age) – skip
                 }
             }
         }
         if (income_min <= income_max) {
             for (auto &person : context.population()) {
-                if (!person.is_active())
+                if (!person.is_active()) {
                     continue;
+                }
                 if (person.risk_factors.contains(income_id)) {
                     double v = person.risk_factors.at(income_id);
                     v = std::clamp(v, income_min, income_max);
@@ -394,8 +394,9 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         double sum_inc = 0.0;
         size_t n_inc = 0;
         for (const auto &person : context.population()) {
-            if (!person.is_active())
+            if (!person.is_active()) {
                 continue;
+            }
             auto it = person.risk_factors.find("income"_id);
             if (it != person.risk_factors.end()) {
                 double v = it->second;
@@ -536,19 +537,22 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
                         income_min = std::min(income_min, e);
                         income_max = std::max(income_max, e);
                     } catch (...) {
+                        // expected value not available for this (sex, age) – skip
                     }
                 }
             }
             if (income_min <= income_max) {
                 for (auto &person : context.population()) {
-                    if (!person.is_active())
+                    if (!person.is_active()) {
                         continue;
+                    }
                     if (person.risk_factors.contains(income_id)) {
                         double v = person.risk_factors.at(income_id);
                         v = std::clamp(v, income_min, income_max);
                         person.risk_factors[income_id] = v;
-                        if (person.income_continuous > 0.0)
+                        if (person.income_continuous > 0.0) {
                             person.income_continuous = v;
+                        }
                     }
                 }
             }
@@ -625,19 +629,22 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
                     income_min = std::min(income_min, e);
                     income_max = std::max(income_max, e);
                 } catch (...) {
+                    // expected value not available for this (sex, age) – skip
                 }
             }
         }
         if (income_min <= income_max) {
             for (auto &person : context.population()) {
-                if (!person.is_active())
+                if (!person.is_active()) {
                     continue;
+                }
                 if (person.risk_factors.contains(income_id)) {
                     double v = person.risk_factors.at(income_id);
                     v = std::clamp(v, income_min, income_max);
                     person.risk_factors[income_id] = v;
-                    if (person.income_continuous > 0.0)
+                    if (person.income_continuous > 0.0) {
                         person.income_continuous = v;
+                    }
                 }
             }
         }
@@ -741,19 +748,22 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
                         income_min = std::min(income_min, e);
                         income_max = std::max(income_max, e);
                     } catch (...) {
+                        // expected value not available for this (sex, age) – skip
                     }
                 }
             }
             if (income_min <= income_max) {
                 for (auto &person : context.population()) {
-                    if (!person.is_active())
+                    if (!person.is_active()) {
                         continue;
+                    }
                     if (person.risk_factors.contains(income_id)) {
                         double v = person.risk_factors.at(income_id);
                         v = std::clamp(v, income_min, income_max);
                         person.risk_factors[income_id] = v;
-                        if (person.income_continuous > 0.0)
+                        if (person.income_continuous > 0.0) {
                             person.income_continuous = v;
+                        }
                     }
                 }
             }
@@ -1258,8 +1268,8 @@ StaticLinearModel::compute_linear_models(RuntimeContext &context, Person &person
         const auto &req = context.inputs().project_requirements();
         const auto &max_age_opt = req.demographics.max_age_for_linear_models;
         if (max_age_opt.has_value() && *max_age_opt > 0) {
-            const double person_age_d = static_cast<double>(person.age);
-            const double cap_d = static_cast<double>(*max_age_opt);
+            auto person_age_d = static_cast<double>(person.age);
+            auto cap_d = static_cast<double>(*max_age_opt);
             return person_age_d < cap_d ? person_age_d : cap_d;
         }
         return static_cast<double>(person.age);
@@ -1760,17 +1770,12 @@ std::vector<double> StaticLinearModel::calculate_income_quartiles(const Populati
     // Collect all valid continuous income values from the population
     std::vector<double> sorted_incomes;
     sorted_incomes.reserve(population.size());
-    size_t processed = 0;
-    size_t found_count = 0;
 
     for (const auto &person : population) {
-        processed++;
-
         if (person.is_active()) {
             auto it = person.risk_factors.find("income"_id);
             if (it != person.risk_factors.end()) {
                 sorted_incomes.push_back(it->second);
-                found_count++;
             }
         }
     }
@@ -1793,17 +1798,20 @@ std::vector<double> StaticLinearModel::calculate_income_quartiles(const Populati
     // Calculate indices for quartiles using proper percentile calculation
     // For n sorted elements, the p-th percentile is at index = (n-1) * p
     // We use rounding to nearest integer for better accuracy
-    size_t q1_index = static_cast<size_t>(std::round((n - 1) * 0.25)); // 25th percentile
-    size_t q2_index = static_cast<size_t>(std::round((n - 1) * 0.50)); // 50th percentile (median)
-    size_t q3_index = static_cast<size_t>(std::round((n - 1) * 0.75)); // 75th percentile
+    auto q1_index = static_cast<size_t>(std::round((n - 1) * 0.25)); // 25th percentile
+    auto q2_index = static_cast<size_t>(std::round((n - 1) * 0.50)); // 50th percentile (median)
+    auto q3_index = static_cast<size_t>(std::round((n - 1) * 0.75)); // 75th percentile
 
     // Ensure indices are within bounds
-    if (q1_index >= n)
+    if (q1_index >= n) {
         q1_index = n - 1;
-    if (q2_index >= n)
+    }
+    if (q2_index >= n) {
         q2_index = n - 1;
-    if (q3_index >= n)
+    }
+    if (q3_index >= n) {
         q3_index = n - 1;
+    }
 
     // Set quartile thresholds
     quartile_thresholds[0] = sorted_incomes[q1_index]; // Q1: 25th percentile
@@ -1824,17 +1832,12 @@ std::vector<double> StaticLinearModel::calculate_income_tertiles(const Populatio
     // Collect all valid continuous income values from the population
     std::vector<double> sorted_incomes;
     sorted_incomes.reserve(population.size());
-    size_t processed = 0;
-    size_t found_count = 0;
 
     for (const auto &person : population) {
-        processed++;
-
         if (person.is_active()) {
             auto it = person.risk_factors.find("income"_id);
             if (it != person.risk_factors.end()) {
                 sorted_incomes.push_back(it->second);
-                found_count++;
             }
         }
     }
@@ -1856,14 +1859,16 @@ std::vector<double> StaticLinearModel::calculate_income_tertiles(const Populatio
     // Calculate indices for tertiles using proper percentile calculation
     // For n sorted elements, the p-th percentile is at index = (n-1) * p
     // We use rounding to nearest integer for better accuracy
-    size_t t1_index = static_cast<size_t>(std::round((n - 1) * 0.33)); // 33rd percentile
-    size_t t2_index = static_cast<size_t>(std::round((n - 1) * 0.67)); // 67th percentile
+    auto t1_index = static_cast<size_t>(std::round((n - 1) * 0.33)); // 33rd percentile
+    auto t2_index = static_cast<size_t>(std::round((n - 1) * 0.67)); // 67th percentile
 
     // Ensure indices are within bounds
-    if (t1_index >= n)
+    if (t1_index >= n) {
         t1_index = n - 1;
-    if (t2_index >= n)
+    }
+    if (t2_index >= n) {
         t2_index = n - 1;
+    }
 
     // Set tertile thresholds
     tertile_thresholds[0] = sorted_incomes[t1_index]; // T1: 33rd percentile
@@ -2189,9 +2194,8 @@ StaticLinearModel::build_extended_factors_list(RuntimeContext &context,
     const core::Identifier income_id("income");
     const core::Identifier PhysicalActivity_id("PhysicalActivity");
     bool income_in_base =
-        std::find(base_factors.begin(), base_factors.end(), income_id) != base_factors.end();
-    bool pa_in_base = std::find(base_factors.begin(), base_factors.end(), PhysicalActivity_id) !=
-                      base_factors.end();
+        std::ranges::find(base_factors, income_id) != base_factors.end();
+    bool pa_in_base = std::ranges::find(base_factors, PhysicalActivity_id) != base_factors.end();
 
     bool add_income =
         for_trended_adjustment ? req.income.trended : req.income.adjust_to_factors_mean;
@@ -2200,8 +2204,7 @@ StaticLinearModel::build_extended_factors_list(RuntimeContext &context,
             get_expected(context, core::Gender::male, 0, income_id, std::nullopt, false);
             extended_factors.push_back(income_id);
             if (!base_ranges.empty()) {
-                extended_ranges.push_back(
-                    core::DoubleInterval(0.0, 1e9)); // no effective clamp for continuous income
+                extended_ranges.emplace_back(0.0, 1e9); // no effective clamp for continuous income
             }
         } catch (...) {
             // Income not in expected table - skip
