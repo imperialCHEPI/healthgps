@@ -6,6 +6,10 @@
         "$schema": {
             "type": "string"
         },
+        "project_requirements": {
+            "$ref": "config/project_requirements.json",
+            "description": "Per-project requirements: demographics, income, PA, risk factors, trend, two-stage. Code uses these flags instead of project-specific hacks. Optional; if absent, behaviour is inferred from existing fields."
+        },
         "version": {
             "const": 2
         },
@@ -14,10 +18,21 @@
             "enum": [
                 "null",
                 "trend",
+                "upf_trend",
+                "UPFTrend",
                 "income_trend"
             ],
             "default": "null",
-            "description": "Type of trend to apply to risk factors. 'null' = no trends, 'trend' = standard trends, 'income_trend' = income-based trends"
+            "description": "Type of trend to apply to risk factors. 'null' = no trends, 'trend'/'upf_trend'/'UPFTrend' = UPF trends, 'income_trend' = income-based trends"
+        },
+        "income_categories": {
+            "type": "string",
+            "enum": [
+                "3",
+                "4"
+            ],
+            "default": "3",
+            "description": "Number of income categories to use. '3' = low, middle, high. '4' = low, lowermiddle, uppermiddle, high"
         },
         "data": {
             "$ref": "config/data.json"

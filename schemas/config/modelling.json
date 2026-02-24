@@ -1,0 +1,250 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/config/modelling.json",
+    "type": "object",
+    "properties": {
+        "ses_model": {
+            "type": "object",
+            "properties": {
+                "function_name": {
+                    "type": "string"
+                },
+                "function_parameters": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                }
+            },
+            "additionalProperties": false
+        },
+        "demographic_models": {
+            "type": "object",
+            "properties": {
+                "region": {
+                    "type": "object",
+                    "properties": {
+                        "probabilities": {
+                            "type": "object",
+                            "properties": {
+                                "coefficients": {
+                                    "type": "object",
+                                    "properties": {
+                                        "age": {
+                                            "type": "number"
+                                        },
+                                        "gender": {
+                                            "type": "object",
+                                            "properties": {
+                                                "male": {
+                                                    "type": "number"
+                                                },
+                                                "female": {
+                                                    "type": "number"
+                                                }
+                                            },
+                                            "additionalProperties": false
+                                        }
+                                    },
+                                    "additionalProperties": false
+                                }
+                            },
+                            "additionalProperties": false
+                        },
+                        "coefficients": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "number"
+                            }
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "ethnicity": {
+                    "type": "object",
+                    "properties": {
+                        "probabilities": {
+                            "type": "object",
+                            "properties": {
+                                "coefficients": {
+                                    "type": "object",
+                                    "properties": {
+                                        "age": {
+                                            "type": "number"
+                                        },
+                                        "gender": {
+                                            "type": "object",
+                                            "properties": {
+                                                "male": {
+                                                    "type": "number"
+                                                },
+                                                "female": {
+                                                    "type": "number"
+                                                }
+                                            },
+                                            "additionalProperties": false
+                                        },
+                                        "region": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "number"
+                                            }
+                                        }
+                                    },
+                                    "additionalProperties": false
+                                }
+                            },
+                            "additionalProperties": false
+                        },
+                        "coefficients": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "number"
+                            }
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "income": {
+                    "type": "object",
+                    "properties": {
+                        "continuous": {
+                            "type": "object",
+                            "properties": {
+                                "coefficients": {
+                                    "type": "object",
+                                    "additionalProperties": true
+                                },
+                                "standard_deviation": {
+                                    "type": "number"
+                                },
+                                "update_frequency": {
+                                    "type": "integer"
+                                }
+                            },
+                            "additionalProperties": false
+                        },
+                        "categories": {
+                            "type": "object",
+                            "properties": {
+                                "method": {
+                                    "type": "string"
+                                },
+                                "update_frequency": {
+                                    "type": "integer"
+                                }
+                            },
+                            "additionalProperties": false
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "physical_activity": {
+                    "type": "object",
+                    "properties": {
+                        "coefficients": {
+                            "type": "object",
+                            "properties": {
+                                "age": {
+                                    "type": "number"
+                                },
+                                "gender": {
+                                    "type": "object",
+                                    "properties": {
+                                        "male": {
+                                            "type": "number"
+                                        },
+                                        "female": {
+                                            "type": "number"
+                                        }
+                                    },
+                                    "additionalProperties": false
+                                }
+                            },
+                            "additionalProperties": false
+                        },
+                        "standard_deviation": {
+                            "type": "number"
+                        }
+                    },
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false
+        },
+        "risk_factors": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "level": {
+                        "type": "integer"
+                    },
+                    "range": {
+                        "type": "array",
+                        "items": {
+                            "type": "number"
+                        }
+                    }
+                },
+                "additionalProperties": false
+            }
+        },
+        "risk_factor_models": {
+            "type": "object",
+            "properties": {
+                "static": {
+                    "type": "string"
+                },
+                "dynamic": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "static",
+                "dynamic"
+            ],
+            "additionalProperties": false
+        },
+        "baseline_adjustments": {
+            "type": "object",
+            "properties": {
+                "format": {
+                    "const": "csv"
+                },
+                "delimiter": {
+                    "type": "string"
+                },
+                "encoding": {
+                    "type": "string"
+                },
+                "file_names": {
+                    "type": "object",
+                    "properties": {
+                        "factorsmean_male": {
+                            "type": "string"
+                        },
+                        "factorsmean_female": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "factorsmean_male",
+                        "factorsmean_female"
+                    ],
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false
+        }
+    },
+    "required": [
+        "risk_factors",
+        "risk_factor_models",
+        "baseline_adjustments"
+    ],
+    "additionalProperties": false
+}

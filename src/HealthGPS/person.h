@@ -45,6 +45,23 @@ struct Person {
     /// @param gender The new person gender
     Person(const core::Gender gender) noexcept;
 
+    // MAHIMA: Index-based ID for same-person tracking across baseline and intervention.
+    // When a Person is created by Population (initial slot, newborn, or add), ID = slot index + 1
+    // so the same logical person has the same ID in both baseline and intervention runs.
+
+    /// @brief Initialise a new instance with an explicit ID (for Population slot assignment).
+    /// @param id The identifier to assign (typically slot index + 1).
+    Person(std::size_t id) noexcept;
+
+    /// @brief Initialise a new instance with gender and explicit ID (for Population newborns).
+    /// @param gender The new person gender
+    /// @param id The identifier to assign (typically slot index + 1).
+    Person(const core::Gender gender, std::size_t id) noexcept;
+
+    /// @brief Set the person identifier (internal use by Population when placing clones).
+    /// @param id The identifier to assign (slot index + 1 after placement).
+    void set_id(std::size_t id) noexcept;
+
     /// @brief Gets this instance unique identifier
     /// @note The identifier is unique within a virtual population only, not global unique.
     /// @return Unique identifier
@@ -59,8 +76,20 @@ struct Person {
     /// @brief Sector (region) assigned value
     core::Sector sector{core::Sector::unknown};
 
+    /// @brief Region category (dynamically assigned from CSV)
+    std::string region{"unknown"};
+
+    /// @brief Ethnicity category (dynamically assigned from CSV)
+    std::string ethnicity{"unknown"};
+
     /// @brief Income category
     core::Income income{core::Income::unknown};
+
+    /// @brief Continuous income value (for FINCH approach)
+    double income_continuous{0.0};
+
+    /// @brief Physical activity level
+    double physical_activity{0.0};
 
     /// @brief Social-economic status (SES) assigned value
     double ses{};
@@ -127,6 +156,16 @@ struct Person {
     /// @return The income value (low = 1, middle = 2, high = 3)
     /// @throws HgpsException if income is unknown
     float income_to_value() const;
+
+    /// @brief Gets the region as a numeric value for analysis
+    /// @return The region value converted to a number based on CSV order
+    /// @throws HgpsException if region is unknown
+    float region_to_value() const;
+
+    /// @brief Gets the ethnicity as a numeric value for analysis
+    /// @return The ethnicity value converted to a number based on CSV order
+    /// @throws HgpsException if ethnicity is unknown
+    float ethnicity_to_value() const;
 
     /// @brief Emigrate this instance from the virtual population
     /// @param time Migration time

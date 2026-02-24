@@ -66,6 +66,26 @@ struct ModellingInfo {
     std::vector<RiskFactorInfo> risk_factors;
     std::unordered_map<std::string, std::filesystem::path> risk_factor_models;
     BaselineInfo baseline_adjustment;
+    /// Calendar year when intervention policies start (e.g. 2024). If 0, uses start_time + 2 for
+    /// backward compatibility.
+    unsigned int policy_start_year{0};
+};
+
+// MAHIMA: Per-person CSV output for same-person tracking across baseline/intervention (by ID).
+//! Optional config for individual ID tracking CSV: filter by age, gender, region, ethnicity,
+//! risk factors, years, scenario; output columns include id, demographics, selected risk factors.
+struct IndividualIdTrackingConfig {
+    bool enabled{false};
+    std::optional<int> age_min;
+    std::optional<int> age_max;
+    std::string gender{"all"}; // "male" | "female" | "all"
+    std::vector<std::string> regions{};
+    std::vector<std::string> ethnicities{};
+    std::vector<std::string> risk_factors{}; // empty = all from mapping
+    std::vector<int> years{};                // empty = all years
+    std::string scenarios{"both"};           // "baseline" | "intervention" | "both"
+
+    auto operator<=>(const IndividualIdTrackingConfig &rhs) const = default;
 };
 
 //! Experiment output folder and file information
@@ -73,6 +93,7 @@ struct OutputInfo {
     unsigned int comorbidities{};
     std::string folder{};
     std::string file_name{};
+    std::optional<IndividualIdTrackingConfig> individual_id_tracking;
 
     auto operator<=>(const OutputInfo &rhs) const = default;
 };
@@ -158,5 +179,52 @@ struct PIFInfo {
     std::string scenario;
 
     auto operator<=>(const PIFInfo &rhs) const = default;
+};
+
+//! Per-project requirements: demographics, income, PA, risk factors, trend, two-stage.
+//! Code uses these flags instead of project-specific hacks. Optional in config; defaults if absent.
+struct ProjectRequirements {
+    struct Demographics {
+        bool age{true};
+        bool gender{true};
+        bool region{false};
+        bool ethnicity{false};
+        /// Optional. If set and > 0, cap age to this value in linear models (age/age2/age3). Else
+        /// no cap.
+        std::optional<int> max_age_for_linear_models;
+    } demographics;
+
+    struct Income {
+        bool enabled{true};
+        std::string type{"categorical"}; // "continuous" | "categorical"
+        std::string categories{"3"};     // "3" | "4"
+        bool adjust_to_factors_mean{false};
+        bool trended{false};
+        /// When true, write income-based CSV files (categorize results by income_category). When
+        /// false, do not.
+        bool income_based_csv_output{true};
+    } income;
+
+    struct PhysicalActivity {
+        bool enabled{true};
+        std::string type{"simple"}; // "simple" | "continuous"
+        bool adjust_to_factors_mean{false};
+        bool trended{false};
+    } physical_activity;
+
+    struct RiskFactors {
+        bool adjust_to_factors_mean{true};
+        bool trended{true};
+    } risk_factors;
+
+    struct Trend {
+        bool enabled{false};
+        std::string type{"null"}; // "null" | "trend" | "upf_trend" | "income_trend"
+    } trend;
+
+    struct TwoStage {
+        bool use_logistic{false};
+        std::string logistic_file;
+    } two_stage;
 };
 } // namespace hgps::input

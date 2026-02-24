@@ -9,6 +9,7 @@
 
 #include <functional>
 #include <optional>
+#include <unordered_set>
 #include <vector>
 
 namespace { // anonymous namespace
@@ -25,9 +26,17 @@ namespace hgps {
 /// @brief Defines the trend type enumeration for factors mean adjustment
 enum class TrendType {
     Null,       ///< No trends applied to factors mean adjustment
-    Trend,      ///< Regular UPF trends applied to factors mean adjustment
+    UPFTrend,   ///< UPF (ultra-processed food) trends; config: "upf_trend", "trend" or "UPFTrend"
     IncomeTrend ///< Income-based trends applied to factors mean adjustment
 };
+
+/// @brief Equality comparison operator for TrendType
+inline bool operator==(TrendType lhs, TrendType rhs) noexcept {
+    return static_cast<int>(lhs) == static_cast<int>(rhs);
+}
+
+/// @brief Inequality comparison operator for TrendType
+inline bool operator!=(TrendType lhs, TrendType rhs) noexcept { return !(lhs == rhs); }
 
 /// @brief Defines a table type for double values by sex and age
 using RiskFactorSexAgeTable = UnorderedMap2d<core::Gender, core::Identifier, std::vector<double>>;
@@ -62,7 +71,7 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
     /// @returns The person's expected risk factor value
     virtual double get_expected(RuntimeContext &context, core::Gender sex, int age,
                                 const core::Identifier &factor, OptionalRange range,
-                                bool apply_trend) const noexcept;
+                                bool apply_trend) const;
 
     /// @brief Adjust risk factors such that mean sim value matches expected value
     /// @param context The simulation run-time context
@@ -77,6 +86,17 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
     /// @returns The number of time steps to apply the trend
     int get_trend_steps(const core::Identifier &factor) const;
 
+    /// @brief Gets the expected trend values
+    /// @returns The expected trend values
+    const std::shared_ptr<std::unordered_map<core::Identifier, double>> &
+    get_expected_trend() const noexcept {
+        return expected_trend_;
+    }
+
+    /// @brief Sets the logistic factors for simulated mean calculation
+    /// @param logistic_factors Set of factors that have logistic models
+    void set_logistic_factors(const std::unordered_set<core::Identifier> &logistic_factors);
+
   private:
     /// @brief Adjust risk factors such that mean sim value matches expected value
     /// @param context The simulation run-time context
@@ -89,7 +109,8 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
 
     static RiskFactorSexAgeTable
     calculate_simulated_mean(Population &population, core::IntegerInterval age_range,
-                             const std::vector<core::Identifier> &factors);
+                             const std::vector<core::Identifier> &factors,
+                             const std::unordered_set<core::Identifier> &logistic_factors = {});
 
     std::shared_ptr<RiskFactorSexAgeTable> expected_;
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_;
@@ -102,11 +123,17 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_income_trend_;
     std::shared_ptr<std::unordered_map<core::Identifier, double>>
         expected_income_trend_decay_factors_;
+
+    // Logistic factors for simulated mean calculation (factors that use 2-stage modeling)
+    std::unordered_set<core::Identifier> logistic_factors_;
 };
 
 /// @brief Risk factor adjustable model definition interface
 class RiskFactorAdjustableModelDefinition : public RiskFactorModelDefinition {
   public:
+    /// @brief Destroys a RiskFactorAdjustableModelDefinition instance
+    ~RiskFactorAdjustableModelDefinition() override = default;
+
     /// @brief Constructs a new RiskFactorAdjustableModelDefinition instance
     /// @param expected The expected risk factor values by sex and age
     /// @param expected_trend The expected trend of risk factor values

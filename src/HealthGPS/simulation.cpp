@@ -4,6 +4,7 @@
 #include "converter.h"
 #include "info_message.h"
 #include "mtrandom.h"
+#include "static_linear_model.h"
 #include "sync_message.h"
 #include "univariate_visitor.h"
 
@@ -57,6 +58,26 @@ adevs::Time Simulation::init(adevs::SimEnv<int> *env) {
 
     initialise_population();
 
+    // MAHIMA: Same-person ID tracking verification – same index has same ID in baseline and
+    // intervention
+    {
+        const auto &pop = context_.population();
+        const auto n = pop.initial_size();
+        std::string sample;
+        for (std::size_t idx : {0u, 1u, 2u}) {
+            if (idx < n) {
+                sample += fmt::format(" ({},{})", idx, pop[idx].id());
+            }
+        }
+        if (n > 100u) {
+            sample += fmt::format(" (100,{})", pop[100].id());
+        } else if (n > 3u) {
+            sample += fmt::format(" ({},{})", n - 1, pop[n - 1].id());
+        }
+        std::cout << "MAHIMA: Same-person ID tracking | scenario=" << context_.identifier()
+                  << " | sample (index,id):" << sample << "\n";
+    }
+
     auto stop = std::chrono::steady_clock::now();
     auto elapsed = std::chrono::duration<double, std::milli>(stop - start);
 
@@ -78,7 +99,6 @@ adevs::Time Simulation::update(adevs::SimEnv<int> *env) {
         auto world_time = env->now() + adevs::Time(1, 0);
         auto time_year = world_time.real;
         context_.set_current_time(time_year);
-
         update_population();
 
         auto stop = std::chrono::steady_clock::now();
@@ -115,10 +135,12 @@ void Simulation::initialise_population() {
 
     // Create virtual population
     const auto &inputs = context_.inputs();
+
     auto model_start_year = inputs.start_time();
     auto total_year_pop_size = demographic_->get_total_population_size(model_start_year);
     float size_fraction = inputs.settings().size_fraction();
     auto virtual_pop_size = static_cast<int>(size_fraction * total_year_pop_size);
+
     context_.reset_population(virtual_pop_size);
 
     // Gender - Age, must be first
@@ -127,7 +149,7 @@ void Simulation::initialise_population() {
     // Social economics status
     ses_->initialise_population(context_);
 
-    // Generate risk factors
+    // Generate risk factors;
     risk_factor_->initialise_population(context_);
 
     // Initialise diseases
@@ -135,6 +157,7 @@ void Simulation::initialise_population() {
 
     // Initialise analysis
     analysis_->initialise_population(context_);
+
     print_initial_population_statistics();
 }
 
@@ -304,6 +327,8 @@ Person Simulation::partial_clone_entity(const Person &source) noexcept {
     auto clone = Person{};
     clone.age = source.age;
     clone.gender = source.gender;
+    clone.region = source.region;
+    clone.ethnicity = source.ethnicity;
     clone.ses = source.ses;
     clone.sector = source.sector;
     clone.income = source.income;
@@ -351,7 +376,20 @@ void hgps::Simulation::print_initial_population_statistics() {
 
     for (const auto &entity : context_.population()) {
         for (const auto &entry : context_.mapping()) {
-            sim_summary[entry.name()].append(entity.get_risk_factor_value(entry.key()));
+            // Special handling for income_category - it's stored as person.income (enum), not in
+            // risk_factors
+            if (entry.key().to_string() == "income_category") {
+                if (entity.income != core::Income::unknown) {
+                    sim_summary[entry.name()].append(entity.income_to_value());
+                }
+                continue;
+            }
+
+            try {
+                sim_summary[entry.name()].append(entity.get_risk_factor_value(entry.key()));
+            } catch (const std::exception &) {
+                // NOLINTNEXTLINE(bugprone-empty-catch) factor not present – skip
+            }
         }
     }
 
@@ -367,15 +405,26 @@ void hgps::Simulation::print_initial_population_statistics() {
                       "Mean (Real)", "Mean (Sim)", "StdDev (Real)", "StdDev (Sim)");
     ss << fmt::format("|{:-<{}}|\n", '-', width);
 
-    ss << fmt::format("| {:{}} : {:14} : {:14} : {:14} : {:14} |\n", population, pad, orig_pop,
-                      sim_pop, orig_pop, sim_pop);
+    // Population row: show counts as Mean (Real/Sim) and 0 as StdDev so column headers match
+    ss << fmt::format("| {:{}} : {:14.0f} : {:14.0f} : {:14.0f} : {:14.0f} |\n", population, pad,
+                      static_cast<double>(orig_pop), static_cast<double>(sim_pop), 0.0, 0.0);
 
     auto orig_summary = original_future.get();
     for (const auto &entry : context_.mapping()) {
         const auto &col = entry.name();
-        ss << fmt::format("| {:{}} : {:14.4f} : {:14.5f} : {:14.5f} : {:14.5f} |\n", col, pad,
-                          orig_summary[col].average(), sim_summary[col].average(),
-                          orig_summary[col].std_deviation(), sim_summary[col].std_deviation());
+        // Real (input CSV) may lack this column (e.g. India has Carbohydrate not FoodCarbohydrate);
+        // avoid showing 0/NaN for missing columns by printing "n/a" when not in input data.
+        const auto it = orig_summary.find(col);
+        const bool has_real = (it != orig_summary.end() && !it->second.is_empty());
+        if (has_real) {
+            ss << fmt::format("| {:{}} : {:14.4f} : {:14.5f} : {:14.5f} : {:14.5f} |\n", col, pad,
+                              it->second.average(), sim_summary[col].average(),
+                              it->second.std_deviation(), sim_summary[col].std_deviation());
+        } else {
+            ss << fmt::format("| {:{}} : {:>14} : {:14.5f} : {:>14} : {:14.5f} |\n", col, pad,
+                              "n/a", sim_summary[col].average(), "n/a",
+                              sim_summary[col].std_deviation());
+        }
     }
 
     ss << fmt::format("|{:_<{}}|\n\n", '_', width);

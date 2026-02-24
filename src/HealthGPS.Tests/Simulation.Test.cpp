@@ -2,6 +2,7 @@
 #include "pch.h"
 
 #include "HealthGPS.Input/api.h"
+#include "HealthGPS/analysis_module.h"
 #include "HealthGPS/api.h"
 #include "HealthGPS/event_bus.h"
 #include "HealthGPS/random_algorithm.h"
@@ -76,7 +77,9 @@ std::shared_ptr<hgps::ModelInput> create_test_configuration(hgps::core::DataTabl
                     .name = "Colorectal cancer"},
     };
 
-    return std::make_shared<hgps::ModelInput>(data, settings, info, ses, mapping, diseases);
+    auto project_requirements = hgps::input::ProjectRequirements{};
+    return std::make_shared<hgps::ModelInput>(data, settings, info, ses, mapping, diseases,
+                                              project_requirements, hgps::input::PIFInfo{});
 }
 
 TEST(TestSimulation, RandomBitGenerator) {
@@ -252,7 +255,9 @@ TEST(TestSimulation, ModuleFactoryRegistry) {
                                                                .code = core::Identifier{"diabetes"},
                                                                .name = "Diabetes Mellitus"}};
 
-    auto inputs = std::make_shared<ModelInput>(data, settings, info, ses, mapping, diseases);
+    auto project_requirements = hgps::input::ProjectRequirements{};
+    auto inputs = std::make_shared<ModelInput>(data, settings, info, ses, mapping, diseases,
+                                               project_requirements, hgps::input::PIFInfo{});
 
     auto manager = DataManager(test_datastore_path);
     auto repository = CachedRepository(manager);
@@ -470,12 +475,13 @@ TEST(TestSimulation, DiseaseModuleUpdateWithInterventionAndPIFConfig) {
                           .code = core::Identifier{"colorectalcancer"},
                           .name = "Colorectal cancer"},
     };
+    auto project_requirements = hgps::input::ProjectRequirements{};
     auto pif_info = PIFInfo{.enabled = true,
                             .data_root_path = "data",
                             .risk_factor = "Smoking",
                             .scenario = "Scenario1"};
-    auto inputs =
-        std::make_shared<ModelInput>(data, settings, run, ses, mapping, diseases, pif_info);
+    auto inputs = std::make_shared<ModelInput>(data, settings, run, ses, mapping, diseases,
+                                               project_requirements, pif_info);
 
     auto manager = DataManager(test_datastore_path);
     auto repository = CachedRepository(manager);
@@ -517,4 +523,170 @@ TEST(TestSimulation, CreateAnalysisModule) {
     auto analysis_module = build_analysis_module(repository, *inputs);
     ASSERT_EQ(SimulationModuleType::Analysis, analysis_module->type());
     ASSERT_EQ("Analysis", analysis_module->name());
+}
+
+TEST(TestSimulation, IncomeCategoryToString) {
+    using namespace hgps;
+
+    EXPECT_EQ("LowIncome", AnalysisModule::income_category_to_string(core::Income::low));
+    EXPECT_EQ("HighIncome", AnalysisModule::income_category_to_string(core::Income::high));
+    EXPECT_EQ("UnknownIncome", AnalysisModule::income_category_to_string(core::Income::unknown));
+    EXPECT_EQ("MiddleIncome", AnalysisModule::income_category_to_string(core::Income::middle));
+    EXPECT_EQ("LowerMiddleIncome",
+              AnalysisModule::income_category_to_string(core::Income::lowermiddle));
+    EXPECT_EQ("UpperMiddleIncome",
+              AnalysisModule::income_category_to_string(core::Income::uppermiddle));
+}
+
+TEST(TestSimulation, GetAvailableIncomeCategoriesEmptyPopulation) {
+    using namespace hgps;
+    using namespace hgps::input;
+
+    DataTable data;
+    create_test_datatable(data);
+    auto bus = std::make_shared<DefaultEventBus>();
+    auto channel = SyncChannel{};
+    auto scenario = std::make_unique<BaselineScenario>(channel);
+    auto inputs = create_test_configuration(data);
+    auto context = RuntimeContext(bus, inputs, std::move(scenario));
+
+    auto categories = AnalysisModule::get_available_income_categories(context);
+    EXPECT_TRUE(categories.empty());
+}
+
+TEST(TestSimulation, GetAvailableIncomeCategoriesWithPopulation) {
+    using namespace hgps;
+    using namespace hgps::input;
+
+    DataTable data;
+    create_test_datatable(data);
+    auto bus = std::make_shared<DefaultEventBus>();
+    auto channel = SyncChannel{};
+    auto scenario = std::make_unique<BaselineScenario>(channel);
+    auto inputs = create_test_configuration(data);
+    auto context = RuntimeContext(bus, inputs, std::move(scenario));
+    context.reset_population(10);
+
+    auto categories = AnalysisModule::get_available_income_categories(context);
+    EXPECT_FALSE(categories.empty());
+}
+
+TEST(TestSimulation, ModelInputProjectRequirementsRegionEthnicity) {
+    using namespace hgps;
+    using namespace hgps::input;
+
+    DataTable data;
+    create_test_datatable(data);
+    auto uk = core::Country{.code = 826, .name = "UK", .alpha2 = "GB", .alpha3 = "GBR"};
+    auto settings = Settings{uk, 0.1f, core::IntegerInterval(0, 30)};
+    auto run = RunInfo{.start_time = 2018, .stop_time = 2025, .seed = std::nullopt};
+    auto ses = SESDefinition{.fuction_name = "normal", .parameters = {0.0, 1.0}};
+    auto mapping = HierarchicalMapping(mapping_entries);
+    auto diseases = std::vector<core::DiseaseInfo>{
+        core::DiseaseInfo{.group = core::DiseaseGroup::other,
+                          .code = core::Identifier{"asthma"},
+                          .name = "Asthma"},
+    };
+    ProjectRequirements req{};
+    req.demographics.region = true;
+    req.demographics.ethnicity = true;
+    req.demographics.age = true;
+    req.demographics.gender = true;
+    req.demographics.max_age_for_linear_models = 90;
+    ModelInput inputs(data, settings, run, ses, mapping, diseases, req, PIFInfo{});
+    EXPECT_TRUE(inputs.project_requirements().demographics.region);
+    EXPECT_TRUE(inputs.project_requirements().demographics.ethnicity);
+    ASSERT_TRUE(inputs.project_requirements().demographics.max_age_for_linear_models.has_value());
+    EXPECT_EQ(90, *inputs.project_requirements().demographics.max_age_for_linear_models);
+}
+
+TEST(TestSimulation, ModelInputProjectRequirementsTwoStage) {
+    using namespace hgps;
+    using namespace hgps::input;
+
+    DataTable data;
+    create_test_datatable(data);
+    auto uk = core::Country{.code = 826, .name = "UK", .alpha2 = "GB", .alpha3 = "GBR"};
+    auto settings = Settings{uk, 0.1f, core::IntegerInterval(0, 30)};
+    auto run = RunInfo{.start_time = 2018, .stop_time = 2025, .seed = std::nullopt};
+    auto ses = SESDefinition{.fuction_name = "normal", .parameters = {0.0, 1.0}};
+    auto mapping = HierarchicalMapping(mapping_entries);
+    auto diseases = std::vector<core::DiseaseInfo>{
+        core::DiseaseInfo{.group = core::DiseaseGroup::other,
+                          .code = core::Identifier{"asthma"},
+                          .name = "Asthma"},
+    };
+    ProjectRequirements req{};
+    req.two_stage.use_logistic = true;
+    req.two_stage.logistic_file = "models/logistic.json";
+    ModelInput inputs(data, settings, run, ses, mapping, diseases, req, PIFInfo{});
+    EXPECT_TRUE(inputs.project_requirements().two_stage.use_logistic);
+    EXPECT_EQ("models/logistic.json", inputs.project_requirements().two_stage.logistic_file);
+}
+
+TEST(TestSimulation, ModelInputProjectRequirementsIncomeAndRiskFactors) {
+    using namespace hgps;
+    using namespace hgps::input;
+
+    DataTable data;
+    create_test_datatable(data);
+    auto uk = core::Country{.code = 826, .name = "UK", .alpha2 = "GB", .alpha3 = "GBR"};
+    auto settings = Settings{uk, 0.1f, core::IntegerInterval(0, 30)};
+    auto run = RunInfo{.start_time = 2018, .stop_time = 2025, .seed = std::nullopt};
+    auto ses = SESDefinition{.fuction_name = "normal", .parameters = {0.0, 1.0}};
+    auto mapping = HierarchicalMapping(mapping_entries);
+    auto diseases = std::vector<core::DiseaseInfo>{
+        core::DiseaseInfo{.group = core::DiseaseGroup::other,
+                          .code = core::Identifier{"asthma"},
+                          .name = "Asthma"},
+    };
+    ProjectRequirements req{};
+    req.income.enabled = true;
+    req.income.type = "categorical";
+    req.income.categories = "4";
+    req.income.income_based_csv_output = false;
+    req.risk_factors.adjust_to_factors_mean = false;
+    req.risk_factors.trended = false;
+    req.trend.enabled = true;
+    req.trend.type = "trend";
+    ModelInput inputs(data, settings, run, ses, mapping, diseases, req, PIFInfo{});
+    EXPECT_EQ("4", inputs.project_requirements().income.categories);
+    EXPECT_FALSE(inputs.project_requirements().income.income_based_csv_output);
+    EXPECT_FALSE(inputs.project_requirements().risk_factors.adjust_to_factors_mean);
+    EXPECT_TRUE(inputs.project_requirements().trend.enabled);
+    EXPECT_EQ("trend", inputs.project_requirements().trend.type);
+}
+
+TEST(TestSimulation, AnalysisModuleSetIncomeAnalysisEnabled) {
+    using namespace hgps;
+    using namespace hgps::input;
+
+    DataTable data;
+    create_test_datatable(data);
+    auto manager = DataManager(test_datastore_path);
+    auto repository = CachedRepository(manager);
+    auto inputs = create_test_configuration(data);
+    auto module = build_analysis_module(repository, *inputs);
+    ASSERT_NE(module, nullptr);
+    EXPECT_NO_THROW(module->set_income_analysis_enabled(true));
+    EXPECT_NO_THROW(module->set_income_analysis_enabled(false));
+}
+
+TEST(TestSimulation, AnalysisModuleSetIndividualIdTrackingConfig) {
+    using namespace hgps;
+    using namespace hgps::input;
+
+    DataTable data;
+    create_test_datatable(data);
+    auto manager = DataManager(test_datastore_path);
+    auto repository = CachedRepository(manager);
+    auto inputs = create_test_configuration(data);
+    auto module = build_analysis_module(repository, *inputs);
+    ASSERT_NE(module, nullptr);
+    IndividualIdTrackingConfig track{};
+    track.enabled = true;
+    track.age_min = 25;
+    track.age_max = 65;
+    EXPECT_NO_THROW(module->set_individual_id_tracking_config(track));
+    EXPECT_NO_THROW(module->set_individual_id_tracking_config(std::nullopt));
 }

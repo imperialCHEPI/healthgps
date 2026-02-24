@@ -16,10 +16,10 @@
 #include "HealthGPS.Core/poco.h"
 #include "HealthGPS.Core/scoped_timer.h"
 
-#include <fmt/chrono.h>
 #include <fmt/color.h>
 
 #include <chrono>
+#include <ctime>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -100,18 +100,65 @@ Configuration get_configuration(const std::string &config_source,
     // Base dir for relative paths
     config.root_path = config_file.parent_path();
 
-    // Read trend_type from JSON file (optional, defaults to "null")
+    // project_requirements is optional; if absent, use default-constructed values for older configs
+    if (opt.contains("project_requirements")) {
+        const auto &pr = opt["project_requirements"];
+        auto &req = config.project_requirements;
+        const auto &d = pr["demographics"];
+        req.demographics.age = d["age"].get<bool>();
+        req.demographics.gender = d["gender"].get<bool>();
+        req.demographics.region = d["region"].get<bool>();
+        req.demographics.ethnicity = d["ethnicity"].get<bool>();
+        if (d.contains("max_age_for_linear_models") && !d["max_age_for_linear_models"].is_null()) {
+            req.demographics.max_age_for_linear_models = d["max_age_for_linear_models"].get<int>();
+        }
+        const auto &inc = pr["income"];
+        req.income.enabled = inc["enabled"].get<bool>();
+        req.income.type = inc["type"].get<std::string>();
+        req.income.categories = inc["categories"].get<std::string>();
+        req.income.adjust_to_factors_mean = inc["adjust_to_factors_mean"].get<bool>();
+        req.income.trended = inc["trended"].get<bool>();
+        if (inc.contains("income_based_csv_output")) {
+            req.income.income_based_csv_output = inc["income_based_csv_output"].get<bool>();
+        }
+        const auto &pa = pr["physical_activity"];
+        req.physical_activity.enabled = pa["enabled"].get<bool>();
+        req.physical_activity.type = pa["type"].get<std::string>();
+        req.physical_activity.adjust_to_factors_mean = pa["adjust_to_factors_mean"].get<bool>();
+        req.physical_activity.trended = pa["trended"].get<bool>();
+        const auto &rf = pr["risk_factors"];
+        req.risk_factors.adjust_to_factors_mean = rf["adjust_to_factors_mean"].get<bool>();
+        req.risk_factors.trended = rf["trended"].get<bool>();
+        const auto &tr = pr["trend"];
+        req.trend.enabled = tr["enabled"].get<bool>();
+        req.trend.type = tr["type"].get<std::string>();
+        const auto &ts = pr["two_stage"];
+        req.two_stage.use_logistic = ts["use_logistic"].get<bool>();
+        if (ts.contains("logistic_file") && !ts["logistic_file"].is_null()) {
+            req.two_stage.logistic_file = ts["logistic_file"].get<std::string>();
+        }
+    } else {
+        // Mahima: Legacy configs without project_requirements: use categorical income so static
+        // models that only define categorical IncomeModels (e.g. India) work without change.
+        config.project_requirements.income.type = "categorical";
+        config.project_requirements.income.type = "simple";
+    }
+
+    // Read trend_type from JSON file (defaults to "null")
     if (opt.contains("trend_type")) {
         config.trend_type = opt["trend_type"].get<std::string>();
         // Validate trend_type value
         if (config.trend_type != "null" && config.trend_type != "trend" &&
+            config.trend_type != "upf_trend" && config.trend_type != "UPFTrend" &&
             config.trend_type != "income_trend") {
-            throw ConfigurationError{
-                fmt::format("Invalid trend_type: {}. Must be one of: null, trend, income_trend",
-                            config.trend_type)};
+            throw ConfigurationError{fmt::format("Invalid trend_type: {}. Must be one of: null, "
+                                                 "trend, upf_trend, UPFTrend, income_trend",
+                                                 config.trend_type)};
         }
     }
 
+    // Store the original config.json data for accessing additional fields
+    config.config_data = opt;
     // Read PIF configuration from JSON file (if available)
     if (opt.contains("population_impact_fraction")) {
         const auto &pif_json = opt["population_impact_fraction"];
@@ -123,7 +170,6 @@ Configuration get_configuration(const std::string &config_source,
     }
 
     // Read data source from JSON file. For now, this is optional, but in future it will be
-    // mandatory.
     if (opt.contains("data")) {
         config.data_source = get_data_source_from_json(opt["data"], config.root_path);
     }
@@ -204,6 +250,9 @@ ModelInput create_model_input(core::DataTable &input_table, core::Country countr
         .seed = job_custom_seed,
         .verbosity = config.verbosity,
         .comorbidities = comorbidities,
+        .policy_start_year = config.modelling.policy_start_year != 0
+                                 ? config.modelling.policy_start_year
+                                 : static_cast<unsigned int>(config.start_time + 2),
     };
 
     auto ses_mapping =
@@ -220,7 +269,9 @@ ModelInput create_model_input(core::DataTable &input_table, core::Country countr
             ses_mapping,
             HierarchicalMapping(std::move(mapping)),
             std::move(diseases),
-            config.population_impact_fraction};
+            config.project_requirements,
+            config.population_impact_fraction,
+            config.output.individual_id_tracking};
 }
 
 std::string create_output_file_name(const OutputInfo &info, int job_id) {
@@ -228,7 +279,11 @@ std::string create_output_file_name(const OutputInfo &info, int job_id) {
 
     fs::path output_folder = expand_environment_variables(info.folder);
     auto tp = std::chrono::system_clock::now();
-    auto timestamp_tk = fmt::format("{0:%F_%H-%M-}{1:%S}", tp, tp.time_since_epoch());
+    auto t = std::chrono::system_clock::to_time_t(tp);
+    std::tm *tm = std::gmtime(&t);
+    char buf[32];
+    std::strftime(buf, sizeof(buf), "%F_%H-%M-%S", tm);
+    std::string timestamp_tk{buf};
 
     // filename token replacement
     auto file_name = info.file_name;

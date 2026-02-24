@@ -2,6 +2,8 @@
 #include <atomic>
 #include <filesystem>
 #include <fstream>
+#include <map>
+#include <memory>
 #include <mutex>
 
 #include "model_info.h"
@@ -20,7 +22,10 @@ class ResultFileWriter final : public ResultWriter {
     /// @brief Initialises an instance of the hgps::ResultFileWriter class.
     /// @param file_name The JSON output file full name
     /// @param info The associated experiment information
-    ResultFileWriter(const std::filesystem::path &file_name, ExperimentInfo info);
+    /// @param write_income_csv When true, write income-based CSV files (one per category). When
+    /// false, do not.
+    ResultFileWriter(const std::filesystem::path &file_name, ExperimentInfo info,
+                     bool write_income_csv = true);
 
     ResultFileWriter(const ResultFileWriter &) = delete;
     ResultFileWriter &operator=(const ResultFileWriter &) = delete;
@@ -36,7 +41,11 @@ class ResultFileWriter final : public ResultWriter {
     std::ofstream csvstream_;
     std::map<core::Income, std::ofstream> income_csvstreams_;
     std::map<core::Income, bool> income_first_row_;
+    // MAHIMA: One mutex per income stream so income CSV files can be written in parallel.
+    // unique_ptr so the map is movable (std::mutex is not movable).
+    std::map<core::Income, std::unique_ptr<std::mutex>> income_mutexes_;
     ExperimentInfo info_;
+    bool write_income_csv_{true};
     std::filesystem::path base_filename_;
     std::atomic<bool> first_row_{true};
     std::mutex lock_mutex_;

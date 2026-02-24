@@ -18,6 +18,12 @@
             },
             "additionalProperties": false
         },
+        "policy_start_year": {
+            "type": "integer",
+            "minimum": 0,
+            "default": 0,
+            "description": "Calendar year when intervention policies start (e.g. 2024 if simulation starts in 2022). If 0 or omitted, policies start at start_time + 2."
+        },
         "demographic_models": {
             "type": "object",
             "properties": {

@@ -2,7 +2,17 @@
 #include <execution>
 
 namespace hgps {
-Population::Population(const std::size_t size) : initial_size_{size}, people_(size) {}
+
+// MAHIMA: IDs are assigned from slot index (id = index + 1) so the same logical person has the
+// same ID in baseline and intervention runs; Population is the only place that assigns these IDs.
+
+Population::Population(const std::size_t size) : initial_size_{size} {
+    // MAHIMA: Create each slot with ID = index + 1 for cross-scenario same-person tracking.
+    people_.reserve(size);
+    for (std::size_t i = 0; i < size; ++i) {
+        people_.emplace_back(i + 1);
+    }
+}
 
 std::size_t Population::size() const noexcept { return people_.size(); }
 
@@ -26,9 +36,14 @@ const Person &Population::at(std::size_t index) const { return people_.at(index)
 void Population::add(Person person, unsigned int time) noexcept {
     const auto recycle = find_index_of_recyclables(time, 1);
     if (!recycle.empty()) {
-        people_.at(recycle.at(0)) = std::move(person);
+        const auto slot_index = static_cast<std::size_t>(recycle.at(0));
+        people_.at(slot_index) = std::move(person);
+        // MAHIMA: Assign slot-based ID so this person is tracked with same ID across scenarios.
+        people_.at(slot_index).set_id(slot_index + 1);
     } else {
         people_.emplace_back(std::move(person));
+        // MAHIMA: New slot gets ID = current size (index + 1).
+        people_.back().set_id(people_.size());
     }
 }
 
@@ -39,13 +54,16 @@ void Population::add_newborn_babies(std::size_t number, core::Gender gender,
     if (!recycle.empty()) {
         auto replacebles = std::min(number, recycle.size());
         for (auto index = std::size_t{0}; index < replacebles; index++) {
-            people_.at(recycle.at(index)) = Person{gender};
+            const auto slot_index = static_cast<std::size_t>(recycle.at(index));
+            // MAHIMA: Newborn in recycled slot keeps that slot's ID (index + 1).
+            people_.at(slot_index) = Person{gender, slot_index + 1};
             remaining--;
         }
     }
 
     for (auto i = std::size_t{0}; i < remaining; i++) {
-        people_.emplace_back(gender);
+        // MAHIMA: New slot gets ID = current size + 1 (next index + 1).
+        people_.emplace_back(gender, people_.size() + 1);
     }
 }
 

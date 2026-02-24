@@ -1,5 +1,6 @@
 #pragma once
 
+#include "HealthGPS.Input/poco.h"
 #include "analysis_definition.h"
 #include "interfaces.h"
 #include "modelinput.h"
@@ -7,6 +8,8 @@
 #include "result_message.h"
 #include "runtime_context.h"
 #include "weight_model.h"
+
+#include <optional>
 
 namespace hgps {
 
@@ -45,6 +48,16 @@ class AnalysisModule final : public UpdatableModule {
     /// @param enabled true to enable income analysis, false to disable
     void set_income_analysis_enabled(bool enabled) noexcept;
 
+    /// @brief MAHIMA: Sets optional individual ID tracking config for per-person CSV output.
+    void set_individual_id_tracking_config(
+        std::optional<hgps::input::IndividualIdTrackingConfig> config) noexcept;
+
+    /// @brief Gets available income categories from the runtime context (for tests and callers).
+    static std::vector<core::Income> get_available_income_categories(RuntimeContext &context);
+
+    /// @brief Converts income category enum to string representation (for tests and callers).
+    static std::string income_category_to_string(core::Income income);
+
   private:
     AnalysisDefinition definition_;
     WeightModel weight_classifier_;
@@ -59,6 +72,7 @@ class AnalysisModule final : public UpdatableModule {
     std::vector<double> factor_min_values_;
     bool enable_income_analysis_{
         true}; // This is to set if results be categorised by income or not. Set to TRUE for now.
+    std::optional<hgps::input::IndividualIdTrackingConfig> individual_id_tracking_config_{};
 
     void initialise_vector(RuntimeContext &context);
 
@@ -67,6 +81,7 @@ class AnalysisModule final : public UpdatableModule {
                                                 const IntegerAgeGenderTable &expected_count);
 
     void publish_result_message(RuntimeContext &context) const;
+    void publish_individual_tracking_if_enabled(RuntimeContext &context) const;
     void calculate_historical_statistics(RuntimeContext &context, ModelResult &result) const;
     void calculate_income_based_statistics(RuntimeContext &context, ModelResult &result) const;
     double calculate_disability_weight(const Person &entity) const;
@@ -89,16 +104,6 @@ class AnalysisModule final : public UpdatableModule {
     /// @param context The runtime context
     /// @param series The data series containing factor means
     void calculate_standard_deviation(RuntimeContext &context, DataSeries &series) const;
-
-    /// @brief Gets available income categories from the runtime context
-    /// @param context The runtime context
-    /// @return Vector of available income categories
-    std::vector<core::Income> get_available_income_categories(RuntimeContext &context) const;
-
-    /// @brief Converts income category enum to string representation
-    /// @param income The income category
-    /// @return String representation of the income category
-    std::string income_category_to_string(core::Income income) const;
 };
 
 /// @brief Builds a new instance of the AnalysisModule using the given data infrastructure

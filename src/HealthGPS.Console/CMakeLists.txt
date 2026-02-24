@@ -11,6 +11,8 @@ add_library(
     "command_options.h"
     "event_monitor.cpp"
     "event_monitor.h"
+    "individual_id_tracking_writer.cpp"
+    "individual_id_tracking_writer.h"
     "program.cpp"
     "result_file_writer.cpp"
     "result_file_writer.h"

@@ -139,3 +139,24 @@ TEST(TestCore_Identity, ConvertToStream) {
     auto dodo_str = stream.str();
     ASSERT_EQ(dodo.to_string(), dodo_str);
 }
+
+TEST(TestCore_Identity, ToStringMatchesValue) {
+    using namespace hgps::core;
+    Identifier id{"bmi"};
+    ASSERT_EQ("bmi", id.to_string());
+}
+
+TEST(TestCore_Identity, HashStable) {
+    using namespace hgps::core;
+    Identifier a{"x"};
+    Identifier b{"x"};
+    ASSERT_EQ(std::hash<Identifier>{}(a), std::hash<Identifier>{}(b));
+}
+
+TEST(TestCore_Identity, OrderingConsistentWithEquals) {
+    using namespace hgps::core;
+    Identifier a{"a"};
+    Identifier b{"b"};
+    ASSERT_TRUE(a < b);
+    ASSERT_FALSE(b < a);
+}

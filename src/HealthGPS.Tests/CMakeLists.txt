@@ -19,6 +19,7 @@ target_sources(
             "AgeGenderTable.Test.cpp"
             "Channel.Test.cpp"
             "Configuration.Test.cpp"
+            "ConfigSchemaExpanded.Test.cpp"
             "Core.Array2DTest.cpp"
             "Core.Test.cpp"
             "Core.UnivariateSummary.Test.cpp"

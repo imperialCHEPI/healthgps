@@ -47,6 +47,8 @@ target_sources(
             "static_linear_model.h"
             "static_hierarchical_linear_model.cpp"
             "static_hierarchical_linear_model.h"
+            "individual_tracking_message.cpp"
+            "individual_tracking_message.h"
             "info_message.cpp"
             "info_message.h"
             "life_table.cpp"

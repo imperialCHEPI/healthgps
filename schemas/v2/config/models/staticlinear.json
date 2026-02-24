@@ -38,84 +38,242 @@
                 "additionalProperties": false
             }
         },
+        "RegionFile": {
+            "$ref": "../../../v1/config/csv_file.json",
+            "description": "CSV file containing region assignment probabilities by age and gender"
+        },
+        "EthnicityFile": {
+            "$ref": "../../../v1/config/csv_file.json",
+            "description": "CSV file containing ethnicity assignment probabilities by age group, gender, and region"
+        },
         "IncomeModels": {
             "type": "object",
-            "additionalProperties": {
-                "type": "object",
-                "properties": {
-                    "Intercept": {
-                        "type": "number"
-                    },
-                    "Coefficients": {
-                        "type": "object",
-                        "additionalProperties": {
-                            "type": "number"
+            "properties": {
+                "continuous": {
+                    "type": "object",
+                    "description": "CSV-based continuous income model (FINCH approach) - uses CSV file with coefficients",
+                    "properties": {
+                        "csv_file": {
+                            "type": "string",
+                            "description": "CSV file containing income model coefficients"
+                        },
+                        "format": {
+                            "type": "string",
+                            "enum": [
+                                "csv"
+                            ],
+                            "default": "csv"
+                        },
+                        "delimiter": {
+                            "type": "string",
+                            "default": ","
+                        },
+                        "encoding": {
+                            "type": "string",
+                            "default": "ASCII"
+                        },
+                        "columns": {
+                            "type": "object",
+                            "description": "Column definitions for the income model CSV",
+                            "properties": {
+                                "Factor": {
+                                    "type": "string",
+                                    "description": "Factor name column (e.g., Intercept, age, gender, region names, ethnicity names, etc.)"
+                                },
+                                "Coefficient": {
+                                    "type": "string",
+                                    "description": "Coefficient value column"
+                                }
+                            },
+                            "required": [
+                                "Factor",
+                                "Coefficient"
+                            ],
+                            "additionalProperties": false
                         }
-                    }
+                    },
+                    "required": [
+                        "csv_file"
+                    ],
+                    "additionalProperties": false
                 },
-                "required": [
-                    "Intercept",
-                    "Coefficients"
-                ],
-                "additionalProperties": false
-            }
+                "simple": {
+                    "type": "object",
+                    "description": "Simple income model (India approach) - directly assigns income categories",
+                    "properties": {
+                        "Intercept": {
+                            "type": "number"
+                        },
+                        "Coefficients": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "number"
+                            }
+                        }
+                    },
+                    "required": [
+                        "Intercept",
+                        "Coefficients"
+                    ],
+                    "additionalProperties": false
+                },
+                "Low": {
+                    "type": "object",
+                    "description": "Low income category model (India approach) - individual income categories with coefficients",
+                    "properties": {
+                        "Intercept": {
+                            "type": "number"
+                        },
+                        "Coefficients": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "number"
+                            }
+                        }
+                    },
+                    "required": [
+                        "Intercept",
+                        "Coefficients"
+                    ],
+                    "additionalProperties": false
+                },
+                "Middle": {
+                    "type": "object",
+                    "description": "Middle income category model (India approach) - individual income categories with coefficients",
+                    "properties": {
+                        "Intercept": {
+                            "type": "number"
+                        },
+                        "Coefficients": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "number"
+                            }
+                        }
+                    },
+                    "required": [
+                        "Intercept",
+                        "Coefficients"
+                    ],
+                    "additionalProperties": false
+                },
+                "High": {
+                    "type": "object",
+                    "description": "High income category model (India approach) - individual income categories with coefficients",
+                    "properties": {
+                        "Intercept": {
+                            "type": "number"
+                        },
+                        "Coefficients": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "number"
+                            }
+                        }
+                    },
+                    "required": [
+                        "Intercept",
+                        "Coefficients"
+                    ],
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false
         },
         "PhysicalActivityModels": {
             "type": "object",
             "propertyNames": {
                 "enum": [
+                    "simple",
                     "continuous"
                 ]
             },
             "additionalProperties": {
-                "type": "object",
-                "properties": {
-                    "Intercept": {
-                        "type": "number"
-                    },
-                    "Coefficients": {
+                "oneOf": [
+                    {
                         "type": "object",
-                        "additionalProperties": {
-                            "type": "number"
-                        }
+                        "description": "Simple physical activity model (India approach) - uses standard deviation only",
+                        "properties": {
+                            "PhysicalActivityStdDev": {
+                                "type": "number",
+                                "description": "Standard deviation for physical activity calculation"
+                            }
+                        },
+                        "required": [
+                            "PhysicalActivityStdDev"
+                        ],
+                        "additionalProperties": false
                     },
-                    "StandardDeviation": {
-                        "type": "number"
+                    {
+                        "type": "object",
+                        "description": "Continuous physical activity model (FINCH approach) - uses CSV file with coefficients",
+                        "properties": {
+                            "csv_file": {
+                                "type": "string",
+                                "description": "CSV file containing physical activity model coefficients"
+                            },
+                            "format": {
+                                "type": "string",
+                                "enum": [
+                                    "csv"
+                                ],
+                                "default": "csv"
+                            },
+                            "delimiter": {
+                                "type": "string",
+                                "default": ","
+                            },
+                            "encoding": {
+                                "type": "string",
+                                "default": "ASCII"
+                            },
+                            "columns": {
+                                "type": "object",
+                                "description": "Column definitions for the physical activity model CSV",
+                                "properties": {
+                                    "Factor": {
+                                        "type": "string",
+                                        "description": "Factor name column (e.g., Intercept, age, gender, region names, ethnicity names, etc.)"
+                                    },
+                                    "Coefficient": {
+                                        "type": "string",
+                                        "description": "Coefficient value column"
+                                    }
+                                },
+                                "required": [
+                                    "Factor",
+                                    "Coefficient"
+                                ],
+                                "additionalProperties": false
+                            }
+                        },
+                        "required": [
+                            "csv_file"
+                        ],
+                        "additionalProperties": false
                     }
-                },
-                "additionalProperties": false
+                ]
             }
         },
         "RiskFactorModels": {
-            "type": "object",
-            "additionalProperties": {
-                "type": "object",
-                "properties": {
-                    "Lambda": {
-                        "type": "number"
+            "oneOf": [
+                {
+                    "type": "object",
+                    "description": "Legacy individual risk factor structure (India/PIF approach)",
+                    "not": {
+                        "required": [
+                            "boxcox_coefficients"
+                        ]
                     },
-                    "StdDev": {
-                        "type": "number"
-                    },
-                    "Intercept": {
-                        "type": "number"
-                    },
-                    "Range": {
-                        "type": "array",
-                        "items": {
-                            "type": "number"
-                        },
-                        "minItems": 2,
-                        "maxItems": 2
-                    },
-                    "Coefficients": {
-                        "additionalProperties": {
-                            "type": "number"
-                        }
-                    },
-                    "Policy": {
+                    "additionalProperties": {
                         "type": "object",
                         "properties": {
+                            "Lambda": {
+                                "type": "number"
+                            },
+                            "StdDev": {
+                                "type": "number"
+                            },
                             "Intercept": {
                                 "type": "number"
                             },
@@ -132,107 +290,300 @@
                                     "type": "number"
                                 }
                             },
-                            "LogCoefficients": {
-                                "additionalProperties": {
-                                    "type": "number"
-                                }
+                            "Policy": {
+                                "type": "object",
+                                "properties": {
+                                    "Intercept": {
+                                        "type": "number"
+                                    },
+                                    "Range": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "number"
+                                        },
+                                        "minItems": 2,
+                                        "maxItems": 2
+                                    },
+                                    "Coefficients": {
+                                        "additionalProperties": {
+                                            "type": "number"
+                                        }
+                                    },
+                                    "LogCoefficients": {
+                                        "additionalProperties": {
+                                            "type": "number"
+                                        }
+                                    }
+                                },
+                                "additionalProperties": true
+                            },
+                            "Trend": {
+                                "type": "object",
+                                "properties": {
+                                    "Intercept": {
+                                        "type": "number"
+                                    },
+                                    "Coefficients": {
+                                        "type": "object",
+                                        "additionalProperties": {
+                                            "type": "number"
+                                        },
+                                        "minItems": 1
+                                    },
+                                    "LogCoefficients": {
+                                        "type": "object",
+                                        "additionalProperties": {
+                                            "type": "number"
+                                        },
+                                        "minItems": 1
+                                    },
+                                    "Range": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "number"
+                                        },
+                                        "minItems": 2,
+                                        "maxItems": 2
+                                    },
+                                    "Lambda": {
+                                        "type": "number"
+                                    }
+                                },
+                                "additionalProperties": true
+                            },
+                            "ExpectedTrend": {
+                                "type": "number"
+                            },
+                            "ExpectedTrendBoxCox": {
+                                "type": "number"
+                            },
+                            "TrendSteps": {
+                                "type": "integer"
+                            },
+                            "ExpectedIncomeTrend": {
+                                "type": "number"
+                            },
+                            "ExpectedIncomeTrendBoxCox": {
+                                "type": "number"
+                            },
+                            "IncomeTrendSteps": {
+                                "type": "integer"
+                            },
+                            "IncomeDecayFactor": {
+                                "type": "number",
+                                "description": "Exponential decay factor 'b' for income trend calculation"
+                            },
+                            "IncomeTrend": {
+                                "type": "object",
+                                "properties": {
+                                    "Intercept": {
+                                        "type": "number"
+                                    },
+                                    "Range": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "number"
+                                        },
+                                        "minItems": 2,
+                                        "maxItems": 2
+                                    },
+                                    "Lambda": {
+                                        "type": "number"
+                                    },
+                                    "Coefficients": {
+                                        "type": "object",
+                                        "additionalProperties": {
+                                            "type": "number"
+                                        }
+                                    },
+                                    "LogCoefficients": {
+                                        "type": "object",
+                                        "additionalProperties": {
+                                            "type": "number"
+                                        }
+                                    }
+                                },
+                                "additionalProperties": true
                             }
                         },
                         "additionalProperties": true
-                    },
-                    "Trend": {
-                        "type": "object",
-                        "properties": {
-                            "Intercept": {
-                                "type": "number"
-                            },
-                            "Coefficients": {
-                                "type": "object",
-                                "additionalProperties": {
-                                    "type": "number"
-                                },
-                                "minItems": 1
-                            },
-                            "LogCoefficients": {
-                                "type": "object",
-                                "additionalProperties": {
-                                    "type": "number"
-                                },
-                                "minItems": 1
-                            },
-                            "Range": {
-                                "type": "array",
-                                "items": {
-                                    "type": "number"
-                                },
-                                "minItems": 2,
-                                "maxItems": 2
-                            },
-                            "Lambda": {
-                                "type": "number"
-                            }
-                        },
-                        "additionalProperties": true
-                    },
-                    "IncomeTrend": {
-                        "type": "object",
-                        "properties": {
-                            "Intercept": {
-                                "type": "number"
-                            },
-                            "Coefficients": {
-                                "type": "object",
-                                "additionalProperties": {
-                                    "type": "number"
-                                },
-                                "minItems": 1
-                            },
-                            "LogCoefficients": {
-                                "type": "object",
-                                "additionalProperties": {
-                                    "type": "number"
-                                },
-                                "minItems": 1
-                            },
-                            "Range": {
-                                "type": "array",
-                                "items": {
-                                    "type": "number"
-                                },
-                                "minItems": 2,
-                                "maxItems": 2
-                            },
-                            "Lambda": {
-                                "type": "number"
-                            }
-                        },
-                        "additionalProperties": true
-                    },
-                    "ExpectedTrend": {
-                        "type": "number"
-                    },
-                    "ExpectedTrendBoxCox": {
-                        "type": "number"
-                    },
-                    "TrendSteps": {
-                        "type": "integer"
-                    },
-                    "ExpectedIncomeTrend": {
-                        "type": "number"
-                    },
-                    "ExpectedIncomeTrendBoxCox": {
-                        "type": "number"
-                    },
-                    "IncomeTrendSteps": {
-                        "type": "integer"
-                    },
-                    "IncomeDecayFactor": {
-                        "type": "number",
-                        "description": "Exponential decay factor 'b' for income trend calculation"
                     }
                 },
-                "additionalProperties": true
-            }
+                {
+                    "type": "object",
+                    "description": "New matrix-based CSV coefficient structure (FINCH approach)",
+                    "properties": {
+                        "boxcox_coefficients": {
+                            "type": "object",
+                            "description": "CSV file containing BoxCox coefficients for all risk factors",
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "description": "CSV file name containing BoxCox coefficients"
+                                },
+                                "format": {
+                                    "type": "string",
+                                    "enum": [
+                                        "csv"
+                                    ],
+                                    "default": "csv"
+                                },
+                                "delimiter": {
+                                    "type": "string",
+                                    "default": ","
+                                },
+                                "encoding": {
+                                    "type": "string",
+                                    "default": "ASCII"
+                                },
+                                "columns": {
+                                    "type": "object",
+                                    "description": "Column definitions for risk factors (columns in CSV)",
+                                    "additionalProperties": {
+                                        "type": "string",
+                                        "enum": [
+                                            "double"
+                                        ]
+                                    }
+                                }
+                            },
+                            "required": [
+                                "name",
+                                "format",
+                                "delimiter"
+                            ],
+                            "additionalProperties": false
+                        },
+                        "policy_coefficients": {
+                            "type": "object",
+                            "description": "CSV file containing policy coefficients for all risk factors (optional)",
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "description": "CSV file name containing policy coefficients"
+                                },
+                                "format": {
+                                    "type": "string",
+                                    "enum": [
+                                        "csv"
+                                    ],
+                                    "default": "csv"
+                                },
+                                "delimiter": {
+                                    "type": "string",
+                                    "default": ","
+                                },
+                                "encoding": {
+                                    "type": "string",
+                                    "default": "ASCII"
+                                },
+                                "columns": {
+                                    "type": "object",
+                                    "description": "Column definitions for risk factors (columns in CSV)",
+                                    "additionalProperties": {
+                                        "type": "string",
+                                        "enum": [
+                                            "double"
+                                        ]
+                                    }
+                                }
+                            },
+                            "required": [
+                                "name",
+                                "format",
+                                "delimiter"
+                            ],
+                            "additionalProperties": false
+                        },
+                        "trend_coefficients": {
+                            "type": "object",
+                            "description": "CSV file containing trend coefficients for all risk factors (optional)",
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "description": "CSV file name containing trend coefficients"
+                                },
+                                "format": {
+                                    "type": "string",
+                                    "enum": [
+                                        "csv"
+                                    ],
+                                    "default": "csv"
+                                },
+                                "delimiter": {
+                                    "type": "string",
+                                    "default": ","
+                                },
+                                "encoding": {
+                                    "type": "string",
+                                    "default": "ASCII"
+                                },
+                                "columns": {
+                                    "type": "object",
+                                    "description": "Column definitions for risk factors (columns in CSV)",
+                                    "additionalProperties": {
+                                        "type": "string",
+                                        "enum": [
+                                            "double"
+                                        ]
+                                    }
+                                }
+                            },
+                            "required": [
+                                "name",
+                                "format",
+                                "delimiter"
+                            ],
+                            "additionalProperties": false
+                        },
+                        "logistic_regression": {
+                            "type": "object",
+                            "description": "CSV file containing logistic regression coefficients for two-stage modeling (optional). Used to determine zero probability before BoxCox transformation.",
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "description": "CSV file name containing logistic regression coefficients (e.g., logistic_regression.csv)"
+                                },
+                                "format": {
+                                    "type": "string",
+                                    "enum": [
+                                        "csv"
+                                    ],
+                                    "default": "csv"
+                                },
+                                "delimiter": {
+                                    "type": "string",
+                                    "default": ","
+                                },
+                                "encoding": {
+                                    "type": "string",
+                                    "default": "ASCII"
+                                },
+                                "columns": {
+                                    "type": "object",
+                                    "description": "Column definitions for risk factors (columns in CSV)",
+                                    "additionalProperties": {
+                                        "type": "string",
+                                        "enum": [
+                                            "double"
+                                        ]
+                                    }
+                                }
+                            },
+                            "required": [
+                                "name",
+                                "format",
+                                "delimiter"
+                            ],
+                            "additionalProperties": false
+                        }
+                    },
+                    "required": [
+                        "boxcox_coefficients"
+                    ],
+                    "additionalProperties": false
+                }
+            ]
         },
         "RiskFactorCorrelationFile": {
             "$ref": "../../../v1/config/csv_file.json"
@@ -244,10 +595,25 @@
     "required": [
         "ModelName",
         "InformationSpeed",
-        "PhysicalActivityStdDev",
         "RiskFactorModels",
         "RiskFactorCorrelationFile",
         "PolicyCovarianceFile"
+    ],
+    "allOf": [
+        {
+            "if": {
+                "not": {
+                    "required": [
+                        "PhysicalActivityModels"
+                    ]
+                }
+            },
+            "then": {
+                "required": [
+                    "PhysicalActivityStdDev"
+                ]
+            }
+        }
     ],
     "additionalProperties": true
 }

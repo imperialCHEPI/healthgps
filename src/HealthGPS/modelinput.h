@@ -8,6 +8,8 @@
 #include "mapping.h"
 #include "settings.h"
 
+#include <optional>
+
 namespace hgps {
 
 /// @brief Defines the Simulation run information data type
@@ -29,6 +31,9 @@ struct RunInfo {
 
     /// @brief Maximum number of comorbidities to include in results
     unsigned int comorbidities{};
+
+    /// @brief Calendar year when intervention policies start (e.g. 2024)
+    unsigned int policy_start_year{0};
 };
 
 /// @brief Defines the socio-economic status (SES) model data type
@@ -52,11 +57,16 @@ class ModelInput {
     /// @param ses_info Socio-economic status (SES) model information
     /// @param risk_mapping Hierarchical risk factors model mappings
     /// @param diseases Selected diseases to include in experiment
+    /// @param project_requirements Per-project requirements (demographics, income, PA, etc.)
     /// @param pif_info Population Impact Fraction configuration
+    /// @param individual_id_tracking_config MAHIMA: optional per-person CSV tracking (output)
     ModelInput(core::DataTable &data, Settings settings, const RunInfo &run_info,
                SESDefinition ses_info, HierarchicalMapping risk_mapping,
                std::vector<core::DiseaseInfo> diseases,
-               hgps::input::PIFInfo pif_info = hgps::input::PIFInfo{});
+               hgps::input::ProjectRequirements project_requirements,
+               hgps::input::PIFInfo pif_info = hgps::input::PIFInfo{},
+               std::optional<hgps::input::IndividualIdTrackingConfig>
+                   individual_id_tracking_config = std::nullopt);
 
     /// @brief Gets the simulation experiment settings definition
     /// @return Experiment settings definition
@@ -106,6 +116,16 @@ class ModelInput {
     /// @return PIF configuration
     const hgps::input::PIFInfo &population_impact_fraction() const noexcept;
 
+    /// @brief Gets the per-project requirements (demographics, income, PA, risk factors, trend,
+    /// two-stage)
+    /// @return Project requirements
+    const hgps::input::ProjectRequirements &project_requirements() const noexcept;
+
+    /// @brief Gets optional individual ID tracking config (MAHIMA: per-person CSV output).
+    /// @return Optional tracking config, or nullopt if not set
+    const std::optional<hgps::input::IndividualIdTrackingConfig> &
+    individual_id_tracking_config() const noexcept;
+
   private:
     std::reference_wrapper<core::DataTable> input_data_;
     Settings settings_;
@@ -113,8 +133,10 @@ class ModelInput {
     SESDefinition ses_definition_;
     HierarchicalMapping risk_mapping_;
     std::vector<core::DiseaseInfo> diseases_;
+    hgps::input::ProjectRequirements project_requirements_{};
     bool enable_income_analysis_{
         true}; // This is to set if results be categorised by income or not. Set to TRUE for now.
     hgps::input::PIFInfo pif_info_;
+    std::optional<hgps::input::IndividualIdTrackingConfig> individual_id_tracking_config_{};
 };
 } // namespace hgps

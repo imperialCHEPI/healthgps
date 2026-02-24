@@ -308,3 +308,25 @@ TEST(TestCore, SplitDelimitedString) {
     ASSERT_EQ(parts.front(), csv_parts.front());
     ASSERT_EQ(parts.back(), csv_parts.back());
 }
+
+TEST(TestCore, SplitDelimitedStringEmpty) {
+    using namespace hgps::core;
+    auto parts = split_string("", ",");
+    ASSERT_TRUE(parts.empty());
+}
+
+TEST(TestCore, SplitDelimitedStringNoDelimiter) {
+    using namespace hgps::core;
+    auto parts = split_string("single", ",");
+    ASSERT_EQ(1u, parts.size());
+    ASSERT_EQ("single", parts[0]);
+}
+
+TEST(TestCore, SplitDelimitedStringTrailingDelimiter) {
+    using namespace hgps::core;
+    // split_string only emits non-empty segments; trailing delimiter does not add empty part
+    auto parts = split_string("a,b,", ",");
+    ASSERT_EQ(2u, parts.size());
+    ASSERT_EQ("a", parts[0]);
+    ASSERT_EQ("b", parts[1]);
+}

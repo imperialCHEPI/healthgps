@@ -1,4 +1,5 @@
 #include "riskfactor.h"
+#include <iostream>
 
 namespace hgps {
 
@@ -42,11 +43,30 @@ RiskFactorModel &RiskFactorModule::at(const RiskFactorModelType &model_type) con
 }
 
 void RiskFactorModule::initialise_population(RuntimeContext &context) {
-    auto &static_model = models_.at(RiskFactorModelType::Static);
-    static_model->generate_risk_factors(context);
+    if (!models_.contains(RiskFactorModelType::Static)) {
+        std::cout << " ERROR: Static model not found!";
+        throw std::runtime_error("Static model not found in RiskFactorModule");
+    }
+    try {
+        auto &static_model = models_.at(RiskFactorModelType::Static);
+        static_model->generate_risk_factors(context);
+    } catch (const std::exception &e) {
+        std::cout << " ERROR: Exception in static model: " << e.what();
+        throw;
+    }
 
-    auto &dynamic_model = models_.at(RiskFactorModelType::Dynamic);
-    dynamic_model->generate_risk_factors(context);
+    if (!models_.contains(RiskFactorModelType::Dynamic)) {
+        std::cout << " ERROR: Dynamic model not found!";
+        throw std::runtime_error("Dynamic model not found in RiskFactorModule");
+    }
+
+    try {
+        auto &dynamic_model = models_.at(RiskFactorModelType::Dynamic);
+        dynamic_model->generate_risk_factors(context);
+    } catch (const std::exception &e) {
+        std::cout << " ERROR: Exception in dynamic model: " << e.what();
+        throw;
+    }
 }
 
 void RiskFactorModule::update_population(RuntimeContext &context) {

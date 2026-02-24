@@ -3,17 +3,42 @@
 #include "HealthGPS.Core/forward_type.h"
 #include "HealthGPS/data_series.h"
 
-#include <fmt/chrono.h>
+#include <oneapi/tbb/parallel_for_each.h>
+
+#include <chrono>
+#include <ctime>
 #include <fmt/color.h>
 #include <fmt/core.h>
+#include <fstream>
 #include <nlohmann/json.hpp>
 #include <sstream>
 #include <unordered_set>
 #include <utility>
 
 namespace hgps {
-ResultFileWriter::ResultFileWriter(const std::filesystem::path &file_name, ExperimentInfo info)
-    : info_{std::move(info)}, base_filename_{file_name} {
+namespace {
+/// Numeric value for mean_income_category column (matches Person::income_to_value).
+/// Each income-stratified file contains only that category, so mean_income_category is fixed.
+double income_category_numeric(core::Income inc) {
+    switch (inc) {
+    case core::Income::low:
+        return 1.0;
+    case core::Income::lowermiddle:
+    case core::Income::middle:
+        return 2.0;
+    case core::Income::uppermiddle:
+        return 3.0;
+    case core::Income::high:
+        return 4.0;
+    default:
+        return 0.0;
+    }
+}
+} // namespace
+
+ResultFileWriter::ResultFileWriter(const std::filesystem::path &file_name, ExperimentInfo info,
+                                   bool write_income_csv)
+    : info_{std::move(info)}, write_income_csv_{write_income_csv}, base_filename_{file_name} {
     stream_.open(file_name, std::ofstream::out | std::ofstream::app);
     if (stream_.fail() || !stream_.is_open()) {
         throw std::invalid_argument(fmt::format("Cannot open output file: {}", file_name.string()));
@@ -33,8 +58,9 @@ ResultFileWriter::ResultFileWriter(const std::filesystem::path &file_name, Exper
 ResultFileWriter::ResultFileWriter(ResultFileWriter &&other) noexcept
     : stream_{std::move(other.stream_)}, csvstream_{std::move(other.csvstream_)},
       income_csvstreams_{std::move(other.income_csvstreams_)},
-      income_first_row_{std::move(other.income_first_row_)}, info_{std::move(other.info_)},
-      base_filename_{std::move(other.base_filename_)} {}
+      income_first_row_{std::move(other.income_first_row_)},
+      income_mutexes_{std::move(other.income_mutexes_)}, info_{std::move(other.info_)},
+      write_income_csv_{other.write_income_csv_}, base_filename_{std::move(other.base_filename_)} {}
 
 ResultFileWriter &ResultFileWriter::operator=(ResultFileWriter &&other) noexcept {
     stream_.close();
@@ -51,9 +77,11 @@ ResultFileWriter &ResultFileWriter::operator=(ResultFileWriter &&other) noexcept
     }
     income_csvstreams_ = std::move(other.income_csvstreams_);
     income_first_row_ = std::move(other.income_first_row_);
+    income_mutexes_ = std::move(other.income_mutexes_);
 
     info_ = std::move(other.info_);
     base_filename_ = std::move(other.base_filename_);
+    write_income_csv_ = other.write_income_csv_;
     return *this;
 }
 
@@ -78,24 +106,52 @@ ResultFileWriter::~ResultFileWriter() {
     }
 }
 
+// MAHIMA: Write order and parallelism. (1) Under one lock we write JSON + main CSV, then
+// release. (2) Income CSVs are then written in parallel (TBB: one task per income category).
+// (3) The EventMonitor uses two dispatch threads: result_dispatch_thread runs this write();
+// tracking_dispatch_thread writes the IndividualIDTracking CSV. So main result and tracking
+// CSV are written in parallel; within this write(), income CSV files are written in parallel.
 void ResultFileWriter::write(const hgps::ResultEventMessage &message) {
-    std::scoped_lock lock(lock_mutex_);
-    if (first_row_.load()) {
-        first_row_ = false;
-        write_csv_header(message);
-    } else {
-        stream_ << ",";
+    std::vector<core::Income> income_categories;
+    {
+        std::scoped_lock lock(lock_mutex_);
+        if (first_row_.load()) {
+            first_row_ = false;
+            write_csv_header(message);
+        } else {
+            stream_ << ",";
+        }
+
+        stream_ << to_json_string(message);
+        write_csv_channels(message);
+
+        // MAHIMA: Initialize income streams under main lock; then release lock and write
+        // income CSVs in parallel (one thread per income category) for faster output.
+        if (write_income_csv_ && message.content.population_by_income.has_value()) {
+            if (income_csvstreams_.empty()) {
+                initialize_income_streams(message);
+                for (const auto &[income, stream] : income_csvstreams_) {
+                    (void)stream;
+                    income_mutexes_[income] = std::make_unique<std::mutex>();
+                }
+            }
+            income_categories = get_available_income_categories(message);
+        }
     }
 
-    stream_ << to_json_string(message);
-    write_csv_channels(message);
-
-    // Initialize income streams on first use and write income-based CSV data
-    if (message.content.population_by_income.has_value()) {
-        if (income_csvstreams_.empty()) {
-            initialize_income_streams(message);
-        }
-        write_income_csv_channels(message);
+    // MAHIMA: Write each income CSV file in parallel; each stream has its own mutex so no
+    // conflict with main result writer or other income files.
+    if (!income_categories.empty()) {
+        tbb::parallel_for_each(income_categories, [&](core::Income income) {
+            std::scoped_lock ilock(*income_mutexes_[income]);
+            auto &income_stream = income_csvstreams_[income];
+            auto &is_first_row = income_first_row_[income];
+            if (is_first_row) {
+                is_first_row = false;
+                write_income_csv_header(message, income_stream);
+            }
+            write_income_csv_data(message, income, income_stream);
+        });
     }
 }
 
@@ -103,16 +159,22 @@ void ResultFileWriter::write_json_begin(const std::filesystem::path &output) {
     using json = nlohmann::ordered_json;
 
     auto tp = std::chrono::system_clock::now();
-    json msg = {
-        {"experiment",
-         {{"model", info_.model},
-          {"version", info_.version},
-          {"intervention", info_.intervention},
-          {"job_id", info_.job_id},
-          {"custom_seed", info_.seed},
-          {"time_of_day", fmt::format("{0:%F %H:%M:}{1:%S} {0:%Z}", tp, tp.time_since_epoch())},
-          {"output_filename", output.filename().string()}}},
-        {"result", {1, 2}}};
+    json msg = {{"experiment",
+                 {{"model", info_.model},
+                  {"version", info_.version},
+                  {"intervention", info_.intervention},
+                  {"job_id", info_.job_id},
+                  {"custom_seed", info_.seed},
+                  {"time_of_day",
+                   [tp]() {
+                       auto t = std::chrono::system_clock::to_time_t(tp);
+                       std::tm *tm = std::gmtime(&t);
+                       char buf[64];
+                       std::strftime(buf, sizeof(buf), "%F %H:%M:%S UTC", tm);
+                       return std::string{buf};
+                   }()},
+                  {"output_filename", output.filename().string()}}},
+                {"result", {1, 2}}};
 
     auto json_header = msg.dump();
     auto array_start = json_header.find_last_of('[');
@@ -289,35 +351,51 @@ void ResultFileWriter::write_income_csv_data(const hgps::ResultEventMessage &mes
 
     const auto *sep = ",";
     const auto &series = message.content.series;
-    std::stringstream mss;
-    std::stringstream fss;
+    const double file_income_category_value = income_category_numeric(income);
 
+    // Write only rows for (age, gender) strata that have at least one person in this income
+    // category. No fallback, no zeros: each file has one row per stratum that has people in that
+    // category (e.g. low-income file has one entry per age/gender cell that has low-income people).
     for (auto index = 0u; index < series.sample_size(); index++) {
-        mss << message.source << sep << message.run_number << sep << message.model_time << sep
-            << "male" << sep << index;
-        fss << message.source << sep << message.run_number << sep << message.model_time << sep
-            << "female" << sep << index;
-
-        for (const auto &key : series.channels()) {
-            // Use income-based data if available, otherwise use regular data
-            try {
-                mss << sep << series.at(Gender::male, income, key).at(index);
-                fss << sep << series.at(Gender::female, income, key).at(index);
-            } catch (const std::out_of_range &) {
-                // Fallback to regular data if income-based data not available
-                mss << sep << series.at(Gender::male, key).at(index);
-                fss << sep << series.at(Gender::female, key).at(index);
-            }
+        double count_m = 0.0;
+        double count_f = 0.0;
+        try {
+            count_m = series.at(Gender::male, income, "count").at(index);
+            count_f = series.at(Gender::female, income, "count").at(index);
+        } catch (const std::out_of_range &) {
+            // No count for this income stratum – skip this index (no rows)
+            continue;
         }
 
-        income_csv << mss.str() << '\n' << fss.str() << '\n';
+        auto write_row = [&](Gender gender, double count) {
+            if (count <= 0.0) {
+                return;
+            }
+            std::stringstream ss;
+            ss << message.source << sep << message.run_number << sep << message.model_time << sep
+               << (gender == Gender::male ? "male" : "female") << sep << index;
+            for (const auto &key : series.channels()) {
+                if (key == "mean_income_category") {
+                    ss << sep << file_income_category_value;
+                    continue;
+                }
+                if (key == "std_income_category") {
+                    ss << sep << 0.0;
+                    continue;
+                }
+                double val = 0.0;
+                try {
+                    val = series.at(gender, income, key).at(index);
+                } catch (const std::out_of_range &) {
+                    // NOLINTNEXTLINE(bugprone-empty-catch) missing value → use 0.0
+                }
+                ss << sep << val;
+            }
+            income_csv << ss.str() << '\n';
+        };
 
-        // Reset row streams
-        mss.str(std::string{});
-        mss.clear();
-
-        fss.str(std::string{});
-        fss.clear();
+        write_row(Gender::male, count_m);
+        write_row(Gender::female, count_f);
     }
 }
 
@@ -336,8 +414,12 @@ std::string ResultFileWriter::income_category_to_string(core::Income income) con
     switch (income) {
     case core::Income::low:
         return "LowIncome";
+    case core::Income::lowermiddle:
+        return "LowerMiddleIncome";
     case core::Income::middle:
         return "MiddleIncome";
+    case core::Income::uppermiddle:
+        return "UpperMiddleIncome";
     case core::Income::high:
         return "HighIncome";
     case core::Income::unknown:
@@ -359,9 +441,17 @@ ResultFileWriter::get_available_income_categories(const hgps::ResultEventMessage
             categories.push_back(core::Income::low);
             seen.insert(core::Income::low);
         }
+        if (pop_by_income.lowermiddle > 0 && !seen.contains(core::Income::lowermiddle)) {
+            categories.push_back(core::Income::lowermiddle);
+            seen.insert(core::Income::lowermiddle);
+        }
         if (pop_by_income.middle > 0 && !seen.contains(core::Income::middle)) {
             categories.push_back(core::Income::middle);
             seen.insert(core::Income::middle);
+        }
+        if (pop_by_income.uppermiddle > 0 && !seen.contains(core::Income::uppermiddle)) {
+            categories.push_back(core::Income::uppermiddle);
+            seen.insert(core::Income::uppermiddle);
         }
         if (pop_by_income.high > 0 && !seen.contains(core::Income::high)) {
             categories.push_back(core::Income::high);

@@ -394,3 +394,30 @@ TEST(ScenarioTest, MarketingPolicyCreate) {
         ASSERT_EQ(expected.at(i), policy_delta);
     }
 }
+
+TEST(ScenarioTest, PolicyIntervalEquality) {
+    using namespace hgps;
+    PolicyInterval open(2020);
+    PolicyInterval closed(2020, 2050);
+    PolicyInterval sameOpen(2020);
+    ASSERT_EQ(open.start_time, sameOpen.start_time);
+    ASSERT_FALSE(open.finish_time.has_value());
+    ASSERT_TRUE(closed.finish_time.has_value());
+}
+
+TEST(ScenarioTest, BaselineScenarioTypeAndName) {
+    using namespace hgps;
+    auto channel = SyncChannel{};
+    BaselineScenario baseline{channel};
+    ASSERT_EQ(ScenarioType::baseline, baseline.type());
+    ASSERT_EQ("Baseline", baseline.name());
+}
+
+TEST(ScenarioTest, InterventionScenarioType) {
+    using namespace hgps;
+    auto channel = SyncChannel{};
+    // PolicyDynamic requires exactly 3 parameters [alpha, beta, gamma]
+    MarketingDynamicScenario intervention{
+        channel, create_dynamic_marketing_definition(std::vector{1.0, 0.0, 0.0})};
+    ASSERT_EQ(ScenarioType::intervention, intervention.type());
+}

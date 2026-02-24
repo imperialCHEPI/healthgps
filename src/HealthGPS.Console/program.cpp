@@ -7,22 +7,28 @@
 #include "HealthGPS/event_bus.h"
 #include "command_options.h"
 #include "event_monitor.h"
+#include "individual_id_tracking_writer.h"
 #include "model_info.h"
 #include "result_file_writer.h"
 
-#include <fmt/chrono.h>
 #include <fmt/color.h>
 
 #include <chrono>
 #include <cstdlib>
+#include <ctime>
 #include <oneapi/tbb/global_control.h>
+#include <optional>
 
 namespace {
 /// @brief Get a string representation of current system time
 /// @return The system time as string
 std::string get_time_now_str() {
     auto tp = std::chrono::system_clock::now();
-    return fmt::format("{0:%F %H:%M:}{1:%S} {0:%Z}", tp, tp.time_since_epoch());
+    auto t = std::chrono::system_clock::to_time_t(tp);
+    std::tm *tm = std::gmtime(&t);
+    char buf[64];
+    std::strftime(buf, sizeof(buf), "%F %H:%M:%S UTC", tm);
+    return std::string{buf};
 }
 
 /// @brief Prints application start-up messages
@@ -36,6 +42,7 @@ void print_app_title() {
 
 hgps::ResultFileWriter create_results_file_logger(const hgps::input::Configuration &config,
                                                   const hgps::ModelInput &input) {
+    const bool write_income_csv = input.project_requirements().income.income_based_csv_output;
     return {create_output_file_name(config.output, config.job_id),
             hgps::ExperimentInfo{.model = config.app_name,
                                  .version = config.app_version,
@@ -43,7 +50,8 @@ hgps::ResultFileWriter create_results_file_logger(const hgps::input::Configurati
                                                      ? config.active_intervention->identifier
                                                      : "",
                                  .job_id = config.job_id,
-                                 .seed = input.seed().value_or(0u)}};
+                                 .seed = input.seed().value_or(0u)},
+            write_income_csv};
 }
 
 /// @brief Prints application exit message
@@ -180,7 +188,15 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
         // Create event bus and event monitor with a results file writer
         auto event_bus = std::make_shared<DefaultEventBus>();
         auto json_file_logger = create_results_file_logger(config, *model_input);
-        auto event_monitor = EventMonitor{*event_bus, json_file_logger};
+        std::optional<hgps::IndividualIDTrackingWriter> individual_tracking_writer;
+        if (config.output.individual_id_tracking.has_value() &&
+            config.output.individual_id_tracking->enabled) {
+            individual_tracking_writer.emplace(
+                create_output_file_name(config.output, config.job_id));
+        }
+        auto event_monitor =
+            EventMonitor{*event_bus, json_file_logger,
+                         individual_tracking_writer ? &*individual_tracking_writer : nullptr};
 
         // Create simulation executive instance with master seed generator
         auto seed_generator = std::make_unique<hgps::MTRandom32>();
