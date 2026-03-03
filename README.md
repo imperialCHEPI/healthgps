@@ -13,7 +13,7 @@ Childhood obesity is one of the major public health challenges throughout the wo
 
 The *Health GPS microsimulation* is being developed in collaboration between the [Centre for Health Economics & Policy Innovation (CHEPI)](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/), Imperial College London; and [INRAE](https://www.inrae.fr), France; as part of the [STOP project](https://www.stopchildobesity.eu/). The software architecture uses a modular design approach to provide the building blocks of the *Health GPS application*, which is implemented using object-oriented principles in *Modern C++* programming language targeting the [C++20 standard](https://en.cppreference.com/w/cpp/20).
 
-### For more on technical documentation for HealthGPS along with latest updates visit [HGPS Feb 2026 Updates] (https://github.com/imperialCHEPI/healthgps/blob/main/HealthGPS%20Update%20Report-%2020th%20Feb%202026.md)
+### For more on technical documentation for HealthGPS along with latest updates visit [HGPS Feb 2026 Updates](https://github.com/imperialCHEPI/healthgps/blob/main/HealthGPS%20Update%20Report-%2020th%20Feb%202026.md)
 
 ## Quick Start
 
