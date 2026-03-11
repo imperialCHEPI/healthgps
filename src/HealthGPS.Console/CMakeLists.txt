@@ -5,6 +5,15 @@ find_path(RAPIDCSV_INCLUDE_DIRS "rapidcsv.h")
 find_package(Threads REQUIRED)
 
 add_executable(HealthGPS.Console "program.cpp")
+
+# Copy JSON schemas next to the console executable in the build tree so
+# developers can run from the build directory as well as from the install tree.
+add_custom_command(
+    TARGET HealthGPS.Console POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${CMAKE_SOURCE_DIR}/schemas
+            $<TARGET_FILE_DIR:HealthGPS.Console>/schemas
+)
 add_library(
     HealthGPS.LibConsole STATIC
     "command_options.cpp"
