@@ -11,7 +11,6 @@
                 "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
             }
         },
-
         {
             "name": "linux-debug",
             "displayName": "Linux Debug",
@@ -26,14 +25,15 @@
             },
             "vendor": {
                 "microsoft.com/VisualStudioSettings/CMake/1.0": {
-                    "hostOS": [ "Linux" ]
+                    "hostOS": [
+                        "Linux"
+                    ]
                 },
                 "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": {
                     "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}"
                 }
             }
         },
-
         {
             "name": "linux-release",
             "displayName": "Linux Release",
@@ -43,7 +43,6 @@
                 "CMAKE_BUILD_TYPE": "Release"
             }
         },
-
         {
             "name": "windows-debug",
             "displayName": "Windows Debug",
@@ -66,11 +65,12 @@
             },
             "vendor": {
                 "microsoft.com/VisualStudioSettings/CMake/1.0": {
-                    "hostOS": [ "Windows" ]
+                    "hostOS": [
+                        "Windows"
+                    ]
                 }
             }
         },
-
         {
             "name": "windows-release",
             "displayName": "Windows Release",
@@ -80,7 +80,6 @@
                 "CMAKE_BUILD_TYPE": "Release"
             }
         },
-
         {
             "name": "windows-relwithdebinfo",
             "displayName": "Windows RelWithDebInfo",
@@ -91,7 +90,6 @@
             }
         }
     ],
-
     "buildPresets": [
         {
             "name": "debug-build-linux",
@@ -124,7 +122,6 @@
             "description": "Windows build with debug symbols for profiling"
         }
     ],
-
     "testPresets": [
         {
             "name": "core-test-linux",
