@@ -24,7 +24,7 @@ endif()
 
 project(
     Health-GPS
-    VERSION 1.2.2.0
+    VERSION 3.0.0.0
     DESCRIPTION "Global Health Policy Simulation model (Health-GPS)"
     HOMEPAGE_URL "https://github.com/imperialCHEPI/healthgps"
     LANGUAGES CXX)

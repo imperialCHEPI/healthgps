@@ -37,8 +37,8 @@
         {
             "name": "linux-release",
             "displayName": "Linux Release",
-            "description": "Build on Linux (release).",
             "inherits": "linux-debug",
+            "description": "Build on Linux (release).",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release"
             }
@@ -54,7 +54,10 @@
             },
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_C_COMPILER": "cl",
                 "CMAKE_CXX_COMPILER": "cl",
+                "CMAKE_LINKER": "link",
+                "VCPKG_TARGET_TRIPLET": "x64-windows",
                 "CMAKE_TOOLCHAIN_FILE": {
                     "value": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
                     "type": "FILEPATH"
@@ -122,8 +125,8 @@
     "testPresets": [
         {
             "name": "core-test-linux",
-            "description": "Enable output on failure",
             "configurePreset": "linux-debug",
+            "description": "Enable output on failure",
             "output": {
                 "outputOnFailure": true
             }
