@@ -115,6 +115,7 @@ HealthGPS.Console -c config.json -T 64
 ```
 
 ### **Detailed Performance Breakdown**
+
 ```
 📊 Performance Summary:
 Operation                      Count      Total(ms)    Avg(ms)      Max(ms)

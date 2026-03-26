@@ -202,9 +202,9 @@ void Simulation::initialise_population() {
         }
         auto t0 = std::chrono::steady_clock::now();
         fn();
-        phase_profile_->*accum += std::chrono::duration<double, std::milli>(
-                                       std::chrono::steady_clock::now() - t0)
-                                       .count();
+        phase_profile_->*accum +=
+            std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0)
+                .count();
     };
 
     // Gender - Age, must be first
@@ -241,9 +241,9 @@ void Simulation::update_population() {
         }
         auto t0 = std::chrono::steady_clock::now();
         fn();
-        phase_profile_->*accum += std::chrono::duration<double, std::milli>(
-                                      std::chrono::steady_clock::now() - t0)
-                                      .count();
+        phase_profile_->*accum +=
+            std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0)
+                .count();
     };
 
     if (phase_profile_) {
