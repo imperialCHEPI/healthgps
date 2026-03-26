@@ -60,11 +60,11 @@ def check_file_ages(z, filepath, disease_name):
     try:
         content = z.read(filepath).decode('utf-8')
         reader = csv.DictReader(io.StringIO(content))
-        
+
         # Check if 'age' column exists
         if 'age' not in reader.fieldnames:
             return ('no_age_column', None)
-        
+
         ages = set()
         for row in reader:
             try:
@@ -72,19 +72,19 @@ def check_file_ages(z, filepath, disease_name):
                 ages.add(age)
             except (ValueError, KeyError):
                 pass
-        
+
         if not ages:
             return ('empty', None)
-        
+
         min_age = min(ages)
         max_age = max(ages)
-        
+
         # Check for missing ages in range 0-100
         missing_ages = []
         for age in range(0, 101):
             if age not in ages:
                 missing_ages.append(age)
-        
+
         return ('ok', {
             'ages': ages,
             'min_age': min_age,
@@ -99,27 +99,27 @@ def check_file_ages(z, filepath, disease_name):
 with zipfile.ZipFile(zip_path, 'r') as z:
     # Find all files
     all_files = z.namelist()
-    
+
     # Filter for India files
     india_files = [f for f in all_files if is_india_file(f)]
-    
+
     print(f"Found {len(india_files)} India-related files total\n")
-    
+
     for zip_file_path in sorted(india_files):
         all_files_checked.append(zip_file_path)
         folder_name = zip_file_path.split('/')[0] if '/' in zip_file_path else "root"
         disease_name = extract_disease_from_path(zip_file_path)
-        
+
         # Check if this file is relevant to simulated diseases
         is_simulated = disease_name and disease_name in simulated_diseases
-        
+
         if not is_simulated:
             # Still check it but don't report unless it's in diseases folder
             if folder_name == "diseases":
                 continue  # Skip non-simulated disease files
-        
+
         status, data = check_file_ages(z, zip_file_path, disease_name)
-        
+
         if status == 'no_age_column':
             if is_simulated:
                 issues['no_age_column'].append((zip_file_path, disease_name))
@@ -132,14 +132,14 @@ with zipfile.ZipFile(zip_path, 'r') as z:
             if is_simulated:
                 issues['read_errors'].append((zip_file_path, disease_name, data))
             continue
-        
+
         # File has age data
         min_age = data['min_age']
         max_age = data['max_age']
         missing_ages = data['missing_ages']
         has_age_0 = data['has_age_0']
         has_age_100 = data['has_age_100']
-        
+
         if is_simulated:
             if missing_ages:
                 issues['missing_ages'].append((zip_file_path, disease_name, missing_ages, min_age, max_age))
@@ -227,4 +227,3 @@ for file_path in sorted(india_files):
     disease = extract_disease_from_path(file_path)
     is_sim = " [SIMULATED]" if disease and disease in simulated_diseases else ""
     print(f"  {file_path}{is_sim}")
-

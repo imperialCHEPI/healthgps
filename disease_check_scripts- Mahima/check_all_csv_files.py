@@ -20,24 +20,24 @@ with zipfile.ZipFile(zip_path, 'r') as z:
     # Get all CSV files (not just diseases folder)
     all_csv_files = [f for f in z.namelist() if f.endswith('.csv')]
     total_files = len(all_csv_files)
-    
+
     print(f"Found {total_files} CSV files total\n")
-    
+
     for zip_file_path in sorted(all_csv_files):
         parts = zip_file_path.split('/')
         folder_name = parts[0] if len(parts) > 1 else "root"
         file_name = parts[-1]
-        
+
         # Read and check ages
         try:
             content = z.read(zip_file_path).decode('utf-8')
             reader = csv.DictReader(io.StringIO(content))
-            
+
             # Check if 'age' column exists
             if 'age' not in reader.fieldnames:
                 issues['no_age_column'].append(zip_file_path)
                 continue
-            
+
             ages = set()
             for row in reader:
                 try:
@@ -45,25 +45,25 @@ with zipfile.ZipFile(zip_path, 'r') as z:
                     ages.add(age)
                 except (ValueError, KeyError):
                     pass
-            
+
             if not ages:
                 issues['empty_files'].append(zip_file_path)
                 continue
-            
+
             min_age = min(ages)
             max_age = max(ages)
-            
+
             # Check for missing ages in range 0-100
             missing_ages = []
             for age in range(0, 101):  # 0 to 100 inclusive
                 if age not in ages:
                     missing_ages.append(age)
-            
+
             # Check specific critical ages
             has_age_0 = 0 in ages
             has_age_100 = 100 in ages
             has_age_101_plus = any(a > 100 for a in ages)
-            
+
             if missing_ages:
                 issues['missing_ages'].append((zip_file_path, missing_ages, min_age, max_age))
                 print(f"[WARN] {zip_file_path}")
@@ -73,7 +73,7 @@ with zipfile.ZipFile(zip_path, 'r') as z:
                     print(f" ... and {len(missing_ages) - 20} more")
                 else:
                     print()
-                
+
                 if not has_age_0:
                     print(f"        [CRITICAL] Missing age 0!")
                 if not has_age_100:
@@ -155,4 +155,3 @@ print(f"\n\nFOLDER BREAKDOWN:")
 for folder in sorted(folder_stats.keys()):
     stats = folder_stats[folder]
     print(f"  {folder}: {stats['total']} files - {stats['ok']} OK, {stats['missing_ages']} missing ages, {stats['missing_age_0']} missing age 0")
-

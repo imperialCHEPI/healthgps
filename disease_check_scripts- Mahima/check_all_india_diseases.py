@@ -18,16 +18,16 @@ print("=" * 80)
 with zipfile.ZipFile(zip_path, 'r') as z:
     # Find all D356.csv files
     disease_files = [f for f in z.namelist() if f.endswith('D356.csv') and 'diseases/' in f]
-    
+
     for zip_file_path in sorted(disease_files):
         parts = zip_file_path.split('/')
         if len(parts) >= 3 and parts[0] == 'diseases':
             disease_name = parts[1]
-            
+
             # Read and check ages
             content = z.read(zip_file_path).decode('utf-8')
             reader = csv.DictReader(io.StringIO(content))
-            
+
             ages = set()
             for row in reader:
                 try:
@@ -35,26 +35,26 @@ with zipfile.ZipFile(zip_path, 'r') as z:
                     ages.add(age)
                 except (ValueError, KeyError):
                     pass
-            
+
             if not ages:
                 issues['empty_files'].append(disease_name)
                 print(f"[ERROR] {disease_name}/D356.csv - No age data found")
                 continue
-            
+
             min_age = min(ages)
             max_age = max(ages)
-            
+
             # Check for missing ages in range 0-100
             missing_ages = []
             for age in range(0, 101):  # 0 to 100 inclusive
                 if age not in ages:
                     missing_ages.append(age)
-            
+
             # Check specific critical ages
             has_age_0 = 0 in ages
             has_age_100 = 100 in ages
             has_age_101_plus = any(a > 100 for a in ages)
-            
+
             if missing_ages:
                 issues['missing_ages'].append((disease_name, missing_ages, min_age, max_age))
                 print(f"[WARN] {disease_name}/D356.csv")
@@ -64,7 +64,7 @@ with zipfile.ZipFile(zip_path, 'r') as z:
                     print(f" ... and {len(missing_ages) - 20} more")
                 else:
                     print()
-                
+
                 if not has_age_0:
                     print(f"        [CRITICAL] Missing age 0!")
                 if not has_age_100:
@@ -133,4 +133,3 @@ if affected_simulated:
             print(f"     [CRITICAL] Missing age 100!")
 else:
     print(f"\n[OK] None of your simulated diseases have missing age issues!")
-

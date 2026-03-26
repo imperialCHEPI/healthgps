@@ -4,7 +4,7 @@
 import subprocess
 import sys
 
-result = subprocess.run([sys.executable, "check_all_csv_files.py"], 
+result = subprocess.run([sys.executable, "check_all_csv_files.py"],
                        capture_output=True, text=True, encoding='utf-8', errors='replace')
 
 # Find and print summary section
@@ -24,4 +24,3 @@ for line in lines:
             break
 
 print('\n'.join(summary_lines))
-

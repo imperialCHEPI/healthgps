@@ -40,15 +40,15 @@ for %%A in (%AGE_GROUPS%) do (
     ) else if !TOTAL_COUNT! equ 3 (
         set GROUP_NAME=%%A
         set /A TOTAL_COUNT=0
-        
+
         echo ========================================
         echo Processing Age Group: !MIN_AGE!-!MAX_AGE! (!GROUP_NAME!)
         echo ========================================
-        
+
         REM Step 1: Update simulation.cpp
         echo Updating simulation.cpp for ages !MIN_AGE!-!MAX_AGE!...
         powershell -Command "(Get-Content '%SIMULATION_CPP%') -replace 'int min_age = \d+;', 'int min_age = !MIN_AGE!;' -replace 'int max_age = \d+;', 'int max_age = !MAX_AGE!;' | Set-Content '%SIMULATION_CPP%'"
-        
+
         REM Step 2: Build project
         echo Building HealthGPS project...
         cmake --build out\build\windows-release --target %BUILD_TARGET% --config Release
@@ -56,14 +56,14 @@ for %%A in (%AGE_GROUPS%) do (
             echo ERROR: Build failed for age group !MIN_AGE!-!MAX_AGE!
             goto :next_group
         )
-        
+
         REM Step 3: Run simulation (you need to replace this with your actual simulation command)
         echo Running simulation...
         echo WARNING: Please replace this with your actual simulation command
         echo Your simulation command should go here...
         REM Your actual simulation command goes here
         REM Example: your_simulation.exe --config your_config.json
-        
+
         REM Step 4: Organize output files
         echo Organizing output files...
         if exist "risk_factor_inspection\foodvegetable_inspection.csv" (
@@ -74,15 +74,15 @@ for %%A in (%AGE_GROUPS%) do (
             move "risk_factor_inspection\foodfruit_inspection.csv" "%OUTPUT_DIR%\!GROUP_NAME!\"
             echo   Moved: foodfruit_inspection.csv
         )
-        
+
         REM Clean up inspection directory
         if exist "risk_factor_inspection" (
             del "risk_factor_inspection\*" /q
         )
-        
+
         set /A SUCCESS_COUNT+=1
         echo Age group !MIN_AGE!-!MAX_AGE! completed successfully!
-        
+
         :next_group
         echo.
         timeout /t 2 /nobreak >nul

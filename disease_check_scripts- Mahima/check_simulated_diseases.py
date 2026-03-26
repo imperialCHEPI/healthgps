@@ -73,16 +73,16 @@ print("=" * 80)
 with zipfile.ZipFile(zip_path, 'r') as z:
     for disease in sorted(all_diseases):
         zip_file_path = f"diseases/{disease}/D356.csv"
-        
+
         if zip_file_path not in z.namelist():
             not_found.append(disease)
             print(f"[NOT FOUND] {disease}/D356.csv")
             continue
-        
+
         # Read and check for age 0
         content = z.read(zip_file_path).decode('utf-8')
         reader = csv.DictReader(io.StringIO(content))
-        
+
         ages = set()
         for row in reader:
             try:
@@ -90,10 +90,10 @@ with zipfile.ZipFile(zip_path, 'r') as z:
                 ages.add(age)
             except (ValueError, KeyError):
                 pass
-        
+
         min_age = min(ages) if ages else None
         max_age = max(ages) if ages else None
-        
+
         if 0 not in ages:
             missing_age0.append(disease)
             print(f"[MISSING AGE 0] {disease}/D356.csv (age range: {min_age}-{max_age})")
@@ -120,4 +120,3 @@ if not_found:
 
 if not missing_age0 and not not_found:
     print("\n✅ All simulated diseases have age 0 data!")
-
