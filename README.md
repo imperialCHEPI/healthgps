@@ -5,7 +5,7 @@
 ![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/imperialCHEPI/healthgps?include_prereleases)
 ![GitHub](https://img.shields.io/github/license/imperialCHEPI/healthgps)
 
-| [Quick Start](#quick-start) | [Feb 2026 updates](#feb-2026-updates) | [Development Tools](#development-tools) | [License](#license) | [Third-party Components](#third-party-components) |
+| [Quick Start](#quick-start) | [February 2026 updates](#feb-2026-updates) | [Development Tools](#development-tools) | [License](#license) | [Third-party Components](#third-party-components) |
 
 Health-GPS microsimulation is part of the [STOP project](https://www.stopchildobesity.eu/), and support researchers and policy makers in the analysis of the health and economic impacts of alternative measures to tackle *chronic diseases* and *obesity in children*. The model reproduces the characteristics of a population and simulates key individual event histories associated with key components of relevant behaviours, such as physical activity, and diseases such as diabetes or cancer. 
 
@@ -13,7 +13,7 @@ HealthGPS has now been adpated to run for projects such as [FINCH](https://www.i
 
 The *Health GPS microsimulation* is being developed in collaboration between the [Centre for Health Economics & Policy Innovation (CHEPI)](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/), Imperial College London; and [INRAE](https://www.inrae.fr), France; as part of the [STOP project](https://www.stopchildobesity.eu/). The software architecture uses a modular design approach to provide the building blocks of the *Health GPS application*, which is implemented using object-oriented principles in *Modern C++* programming language targeting the [C++20 standard](https://en.cppreference.com/w/cpp/20).
 
-## Febuary 2026 updates
+## February 2026 updates
 
 The **[HealthGPS Update Report – 20th Feb 2026](https://github.com/imperialCHEPI/healthgps/blob/main/HealthGPS%20Update%20Report-%2020th%20Feb%202026.md)** summarises integrated changes (demographics, socioeconomic/income, static and dynamic risk factors, analysis/output, disease/PIF, policy, config/schema), parallelisation notes, and a developer file map. Snippets below are taken from that report.
 
@@ -136,7 +136,7 @@ flowchart TB
     P --> Q[Disease Model]
 ```
 
-**Progress (as of 20 February 2026, from the report):** trended adjustment, schema validation, risk factors from config, dynamic age cap, dynamic schemas, income-based files, consistent data loading, age limits, log energy intake, FINCH age cap, and trended factors mean are marked **completed**. **Remaining:** remove Food section; remove `DataFile.csv` from config; remove SES model from config; remove Level from schemas.
+**Progress (as of 20 February 2026, from the report):** trended adjustment, schema validation, risk factors from config, dynamic age cap, dynamic schemas, income-based files, consistent data loading, age limits, log energy intake, FINCH age cap, and trended factors mean are marked **completed**.
 
 For tables on **where parallelisation is used**, PIF, income/ID tracking, and links to design docs (`individual_id_tracking_csv-plan.md`, `same_person_id_across_baseline_and_intervention-plan.md`), see the [full update report](https://github.com/imperialCHEPI/healthgps/blob/main/HealthGPS%20Update%20Report-%2020th%20Feb%202026.md).
 
@@ -157,7 +157,9 @@ If you omit -T, the model uses the maximum parallelism available on your machine
 
 Adjust the two paths to match where you built Health-GPS and where your config.json lives 
 e.g.PowerShell: 
-``` bash C:\healthgps\...\HealthGPS.Console.exe -c C:\healthgps-examples\...)```
+``` bash 
+C:\healthgps\...\HealthGPS.Console.exe -c C:\healthgps-examples\...)
+```
 
 For more information, see the [quick start guide] in the documentation.
 
