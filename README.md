@@ -7,13 +7,13 @@
 
 | [Quick Start](#quick-start) | [Feb 2026 updates](#feb-2026-updates) | [Development Tools](#development-tools) | [License](#license) | [Third-party Components](#third-party-components) |
 
-Health-GPS microsimulation is part of the [STOP project](https://www.stopchildobesity.eu/), and support researchers and policy makers in the analysis of the health and economic impacts of alternative measures to tackle *chronic diseases* and *obesity in children*. The model reproduces the characteristics of a population and simulates key individual event histories associated with key components of relevant behaviours, such as physical activity, and diseases such as diabetes or cancer.
+Health-GPS microsimulation is part of the [STOP project](https://www.stopchildobesity.eu/), and support researchers and policy makers in the analysis of the health and economic impacts of alternative measures to tackle *chronic diseases* and *obesity in children*. The model reproduces the characteristics of a population and simulates key individual event histories associated with key components of relevant behaviours, such as physical activity, and diseases such as diabetes or cancer. 
 
-Childhood obesity is one of the major public health challenges throughout the world and is rising at an alarming rate in most countries. In particular, the rates of increase in obesity prevalence in developing countries have been more than 30% higher than those in developed countries. Simulation models are especially useful for assessing the long-term impacts of the wide range of policies that will be needed to tackle the obesity epidemic.
+HealthGPS has now been adpated to run for projects such as [FINCH](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/finch/), [JACARDI](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/jacardi/) and [JA PreventNCD](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/ja-prevent-ncd/). It can run for multiple projects using the inputs available at [HealthGPS-examples](https://github.com/imperialCHEPI/healthgps-examples) for each of the projects. Example- to run for STOP, use the [HLM_France](https://github.com/imperialCHEPI/healthgps-examples/tree/main/HLM_France) folder, for India the [KevinHall_India](https://github.com/imperialCHEPI/healthgps-examples/tree/main/KevinHall_India) folder must be used and for FINCH the [KevinHall_FINCH](https://github.com/imperialCHEPI/healthgps-examples/tree/main/KevinHall_FINCH). 
 
 The *Health GPS microsimulation* is being developed in collaboration between the [Centre for Health Economics & Policy Innovation (CHEPI)](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/), Imperial College London; and [INRAE](https://www.inrae.fr), France; as part of the [STOP project](https://www.stopchildobesity.eu/). The software architecture uses a modular design approach to provide the building blocks of the *Health GPS application*, which is implemented using object-oriented principles in *Modern C++* programming language targeting the [C++20 standard](https://en.cppreference.com/w/cpp/20).
 
-## Feb 2026 updates
+## Febuary 2026 updates
 
 The **[HealthGPS Update Report – 20th Feb 2026](https://github.com/imperialCHEPI/healthgps/blob/main/HealthGPS%20Update%20Report-%2020th%20Feb%202026.md)** summarises integrated changes (demographics, socioeconomic/income, static and dynamic risk factors, analysis/output, disease/PIF, policy, config/schema), parallelisation notes, and a developer file map. Snippets below are taken from that report.
 
@@ -142,15 +142,27 @@ For tables on **where parallelisation is used**, PIF, income/ID tracking, and li
 
 ## Quick Start
 
-The **Health GPS** application provides a command line interface (CLI) and runs on
-*Windows 10 (and newer)* and *Linux* devices. All supported options are provided to the
-model via a *configuration file* (JSON format), including intervention scenarios and
-multiple runs. Users are encouraged to start exploring the model by changing the
-provided example configuration file and running the model again.
+The **Health GPS** application provides a command line interface (CLI) and runs on *Windows 10 (and newer)* and *Linux* devices. All supported options are provided to the model via a *configuration file* (JSON format), including intervention scenarios and multiple runs. Users are encouraged to start exploring the model by changing the provided example configuration file and running the model again.
+
+From a Git Bash-style shell, run the console app with a config file and optional thread count:
+``` bash
+/c/healthgps/out/build/windows-release/src/HealthGPS.Console/HealthGPS.Console.exe \
+  -c /c/healthgps-examples/KevinHall_India/config.json \
+  -T 2
+```
+First argument path: built executable HealthGPS.Console.exe.
+-c: path to your JSON configuration (input / scenario).
+-T: number of threads TBB may use for parallel work (example: 2).
+If you omit -T, the model uses the maximum parallelism available on your machine (effectively up to the number of logical CPUs), subject to TBB defaults. NOTE: If you specify the number of threads, a minimum of 2 threads is required. 
+
+Adjust the two paths to match where you built Health-GPS and where your config.json lives 
+e.g.PowerShell: 
+``` bash C:\healthgps\...\HealthGPS.Console.exe -c C:\healthgps-examples\...)```
 
 For more information, see the [quick start guide] in the documentation.
 
 [quick start guide]: https://imperialchepi.github.io/healthgps/getstarted
+
 
 ## Development Tools
 
