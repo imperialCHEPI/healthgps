@@ -9,8 +9,6 @@
 #include "univariate_visitor.h"
 
 #include <algorithm>
-#include <chrono>
-#include <cstdlib>
 #include <fmt/format.h>
 #include <iostream>
 #include <memory>
@@ -22,28 +20,7 @@ namespace { // anonymous namespace
 /// @brief Defines the net immigration synchronisation message
 using NetImmigrationMessage = hgps::SyncDataMessage<hgps::IntegerAgeGenderTable>;
 
-bool simulation_phase_profile_env_on() noexcept {
-    const char *v = std::getenv("HEALTHGPS_PROFILE");
-    return v != nullptr && v[0] != '\0' && !(v[0] == '0' && v[1] == '\0');
-}
-
 } // anonymous namespace
-
-struct hgps::Simulation::PhaseProfile {
-    double initialise_demo_ms{0.0};
-    double initialise_ses_ms{0.0};
-    double initialise_risk_ms{0.0};
-    double initialise_disease_ms{0.0};
-    double initialise_analysis_ms{0.0};
-    double initialise_print_stats_ms{0.0};
-    int year_updates{0};
-    double update_demo_ms{0.0};
-    double update_net_migration_ms{0.0};
-    double update_ses_ms{0.0};
-    double update_risk_ms{0.0};
-    double update_disease_ms{0.0};
-    double update_analysis_ms{0.0};
-};
 
 namespace hgps {
 
@@ -63,13 +40,7 @@ Simulation::Simulation(SimulationModuleFactory &factory, std::shared_ptr<const E
     risk_factor_ = std::static_pointer_cast<RiskFactorHostModule>(risk_base);
     disease_ = std::static_pointer_cast<DiseaseModule>(disease_base);
     analysis_ = std::static_pointer_cast<UpdatableModule>(analysis_base);
-
-    if (simulation_phase_profile_env_on()) {
-        phase_profile_ = std::make_unique<PhaseProfile>();
-    }
 }
-
-Simulation::~Simulation() = default;
 
 void Simulation::setup_run(unsigned int run_number, unsigned int run_seed) noexcept {
     context_.set_current_run(run_number);
@@ -153,29 +124,6 @@ adevs::Time Simulation::update(adevs::SimEnv<int> * /*env*/, std::vector<int> & 
 }
 
 void Simulation::fini(adevs::Time clock) {
-    if (phase_profile_) {
-        auto &p = *phase_profile_;
-        std::cerr << fmt::format(
-            "\n[HEALTHGPS_PROFILE] scenario={} population init (ms): demo {:.3f}, ses {:.3f}, "
-            "risk {:.3f}, disease {:.3f}, analysis {:.3f}, print_stats {:.3f}\n",
-            context_.identifier(), p.initialise_demo_ms, p.initialise_ses_ms, p.initialise_risk_ms,
-            p.initialise_disease_ms, p.initialise_analysis_ms, p.initialise_print_stats_ms);
-        if (p.year_updates > 0) {
-            const auto n = static_cast<double>(p.year_updates);
-            std::cerr << fmt::format(
-                "[HEALTHGPS_PROFILE] scenario={} per-year avg (ms) over {} year(s):\n"
-                "  demographic.update      {:10.3f}  (total {:.3f})\n"
-                "  net_migration           {:10.3f}  (total {:.3f})\n"
-                "  ses.update              {:10.3f}  (total {:.3f})\n"
-                "  risk_factor.update      {:10.3f}  (total {:.3f})\n"
-                "  disease.update          {:10.3f}  (total {:.3f})\n"
-                "  analysis.update         {:10.3f}  (total {:.3f})\n\n",
-                context_.identifier(), p.year_updates, p.update_demo_ms / n, p.update_demo_ms,
-                p.update_net_migration_ms / n, p.update_net_migration_ms, p.update_ses_ms / n,
-                p.update_ses_ms, p.update_risk_ms / n, p.update_risk_ms, p.update_disease_ms / n,
-                p.update_disease_ms, p.update_analysis_ms / n, p.update_analysis_ms);
-        }
-    }
     // risk_factor_->update_population(context_);
     auto message = fmt::format("[{:4},{}] clear up resources.", clock.real, clock.logical);
     context_.publish(std::make_unique<InfoEventMessage>(
@@ -195,82 +143,44 @@ void Simulation::initialise_population() {
 
     context_.reset_population(virtual_pop_size);
 
-    auto run_init_phase = [&](double PhaseProfile::*accum, auto &&fn) {
-        if (!phase_profile_) {
-            fn();
-            return;
-        }
-        auto t0 = std::chrono::steady_clock::now();
-        fn();
-        phase_profile_->*accum +=
-            std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0)
-                .count();
-    };
-
     // Gender - Age, must be first
-    run_init_phase(&PhaseProfile::initialise_demo_ms,
-                   [&] { demographic_->initialise_population(context_); });
+    demographic_->initialise_population(context_);
 
     // Social economics status
-    run_init_phase(&PhaseProfile::initialise_ses_ms,
-                   [&] { ses_->initialise_population(context_); });
+    ses_->initialise_population(context_);
 
     // Generate risk factors;
-    run_init_phase(&PhaseProfile::initialise_risk_ms,
-                   [&] { risk_factor_->initialise_population(context_); });
+    risk_factor_->initialise_population(context_);
 
     // Initialise diseases
-    run_init_phase(&PhaseProfile::initialise_disease_ms,
-                   [&] { disease_->initialise_population(context_); });
+    disease_->initialise_population(context_);
 
     // Initialise analysis
-    run_init_phase(&PhaseProfile::initialise_analysis_ms,
-                   [&] { analysis_->initialise_population(context_); });
+    analysis_->initialise_population(context_);
 
-    run_init_phase(&PhaseProfile::initialise_print_stats_ms,
-                   [&] { print_initial_population_statistics(); });
+    print_initial_population_statistics();
 }
 
 void Simulation::update_population() {
     /* Note: order is very important */
 
-    auto run_update_phase = [&](double PhaseProfile::*accum, auto &&fn) {
-        if (!phase_profile_) {
-            fn();
-            return;
-        }
-        auto t0 = std::chrono::steady_clock::now();
-        fn();
-        phase_profile_->*accum +=
-            std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0)
-                .count();
-    };
-
-    if (phase_profile_) {
-        phase_profile_->year_updates++;
-    }
-
     // update basic information: demographics + diseases
-    run_update_phase(&PhaseProfile::update_demo_ms,
-                     [&] { demographic_->update_population(context_, *disease_); });
+    demographic_->update_population(context_, *disease_);
 
     // Calculate the net immigration by gender and age, update the population accordingly
-    run_update_phase(&PhaseProfile::update_net_migration_ms, [&] { update_net_immigration(); });
+    update_net_immigration();
 
     // update population socio-economic status
-    run_update_phase(&PhaseProfile::update_ses_ms, [&] { ses_->update_population(context_); });
+    ses_->update_population(context_);
 
     // Update population risk factors
-    run_update_phase(&PhaseProfile::update_risk_ms,
-                     [&] { risk_factor_->update_population(context_); });
+    risk_factor_->update_population(context_);
 
     // Update diseases status: remission and incidence
-    run_update_phase(&PhaseProfile::update_disease_ms,
-                     [&] { disease_->update_population(context_); });
+    disease_->update_population(context_);
 
     // Publish results to data logger
-    run_update_phase(&PhaseProfile::update_analysis_ms,
-                     [&] { analysis_->update_population(context_); });
+    analysis_->update_population(context_);
 }
 
 void Simulation::update_net_immigration() {
