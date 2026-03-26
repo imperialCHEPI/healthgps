@@ -107,7 +107,7 @@ HealthGPS.Console -c config.json -T 64
 
 ### **Real-Time Progress**
 
-```
+```text
 🚀 Optimized execution: 4 concurrent trials, 16 threads per trial
 🚀 Progress: 25/100 trials (25.0%) | Avg: 2156.3ms/trial | ETA: 161.2s | Elapsed: 53.9s
 🚀 Progress: 50/100 trials (50.0%) | Avg: 2203.1ms/trial | ETA: 110.2s | Elapsed: 110.2s
@@ -116,7 +116,7 @@ HealthGPS.Console -c config.json -T 64
 
 ### **Detailed Performance Breakdown**
 
-```
+```text
 📊 Performance Summary:
 Operation                      Count      Total(ms)    Avg(ms)      Max(ms)
 --------------------------------------------------------------------------------
