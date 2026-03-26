@@ -27,7 +27,7 @@ config.enable_monitoring = true;        // Real-time progress monitoring
 - **Performance Metrics**: Tracks average trial time and identifies bottlenecks
 - **Color-Coded Output**: Easy-to-read progress indicators
 
-```
+```text
 🚀 Progress: 45/100 trials (45.0%) | Avg: 2341.2ms/trial | ETA: 128.7s | Elapsed: 105.3s
 ```
 
@@ -94,7 +94,7 @@ HealthGPS.Console -c config.json -T 64
 ## 📈 Performance Monitoring Output
 
 ### **Real-Time Progress**
-```
+```text
 🚀 Optimized execution: 4 concurrent trials, 16 threads per trial
 🚀 Progress: 25/100 trials (25.0%) | Avg: 2156.3ms/trial | ETA: 161.2s | Elapsed: 53.9s
 🚀 Progress: 50/100 trials (50.0%) | Avg: 2203.1ms/trial | ETA: 110.2s | Elapsed: 110.2s
@@ -102,7 +102,7 @@ HealthGPS.Console -c config.json -T 64
 ```
 
 ### **Detailed Performance Breakdown**
-```
+```text
 📊 Performance Summary:
 Operation                      Count      Total(ms)    Avg(ms)      Max(ms)     
 --------------------------------------------------------------------------------
