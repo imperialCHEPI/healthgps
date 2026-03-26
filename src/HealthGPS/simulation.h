@@ -8,6 +8,7 @@
 #include "simulation_module.h"
 
 #include <adevs/adevs.h>
+#include <memory>
 #include <vector>
 
 namespace hgps {
@@ -36,7 +37,7 @@ class Simulation : public adevs::Model<int> {
                         std::unique_ptr<Scenario> scenario);
 
     /// @brief Destroys a simulation instance
-    virtual ~Simulation() = default;
+    ~Simulation() override;
 
     /// @brief Called when the model is added to the simulation executive
     /// @param env The simulation executive environment
@@ -85,6 +86,9 @@ class Simulation : public adevs::Model<int> {
     std::shared_ptr<DiseaseModule> disease_;
     std::shared_ptr<UpdatableModule> analysis_;
     adevs::Time end_time_;
+
+    struct PhaseProfile;
+    std::unique_ptr<PhaseProfile> phase_profile_;
 
     void initialise_population();
     void update_population();

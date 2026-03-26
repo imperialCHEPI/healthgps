@@ -26,14 +26,14 @@ issues_found = []
 with zipfile.ZipFile(zip_path, 'r') as z:
     for disease in sorted(simulated_diseases):
         zip_file_path = f"diseases/{disease}/D356.csv"
-        
+
         if zip_file_path not in z.namelist():
             print(f"[NOT FOUND] {disease}/D356.csv")
             continue
-        
+
         content = z.read(zip_file_path).decode('utf-8')
         reader = csv.DictReader(io.StringIO(content))
-        
+
         ages = set()
         for row in reader:
             try:
@@ -41,10 +41,10 @@ with zipfile.ZipFile(zip_path, 'r') as z:
                 ages.add(age)
             except (ValueError, KeyError):
                 pass
-        
+
         # Check for gaps in 0-100
         missing_ages = [age for age in range(0, 101) if age not in ages]
-        
+
         if missing_ages:
             issues_found.append((disease, missing_ages))
             print(f"[GAPS] {disease}/D356.csv")
@@ -60,4 +60,3 @@ if issues_found:
         print(f"   - {disease}: missing {len(missing)} ages")
 else:
     print("\n[OK] All simulated diseases have complete age coverage 0-100!")
-

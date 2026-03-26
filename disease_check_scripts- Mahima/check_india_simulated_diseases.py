@@ -28,13 +28,13 @@ print("=" * 80)
 with zipfile.ZipFile(zip_path, 'r') as z:
     # Find ALL D356.csv files (not just in diseases folder)
     all_d356_files = [f for f in z.namelist() if f.endswith('D356.csv')]
-    
+
     print(f"Found {len(all_d356_files)} D356.csv files total\n")
-    
+
     for zip_file_path in sorted(all_d356_files):
         parts = zip_file_path.split('/')
         folder_name = parts[0] if len(parts) > 1 else "root"
-        
+
         # Extract disease name from path
         disease_name = None
         if folder_name == "diseases" and len(parts) >= 3:
@@ -48,7 +48,7 @@ with zipfile.ZipFile(zip_path, 'r') as z:
         elif folder_name == "undb":
             # UNDB files might not be disease-specific
             disease_name = "undb_data"
-        
+
         # Check if this file is relevant to simulated diseases
         is_simulated = False
         if disease_name and disease_name in simulated_diseases:
@@ -60,18 +60,18 @@ with zipfile.ZipFile(zip_path, 'r') as z:
                     is_simulated = True
                     disease_name = disease
                     break
-        
+
         # Read and check ages
         try:
             content = z.read(zip_file_path).decode('utf-8')
             reader = csv.DictReader(io.StringIO(content))
-            
+
             # Check if 'age' column exists
             if 'age' not in reader.fieldnames:
                 if is_simulated:
                     issues['no_age_column'].append((zip_file_path, disease_name))
                 continue
-            
+
             ages = set()
             for row in reader:
                 try:
@@ -79,24 +79,24 @@ with zipfile.ZipFile(zip_path, 'r') as z:
                     ages.add(age)
                 except (ValueError, KeyError):
                     pass
-            
+
             if not ages:
                 if is_simulated:
                     issues['empty_files'].append((zip_file_path, disease_name))
                 continue
-            
+
             min_age = min(ages)
             max_age = max(ages)
-            
+
             # Check for missing ages in range 0-100
             missing_ages = []
             for age in range(0, 101):  # 0 to 100 inclusive
                 if age not in ages:
                     missing_ages.append(age)
-            
+
             has_age_0 = 0 in ages
             has_age_100 = 100 in ages
-            
+
             if is_simulated:
                 if missing_ages:
                     issues['missing_ages'].append((zip_file_path, disease_name, missing_ages, min_age, max_age))
@@ -180,4 +180,3 @@ print(f"\n\nFOLDER BREAKDOWN FOR SIMULATED DISEASES:")
 for folder in sorted(folder_stats.keys()):
     stats = folder_stats[folder]
     print(f"  {folder}: {stats['total']} files - {stats['ok']} OK, {stats['missing_ages']} missing ages")
-

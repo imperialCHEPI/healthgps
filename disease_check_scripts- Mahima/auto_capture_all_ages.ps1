@@ -32,12 +32,12 @@ function Write-ColorOutput {
 
 function Create-Directories {
     Write-ColorOutput "📁 Creating output directories..." "Cyan"
-    
+
     # Create base directory
     if (!(Test-Path $OutputBaseDir)) {
         New-Item -ItemType Directory -Path $OutputBaseDir | Out-Null
     }
-    
+
     # Create subdirectories for each age group
     foreach ($group in $AgeGroups) {
         $groupDir = Join-Path $OutputBaseDir $group.GroupName
@@ -50,14 +50,14 @@ function Create-Directories {
 
 function Update-SimulationCpp {
     param([int]$MinAge, [int]$MaxAge)
-    
+
     Write-ColorOutput "🔧 Updating simulation.cpp for ages $MinAge-$MaxAge..." "Cyan"
-    
+
     if (!(Test-Path $SimulationCppPath)) {
         Write-ColorOutput "❌ Error: $SimulationCppPath not found!" "Red"
         return $false
     }
-    
+
     try {
         $content = Get-Content $SimulationCppPath -Raw
         $content = $content -replace 'int min_age = \d+;', "int min_age = $MinAge;"
@@ -74,16 +74,16 @@ function Update-SimulationCpp {
 
 function Build-Project {
     Write-ColorOutput "🔨 Building HealthGPS project..." "Cyan"
-    
+
     try {
         $buildArgs = @(
             "--build", "out\build\windows-release",
             "--target", $BuildTarget,
             "--config", "Release"
         )
-        
+
         $process = Start-Process -FilePath "cmake" -ArgumentList $buildArgs -Wait -PassThru -NoNewWindow
-        
+
         if ($process.ExitCode -eq 0) {
             Write-ColorOutput "   ✅ Build successful!" "Green"
             return $true
@@ -100,17 +100,17 @@ function Build-Project {
 
 function Run-Simulation {
     Write-ColorOutput "🚀 Running HealthGPS simulation..." "Cyan"
-    
+
     if ($SimulationCommand -eq "your_simulation_command_here") {
         Write-ColorOutput "⚠️  WARNING: Please update the simulation command in the script!" "Yellow"
         Write-ColorOutput "   Current command: $SimulationCommand" "Yellow"
         Write-ColorOutput "   Please edit this script and replace with your actual simulation command." "Yellow"
         return $false
     }
-    
+
     try {
         $process = Start-Process -FilePath $SimulationCommand -Wait -PassThru -NoNewWindow
-        
+
         if ($process.ExitCode -eq 0) {
             Write-ColorOutput "   ✅ Simulation completed successfully!" "Green"
             return $true
@@ -127,69 +127,69 @@ function Run-Simulation {
 
 function Organize-OutputFiles {
     param([string]$GroupName)
-    
+
     Write-ColorOutput "📦 Organizing output files for $GroupName..." "Cyan"
-    
+
     $groupDir = Join-Path $OutputBaseDir $GroupName
     $inspectionPath = $InspectionDir
-    
+
     if (!(Test-Path $inspectionPath)) {
         Write-ColorOutput "   ⚠️  Inspection directory $inspectionPath not found" "Yellow"
         return
     }
-    
+
     $csvFiles = Get-ChildItem -Path $inspectionPath -Filter "*_inspection.csv"
-    
+
     if ($csvFiles.Count -eq 0) {
         Write-ColorOutput "   ⚠️  No CSV files found in $inspectionPath" "Yellow"
         return
     }
-    
+
     foreach ($file in $csvFiles) {
         $destPath = Join-Path $groupDir $file.Name
         Move-Item -Path $file.FullName -Destination $destPath
         Write-ColorOutput "   Moved: $($file.Name) -> $GroupName/" "Green"
     }
-    
+
     # Clean up inspection directory
     Get-ChildItem -Path $inspectionPath -File | Remove-Item -Force
 }
 
 function Process-AgeGroup {
     param([hashtable]$Group)
-    
+
     $minAge = $Group.MinAge
     $maxAge = $Group.MaxAge
     $groupName = $Group.GroupName
-    
+
     Write-ColorOutput "`n$('='*60)" "Magenta"
     Write-ColorOutput "🎯 Processing Age Group: $minAge-$maxAge ($groupName)" "Magenta"
     Write-ColorOutput "$('='*60)" "Magenta"
-    
+
     $startTime = Get-Date
-    
+
     try {
         # Step 1: Update simulation.cpp
         if (!(Update-SimulationCpp -MinAge $minAge -MaxAge $maxAge)) {
             return $false
         }
-        
+
         # Step 2: Build project
         if (!(Build-Project)) {
             return $false
         }
-        
+
         # Step 3: Run simulation
         if (!(Run-Simulation)) {
             return $false
         }
-        
+
         # Step 4: Organize output files
         Organize-OutputFiles -GroupName $groupName
-        
+
         $elapsedTime = (Get-Date) - $startTime
         Write-ColorOutput "✅ Age group $minAge-$maxAge completed in $($elapsedTime.TotalSeconds.ToString('F1')) seconds" "Green"
-        
+
         return $true
     }
     catch {
@@ -200,11 +200,11 @@ function Process-AgeGroup {
 
 function Create-SummaryReport {
     param([array]$SuccessfulGroups, [array]$FailedGroups)
-    
+
     Write-ColorOutput "`n📊 Creating summary report..." "Cyan"
-    
+
     $reportPath = Join-Path $OutputBaseDir "CAPTURE_SUMMARY.md"
-    
+
     $reportContent = @"
 # Age Group Data Capture Summary
 
@@ -219,7 +219,7 @@ Generated on: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')
     foreach ($group in $AgeGroups) {
         $groupDir = Join-Path $OutputBaseDir $group.GroupName
         $isSuccessful = $SuccessfulGroups -contains $group.GroupName
-        
+
         if ($isSuccessful) {
             $csvFiles = Get-ChildItem -Path $groupDir -Filter "*.csv" -ErrorAction SilentlyContinue
             $fileCount = if ($csvFiles) { $csvFiles.Count } else { 0 }
@@ -228,7 +228,7 @@ Generated on: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')
             $reportContent += "`n| $($group.GroupName) | $($group.MinAge)-$($group.MaxAge) | $($group.GroupName)/ | ❌ Failed |"
         }
     }
-    
+
     $reportContent += @"
 
 ## File Locations
@@ -267,13 +267,13 @@ $failedGroups = @()
 
 foreach ($group in $AgeGroups) {
     $success = Process-AgeGroup -Group $group
-    
+
     if ($success) {
         $successfulGroups += $group.GroupName
     } else {
         $failedGroups += $group.GroupName
     }
-    
+
     # Small delay between runs
     Start-Sleep -Seconds 2
 }
