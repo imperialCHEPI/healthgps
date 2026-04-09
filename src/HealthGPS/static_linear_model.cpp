@@ -1738,7 +1738,7 @@ double StaticLinearModel::calculate_continuous_income(Person &person, Random &ra
 
     // Add random noise based on standard deviation
     double stddev = 0.0;
-    auto stddev_it = continuous_income_model_.coefficients.find("IncomeContinuousStdDev"_id);
+    auto stddev_it = continuous_income_model_.coefficients.find("stddev"_id);
     if (stddev_it != continuous_income_model_.coefficients.end()) {
         stddev = stddev_it->second;
     }
