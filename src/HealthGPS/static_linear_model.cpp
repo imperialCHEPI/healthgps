@@ -18,7 +18,7 @@
 
 namespace { // anonymous namespace
 
-//MAHIMA: Helper function to create shared_ptr from unique_ptr before moving
+// MAHIMA: Helper function to create shared_ptr from unique_ptr before moving
 template <typename T> std::shared_ptr<T> create_shared_from_unique(std::unique_ptr<T> &ptr) {
     return ptr ? std::make_shared<T>(*ptr) : nullptr;
 }
@@ -1641,7 +1641,7 @@ double StaticLinearModel::calculate_continuous_income(Person &person, Random &ra
     auto min_it = continuous_income_model_.coefficients.find("min"_id);
     auto max_it = continuous_income_model_.coefficients.find("max"_id);
 
-   if (min_it != continuous_income_model_.coefficients.end()) {
+    if (min_it != continuous_income_model_.coefficients.end()) {
         income = std::max(income, min_it->second);
     }
     if (max_it != continuous_income_model_.coefficients.end()) {
