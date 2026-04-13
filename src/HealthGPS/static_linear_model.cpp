@@ -329,8 +329,8 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     }
 
     // STEP 4: Initialize income
-    // Continuous: regression (age, gender, region, ethnicity + random) for all. Quartiles/
-    // tertiles and category assignment happen AFTER adjustment to factors mean (see below).
+    // Continuous: regression (age, gender, region, ethnicity + random) for all.
+    // Category assignment happens AFTER factors-mean adjustment (see below).
     // Categorical: logits + softmax -> 3 categories; no adjustment to factors mean.
     if (is_continuous_income_model_) {
         // Phase 1 only: assign continuous income via regression for all people.
@@ -338,10 +338,10 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
             double continuous_income = calculate_continuous_income(person, context.random());
             person.risk_factors["income"_id] = continuous_income;
             person.income_continuous = continuous_income;
-            person.income = core::Income::unknown; // set after adjustment + quartiles below
+            person.income = core::Income::unknown; // set after post-adjustment rebucketing below
         }
-        // Phase 2 (quartiles/tertiles) and Phase 3 (assign categories) are done after
-        // adjust_risk_factors below, so thresholds are computed from adjusted income.
+        // Phase 2 (diagnostic quantiles) and Phase 3 (equal-split assignment) are done after
+        // adjust_risk_factors below so categories reflect adjusted income.
     } else {
         for (auto &person : context.population()) {
             initialise_categorical_income(person, context.random());
@@ -438,13 +438,11 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
                       << " max=" << max_inc << " mean=" << (sum_inc / static_cast<double>(n_inc))
                       << " n=" << n_inc;
         }
-        std::vector<double> thresholds;
         if (income_categories_ == "4") {
-            thresholds = calculate_income_quartiles(context.population());
+            calculate_income_quartiles(context.population());
         } else {
-            thresholds = calculate_income_tertiles(context.population());
+            calculate_income_tertiles(context.population());
         }
-        (void)thresholds;
         assign_income_categories_equal_split(context.population(), income_categories_);
 
         // Print a simple per-category summary (once) showing income ranges and counts
@@ -1372,9 +1370,8 @@ void StaticLinearModel::initialise_income(RuntimeContext &context, Person &perso
         person.risk_factors["income"_id] = continuous_income;
         person.income_continuous = continuous_income; // Keep for internal use (adjustment)
 
-        // Category assignment will happen after income is adjusted and thresholds are recalculated
-        // in update_risk_factors(). For now, just set a temporary category (will be updated later).
-        // This ensures thresholds are calculated from adjusted income values.
+        // Category assignment happens later in update_risk_factors() after factors-mean
+        // adjustment. For now set temporary category; it will be replaced post-adjustment.
         person.income = core::Income::unknown; // Temporary, will be assigned after adjustment
     } else {
         // India approach: Use direct categorical assignment
@@ -1436,13 +1433,12 @@ void StaticLinearModel::initialise_categorical_income(Person &person, Random &ra
     throw core::HgpsException("Logic Error: failed to initialise categorical income category");
 }
 
-// MAHIMA: This is the FINCH approach for continuous income calculation
-// In the static_model.json, we have a IncomeModel with intercept, regression values (age,
-// gender, region, ethnicity etc) If is_continuous_income_model_ is true, we use this approach-
-// the order for this is- calculate continuous income, calculate quartiles, assign category
+// MAHIMA: FINCH approach for continuous income regression.
+// Continuous income is computed here and stored; category assignment is deferred to
+// post-adjustment rebucketing in generate/update flows.
 void StaticLinearModel::initialise_continuous_income(RuntimeContext &context, Person &person,
                                                      Random &random) {
-    // FINCH approach: Calculate continuous income, then convert to category
+    // FINCH approach: calculate continuous income and store it.
     // Step 1: Calculate continuous income
     double continuous_income = calculate_continuous_income(person, random);
 
@@ -1451,7 +1447,7 @@ void StaticLinearModel::initialise_continuous_income(RuntimeContext &context, Pe
     person.risk_factors["income"_id] =
         continuous_income; // Also store as "income" for mapping lookup
 
-    // Step 2: Convert to income category based on population quartiles
+    // Step 2: Legacy direct conversion (kept for compatibility with older call paths).
     person.income =
         convert_income_continuous_to_category(continuous_income, context.population(), random);
 }
