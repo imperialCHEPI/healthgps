@@ -74,8 +74,7 @@ adevs::Time Simulation::init(adevs::SimEnv<int> *env) {
         } else if (n > 3u) {
             sample += fmt::format(" ({},{})", n - 1, pop[n - 1].id());
         }
-        std::cout << "MAHIMA: Same-person ID tracking | scenario=" << context_.identifier()
-                  << " | sample (index,id):" << sample << "\n";
+        //std::cout << "MAHIMA: Same-person ID tracking | scenario=" << context_.identifier() << " | sample (index,id):" << sample << "\n";
     }
 
     auto stop = std::chrono::steady_clock::now();

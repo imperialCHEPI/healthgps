@@ -12,35 +12,90 @@
 #include <iostream>
 #include <limits>
 #include <ranges>
+#include <string_view>
 #include <unordered_map>
 #include <utility>
 
 namespace { // anonymous namespace
 
-// Helper function to create shared_ptr from unique_ptr before moving
+//MAHIMA: Helper function to create shared_ptr from unique_ptr before moving
 template <typename T> std::shared_ptr<T> create_shared_from_unique(std::unique_ptr<T> &ptr) {
     return ptr ? std::make_shared<T>(*ptr) : nullptr;
-}
-
-// Shared thread-local cache for income thresholds (quartiles for 4 categories, tertiles for 3
-// categories)
-struct IncomeThresholdCache {
-    std::vector<double> thresholds; // Quartiles [Q1, Q2, Q3] for 4 categories, or tertiles [T1, T2]
-                                    // for 3 categories
-    size_t population_size = 0;
-    int year = -1;
-    std::string income_categories; // "3" or "4" to know which type of thresholds we have
-};
-
-// Helper function to get shared thread-local income threshold cache
-IncomeThresholdCache &get_income_threshold_cache() {
-    thread_local static IncomeThresholdCache cache;
-    return cache;
 }
 
 } // anonymous namespace
 
 namespace hgps {
+
+namespace {
+
+core::Income income_category_from_rank_bucket(std::size_t bucket, std::size_t bucket_count) {
+    if (bucket_count == 4) {
+        switch (bucket) {
+        case 0:
+            return core::Income::low;
+        case 1:
+            return core::Income::lowermiddle;
+        case 2:
+            return core::Income::uppermiddle;
+        default:
+            return core::Income::high;
+        }
+    }
+
+    // MAHIMA: For the current legacy path we support 3-category split as
+    // low/middle/high and keep the existing enum contract unchanged.
+    switch (bucket) {
+    case 0:
+        return core::Income::low;
+    case 1:
+        return core::Income::middle;
+    default:
+        return core::Income::high;
+    }
+}
+
+void assign_income_categories_equal_split(Population &population,
+                                          std::string_view income_categories) {
+    const std::size_t bucket_count = income_categories == "4" ? 4u : 3u;
+    std::vector<std::pair<double, std::size_t>> ranked_people;
+    ranked_people.reserve(population.size());
+
+    for (std::size_t i = 0; i < population.size(); ++i) {
+        auto &person = population[i];
+        if (!person.is_active()) {
+            continue;
+        }
+        auto it = person.risk_factors.find("income"_id);
+        if (it == person.risk_factors.end()) {
+            continue;
+        }
+        ranked_people.emplace_back(it->second, i);
+    }
+
+    if (ranked_people.empty()) {
+        return;
+    }
+
+    // MAHIMA: Assign income categories by sorted rank (not threshold cutoffs) so
+    // configured buckets stay balanced (difference <= 1), even when many people tie
+    // at the clamped max income value.
+    std::ranges::sort(ranked_people, [](const auto &lhs, const auto &rhs) {
+        if (lhs.first != rhs.first) {
+            return lhs.first < rhs.first;
+        }
+        return lhs.second < rhs.second;
+    });
+
+    const std::size_t n = ranked_people.size();
+    for (std::size_t rank = 0; rank < n; ++rank) {
+        const std::size_t bucket = (rank * bucket_count) / n;
+        population[ranked_people[rank].second].income =
+            income_category_from_rank_bucket(bucket, bucket_count);
+    }
+}
+
+} // namespace
 
 StaticLinearModel::StaticLinearModel(
     std::shared_ptr<RiskFactorSexAgeTable> expected,
@@ -291,7 +346,6 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         for (auto &person : context.population()) {
             initialise_categorical_income(person, context.random());
         }
-        std::cout << " done.";
     }
 
     // STEP 5: Initialize risk factors and physical activity
@@ -355,42 +409,13 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
                             false); // false = initial adjustment, not trended
     }
 
-    // Continuous income only: after adjustment, clamp to factors-mean range, then assign
-    // income_categories (3 or 4).
+    // Continuous income only: after adjustment, assign income_categories (3 or 4).
     if (is_continuous_income_model_) {
-        // Clamp income to the min/max expected (factors-mean) range so values stay within range.
+        // MAHIMA: Clamping is intentionally disabled so category assignment reflects the
+        // full adjusted continuous-income spread after factors-mean adjustment.
         const core::Identifier income_id("income");
-        double income_min = std::numeric_limits<double>::max();
-        double income_max = std::numeric_limits<double>::lowest();
-        const auto age_range = context.age_range();
-        for (int age = age_range.lower(); age <= age_range.upper(); age++) {
-            for (auto sex : {core::Gender::male, core::Gender::female}) {
-                try {
-                    double e = get_expected(context, sex, age, income_id, std::nullopt, false);
-                    income_min = std::min(income_min, e);
-                    income_max = std::max(income_max, e);
-                } catch (...) {
-                    // income not in expected table for this (sex, age) – skip
-                }
-            }
-        }
-        if (income_min <= income_max) {
-            for (auto &person : context.population()) {
-                if (!person.is_active()) {
-                    continue;
-                }
-                if (person.risk_factors.contains(income_id)) {
-                    double v = person.risk_factors.at(income_id);
-                    v = std::clamp(v, income_min, income_max);
-                    person.risk_factors[income_id] = v;
-                    if (person.income_continuous > 0.0) {
-                        person.income_continuous = v;
-                    }
-                }
-            }
-        }
 
-        // Diagnostic: confirm adjusted and clamped income range
+        // Diagnostic: confirm adjusted income range
         double min_inc = std::numeric_limits<double>::max();
         double max_inc = std::numeric_limits<double>::lowest();
         double sum_inc = 0.0;
@@ -409,7 +434,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
             }
         }
         if (n_inc > 0) {
-            std::cout << "\n[INCOME] After adjustment and clamp, income stats: min=" << min_inc
+            std::cout << "\n[INCOME] After adjustment, income stats: min=" << min_inc
                       << " max=" << max_inc << " mean=" << (sum_inc / static_cast<double>(n_inc))
                       << " n=" << n_inc;
         }
@@ -419,10 +444,8 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         } else {
             thresholds = calculate_income_tertiles(context.population());
         }
-        for (auto &person : context.population()) {
-            double continuous_income = person.risk_factors.at("income"_id);
-            person.income = convert_income_to_category(continuous_income, thresholds);
-        }
+        (void)thresholds;
+        assign_income_categories_equal_split(context.population(), income_categories_);
 
         // Print a simple per-category summary (once) showing income ranges and counts
         // after initial adjustment and categorisation.
@@ -525,49 +548,12 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
                                 : OptionalRanges{trended_extended_ranges},
                             true); // true = apply trend to expected values
 
-        // Continuous income only: clamp to factors-mean range, then recalc thresholds and assign
-        // categories.
+        // MAHIMA: Continuous income only: apply equal-split category reassignment
+        // rebalance configured income buckets using rank-based equal split.
         if (is_continuous_income_model_) {
-            const core::Identifier income_id("income");
-            double income_min = std::numeric_limits<double>::max();
-            double income_max = std::numeric_limits<double>::lowest();
-            const auto age_range = context.age_range();
-            for (int age = age_range.lower(); age <= age_range.upper(); age++) {
-                for (auto sex : {core::Gender::male, core::Gender::female}) {
-                    try {
-                        double e = get_expected(context, sex, age, income_id, std::nullopt, false);
-                        income_min = std::min(income_min, e);
-                        income_max = std::max(income_max, e);
-                    } catch (...) {
-                        // expected value not available for this (sex, age) – skip
-                    }
-                }
-            }
-            if (income_min <= income_max) {
-                for (auto &person : context.population()) {
-                    if (!person.is_active()) {
-                        continue;
-                    }
-                    if (person.risk_factors.contains(income_id)) {
-                        double v = person.risk_factors.at(income_id);
-                        v = std::clamp(v, income_min, income_max);
-                        person.risk_factors[income_id] = v;
-                        if (person.income_continuous > 0.0) {
-                            person.income_continuous = v;
-                        }
-                    }
-                }
-            }
-            std::vector<double> thresholds;
-            if (income_categories_ == "4") {
-                thresholds = calculate_income_quartiles(context.population());
-            } else {
-                thresholds = calculate_income_tertiles(context.population());
-            }
-            for (auto &person : context.population()) {
-                double continuous_income = person.risk_factors.at("income"_id);
-                person.income = convert_income_to_category(continuous_income, thresholds);
-            }
+            // MAHIMA: Clamping is intentionally disabled in the trended path as well,
+            // to keep bucketing based on full adjusted income variation.
+            assign_income_categories_equal_split(context.population(), income_categories_);
         }
     } else {
         // MAHIMA: Skipped because user set trend.enabled or risk_factors.trended false in
@@ -583,7 +569,6 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
     bool intervene = (context.scenario().type() == ScenarioType::intervention &&
                       context.time_now() >= policy_start_year);
 
-    auto &cache = get_income_threshold_cache();
     // Initialise newborns and update others.
     for (auto &person : context.population()) {
         if (person.age == 0) {
@@ -618,67 +603,13 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
                             false); // false = initial adjustment, not trended
     }
 
-    // Continuous income: clamp to factors-mean range, then assign categories.
+    // MAHIMA: Continuous income: assign categories with rank-based equal split.
     if (is_continuous_income_model_) {
-        const core::Identifier income_id("income");
-        double income_min = std::numeric_limits<double>::max();
-        double income_max = std::numeric_limits<double>::lowest();
-        const auto age_range = context.age_range();
-        for (int age = age_range.lower(); age <= age_range.upper(); age++) {
-            for (auto sex : {core::Gender::male, core::Gender::female}) {
-                try {
-                    double e = get_expected(context, sex, age, income_id, std::nullopt, false);
-                    income_min = std::min(income_min, e);
-                    income_max = std::max(income_max, e);
-                } catch (...) {
-                    // expected value not available for this (sex, age) – skip
-                }
-            }
-        }
-        if (income_min <= income_max) {
-            for (auto &person : context.population()) {
-                if (!person.is_active()) {
-                    continue;
-                }
-                if (person.risk_factors.contains(income_id)) {
-                    double v = person.risk_factors.at(income_id);
-                    v = std::clamp(v, income_min, income_max);
-                    person.risk_factors[income_id] = v;
-                    if (person.income_continuous > 0.0) {
-                        person.income_continuous = v;
-                    }
-                }
-            }
-        }
-        size_t current_pop_size = context.population().size();
-        int current_year = static_cast<int>(context.time_now());
-
-        // Recalculate thresholds if cache is empty, population size changed, year changed, or
-        // income_categories changed
-        if (cache.thresholds.empty() || cache.population_size != current_pop_size ||
-            cache.year != current_year || cache.income_categories != income_categories_) {
-            if (income_categories_ == "4") {
-                cache.thresholds = calculate_income_quartiles(context.population());
-            } else {
-                // 3 categories: use tertiles
-                cache.thresholds = calculate_income_tertiles(context.population());
-            }
-            cache.population_size = current_pop_size;
-            cache.year = current_year;
-            cache.income_categories = income_categories_;
-        }
-
-        // Now assign income categories using the calculated thresholds
-        // This must happen after thresholds are calculated from adjusted income
-        for (auto &person : context.population()) {
-            if (!person.is_active()) {
-                continue;
-            }
-            if (person.risk_factors.contains("income"_id)) {
-                double continuous_income = person.risk_factors.at("income"_id);
-                person.income = convert_income_to_category(continuous_income, cache.thresholds);
-            }
-        }
+        // MAHIMA: Clamping disabled in yearly update path; factors-mean adjustment still applies.
+        // MAHIMA: Reassign using equal-population rank buckets; this
+        // removes redundant quartile/tertile recalculation and avoids tie-at-max
+        // edge cases where the highest category can become empty.
+        assign_income_categories_equal_split(context.population(), income_categories_);
     }
 
     // Initialise newborns and update others with policies and trends.
@@ -737,63 +668,15 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
                                 : OptionalRanges{trended_extended_ranges},
                             true); // true = apply trend to expected values
 
-        // Continuous income: clamp to factors-mean range, then recalc thresholds and categories
+        // MAHIMA: Continuous income: apply
+        // the same equal-split category reassignment used in non-trended flow.
         if (is_continuous_income_model_) {
-            const core::Identifier income_id("income");
-            double income_min = std::numeric_limits<double>::max();
-            double income_max = std::numeric_limits<double>::lowest();
-            const auto age_range = context.age_range();
-            for (int age = age_range.lower(); age <= age_range.upper(); age++) {
-                for (auto sex : {core::Gender::male, core::Gender::female}) {
-                    try {
-                        double e = get_expected(context, sex, age, income_id, std::nullopt, false);
-                        income_min = std::min(income_min, e);
-                        income_max = std::max(income_max, e);
-                    } catch (...) {
-                        // expected value not available for this (sex, age) – skip
-                    }
-                }
-            }
-            if (income_min <= income_max) {
-                for (auto &person : context.population()) {
-                    if (!person.is_active()) {
-                        continue;
-                    }
-                    if (person.risk_factors.contains(income_id)) {
-                        double v = person.risk_factors.at(income_id);
-                        v = std::clamp(v, income_min, income_max);
-                        person.risk_factors[income_id] = v;
-                        if (person.income_continuous > 0.0) {
-                            person.income_continuous = v;
-                        }
-                    }
-                }
-            }
-            size_t current_pop_size = context.population().size();
-            int current_year = static_cast<int>(context.time_now());
-
-            // Always recalculate thresholds after trend adjustment to ensure they're based on
-            // trend-adjusted income values
-            if (income_categories_ == "4") {
-                cache.thresholds = calculate_income_quartiles(context.population());
-            } else {
-                // 3 categories: use tertiles
-                cache.thresholds = calculate_income_tertiles(context.population());
-            }
-            cache.population_size = current_pop_size;
-            cache.year = current_year;
-            cache.income_categories = income_categories_;
-
-            // Reassign income categories using the recalculated thresholds
-            for (auto &person : context.population()) {
-                if (!person.is_active()) {
-                    continue;
-                }
-                if (person.risk_factors.contains("income"_id)) {
-                    double continuous_income = person.risk_factors.at("income"_id);
-                    person.income = convert_income_to_category(continuous_income, cache.thresholds);
-                }
-            }
+            // MAHIMA: Clamping disabled in trended yearly update path; factors-mean
+            // adjustment remains enabled and category assignment still runs below.
+            // MAHIMA: Trended path uses the same balanced rank assignment,
+            // keeping behaviour identical to initial assignment and avoiding
+            // repeated threshold scans.
+            assign_income_categories_equal_split(context.population(), income_categories_);
         }
     }
 
@@ -1758,7 +1641,7 @@ double StaticLinearModel::calculate_continuous_income(Person &person, Random &ra
     auto min_it = continuous_income_model_.coefficients.find("min"_id);
     auto max_it = continuous_income_model_.coefficients.find("max"_id);
 
-    if (min_it != continuous_income_model_.coefficients.end()) {
+   if (min_it != continuous_income_model_.coefficients.end()) {
         income = std::max(income, min_it->second);
     }
     if (max_it != continuous_income_model_.coefficients.end()) {
