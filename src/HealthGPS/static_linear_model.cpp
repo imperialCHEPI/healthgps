@@ -1462,8 +1462,7 @@ double StaticLinearModel::calculate_continuous_income(Person &person, Random &ra
         std::string factor_name = factor.to_string();
 
         // Skip special coefficients that are not part of the regression
-        if (factor_name == "IncomeContinuousStdDev" || factor_name == "stddev" ||
-            factor_name == "min" || factor_name == "max") {
+        if (factor_name == "stddev" || factor_name == "min" || factor_name == "max") {
             continue;
         }
 
