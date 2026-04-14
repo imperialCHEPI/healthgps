@@ -133,12 +133,15 @@ flowchart TB
     M --> O["Income trends: exponential decay"]
     N --> P[Trended Risk Factor Adjustment]
     O --> P
-    P --> Q[Disease Model]
+    P --> Q[Kevin Hall Model]
+    Q --> R[Disease Model]
 ```
 
 **Progress (as of 20 February 2026, from the report):** trended adjustment, schema validation, risk factors from config, dynamic age cap, dynamic schemas, income-based files, consistent data loading, age limits, log energy intake, FINCH age cap, and trended factors mean are marked **completed**.
 
 For tables on **where parallelisation is used**, PIF, income/ID tracking, and links to design docs (`individual_id_tracking_csv-plan.md`, `same_person_id_across_baseline_and_intervention-plan.md`), see the [full update report](https://github.com/imperialCHEPI/healthgps/blob/main/HealthGPS%20Update%20Report-%2020th%20Feb%202026.md).
+
+NOTE: For the project FINCH, we added a new feature (in progress) where we adjust our model to real world for validation using age, gender and income quintiles. For plan and further details, see [here](https://github.com/imperialCHEPI/healthgps/blob/main/income_quintile_factor_means_plan.md)
 
 ## Quick Start
 
