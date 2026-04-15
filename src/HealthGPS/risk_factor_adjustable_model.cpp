@@ -212,7 +212,7 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
             const std::string &factor_name = factor.to_string();
             std::string factor_name_lower = factor_name;
             std::ranges::transform(factor_name_lower, factor_name_lower.begin(), ::tolower);
-
+            
             // MAHIMA: Special handling for income and physical activity
             //  These are stored in member variables, not just in risk_factors map
             //  Note: Factor name in expected table is "income" (canonical)
