@@ -11,7 +11,8 @@ using json = nlohmann::json;
 
 namespace {
 
-//MAHIMA: Income quintile factor means adjustment (see income_quintile_factor_means_plan.md; Phase 2+ simulation behaviour).
+// MAHIMA: Income quintile factor means adjustment (see income_quintile_factor_means_plan.md; Phase
+// 2+ simulation behaviour).
 /// Optional block under modelling.baseline_adjustments: extra factors-mean CSVs per income stratum.
 /// Phase 1 only parses, validates paths when enabled, and stores results on BaselineInfo.
 /// Simulation behaviour is unchanged until later phases read these fields.
@@ -43,7 +44,8 @@ void parse_income_stratum_factors_mean_block(const json &baseline_adjustments_no
             throw ConfigurationError{"baseline_adjustments.income_stratum_factors_mean."
                                      "adjustment_income_stratum_count must be an integer"};
         }
-        out.adjustment_income_stratum_count = block.at("adjustment_income_stratum_count").get<int>();
+        out.adjustment_income_stratum_count =
+            block.at("adjustment_income_stratum_count").get<int>();
     }
 
     if (block.contains("strata")) {
@@ -70,7 +72,8 @@ void parse_income_stratum_factors_mean_block(const json &baseline_adjustments_no
     }
 
     if (!out.enabled) {
-        // Stratum files are ignored when disabled; do not require paths to exist (easier WIP configs).
+        // Stratum files are ignored when disabled; do not require paths to exist (easier WIP
+        // configs).
         return;
     }
 
@@ -90,8 +93,8 @@ void parse_income_stratum_factors_mean_block(const json &baseline_adjustments_no
     for (std::size_t i = 0; i < out.strata.size(); ++i) {
         auto &e = out.strata[i];
         if (e.id.empty()) {
-            throw ConfigurationError{fmt::format(
-                "income_stratum_factors_mean.strata[{}]: id must be non-empty", i)};
+            throw ConfigurationError{
+                fmt::format("income_stratum_factors_mean.strata[{}]: id must be non-empty", i)};
         }
         try {
             rebase_valid_path(e.factorsmean_male, base_dir);
@@ -200,8 +203,10 @@ BaselineInfo get_baseline_info(const json &j, const std::filesystem::path &base_
     if (!success) {
         throw ConfigurationError{"Could not get baseline adjustments"};
     }
-    //MAHIMA: Income quintile factor means adjustment (see income_quintile_factor_means_plan.md; Phase 2+ simulation behaviour).
-    // Optional: per-stratum factors-mean files (income-stratum adjustment feature; see project plan).
+    // MAHIMA: Income quintile factor means adjustment (see income_quintile_factor_means_plan.md;
+    // Phase 2+ simulation behaviour).
+    //  Optional: per-stratum factors-mean files (income-stratum adjustment feature; see project
+    //  plan).
     parse_income_stratum_factors_mean_block(adj, base_dir, info.income_stratum_factors_mean);
 
     return info;

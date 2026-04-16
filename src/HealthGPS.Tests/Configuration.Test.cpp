@@ -383,7 +383,8 @@ TEST_F(ConfigParsingFixture, GetBaseLineInfo) {
     EXPECT_THROW(get_baseline_info(j, tmp_path()), ConfigurationError);
 }
 
-/// Phase 1: income_stratum_factors_mean enabled requires adjustment_income_stratum_count == strata.size().
+/// Phase 1: income_stratum_factors_mean enabled requires adjustment_income_stratum_count ==
+/// strata.size().
 TEST_F(ConfigParsingFixture, GetBaseLineInfo_IncomeStratumCountMismatchThrows) {
     json j;
     j["baseline_adjustments"]["format"] = "csv";
@@ -409,20 +410,19 @@ TEST_F(ConfigParsingFixture, GetBaseLineInfo_IncomeStratumFactorsMeanWhenEnabled
     stratum_config.enabled = true;
     stratum_config.adjustment_income_stratum_count = 2;
     stratum_config.strata = {
-        IncomeStratumFactorsMeanStratumEntry{.id = "Q1",
-                                              .factorsmean_male = male_q1,
-                                              .factorsmean_female = female_q1},
-        IncomeStratumFactorsMeanStratumEntry{.id = "Q2",
-                                              .factorsmean_male = male_q2,
-                                              .factorsmean_female = female_q2},
+        IncomeStratumFactorsMeanStratumEntry{
+            .id = "Q1", .factorsmean_male = male_q1, .factorsmean_female = female_q1},
+        IncomeStratumFactorsMeanStratumEntry{
+            .id = "Q2", .factorsmean_male = male_q2, .factorsmean_female = female_q2},
     };
-//MAHIMA: Income quintile factor means adjustment (see income_quintile_factor_means_plan.md; Phase 2+ simulation behaviour).
+    // MAHIMA: Income quintile factor means adjustment (see income_quintile_factor_means_plan.md;
+    // Phase 2+ simulation behaviour).
     BaselineInfo info;
     info.format = "csv";
     info.delimiter = ",";
     info.encoding = "UTF8";
     info.file_names = {{"factorsmean_male", create_file_absolute()},
-                        {"factorsmean_female", create_file_absolute()}};
+                       {"factorsmean_female", create_file_absolute()}};
     info.income_stratum_factors_mean = std::move(stratum_config);
 
     json j;
