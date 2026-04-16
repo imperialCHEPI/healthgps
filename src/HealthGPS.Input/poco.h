@@ -42,12 +42,39 @@ struct SESInfo {
     auto operator<=>(const SESInfo &) const = default;
 };
 
+//MAHIMA: Income quintile factor means adjustment (see income_quintile_factor_means_plan.md; Phase 2+ simulation behaviour).
+//! One pair of factors-mean CSV paths for a single income stratum (e.g. one quintile).
+//! Used when income_stratum_factors_mean.enabled is true (Phase 2+ simulation behaviour).
+struct IncomeStratumFactorsMeanStratumEntry {
+    /// Stable label for logs and for mapping persons to this stratum (e.g. "Quintile1").
+    std::string id;
+    std::filesystem::path factorsmean_male;
+    std::filesystem::path factorsmean_female;
+
+    auto operator<=>(const IncomeStratumFactorsMeanStratumEntry &rhs) const = default;
+};
+
+//! Optional income-stratum factors-mean adjustment: extra male/female tables per stratum.
+//! When disabled, the simulator uses only file_names.factorsmean_male/female (legacy behaviour).
+//! Final output income bucket count remains in project_requirements.income.categories ("3"/"4").
+struct IncomeStratumFactorsMeanConfig {
+    bool enabled{false};
+    /// Rank buckets formed from continuous income for adjustment (N). Must equal strata.size()
+    /// when enabled. Independent of project_requirements income.categories (final person.income).
+    int adjustment_income_stratum_count{0};
+    std::vector<IncomeStratumFactorsMeanStratumEntry> strata;
+
+    auto operator<=>(const IncomeStratumFactorsMeanConfig &rhs) const = default;
+};
+
 //! Baseline adjustment information
 struct BaselineInfo {
     std::string format;
     std::string delimiter;
     std::string encoding;
     std::map<std::string, std::filesystem::path> file_names;
+    /// Optional: per-stratum factors-mean files for RF/PA adjustment (see plan income_quintile_factor_means_plan.md; Phase 1 = parse only).
+    IncomeStratumFactorsMeanConfig income_stratum_factors_mean;
 
     auto operator<=>(const BaselineInfo &rhs) const = default;
 };

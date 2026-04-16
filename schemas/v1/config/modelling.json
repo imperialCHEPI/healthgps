@@ -242,6 +242,48 @@
                         "factorsmean_female"
                     ],
                     "additionalProperties": false
+                },
+                "income_stratum_factors_mean": {
+                    "type": "object",
+                    "description": "Optional income-stratum factors-mean adjustment: extra male/female CSV pairs per stratum. When enabled, adjustment_income_stratum_count must equal strata.length. Final person.income bucket count stays in project_requirements.income.categories.",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "default": false,
+                            "description": "When false, only file_names factorsmean_male/female are used (legacy)."
+                        },
+                        "adjustment_income_stratum_count": {
+                            "type": "integer",
+                            "minimum": 2,
+                            "description": "Number of rank buckets from continuous income for factors-mean adjustment; must equal the length of strata when enabled is true."
+                        },
+                        "strata": {
+                            "type": "array",
+                            "description": "One entry per adjustment stratum (e.g. quintile); order matches rank buckets.",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "string",
+                                        "description": "Label for logs and mapping (e.g. Quintile1)."
+                                    },
+                                    "factorsmean_male": {
+                                        "type": "string"
+                                    },
+                                    "factorsmean_female": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "id",
+                                    "factorsmean_male",
+                                    "factorsmean_female"
+                                ],
+                                "additionalProperties": false
+                            }
+                        }
+                    },
+                    "additionalProperties": false
                 }
             },
             "additionalProperties": false
