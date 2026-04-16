@@ -239,7 +239,9 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
                 // 0–42.7) would cap everyone at 42.7 and collapse quartiles, leaving only
                 // low/lowermiddle. (Ranges passed in are for base risk factors; income uses a
                 // different scale.)
-                // The problem is that in income module csv file, income ranges are diffrent from the fcators mean range. In the csv, the range is 25-2379 wheras in factors mean, the range is 769. So majority of the people will get clamped. 
+                // The problem is that in income module csv file, income ranges are diffrent from
+                // the fcators mean range. In the csv, the range is 25-2379 wheras in factors mean,
+                // the range is 769. So majority of the people will get clamped.
 
                 // Update risk_factors["income"] (canonical name for mapping/output)
                 person.risk_factors[factor] = adjusted_value;
