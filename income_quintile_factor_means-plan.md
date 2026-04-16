@@ -74,6 +74,8 @@ flowchart TB
   end
 ```
 
+
+
 ```mermaid
 flowchart TB
   subgraph stratumPath [FeatureOn_StratumPath]
@@ -88,6 +90,8 @@ flowchart TB
     s1 --> s2 --> s3 --> s4 --> s5 --> s6 --> s7 --> s8
   end
 ```
+
+
 
 When the feature is **off**, the simulator keeps the **existing** implementation order and logic (not this diagram’s abstraction alone); the diagram summarises “two files, one adjustment, then final categories.”
 
@@ -146,11 +150,13 @@ Continues to use the **overall** `expected_` table for **initialisation** / blen
 
 ## Files touched (by phase)
 
+
 | Phase | Files                                                                                                                          |
 | ----- | ------------------------------------------------------------------------------------------------------------------------------ |
 | 1     | `modelling.json` schemas, `poco.h`, `configuration_parsing.cpp`, optional example JSON                                         |
 | 2     | `model_parser.cpp`, `static_linear_model.cpp`, `risk_factor_adjustable_model.cpp` (or helpers), `person.h`, sync in simulation |
 | 3     | Tests per repo layout                                                                                                          |
+
 
 ---
 
@@ -165,3 +171,4 @@ Continues to use the **overall** `expected_` table for **initialisation** / blen
 - Logistic simulated-mean exclusion **unchanged**; stratum = extra filter only.
 - Baseline/intervention sync extended for stratified deltas.
 - Diagrams: default path vs stratum path.
+
