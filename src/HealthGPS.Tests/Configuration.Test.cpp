@@ -365,6 +365,9 @@ TEST_F(ConfigParsingFixture, GetFileInfo) {
 }
 
 TEST_F(ConfigParsingFixture, GetBaseLineInfo) {
+    // MAHIMA: Designated-initializer literals must name every BaselineInfo member; omitting
+    // income_stratum_factors_mean fails GCC -Wmissing-field-initializers under -Werror (CI). `{}`
+    // keeps the optional block at defaults (feature off), same as configs without that JSON key.
     const BaselineInfo info1{
         .format = "csv",
         .delimiter = ",",
@@ -431,7 +434,8 @@ TEST_F(ConfigParsingFixture, GetBaseLineInfo_IncomeStratumFactorsMeanWhenEnabled
 
     const auto parsed = get_baseline_info(j, tmp_path());
     EXPECT_TRUE(parsed.income_stratum_factors_mean.enabled);
-    EXPECT_EQ(2, parsed.income_stratum_factors_mean.adjustment_income_stratum_count);
+    // MAHIMA: 2u matches std::size_t on adjustment_income_stratum_count (avoids mixed sign in GTest).
+    EXPECT_EQ(2u, parsed.income_stratum_factors_mean.adjustment_income_stratum_count);
     ASSERT_EQ(2u, parsed.income_stratum_factors_mean.strata.size());
     EXPECT_EQ("Q1", parsed.income_stratum_factors_mean.strata[0].id);
     EXPECT_EQ("Q2", parsed.income_stratum_factors_mean.strata[1].id);

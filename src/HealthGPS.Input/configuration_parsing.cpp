@@ -3,6 +3,7 @@
 #include "jsonparser.h"
 
 #include <fmt/color.h>
+#include <cstdint>
 #include <stdexcept>
 #include <unordered_map>
 
@@ -44,8 +45,16 @@ void parse_income_stratum_factors_mean_block(const json &baseline_adjustments_no
             throw ConfigurationError{"baseline_adjustments.income_stratum_factors_mean."
                                      "adjustment_income_stratum_count must be an integer"};
         }
-        out.adjustment_income_stratum_count =
-            block.at("adjustment_income_stratum_count").get<int>();
+        // MAHIMA: Parse via int64_t first, reject negatives, then cast to std::size_t. JSON has no
+        // unsigned type; direct get<std::size_t>() is awkward for validation, and we want an
+        // explicit error for negative values rather than silent wraparound.
+        const auto n = block.at("adjustment_income_stratum_count").get<std::int64_t>();
+        if (n < 0) {
+            throw ConfigurationError{
+                "baseline_adjustments.income_stratum_factors_mean."
+                "adjustment_income_stratum_count must be non-negative"};
+        }
+        out.adjustment_income_stratum_count = static_cast<std::size_t>(n);
     }
 
     if (block.contains("strata")) {
@@ -83,7 +92,10 @@ void parse_income_stratum_factors_mean_block(const json &baseline_adjustments_no
             "When income_stratum_factors_mean.enabled is true, "
             "adjustment_income_stratum_count must be >= 2 (rank buckets for adjustment)."};
     }
-    if (static_cast<int>(out.strata.size()) != out.adjustment_income_stratum_count) {
+    // MAHIMA: Compare strata.size() to adjustment_income_stratum_count without casts; both are
+    // unsigned (size_t), which fixes clang-tidy modernize-use-integer-sign-comparison from the
+    // earlier int vs size_t pattern.
+    if (out.strata.size() != out.adjustment_income_stratum_count) {
         throw ConfigurationError{fmt::format(
             "income_stratum_factors_mean: adjustment_income_stratum_count ({}) must equal "
             "the number of strata entries ({})",

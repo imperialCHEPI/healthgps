@@ -1,6 +1,7 @@
 #pragma once
 #include "HealthGPS.Core/interval.h"
 
+#include <cstddef>
 #include <filesystem>
 #include <map>
 #include <optional>
@@ -42,8 +43,7 @@ struct SESInfo {
     auto operator<=>(const SESInfo &) const = default;
 };
 
-// MAHIMA: Income quintile factor means adjustment (see income_quintile_factor_means_plan.md; Phase
-// 2+ simulation behaviour).
+//MAHIMA: Income quintile factor means adjustment (see income_quintile_factor_means_plan.md; Phase 2+ simulation behaviour).
 //! One pair of factors-mean CSV paths for a single income stratum (e.g. one quintile).
 //! Used when income_stratum_factors_mean.enabled is true (Phase 2+ simulation behaviour).
 struct IncomeStratumFactorsMeanStratumEntry {
@@ -55,6 +55,7 @@ struct IncomeStratumFactorsMeanStratumEntry {
     auto operator<=>(const IncomeStratumFactorsMeanStratumEntry &rhs) const = default;
 };
 
+//MAHIMA: Income quintile factor means adjustment (see income_quintile_factor_means_plan.md; Phase 2+ simulation behaviour).
 //! Optional income-stratum factors-mean adjustment: extra male/female tables per stratum.
 //! When disabled, the simulator uses only file_names.factorsmean_male/female (legacy behaviour).
 //! Final output income bucket count remains in project_requirements.income.categories ("3"/"4").
@@ -62,7 +63,10 @@ struct IncomeStratumFactorsMeanConfig {
     bool enabled{false};
     /// Rank buckets formed from continuous income for adjustment (N). Must equal strata.size()
     /// when enabled. Independent of project_requirements income.categories (final person.income).
-    int adjustment_income_stratum_count{0};
+    // MAHIMA: Stored as std::size_t (not int) because N is a non-negative count comparable to
+    // strata.size(); avoids signed/unsigned comparisons and satisfies clang-tidy
+    // modernize-use-integer-sign-comparison in validation code.
+    std::size_t adjustment_income_stratum_count{0};
     std::vector<IncomeStratumFactorsMeanStratumEntry> strata;
 
     auto operator<=>(const IncomeStratumFactorsMeanConfig &rhs) const = default;
@@ -74,8 +78,7 @@ struct BaselineInfo {
     std::string delimiter;
     std::string encoding;
     std::map<std::string, std::filesystem::path> file_names;
-    /// Optional: per-stratum factors-mean files for RF/PA adjustment (see plan
-    /// income_quintile_factor_means_plan.md; Phase 1 = parse only).
+    /// Optional: per-stratum factors-mean files for RF/PA adjustment (see plan income_quintile_factor_means_plan.md; Phase 1 = parse only).
     IncomeStratumFactorsMeanConfig income_stratum_factors_mean;
 
     auto operator<=>(const BaselineInfo &rhs) const = default;
