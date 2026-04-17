@@ -369,7 +369,8 @@ TEST_F(ConfigParsingFixture, GetBaseLineInfo) {
         .format = "csv",
         .delimiter = ",",
         .encoding = "UTF8",
-        .file_names = {{"a", create_file_absolute()}, {"b", create_file_absolute()}}};
+        .file_names = {{"a", create_file_absolute()}, {"b", create_file_absolute()}},
+        .income_stratum_factors_mean = {}};
 
     json j;
     j["baseline_adjustments"] = info1;
@@ -590,7 +591,8 @@ TEST_F(ConfigParsingFixture, LoadModellingInfo) {
         .format = "csv",
         .delimiter = ",",
         .encoding = "UTF8",
-        .file_names = {{"a", create_file_absolute()}, {"b", create_file_absolute()}}};
+        .file_names = {{"a", create_file_absolute()}, {"b", create_file_absolute()}},
+        .income_stratum_factors_mean = {}};
     const SESInfo ses_info{.function = "normal", .parameters = {0.0, 1.0}};
 
     const json valid_modelling_info = [&]() {
@@ -733,7 +735,8 @@ TEST_F(ConfigParsingFixture, LoadModellingInfoOptionalPolicyStartYear) {
     const BaselineInfo baseline_info{.format = "csv",
                                      .delimiter = ",",
                                      .encoding = "UTF8",
-                                     .file_names = {{"a", create_file_absolute()}}};
+                                     .file_names = {{"a", create_file_absolute()}},
+                                     .income_stratum_factors_mean = {}};
     const SESInfo ses_info{.function = "normal", .parameters = {0.0}};
     json j;
     j["modelling"]["risk_factors"] = risk_factors;
