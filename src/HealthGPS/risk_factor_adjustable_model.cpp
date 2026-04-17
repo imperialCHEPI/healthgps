@@ -282,7 +282,7 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
                     value = range.clamp(value);
                 }
 
-                // Set the adjusted value
+                // Set the adjusted value to the risk factor
                 person.risk_factors.at(factor) = value;
             }
         }
