@@ -2,12 +2,124 @@
 #include "configuration_parsing_helpers.h"
 #include "jsonparser.h"
 
+#include <cstdint>
 #include <fmt/color.h>
 #include <stdexcept>
 #include <unordered_map>
 
 namespace hgps::input {
 using json = nlohmann::json;
+
+namespace {
+
+// MAHIMA: Income quintile factor means adjustment (see income_quintile_factor_means_plan.md; Phase
+// 2+ simulation behaviour).
+/// Optional block under modelling.baseline_adjustments: extra factors-mean CSVs per income stratum.
+/// Phase 1 only parses, validates paths when enabled, and stores results on BaselineInfo.
+/// Simulation behaviour is unchanged until later phases read these fields.
+void parse_income_stratum_factors_mean_block(const json &baseline_adjustments_node,
+                                             const std::filesystem::path &base_dir,
+                                             IncomeStratumFactorsMeanConfig &out) {
+    if (!baseline_adjustments_node.contains("income_stratum_factors_mean")) {
+        return;
+    }
+    const auto &block = baseline_adjustments_node.at("income_stratum_factors_mean");
+    if (block.is_null()) {
+        return;
+    }
+    if (!block.is_object()) {
+        throw ConfigurationError{
+            "baseline_adjustments.income_stratum_factors_mean must be a JSON object"};
+    }
+
+    if (block.contains("enabled")) {
+        if (!block.at("enabled").is_boolean()) {
+            throw ConfigurationError{
+                "baseline_adjustments.income_stratum_factors_mean.enabled must be a boolean"};
+        }
+        out.enabled = block.at("enabled").get<bool>();
+    }
+
+    if (block.contains("adjustment_income_stratum_count")) {
+        if (!block.at("adjustment_income_stratum_count").is_number_integer()) {
+            throw ConfigurationError{"baseline_adjustments.income_stratum_factors_mean."
+                                     "adjustment_income_stratum_count must be an integer"};
+        }
+        // MAHIMA: Parse via int64_t first, reject negatives, then cast to std::size_t. JSON has no
+        // unsigned type; direct get<std::size_t>() is awkward for validation, and we want an
+        // explicit error for negative values rather than silent wraparound.
+        const auto n = block.at("adjustment_income_stratum_count").get<std::int64_t>();
+        if (n < 0) {
+            throw ConfigurationError{"baseline_adjustments.income_stratum_factors_mean."
+                                     "adjustment_income_stratum_count must be non-negative"};
+        }
+        out.adjustment_income_stratum_count = static_cast<std::size_t>(n);
+    }
+
+    if (block.contains("strata")) {
+        const auto &strata_json = block.at("strata");
+        if (!strata_json.is_array()) {
+            throw ConfigurationError{
+                "baseline_adjustments.income_stratum_factors_mean.strata must be an array"};
+        }
+        out.strata.clear();
+        out.strata.reserve(strata_json.size());
+        for (std::size_t i = 0; i < strata_json.size(); ++i) {
+            const auto &row = strata_json.at(i);
+            if (!row.is_object()) {
+                throw ConfigurationError{fmt::format(
+                    "baseline_adjustments.income_stratum_factors_mean.strata[{}] must be an object",
+                    i)};
+            }
+            IncomeStratumFactorsMeanStratumEntry entry;
+            entry.id = row.at("id").get<std::string>();
+            entry.factorsmean_male = row.at("factorsmean_male").get<std::string>();
+            entry.factorsmean_female = row.at("factorsmean_female").get<std::string>();
+            out.strata.push_back(std::move(entry));
+        }
+    }
+
+    if (!out.enabled) {
+        // Stratum files are ignored when disabled; do not require paths to exist (easier WIP
+        // configs).
+        return;
+    }
+
+    // --- Validation when enabled (strict) ---
+    if (out.adjustment_income_stratum_count < 2) {
+        throw ConfigurationError{
+            "When income_stratum_factors_mean.enabled is true, "
+            "adjustment_income_stratum_count must be >= 2 (rank buckets for adjustment)."};
+    }
+    // MAHIMA: Compare strata.size() to adjustment_income_stratum_count without casts; both are
+    // unsigned (size_t), which fixes clang-tidy modernize-use-integer-sign-comparison from the
+    // earlier int vs size_t pattern.
+    if (out.strata.size() != out.adjustment_income_stratum_count) {
+        throw ConfigurationError{fmt::format(
+            "income_stratum_factors_mean: adjustment_income_stratum_count ({}) must equal "
+            "the number of strata entries ({})",
+            out.adjustment_income_stratum_count, out.strata.size())};
+    }
+
+    for (std::size_t i = 0; i < out.strata.size(); ++i) {
+        auto &e = out.strata[i];
+        if (e.id.empty()) {
+            throw ConfigurationError{
+                fmt::format("income_stratum_factors_mean.strata[{}]: id must be non-empty", i)};
+        }
+        try {
+            rebase_valid_path(e.factorsmean_male, base_dir);
+            rebase_valid_path(e.factorsmean_female, base_dir);
+        } catch (const ConfigurationError &ex) {
+            throw ConfigurationError{fmt::format(
+                "income_stratum_factors_mean.strata[{}] (id=\"{}\"): {}", i, e.id, ex.what())};
+        }
+        fmt::print("  stratum {:>2} id={:<16} male: {}\n", i, e.id, e.factorsmean_male.string());
+        fmt::print("              {:<16} female: {}\n", "", e.factorsmean_female.string());
+    }
+}
+
+} // namespace
 
 nlohmann::json get(const json &j, const std::string &key) {
     try {
@@ -102,6 +214,11 @@ BaselineInfo get_baseline_info(const json &j, const std::filesystem::path &base_
     if (!success) {
         throw ConfigurationError{"Could not get baseline adjustments"};
     }
+    // MAHIMA: Income quintile factor means adjustment (see income_quintile_factor_means_plan.md;
+    // Phase 2+ simulation behaviour).
+    //  Optional: per-stratum factors-mean files (income-stratum adjustment feature; see project
+    //  plan).
+    parse_income_stratum_factors_mean_block(adj, base_dir, info.income_stratum_factors_mean);
 
     return info;
 }

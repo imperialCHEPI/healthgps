@@ -365,11 +365,15 @@ TEST_F(ConfigParsingFixture, GetFileInfo) {
 }
 
 TEST_F(ConfigParsingFixture, GetBaseLineInfo) {
+    // MAHIMA: Designated-initializer literals must name every BaselineInfo member; omitting
+    // income_stratum_factors_mean fails GCC -Wmissing-field-initializers under -Werror (CI). `{}`
+    // keeps the optional block at defaults (feature off), same as configs without that JSON key.
     const BaselineInfo info1{
         .format = "csv",
         .delimiter = ",",
         .encoding = "UTF8",
-        .file_names = {{"a", create_file_absolute()}, {"b", create_file_absolute()}}};
+        .file_names = {{"a", create_file_absolute()}, {"b", create_file_absolute()}},
+        .income_stratum_factors_mean = {}};
 
     json j;
     j["baseline_adjustments"] = info1;
@@ -381,6 +385,61 @@ TEST_F(ConfigParsingFixture, GetBaseLineInfo) {
     // Using an invalid path should cause an error
     j["baseline_adjustments"]["file_names"]["a"] = random_filename();
     EXPECT_THROW(get_baseline_info(j, tmp_path()), ConfigurationError);
+}
+
+/// Phase 1: income_stratum_factors_mean enabled requires adjustment_income_stratum_count ==
+/// strata.size().
+TEST_F(ConfigParsingFixture, GetBaseLineInfo_IncomeStratumCountMismatchThrows) {
+    json j;
+    j["baseline_adjustments"]["format"] = "csv";
+    j["baseline_adjustments"]["delimiter"] = ",";
+    j["baseline_adjustments"]["encoding"] = "UTF8";
+    j["baseline_adjustments"]["file_names"]["factorsmean_male"] = create_file_absolute().string();
+    j["baseline_adjustments"]["file_names"]["factorsmean_female"] = create_file_absolute().string();
+    j["baseline_adjustments"]["income_stratum_factors_mean"]["enabled"] = true;
+    j["baseline_adjustments"]["income_stratum_factors_mean"]["adjustment_income_stratum_count"] = 2;
+    j["baseline_adjustments"]["income_stratum_factors_mean"]["strata"] = json::array();
+
+    EXPECT_THROW(get_baseline_info(j, tmp_path()), ConfigurationError);
+}
+
+/// Phase 1: when enabled, two stratum pairs load and paths are rebased.
+TEST_F(ConfigParsingFixture, GetBaseLineInfo_IncomeStratumFactorsMeanWhenEnabled) {
+    const auto male_q1 = create_file_absolute();
+    const auto female_q1 = create_file_absolute();
+    const auto male_q2 = create_file_absolute();
+    const auto female_q2 = create_file_absolute();
+
+    IncomeStratumFactorsMeanConfig stratum_config;
+    stratum_config.enabled = true;
+    stratum_config.adjustment_income_stratum_count = 2;
+    stratum_config.strata = {
+        IncomeStratumFactorsMeanStratumEntry{
+            .id = "Q1", .factorsmean_male = male_q1, .factorsmean_female = female_q1},
+        IncomeStratumFactorsMeanStratumEntry{
+            .id = "Q2", .factorsmean_male = male_q2, .factorsmean_female = female_q2},
+    };
+    // MAHIMA: Income quintile factor means adjustment (see income_quintile_factor_means_plan.md;
+    // Phase 2+ simulation behaviour).
+    BaselineInfo info;
+    info.format = "csv";
+    info.delimiter = ",";
+    info.encoding = "UTF8";
+    info.file_names = {{"factorsmean_male", create_file_absolute()},
+                       {"factorsmean_female", create_file_absolute()}};
+    info.income_stratum_factors_mean = std::move(stratum_config);
+
+    json j;
+    j["baseline_adjustments"] = info;
+
+    const auto parsed = get_baseline_info(j, tmp_path());
+    EXPECT_TRUE(parsed.income_stratum_factors_mean.enabled);
+    // MAHIMA: 2u matches std::size_t on adjustment_income_stratum_count (avoids mixed sign in
+    // GTest).
+    EXPECT_EQ(2u, parsed.income_stratum_factors_mean.adjustment_income_stratum_count);
+    ASSERT_EQ(2u, parsed.income_stratum_factors_mean.strata.size());
+    EXPECT_EQ("Q1", parsed.income_stratum_factors_mean.strata[0].id);
+    EXPECT_EQ("Q2", parsed.income_stratum_factors_mean.strata[1].id);
 }
 
 TEST_F(ConfigParsingFixture, LoadInterventions) {
@@ -537,7 +596,8 @@ TEST_F(ConfigParsingFixture, LoadModellingInfo) {
         .format = "csv",
         .delimiter = ",",
         .encoding = "UTF8",
-        .file_names = {{"a", create_file_absolute()}, {"b", create_file_absolute()}}};
+        .file_names = {{"a", create_file_absolute()}, {"b", create_file_absolute()}},
+        .income_stratum_factors_mean = {}};
     const SESInfo ses_info{.function = "normal", .parameters = {0.0, 1.0}};
 
     const json valid_modelling_info = [&]() {
@@ -680,7 +740,8 @@ TEST_F(ConfigParsingFixture, LoadModellingInfoOptionalPolicyStartYear) {
     const BaselineInfo baseline_info{.format = "csv",
                                      .delimiter = ",",
                                      .encoding = "UTF8",
-                                     .file_names = {{"a", create_file_absolute()}}};
+                                     .file_names = {{"a", create_file_absolute()}},
+                                     .income_stratum_factors_mean = {}};
     const SESInfo ses_info{.function = "normal", .parameters = {0.0}};
     json j;
     j["modelling"]["risk_factors"] = risk_factors;

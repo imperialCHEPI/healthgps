@@ -233,11 +233,15 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
                 // Apply adjustment: new_value = current_value + delta
                 double adjusted_value = current_value + delta;
 
+                // MAHIMA: We make sure that min/max of income models is used but we do not clamp
                 // Do not clamp income to a range: income is continuous and should match
                 // factors-mean scale (e.g. ~621 for age 0). Using another factor's range (e.g.
                 // 0–42.7) would cap everyone at 42.7 and collapse quartiles, leaving only
                 // low/lowermiddle. (Ranges passed in are for base risk factors; income uses a
                 // different scale.)
+                // The problem is that in income module csv file, income ranges are diffrent from
+                // the fcators mean range. In the csv, the range is 25-2379 wheras in factors mean,
+                // the range is 769. So majority of the people will get clamped.
 
                 // Update risk_factors["income"] (canonical name for mapping/output)
                 person.risk_factors[factor] = adjusted_value;
@@ -278,7 +282,7 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
                     value = range.clamp(value);
                 }
 
-                // Set the adjusted value
+                // Set the adjusted value to the risk factor
                 person.risk_factors.at(factor) = value;
             }
         }

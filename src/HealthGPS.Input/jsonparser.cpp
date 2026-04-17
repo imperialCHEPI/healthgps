@@ -120,12 +120,30 @@ void from_json(const json &j, FactorDynamicEquationInfo &p) {
     j.at("ResidualsStandardDeviation").get_to(p.residuals_standard_deviation);
 }
 
-// Baseline scenario adjustments
+// MAHIMA: Income quintile factor means adjustment (see income_quintile_factor_means_plan.md; Phase
+// 2+ simulation behaviour).
+//  Baseline scenario adjustments (optional per-stratum factors-mean CSVs; Phase 1 = config only)
+void to_json(json &j, const IncomeStratumFactorsMeanStratumEntry &p) {
+    j = json{{"id", p.id},
+             {"factorsmean_male", p.factorsmean_male.string()},
+             {"factorsmean_female", p.factorsmean_female.string()}};
+}
+
+void to_json(json &j, const IncomeStratumFactorsMeanConfig &p) {
+    j = json{{"enabled", p.enabled},
+             {"adjustment_income_stratum_count", p.adjustment_income_stratum_count},
+             {"strata", p.strata}};
+}
+
 void to_json(json &j, const BaselineInfo &p) {
     j = json{{"format", p.format},
              {"delimiter", p.delimiter},
              {"encoding", p.encoding},
-             {"file_names", p.file_names}};
+             {"file_names", p.file_names},
+             {"income_stratum_factors_mean",
+              p.income_stratum_factors_mean}}; // MAHIMA: Income based factors-mean adjustment (see
+                                               // income_quintile_factor_means_plan.md; Phase 2+
+                                               // simulation behaviour).
 }
 
 // Policy Scenario

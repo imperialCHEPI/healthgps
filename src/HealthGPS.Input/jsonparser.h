@@ -52,7 +52,12 @@ void from_json(const json &j, SettingsInfo &p);
 void to_json(json &j, const SESInfo &p);
 void from_json(const json &j, SESInfo &p);
 
-// Baseline model information
+// MAHIMA: Income quintile factor means adjustment (see income_quintile_factor_means_plan.md; Phase
+// 2+ simulation behaviour).
+//  Baseline model information (optional income-stratum factors-mean block is nested on
+//  BaselineInfo)
+void to_json(json &j, const IncomeStratumFactorsMeanStratumEntry &p);
+void to_json(json &j, const IncomeStratumFactorsMeanConfig &p);
 void to_json(json &j, const BaselineInfo &p);
 
 // Lite risk factors models (Energy Balance Model)
