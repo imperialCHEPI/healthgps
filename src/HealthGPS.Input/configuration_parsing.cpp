@@ -2,8 +2,8 @@
 #include "configuration_parsing_helpers.h"
 #include "jsonparser.h"
 
-#include <fmt/color.h>
 #include <cstdint>
+#include <fmt/color.h>
 #include <stdexcept>
 #include <unordered_map>
 
@@ -50,9 +50,8 @@ void parse_income_stratum_factors_mean_block(const json &baseline_adjustments_no
         // explicit error for negative values rather than silent wraparound.
         const auto n = block.at("adjustment_income_stratum_count").get<std::int64_t>();
         if (n < 0) {
-            throw ConfigurationError{
-                "baseline_adjustments.income_stratum_factors_mean."
-                "adjustment_income_stratum_count must be non-negative"};
+            throw ConfigurationError{"baseline_adjustments.income_stratum_factors_mean."
+                                     "adjustment_income_stratum_count must be non-negative"};
         }
         out.adjustment_income_stratum_count = static_cast<std::size_t>(n);
     }

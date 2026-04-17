@@ -434,7 +434,8 @@ TEST_F(ConfigParsingFixture, GetBaseLineInfo_IncomeStratumFactorsMeanWhenEnabled
 
     const auto parsed = get_baseline_info(j, tmp_path());
     EXPECT_TRUE(parsed.income_stratum_factors_mean.enabled);
-    // MAHIMA: 2u matches std::size_t on adjustment_income_stratum_count (avoids mixed sign in GTest).
+    // MAHIMA: 2u matches std::size_t on adjustment_income_stratum_count (avoids mixed sign in
+    // GTest).
     EXPECT_EQ(2u, parsed.income_stratum_factors_mean.adjustment_income_stratum_count);
     ASSERT_EQ(2u, parsed.income_stratum_factors_mean.strata.size());
     EXPECT_EQ("Q1", parsed.income_stratum_factors_mean.strata[0].id);
