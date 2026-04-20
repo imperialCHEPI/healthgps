@@ -310,6 +310,7 @@ void print_income_stratum_adjustment_examples_table(
 
 } // namespace
 
+// NOLINTBEGIN(readability-function-cognitive-complexity)
 StaticLinearModel::StaticLinearModel(
     std::shared_ptr<RiskFactorSexAgeTable> expected,
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
@@ -341,7 +342,8 @@ StaticLinearModel::StaticLinearModel(
     bool income_stratum_adjustment_enabled, std::size_t adjustment_income_stratum_count,
     bool has_active_policies, const std::vector<LinearModelParams> &logistic_models)
     // NOLINTNEXTLINE(readability-function-cognitive-complexity)
-    : RiskFactorAdjustableModel{std::move(expected),       expected_trend, trend_steps, trend_type,
+    : RiskFactorAdjustableModel{std::move(expected),       expected_trend, std::move(trend_steps),
+                                trend_type,
                                 expected_income_trend,       // Pass by value, not moved
                                 income_trend_decay_factors}, // Pass by value, not moved
       // Continuous income model support (FINCH approach) - must come first
@@ -520,6 +522,7 @@ StaticLinearModel::StaticLinearModel(
         }
     }
 }
+// NOLINTEND(readability-function-cognitive-complexity)
 
 RiskFactorModelType StaticLinearModel::type() const noexcept { return RiskFactorModelType::Static; }
 
@@ -619,11 +622,11 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
                 };
                 if (!in_base(income_id) &&
                     std::ranges::find(extended_factors, income_id) != extended_factors.end()) {
-                    added.push_back("income");
+                    added.emplace_back("income");
                 }
                 if (!in_base(pa_id) &&
                     std::ranges::find(extended_factors, pa_id) != extended_factors.end()) {
-                    added.push_back("physical_activity");
+                    added.emplace_back("physical_activity");
                 }
                 std::string list_str;
                 for (size_t i = 0; i < added.size(); ++i) {
@@ -653,7 +656,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         if (context.scenario().type() == ScenarioType::baseline) {
             print_income_adjustment_strata_table(
                 context.population(), income_stratum_expected_tables_,
-                adjustment_income_stratum_count_, static_cast<int>(context.time_now()), "initial");
+                adjustment_income_stratum_count_, context.time_now(), "initial");
         }
     }
 
@@ -714,7 +717,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         }
         if (context.scenario().type() == ScenarioType::baseline) {
             print_income_stratum_adjustment_examples_table(
-                debug_rows, static_cast<int>(context.time_now()), "initial");
+                debug_rows, context.time_now(), "initial");
         }
     }
 
@@ -753,7 +756,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         assign_income_categories_equal_split(context.population(), income_categories_);
         if (context.scenario().type() == ScenarioType::baseline) {
             print_final_income_category_table(context.population(), income_categories_, thresholds,
-                                              static_cast<int>(context.time_now()), "initial");
+                                              context.time_now(), "initial");
         }
     }
 
@@ -801,8 +804,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
             if (context.scenario().type() == ScenarioType::baseline) {
                 print_income_adjustment_strata_table(
                     context.population(), income_stratum_expected_tables_,
-                    adjustment_income_stratum_count_, static_cast<int>(context.time_now()),
-                    "trended");
+                    adjustment_income_stratum_count_, context.time_now(), "trended");
             }
 
             const core::Identifier income_id("income");
@@ -855,8 +857,8 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
                 }
             }
             if (context.scenario().type() == ScenarioType::baseline) {
-                print_income_stratum_adjustment_examples_table(
-                    debug_rows, static_cast<int>(context.time_now()), "trended");
+                print_income_stratum_adjustment_examples_table(debug_rows, context.time_now(),
+                                                               "trended");
             }
         } else {
             // Trended adjustment: extended list uses project_requirements (legacy path).
@@ -945,8 +947,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
         if (context.scenario().type() == ScenarioType::baseline) {
             print_income_adjustment_strata_table(
                 context.population(), income_stratum_expected_tables_,
-                adjustment_income_stratum_count_, static_cast<int>(context.time_now()),
-                "yearly-initial");
+                adjustment_income_stratum_count_, context.time_now(), "yearly-initial");
         }
     }
 
@@ -1003,8 +1004,8 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             }
         }
         if (context.scenario().type() == ScenarioType::baseline) {
-            print_income_stratum_adjustment_examples_table(
-                debug_rows, static_cast<int>(context.time_now()), "yearly-initial");
+            print_income_stratum_adjustment_examples_table(debug_rows, context.time_now(),
+                                                           "yearly-initial");
         }
     }
 
@@ -1020,8 +1021,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
         assign_income_categories_equal_split(context.population(), income_categories_);
         if (context.scenario().type() == ScenarioType::baseline) {
             print_final_income_category_table(context.population(), income_categories_, thresholds,
-                                              static_cast<int>(context.time_now()),
-                                              "yearly-initial");
+                                              context.time_now(), "yearly-initial");
         }
     }
 
@@ -1086,8 +1086,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             if (context.scenario().type() == ScenarioType::baseline) {
                 print_income_adjustment_strata_table(
                     context.population(), income_stratum_expected_tables_,
-                    adjustment_income_stratum_count_, static_cast<int>(context.time_now()),
-                    "yearly-trended");
+                    adjustment_income_stratum_count_, context.time_now(), "yearly-trended");
             }
 
             const core::Identifier income_id("income");
@@ -1140,8 +1139,8 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
                 }
             }
             if (context.scenario().type() == ScenarioType::baseline) {
-                print_income_stratum_adjustment_examples_table(
-                    debug_rows, static_cast<int>(context.time_now()), "yearly-trended");
+                print_income_stratum_adjustment_examples_table(debug_rows, context.time_now(),
+                                                               "yearly-trended");
             }
         } else {
             auto [trended_extended_factors, trended_extended_ranges] =
@@ -1168,8 +1167,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
                     income_categories_ == "4" ? calculate_income_quartiles(context.population())
                                               : calculate_income_tertiles(context.population());
                 print_final_income_category_table(context.population(), income_categories_,
-                                                  thresholds, static_cast<int>(context.time_now()),
-                                                  "yearly-trended");
+                                                  thresholds, context.time_now(), "yearly-trended");
             }
         }
     }

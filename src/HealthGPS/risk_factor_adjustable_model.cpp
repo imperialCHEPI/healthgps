@@ -213,6 +213,7 @@ void RiskFactorAdjustableModel::adjust_risk_factors(
 
     // All scenarios: apply adjustments to population.
     auto &pop = context.population();
+    // NOLINTNEXTLINE(readability-function-cognitive-complexity)
     tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         if (!person.is_active()) {
             return;
@@ -369,7 +370,7 @@ void RiskFactorAdjustableModel::set_logistic_factors(
     logistic_factors_ = logistic_factors;
 }
 
-// NOLINTNEXTLINE(readability-function-cognitive-complexity)
+// NOLINTBEGIN(readability-function-cognitive-complexity)
 RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_adjustments(
     RuntimeContext &context, const std::vector<core::Identifier> &factors, OptionalRanges ranges,
     bool apply_trend, const RiskFactorSexAgeTable *expected_override,
@@ -489,6 +490,7 @@ RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_adjustments(
 
     return adjustments;
 }
+// NOLINTEND(readability-function-cognitive-complexity)
 
 RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_simulated_mean(
     Population &population, const core::IntegerInterval age_range,
