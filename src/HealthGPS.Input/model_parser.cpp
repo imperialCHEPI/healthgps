@@ -138,7 +138,8 @@ load_risk_factor_expected_pair(const Configuration &config, const std::filesyste
     const auto male_filename = male_file.string();
     const auto female_filename = female_file.string();
     try {
-        table->emplace_row(hgps::core::Gender::male, load_baseline_from_csv(male_filename, delimiter));
+        table->emplace_row(hgps::core::Gender::male,
+                           load_baseline_from_csv(male_filename, delimiter));
         table->emplace_row(hgps::core::Gender::female,
                            load_baseline_from_csv(female_filename, delimiter));
     } catch (const std::runtime_error &ex) {
@@ -151,9 +152,9 @@ load_risk_factor_expected_pair(const Configuration &config, const std::filesyste
     for (const auto &sex : *table) {
         for (const auto &factor : sex.second) {
             if (factor.second.size() <= max_age) {
-                throw hgps::core::HgpsException{
-                    fmt::format("{} baseline adjustment file must cover the required age range: [{}].",
-                                source_tag, config.settings.age_range.to_string())};
+                throw hgps::core::HgpsException{fmt::format(
+                    "{} baseline adjustment file must cover the required age range: [{}].",
+                    source_tag, config.settings.age_range.to_string())};
             }
         }
     }
@@ -1169,7 +1170,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             auto table = load_risk_factor_expected_pair(
                 config, stratum.factorsmean_male, stratum.factorsmean_female, base_info.delimiter,
                 fmt::format("income stratum '{}'", stratum.id));
-            validate_expected_has_all_factors(*table, fmt::format("income stratum '{}'", stratum.id));
+            validate_expected_has_all_factors(*table,
+                                              fmt::format("income stratum '{}'", stratum.id));
             income_stratum_expected_tables.emplace_back(
                 stratum.id, std::shared_ptr<RiskFactorSexAgeTable>{std::move(table)});
         }

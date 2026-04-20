@@ -6,8 +6,8 @@
 
 #include <Eigen/Dense>
 #include <string>
-#include <utility>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 namespace hgps {
@@ -119,15 +119,14 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
         /// FINCH (continuous) approaches
         const std::unordered_map<core::Identifier, PhysicalActivityModel>
             &physical_activity_models = {},
-        /// @param income_stratum_expected_tables Optional per-stratum expected tables (ordered as in
-        /// config)
+        /// @param income_stratum_expected_tables Optional per-stratum expected tables (ordered as
+        /// in config)
         const std::vector<IncomeStratumExpectedTableEntry> &income_stratum_expected_tables = {},
         /// @param income_stratum_adjustment_enabled Whether per-stratum factors-mean adjustment is
         /// enabled
         bool income_stratum_adjustment_enabled = false,
         /// @param adjustment_income_stratum_count Number of rank buckets used for adjustment strata
-        std::size_t adjustment_income_stratum_count = 0u,
-        bool has_active_policies = true,
+        std::size_t adjustment_income_stratum_count = 0u, bool has_active_policies = true,
         /// @param logistic_models Logistic regression models for two-stage modeling (optional)
         /// Empty models indicate no logistic regression for that risk factor
         const std::vector<LinearModelParams> &logistic_models = {});
@@ -419,8 +418,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
             &physical_activity_models = {},
         const std::vector<IncomeStratumExpectedTableEntry> &income_stratum_expected_tables = {},
         bool income_stratum_adjustment_enabled = false,
-        std::size_t adjustment_income_stratum_count = 0u,
-        bool has_active_policies = true,
+        std::size_t adjustment_income_stratum_count = 0u, bool has_active_policies = true,
         /// @param logistic_models Logistic regression models for two-stage modeling (optional)
         std::vector<LinearModelParams> logistic_models = {});
 

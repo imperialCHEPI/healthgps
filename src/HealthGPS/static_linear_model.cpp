@@ -203,7 +203,8 @@ StaticLinearModel::StaticLinearModel(
       physical_activity_stddev_{physical_activity_stddev},
       physical_activity_models_{physical_activity_models},
       has_physical_activity_models_{!physical_activity_models.empty()},
-      // MAHIMA: For income based factor means adjustment - cache loaded per-stratum expected tables for later use.
+      // MAHIMA: For income based factor means adjustment - cache loaded per-stratum expected tables
+      // for later use.
       income_stratum_expected_tables_{income_stratum_expected_tables},
       income_stratum_adjustment_enabled_{income_stratum_adjustment_enabled},
       adjustment_income_stratum_count_{adjustment_income_stratum_count},
@@ -2267,7 +2268,8 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
       physical_activity_stddev_{physical_activity_stddev},
       physical_activity_models_{physical_activity_models},
       has_physical_activity_models_{!physical_activity_models.empty()},
-      // MAHIMA: For income based factor means adjustment - definition retains per-stratum expected tables for create_model().
+      // MAHIMA: For income based factor means adjustment - definition retains per-stratum expected
+      // tables for create_model().
       income_stratum_expected_tables_{income_stratum_expected_tables},
       income_stratum_adjustment_enabled_{income_stratum_adjustment_enabled},
       adjustment_income_stratum_count_{adjustment_income_stratum_count},
@@ -2419,8 +2421,8 @@ std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() con
         income_trend_ranges_, income_trend_lambda_, income_trend_decay_factors_,
         is_continuous_income_model_, continuous_income_model_, income_categories_,
         physical_activity_models_, income_stratum_expected_tables_,
-        income_stratum_adjustment_enabled_, adjustment_income_stratum_count_,
-        has_active_policies_, logistic_models_);
+        income_stratum_adjustment_enabled_, adjustment_income_stratum_count_, has_active_policies_,
+        logistic_models_);
 }
 
 } // namespace hgps
