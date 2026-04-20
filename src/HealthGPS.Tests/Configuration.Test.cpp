@@ -411,7 +411,8 @@ TEST_F(ConfigParsingFixture, GetBaseLineInfo_IncomeStratumNegativeCountThrows) {
     j["baseline_adjustments"]["file_names"]["factorsmean_male"] = create_file_absolute().string();
     j["baseline_adjustments"]["file_names"]["factorsmean_female"] = create_file_absolute().string();
     j["baseline_adjustments"]["income_stratum_factors_mean"]["enabled"] = true;
-    j["baseline_adjustments"]["income_stratum_factors_mean"]["adjustment_income_stratum_count"] = -1;
+    j["baseline_adjustments"]["income_stratum_factors_mean"]["adjustment_income_stratum_count"] =
+        -1;
     j["baseline_adjustments"]["income_stratum_factors_mean"]["strata"] = json::array();
 
     EXPECT_THROW(get_baseline_info(j, tmp_path()), ConfigurationError);

@@ -49,8 +49,8 @@ std::shared_ptr<hgps::ModelInput> create_minimal_model_input(hgps::core::DataTab
                                         project_requirements, hgps::input::PIFInfo{});
 }
 
-std::shared_ptr<hgps::RiskFactorSexAgeTable> make_expected_table(const hgps::core::Identifier &factor,
-                                                                  double value) {
+std::shared_ptr<hgps::RiskFactorSexAgeTable>
+make_expected_table(const hgps::core::Identifier &factor, double value) {
     auto expected = std::make_shared<hgps::RiskFactorSexAgeTable>();
     expected->emplace(hgps::core::Gender::male, factor, std::vector<double>{value, value, value});
     expected->emplace(hgps::core::Gender::female, factor, std::vector<double>{value, value, value});
@@ -84,8 +84,8 @@ TEST(IncomeStratumAdjustment, CapturesSingleDebugRowForFilteredStratumAdjustment
     auto expected = make_expected_table(factor, 20.0);
     auto expected_trend = std::make_shared<std::unordered_map<core::Identifier, double>>();
     auto trend_steps = std::make_shared<std::unordered_map<core::Identifier, int>>();
-    auto model =
-        TestAdjustableModel(expected, expected_trend, trend_steps, TrendType::Null, nullptr, nullptr);
+    auto model = TestAdjustableModel(expected, expected_trend, trend_steps, TrendType::Null,
+                                     nullptr, nullptr);
 
     std::vector<IncomeStratumAdjustmentExampleRow> rows;
     model.adjust_risk_factors(context, std::vector<core::Identifier>{factor}, std::nullopt, false,
@@ -104,5 +104,6 @@ TEST(IncomeStratumAdjustment, CapturesSingleDebugRowForFilteredStratumAdjustment
     EXPECT_NEAR(10.0, row.delta, 1e-9);
     EXPECT_NEAR(10.0, row.current_value, 1e-9);
     EXPECT_NEAR(20.0, row.final_value, 1e-9);
-    EXPECT_TRUE(row.person_id == context.population()[0].id() || row.person_id == context.population()[1].id());
+    EXPECT_TRUE(row.person_id == context.population()[0].id() ||
+                row.person_id == context.population()[1].id());
 }
