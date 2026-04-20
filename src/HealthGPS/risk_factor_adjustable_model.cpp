@@ -6,6 +6,7 @@
 #include <fmt/core.h>
 
 #include <algorithm>
+#include <atomic>
 #include <cmath>
 #include <iomanip>
 #include <iostream>
@@ -172,12 +173,26 @@ double RiskFactorAdjustableModel::get_expected(RuntimeContext &context, core::Ge
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
                                                     const std::vector<core::Identifier> &factors,
-                                                    OptionalRanges ranges, bool apply_trend) const {
+                                                    OptionalRanges ranges, bool apply_trend,
+                                                    const RiskFactorSexAgeTable *expected_override,
+                                                    std::optional<std::size_t>
+                                                        income_stratum_filter,
+                                                    std::vector<IncomeStratumAdjustmentExampleRow>
+                                                        *debug_example_rows) const {
     RiskFactorSexAgeTable adjustments;
+    std::atomic<bool> captured_apply_example{false};
+    std::optional<IncomeStratumAdjustmentExampleRow> example_row;
 
     // Baseline scenatio: compute adjustments.
     if (context.scenario().type() == ScenarioType::baseline) {
-        adjustments = calculate_adjustments(context, factors, ranges, apply_trend);
+        IncomeStratumAdjustmentExampleRow delta_row;
+        adjustments = calculate_adjustments(context, factors, ranges, apply_trend, expected_override,
+                                            income_stratum_filter,
+                                            debug_example_rows != nullptr ? &delta_row : nullptr);
+        if (debug_example_rows != nullptr && income_stratum_filter.has_value() &&
+            expected_override != nullptr) {
+            example_row = std::move(delta_row);
+        }
     }
 
     // Intervention scenario: receive adjustments from baseline scenario.
@@ -203,6 +218,11 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
     auto &pop = context.population();
     tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         if (!person.is_active()) {
+            return;
+        }
+        if (income_stratum_filter.has_value() &&
+            (!person.has_income_adjustment_stratum ||
+             person.income_adjustment_stratum != income_stratum_filter.value())) {
             return;
         }
 
@@ -232,6 +252,17 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
 
                 // Apply adjustment: new_value = current_value + delta
                 double adjusted_value = current_value + delta;
+                if (income_stratum_filter.has_value() &&
+                    context.scenario().type() == ScenarioType::baseline && example_row.has_value() &&
+                    debug_example_rows != nullptr &&
+                    factor_name == example_row->factor) {
+                    bool expected = false;
+                    if (captured_apply_example.compare_exchange_strong(expected, true)) {
+                        example_row->person_id = person.id();
+                        example_row->current_value = current_value;
+                        example_row->final_value = adjusted_value;
+                    }
+                }
 
                 // MAHIMA: We make sure that min/max of income models is used but we do not clamp
                 // Do not clamp income to a range: income is continuous and should match
@@ -261,6 +292,17 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
 
                 // Apply adjustment: new_value = current_value + delta
                 double adjusted_value = current_value + delta;
+                if (income_stratum_filter.has_value() &&
+                    context.scenario().type() == ScenarioType::baseline && example_row.has_value() &&
+                    debug_example_rows != nullptr &&
+                    factor_name == example_row->factor) {
+                    bool expected = false;
+                    if (captured_apply_example.compare_exchange_strong(expected, true)) {
+                        example_row->person_id = person.id();
+                        example_row->current_value = current_value;
+                        example_row->final_value = adjusted_value;
+                    }
+                }
 
                 // Clamp value to an optionally specified range
                 if (ranges.has_value() && i < ranges.value().get().size()) {
@@ -274,7 +316,8 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
             } else {
                 // Regular risk factor: stored only in risk_factors map
                 // Get current value from risk_factors
-                double value = person.risk_factors.at(factor) + delta;
+                double current_value = person.risk_factors.at(factor);
+                double value = current_value + delta;
 
                 // Clamp value to an optionally specified range
                 if (ranges.has_value() && i < ranges.value().get().size()) {
@@ -284,9 +327,24 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
 
                 // Set the adjusted value to the risk factor
                 person.risk_factors.at(factor) = value;
+                if (income_stratum_filter.has_value() &&
+                    context.scenario().type() == ScenarioType::baseline && example_row.has_value() &&
+                    debug_example_rows != nullptr &&
+                    factor_name == example_row->factor) {
+                    bool expected = false;
+                    if (captured_apply_example.compare_exchange_strong(expected, true)) {
+                        example_row->person_id = person.id();
+                        example_row->current_value = current_value;
+                        example_row->final_value = value;
+                    }
+                }
             }
         }
     });
+
+    if (debug_example_rows != nullptr && example_row.has_value() && captured_apply_example.load()) {
+        debug_example_rows->push_back(*example_row);
+    }
 
     // Baseline scenario: send adjustments to intervention scenario.
     if (context.scenario().type() == ScenarioType::baseline) {
@@ -318,22 +376,30 @@ void RiskFactorAdjustableModel::set_logistic_factors(
 RiskFactorSexAgeTable
 RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context,
                                                  const std::vector<core::Identifier> &factors,
-                                                 OptionalRanges ranges, bool apply_trend) const {
+                                                 OptionalRanges ranges, bool apply_trend,
+                                                 const RiskFactorSexAgeTable *expected_override,
+                                                 std::optional<std::size_t>
+                                                     income_stratum_filter,
+                                                 IncomeStratumAdjustmentExampleRow
+                                                     *debug_delta_row) const {
     auto age_range = context.age_range();
     auto age_count = age_range.upper() + 1;
 
+    const auto *expected_table = expected_override != nullptr ? expected_override : expected_.get();
+
     // Compute simulated means.
-    auto simulated_means =
-        calculate_simulated_mean(context.population(), age_range, factors, logistic_factors_);
+    auto simulated_means = calculate_simulated_mean(context.population(), age_range, factors,
+                                                    logistic_factors_, income_stratum_filter);
 
     // Compute adjustments.
     auto adjustments = RiskFactorSexAgeTable{};
+    bool printed_delta_example = false;
     for (const auto &[sex, simulated_means_by_sex] : simulated_means) {
         for (size_t i = 0; i < factors.size(); i++) {
             const core::Identifier &factor = factors[i];
 
             // Check if this factor exists in the expected table
-            if (!expected_->contains(sex, factor)) {
+            if (!expected_table->contains(sex, factor)) {
                 std::cout << "\nWARNING - Factor " << factor.to_string()
                           << " not found in expected table for gender "
                           << (sex == core::Gender::male ? "Male" : "Female") << " - skipping";
@@ -347,7 +413,37 @@ RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context,
 
             adjustments.emplace(sex, factor, std::vector<double>(age_count));
             for (auto age = age_range.lower(); age <= age_range.upper(); age++) {
-                double expect = get_expected(context, sex, age, factor, range, apply_trend);
+                double expect = 0.0;
+                if (!expected_table->contains(sex, factor)) {
+                    continue;
+                }
+                expect = expected_table->at(sex, factor).at(age);
+                if (apply_trend && trend_type_ != TrendType::Null) {
+                    int elapsed_time = context.time_now() - context.start_time();
+                    switch (trend_type_) {
+                    case TrendType::Null:
+                        break;
+                    case TrendType::UPFTrend: {
+                        if (expected_trend_) {
+                            int t = std::min(elapsed_time, get_trend_steps(factor));
+                            expect *= pow(expected_trend_->at(factor), t);
+                        }
+                        break;
+                    }
+                    case TrendType::IncomeTrend: {
+                        if (elapsed_time > 0 && expected_income_trend_ &&
+                            expected_income_trend_decay_factors_) {
+                            double decay_factor = expected_income_trend_decay_factors_->at(factor);
+                            double expected_income_trend = expected_income_trend_->at(factor);
+                            expect *= expected_income_trend * exp(decay_factor * elapsed_time);
+                        }
+                        break;
+                    }
+                    }
+                }
+                if (range.has_value()) {
+                    expect = range.value().get().clamp(expect);
+                }
                 double sim_mean = simulated_means_by_sex.at(factor).at(age);
 
                 // Delta should remain zero if simulated mean is NaN.
@@ -359,6 +455,18 @@ RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context,
                 }
 
                 adjustments.at(sex, factor).at(age) = delta;
+                if (!printed_delta_example && debug_delta_row != nullptr &&
+                    income_stratum_filter.has_value() && expected_override != nullptr &&
+                    context.scenario().type() == ScenarioType::baseline) {
+                    debug_delta_row->bucket = income_stratum_filter.value();
+                    debug_delta_row->factor = factor.to_string();
+                    debug_delta_row->sex = sex == core::Gender::male ? "male" : "female";
+                    debug_delta_row->age = age;
+                    debug_delta_row->expected_value = expect;
+                    debug_delta_row->simulated_mean = sim_mean;
+                    debug_delta_row->delta = delta;
+                    printed_delta_example = true;
+                }
 
                 // Debug for income: expected vs simulated_mean vs delta (age 0 and 1 for both
                 // sexes)
@@ -392,7 +500,8 @@ RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context,
 RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_simulated_mean(
     Population &population, const core::IntegerInterval age_range,
     const std::vector<core::Identifier> &factors,
-    const std::unordered_set<core::Identifier> &logistic_factors) {
+    const std::unordered_set<core::Identifier> &logistic_factors,
+    std::optional<std::size_t> income_stratum_filter) {
     auto age_count = age_range.upper() + 1;
 
     // MAHIMA: Track excluded values for debugging
@@ -408,6 +517,11 @@ RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_simulated_mean(
 
     for (const auto &person : population) {
         if (!person.is_active()) {
+            continue;
+        }
+        if (income_stratum_filter.has_value() &&
+            (!person.has_income_adjustment_stratum ||
+             person.income_adjustment_stratum != income_stratum_filter.value())) {
             continue;
         }
 
