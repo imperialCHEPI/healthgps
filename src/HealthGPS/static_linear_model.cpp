@@ -95,6 +95,53 @@ void assign_income_categories_equal_split(Population &population,
     }
 }
 
+void assign_income_adjustment_strata_equal_split(Population &population, std::size_t bucket_count) {
+    if (bucket_count < 2u) {
+        return;
+    }
+
+    std::vector<std::pair<double, std::size_t>> ranked_people;
+    ranked_people.reserve(population.size());
+
+    // MAHIMA: Reset flags first so callers can reliably test assignment status per-step.
+    for (auto &person : population) {
+        person.has_income_adjustment_stratum = false;
+        person.income_adjustment_stratum = 0u;
+    }
+
+    for (std::size_t i = 0; i < population.size(); ++i) {
+        auto &person = population[i];
+        if (!person.is_active()) {
+            continue;
+        }
+        auto it = person.risk_factors.find("income"_id);
+        if (it == person.risk_factors.end()) {
+            continue;
+        }
+        ranked_people.emplace_back(it->second, i);
+    }
+
+    if (ranked_people.empty()) {
+        return;
+    }
+
+    // MAHIMA: Rank-based equal split keeps strata balanced (difference <= 1) and deterministic.
+    std::ranges::sort(ranked_people, [](const auto &lhs, const auto &rhs) {
+        if (lhs.first != rhs.first) {
+            return lhs.first < rhs.first;
+        }
+        return lhs.second < rhs.second;
+    });
+
+    const std::size_t n = ranked_people.size();
+    for (std::size_t rank = 0; rank < n; ++rank) {
+        const std::size_t bucket = (rank * bucket_count) / n;
+        auto &person = population[ranked_people[rank].second];
+        person.income_adjustment_stratum = bucket;
+        person.has_income_adjustment_stratum = true;
+    }
+}
+
 } // namespace
 
 StaticLinearModel::StaticLinearModel(
@@ -124,6 +171,8 @@ StaticLinearModel::StaticLinearModel(
     bool is_continuous_income_model, const LinearModelParams &continuous_income_model,
     std::string income_categories,
     const std::unordered_map<core::Identifier, PhysicalActivityModel> &physical_activity_models,
+    const std::vector<IncomeStratumExpectedTableEntry> &income_stratum_expected_tables,
+    bool income_stratum_adjustment_enabled, std::size_t adjustment_income_stratum_count,
     bool has_active_policies, const std::vector<LinearModelParams> &logistic_models)
     // NOLINTNEXTLINE(readability-function-cognitive-complexity)
     : RiskFactorAdjustableModel{std::move(expected),       expected_trend, trend_steps, trend_type,
@@ -154,6 +203,10 @@ StaticLinearModel::StaticLinearModel(
       physical_activity_stddev_{physical_activity_stddev},
       physical_activity_models_{physical_activity_models},
       has_physical_activity_models_{!physical_activity_models.empty()},
+      // MAHIMA: For income based factor means adjustment - cache loaded per-stratum expected tables for later use.
+      income_stratum_expected_tables_{income_stratum_expected_tables},
+      income_stratum_adjustment_enabled_{income_stratum_adjustment_enabled},
+      adjustment_income_stratum_count_{adjustment_income_stratum_count},
       has_active_policies_{has_active_policies}, logistic_models_{logistic_models} {
 
     if (names_.empty()) {
@@ -409,6 +462,14 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
                             false); // false = initial adjustment, not trended
     }
 
+    if (is_continuous_income_model_ && income_stratum_adjustment_enabled_) {
+        // MAHIMA: Phase 2 step 2 - assign N adjustment strata from current continuous income rank.
+        // If factors-mean adjustment is enabled, this uses the post-adjustment distribution;
+        // otherwise it uses initial continuous income values for a consistent fallback.
+        assign_income_adjustment_strata_equal_split(context.population(),
+                                                    adjustment_income_stratum_count_);
+    }
+
     // Continuous income only: after adjustment, assign income_categories (3 or 4).
     if (is_continuous_income_model_) {
         // MAHIMA: Clamping is intentionally disabled so category assignment reflects the
@@ -599,6 +660,13 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
                             extended_ranges.empty() ? std::nullopt
                                                     : OptionalRanges{extended_ranges},
                             false); // false = initial adjustment, not trended
+    }
+
+    if (is_continuous_income_model_ && income_stratum_adjustment_enabled_) {
+        // MAHIMA: Phase 2 step 2 - recompute yearly adjustment strata from current income rank so
+        // newborns and updated cohorts are always mapped to the configured N adjustment buckets.
+        assign_income_adjustment_strata_equal_split(context.population(),
+                                                    adjustment_income_stratum_count_);
     }
 
     // MAHIMA: Continuous income: assign categories with rank-based equal split.
@@ -2133,6 +2201,8 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     bool is_continuous_income_model, const LinearModelParams &continuous_income_model,
     std::string income_categories,
     const std::unordered_map<core::Identifier, PhysicalActivityModel> &physical_activity_models,
+    const std::vector<IncomeStratumExpectedTableEntry> &income_stratum_expected_tables,
+    bool income_stratum_adjustment_enabled, std::size_t adjustment_income_stratum_count,
     bool has_active_policies, std::vector<LinearModelParams> logistic_models)
     // NOLINTNEXTLINE(readability-function-cognitive-complexity)
     : RiskFactorAdjustableModelDefinition{std::move(expected),
@@ -2197,6 +2267,10 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
       physical_activity_stddev_{physical_activity_stddev},
       physical_activity_models_{physical_activity_models},
       has_physical_activity_models_{!physical_activity_models.empty()},
+      // MAHIMA: For income based factor means adjustment - definition retains per-stratum expected tables for create_model().
+      income_stratum_expected_tables_{income_stratum_expected_tables},
+      income_stratum_adjustment_enabled_{income_stratum_adjustment_enabled},
+      adjustment_income_stratum_count_{adjustment_income_stratum_count},
       // Two-stage modeling: Logistic regression for zero probability (optional)
       // Must be initialized before continuous income model fields (declaration order)
       logistic_models_{std::move(logistic_models)},
@@ -2344,7 +2418,9 @@ std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() con
         expected_income_trend_boxcox_, income_trend_steps_, income_trend_models_,
         income_trend_ranges_, income_trend_lambda_, income_trend_decay_factors_,
         is_continuous_income_model_, continuous_income_model_, income_categories_,
-        physical_activity_models_, has_active_policies_, logistic_models_);
+        physical_activity_models_, income_stratum_expected_tables_,
+        income_stratum_adjustment_enabled_, adjustment_income_stratum_count_,
+        has_active_policies_, logistic_models_);
 }
 
 } // namespace hgps

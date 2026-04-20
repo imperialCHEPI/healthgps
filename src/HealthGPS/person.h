@@ -88,6 +88,13 @@ struct Person {
     /// @brief Continuous income value (for FINCH approach)
     double income_continuous{0.0};
 
+    /// @brief Income adjustment stratum index (0..N-1) for optional stratum-specific factors mean.
+    /// @details This is separate from final `income` categories (3/4) used for reporting.
+    std::size_t income_adjustment_stratum{0};
+
+    /// @brief Whether income_adjustment_stratum has been assigned for this simulation step.
+    bool has_income_adjustment_stratum{false};
+
     /// @brief Physical activity level
     double physical_activity{0.0};
 

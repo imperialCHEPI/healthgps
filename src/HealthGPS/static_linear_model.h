@@ -5,6 +5,8 @@
 #include "risk_factor_adjustable_model.h"
 
 #include <Eigen/Dense>
+#include <string>
+#include <utility>
 #include <unordered_map>
 #include <vector>
 
@@ -38,6 +40,10 @@ struct PhysicalActivityModel {
     /// @brief Standard deviation for simple models (India approach)
     double stddev = 0.06;
 };
+
+/// @brief One expected factors-mean table mapped to a configured income stratum id.
+using IncomeStratumExpectedTableEntry =
+    std::pair<std::string, std::shared_ptr<RiskFactorSexAgeTable>>;
 
 /// @brief Implements the static linear model type
 /// @details The static model is used to initialise the virtual population.
@@ -113,6 +119,14 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
         /// FINCH (continuous) approaches
         const std::unordered_map<core::Identifier, PhysicalActivityModel>
             &physical_activity_models = {},
+        /// @param income_stratum_expected_tables Optional per-stratum expected tables (ordered as in
+        /// config)
+        const std::vector<IncomeStratumExpectedTableEntry> &income_stratum_expected_tables = {},
+        /// @param income_stratum_adjustment_enabled Whether per-stratum factors-mean adjustment is
+        /// enabled
+        bool income_stratum_adjustment_enabled = false,
+        /// @param adjustment_income_stratum_count Number of rank buckets used for adjustment strata
+        std::size_t adjustment_income_stratum_count = 0u,
         bool has_active_policies = true,
         /// @param logistic_models Logistic regression models for two-stage modeling (optional)
         /// Empty models indicate no logistic regression for that risk factor
@@ -321,6 +335,10 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     // Physical activity model support (both India and FINCH approaches)
     std::unordered_map<core::Identifier, PhysicalActivityModel> physical_activity_models_;
     bool has_physical_activity_models_ = false;
+    // MAHIMA: Phase 2 step 1 wiring only - parsed/loaded per-stratum tables cached on model.
+    std::vector<IncomeStratumExpectedTableEntry> income_stratum_expected_tables_;
+    bool income_stratum_adjustment_enabled_{false};
+    std::size_t adjustment_income_stratum_count_{0};
     // Policy optimization flag - Mahima's enhancement
     bool has_active_policies_;
 
@@ -399,6 +417,9 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
         std::string income_categories = "3",
         const std::unordered_map<core::Identifier, PhysicalActivityModel>
             &physical_activity_models = {},
+        const std::vector<IncomeStratumExpectedTableEntry> &income_stratum_expected_tables = {},
+        bool income_stratum_adjustment_enabled = false,
+        std::size_t adjustment_income_stratum_count = 0u,
         bool has_active_policies = true,
         /// @param logistic_models Logistic regression models for two-stage modeling (optional)
         std::vector<LinearModelParams> logistic_models = {});
@@ -444,6 +465,10 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     // Physical activity model support (FINCH approach)
     std::unordered_map<core::Identifier, PhysicalActivityModel> physical_activity_models_;
     bool has_physical_activity_models_ = false;
+    // MAHIMA: Phase 2 step 1 wiring only - carry per-stratum expected tables into runtime model.
+    std::vector<IncomeStratumExpectedTableEntry> income_stratum_expected_tables_;
+    bool income_stratum_adjustment_enabled_{false};
+    std::size_t adjustment_income_stratum_count_{0};
 
     // Two-stage modeling: Logistic regression for zero probability (optional)
     std::vector<LinearModelParams> logistic_models_;

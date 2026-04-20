@@ -129,6 +129,39 @@ nlohmann::json load_json(const std::filesystem::path &filepath) {
     }
 }
 
+namespace {
+std::unique_ptr<hgps::RiskFactorSexAgeTable>
+load_risk_factor_expected_pair(const Configuration &config, const std::filesystem::path &male_file,
+                               const std::filesystem::path &female_file,
+                               const std::string &delimiter, const std::string &source_tag) {
+    auto table = std::make_unique<hgps::RiskFactorSexAgeTable>();
+    const auto male_filename = male_file.string();
+    const auto female_filename = female_file.string();
+    try {
+        table->emplace_row(hgps::core::Gender::male, load_baseline_from_csv(male_filename, delimiter));
+        table->emplace_row(hgps::core::Gender::female,
+                           load_baseline_from_csv(female_filename, delimiter));
+    } catch (const std::runtime_error &ex) {
+        throw hgps::core::HgpsException{
+            fmt::format("Failed to parse adjustment file(s) for {}: {} or {}. {}", source_tag,
+                        male_filename, female_filename, ex.what())};
+    }
+
+    const auto max_age = static_cast<std::size_t>(config.settings.age_range.upper());
+    for (const auto &sex : *table) {
+        for (const auto &factor : sex.second) {
+            if (factor.second.size() <= max_age) {
+                throw hgps::core::HgpsException{
+                    fmt::format("{} baseline adjustment file must cover the required age range: [{}].",
+                                source_tag, config.settings.age_range.to_string())};
+            }
+        }
+    }
+
+    return table;
+}
+} // namespace
+
 // Loading of Factors Mean CSV file for Male and Female
 std::unique_ptr<hgps::RiskFactorSexAgeTable>
 load_risk_factor_expected(const Configuration &config) {
@@ -139,31 +172,9 @@ load_risk_factor_expected(const Configuration &config) {
         throw hgps::core::HgpsException{"Unsupported file format: " + info.format};
     }
 
-    auto table = std::make_unique<hgps::RiskFactorSexAgeTable>();
-    const auto male_filename = info.file_names.at("factorsmean_male").string();
-    const auto female_filename = info.file_names.at("factorsmean_female").string();
-    try {
-        table->emplace_row(hgps::core::Gender::male,
-                           load_baseline_from_csv(male_filename, info.delimiter));
-        table->emplace_row(hgps::core::Gender::female,
-                           load_baseline_from_csv(female_filename, info.delimiter));
-    } catch (const std::runtime_error &ex) {
-        throw hgps::core::HgpsException{fmt::format("Failed to parse adjustment file: {} or {}. {}",
-                                                    male_filename, female_filename, ex.what())};
-    }
-
-    const auto max_age = static_cast<std::size_t>(config.settings.age_range.upper());
-    for (const auto &sex : *table) {
-        for (const auto &factor : sex.second) {
-            if (factor.second.size() <= max_age) {
-                throw hgps::core::HgpsException{
-                    fmt::format("Baseline adjustment file must cover the required age range: [{}].",
-                                config.settings.age_range.to_string())};
-            }
-        }
-    }
-
-    return table;
+    return load_risk_factor_expected_pair(config, info.file_names.at("factorsmean_male"),
+                                          info.file_names.at("factorsmean_female"), info.delimiter,
+                                          "overall");
 }
 
 std::unique_ptr<hgps::DummyModelDefinition>
@@ -1126,14 +1137,41 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     auto expected = load_risk_factor_expected(config);
 
     // Check expected values are defined for all risk factors.
-    for (const auto &name : names) {
-        if (!expected->at(core::Gender::male).contains(name)) {
-            throw core::HgpsException{fmt::format(
-                "'{}' is not defined in male risk factor expected values.", name.to_string())};
+    auto validate_expected_has_all_factors = [&](const RiskFactorSexAgeTable &table,
+                                                 const std::string &label) {
+        for (const auto &name : names) {
+            if (!table.at(core::Gender::male).contains(name)) {
+                throw core::HgpsException{
+                    fmt::format("'{}' is not defined in male risk factor expected values for {}.",
+                                name.to_string(), label)};
+            }
+            if (!table.at(core::Gender::female).contains(name)) {
+                throw core::HgpsException{
+                    fmt::format("'{}' is not defined in female risk factor expected values for {}.",
+                                name.to_string(), label)};
+            }
         }
-        if (!expected->at(core::Gender::female).contains(name)) {
-            throw core::HgpsException{fmt::format(
-                "'{}' is not defined in female risk factor expected values.", name.to_string())};
+    };
+    validate_expected_has_all_factors(*expected, "overall");
+
+    std::vector<IncomeStratumExpectedTableEntry> income_stratum_expected_tables;
+    const auto &stratum_cfg = config.modelling.baseline_adjustment.income_stratum_factors_mean;
+    if (stratum_cfg.enabled) {
+        // MAHIMA: Phase 2 step 1 - load each configured stratum pair now and fail fast with
+        // stratum-specific context, so runtime never starts with partial stratum inputs.
+        income_stratum_expected_tables.reserve(stratum_cfg.strata.size());
+        const auto &base_info = config.modelling.baseline_adjustment;
+        if (!core::case_insensitive::equals(base_info.format, "CSV")) {
+            throw core::HgpsException{"Unsupported file format for income stratum adjustment: " +
+                                      base_info.format};
+        }
+        for (const auto &stratum : stratum_cfg.strata) {
+            auto table = load_risk_factor_expected_pair(
+                config, stratum.factorsmean_male, stratum.factorsmean_female, base_info.delimiter,
+                fmt::format("income stratum '{}'", stratum.id));
+            validate_expected_has_all_factors(*table, fmt::format("income stratum '{}'", stratum.id));
+            income_stratum_expected_tables.emplace_back(
+                stratum.id, std::shared_ptr<RiskFactorSexAgeTable>{std::move(table)});
         }
     }
 
@@ -1397,7 +1435,9 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             std::move(income_trend_steps), std::move(income_trend_models),
             std::move(income_trend_ranges), std::move(income_trend_lambda),
             std::move(income_trend_decay_factors), is_continuous_model, continuous_income_model,
-            income_categories, std::move(physical_activity_models), has_active_policies,
+            income_categories, std::move(physical_activity_models),
+            std::move(income_stratum_expected_tables), stratum_cfg.enabled,
+            stratum_cfg.adjustment_income_stratum_count, has_active_policies,
             std::move(logistic_models));
 
         std::cout << "\nDEBUG: StaticLinearModelDefinition created successfully";
