@@ -82,7 +82,8 @@ make_expected_table_with_income_and_pa(const hgps::core::Identifier &factor, dou
     expected->emplace(hgps::core::Gender::male, hgps::core::Identifier("income"), income_row);
     expected->emplace(hgps::core::Gender::female, hgps::core::Identifier("income"), income_row);
     expected->emplace(hgps::core::Gender::male, hgps::core::Identifier("PhysicalActivity"), pa_row);
-    expected->emplace(hgps::core::Gender::female, hgps::core::Identifier("PhysicalActivity"), pa_row);
+    expected->emplace(hgps::core::Gender::female, hgps::core::Identifier("PhysicalActivity"),
+                      pa_row);
     return expected;
 }
 } // namespace
@@ -190,13 +191,12 @@ TEST(IncomeStratumAdjustment, StaticLinearModelAppliesStrataInGenerateAndUpdate)
     auto trend_steps = std::make_shared<std::unordered_map<core::Identifier, int>>();
     auto expected_trend_boxcox = std::make_shared<std::unordered_map<core::Identifier, double>>();
 
-    auto model = StaticLinearModel(overall_expected, expected_trend, trend_steps, expected_trend_boxcox,
-                                   names, models, ranges, lambda, stddev, cholesky, policy_models,
-                                   policy_ranges, policy_cholesky, trend_models, trend_ranges,
-                                   trend_lambda, 0.0, rural_prevalence, income_models, 0.01,
-                                   TrendType::Null, nullptr, nullptr, nullptr, nullptr, nullptr,
-                                   nullptr, nullptr, true, continuous_income_model, "4", {},
-                                   stratum_tables, true, 2u, false, logistic_models);
+    auto model = StaticLinearModel(
+        overall_expected, expected_trend, trend_steps, expected_trend_boxcox, names, models, ranges,
+        lambda, stddev, cholesky, policy_models, policy_ranges, policy_cholesky, trend_models,
+        trend_ranges, trend_lambda, 0.0, rural_prevalence, income_models, 0.01, TrendType::Null,
+        nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, true,
+        continuous_income_model, "4", {}, stratum_tables, true, 2u, false, logistic_models);
 
     model.generate_risk_factors(context);
     for (const auto &p : context.population()) {
