@@ -171,14 +171,11 @@ double RiskFactorAdjustableModel::get_expected(RuntimeContext &context, core::Ge
 }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
-void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
-                                                    const std::vector<core::Identifier> &factors,
-                                                    OptionalRanges ranges, bool apply_trend,
-                                                    const RiskFactorSexAgeTable *expected_override,
-                                                    std::optional<std::size_t>
-                                                        income_stratum_filter,
-                                                    std::vector<IncomeStratumAdjustmentExampleRow>
-                                                        *debug_example_rows) const {
+void RiskFactorAdjustableModel::adjust_risk_factors(
+    RuntimeContext &context, const std::vector<core::Identifier> &factors, OptionalRanges ranges,
+    bool apply_trend, const RiskFactorSexAgeTable *expected_override,
+    std::optional<std::size_t> income_stratum_filter,
+    std::vector<IncomeStratumAdjustmentExampleRow> *debug_example_rows) const {
     RiskFactorSexAgeTable adjustments;
     std::atomic<bool> captured_apply_example{false};
     std::optional<IncomeStratumAdjustmentExampleRow> example_row;
@@ -186,8 +183,8 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
     // Baseline scenatio: compute adjustments.
     if (context.scenario().type() == ScenarioType::baseline) {
         IncomeStratumAdjustmentExampleRow delta_row;
-        adjustments = calculate_adjustments(context, factors, ranges, apply_trend, expected_override,
-                                            income_stratum_filter,
+        adjustments = calculate_adjustments(context, factors, ranges, apply_trend,
+                                            expected_override, income_stratum_filter,
                                             debug_example_rows != nullptr ? &delta_row : nullptr);
         if (debug_example_rows != nullptr && income_stratum_filter.has_value() &&
             expected_override != nullptr) {
@@ -253,8 +250,8 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
                 // Apply adjustment: new_value = current_value + delta
                 double adjusted_value = current_value + delta;
                 if (income_stratum_filter.has_value() &&
-                    context.scenario().type() == ScenarioType::baseline && example_row.has_value() &&
-                    debug_example_rows != nullptr &&
+                    context.scenario().type() == ScenarioType::baseline &&
+                    example_row.has_value() && debug_example_rows != nullptr &&
                     factor_name == example_row->factor) {
                     bool expected = false;
                     if (captured_apply_example.compare_exchange_strong(expected, true)) {
@@ -293,8 +290,8 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
                 // Apply adjustment: new_value = current_value + delta
                 double adjusted_value = current_value + delta;
                 if (income_stratum_filter.has_value() &&
-                    context.scenario().type() == ScenarioType::baseline && example_row.has_value() &&
-                    debug_example_rows != nullptr &&
+                    context.scenario().type() == ScenarioType::baseline &&
+                    example_row.has_value() && debug_example_rows != nullptr &&
                     factor_name == example_row->factor) {
                     bool expected = false;
                     if (captured_apply_example.compare_exchange_strong(expected, true)) {
@@ -328,8 +325,8 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
                 // Set the adjusted value to the risk factor
                 person.risk_factors.at(factor) = value;
                 if (income_stratum_filter.has_value() &&
-                    context.scenario().type() == ScenarioType::baseline && example_row.has_value() &&
-                    debug_example_rows != nullptr &&
+                    context.scenario().type() == ScenarioType::baseline &&
+                    example_row.has_value() && debug_example_rows != nullptr &&
                     factor_name == example_row->factor) {
                     bool expected = false;
                     if (captured_apply_example.compare_exchange_strong(expected, true)) {
@@ -373,15 +370,11 @@ void RiskFactorAdjustableModel::set_logistic_factors(
 }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
-RiskFactorSexAgeTable
-RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context,
-                                                 const std::vector<core::Identifier> &factors,
-                                                 OptionalRanges ranges, bool apply_trend,
-                                                 const RiskFactorSexAgeTable *expected_override,
-                                                 std::optional<std::size_t>
-                                                     income_stratum_filter,
-                                                 IncomeStratumAdjustmentExampleRow
-                                                     *debug_delta_row) const {
+RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_adjustments(
+    RuntimeContext &context, const std::vector<core::Identifier> &factors, OptionalRanges ranges,
+    bool apply_trend, const RiskFactorSexAgeTable *expected_override,
+    std::optional<std::size_t> income_stratum_filter,
+    IncomeStratumAdjustmentExampleRow *debug_delta_row) const {
     auto age_range = context.age_range();
     auto age_count = age_range.upper() + 1;
 

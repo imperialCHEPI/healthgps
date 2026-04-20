@@ -152,10 +152,9 @@ struct IncomeBucketSummary {
     double sum{0.0};
 };
 
-void print_income_adjustment_strata_table(const Population &population,
-                                          const std::vector<IncomeStratumExpectedTableEntry> &tables,
-                                          std::size_t bucket_count, int year,
-                                          std::string_view phase) {
+void print_income_adjustment_strata_table(
+    const Population &population, const std::vector<IncomeStratumExpectedTableEntry> &tables,
+    std::size_t bucket_count, int year, std::string_view phase) {
     if (bucket_count == 0) {
         return;
     }
@@ -179,7 +178,8 @@ void print_income_adjustment_strata_table(const Population &population,
     }
 
     std::ostringstream out;
-    out << "\n[INCOME BASED FACTOR MEANS ADJUSTMENT][INCOME-STRATUM ASSIGNMENT] Year " << year << " phase=" << phase << '\n';
+    out << "\n[INCOME BASED FACTOR MEANS ADJUSTMENT][INCOME-STRATUM ASSIGNMENT] Year " << year
+        << " phase=" << phase << '\n';
     out << "+--------+----------------------+-------+-------------+-------------+-------------+\n";
     out << "| Bucket | Stratum ID           | Count | Income Min  | Income Max  | Income Mean |\n";
     out << "+--------+----------------------+-------+-------------+-------------+-------------+\n";
@@ -287,9 +287,12 @@ void print_income_stratum_adjustment_examples_table(
     std::ostringstream out;
     out << "\n[MAHIMA][INCOME-STRATUM DELTA/APPLY EXAMPLES] Year " << year << " phase=" << phase
         << '\n';
-    out << "+--------+----------+----------------------+--------+-----+-------------+---------------+-------------+-------------+-------------+\n";
-    out << "| Bucket | PersonID | Factor               | Sex    | Age | Expected    | SimulatedMean | Delta       | Current     | Final       |\n";
-    out << "+--------+----------+----------------------+--------+-----+-------------+---------------+-------------+-------------+-------------+\n";
+    out << "+--------+----------+----------------------+--------+-----+-------------+--------------"
+           "-+-------------+-------------+-------------+\n";
+    out << "| Bucket | PersonID | Factor               | Sex    | Age | Expected    | "
+           "SimulatedMean | Delta       | Current     | Final       |\n";
+    out << "+--------+----------+----------------------+--------+-----+-------------+--------------"
+           "-+-------------+-------------+-------------+\n";
     for (const auto &r : rows) {
         out << "| " << std::setw(6) << r.bucket << " | " << std::setw(8) << r.person_id << " | "
             << std::setw(20) << std::left << r.factor << std::right << " | " << std::setw(6)
@@ -300,7 +303,8 @@ void print_income_stratum_adjustment_examples_table(
             << fmt::format("{:.5f}", r.current_value) << " | " << std::setw(11)
             << fmt::format("{:.5f}", r.final_value) << " |\n";
     }
-    out << "+--------+----------+----------------------+--------+-----+-------------+---------------+-------------+-------------+-------------+\n";
+    out << "+--------+----------+----------------------+--------+-----+-------------+--------------"
+           "-+-------------+-------------+-------------+\n";
     std::osyncstream(std::cout) << out.str();
 }
 
@@ -365,7 +369,8 @@ StaticLinearModel::StaticLinearModel(
       physical_activity_stddev_{physical_activity_stddev},
       physical_activity_models_{physical_activity_models},
       has_physical_activity_models_{!physical_activity_models.empty()},
-      // MAHIMA: For income based factor means adjustment - cache loaded per-stratum expected tables for later use.
+      // MAHIMA: For income based factor means adjustment - cache loaded per-stratum expected tables
+      // for later use.
       income_stratum_expected_tables_{income_stratum_expected_tables},
       income_stratum_adjustment_enabled_{income_stratum_adjustment_enabled},
       adjustment_income_stratum_count_{adjustment_income_stratum_count},
@@ -589,15 +594,16 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     if (req.risk_factors.adjust_to_factors_mean) {
         if (is_continuous_income_model_ && income_stratum_adjustment_enabled_ &&
             !income_stratum_expected_tables_.empty()) {
-            // MAHIMA: For income based factor means adjustment - with stratum mode ON, income is adjusted only
-            // against the overall expected table first. Risk factors + physical activity are then
-            // adjusted in per-stratum passes below (after rank-strata assignment).
+            // MAHIMA: For income based factor means adjustment - with stratum mode ON, income is
+            // adjusted only against the overall expected table first. Risk factors + physical
+            // activity are then adjusted in per-stratum passes below (after rank-strata
+            // assignment).
             if (req.income.enabled && req.income.adjust_to_factors_mean) {
                 const std::vector<core::Identifier> income_only_factors{"income"_id};
                 const std::vector<core::DoubleInterval> income_only_ranges{
                     core::DoubleInterval{0.0, 1e9}};
-                adjust_risk_factors(context, income_only_factors, OptionalRanges{income_only_ranges},
-                                    false);
+                adjust_risk_factors(context, income_only_factors,
+                                    OptionalRanges{income_only_ranges}, false);
             }
         } else {
             // Feature off path: keep legacy combined adjustment flow unchanged.
@@ -638,23 +644,24 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     }
 
     if (is_continuous_income_model_ && income_stratum_adjustment_enabled_) {
-        // MAHIMA:For income based factor means adjustment - assign N adjustment strata from current continuous income rank.
-        // If factors-mean adjustment is enabled, this uses the post-adjustment distribution;
-        // otherwise it uses initial continuous income values for a consistent fallback.
+        // MAHIMA:For income based factor means adjustment - assign N adjustment strata from current
+        // continuous income rank. If factors-mean adjustment is enabled, this uses the
+        // post-adjustment distribution; otherwise it uses initial continuous income values for a
+        // consistent fallback.
         assign_income_adjustment_strata_equal_split(context.population(),
                                                     adjustment_income_stratum_count_);
         if (context.scenario().type() == ScenarioType::baseline) {
-            print_income_adjustment_strata_table(context.population(), income_stratum_expected_tables_,
-                                                 adjustment_income_stratum_count_,
-                                                 static_cast<int>(context.time_now()), "initial");
+            print_income_adjustment_strata_table(
+                context.population(), income_stratum_expected_tables_,
+                adjustment_income_stratum_count_, static_cast<int>(context.time_now()), "initial");
         }
     }
 
     if (req.risk_factors.adjust_to_factors_mean && is_continuous_income_model_ &&
         income_stratum_adjustment_enabled_ && !income_stratum_expected_tables_.empty()) {
-        // MAHIMA: For income based factor means adjustment - apply per-stratum RF first, then PA, using each
-        // stratum's expected table and filtering to people in that adjustment stratum. Income is
-        // intentionally excluded here (already handled in overall pass above).
+        // MAHIMA: For income based factor means adjustment - apply per-stratum RF first, then PA,
+        // using each stratum's expected table and filtering to people in that adjustment stratum.
+        // Income is intentionally excluded here (already handled in overall pass above).
         const core::Identifier income_id("income");
         const core::Identifier pa_id("PhysicalActivity");
 
@@ -670,7 +677,8 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
             stratum_rf_ranges.push_back(ranges_[i]);
         }
 
-        bool adjust_pa = req.physical_activity.enabled && req.physical_activity.adjust_to_factors_mean;
+        bool adjust_pa =
+            req.physical_activity.enabled && req.physical_activity.adjust_to_factors_mean;
         bool pa_in_expected = false;
         if (adjust_pa) {
             try {
@@ -705,9 +713,8 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
             }
         }
         if (context.scenario().type() == ScenarioType::baseline) {
-            print_income_stratum_adjustment_examples_table(debug_rows,
-                                                           static_cast<int>(context.time_now()),
-                                                           "initial");
+            print_income_stratum_adjustment_examples_table(
+                debug_rows, static_cast<int>(context.time_now()), "initial");
         }
     }
 
@@ -740,9 +747,9 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
                       << " max=" << max_inc << " mean=" << (sum_inc / static_cast<double>(n_inc))
                       << " n=" << n_inc;
         }
-        const std::vector<double> thresholds = income_categories_ == "4"
-                                                   ? calculate_income_quartiles(context.population())
-                                                   : calculate_income_tertiles(context.population());
+        const std::vector<double> thresholds =
+            income_categories_ == "4" ? calculate_income_quartiles(context.population())
+                                      : calculate_income_tertiles(context.population());
         assign_income_categories_equal_split(context.population(), income_categories_);
         if (context.scenario().type() == ScenarioType::baseline) {
             print_final_income_category_table(context.population(), income_categories_, thresholds,
@@ -777,17 +784,16 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     if (req.trend.enabled && req.risk_factors.trended) {
         if (is_continuous_income_model_ && income_stratum_adjustment_enabled_ &&
             !income_stratum_expected_tables_.empty()) {
-            // MAHIMA: For income based factor means adjustment - trended path: same ordering as initial path.
-            // 1) Overall income trended adjustment (optional by project requirements),
-            // 2) refresh adjustment strata from updated continuous income,
-            // 3) per-stratum RF trended adjustment,
-            // 4) per-stratum PA trended adjustment.
+            // MAHIMA: For income based factor means adjustment - trended path: same ordering as
+            // initial path. 1) Overall income trended adjustment (optional by project
+            // requirements), 2) refresh adjustment strata from updated continuous income, 3)
+            // per-stratum RF trended adjustment, 4) per-stratum PA trended adjustment.
             if (req.income.enabled && req.income.trended) {
                 const std::vector<core::Identifier> income_only_factors{"income"_id};
                 const std::vector<core::DoubleInterval> income_only_ranges{
                     core::DoubleInterval{0.0, 1e9}};
-                adjust_risk_factors(context, income_only_factors, OptionalRanges{income_only_ranges},
-                                    true);
+                adjust_risk_factors(context, income_only_factors,
+                                    OptionalRanges{income_only_ranges}, true);
             }
 
             assign_income_adjustment_strata_equal_split(context.population(),
@@ -849,9 +855,8 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
                 }
             }
             if (context.scenario().type() == ScenarioType::baseline) {
-                print_income_stratum_adjustment_examples_table(debug_rows,
-                                                               static_cast<int>(context.time_now()),
-                                                               "trended");
+                print_income_stratum_adjustment_examples_table(
+                    debug_rows, static_cast<int>(context.time_now()), "trended");
             }
         } else {
             // Trended adjustment: extended list uses project_requirements (legacy path).
@@ -918,8 +923,8 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
                 const std::vector<core::Identifier> income_only_factors{"income"_id};
                 const std::vector<core::DoubleInterval> income_only_ranges{
                     core::DoubleInterval{0.0, 1e9}};
-                adjust_risk_factors(context, income_only_factors, OptionalRanges{income_only_ranges},
-                                    false);
+                adjust_risk_factors(context, income_only_factors,
+                                    OptionalRanges{income_only_ranges}, false);
             }
         } else {
             auto [extended_factors, extended_ranges] =
@@ -932,8 +937,9 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
     }
 
     if (is_continuous_income_model_ && income_stratum_adjustment_enabled_) {
-        // MAHIMA: For income based factor means adjustment - recompute yearly adjustment strata from current income rank so
-        // newborns and updated cohorts are always mapped to the configured N adjustment buckets.
+        // MAHIMA: For income based factor means adjustment - recompute yearly adjustment strata
+        // from current income rank so newborns and updated cohorts are always mapped to the
+        // configured N adjustment buckets.
         assign_income_adjustment_strata_equal_split(context.population(),
                                                     adjustment_income_stratum_count_);
         if (context.scenario().type() == ScenarioType::baseline) {
@@ -961,7 +967,8 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             stratum_rf_ranges.push_back(ranges_[i]);
         }
 
-        bool adjust_pa = req.physical_activity.enabled && req.physical_activity.adjust_to_factors_mean;
+        bool adjust_pa =
+            req.physical_activity.enabled && req.physical_activity.adjust_to_factors_mean;
         bool pa_in_expected = false;
         if (adjust_pa) {
             try {
@@ -996,9 +1003,8 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             }
         }
         if (context.scenario().type() == ScenarioType::baseline) {
-            print_income_stratum_adjustment_examples_table(debug_rows,
-                                                           static_cast<int>(context.time_now()),
-                                                           "yearly-initial");
+            print_income_stratum_adjustment_examples_table(
+                debug_rows, static_cast<int>(context.time_now()), "yearly-initial");
         }
     }
 
@@ -1008,9 +1014,9 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
         // MAHIMA: Reassign using equal-population rank buckets; this
         // removes redundant quartile/tertile recalculation and avoids tie-at-max
         // edge cases where the highest category can become empty.
-        const std::vector<double> thresholds = income_categories_ == "4"
-                                                   ? calculate_income_quartiles(context.population())
-                                                   : calculate_income_tertiles(context.population());
+        const std::vector<double> thresholds =
+            income_categories_ == "4" ? calculate_income_quartiles(context.population())
+                                      : calculate_income_tertiles(context.population());
         assign_income_categories_equal_split(context.population(), income_categories_);
         if (context.scenario().type() == ScenarioType::baseline) {
             print_final_income_category_table(context.population(), income_categories_, thresholds,
@@ -1072,8 +1078,8 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
                 const std::vector<core::Identifier> income_only_factors{"income"_id};
                 const std::vector<core::DoubleInterval> income_only_ranges{
                     core::DoubleInterval{0.0, 1e9}};
-                adjust_risk_factors(context, income_only_factors, OptionalRanges{income_only_ranges},
-                                    true);
+                adjust_risk_factors(context, income_only_factors,
+                                    OptionalRanges{income_only_ranges}, true);
             }
             assign_income_adjustment_strata_equal_split(context.population(),
                                                         adjustment_income_stratum_count_);
@@ -1134,9 +1140,8 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
                 }
             }
             if (context.scenario().type() == ScenarioType::baseline) {
-                print_income_stratum_adjustment_examples_table(debug_rows,
-                                                               static_cast<int>(context.time_now()),
-                                                               "yearly-trended");
+                print_income_stratum_adjustment_examples_table(
+                    debug_rows, static_cast<int>(context.time_now()), "yearly-trended");
             }
         } else {
             auto [trended_extended_factors, trended_extended_ranges] =
@@ -1159,11 +1164,9 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             // repeated threshold scans.
             assign_income_categories_equal_split(context.population(), income_categories_);
             if (context.scenario().type() == ScenarioType::baseline) {
-                const std::vector<double> thresholds = income_categories_ == "4"
-                                                           ? calculate_income_quartiles(
-                                                                 context.population())
-                                                           : calculate_income_tertiles(
-                                                                 context.population());
+                const std::vector<double> thresholds =
+                    income_categories_ == "4" ? calculate_income_quartiles(context.population())
+                                              : calculate_income_tertiles(context.population());
                 print_final_income_category_table(context.population(), income_categories_,
                                                   thresholds, static_cast<int>(context.time_now()),
                                                   "yearly-trended");
@@ -2681,7 +2684,8 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
       physical_activity_stddev_{physical_activity_stddev},
       physical_activity_models_{physical_activity_models},
       has_physical_activity_models_{!physical_activity_models.empty()},
-      // MAHIMA: For income based factor means adjustment - definition retains per-stratum expected tables for create_model().
+      // MAHIMA: For income based factor means adjustment - definition retains per-stratum expected
+      // tables for create_model().
       income_stratum_expected_tables_{income_stratum_expected_tables},
       income_stratum_adjustment_enabled_{income_stratum_adjustment_enabled},
       adjustment_income_stratum_count_{adjustment_income_stratum_count},
@@ -2833,8 +2837,8 @@ std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() con
         income_trend_ranges_, income_trend_lambda_, income_trend_decay_factors_,
         is_continuous_income_model_, continuous_income_model_, income_categories_,
         physical_activity_models_, income_stratum_expected_tables_,
-        income_stratum_adjustment_enabled_, adjustment_income_stratum_count_,
-        has_active_policies_, logistic_models_);
+        income_stratum_adjustment_enabled_, adjustment_income_stratum_count_, has_active_policies_,
+        logistic_models_);
 }
 
 } // namespace hgps

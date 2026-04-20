@@ -7,9 +7,9 @@
 #include "risk_factor_model.h"
 #include "runtime_context.h"
 
+#include <cstddef>
 #include <functional>
 #include <optional>
-#include <cstddef>
 #include <string>
 #include <unordered_set>
 #include <vector>
@@ -95,8 +95,9 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
     /// @param ranges An optional list of risk factor value boundaries
     /// @param apply_trend Whether to apply expected value time trend
     void adjust_risk_factors(
-        RuntimeContext &context, const std::vector<core::Identifier> &factors, OptionalRanges ranges,
-        bool apply_trend, const RiskFactorSexAgeTable *expected_override = nullptr,
+        RuntimeContext &context, const std::vector<core::Identifier> &factors,
+        OptionalRanges ranges, bool apply_trend,
+        const RiskFactorSexAgeTable *expected_override = nullptr,
         std::optional<std::size_t> income_stratum_filter = std::nullopt,
         std::vector<IncomeStratumAdjustmentExampleRow> *debug_example_rows = nullptr) const;
 
