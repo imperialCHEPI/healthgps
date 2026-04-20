@@ -234,14 +234,13 @@ hgps::StaticLinearModel create_test_static_linear_model(
     auto expected_trend = std::make_shared<std::unordered_map<core::Identifier, double>>();
     auto trend_steps = std::make_shared<std::unordered_map<core::Identifier, int>>();
     auto expected_trend_boxcox = std::make_shared<std::unordered_map<core::Identifier, double>>();
-    return StaticLinearModel(overall_expected, expected_trend, trend_steps, expected_trend_boxcox,
-                             names, models, ranges, lambda, stddev, cholesky, policy_models,
-                             policy_ranges, policy_cholesky, trend_models, trend_ranges,
-                             trend_lambda, 0.0, rural_prevalence, income_models, 0.01,
-                             TrendType::Null, nullptr, nullptr, nullptr, nullptr, nullptr,
-                             nullptr, nullptr, true, continuous_income_model, "4", {}, stratum_tables,
-                             stratum_enabled, adjustment_income_stratum_count, false,
-                             logistic_models);
+    return StaticLinearModel(
+        overall_expected, expected_trend, trend_steps, expected_trend_boxcox, names, models, ranges,
+        lambda, stddev, cholesky, policy_models, policy_ranges, policy_cholesky, trend_models,
+        trend_ranges, trend_lambda, 0.0, rural_prevalence, income_models, 0.01, TrendType::Null,
+        nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, true,
+        continuous_income_model, "4", {}, stratum_tables, stratum_enabled,
+        adjustment_income_stratum_count, false, logistic_models);
 }
 } // namespace
 
@@ -466,7 +465,8 @@ TEST(IncomeStratumAdjustment, LoadExpectedFailsWhenCsvFilesMissing) {
     const auto base = std::filesystem::temp_directory_path() /
                       ("healthgps_income_stratum_missing_" +
                        std::to_string(static_cast<unsigned long long>(std::rand())));
-    auto config = make_config_for_expected_load(base / "missing_male.csv", base / "missing_female.csv", 2);
+    auto config =
+        make_config_for_expected_load(base / "missing_male.csv", base / "missing_female.csv", 2);
 
     // MAHIMA: Phase-3 parser/load failure coverage for missing files.
     // We assert fail-fast behavior so invalid baseline-adjustment paths are reported immediately.
