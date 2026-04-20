@@ -8,7 +8,6 @@
 #include <algorithm>
 #include <atomic>
 #include <cmath>
-#include <iomanip>
 #include <iostream>
 #include <oneapi/tbb/parallel_for_each.h>
 #include <optional>
@@ -62,39 +61,6 @@ bool should_include_in_simulated_mean(
         return true;
     }
     return value != 0;
-}
-
-/// @brief Print excluded-values summary once (thread-local).
-void print_excluded_summary_once(
-    const std::vector<hgps::core::Identifier> &factors,
-    const std::unordered_set<hgps::core::Identifier> &logistic_factors,
-    const std::unordered_map<hgps::core::Identifier, int> &excluded_counts,
-    const std::unordered_map<hgps::core::Identifier, int> &total_counts) {
-    thread_local static bool summary_printed = false;
-    if (summary_printed) {
-        return;
-    }
-    const hgps::core::Identifier income_id("income");
-    const hgps::core::Identifier pa_id("PhysicalActivity");
-    std::cout << "\n=== SIMULATED MEAN CALCULATION - EXCLUDED VALUES SUMMARY ===";
-    std::cout << "\nLogistic factors set size: " << logistic_factors.size();
-    for (const auto &factor : factors) {
-        if (factor == income_id || factor == pa_id) {
-            continue;
-        }
-        const int excluded = excluded_counts.at(factor);
-        const int total = total_counts.at(factor);
-        const double pct = (total > 0) ? (100.0 * excluded / total) : 0.0;
-        const char *tag =
-            logistic_factors.contains(factor) ? "HAS logistic model" : "NO logistic model";
-        std::cout << "\n"
-                  << factor.to_string() << " (" << tag << "): " << excluded
-                  << " zero values excluded out of " << total << " total values (" << std::fixed
-                  << std::setprecision(1) << pct << "% excluded)";
-    }
-    std::cout << "\n===============================================================";
-    std::cout.flush();
-    summary_printed = true;
 }
 
 } // anonymous namespace
@@ -213,8 +179,7 @@ void RiskFactorAdjustableModel::adjust_risk_factors(
 
     // All scenarios: apply adjustments to population.
     auto &pop = context.population();
-    // NOLINTNEXTLINE(readability-function-cognitive-complexity)
-    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
+    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) { // NOLINT(readability-function-cognitive-complexity)
         if (!person.is_active()) {
             return;
         }
@@ -462,28 +427,6 @@ RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_adjustments(
                     printed_delta_example = true;
                 }
 
-                // Debug for income: expected vs simulated_mean vs delta (age 0 and 1 for both
-                // sexes)
-                if (factor.to_string() == "income" &&
-                    (age == age_range.lower() ||
-                     (age == age_range.lower() + 1 && age <= age_range.upper()))) {
-                    std::cout << "\n[INCOME ADJUST] "
-                              << (sex == core::Gender::male ? "male" : "female") << " age" << age
-                              << " expected=" << expect << " simulated_mean=" << sim_mean
-                              << " delta=" << delta;
-                    if (expect < 100.0 && sim_mean > 200.0) {
-                        static bool warned = false;
-                        if (!warned) {
-                            std::cout << "\n[INCOME] WARNING: factors mean 'income' column has "
-                                         "expected="
-                                      << expect << " but simulated mean is ~" << sim_mean
-                                      << ". For continuous income use values in the same scale "
-                                         "(e.g. ~600 for age 0) in factorsmean_male/female CSV, "
-                                         "not category (1-4) or another variable.";
-                            warned = true;
-                        }
-                    }
-                }
             }
         }
     }
@@ -550,8 +493,6 @@ RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_simulated_mean(
             }
         }
     }
-
-    print_excluded_summary_once(factors, logistic_factors, excluded_counts, total_counts);
 
     return means;
 }

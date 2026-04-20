@@ -12,10 +12,12 @@
 #include <iomanip>
 #include <iostream>
 #include <limits>
+#include <mutex>
 #include <ranges>
 #include <sstream>
 #include <string_view>
 #include <syncstream>
+#include <tuple>
 #include <unordered_map>
 #include <utility>
 
@@ -310,7 +312,7 @@ void print_income_stratum_adjustment_examples_table(
 
 } // namespace
 
-// NOLINTBEGIN(readability-function-cognitive-complexity)
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 StaticLinearModel::StaticLinearModel(
     std::shared_ptr<RiskFactorSexAgeTable> expected,
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
@@ -341,7 +343,6 @@ StaticLinearModel::StaticLinearModel(
     const std::vector<IncomeStratumExpectedTableEntry> &income_stratum_expected_tables,
     bool income_stratum_adjustment_enabled, std::size_t adjustment_income_stratum_count,
     bool has_active_policies, const std::vector<LinearModelParams> &logistic_models)
-    // NOLINTNEXTLINE(readability-function-cognitive-complexity)
     : RiskFactorAdjustableModel{std::move(expected),       expected_trend,
                                 std::move(trend_steps),    trend_type,
                                 expected_income_trend,       // Pass by value, not moved
@@ -522,7 +523,6 @@ StaticLinearModel::StaticLinearModel(
         }
     }
 }
-// NOLINTEND(readability-function-cognitive-complexity)
 
 RiskFactorModelType StaticLinearModel::type() const noexcept { return RiskFactorModelType::Static; }
 
@@ -587,8 +587,12 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         }
     }
     set_logistic_factors(logistic_factors_set);
-    std::cout << "\nSet " << logistic_factors_set.size()
-              << " logistic factors for simulated mean calculation";
+    static std::once_flag logistic_factors_print_once;
+    std::call_once(logistic_factors_print_once, [&]() {
+        std::osyncstream(std::cout)
+            << "\nSet " << logistic_factors_set.size()
+            << " logistic factors for simulated mean calculation\n";
+    });
 
     // MAHIMA: Initial factors-mean adjustment only when user sets
     // risk_factors.adjust_to_factors_mean to true in project_requirements. No hardcoded true/false
@@ -1218,6 +1222,7 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
     static int factors_count = 0;
     static bool first_call = true;
     static bool summary_printed = false;
+    static std::once_flag summary_print_once;
     static std::unordered_map<core::Identifier, int> risk_factor_counts;
     static std::unordered_map<core::Identifier, int> stage1_zero_counts; // Track Stage 1 zeros
     static std::unordered_map<core::Identifier, int> stage2_counts; // Track Stage 2 (BoxCox) usage
@@ -1311,39 +1316,56 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
 
     // Print summary once at the end of initial generation (not during updates for newborns)
     if (!summary_printed && std::cmp_equal(factors_count, initial_generation_count)) {
+        std::call_once(summary_print_once, [&]() {
         // Print 2-stage modeling summary
-        std::cout << "\n=== TWO-STAGE MODELING SUMMARY ===";
-        std::vector<std::string> two_stage_factors;
-        std::vector<std::string> boxcox_only_factors;
+        std::vector<std::tuple<std::string, std::string, int, int>> modeling_rows;
+        std::size_t two_stage_count = 0;
+        std::size_t boxcox_only_count = 0;
 
         for (const auto &name : names_) {
             bool has_logistic = has_logistic_tracked[name];
+            const int stage2_non_zeros = stage2_counts[name];
             if (has_logistic) {
-                two_stage_factors.push_back(name.to_string());
-                int zeros = stage1_zero_counts[name];
-                int non_zeros = stage2_counts[name];
-                std::cout << "\n  " << name.to_string() << " (2-stage): " << zeros
-                          << " zeros from Stage 1, " << non_zeros << " non-zeros from Stage 2";
+                const int stage1_zeros = stage1_zero_counts[name];
+                modeling_rows.emplace_back(name.to_string(), "2-stage", stage1_zeros,
+                                           stage2_non_zeros);
+                two_stage_count++;
             } else {
-                boxcox_only_factors.push_back(name.to_string());
+                // Stage 1 is intentionally skipped for BoxCox-only factors.
+                modeling_rows.emplace_back(name.to_string(), "BoxCox-only", 0, stage2_non_zeros);
+                boxcox_only_count++;
             }
         }
 
-        std::cout
-            << "\n\nRisk factors using 2-stage modeling (Stage 1: Logistic, Stage 2: BoxCox): "
-            << two_stage_factors.size();
-        if (!two_stage_factors.empty()) {
-            std::cout << "\n  " << fmt::format("{}", fmt::join(two_stage_factors, ", "));
+        std::ostringstream out;
+        const int factor_width = 28;
+        const int model_width = 14;
+        const int count_width = 16;
+        const std::string separator = "+" + std::string(factor_width + 2, '-') + "+" +
+                                      std::string(model_width + 2, '-') + "+" +
+                                      std::string(count_width + 2, '-') + "+" +
+                                      std::string(count_width + 2, '-') + "+";
+        out << "\n=== TWO-STAGE MODELING SUMMARY ===";
+        out << "\n" << separator;
+        out << "\n| " << std::left << std::setw(factor_width) << "Risk factor" << " | "
+            << std::left << std::setw(model_width) << "Model type" << " | " << std::right
+            << std::setw(count_width) << "Stage 1 zeros"
+            << " | " << std::setw(count_width) << "Stage 2 non-zeros"
+            << " |";
+        out << "\n" << separator;
+        for (const auto &[factor, model, stage1_zeros, stage2_non_zeros] : modeling_rows) {
+            out << "\n| " << std::left << std::setw(factor_width) << factor << " | " << std::left
+                << std::setw(model_width) << model << " | " << std::right << std::setw(count_width)
+                << stage1_zeros << " | " << std::setw(count_width) << stage2_non_zeros << " |";
         }
-
-        std::cout << "\n\nRisk factors using BoxCox-only (no logistic regression): "
-                  << boxcox_only_factors.size();
-        if (!boxcox_only_factors.empty()) {
-            std::cout << "\n  " << fmt::format("{}", fmt::join(boxcox_only_factors, ", "));
-        }
-        std::cout << "\n======================================";
+        out << "\n" << separator;
+        out << "\n2-stage factors: " << two_stage_count
+            << " | BoxCox-only factors (Stage 1 skipped): " << boxcox_only_count;
+        out << "\n======================================";
+        std::osyncstream(std::cout) << out.str() << '\n';
 
         summary_printed = true;
+        });
     }
 }
 
