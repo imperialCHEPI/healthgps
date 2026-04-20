@@ -179,131 +179,134 @@ void RiskFactorAdjustableModel::adjust_risk_factors(
 
     // All scenarios: apply adjustments to population.
     auto &pop = context.population();
-    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) { // NOLINT(readability-function-cognitive-complexity)
-        if (!person.is_active()) {
-            return;
-        }
-        if (income_stratum_filter.has_value() &&
-            (!person.has_income_adjustment_stratum ||
-             person.income_adjustment_stratum != income_stratum_filter.value())) {
-            return;
-        }
+    tbb::parallel_for_each(
+        pop.begin(), pop.end(),
+        [&](auto &person) { // NOLINT(readability-function-cognitive-complexity)
+            if (!person.is_active()) {
+                return;
+            }
+            if (income_stratum_filter.has_value() &&
+                (!person.has_income_adjustment_stratum ||
+                 person.income_adjustment_stratum != income_stratum_filter.value())) {
+                return;
+            }
 
-        for (size_t i = 0; i < factors.size(); i++) {
-            const core::Identifier &factor = factors[i];
-            double delta = adjustments.at(person.gender, factor).at(person.age);
-            const std::string &factor_name = factor.to_string();
-            std::string factor_name_lower = factor_name;
-            std::ranges::transform(factor_name_lower, factor_name_lower.begin(), ::tolower);
+            for (size_t i = 0; i < factors.size(); i++) {
+                const core::Identifier &factor = factors[i];
+                double delta = adjustments.at(person.gender, factor).at(person.age);
+                const std::string &factor_name = factor.to_string();
+                std::string factor_name_lower = factor_name;
+                std::ranges::transform(factor_name_lower, factor_name_lower.begin(), ::tolower);
 
-            // MAHIMA: Special handling for income and physical activity
-            //  These are stored in member variables, not just in risk_factors map
-            //  Note: Factor name in expected table is "income" (canonical)
-            //        Factor name in expected table is "PhysicalActivity" (canonical), but
-            //        internally stored as physical_activity
-            if (factor_name_lower == "income") {
-                // Get current value from risk_factors["income"] or person.income_continuous (for
-                // continuous model)
-                double current_value = 0.0;
-                if (person.risk_factors.contains(factor)) {
-                    current_value = person.risk_factors.at(factor);
-                } else if (person.income_continuous > 0.0) {
-                    // Fallback: use member variable if risk_factors doesn't have it (continuous
+                // MAHIMA: Special handling for income and physical activity
+                //  These are stored in member variables, not just in risk_factors map
+                //  Note: Factor name in expected table is "income" (canonical)
+                //        Factor name in expected table is "PhysicalActivity" (canonical), but
+                //        internally stored as physical_activity
+                if (factor_name_lower == "income") {
+                    // Get current value from risk_factors["income"] or person.income_continuous
+                    // (for continuous model)
+                    double current_value = 0.0;
+                    if (person.risk_factors.contains(factor)) {
+                        current_value = person.risk_factors.at(factor);
+                    } else if (person.income_continuous > 0.0) {
+                        // Fallback: use member variable if risk_factors doesn't have it (continuous
+                        // model)
+                        current_value = person.income_continuous;
+                    }
+
+                    // Apply adjustment: new_value = current_value + delta
+                    double adjusted_value = current_value + delta;
+                    if (income_stratum_filter.has_value() &&
+                        context.scenario().type() == ScenarioType::baseline &&
+                        example_row.has_value() && debug_example_rows != nullptr &&
+                        factor_name == example_row->factor) {
+                        bool expected = false;
+                        if (captured_apply_example.compare_exchange_strong(expected, true)) {
+                            example_row->person_id = person.id();
+                            example_row->current_value = current_value;
+                            example_row->final_value = adjusted_value;
+                        }
+                    }
+
+                    // MAHIMA: We make sure that min/max of income models is used but we do not
+                    // clamp Do not clamp income to a range: income is continuous and should match
+                    // factors-mean scale (e.g. ~621 for age 0). Using another factor's range (e.g.
+                    // 0–42.7) would cap everyone at 42.7 and collapse quartiles, leaving only
+                    // low/lowermiddle. (Ranges passed in are for base risk factors; income uses a
+                    // different scale.)
+                    // The problem is that in income module csv file, income ranges are diffrent
+                    // from the fcators mean range. In the csv, the range is 25-2379 wheras in
+                    // factors mean, the range is 769. So majority of the people will get clamped.
+
+                    // Update risk_factors["income"] (canonical name for mapping/output)
+                    person.risk_factors[factor] = adjusted_value;
+                    // Also update person.income_continuous if it was previously set (continuous
                     // model)
-                    current_value = person.income_continuous;
-                }
-
-                // Apply adjustment: new_value = current_value + delta
-                double adjusted_value = current_value + delta;
-                if (income_stratum_filter.has_value() &&
-                    context.scenario().type() == ScenarioType::baseline &&
-                    example_row.has_value() && debug_example_rows != nullptr &&
-                    factor_name == example_row->factor) {
-                    bool expected = false;
-                    if (captured_apply_example.compare_exchange_strong(expected, true)) {
-                        example_row->person_id = person.id();
-                        example_row->current_value = current_value;
-                        example_row->final_value = adjusted_value;
+                    if (person.income_continuous > 0.0) {
+                        person.income_continuous = adjusted_value;
                     }
-                }
-
-                // MAHIMA: We make sure that min/max of income models is used but we do not clamp
-                // Do not clamp income to a range: income is continuous and should match
-                // factors-mean scale (e.g. ~621 for age 0). Using another factor's range (e.g.
-                // 0–42.7) would cap everyone at 42.7 and collapse quartiles, leaving only
-                // low/lowermiddle. (Ranges passed in are for base risk factors; income uses a
-                // different scale.)
-                // The problem is that in income module csv file, income ranges are diffrent from
-                // the fcators mean range. In the csv, the range is 25-2379 wheras in factors mean,
-                // the range is 769. So majority of the people will get clamped.
-
-                // Update risk_factors["income"] (canonical name for mapping/output)
-                person.risk_factors[factor] = adjusted_value;
-                // Also update person.income_continuous if it was previously set (continuous model)
-                if (person.income_continuous > 0.0) {
-                    person.income_continuous = adjusted_value;
-                }
-            } else if (factor_name == "PhysicalActivity") {
-                // Factor name "PhysicalActivity" from expected table maps to
-                // person.physical_activity internally Get current value from member variable
-                double current_value = person.physical_activity;
-                const core::Identifier physical_activity_id("PhysicalActivity");
-                if (person.risk_factors.contains(physical_activity_id)) {
-                    // Use risk_factors value if it exists (may be more up-to-date)
-                    current_value = person.risk_factors.at(physical_activity_id);
-                }
-
-                // Apply adjustment: new_value = current_value + delta
-                double adjusted_value = current_value + delta;
-                if (income_stratum_filter.has_value() &&
-                    context.scenario().type() == ScenarioType::baseline &&
-                    example_row.has_value() && debug_example_rows != nullptr &&
-                    factor_name == example_row->factor) {
-                    bool expected = false;
-                    if (captured_apply_example.compare_exchange_strong(expected, true)) {
-                        example_row->person_id = person.id();
-                        example_row->current_value = current_value;
-                        example_row->final_value = adjusted_value;
+                } else if (factor_name == "PhysicalActivity") {
+                    // Factor name "PhysicalActivity" from expected table maps to
+                    // person.physical_activity internally Get current value from member variable
+                    double current_value = person.physical_activity;
+                    const core::Identifier physical_activity_id("PhysicalActivity");
+                    if (person.risk_factors.contains(physical_activity_id)) {
+                        // Use risk_factors value if it exists (may be more up-to-date)
+                        current_value = person.risk_factors.at(physical_activity_id);
                     }
-                }
 
-                // Clamp value to an optionally specified range
-                if (ranges.has_value() && i < ranges.value().get().size()) {
-                    const auto &range = ranges.value().get()[i];
-                    adjusted_value = range.clamp(adjusted_value);
-                }
+                    // Apply adjustment: new_value = current_value + delta
+                    double adjusted_value = current_value + delta;
+                    if (income_stratum_filter.has_value() &&
+                        context.scenario().type() == ScenarioType::baseline &&
+                        example_row.has_value() && debug_example_rows != nullptr &&
+                        factor_name == example_row->factor) {
+                        bool expected = false;
+                        if (captured_apply_example.compare_exchange_strong(expected, true)) {
+                            example_row->person_id = person.id();
+                            example_row->current_value = current_value;
+                            example_row->final_value = adjusted_value;
+                        }
+                    }
 
-                // Update both member variable and risk_factors map for consistency
-                person.physical_activity = adjusted_value;
-                person.risk_factors[physical_activity_id] = adjusted_value;
-            } else {
-                // Regular risk factor: stored only in risk_factors map
-                // Get current value from risk_factors
-                double current_value = person.risk_factors.at(factor);
-                double value = current_value + delta;
+                    // Clamp value to an optionally specified range
+                    if (ranges.has_value() && i < ranges.value().get().size()) {
+                        const auto &range = ranges.value().get()[i];
+                        adjusted_value = range.clamp(adjusted_value);
+                    }
 
-                // Clamp value to an optionally specified range
-                if (ranges.has_value() && i < ranges.value().get().size()) {
-                    const auto &range = ranges.value().get()[i];
-                    value = range.clamp(value);
-                }
+                    // Update both member variable and risk_factors map for consistency
+                    person.physical_activity = adjusted_value;
+                    person.risk_factors[physical_activity_id] = adjusted_value;
+                } else {
+                    // Regular risk factor: stored only in risk_factors map
+                    // Get current value from risk_factors
+                    double current_value = person.risk_factors.at(factor);
+                    double value = current_value + delta;
 
-                // Set the adjusted value to the risk factor
-                person.risk_factors.at(factor) = value;
-                if (income_stratum_filter.has_value() &&
-                    context.scenario().type() == ScenarioType::baseline &&
-                    example_row.has_value() && debug_example_rows != nullptr &&
-                    factor_name == example_row->factor) {
-                    bool expected = false;
-                    if (captured_apply_example.compare_exchange_strong(expected, true)) {
-                        example_row->person_id = person.id();
-                        example_row->current_value = current_value;
-                        example_row->final_value = value;
+                    // Clamp value to an optionally specified range
+                    if (ranges.has_value() && i < ranges.value().get().size()) {
+                        const auto &range = ranges.value().get()[i];
+                        value = range.clamp(value);
+                    }
+
+                    // Set the adjusted value to the risk factor
+                    person.risk_factors.at(factor) = value;
+                    if (income_stratum_filter.has_value() &&
+                        context.scenario().type() == ScenarioType::baseline &&
+                        example_row.has_value() && debug_example_rows != nullptr &&
+                        factor_name == example_row->factor) {
+                        bool expected = false;
+                        if (captured_apply_example.compare_exchange_strong(expected, true)) {
+                            example_row->person_id = person.id();
+                            example_row->current_value = current_value;
+                            example_row->final_value = value;
+                        }
                     }
                 }
             }
-        }
-    });
+        });
 
     if (debug_example_rows != nullptr && example_row.has_value() && captured_apply_example.load()) {
         debug_example_rows->push_back(*example_row);
@@ -426,7 +429,6 @@ RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_adjustments(
                     debug_delta_row->delta = delta;
                     printed_delta_example = true;
                 }
-
             }
         }
     }
