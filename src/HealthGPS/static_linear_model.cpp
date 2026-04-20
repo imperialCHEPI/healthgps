@@ -342,8 +342,8 @@ StaticLinearModel::StaticLinearModel(
     bool income_stratum_adjustment_enabled, std::size_t adjustment_income_stratum_count,
     bool has_active_policies, const std::vector<LinearModelParams> &logistic_models)
     // NOLINTNEXTLINE(readability-function-cognitive-complexity)
-    : RiskFactorAdjustableModel{std::move(expected),       expected_trend, std::move(trend_steps),
-                                trend_type,
+    : RiskFactorAdjustableModel{std::move(expected),       expected_trend,
+                                std::move(trend_steps),    trend_type,
                                 expected_income_trend,       // Pass by value, not moved
                                 income_trend_decay_factors}, // Pass by value, not moved
       // Continuous income model support (FINCH approach) - must come first
@@ -716,8 +716,8 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
             }
         }
         if (context.scenario().type() == ScenarioType::baseline) {
-            print_income_stratum_adjustment_examples_table(
-                debug_rows, context.time_now(), "initial");
+            print_income_stratum_adjustment_examples_table(debug_rows, context.time_now(),
+                                                           "initial");
         }
     }
 
