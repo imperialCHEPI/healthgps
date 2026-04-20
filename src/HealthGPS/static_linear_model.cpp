@@ -211,6 +211,8 @@ void print_final_income_category_table(const Population &population, std::string
     const core::Identifier income_id("income");
     auto cat_count = categories == "4" ? 4u : 3u;
     std::vector<IncomeBucketSummary> summaries(cat_count);
+    bool has_observed_income = false;
+    double observed_income_max = std::numeric_limits<double>::lowest();
     for (const auto &person : population) {
         if (!person.is_active()) {
             continue;
@@ -239,6 +241,8 @@ void print_final_income_category_table(const Population &population, std::string
         }
         auto &s = summaries[idx];
         const double v = it->second;
+        has_observed_income = true;
+        observed_income_max = std::max(observed_income_max, v);
         s.count++;
         s.sum += v;
         s.min = std::min(s.min, v);
@@ -251,7 +255,10 @@ void print_final_income_category_table(const Population &population, std::string
     if (categories == "4" && thresholds.size() >= 3) {
         out << "Thresholds: Q1=" << fmt::format("{:.3f}", thresholds[0])
             << ", Q2=" << fmt::format("{:.3f}", thresholds[1])
-            << ", Q3=" << fmt::format("{:.3f}", thresholds[2]) << '\n';
+            << ", Q3=" << fmt::format("{:.3f}", thresholds[2])
+            << ", Q4="
+            << (has_observed_income ? fmt::format("{:.3f}", observed_income_max) : std::string("n/a"))
+            << '\n';
     } else if (categories != "4" && thresholds.size() >= 2) {
         out << "Thresholds: T1=" << fmt::format("{:.3f}", thresholds[0])
             << ", T2=" << fmt::format("{:.3f}", thresholds[1]) << '\n';

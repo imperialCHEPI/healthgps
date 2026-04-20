@@ -7,6 +7,7 @@
 #include "HealthGPS/modelinput.h"
 #include "HealthGPS/risk_factor_adjustable_model.h"
 #include "HealthGPS/runtime_context.h"
+#include "HealthGPS/static_linear_model.h"
 
 namespace {
 class TestAdjustableModel final : public hgps::RiskFactorAdjustableModel {
@@ -45,6 +46,18 @@ std::shared_ptr<hgps::ModelInput> create_minimal_model_input(hgps::core::DataTab
     auto mapping = HierarchicalMapping({MappingEntry{"Age", 0}});
     std::vector<core::DiseaseInfo> diseases{};
     auto project_requirements = hgps::input::ProjectRequirements{};
+    project_requirements.risk_factors.adjust_to_factors_mean = true;
+    project_requirements.risk_factors.trended = false;
+    project_requirements.income.enabled = true;
+    project_requirements.income.type = "continuous";
+    project_requirements.income.categories = "4";
+    project_requirements.income.adjust_to_factors_mean = true;
+    project_requirements.income.trended = false;
+    project_requirements.physical_activity.enabled = true;
+    project_requirements.physical_activity.type = "simple";
+    project_requirements.physical_activity.adjust_to_factors_mean = true;
+    project_requirements.physical_activity.trended = false;
+    project_requirements.trend.enabled = false;
     return std::make_shared<ModelInput>(data, settings, run, ses, mapping, diseases,
                                         project_requirements, hgps::input::PIFInfo{});
 }
@@ -54,6 +67,22 @@ make_expected_table(const hgps::core::Identifier &factor, double value) {
     auto expected = std::make_shared<hgps::RiskFactorSexAgeTable>();
     expected->emplace(hgps::core::Gender::male, factor, std::vector<double>{value, value, value});
     expected->emplace(hgps::core::Gender::female, factor, std::vector<double>{value, value, value});
+    return expected;
+}
+
+std::shared_ptr<hgps::RiskFactorSexAgeTable>
+make_expected_table_with_income_and_pa(const hgps::core::Identifier &factor, double factor_value,
+                                       double income_value, double pa_value) {
+    auto expected = std::make_shared<hgps::RiskFactorSexAgeTable>();
+    const std::vector<double> factor_row{factor_value, factor_value, factor_value};
+    const std::vector<double> income_row{income_value, income_value, income_value};
+    const std::vector<double> pa_row{pa_value, pa_value, pa_value};
+    expected->emplace(hgps::core::Gender::male, factor, factor_row);
+    expected->emplace(hgps::core::Gender::female, factor, factor_row);
+    expected->emplace(hgps::core::Gender::male, hgps::core::Identifier("income"), income_row);
+    expected->emplace(hgps::core::Gender::female, hgps::core::Identifier("income"), income_row);
+    expected->emplace(hgps::core::Gender::male, hgps::core::Identifier("PhysicalActivity"), pa_row);
+    expected->emplace(hgps::core::Gender::female, hgps::core::Identifier("PhysicalActivity"), pa_row);
     return expected;
 }
 } // namespace
@@ -106,4 +135,87 @@ TEST(IncomeStratumAdjustment, CapturesSingleDebugRowForFilteredStratumAdjustment
     EXPECT_NEAR(20.0, row.final_value, 1e-9);
     EXPECT_TRUE(row.person_id == context.population()[0].id() ||
                 row.person_id == context.population()[1].id());
+}
+
+TEST(IncomeStratumAdjustment, StaticLinearModelAppliesStrataInGenerateAndUpdate) {
+    using namespace hgps;
+
+    core::DataTable data;
+    auto inputs = create_minimal_model_input(data);
+    auto bus = std::make_shared<DefaultEventBus>();
+    auto channel = SyncChannel{};
+    auto scenario = std::make_unique<BaselineScenario>(channel);
+    auto context = RuntimeContext(bus, inputs, std::move(scenario));
+    context.reset_population(8);
+
+    for (std::size_t i = 0; i < context.population().size(); ++i) {
+        auto &p = context.population()[i];
+        p.gender = (i % 2 == 0) ? core::Gender::male : core::Gender::female;
+        p.age = 20;
+    }
+
+    const auto factor = core::Identifier("foodcarbohydrate");
+    auto overall_expected = make_expected_table_with_income_and_pa(factor, 100.0, 600.0, 1.8);
+    auto q1_expected = make_expected_table_with_income_and_pa(factor, 90.0, 600.0, 1.6);
+    auto q2_expected = make_expected_table_with_income_and_pa(factor, 110.0, 600.0, 2.0);
+
+    std::vector<core::Identifier> names{factor};
+    std::vector<LinearModelParams> models{LinearModelParams{.intercept = 95.0}};
+    std::vector<core::DoubleInterval> ranges{core::DoubleInterval(0.0, 500.0)};
+    std::vector<double> lambda{1.0};
+    std::vector<double> stddev{0.0};
+    Eigen::MatrixXd cholesky = Eigen::MatrixXd::Identity(1, 1);
+    std::vector<LinearModelParams> policy_models{LinearModelParams{}};
+    std::vector<core::DoubleInterval> policy_ranges{core::DoubleInterval(0.0, 500.0)};
+    Eigen::MatrixXd policy_cholesky = Eigen::MatrixXd::Identity(1, 1);
+    auto trend_models = std::make_shared<std::vector<LinearModelParams>>(1, LinearModelParams{});
+    auto trend_ranges =
+        std::make_shared<std::vector<core::DoubleInterval>>(1, core::DoubleInterval(0.0, 500.0));
+    auto trend_lambda = std::make_shared<std::vector<double>>(1, 1.0);
+    std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>> rural_prevalence{
+        {"Under18"_id, {{core::Gender::male, 0.2}, {core::Gender::female, 0.2}}},
+        {"Over18"_id, {{core::Gender::male, 0.2}, {core::Gender::female, 0.2}}}};
+    std::unordered_map<core::Income, LinearModelParams> income_models{
+        {core::Income::low, LinearModelParams{}},
+        {core::Income::lowermiddle, LinearModelParams{}},
+        {core::Income::uppermiddle, LinearModelParams{}},
+        {core::Income::high, LinearModelParams{}}};
+    LinearModelParams continuous_income_model{.intercept = 650.0};
+    std::vector<IncomeStratumExpectedTableEntry> stratum_tables{
+        {"Quintile1", q1_expected},
+        {"Quintile2", q2_expected},
+    };
+    std::vector<LinearModelParams> logistic_models{LinearModelParams{}};
+    auto expected_trend = std::make_shared<std::unordered_map<core::Identifier, double>>();
+    auto trend_steps = std::make_shared<std::unordered_map<core::Identifier, int>>();
+    auto expected_trend_boxcox = std::make_shared<std::unordered_map<core::Identifier, double>>();
+
+    auto model = StaticLinearModel(overall_expected, expected_trend, trend_steps, expected_trend_boxcox,
+                                   names, models, ranges, lambda, stddev, cholesky, policy_models,
+                                   policy_ranges, policy_cholesky, trend_models, trend_ranges,
+                                   trend_lambda, 0.0, rural_prevalence, income_models, 0.01,
+                                   TrendType::Null, nullptr, nullptr, nullptr, nullptr, nullptr,
+                                   nullptr, nullptr, true, continuous_income_model, "4", {},
+                                   stratum_tables, true, 2u, false, logistic_models);
+
+    model.generate_risk_factors(context);
+    for (const auto &p : context.population()) {
+        if (!p.is_active()) {
+            continue;
+        }
+        EXPECT_TRUE(p.has_income_adjustment_stratum);
+        EXPECT_LT(p.income_adjustment_stratum, 2u);
+        EXPECT_NE(core::Income::unknown, p.income);
+    }
+
+    context.set_current_time(2023);
+    model.update_risk_factors(context);
+    for (const auto &p : context.population()) {
+        if (!p.is_active()) {
+            continue;
+        }
+        EXPECT_TRUE(p.has_income_adjustment_stratum);
+        EXPECT_LT(p.income_adjustment_stratum, 2u);
+        EXPECT_NE(core::Income::unknown, p.income);
+    }
 }
