@@ -193,7 +193,18 @@ void RiskFactorAdjustableModel::adjust_risk_factors(
 
             for (size_t i = 0; i < factors.size(); i++) {
                 const core::Identifier &factor = factors[i];
-                double delta = adjustments.at(person.gender, factor).at(person.age);
+                // MAHIMA: Defensive guard for sparse/partial adjustment tables.
+                // In stratum mode, a factor/sex bucket may be missing in rare edge cases
+                // (e.g. empty stratum after filtering or incomplete expected overrides).
+                // Skip safely instead of risking invalid memory access while applying deltas.
+                if (!adjustments.contains(person.gender, factor)) {
+                    continue;
+                }
+                const auto &delta_by_age = adjustments.at(person.gender, factor);
+                if (person.age < 0 || static_cast<std::size_t>(person.age) >= delta_by_age.size()) {
+                    continue;
+                }
+                double delta = delta_by_age.at(static_cast<std::size_t>(person.age));
                 const std::string &factor_name = factor.to_string();
                 std::string factor_name_lower = factor_name;
                 std::ranges::transform(factor_name_lower, factor_name_lower.begin(), ::tolower);

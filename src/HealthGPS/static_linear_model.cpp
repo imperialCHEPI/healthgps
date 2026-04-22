@@ -293,6 +293,12 @@ void print_income_stratum_adjustment_examples_table(
     if (rows.empty()) {
         return;
     }
+    // MAHIMA: This is a debug table for inspecting example people across income strata, so we print
+    // all configured columns for transparency and easier troubleshooting. We rely on caller to
+    // limit the number of rows to a reasonable amount (e.g. one per stratum) to avoid excessive
+    // output. Here we print the 1st risk factor value and physical activity for males only as an
+    // example, but this can be adjusted as needed for different scenarios or to inspect other
+    // factors.
     std::ostringstream out;
     out << "\n[MAHIMA][INCOME-STRATUM DELTA/APPLY EXAMPLES] Year " << year << " phase=" << phase
         << '\n';
@@ -1831,7 +1837,12 @@ std::vector<double> StaticLinearModel::compute_residuals(Random &random,
 
     // Correlated samples using Cholesky decomposition.
     Eigen::VectorXd residuals{names_.size()};
-    std::ranges::generate(residuals, [&random] { return random.next_normal(0.0, 1.0); });
+    // MAHIMA: Fill Eigen vector with an index loop instead of std::ranges::generate.
+    // This avoids iterator/range interoperability pitfalls with Eigen containers on MSVC
+    // (observed as access violations in focused unit tests), while keeping behavior identical.
+    for (Eigen::Index i = 0; i < residuals.size(); ++i) {
+        residuals[i] = random.next_normal(0.0, 1.0);
+    }
     residuals = cholesky * residuals;
 
     // Save correlated residuals.
