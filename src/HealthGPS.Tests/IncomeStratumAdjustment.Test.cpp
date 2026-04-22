@@ -215,8 +215,7 @@ struct StaticLinearModelTestBundle {
     std::shared_ptr<std::vector<hgps::LinearModelParams>> trend_models;
     std::shared_ptr<std::vector<hgps::core::DoubleInterval>> trend_ranges;
     std::shared_ptr<std::vector<double>> trend_lambda;
-    std::unordered_map<hgps::core::Identifier,
-                       std::unordered_map<hgps::core::Gender, double>>
+    std::unordered_map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
         rural_prevalence;
     std::unordered_map<hgps::core::Income, hgps::LinearModelParams> income_models;
     hgps::LinearModelParams continuous_income_model;
@@ -246,9 +245,10 @@ StaticLinearModelTestBundle create_test_static_linear_model_bundle(
         .trend_ranges = std::make_shared<std::vector<core::DoubleInterval>>(
             1, core::DoubleInterval(0.0, 500.0)),
         .trend_lambda = std::make_shared<std::vector<double>>(1, 1.0),
-        .rural_prevalence =
-            {{"Under18"_id, {{core::Gender::male, 0.2}, {core::Gender::female, 0.2}}},
-             {"Over18"_id, {{core::Gender::male, 0.2}, {core::Gender::female, 0.2}}}},
+        .rural_prevalence = {{"Under18"_id,
+                              {{core::Gender::male, 0.2}, {core::Gender::female, 0.2}}},
+                             {"Over18"_id,
+                              {{core::Gender::male, 0.2}, {core::Gender::female, 0.2}}}},
         .income_models = {{core::Income::low, LinearModelParams{}},
                           {core::Income::lowermiddle, LinearModelParams{}},
                           {core::Income::uppermiddle, LinearModelParams{}},
@@ -352,7 +352,8 @@ TEST(IncomeStratumAdjustment, StaticLinearModelAppliesStrataInGenerateAndUpdate)
         {"Quintile1", q1_expected},
         {"Quintile2", q2_expected},
     };
-    auto bundle = create_test_static_linear_model_bundle(overall_expected, stratum_tables, true, 2u);
+    auto bundle =
+        create_test_static_linear_model_bundle(overall_expected, stratum_tables, true, 2u);
 
     bundle.model->generate_risk_factors(context);
     for (const auto &p : context.population()) {
@@ -451,7 +452,8 @@ TEST(IncomeStratumAdjustment, UpdateYearRecomputesStrataAfterStateReset) {
         {"Quintile1", q1_expected},
         {"Quintile2", q2_expected},
     };
-    auto bundle = create_test_static_linear_model_bundle(overall_expected, stratum_tables, true, 2u);
+    auto bundle =
+        create_test_static_linear_model_bundle(overall_expected, stratum_tables, true, 2u);
 
     bundle.model->generate_risk_factors(context);
 
@@ -530,7 +532,8 @@ TEST(IncomeStratumAdjustment, TrendedYearlyPathKeepsStrataAndFinalIncomeAssigned
         {"Quintile1", q1_expected},
         {"Quintile2", q2_expected},
     };
-    auto bundle = create_test_static_linear_model_bundle(overall_expected, stratum_tables, true, 2u);
+    auto bundle =
+        create_test_static_linear_model_bundle(overall_expected, stratum_tables, true, 2u);
 
     bundle.model->generate_risk_factors(context);
 
