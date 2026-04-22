@@ -231,34 +231,35 @@ StaticLinearModelTestBundle create_test_static_linear_model_bundle(
     const std::vector<hgps::IncomeStratumExpectedTableEntry> &stratum_tables, bool stratum_enabled,
     std::size_t adjustment_income_stratum_count) {
     using namespace hgps;
-    StaticLinearModelTestBundle bundle{
-        .names = {core::Identifier("foodcarbohydrate")},
-        .models = {LinearModelParams{.intercept = 95.0}},
-        .ranges = {core::DoubleInterval(0.0, 500.0)},
-        .lambda = {1.0},
-        .stddev = {0.0},
-        .cholesky = Eigen::MatrixXd::Identity(1, 1),
-        .policy_models = {LinearModelParams{}},
-        .policy_ranges = {core::DoubleInterval(0.0, 500.0)},
-        .policy_cholesky = Eigen::MatrixXd::Identity(1, 1),
-        .trend_models = std::make_shared<std::vector<LinearModelParams>>(1, LinearModelParams{}),
-        .trend_ranges = std::make_shared<std::vector<core::DoubleInterval>>(
-            1, core::DoubleInterval(0.0, 500.0)),
-        .trend_lambda = std::make_shared<std::vector<double>>(1, 1.0),
-        .rural_prevalence = {{"Under18"_id,
-                              {{core::Gender::male, 0.2}, {core::Gender::female, 0.2}}},
-                             {"Over18"_id,
-                              {{core::Gender::male, 0.2}, {core::Gender::female, 0.2}}}},
-        .income_models = {{core::Income::low, LinearModelParams{}},
-                          {core::Income::lowermiddle, LinearModelParams{}},
-                          {core::Income::uppermiddle, LinearModelParams{}},
-                          {core::Income::high, LinearModelParams{}}},
-        .continuous_income_model = LinearModelParams{.intercept = 650.0},
-        .logistic_models = {LinearModelParams{}},
-        .expected_trend = std::make_shared<std::unordered_map<core::Identifier, double>>(),
-        .trend_steps = std::make_shared<std::unordered_map<core::Identifier, int>>(),
-        .expected_trend_boxcox = std::make_shared<std::unordered_map<core::Identifier, double>>(),
-    };
+    StaticLinearModelTestBundle bundle{};
+    bundle.names = {core::Identifier("foodcarbohydrate")};
+    bundle.models = {LinearModelParams{.intercept = 95.0}};
+    bundle.ranges = {core::DoubleInterval(0.0, 500.0)};
+    bundle.lambda = {1.0};
+    bundle.stddev = {0.0};
+    bundle.cholesky = Eigen::MatrixXd::Identity(1, 1);
+    bundle.policy_models = {LinearModelParams{}};
+    bundle.policy_ranges = {core::DoubleInterval(0.0, 500.0)};
+    bundle.policy_cholesky = Eigen::MatrixXd::Identity(1, 1);
+    bundle.trend_models = std::make_shared<std::vector<LinearModelParams>>(1, LinearModelParams{});
+    bundle.trend_ranges =
+        std::make_shared<std::vector<core::DoubleInterval>>(1, core::DoubleInterval(0.0, 500.0));
+    bundle.trend_lambda = std::make_shared<std::vector<double>>(1, 1.0);
+    bundle.rural_prevalence = {{"Under18"_id,
+                                {{core::Gender::male, 0.2}, {core::Gender::female, 0.2}}},
+                               {"Over18"_id,
+                                {{core::Gender::male, 0.2}, {core::Gender::female, 0.2}}}};
+    bundle.income_models = {{core::Income::low, LinearModelParams{}},
+                            {core::Income::lowermiddle, LinearModelParams{}},
+                            {core::Income::uppermiddle, LinearModelParams{}},
+                            {core::Income::high, LinearModelParams{}}};
+    bundle.continuous_income_model = LinearModelParams{.intercept = 650.0};
+    bundle.logistic_models = {LinearModelParams{}};
+    bundle.expected_trend = std::make_shared<std::unordered_map<core::Identifier, double>>();
+    bundle.trend_steps = std::make_shared<std::unordered_map<core::Identifier, int>>();
+    bundle.expected_trend_boxcox =
+        std::make_shared<std::unordered_map<core::Identifier, double>>();
+    bundle.model = nullptr;
 
     // MAHIMA: StaticLinearModel stores many constructor inputs by reference.
     // This bundle owns those containers for the full test scope so references never dangle.

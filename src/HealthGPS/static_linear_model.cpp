@@ -1837,12 +1837,11 @@ std::vector<double> StaticLinearModel::compute_residuals(Random &random,
 
     // Correlated samples using Cholesky decomposition.
     Eigen::VectorXd residuals{names_.size()};
-    // MAHIMA: Fill Eigen vector with an index loop instead of std::ranges::generate.
-    // This avoids iterator/range interoperability pitfalls with Eigen containers on MSVC
-    // (observed as access violations in focused unit tests), while keeping behavior identical.
-    for (Eigen::Index i = 0; i < residuals.size(); ++i) {
-        residuals[i] = random.next_normal(0.0, 1.0);
-    }
+    // MAHIMA: Use Eigen NullaryExpr for random fill; this avoids iterator interoperability issues
+    // seen with std::ranges on MSVC and keeps clang-tidy happy about loop conversion.
+    residuals = Eigen::VectorXd::NullaryExpr(
+        static_cast<Eigen::Index>(names_.size()),
+        [&random]([[maybe_unused]] Eigen::Index i) { return random.next_normal(0.0, 1.0); });
     residuals = cholesky * residuals;
 
     // Save correlated residuals.
