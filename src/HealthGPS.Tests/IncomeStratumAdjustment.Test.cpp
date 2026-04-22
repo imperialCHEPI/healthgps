@@ -241,8 +241,7 @@ std::shared_ptr<StaticLinearModelTestBundle> create_test_static_linear_model_bun
     bundle->policy_models = {LinearModelParams{}};
     bundle->policy_ranges = {core::DoubleInterval(0.0, 500.0)};
     bundle->policy_cholesky = Eigen::MatrixXd::Identity(1, 1);
-    bundle->trend_models =
-        std::make_shared<std::vector<LinearModelParams>>(1, LinearModelParams{});
+    bundle->trend_models = std::make_shared<std::vector<LinearModelParams>>(1, LinearModelParams{});
     bundle->trend_ranges =
         std::make_shared<std::vector<core::DoubleInterval>>(1, core::DoubleInterval(0.0, 500.0));
     bundle->trend_lambda = std::make_shared<std::vector<double>>(1, 1.0);
@@ -265,15 +264,14 @@ std::shared_ptr<StaticLinearModelTestBundle> create_test_static_linear_model_bun
     // Heap-own the bundle so reference members remain valid after helper returns.
     const std::unordered_map<core::Identifier, PhysicalActivityModel> physical_activity_models{};
     bundle->model = std::make_unique<StaticLinearModel>(
-        overall_expected, bundle->expected_trend, bundle->trend_steps, bundle->expected_trend_boxcox,
-        bundle->names, bundle->models, bundle->ranges, bundle->lambda, bundle->stddev,
-        bundle->cholesky, bundle->policy_models, bundle->policy_ranges, bundle->policy_cholesky,
-        bundle->trend_models, bundle->trend_ranges, bundle->trend_lambda, 0.0,
-        bundle->rural_prevalence, bundle->income_models, 0.01, TrendType::Null, nullptr, nullptr,
-        nullptr, nullptr, nullptr, nullptr, nullptr, true, bundle->continuous_income_model, "4",
-        physical_activity_models,
-        stratum_tables, stratum_enabled, adjustment_income_stratum_count, false,
-        bundle->logistic_models);
+        overall_expected, bundle->expected_trend, bundle->trend_steps,
+        bundle->expected_trend_boxcox, bundle->names, bundle->models, bundle->ranges,
+        bundle->lambda, bundle->stddev, bundle->cholesky, bundle->policy_models,
+        bundle->policy_ranges, bundle->policy_cholesky, bundle->trend_models, bundle->trend_ranges,
+        bundle->trend_lambda, 0.0, bundle->rural_prevalence, bundle->income_models, 0.01,
+        TrendType::Null, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, true,
+        bundle->continuous_income_model, "4", physical_activity_models, stratum_tables,
+        stratum_enabled, adjustment_income_stratum_count, false, bundle->logistic_models);
     return bundle;
 }
 } // namespace
