@@ -245,10 +245,9 @@ StaticLinearModelTestBundle create_test_static_linear_model_bundle(
     bundle.trend_ranges =
         std::make_shared<std::vector<core::DoubleInterval>>(1, core::DoubleInterval(0.0, 500.0));
     bundle.trend_lambda = std::make_shared<std::vector<double>>(1, 1.0);
-    bundle.rural_prevalence = {{"Under18"_id,
-                                {{core::Gender::male, 0.2}, {core::Gender::female, 0.2}}},
-                               {"Over18"_id,
-                                {{core::Gender::male, 0.2}, {core::Gender::female, 0.2}}}};
+    bundle.rural_prevalence = {
+        {"Under18"_id, {{core::Gender::male, 0.2}, {core::Gender::female, 0.2}}},
+        {"Over18"_id, {{core::Gender::male, 0.2}, {core::Gender::female, 0.2}}}};
     bundle.income_models = {{core::Income::low, LinearModelParams{}},
                             {core::Income::lowermiddle, LinearModelParams{}},
                             {core::Income::uppermiddle, LinearModelParams{}},
@@ -257,8 +256,7 @@ StaticLinearModelTestBundle create_test_static_linear_model_bundle(
     bundle.logistic_models = {LinearModelParams{}};
     bundle.expected_trend = std::make_shared<std::unordered_map<core::Identifier, double>>();
     bundle.trend_steps = std::make_shared<std::unordered_map<core::Identifier, int>>();
-    bundle.expected_trend_boxcox =
-        std::make_shared<std::unordered_map<core::Identifier, double>>();
+    bundle.expected_trend_boxcox = std::make_shared<std::unordered_map<core::Identifier, double>>();
     bundle.model = nullptr;
 
     // MAHIMA: StaticLinearModel stores many constructor inputs by reference.
