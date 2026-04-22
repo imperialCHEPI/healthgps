@@ -226,51 +226,54 @@ struct StaticLinearModelTestBundle {
     std::unique_ptr<hgps::StaticLinearModel> model;
 };
 
-StaticLinearModelTestBundle create_test_static_linear_model_bundle(
+std::shared_ptr<StaticLinearModelTestBundle> create_test_static_linear_model_bundle(
     const std::shared_ptr<hgps::RiskFactorSexAgeTable> &overall_expected,
     const std::vector<hgps::IncomeStratumExpectedTableEntry> &stratum_tables, bool stratum_enabled,
     std::size_t adjustment_income_stratum_count) {
     using namespace hgps;
-    StaticLinearModelTestBundle bundle{};
-    bundle.names = {core::Identifier("foodcarbohydrate")};
-    bundle.models = {LinearModelParams{.intercept = 95.0}};
-    bundle.ranges = {core::DoubleInterval(0.0, 500.0)};
-    bundle.lambda = {1.0};
-    bundle.stddev = {0.0};
-    bundle.cholesky = Eigen::MatrixXd::Identity(1, 1);
-    bundle.policy_models = {LinearModelParams{}};
-    bundle.policy_ranges = {core::DoubleInterval(0.0, 500.0)};
-    bundle.policy_cholesky = Eigen::MatrixXd::Identity(1, 1);
-    bundle.trend_models = std::make_shared<std::vector<LinearModelParams>>(1, LinearModelParams{});
-    bundle.trend_ranges =
+    auto bundle = std::make_shared<StaticLinearModelTestBundle>();
+    bundle->names = {core::Identifier("foodcarbohydrate")};
+    bundle->models = {LinearModelParams{.intercept = 95.0}};
+    bundle->ranges = {core::DoubleInterval(0.0, 500.0)};
+    bundle->lambda = {1.0};
+    bundle->stddev = {0.0};
+    bundle->cholesky = Eigen::MatrixXd::Identity(1, 1);
+    bundle->policy_models = {LinearModelParams{}};
+    bundle->policy_ranges = {core::DoubleInterval(0.0, 500.0)};
+    bundle->policy_cholesky = Eigen::MatrixXd::Identity(1, 1);
+    bundle->trend_models =
+        std::make_shared<std::vector<LinearModelParams>>(1, LinearModelParams{});
+    bundle->trend_ranges =
         std::make_shared<std::vector<core::DoubleInterval>>(1, core::DoubleInterval(0.0, 500.0));
-    bundle.trend_lambda = std::make_shared<std::vector<double>>(1, 1.0);
-    bundle.rural_prevalence = {
+    bundle->trend_lambda = std::make_shared<std::vector<double>>(1, 1.0);
+    bundle->rural_prevalence = {
         {"Under18"_id, {{core::Gender::male, 0.2}, {core::Gender::female, 0.2}}},
         {"Over18"_id, {{core::Gender::male, 0.2}, {core::Gender::female, 0.2}}}};
-    bundle.income_models = {{core::Income::low, LinearModelParams{}},
-                            {core::Income::lowermiddle, LinearModelParams{}},
-                            {core::Income::uppermiddle, LinearModelParams{}},
-                            {core::Income::high, LinearModelParams{}}};
-    bundle.continuous_income_model = LinearModelParams{.intercept = 650.0};
-    bundle.logistic_models = {LinearModelParams{}};
-    bundle.expected_trend = std::make_shared<std::unordered_map<core::Identifier, double>>();
-    bundle.trend_steps = std::make_shared<std::unordered_map<core::Identifier, int>>();
-    bundle.expected_trend_boxcox = std::make_shared<std::unordered_map<core::Identifier, double>>();
-    bundle.model = nullptr;
+    bundle->income_models = {{core::Income::low, LinearModelParams{}},
+                             {core::Income::lowermiddle, LinearModelParams{}},
+                             {core::Income::uppermiddle, LinearModelParams{}},
+                             {core::Income::high, LinearModelParams{}}};
+    bundle->continuous_income_model = LinearModelParams{.intercept = 650.0};
+    bundle->logistic_models = {LinearModelParams{}};
+    bundle->expected_trend = std::make_shared<std::unordered_map<core::Identifier, double>>();
+    bundle->trend_steps = std::make_shared<std::unordered_map<core::Identifier, int>>();
+    bundle->expected_trend_boxcox =
+        std::make_shared<std::unordered_map<core::Identifier, double>>();
+    bundle->model = nullptr;
 
     // MAHIMA: StaticLinearModel stores many constructor inputs by reference.
-    // This bundle owns those containers for the full test scope so references never dangle.
+    // Heap-own the bundle so reference members remain valid after helper returns.
     const std::unordered_map<core::Identifier, PhysicalActivityModel> physical_activity_models{};
-    bundle.model = std::make_unique<StaticLinearModel>(
-        overall_expected, bundle.expected_trend, bundle.trend_steps, bundle.expected_trend_boxcox,
-        bundle.names, bundle.models, bundle.ranges, bundle.lambda, bundle.stddev, bundle.cholesky,
-        bundle.policy_models, bundle.policy_ranges, bundle.policy_cholesky, bundle.trend_models,
-        bundle.trend_ranges, bundle.trend_lambda, 0.0, bundle.rural_prevalence,
-        bundle.income_models, 0.01, TrendType::Null, nullptr, nullptr, nullptr, nullptr, nullptr,
-        nullptr, nullptr, true, bundle.continuous_income_model, "4", physical_activity_models,
+    bundle->model = std::make_unique<StaticLinearModel>(
+        overall_expected, bundle->expected_trend, bundle->trend_steps, bundle->expected_trend_boxcox,
+        bundle->names, bundle->models, bundle->ranges, bundle->lambda, bundle->stddev,
+        bundle->cholesky, bundle->policy_models, bundle->policy_ranges, bundle->policy_cholesky,
+        bundle->trend_models, bundle->trend_ranges, bundle->trend_lambda, 0.0,
+        bundle->rural_prevalence, bundle->income_models, 0.01, TrendType::Null, nullptr, nullptr,
+        nullptr, nullptr, nullptr, nullptr, nullptr, true, bundle->continuous_income_model, "4",
+        physical_activity_models,
         stratum_tables, stratum_enabled, adjustment_income_stratum_count, false,
-        bundle.logistic_models);
+        bundle->logistic_models);
     return bundle;
 }
 } // namespace
@@ -354,7 +357,7 @@ TEST(IncomeStratumAdjustment, StaticLinearModelAppliesStrataInGenerateAndUpdate)
     auto bundle =
         create_test_static_linear_model_bundle(overall_expected, stratum_tables, true, 2u);
 
-    bundle.model->generate_risk_factors(context);
+    bundle->model->generate_risk_factors(context);
     for (const auto &p : context.population()) {
         if (!p.is_active()) {
             continue;
@@ -365,7 +368,7 @@ TEST(IncomeStratumAdjustment, StaticLinearModelAppliesStrataInGenerateAndUpdate)
     }
 
     context.set_current_time(2023);
-    bundle.model->update_risk_factors(context);
+    bundle->model->update_risk_factors(context);
     for (const auto &p : context.population()) {
         if (!p.is_active()) {
             continue;
@@ -405,7 +408,7 @@ TEST(IncomeStratumAdjustment, FeatureOffKeepsLegacyPathWithoutStratumAssignment)
 
     // MAHIMA: Regression guard for "feature off" path. Even if tables are present in memory,
     // runtime should remain on legacy behaviour and must not stamp adjustment-stratum fields.
-    bundle.model->generate_risk_factors(context);
+    bundle->model->generate_risk_factors(context);
     for (const auto &p : context.population()) {
         if (!p.is_active()) {
             continue;
@@ -416,7 +419,7 @@ TEST(IncomeStratumAdjustment, FeatureOffKeepsLegacyPathWithoutStratumAssignment)
     }
 
     context.set_current_time(2023);
-    bundle.model->update_risk_factors(context);
+    bundle->model->update_risk_factors(context);
     for (const auto &p : context.population()) {
         if (!p.is_active()) {
             continue;
@@ -454,7 +457,7 @@ TEST(IncomeStratumAdjustment, UpdateYearRecomputesStrataAfterStateReset) {
     auto bundle =
         create_test_static_linear_model_bundle(overall_expected, stratum_tables, true, 2u);
 
-    bundle.model->generate_risk_factors(context);
+    bundle->model->generate_risk_factors(context);
 
     // MAHIMA: Yearly-path check. We explicitly wipe per-person stratum flags to verify update()
     // always recomputes assignment from current continuous income each year.
@@ -467,7 +470,7 @@ TEST(IncomeStratumAdjustment, UpdateYearRecomputesStrataAfterStateReset) {
     }
 
     context.set_current_time(2023);
-    bundle.model->update_risk_factors(context);
+    bundle->model->update_risk_factors(context);
     for (const auto &p : context.population()) {
         if (!p.is_active()) {
             continue;
@@ -534,13 +537,13 @@ TEST(IncomeStratumAdjustment, TrendedYearlyPathKeepsStrataAndFinalIncomeAssigned
     auto bundle =
         create_test_static_linear_model_bundle(overall_expected, stratum_tables, true, 2u);
 
-    bundle.model->generate_risk_factors(context);
+    bundle->model->generate_risk_factors(context);
 
     // MAHIMA: Broader yearly-path guard.
     // With trend.enabled + *.trended set true, update() should execute the trended branch and still
     // maintain valid per-person strata and final income-category assignment every year.
     context.set_current_time(2023);
-    bundle.model->update_risk_factors(context);
+    bundle->model->update_risk_factors(context);
     for (const auto &p : context.population()) {
         if (!p.is_active()) {
             continue;
