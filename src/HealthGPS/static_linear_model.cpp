@@ -296,30 +296,66 @@ void print_income_stratum_adjustment_examples_table(
     // MAHIMA: This is a debug table for inspecting example people across income strata, so we print
     // all configured columns for transparency and easier troubleshooting. We rely on caller to
     // limit the number of rows to a reasonable amount (e.g. one per stratum) to avoid excessive
-    // output. Here we print the 1st risk factor value and physical activity for males only as an
-    // example, but this can be adjusted as needed for different scenarios or to inspect other
-    // factors.
+    // output.
     std::ostringstream out;
     out << "\n[MAHIMA][INCOME-STRATUM DELTA/APPLY EXAMPLES] Year " << year << " phase=" << phase
         << '\n';
-    out << "+--------+----------+----------------------+--------+-----+-------------+--------------"
-           "-+-------------+-------------+-------------+\n";
-    out << "| Bucket | PersonID | Factor               | Sex    | Age | Expected    | "
-           "SimulatedMean | Delta       | Current     | Final       |\n";
-    out << "+--------+----------+----------------------+--------+-----+-------------+--------------"
-           "-+-------------+-------------+-------------+\n";
-    for (const auto &r : rows) {
-        out << "| " << std::setw(6) << r.bucket << " | " << std::setw(8) << r.person_id << " | "
-            << std::setw(20) << std::left << r.factor << std::right << " | " << std::setw(6)
-            << r.sex << " | " << std::setw(3) << r.age << " | " << std::setw(11)
+    constexpr std::size_t max_rows_to_print = 10u;
+    std::vector<std::size_t> selected_indices;
+    selected_indices.reserve(std::min(max_rows_to_print, rows.size()));
+    if (rows.size() <= max_rows_to_print) {
+        for (std::size_t i = 0; i < rows.size(); ++i) {
+            selected_indices.push_back(i);
+        }
+    } else {
+        // MAHIMA: Keep output compact by showing only 10 deterministic pseudo-random rows.
+        // We hash row attributes to get a stable random-like ordering across runs, then take top 10.
+        std::vector<std::pair<std::size_t, std::size_t>> scored_indices;
+        scored_indices.reserve(rows.size());
+        for (std::size_t i = 0; i < rows.size(); ++i) {
+            const auto &r = rows[i];
+            std::size_t score = static_cast<std::size_t>(r.bucket + 1u) * 2654435761u;
+            score ^= static_cast<std::size_t>(r.person_id) * 2246822519u;
+            score ^= static_cast<std::size_t>(r.age + 4099) * 3266489917u;
+            score ^= static_cast<std::size_t>(r.factor.size()) * 668265263u;
+            for (const char c : r.factor) {
+                score = (score * 131u) ^
+                        static_cast<std::size_t>(std::tolower(static_cast<unsigned char>(c)));
+            }
+            scored_indices.emplace_back(score, i);
+        }
+        std::ranges::sort(scored_indices, [](const auto &lhs, const auto &rhs) {
+            if (lhs.first != rhs.first) {
+                return lhs.first < rhs.first;
+            }
+            return lhs.second < rhs.second;
+        });
+        for (std::size_t i = 0; i < max_rows_to_print; ++i) {
+            selected_indices.push_back(scored_indices[i].second);
+        }
+    }
+    out << "Showing " << selected_indices.size() << " of " << rows.size() << " sampled rows\n";
+    out << "+--------+----------------------+----------+----------------------+--------+-----+-----------"
+           "--+---------------+-------------+-------------+-------------+-------------+\n";
+    out << "| Bucket | StratumID            | PersonID | Factor               | Sex    | Age | Expected   "
+           " | SimulatedMean | Delta       | Current     | AfterDelta  | Final       |\n";
+    out << "+--------+----------------------+----------+----------------------+--------+-----+-----------"
+           "--+---------------+-------------+-------------+-------------+-------------+\n";
+    for (const auto idx : selected_indices) {
+        const auto &r = rows[idx];
+        out << "| " << std::setw(6) << r.bucket << " | " << std::setw(20) << std::left << r.stratum_id
+            << std::right << " | " << std::setw(8) << r.person_id << " | " << std::setw(20)
+            << std::left << r.factor << std::right << " | " << std::setw(6) << r.sex << " | "
+            << std::setw(3) << r.age << " | " << std::setw(11)
             << fmt::format("{:.5f}", r.expected_value) << " | " << std::setw(13)
             << fmt::format("{:.5f}", r.simulated_mean) << " | " << std::setw(11)
             << fmt::format("{:.5f}", r.delta) << " | " << std::setw(11)
             << fmt::format("{:.5f}", r.current_value) << " | " << std::setw(11)
+            << fmt::format("{:.5f}", r.after_delta_value) << " | " << std::setw(11)
             << fmt::format("{:.5f}", r.final_value) << " |\n";
     }
-    out << "+--------+----------+----------------------+--------+-----+-------------+--------------"
-           "-+-------------+-------------+-------------+\n";
+    out << "+--------+----------------------+----------+----------------------+--------+-----+-----------"
+           "--+---------------+-------------+-------------+-------------+-------------+\n";
     std::osyncstream(std::cout) << out.str();
 }
 
@@ -715,20 +751,29 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         const std::size_t stratum_count =
             std::min(adjustment_income_stratum_count_, income_stratum_expected_tables_.size());
         std::vector<IncomeStratumAdjustmentExampleRow> debug_rows;
-        debug_rows.reserve(stratum_count * 2u);
+        debug_rows.reserve(stratum_count * 16u);
         for (std::size_t k = 0; k < stratum_count; ++k) {
             const auto *stratum_expected = income_stratum_expected_tables_[k].second.get();
+            const auto &stratum_id = income_stratum_expected_tables_[k].first;
             if (!stratum_rf_factors.empty()) {
+                const auto before = debug_rows.size();
                 adjust_risk_factors(context, stratum_rf_factors,
                                     stratum_rf_ranges.empty() ? std::nullopt
                                                               : OptionalRanges{stratum_rf_ranges},
                                     false, stratum_expected, k, &debug_rows);
+                for (std::size_t idx = before; idx < debug_rows.size(); ++idx) {
+                    debug_rows[idx].stratum_id = stratum_id;
+                }
             }
             if (adjust_pa && pa_in_expected) {
+                const auto before = debug_rows.size();
                 adjust_risk_factors(context, pa_only_factors,
                                     pa_only_ranges.empty() ? std::nullopt
                                                            : OptionalRanges{pa_only_ranges},
                                     false, stratum_expected, k, &debug_rows);
+                for (std::size_t idx = before; idx < debug_rows.size(); ++idx) {
+                    debug_rows[idx].stratum_id = stratum_id;
+                }
             }
         }
         if (context.scenario().type() == ScenarioType::baseline) {
@@ -855,21 +900,30 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
             const std::size_t stratum_count =
                 std::min(adjustment_income_stratum_count_, income_stratum_expected_tables_.size());
             std::vector<IncomeStratumAdjustmentExampleRow> debug_rows;
-            debug_rows.reserve(stratum_count * 2u);
+            debug_rows.reserve(stratum_count * 16u);
             for (std::size_t k = 0; k < stratum_count; ++k) {
                 const auto *stratum_expected = income_stratum_expected_tables_[k].second.get();
+                const auto &stratum_id = income_stratum_expected_tables_[k].first;
                 if (!stratum_rf_factors.empty()) {
+                    const auto before = debug_rows.size();
                     adjust_risk_factors(context, stratum_rf_factors,
                                         stratum_rf_ranges.empty()
                                             ? std::nullopt
                                             : OptionalRanges{stratum_rf_ranges},
                                         true, stratum_expected, k, &debug_rows);
+                    for (std::size_t idx = before; idx < debug_rows.size(); ++idx) {
+                        debug_rows[idx].stratum_id = stratum_id;
+                    }
                 }
                 if (adjust_pa && pa_in_expected) {
+                    const auto before = debug_rows.size();
                     adjust_risk_factors(context, pa_only_factors,
                                         pa_only_ranges.empty() ? std::nullopt
                                                                : OptionalRanges{pa_only_ranges},
                                         true, stratum_expected, k, &debug_rows);
+                    for (std::size_t idx = before; idx < debug_rows.size(); ++idx) {
+                        debug_rows[idx].stratum_id = stratum_id;
+                    }
                 }
             }
             if (context.scenario().type() == ScenarioType::baseline) {
@@ -1003,20 +1057,29 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
         const std::size_t stratum_count =
             std::min(adjustment_income_stratum_count_, income_stratum_expected_tables_.size());
         std::vector<IncomeStratumAdjustmentExampleRow> debug_rows;
-        debug_rows.reserve(stratum_count * 2u);
+        debug_rows.reserve(stratum_count * 16u);
         for (std::size_t k = 0; k < stratum_count; ++k) {
             const auto *stratum_expected = income_stratum_expected_tables_[k].second.get();
+            const auto &stratum_id = income_stratum_expected_tables_[k].first;
             if (!stratum_rf_factors.empty()) {
+                const auto before = debug_rows.size();
                 adjust_risk_factors(context, stratum_rf_factors,
                                     stratum_rf_ranges.empty() ? std::nullopt
                                                               : OptionalRanges{stratum_rf_ranges},
                                     false, stratum_expected, k, &debug_rows);
+                for (std::size_t idx = before; idx < debug_rows.size(); ++idx) {
+                    debug_rows[idx].stratum_id = stratum_id;
+                }
             }
             if (adjust_pa && pa_in_expected) {
+                const auto before = debug_rows.size();
                 adjust_risk_factors(context, pa_only_factors,
                                     pa_only_ranges.empty() ? std::nullopt
                                                            : OptionalRanges{pa_only_ranges},
                                     false, stratum_expected, k, &debug_rows);
+                for (std::size_t idx = before; idx < debug_rows.size(); ++idx) {
+                    debug_rows[idx].stratum_id = stratum_id;
+                }
             }
         }
         if (context.scenario().type() == ScenarioType::baseline) {
@@ -1137,21 +1200,30 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             const std::size_t stratum_count =
                 std::min(adjustment_income_stratum_count_, income_stratum_expected_tables_.size());
             std::vector<IncomeStratumAdjustmentExampleRow> debug_rows;
-            debug_rows.reserve(stratum_count * 2u);
+            debug_rows.reserve(stratum_count * 16u);
             for (std::size_t k = 0; k < stratum_count; ++k) {
                 const auto *stratum_expected = income_stratum_expected_tables_[k].second.get();
+                const auto &stratum_id = income_stratum_expected_tables_[k].first;
                 if (!stratum_rf_factors.empty()) {
+                    const auto before = debug_rows.size();
                     adjust_risk_factors(context, stratum_rf_factors,
                                         stratum_rf_ranges.empty()
                                             ? std::nullopt
                                             : OptionalRanges{stratum_rf_ranges},
                                         true, stratum_expected, k, &debug_rows);
+                    for (std::size_t idx = before; idx < debug_rows.size(); ++idx) {
+                        debug_rows[idx].stratum_id = stratum_id;
+                    }
                 }
                 if (adjust_pa && pa_in_expected) {
+                    const auto before = debug_rows.size();
                     adjust_risk_factors(context, pa_only_factors,
                                         pa_only_ranges.empty() ? std::nullopt
                                                                : OptionalRanges{pa_only_ranges},
                                         true, stratum_expected, k, &debug_rows);
+                    for (std::size_t idx = before; idx < debug_rows.size(); ++idx) {
+                        debug_rows[idx].stratum_id = stratum_id;
+                    }
                 }
             }
             if (context.scenario().type() == ScenarioType::baseline) {

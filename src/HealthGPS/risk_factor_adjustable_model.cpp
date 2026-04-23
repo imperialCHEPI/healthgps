@@ -7,8 +7,11 @@
 
 #include <algorithm>
 #include <atomic>
+#include <cctype>
+#include <cstdint>
 #include <cmath>
 #include <iostream>
+#include <limits>
 #include <oneapi/tbb/parallel_for_each.h>
 #include <optional>
 #include <utility>
@@ -143,18 +146,90 @@ void RiskFactorAdjustableModel::adjust_risk_factors(
     std::optional<std::size_t> income_stratum_filter,
     std::vector<IncomeStratumAdjustmentExampleRow> *debug_example_rows) const {
     RiskFactorSexAgeTable adjustments;
-    std::atomic<bool> captured_apply_example{false};
-    std::optional<IncomeStratumAdjustmentExampleRow> example_row;
+    std::vector<IncomeStratumAdjustmentExampleRow> sampled_rows;
+    const bool collect_debug_rows = debug_example_rows != nullptr && income_stratum_filter.has_value() &&
+                                    expected_override != nullptr &&
+                                    context.scenario().type() == ScenarioType::baseline;
+    const auto sex_to_label = [](core::Gender sex) -> std::string_view {
+        return sex == core::Gender::male ? "male" : "female";
+    };
+    const auto equal_factor_name = [](std::string_view lhs, std::string_view rhs) {
+        if (lhs.size() != rhs.size()) {
+            return false;
+        }
+        for (std::size_t i = 0; i < lhs.size(); ++i) {
+            if (std::tolower(static_cast<unsigned char>(lhs[i])) !=
+                std::tolower(static_cast<unsigned char>(rhs[i]))) {
+                return false;
+            }
+        }
+        return true;
+    };
 
     // Baseline scenatio: compute adjustments.
     if (context.scenario().type() == ScenarioType::baseline) {
-        IncomeStratumAdjustmentExampleRow delta_row;
         adjustments = calculate_adjustments(context, factors, ranges, apply_trend,
                                             expected_override, income_stratum_filter,
-                                            debug_example_rows != nullptr ? &delta_row : nullptr);
-        if (debug_example_rows != nullptr && income_stratum_filter.has_value() &&
-            expected_override != nullptr) {
-            example_row = std::move(delta_row);
+                                            collect_debug_rows ? &sampled_rows : nullptr);
+        if (collect_debug_rows) {
+            for (std::size_t i = 0; i < sampled_rows.size(); ++i) {
+                auto &row = sampled_rows[i];
+                const core::Identifier factor_id(row.factor);
+                std::size_t best_person_id = 0;
+                double best_hash_score = std::numeric_limits<double>::infinity();
+                for (const auto &person : context.population()) {
+                    if (!person.is_active()) {
+                        continue;
+                    }
+                    if (income_stratum_filter.has_value() &&
+                        (!person.has_income_adjustment_stratum ||
+                         person.income_adjustment_stratum != income_stratum_filter.value())) {
+                        continue;
+                    }
+                    if (row.age < 0 || person.age != static_cast<unsigned int>(row.age)) {
+                        continue;
+                    }
+                    if (!equal_factor_name(sex_to_label(person.gender), row.sex)) {
+                        continue;
+                    }
+                    double current_value = 0.0;
+                    bool has_value = false;
+                    if (equal_factor_name(row.factor, "income")) {
+                        if (person.risk_factors.contains(factor_id)) {
+                            current_value = person.risk_factors.at(factor_id);
+                            has_value = true;
+                        } else if (person.income_continuous > 0.0) {
+                            current_value = person.income_continuous;
+                            has_value = true;
+                        }
+                    } else if (equal_factor_name(row.factor, "PhysicalActivity")) {
+                        const core::Identifier pa_id("PhysicalActivity");
+                        current_value = person.physical_activity;
+                        if (person.risk_factors.contains(pa_id)) {
+                            current_value = person.risk_factors.at(pa_id);
+                        }
+                        has_value = true;
+                    } else if (person.risk_factors.contains(factor_id)) {
+                        current_value = person.risk_factors.at(factor_id);
+                        has_value = true;
+                    }
+                    if (!has_value) {
+                        continue;
+                    }
+                    const auto hash_seed =
+                        static_cast<std::uint64_t>(person.id()) * 1315423911ULL ^
+                        static_cast<std::uint64_t>(row.age) * 2654435761ULL ^
+                        static_cast<std::uint64_t>(row.bucket + 1u) * 97531ULL;
+                    const double score = static_cast<double>(hash_seed % 1000003ULL);
+                    if (score < best_hash_score) {
+                        best_hash_score = score;
+                        best_person_id = person.id();
+                        row.person_id = person.id();
+                        row.current_value = current_value;
+                        row.after_delta_value = current_value + row.delta;
+                    }
+                }
+            }
         }
     }
 
@@ -228,18 +303,6 @@ void RiskFactorAdjustableModel::adjust_risk_factors(
 
                     // Apply adjustment: new_value = current_value + delta
                     double adjusted_value = current_value + delta;
-                    if (income_stratum_filter.has_value() &&
-                        context.scenario().type() == ScenarioType::baseline &&
-                        example_row.has_value() && debug_example_rows != nullptr &&
-                        factor_name == example_row->factor) {
-                        bool expected = false;
-                        if (captured_apply_example.compare_exchange_strong(expected, true)) {
-                            example_row->person_id = person.id();
-                            example_row->current_value = current_value;
-                            example_row->final_value = adjusted_value;
-                        }
-                    }
-
                     // MAHIMA: We make sure that min/max of income models is used but we do not
                     // clamp Do not clamp income to a range: income is continuous and should match
                     // factors-mean scale (e.g. ~621 for age 0). Using another factor's range (e.g.
@@ -269,18 +332,6 @@ void RiskFactorAdjustableModel::adjust_risk_factors(
 
                     // Apply adjustment: new_value = current_value + delta
                     double adjusted_value = current_value + delta;
-                    if (income_stratum_filter.has_value() &&
-                        context.scenario().type() == ScenarioType::baseline &&
-                        example_row.has_value() && debug_example_rows != nullptr &&
-                        factor_name == example_row->factor) {
-                        bool expected = false;
-                        if (captured_apply_example.compare_exchange_strong(expected, true)) {
-                            example_row->person_id = person.id();
-                            example_row->current_value = current_value;
-                            example_row->final_value = adjusted_value;
-                        }
-                    }
-
                     // Clamp value to an optionally specified range
                     if (ranges.has_value() && i < ranges.value().get().size()) {
                         const auto &range = ranges.value().get()[i];
@@ -304,23 +355,48 @@ void RiskFactorAdjustableModel::adjust_risk_factors(
 
                     // Set the adjusted value to the risk factor
                     person.risk_factors.at(factor) = value;
-                    if (income_stratum_filter.has_value() &&
-                        context.scenario().type() == ScenarioType::baseline &&
-                        example_row.has_value() && debug_example_rows != nullptr &&
-                        factor_name == example_row->factor) {
-                        bool expected = false;
-                        if (captured_apply_example.compare_exchange_strong(expected, true)) {
-                            example_row->person_id = person.id();
-                            example_row->current_value = current_value;
-                            example_row->final_value = value;
-                        }
-                    }
                 }
             }
         });
 
-    if (debug_example_rows != nullptr && example_row.has_value() && captured_apply_example.load()) {
-        debug_example_rows->push_back(*example_row);
+    if (collect_debug_rows && !sampled_rows.empty()) {
+        for (auto &row : sampled_rows) {
+            if (row.person_id == 0u) {
+                continue;
+            }
+            const auto it_person = std::find_if(
+                context.population().begin(), context.population().end(),
+                [&](const Person &p) { return p.id() == row.person_id; });
+            if (it_person == context.population().end()) {
+                continue;
+            }
+            const auto &person = *it_person;
+            const core::Identifier factor_id(row.factor);
+            if (equal_factor_name(row.factor, "income")) {
+                if (person.risk_factors.contains(factor_id)) {
+                    row.final_value = person.risk_factors.at(factor_id);
+                } else {
+                    row.final_value = row.after_delta_value;
+                }
+            } else if (equal_factor_name(row.factor, "PhysicalActivity")) {
+                const core::Identifier pa_id("PhysicalActivity");
+                row.final_value = person.physical_activity;
+                if (person.risk_factors.contains(pa_id)) {
+                    row.final_value = person.risk_factors.at(pa_id);
+                }
+            } else if (person.risk_factors.contains(factor_id)) {
+                row.final_value = person.risk_factors.at(factor_id);
+            } else {
+                row.final_value = row.after_delta_value;
+            }
+        }
+
+        for (auto &row : sampled_rows) {
+            if (row.person_id == 0u) {
+                continue;
+            }
+            debug_example_rows->push_back(std::move(row));
+        }
     }
 
     // Baseline scenario: send adjustments to intervention scenario.
@@ -354,7 +430,7 @@ RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_adjustments(
     RuntimeContext &context, const std::vector<core::Identifier> &factors, OptionalRanges ranges,
     bool apply_trend, const RiskFactorSexAgeTable *expected_override,
     std::optional<std::size_t> income_stratum_filter,
-    IncomeStratumAdjustmentExampleRow *debug_delta_row) const {
+    std::vector<IncomeStratumAdjustmentExampleRow> *debug_delta_rows) const {
     auto age_range = context.age_range();
     auto age_count = age_range.upper() + 1;
 
@@ -366,7 +442,9 @@ RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_adjustments(
 
     // Compute adjustments.
     auto adjustments = RiskFactorSexAgeTable{};
-    bool printed_delta_example = false;
+    std::vector<std::pair<std::uint64_t, IncomeStratumAdjustmentExampleRow>> debug_candidates;
+    debug_candidates.reserve(32);
+    constexpr std::size_t max_debug_rows_per_call = 8u;
     for (const auto &[sex, simulated_means_by_sex] : simulated_means) {
         for (size_t i = 0; i < factors.size(); i++) {
             const core::Identifier &factor = factors[i];
@@ -428,19 +506,50 @@ RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_adjustments(
                 }
 
                 adjustments.at(sex, factor).at(age) = delta;
-                if (!printed_delta_example && debug_delta_row != nullptr &&
-                    income_stratum_filter.has_value() && expected_override != nullptr &&
-                    context.scenario().type() == ScenarioType::baseline) {
-                    debug_delta_row->bucket = income_stratum_filter.value();
-                    debug_delta_row->factor = factor.to_string();
-                    debug_delta_row->sex = sex == core::Gender::male ? "male" : "female";
-                    debug_delta_row->age = age;
-                    debug_delta_row->expected_value = expect;
-                    debug_delta_row->simulated_mean = sim_mean;
-                    debug_delta_row->delta = delta;
-                    printed_delta_example = true;
+                if (debug_delta_rows != nullptr && income_stratum_filter.has_value() &&
+                    expected_override != nullptr && context.scenario().type() == ScenarioType::baseline &&
+                    !std::isnan(sim_mean)) {
+                    IncomeStratumAdjustmentExampleRow row;
+                    row.bucket = income_stratum_filter.value();
+                    row.factor = factor.to_string();
+                    row.sex = sex == core::Gender::male ? "male" : "female";
+                    row.age = age;
+                    row.expected_value = expect;
+                    row.simulated_mean = sim_mean;
+                    row.delta = delta;
+
+                    std::uint64_t score = static_cast<std::uint64_t>(row.bucket + 1u) * 1099511628211ULL;
+                    score ^= static_cast<std::uint64_t>(age + 4099);
+                    score ^= static_cast<std::uint64_t>(row.factor.size()) * 1469598103934665603ULL;
+                    score ^= static_cast<std::uint64_t>(row.sex == "male" ? 131u : 239u);
+                    for (char c : row.factor) {
+                        score ^= static_cast<std::uint64_t>(
+                            static_cast<unsigned char>(std::tolower(static_cast<unsigned char>(c))) +
+                            1u);
+                        score *= 1099511628211ULL;
+                    }
+                    debug_candidates.emplace_back(score, std::move(row));
                 }
             }
+        }
+    }
+
+    if (debug_delta_rows != nullptr && !debug_candidates.empty()) {
+        std::ranges::sort(debug_candidates, [](const auto &lhs, const auto &rhs) {
+            if (lhs.first != rhs.first) {
+                return lhs.first < rhs.first;
+            }
+            if (lhs.second.factor != rhs.second.factor) {
+                return lhs.second.factor < rhs.second.factor;
+            }
+            if (lhs.second.sex != rhs.second.sex) {
+                return lhs.second.sex < rhs.second.sex;
+            }
+            return lhs.second.age < rhs.second.age;
+        });
+        const std::size_t sample_count = std::min(max_debug_rows_per_call, debug_candidates.size());
+        for (std::size_t i = 0; i < sample_count; ++i) {
+            debug_delta_rows->push_back(std::move(debug_candidates[i].second));
         }
     }
 

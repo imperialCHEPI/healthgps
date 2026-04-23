@@ -46,6 +46,7 @@ using RiskFactorSexAgeTable = UnorderedMap2d<core::Gender, core::Identifier, std
 /// @brief One debug row showing stratum expected/simulated delta and one sample applied update.
 struct IncomeStratumAdjustmentExampleRow {
     std::size_t bucket{};
+    std::string stratum_id;
     std::string factor;
     std::string sex;
     int age{};
@@ -54,6 +55,7 @@ struct IncomeStratumAdjustmentExampleRow {
     double delta{};
     std::size_t person_id{};
     double current_value{};
+    double after_delta_value{};
     double final_value{};
 };
 
@@ -128,7 +130,8 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
                           OptionalRanges ranges, bool apply_trend,
                           const RiskFactorSexAgeTable *expected_override = nullptr,
                           std::optional<std::size_t> income_stratum_filter = std::nullopt,
-                          IncomeStratumAdjustmentExampleRow *debug_delta_row = nullptr) const;
+                          std::vector<IncomeStratumAdjustmentExampleRow> *debug_delta_rows = nullptr)
+        const;
 
     static RiskFactorSexAgeTable
     calculate_simulated_mean(Population &population, core::IntegerInterval age_range,
