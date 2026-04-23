@@ -8,8 +8,8 @@
 #include <algorithm>
 #include <atomic>
 #include <cctype>
-#include <cstdint>
 #include <cmath>
+#include <cstdint>
 #include <iostream>
 #include <limits>
 #include <oneapi/tbb/parallel_for_each.h>
@@ -147,9 +147,9 @@ void RiskFactorAdjustableModel::adjust_risk_factors(
     std::vector<IncomeStratumAdjustmentExampleRow> *debug_example_rows) const {
     RiskFactorSexAgeTable adjustments;
     std::vector<IncomeStratumAdjustmentExampleRow> sampled_rows;
-    const bool collect_debug_rows = debug_example_rows != nullptr && income_stratum_filter.has_value() &&
-                                    expected_override != nullptr &&
-                                    context.scenario().type() == ScenarioType::baseline;
+    const bool collect_debug_rows =
+        debug_example_rows != nullptr && income_stratum_filter.has_value() &&
+        expected_override != nullptr && context.scenario().type() == ScenarioType::baseline;
     const auto sex_to_label = [](core::Gender sex) -> std::string_view {
         return sex == core::Gender::male ? "male" : "female";
     };
@@ -216,10 +216,9 @@ void RiskFactorAdjustableModel::adjust_risk_factors(
                     if (!has_value) {
                         continue;
                     }
-                    const auto hash_seed =
-                        static_cast<std::uint64_t>(person.id()) * 1315423911ULL ^
-                        static_cast<std::uint64_t>(row.age) * 2654435761ULL ^
-                        static_cast<std::uint64_t>(row.bucket + 1u) * 97531ULL;
+                    const auto hash_seed = static_cast<std::uint64_t>(person.id()) * 1315423911ULL ^
+                                           static_cast<std::uint64_t>(row.age) * 2654435761ULL ^
+                                           static_cast<std::uint64_t>(row.bucket + 1u) * 97531ULL;
                     const double score = static_cast<double>(hash_seed % 1000003ULL);
                     if (score < best_hash_score) {
                         best_hash_score = score;
@@ -364,9 +363,9 @@ void RiskFactorAdjustableModel::adjust_risk_factors(
             if (row.person_id == 0u) {
                 continue;
             }
-            const auto it_person = std::find_if(
-                context.population().begin(), context.population().end(),
-                [&](const Person &p) { return p.id() == row.person_id; });
+            const auto it_person =
+                std::find_if(context.population().begin(), context.population().end(),
+                             [&](const Person &p) { return p.id() == row.person_id; });
             if (it_person == context.population().end()) {
                 continue;
             }
@@ -507,8 +506,8 @@ RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_adjustments(
 
                 adjustments.at(sex, factor).at(age) = delta;
                 if (debug_delta_rows != nullptr && income_stratum_filter.has_value() &&
-                    expected_override != nullptr && context.scenario().type() == ScenarioType::baseline &&
-                    !std::isnan(sim_mean)) {
+                    expected_override != nullptr &&
+                    context.scenario().type() == ScenarioType::baseline && !std::isnan(sim_mean)) {
                     IncomeStratumAdjustmentExampleRow row;
                     row.bucket = income_stratum_filter.value();
                     row.factor = factor.to_string();
@@ -518,14 +517,15 @@ RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_adjustments(
                     row.simulated_mean = sim_mean;
                     row.delta = delta;
 
-                    std::uint64_t score = static_cast<std::uint64_t>(row.bucket + 1u) * 1099511628211ULL;
+                    std::uint64_t score =
+                        static_cast<std::uint64_t>(row.bucket + 1u) * 1099511628211ULL;
                     score ^= static_cast<std::uint64_t>(age + 4099);
                     score ^= static_cast<std::uint64_t>(row.factor.size()) * 1469598103934665603ULL;
                     score ^= static_cast<std::uint64_t>(row.sex == "male" ? 131u : 239u);
                     for (char c : row.factor) {
-                        score ^= static_cast<std::uint64_t>(
-                            static_cast<unsigned char>(std::tolower(static_cast<unsigned char>(c))) +
-                            1u);
+                        score ^= static_cast<std::uint64_t>(static_cast<unsigned char>(std::tolower(
+                                                                static_cast<unsigned char>(c))) +
+                                                            1u);
                         score *= 1099511628211ULL;
                     }
                     debug_candidates.emplace_back(score, std::move(row));

@@ -125,13 +125,12 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
     /// @param factors A list of risk factors to be adjusted
     /// @param ranges An optional list of risk factor value boundaries
     /// @param apply_trend Whether to apply expected value time trend
-    RiskFactorSexAgeTable
-    calculate_adjustments(RuntimeContext &context, const std::vector<core::Identifier> &factors,
-                          OptionalRanges ranges, bool apply_trend,
-                          const RiskFactorSexAgeTable *expected_override = nullptr,
-                          std::optional<std::size_t> income_stratum_filter = std::nullopt,
-                          std::vector<IncomeStratumAdjustmentExampleRow> *debug_delta_rows = nullptr)
-        const;
+    RiskFactorSexAgeTable calculate_adjustments(
+        RuntimeContext &context, const std::vector<core::Identifier> &factors,
+        OptionalRanges ranges, bool apply_trend,
+        const RiskFactorSexAgeTable *expected_override = nullptr,
+        std::optional<std::size_t> income_stratum_filter = std::nullopt,
+        std::vector<IncomeStratumAdjustmentExampleRow> *debug_delta_rows = nullptr) const;
 
     static RiskFactorSexAgeTable
     calculate_simulated_mean(Population &population, core::IntegerInterval age_range,

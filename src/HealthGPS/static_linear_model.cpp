@@ -309,7 +309,8 @@ void print_income_stratum_adjustment_examples_table(
         }
     } else {
         // MAHIMA: Keep output compact by showing only 10 deterministic pseudo-random rows.
-        // We hash row attributes to get a stable random-like ordering across runs, then take top 10.
+        // We hash row attributes to get a stable random-like ordering across runs, then take
+        // top 10.
         std::vector<std::pair<std::size_t, std::size_t>> scored_indices;
         scored_indices.reserve(rows.size());
         for (std::size_t i = 0; i < rows.size(); ++i) {
@@ -335,18 +336,21 @@ void print_income_stratum_adjustment_examples_table(
         }
     }
     out << "Showing " << selected_indices.size() << " of " << rows.size() << " sampled rows\n";
-    out << "+--------+----------------------+----------+----------------------+--------+-----+-----------"
+    out << "+--------+----------------------+----------+----------------------+--------+-----+-----"
+           "------"
            "--+---------------+-------------+-------------+-------------+-------------+\n";
-    out << "| Bucket | StratumID            | PersonID | Factor               | Sex    | Age | Expected   "
+    out << "| Bucket | StratumID            | PersonID | Factor               | Sex    | Age | "
+           "Expected   "
            " | SimulatedMean | Delta       | Current     | AfterDelta  | Final       |\n";
-    out << "+--------+----------------------+----------+----------------------+--------+-----+-----------"
+    out << "+--------+----------------------+----------+----------------------+--------+-----+-----"
+           "------"
            "--+---------------+-------------+-------------+-------------+-------------+\n";
     for (const auto idx : selected_indices) {
         const auto &r = rows[idx];
-        out << "| " << std::setw(6) << r.bucket << " | " << std::setw(20) << std::left << r.stratum_id
-            << std::right << " | " << std::setw(8) << r.person_id << " | " << std::setw(20)
-            << std::left << r.factor << std::right << " | " << std::setw(6) << r.sex << " | "
-            << std::setw(3) << r.age << " | " << std::setw(11)
+        out << "| " << std::setw(6) << r.bucket << " | " << std::setw(20) << std::left
+            << r.stratum_id << std::right << " | " << std::setw(8) << r.person_id << " | "
+            << std::setw(20) << std::left << r.factor << std::right << " | " << std::setw(6)
+            << r.sex << " | " << std::setw(3) << r.age << " | " << std::setw(11)
             << fmt::format("{:.5f}", r.expected_value) << " | " << std::setw(13)
             << fmt::format("{:.5f}", r.simulated_mean) << " | " << std::setw(11)
             << fmt::format("{:.5f}", r.delta) << " | " << std::setw(11)
@@ -354,7 +358,8 @@ void print_income_stratum_adjustment_examples_table(
             << fmt::format("{:.5f}", r.after_delta_value) << " | " << std::setw(11)
             << fmt::format("{:.5f}", r.final_value) << " |\n";
     }
-    out << "+--------+----------------------+----------+----------------------+--------+-----+-----------"
+    out << "+--------+----------------------+----------+----------------------+--------+-----+-----"
+           "------"
            "--+---------------+-------------+-------------+-------------+-------------+\n";
     std::osyncstream(std::cout) << out.str();
 }
