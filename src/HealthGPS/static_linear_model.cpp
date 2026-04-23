@@ -781,7 +781,10 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
                 }
             }
         }
-        if (context.scenario().type() == ScenarioType::baseline) {
+        // MAHIMA: Print expanded debug examples only for the first simulation year to limit
+        // runtime/log overhead in long horizon runs.
+        if (context.scenario().type() == ScenarioType::baseline &&
+            context.time_now() == context.start_time()) {
             print_income_stratum_adjustment_examples_table(debug_rows, context.time_now(),
                                                            "initial");
         }
@@ -931,7 +934,8 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
                     }
                 }
             }
-            if (context.scenario().type() == ScenarioType::baseline) {
+            if (context.scenario().type() == ScenarioType::baseline &&
+                context.time_now() == context.start_time()) {
                 print_income_stratum_adjustment_examples_table(debug_rows, context.time_now(),
                                                                "trended");
             }
@@ -1087,7 +1091,8 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
                 }
             }
         }
-        if (context.scenario().type() == ScenarioType::baseline) {
+        if (context.scenario().type() == ScenarioType::baseline &&
+            context.time_now() == context.start_time()) {
             print_income_stratum_adjustment_examples_table(debug_rows, context.time_now(),
                                                            "yearly-initial");
         }
@@ -1231,7 +1236,8 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
                     }
                 }
             }
-            if (context.scenario().type() == ScenarioType::baseline) {
+            if (context.scenario().type() == ScenarioType::baseline &&
+                context.time_now() == context.start_time()) {
                 print_income_stratum_adjustment_examples_table(debug_rows, context.time_now(),
                                                                "yearly-trended");
             }

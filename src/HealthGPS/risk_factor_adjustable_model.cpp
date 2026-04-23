@@ -172,10 +172,8 @@ void RiskFactorAdjustableModel::adjust_risk_factors(
                                             expected_override, income_stratum_filter,
                                             collect_debug_rows ? &sampled_rows : nullptr);
         if (collect_debug_rows) {
-            for (std::size_t i = 0; i < sampled_rows.size(); ++i) {
-                auto &row = sampled_rows[i];
+            for (auto &row : sampled_rows) {
                 const core::Identifier factor_id(row.factor);
-                std::size_t best_person_id = 0;
                 double best_hash_score = std::numeric_limits<double>::infinity();
                 for (const auto &person : context.population()) {
                     if (!person.is_active()) {
@@ -186,7 +184,11 @@ void RiskFactorAdjustableModel::adjust_risk_factors(
                          person.income_adjustment_stratum != income_stratum_filter.value())) {
                         continue;
                     }
-                    if (row.age < 0 || person.age != static_cast<unsigned int>(row.age)) {
+                    if (row.age < 0) {
+                        continue;
+                    }
+                    const auto row_age = static_cast<unsigned int>(row.age);
+                    if (person.age != row_age) {
                         continue;
                     }
                     if (!equal_factor_name(sex_to_label(person.gender), row.sex)) {
@@ -216,13 +218,13 @@ void RiskFactorAdjustableModel::adjust_risk_factors(
                     if (!has_value) {
                         continue;
                     }
-                    const auto hash_seed = static_cast<std::uint64_t>(person.id()) * 1315423911ULL ^
-                                           static_cast<std::uint64_t>(row.age) * 2654435761ULL ^
-                                           static_cast<std::uint64_t>(row.bucket + 1u) * 97531ULL;
-                    const double score = static_cast<double>(hash_seed % 1000003ULL);
+                    const auto hash_seed =
+                        (static_cast<std::uint64_t>(person.id()) * 1315423911ULL) ^
+                        (static_cast<std::uint64_t>(row.age) * 2654435761ULL) ^
+                        (static_cast<std::uint64_t>(row.bucket + 1u) * 97531ULL);
+                    const auto score = static_cast<double>(hash_seed % 1000003ULL);
                     if (score < best_hash_score) {
                         best_hash_score = score;
-                        best_person_id = person.id();
                         row.person_id = person.id();
                         row.current_value = current_value;
                         row.after_delta_value = current_value + row.delta;
@@ -275,7 +277,7 @@ void RiskFactorAdjustableModel::adjust_risk_factors(
                     continue;
                 }
                 const auto &delta_by_age = adjustments.at(person.gender, factor);
-                if (person.age < 0 || static_cast<std::size_t>(person.age) >= delta_by_age.size()) {
+                if (static_cast<std::size_t>(person.age) >= delta_by_age.size()) {
                     continue;
                 }
                 double delta = delta_by_age.at(static_cast<std::size_t>(person.age));
