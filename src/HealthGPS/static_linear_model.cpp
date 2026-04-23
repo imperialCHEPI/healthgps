@@ -1229,6 +1229,7 @@ double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
     return std::max(0.0, result);
 }
 
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &person,
                                            Random &random) const {
     static int factors_count = 0;

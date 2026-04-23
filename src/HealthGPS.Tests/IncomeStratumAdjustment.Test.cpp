@@ -187,7 +187,7 @@ TempCsvPair write_temp_expected_csv_pair(std::string_view suffix, std::size_t ag
     };
     write_file(male);
     write_file(female);
-    return TempCsvPair{male, female};
+    return TempCsvPair{.male = male, .female = female};
 }
 
 hgps::input::Configuration make_config_for_expected_load(const std::filesystem::path &male_file,
