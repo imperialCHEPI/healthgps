@@ -60,6 +60,16 @@ core::Income income_category_from_rank_bucket(std::size_t bucket, std::size_t bu
     }
 }
 
+bool should_print_income_summary_tables(const RuntimeContext &context) {
+    if (context.scenario().type() != ScenarioType::baseline) {
+        return false;
+    }
+    const int current_year = context.time_now();
+    const int start_year = context.start_time();
+    // MAHIMA: Keep summary tables only for baseline start year and first update year.
+    return current_year == start_year || current_year == (start_year + 1);
+}
+
 void assign_income_categories_equal_split(Population &population,
                                           std::string_view income_categories) {
     const std::size_t bucket_count = income_categories == "4" ? 4u : 3u;
@@ -154,6 +164,8 @@ struct IncomeBucketSummary {
     double sum{0.0};
 };
 
+// MAHIMA: We are printing this table to help understand the actual income distributions across final categories after income-based factors -mean adjustment, which may differ from initial quartile thresholds due to people
+// NOTE: Print only in start year and start_year +1
 void print_income_adjustment_strata_table(
     const Population &population, const std::vector<IncomeStratumExpectedTableEntry> &tables,
     std::size_t bucket_count, int year, std::string_view phase) {
@@ -248,9 +260,9 @@ void print_final_income_category_table(const Population &population, std::string
         s.min = std::min(s.min, v);
         s.max = std::max(s.max, v);
     }
-
+    
     std::ostringstream out;
-    out << "\n[FINAL INCOME CATEGORIES] Year " << year << " phase=" << phase
+    out << "\n[YEAR 2 UPDATE INCOME CATEGORIES] Year " << year << " phase=" << phase
         << " project_requirements.categories=" << categories << '\n';
     if (categories == "4" && thresholds.size() >= 3) {
         out << "Thresholds: Q1=" << fmt::format("{:.3f}", thresholds[0])
@@ -710,7 +722,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         // consistent fallback.
         assign_income_adjustment_strata_equal_split(context.population(),
                                                     adjustment_income_stratum_count_);
-        if (context.scenario().type() == ScenarioType::baseline) {
+        if (should_print_income_summary_tables(context)) {
             print_income_adjustment_strata_table(
                 context.population(), income_stratum_expected_tables_,
                 adjustment_income_stratum_count_, context.time_now(), "initial");
@@ -823,7 +835,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
             income_categories_ == "4" ? calculate_income_quartiles(context.population())
                                       : calculate_income_tertiles(context.population());
         assign_income_categories_equal_split(context.population(), income_categories_);
-        if (context.scenario().type() == ScenarioType::baseline) {
+        if (should_print_income_summary_tables(context)) {
             print_final_income_category_table(context.population(), income_categories_, thresholds,
                                               context.time_now(), "initial");
         }
@@ -870,7 +882,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
 
             assign_income_adjustment_strata_equal_split(context.population(),
                                                         adjustment_income_stratum_count_);
-            if (context.scenario().type() == ScenarioType::baseline) {
+            if (should_print_income_summary_tables(context)) {
                 print_income_adjustment_strata_table(
                     context.population(), income_stratum_expected_tables_,
                     adjustment_income_stratum_count_, context.time_now(), "trended");
@@ -1023,7 +1035,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
         // configured N adjustment buckets.
         assign_income_adjustment_strata_equal_split(context.population(),
                                                     adjustment_income_stratum_count_);
-        if (context.scenario().type() == ScenarioType::baseline) {
+        if (should_print_income_summary_tables(context)) {
             print_income_adjustment_strata_table(
                 context.population(), income_stratum_expected_tables_,
                 adjustment_income_stratum_count_, context.time_now(), "yearly-initial");
@@ -1108,7 +1120,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             income_categories_ == "4" ? calculate_income_quartiles(context.population())
                                       : calculate_income_tertiles(context.population());
         assign_income_categories_equal_split(context.population(), income_categories_);
-        if (context.scenario().type() == ScenarioType::baseline) {
+        if (should_print_income_summary_tables(context)) {
             print_final_income_category_table(context.population(), income_categories_, thresholds,
                                               context.time_now(), "yearly-initial");
         }
@@ -1172,7 +1184,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             }
             assign_income_adjustment_strata_equal_split(context.population(),
                                                         adjustment_income_stratum_count_);
-            if (context.scenario().type() == ScenarioType::baseline) {
+            if (should_print_income_summary_tables(context)) {
                 print_income_adjustment_strata_table(
                     context.population(), income_stratum_expected_tables_,
                     adjustment_income_stratum_count_, context.time_now(), "yearly-trended");
@@ -1261,7 +1273,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             // keeping behaviour identical to initial assignment and avoiding
             // repeated threshold scans.
             assign_income_categories_equal_split(context.population(), income_categories_);
-            if (context.scenario().type() == ScenarioType::baseline) {
+            if (should_print_income_summary_tables(context)) {
                 const std::vector<double> thresholds =
                     income_categories_ == "4" ? calculate_income_quartiles(context.population())
                                               : calculate_income_tertiles(context.population());

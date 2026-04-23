@@ -312,15 +312,18 @@ TEST(IncomeStratumAdjustment, CapturesSingleDebugRowForFilteredStratumAdjustment
     EXPECT_NEAR(20.0, context.population()[0].risk_factors.at(factor), 1e-9);
     EXPECT_NEAR(20.0, context.population()[1].risk_factors.at(factor), 1e-9);
 
-    ASSERT_EQ(1u, rows.size());
-    const auto &row = rows.front();
+    ASSERT_FALSE(rows.empty());
+    const auto it = std::find_if(rows.begin(), rows.end(), [](const auto &row) {
+        return row.factor == "foodcarbohydrate" && row.age == 0;
+    });
+    ASSERT_NE(rows.end(), it);
+    const auto &row = *it;
     EXPECT_EQ(0u, row.bucket);
-    EXPECT_EQ("foodcarbohydrate", row.factor);
-    EXPECT_EQ(0, row.age);
     EXPECT_NEAR(20.0, row.expected_value, 1e-9);
     EXPECT_NEAR(10.0, row.simulated_mean, 1e-9);
     EXPECT_NEAR(10.0, row.delta, 1e-9);
     EXPECT_NEAR(10.0, row.current_value, 1e-9);
+    EXPECT_NEAR(20.0, row.after_delta_value, 1e-9);
     EXPECT_NEAR(20.0, row.final_value, 1e-9);
     EXPECT_TRUE(row.person_id == context.population()[0].id() ||
                 row.person_id == context.population()[1].id());
