@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <atomic>
+#include <cstdint>
 #include <cmath>
 #include <functional>
 #include <future>
@@ -96,10 +97,10 @@ void AnalysisModule::initialise_population(RuntimeContext &context) {
     auto expected_count = create_age_gender_table<int>(age_range);
     auto &pop = context.population();
     // MAHIMA: Build is_active cache once in parallel (each index written by one task; no races).
-    std::vector<bool> is_active(pop.size());
+    std::vector<std::uint8_t> is_active(pop.size(), 0u);
     if (pop.size() > 0) {
         core::parallel_for(size_t{0}, pop.size() - 1,
-                           [&](size_t i) { is_active[i] = pop[i].is_active(); });
+                           [&](size_t i) { is_active[i] = pop[i].is_active() ? 1u : 0u; });
     }
     auto sum_mutex = std::mutex{};
     std::atomic_size_t processed{0};
@@ -231,11 +232,14 @@ void AnalysisModule::publish_individual_tracking_if_enabled(RuntimeContext &cont
     }
 
     // MAHIMA: Cache is_active once in parallel (each index written by one task; no races).
+    // Use uint8_t instead of vector<bool> because vector<bool> stores proxy bits that are unsafe for concurrent element writes.
     const auto &pop_track = context.population();
-    std::vector<bool> is_active_track(pop_track.size());
+    std::vector<std::uint8_t> is_active_track(pop_track.size(), 0u);
     if (pop_track.size() > 0) {
         core::parallel_for(size_t{0}, pop_track.size() - 1,
-                           [&](size_t i) { is_active_track[i] = pop_track[i].is_active(); });
+                           [&](size_t i) {
+                               is_active_track[i] = pop_track[i].is_active() ? 1u : 0u;
+                           });
     }
 
     std::vector<IndividualTrackingRow> rows;
@@ -328,10 +332,12 @@ void AnalysisModule::calculate_historical_statistics(RuntimeContext &context,
     auto population_dead = 0;
     auto population_migrated = 0;
     // MAHIMA: Cache is_active once in parallel (each index written by one task; no races).
-    std::vector<bool> is_active_hist(pop_hist.size());
+    std::vector<std::uint8_t> is_active_hist(pop_hist.size(), 0u);
     if (pop_hist.size() > 0) {
         core::parallel_for(size_t{0}, pop_hist.size() - 1,
-                           [&](size_t idx) { is_active_hist[idx] = pop_hist[idx].is_active(); });
+                           [&](size_t idx) {
+                               is_active_hist[idx] = pop_hist[idx].is_active() ? 1u : 0u;
+                           });
     }
     for (size_t idx = 0; idx < pop_hist.size(); ++idx) {
         if (!is_active_hist[idx]) {
@@ -442,10 +448,10 @@ void AnalysisModule::calculate_income_based_statistics(RuntimeContext &context,
 
     // MAHIMA: Cache is_active once in parallel (each index written by one task; no races).
     const auto &pop_inc = context.population();
-    std::vector<bool> is_active_inc(pop_inc.size());
+    std::vector<std::uint8_t> is_active_inc(pop_inc.size(), 0u);
     if (pop_inc.size() > 0) {
         core::parallel_for(size_t{0}, pop_inc.size() - 1,
-                           [&](size_t i) { is_active_inc[i] = pop_inc[i].is_active(); });
+                           [&](size_t i) { is_active_inc[i] = pop_inc[i].is_active() ? 1u : 0u; });
     }
 
     // Aggregate statistics by income category
@@ -658,10 +664,10 @@ std::vector<core::Income> AnalysisModule::get_available_income_categories(Runtim
 
     // MAHIMA: Cache is_active once in parallel (each index written by one task; no races).
     const auto &pop_cat = context.population();
-    std::vector<bool> is_active_cat(pop_cat.size());
+    std::vector<std::uint8_t> is_active_cat(pop_cat.size(), 0u);
     if (pop_cat.size() > 0) {
         core::parallel_for(size_t{0}, pop_cat.size() - 1,
-                           [&](size_t i) { is_active_cat[i] = pop_cat[i].is_active(); });
+                           [&](size_t i) { is_active_cat[i] = pop_cat[i].is_active() ? 1u : 0u; });
     }
     for (size_t i = 0; i < pop_cat.size(); ++i) {
         if (is_active_cat[i] && !seen.contains(pop_cat[i].income)) {
@@ -714,10 +720,10 @@ DALYsIndicator AnalysisModule::calculate_dalys(Population &population, unsigned 
     auto count = 0.0;
     // MAHIMA: Cache is_active once in parallel (each index written by one task; no races).
     const size_t pop_size = population.size();
-    std::vector<bool> is_active_daly(pop_size);
+    std::vector<std::uint8_t> is_active_daly(pop_size, 0u);
     if (pop_size > 0) {
         core::parallel_for(size_t{0}, pop_size - 1,
-                           [&](size_t i) { is_active_daly[i] = population[i].is_active(); });
+                           [&](size_t i) { is_active_daly[i] = population[i].is_active() ? 1u : 0u; });
     }
     for (size_t i = 0; i < pop_size; ++i) {
         const auto &entity = population[i];
@@ -791,10 +797,12 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
     std::size_t processed = 0; // NOLINT(clang-diagnostic-unused-but-set-variable)
     // MAHIMA: Cache is_active once in parallel (each index written by one task; no races).
     const auto &pop_series = context.population();
-    std::vector<bool> is_active_series(pop_series.size());
+    std::vector<std::uint8_t> is_active_series(pop_series.size(), 0u);
     if (pop_series.size() > 0) {
         core::parallel_for(size_t{0}, pop_series.size() - 1,
-                           [&](size_t i) { is_active_series[i] = pop_series[i].is_active(); });
+                           [&](size_t i) {
+                               is_active_series[i] = pop_series[i].is_active() ? 1u : 0u;
+                           });
     }
     for (size_t i = 0; i < pop_series.size(); ++i) {
         const auto &person = pop_series[i];
@@ -1054,10 +1062,10 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
 
     // MAHIMA: Cache is_active once in parallel (each index written by one task; no races).
     const auto &pop = context.population();
-    std::vector<bool> is_active(pop.size());
+    std::vector<std::uint8_t> is_active(pop.size(), 0u);
     if (pop.size() > 0) {
         core::parallel_for(size_t{0}, pop.size() - 1,
-                           [&](size_t i) { is_active[i] = pop[i].is_active(); });
+                           [&](size_t i) { is_active[i] = pop[i].is_active() ? 1u : 0u; });
     }
 
     // Sample a subset of the population to check for attribute availability
@@ -1512,10 +1520,10 @@ void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &c
 
     // MAHIMA: Cache is_active once in parallel (each index written by one task; no races).
     const auto &pop = context.population();
-    std::vector<bool> is_active_std_inc(pop.size());
+    std::vector<std::uint8_t> is_active_std_inc(pop.size(), 0u);
     if (pop.size() > 0) {
         core::parallel_for(size_t{0}, pop.size() - 1,
-                           [&](size_t ii) { is_active_std_inc[ii] = pop[ii].is_active(); });
+                           [&](size_t ii) { is_active_std_inc[ii] = pop[ii].is_active() ? 1u : 0u; });
     }
 
     // Sample a subset of the population to check for attribute availability
@@ -1829,10 +1837,10 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
     auto current_time = static_cast<unsigned int>(context.time_now());
     // MAHIMA: Cache is_active once in parallel (each index written by one task; no races).
     const auto &pop_std = context.population();
-    std::vector<bool> is_active_std(pop_std.size());
+    std::vector<std::uint8_t> is_active_std(pop_std.size(), 0u);
     if (pop_std.size() > 0) {
         core::parallel_for(size_t{0}, pop_std.size() - 1,
-                           [&](size_t i) { is_active_std[i] = pop_std[i].is_active(); });
+                           [&](size_t i) { is_active_std[i] = pop_std[i].is_active() ? 1u : 0u; });
     }
     for (size_t i = 0; i < pop_std.size(); ++i) {
         const auto &person = pop_std[i];
@@ -2055,10 +2063,10 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
 
     // MAHIMA: Cache is_active once in parallel (each index written by one task; no races).
     const auto &pop = context.population();
-    std::vector<bool> is_active_out(pop.size());
+    std::vector<std::uint8_t> is_active_out(pop.size(), 0u);
     if (pop.size() > 0) {
         core::parallel_for(size_t{0}, pop.size() - 1,
-                           [&](size_t i) { is_active_out[i] = pop[i].is_active(); });
+                           [&](size_t i) { is_active_out[i] = pop[i].is_active() ? 1u : 0u; });
     }
 
     // Sample a subset of the population to check for attribute availability

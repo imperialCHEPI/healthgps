@@ -11,7 +11,9 @@
 #include "HealthGPS/runtime_context.h"
 #include "HealthGPS/static_linear_model.h"
 
+#include <algorithm>
 #include <fstream>
+
 
 namespace {
 struct TempCsvPair {
