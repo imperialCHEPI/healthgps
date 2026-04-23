@@ -403,6 +403,45 @@ TEST_F(ConfigParsingFixture, GetBaseLineInfo_IncomeStratumCountMismatchThrows) {
     EXPECT_THROW(get_baseline_info(j, tmp_path()), ConfigurationError);
 }
 
+TEST_F(ConfigParsingFixture, GetBaseLineInfo_IncomeStratumNegativeCountThrows) {
+    json j;
+    j["baseline_adjustments"]["format"] = "csv";
+    j["baseline_adjustments"]["delimiter"] = ",";
+    j["baseline_adjustments"]["encoding"] = "UTF8";
+    j["baseline_adjustments"]["file_names"]["factorsmean_male"] = create_file_absolute().string();
+    j["baseline_adjustments"]["file_names"]["factorsmean_female"] = create_file_absolute().string();
+    j["baseline_adjustments"]["income_stratum_factors_mean"]["enabled"] = true;
+    j["baseline_adjustments"]["income_stratum_factors_mean"]["adjustment_income_stratum_count"] =
+        -1;
+    j["baseline_adjustments"]["income_stratum_factors_mean"]["strata"] = json::array();
+
+    EXPECT_THROW(get_baseline_info(j, tmp_path()), ConfigurationError);
+}
+
+TEST_F(ConfigParsingFixture, GetBaseLineInfo_IncomeStratumDisabledAllowsCountMismatch) {
+    const auto male_q1 = create_file_absolute();
+    const auto female_q1 = create_file_absolute();
+
+    json j;
+    j["baseline_adjustments"]["format"] = "csv";
+    j["baseline_adjustments"]["delimiter"] = ",";
+    j["baseline_adjustments"]["encoding"] = "UTF8";
+    j["baseline_adjustments"]["file_names"]["factorsmean_male"] = create_file_absolute().string();
+    j["baseline_adjustments"]["file_names"]["factorsmean_female"] = create_file_absolute().string();
+    j["baseline_adjustments"]["income_stratum_factors_mean"]["enabled"] = false;
+    j["baseline_adjustments"]["income_stratum_factors_mean"]["adjustment_income_stratum_count"] = 5;
+    j["baseline_adjustments"]["income_stratum_factors_mean"]["strata"] =
+        json::array({{{"id", "Q1"},
+                      {"factorsmean_male", male_q1.string()},
+                      {"factorsmean_female", female_q1.string()}}});
+
+    const auto parsed = get_baseline_info(j, tmp_path());
+    EXPECT_FALSE(parsed.income_stratum_factors_mean.enabled);
+    EXPECT_EQ(5u, parsed.income_stratum_factors_mean.adjustment_income_stratum_count);
+    ASSERT_EQ(1u, parsed.income_stratum_factors_mean.strata.size());
+    EXPECT_EQ("Q1", parsed.income_stratum_factors_mean.strata[0].id);
+}
+
 /// Phase 1: when enabled, two stratum pairs load and paths are rebased.
 TEST_F(ConfigParsingFixture, GetBaseLineInfo_IncomeStratumFactorsMeanWhenEnabled) {
     const auto male_q1 = create_file_absolute();

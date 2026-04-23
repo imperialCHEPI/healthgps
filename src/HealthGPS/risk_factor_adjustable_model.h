@@ -7,8 +7,10 @@
 #include "risk_factor_model.h"
 #include "runtime_context.h"
 
+#include <cstddef>
 #include <functional>
 #include <optional>
+#include <string>
 #include <unordered_set>
 #include <vector>
 
@@ -40,6 +42,22 @@ inline bool operator!=(TrendType lhs, TrendType rhs) noexcept { return !(lhs == 
 
 /// @brief Defines a table type for double values by sex and age
 using RiskFactorSexAgeTable = UnorderedMap2d<core::Gender, core::Identifier, std::vector<double>>;
+
+/// @brief One debug row showing stratum expected/simulated delta and one sample applied update.
+struct IncomeStratumAdjustmentExampleRow {
+    std::size_t bucket{};
+    std::string stratum_id;
+    std::string factor;
+    std::string sex;
+    int age{};
+    double expected_value{};
+    double simulated_mean{};
+    double delta{};
+    std::size_t person_id{};
+    double current_value{};
+    double after_delta_value{};
+    double final_value{};
+};
 
 /// @brief Risk factor model interface with mean adjustment by sex and age
 class RiskFactorAdjustableModel : public RiskFactorModel {
@@ -78,8 +96,12 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
     /// @param factors A list of risk factors to be adjusted
     /// @param ranges An optional list of risk factor value boundaries
     /// @param apply_trend Whether to apply expected value time trend
-    void adjust_risk_factors(RuntimeContext &context, const std::vector<core::Identifier> &factors,
-                             OptionalRanges ranges, bool apply_trend) const;
+    void adjust_risk_factors(
+        RuntimeContext &context, const std::vector<core::Identifier> &factors,
+        OptionalRanges ranges, bool apply_trend,
+        const RiskFactorSexAgeTable *expected_override = nullptr,
+        std::optional<std::size_t> income_stratum_filter = std::nullopt,
+        std::vector<IncomeStratumAdjustmentExampleRow> *debug_example_rows = nullptr) const;
 
     /// @brief Gets the number of time steps to apply the trend
     /// @param factor The risk factor to get the trend steps
@@ -103,14 +125,18 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
     /// @param factors A list of risk factors to be adjusted
     /// @param ranges An optional list of risk factor value boundaries
     /// @param apply_trend Whether to apply expected value time trend
-    RiskFactorSexAgeTable calculate_adjustments(RuntimeContext &context,
-                                                const std::vector<core::Identifier> &factors,
-                                                OptionalRanges ranges, bool apply_trend) const;
+    RiskFactorSexAgeTable calculate_adjustments(
+        RuntimeContext &context, const std::vector<core::Identifier> &factors,
+        OptionalRanges ranges, bool apply_trend,
+        const RiskFactorSexAgeTable *expected_override = nullptr,
+        std::optional<std::size_t> income_stratum_filter = std::nullopt,
+        std::vector<IncomeStratumAdjustmentExampleRow> *debug_delta_rows = nullptr) const;
 
     static RiskFactorSexAgeTable
     calculate_simulated_mean(Population &population, core::IntegerInterval age_range,
                              const std::vector<core::Identifier> &factors,
-                             const std::unordered_set<core::Identifier> &logistic_factors = {});
+                             const std::unordered_set<core::Identifier> &logistic_factors = {},
+                             std::optional<std::size_t> income_stratum_filter = std::nullopt);
 
     std::shared_ptr<RiskFactorSexAgeTable> expected_;
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_;

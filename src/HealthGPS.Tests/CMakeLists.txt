@@ -50,7 +50,8 @@ target_sources(
             "DiseaseModelPIF.Test.cpp"
             "RepositoryPIF.Test.cpp"
             "ConfigurationPIF.Test.cpp"
-            "PIFIntegration.Test.cpp")
+            "PIFIntegration.Test.cpp"
+            "IncomeStratumAdjustment.Test.cpp")
 
 # Download and extract test data
 cmake_policy(SET CMP0135 NEW)
