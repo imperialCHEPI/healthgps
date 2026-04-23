@@ -164,8 +164,9 @@ struct IncomeBucketSummary {
     double sum{0.0};
 };
 
-// MAHIMA: We are printing this table to help understand the actual income distributions across final categories after income-based factors -mean adjustment, which may differ from initial quartile thresholds due to people
-// NOTE: Print only in start year and start_year +1
+// MAHIMA: We are printing this table to help understand the actual income distributions across
+// final categories after income-based factors -mean adjustment, which may differ from initial
+// quartile thresholds due to people NOTE: Print only in start year and start_year +1
 void print_income_adjustment_strata_table(
     const Population &population, const std::vector<IncomeStratumExpectedTableEntry> &tables,
     std::size_t bucket_count, int year, std::string_view phase) {
@@ -260,7 +261,7 @@ void print_final_income_category_table(const Population &population, std::string
         s.min = std::min(s.min, v);
         s.max = std::max(s.max, v);
     }
-    
+
     std::ostringstream out;
     out << "\n[YEAR 2 UPDATE INCOME CATEGORIES] Year " << year << " phase=" << phase
         << " project_requirements.categories=" << categories << '\n';

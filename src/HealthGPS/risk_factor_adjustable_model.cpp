@@ -218,7 +218,9 @@ void RiskFactorAdjustableModel::adjust_risk_factors(
                     if (!has_value) {
                         continue;
                     }
-                    //MAHIMA: These numbers are carefully chosen hash‑mixing constants that turn simple inputs (ID, age, bucket) into a well‑distributed, deterministic, random‑looking score without bias or collisions.
+                    // MAHIMA: These numbers are carefully chosen hash‑mixing constants that turn
+                    // simple inputs (ID, age, bucket) into a well‑distributed, deterministic,
+                    // random‑looking score without bias or collisions.
                     const auto hash_seed =
                         (static_cast<std::uint64_t>(person.id()) * 1315423911ULL) ^
                         (static_cast<std::uint64_t>(row.age) * 2654435761ULL) ^
