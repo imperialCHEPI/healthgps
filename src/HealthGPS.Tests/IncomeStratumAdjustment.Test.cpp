@@ -14,7 +14,6 @@
 #include <algorithm>
 #include <fstream>
 
-
 namespace {
 struct TempCsvPair {
     std::filesystem::path male;
