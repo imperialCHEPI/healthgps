@@ -48,7 +48,8 @@ TEST(ResultFileWriter, IncomeCsvIncludesZeroCountAgeGenderRows) {
     result.population_by_income->low = 1.0;
 
     const auto message = ResultEventMessage("baseline", 1u, 2022, std::move(result));
-    auto info = ExperimentInfo{.model = "test", .version = "1", .intervention = "none", .job_id = 1, .seed = 1u};
+    auto info = ExperimentInfo{
+        .model = "test", .version = "1", .intervention = "none", .job_id = 1, .seed = 1u};
 
     {
         auto writer = ResultFileWriter(base_file, info, true);
@@ -87,4 +88,3 @@ TEST(ResultFileWriter, IncomeCsvIncludesZeroCountAgeGenderRows) {
 
     std::filesystem::remove_all(temp_dir);
 }
-
