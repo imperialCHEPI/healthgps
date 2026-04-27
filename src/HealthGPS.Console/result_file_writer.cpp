@@ -353,9 +353,9 @@ void ResultFileWriter::write_income_csv_data(const hgps::ResultEventMessage &mes
     const auto &series = message.content.series;
     const double file_income_category_value = income_category_numeric(income);
 
-    // Write only rows for (age, gender) strata that have at least one person in this income
-    // category. No fallback, no zeros: each file has one row per stratum that has people in that
-    // category (e.g. low-income file has one entry per age/gender cell that has low-income people).
+    // MAHIMA: Always write full age x gender coverage for each income file.
+    // If an age/gender cell has no people in this income category, its values stay 0.0 so analysts
+    // can distinguish missing population from missing output rows.
     for (auto index = 0u; index < series.sample_size(); index++) {
         double count_m = 0.0;
         double count_f = 0.0;
@@ -363,14 +363,10 @@ void ResultFileWriter::write_income_csv_data(const hgps::ResultEventMessage &mes
             count_m = series.at(Gender::male, income, "count").at(index);
             count_f = series.at(Gender::female, income, "count").at(index);
         } catch (const std::out_of_range &) {
-            // No count for this income stratum – skip this index (no rows)
-            continue;
+            // Missing count channel entry for this index/income: keep defaults as 0.0.
         }
 
-        auto write_row = [&](Gender gender, double count) {
-            if (count <= 0.0) {
-                return;
-            }
+        auto write_row = [&](Gender gender) {
             std::stringstream ss;
             ss << message.source << sep << message.run_number << sep << message.model_time << sep
                << (gender == Gender::male ? "male" : "female") << sep << index;
@@ -394,8 +390,8 @@ void ResultFileWriter::write_income_csv_data(const hgps::ResultEventMessage &mes
             income_csv << ss.str() << '\n';
         };
 
-        write_row(Gender::male, count_m);
-        write_row(Gender::female, count_f);
+        write_row(Gender::male);
+        write_row(Gender::female);
     }
 }
 
