@@ -51,7 +51,8 @@ target_sources(
             "RepositoryPIF.Test.cpp"
             "ConfigurationPIF.Test.cpp"
             "PIFIntegration.Test.cpp"
-            "IncomeStratumAdjustment.Test.cpp")
+            "IncomeStratumAdjustment.Test.cpp"
+            "ResultFileWriter.Test.cpp")
 
 # Download and extract test data
 cmake_policy(SET CMP0135 NEW)
