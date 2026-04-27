@@ -59,7 +59,8 @@ else()
     add_compile_options(-Wall -Wextra -Wpedantic)
 
     if(GENERATE_COVERAGE)
-        # Use atomic profile counter updates to avoid negative gcov counts when tests run in parallel.
+        # Use atomic profile counter updates to avoid negative gcov counts when tests run in
+        # parallel.
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g --coverage")
         if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-update=atomic")
