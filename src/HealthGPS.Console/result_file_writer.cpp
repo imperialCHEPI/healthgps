@@ -357,15 +357,6 @@ void ResultFileWriter::write_income_csv_data(const hgps::ResultEventMessage &mes
     // If an age/gender cell has no people in this income category, its values stay 0.0 so analysts
     // can distinguish missing population from missing output rows.
     for (auto index = 0u; index < series.sample_size(); index++) {
-        double count_m = 0.0;
-        double count_f = 0.0;
-        try {
-            count_m = series.at(Gender::male, income, "count").at(index);
-            count_f = series.at(Gender::female, income, "count").at(index);
-        } catch (const std::out_of_range &) {
-            // Missing count channel entry for this index/income: keep defaults as 0.0.
-        }
-
         auto write_row = [&](Gender gender) {
             std::stringstream ss;
             ss << message.source << sep << message.run_number << sep << message.model_time << sep
