@@ -157,8 +157,6 @@ These updates improve robustness, extensibility, and consistency across both bas
 
 ---
 
-## Parallelisation and Data Flow Documentation
-
 Detailed tables describing:
 - **Where parallelisation is applied**
 - **Population Impact Fraction (PIF) handling**
@@ -174,12 +172,14 @@ Relevant design documents:
 ## Project Specific Requirements
 Currently HealthGPS allows user flexibility in the following areas. View [Project Requirements](https://github.com/imperialCHEPI/healthgps/blob/main/Technical%20Documentations/PROJECT_REQUIREMENTS_PLAN.md) for more details. 
 
-## FINCH: Income-Quintile Model Validation
+---
+
+## FINCH: Age/Gender/Income-Based Model Validation
 As part of the **FINCH** project, a new validation feature is currently under development. This work adjusts model outputs to better reflect real-world population distributions using:
 
 - Age  
 - Gender  
-- Income quintiles (or any number of income categroies the user specifies)
+- Income quintiles (or any number of income categories the user specifies)
 
 This enables income-stratified calibration and improves external validity when comparing model outputs against observed data.
 
