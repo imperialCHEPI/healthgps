@@ -758,8 +758,11 @@ TEST(TestSimulation, AnalysisModuleDoesNotDoubleCountIncomeFieldsWhenMapped) {
     // regression test deterministic.
     module->initialise_population(context);
 
-    ASSERT_TRUE(captured_result.has_value());
-    const auto &series = captured_result->series;
+    // MAHIMA: Keep an explicit runtime guard for clang-tidy (it does not always model ASSERT_*).
+    if (!captured_result.has_value()) {
+        FAIL() << "Expected analysis module to publish a ResultEventMessage";
+    }
+    const auto &series = captured_result.value().series;
     const auto income_category_value = static_cast<double>(person.income_to_value());
 
     // MAHIMA: Single active person => mean must equal that person's value exactly if no duplicate
