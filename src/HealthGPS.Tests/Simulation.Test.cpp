@@ -706,11 +706,8 @@ TEST(TestSimulation, AnalysisModuleDoesNotDoubleCountIncomeFieldsWhenMapped) {
 
     // MAHIMA: Keep both "Income" and "income_category" in mapping to guard against
     // accidental double counting in analysis aggregation paths.
-    auto mapping = HierarchicalMapping({{"Gender", 0},
-                                        {"Age", 0},
-                                        {"Income", 0},
-                                        {"income_category", 0},
-                                        {"SmokingStatus", 1}});
+    auto mapping = HierarchicalMapping(
+        {{"Gender", 0}, {"Age", 0}, {"Income", 0}, {"income_category", 0}, {"SmokingStatus", 1}});
 
     auto diseases = std::vector<core::DiseaseInfo>{
         core::DiseaseInfo{.group = core::DiseaseGroup::other,
