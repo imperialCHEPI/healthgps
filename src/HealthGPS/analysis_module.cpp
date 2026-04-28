@@ -870,26 +870,13 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
         for (const auto &factor : context.mapping().entries()) {
             std::string fkey = factor.key().to_string();
             std::string fkey_lower = core::to_lower(fkey);
-            // Skip factors already handled in demographic block (region, ethnicity, sector,
-            // income_category, income) to avoid double-add or wrong source
+            // MAHIMA: Keep one source of truth for demographic-style channels so means are never
+            // double-counted when the same concept appears in mapping as well.
+            // - income_category must come from person.income (enum -> income_to_value)
+            // - income must come from risk_factors["income"] (continuous/numeric storage)
+            // - region/ethnicity/sector are handled in dedicated demographic block below
             if (fkey_lower == "region" || fkey_lower == "ethnicity" || fkey_lower == "sector" ||
                 fkey_lower == "income_category" || fkey_lower == "income") {
-                continue;
-            }
-            // Special handling for income_category - it's stored as person.income (enum), not in
-            // risk_factors (redundant with skip above, kept for clarity)
-            if (fkey_lower == "income_category") {
-                if (person.income != core::Income::unknown) {
-                    series(gender, "mean_income_category").at(age) += person.income_to_value();
-                }
-                continue;
-            }
-            // Special handling for income - stored in risk_factors["income"] for both assignment
-            // methods (redundant with skip above, kept for clarity)
-            if (fkey_lower == "income") {
-                if (person.risk_factors.contains(factor.key())) {
-                    series(gender, "mean_income").at(age) += person.risk_factors.at(factor.key());
-                }
                 continue;
             }
             // Check if risk factor exists before accessing (channel keys stored lowercase)
@@ -1265,20 +1252,15 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
                             static_cast<double>(person.gender_to_value()));
 
         for (const auto &factor : context.mapping().entries()) {
-            // Special handling for income_category - it's stored as person.income (enum), not in
-            // risk_factors
-            if (factor.key().to_string() == "income_category") {
-                if (person.income != core::Income::unknown) {
-                    double income_value = person.income_to_value();
-                    safe_add_to_channel(gender, income, "mean_income_category", age, income_value);
-                }
-                continue;
-            }
-
-            // Skip "income" here: mean_income is added once explicitly below from
-            // risk_factors["income"] (continuous value). Adding it in the loop too would
-            // double-count and make income-based CSV mean_income ~2x the true value.
-            if (factor.key().to_string() == "income" || factor.key().to_string() == "Income") {
+            const std::string fkey_lower = core::to_lower(factor.key().to_string());
+            // MAHIMA: Apply the same single-source rule in income-stratified means to keep India
+            // and FINCH consistent:
+            // - income_category comes ONLY from person.income (enum)
+            // - income comes ONLY from risk_factors["income"] (numeric)
+            // - region/ethnicity/sector come from demographic fields below
+            // This prevents over-counting whenever these names also exist in mapping.
+            if (fkey_lower == "region" || fkey_lower == "ethnicity" || fkey_lower == "sector" ||
+                fkey_lower == "income_category" || fkey_lower == "income") {
                 continue;
             }
 
@@ -1648,14 +1630,12 @@ void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &c
         accumulate_squared_diffs_income("daly", sex, income, age, yld);
 
         for (const auto &factor : context.mapping().entries()) {
-            // Special handling for income_category - it's stored as person.income (enum), not in
-            // risk_factors
-            if (factor.key().to_string() == "income_category") {
-                if (person.income != core::Income::unknown) {
-                    double income_value = person.income_to_value();
-                    accumulate_squared_diffs_income("income_category", sex, income, age,
-                                                    income_value);
-                }
+            const std::string fkey_lower = core::to_lower(factor.key().to_string());
+            // MAHIMA: For income-stratified standard deviations, keep demographic variables on one
+            // explicit path only. If these are also present in mapping, skip them here and let the
+            // dedicated demographic block below handle them once.
+            if (fkey_lower == "region" || fkey_lower == "ethnicity" || fkey_lower == "sector" ||
+                fkey_lower == "income_category" || fkey_lower == "income") {
                 continue;
             }
 
@@ -1870,13 +1850,11 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
         accumulate_squared_diffs("gender", sex, age, static_cast<double>(person.gender_to_value()));
 
         for (const auto &factor : context.mapping().entries()) {
-            // Special handling for income_category - it's stored as person.income (enum), not in
-            // risk_factors
-            if (factor.key().to_string() == "income_category") {
-                if (person.income != core::Income::unknown) {
-                    double income_value = person.income_to_value();
-                    accumulate_squared_diffs("income_category", sex, age, income_value);
-                }
+            const std::string fkey_lower = core::to_lower(factor.key().to_string());
+            // MAHIMA: Mirror the same single-source policy in the non-income standard deviation
+            // path to avoid counting the same conceptual field from both mapping and demographics.
+            if (fkey_lower == "region" || fkey_lower == "ethnicity" || fkey_lower == "sector" ||
+                fkey_lower == "income_category" || fkey_lower == "income") {
                 continue;
             }
 

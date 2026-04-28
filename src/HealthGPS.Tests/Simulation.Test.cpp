@@ -6,6 +6,7 @@
 #include "HealthGPS/api.h"
 #include "HealthGPS/event_bus.h"
 #include "HealthGPS/random_algorithm.h"
+#include "HealthGPS/result_message.h"
 #include "HealthGPS/simple_policy_scenario.h"
 
 #include "CountryModule.h"
@@ -689,4 +690,99 @@ TEST(TestSimulation, AnalysisModuleSetIndividualIdTrackingConfig) {
     track.age_max = 65;
     EXPECT_NO_THROW(module->set_individual_id_tracking_config(track));
     EXPECT_NO_THROW(module->set_individual_id_tracking_config(std::nullopt));
+}
+
+TEST(TestSimulation, AnalysisModuleDoesNotDoubleCountIncomeFieldsWhenMapped) {
+    using namespace hgps;
+    using namespace hgps::input;
+
+    core::DataTable data;
+    create_test_datatable(data);
+
+    auto uk = core::Country{.code = 826, .name = "United Kingdom", .alpha2 = "GB", .alpha3 = "GBR"};
+    auto settings = Settings{uk, 0.1f, core::IntegerInterval(0, 30)};
+    auto run = RunInfo{.start_time = 2018, .stop_time = 2025, .seed = std::nullopt};
+    auto ses = SESDefinition{.fuction_name = "normal", .parameters = {0.0, 1.0}};
+
+    // MAHIMA: Keep both "Income" and "income_category" in mapping to guard against
+    // accidental double counting in analysis aggregation paths.
+    auto mapping = HierarchicalMapping(
+        {{"Gender", 0}, {"Age", 0}, {"Income", 0}, {"income_category", 0}, {"SmokingStatus", 1}});
+
+    auto diseases = std::vector<core::DiseaseInfo>{
+        core::DiseaseInfo{.group = core::DiseaseGroup::other,
+                          .code = core::Identifier{"asthma"},
+                          .name = "Asthma"},
+    };
+
+    auto project_requirements = hgps::input::ProjectRequirements{};
+    auto inputs = std::make_shared<ModelInput>(data, settings, run, ses, mapping, diseases,
+                                               project_requirements, hgps::input::PIFInfo{});
+
+    auto manager = DataManager(test_datastore_path);
+    auto repository = CachedRepository(manager);
+
+    auto bus = std::make_shared<DefaultEventBus>();
+    std::optional<ModelResult> captured_result;
+    auto result_sub = bus->subscribe(
+        EventType::result, [&captured_result](const std::shared_ptr<EventMessage> &msg) {
+            auto result_msg = std::dynamic_pointer_cast<ResultEventMessage>(msg);
+            if (result_msg != nullptr) {
+                captured_result = result_msg->content;
+            }
+        });
+
+    auto channel = SyncChannel{};
+    auto scenario = std::make_unique<BaselineScenario>(channel);
+    auto context = RuntimeContext(bus, inputs, std::move(scenario));
+    context.reset_population(1);
+    // MAHIMA: Align test-time with model input years so analysis lookups that use .at(year)
+    // (e.g. life expectancy tables) do not query an invalid year key.
+    context.set_current_time(inputs->start_time());
+    context.set_current_run(1);
+
+    auto &person = context.population()[0];
+    person.gender = core::Gender::male;
+    person.age = 10;
+    person.income = core::Income::low;
+    person.risk_factors["income"_id] = 123.0;
+    person.risk_factors["smokingstatus"_id] = 7.0;
+    // MAHIMA: Analysis weight classification requires BMI to exist on the person.
+    person.risk_factors["bmi"_id] = 22.0;
+
+    auto module = build_analysis_module(repository, *inputs);
+    ASSERT_NE(module, nullptr);
+    module->set_income_analysis_enabled(true);
+
+    // MAHIMA: One analysis pass is enough to validate no double-counting and keeps this
+    // regression test deterministic.
+    module->initialise_population(context);
+
+    // MAHIMA: Keep an explicit runtime guard for clang-tidy (it does not always model ASSERT_*).
+    if (!captured_result.has_value()) {
+        FAIL() << "Expected analysis module to publish a ResultEventMessage";
+    }
+    const auto &series = captured_result.value().series;
+    const auto income_category_value = static_cast<double>(person.income_to_value());
+
+    // MAHIMA: Single active person => mean must equal that person's value exactly if no duplicate
+    // accumulation occurs.
+    EXPECT_DOUBLE_EQ(series.at(core::Gender::male, "mean_income_category").at(person.age),
+                     income_category_value);
+    EXPECT_DOUBLE_EQ(series.at(core::Gender::male, "mean_income").at(person.age), 123.0);
+    EXPECT_DOUBLE_EQ(series.at(core::Gender::male, "std_income_category").at(person.age), 0.0);
+    EXPECT_DOUBLE_EQ(series.at(core::Gender::male, "std_income").at(person.age), 0.0);
+
+    // MAHIMA: Income-stratified series must follow the same single-source rule.
+    ASSERT_TRUE(series.has_income_category(core::Gender::male, core::Income::low));
+    EXPECT_DOUBLE_EQ(
+        series.at(core::Gender::male, core::Income::low, "mean_income_category").at(person.age),
+        income_category_value);
+    EXPECT_DOUBLE_EQ(series.at(core::Gender::male, core::Income::low, "mean_income").at(person.age),
+                     123.0);
+    EXPECT_DOUBLE_EQ(
+        series.at(core::Gender::male, core::Income::low, "std_income_category").at(person.age),
+        0.0);
+    EXPECT_DOUBLE_EQ(series.at(core::Gender::male, core::Income::low, "std_income").at(person.age),
+                     0.0);
 }
