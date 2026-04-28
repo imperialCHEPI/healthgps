@@ -142,44 +142,48 @@ flowchart TB
 **Last updated**
 Significant progress has been made across the HealthGPS codebase. The following features and improvements are now **completed**:
 
-- Trended adjustment framework  
-- Schema validation and dynamic schema handling  
-- Risk factor configuration via external config files  
-- Dynamic age caps and age limits  
+- Trended adjustment framework
+- Schema validation and dynamic schema handling
+- Risk factor configuration via external config files
+- Dynamic age caps and age limits
 - Income-based input and output files
 - Individual ID based tracking and output
-- Consistent data loading across modules  
-- Log-transformed energy intake handling  
-- FINCH-specific age cap implementation  
-- Trended factor mean calculations  
+- Consistent data loading across modules
+- Log-transformed energy intake handling
+- FINCH-specific age cap implementation
+- Trended factor mean calculations
 
 These updates improve robustness, extensibility, and consistency across both baseline and intervention workflows.
 
 ---
 
-## Parallelisation and Data Flow Documentation
-
 Detailed tables describing:
+
 - **Where parallelisation is applied**
 - **Population Impact Fraction (PIF) handling**
 - **Income and individual ID tracking mechanisms**
 are available in the full update report: [here](https://github.com/imperialCHEPI/healthgps/blob/main/Technical%20Documentations/HealthGPS%20Update%20Report-%2020th%20Feb%202026.md)
 
 Relevant design documents:
-- [individual ID tracking](https://github.com/imperialCHEPI/healthgps/blob/main/Technical%20Documentations/individual_id_tracking_csv-plan.md) 
-- [consistent person IDs across scenarios](https://github.com/imperialCHEPI/healthgps/blob/main/Technical%20Documentations/same_person_id_across_baseline_and_intervention-plan.md)  
+
+- [individual ID tracking](https://github.com/imperialCHEPI/healthgps/blob/main/Technical%20Documentations/individual_id_tracking_csv-plan.md)
+- [consistent person IDs across scenarios](https://github.com/imperialCHEPI/healthgps/blob/main/Technical%20Documentations/same_person_id_across_baseline_and_intervention-plan.md)
 
 ---
 
 ## Project Specific Requirements
-Currently HealthGPS allows user flexibility in the following areas. View [Project Requirements](https://github.com/imperialCHEPI/healthgps/blob/main/Technical%20Documentations/PROJECT_REQUIREMENTS_PLAN.md) for more details. 
 
-## FINCH: Income-Quintile Model Validation
+Currently HealthGPS allows user flexibility in the following areas. View [Project Requirements](https://github.com/imperialCHEPI/healthgps/blob/main/Technical%20Documentations/PROJECT_REQUIREMENTS_PLAN.md) for more details.
+
+---
+
+## FINCH: Age/Gender/Income-Based Model Validation
+
 As part of the **FINCH** project, a new validation feature is currently under development. This work adjusts model outputs to better reflect real-world population distributions using:
 
-- Age  
-- Gender  
-- Income quintiles (or any number of income categroies the user specifies)
+- Age
+- Gender
+- Income quintiles (or any number of income categories the user specifies)
 
 This enables income-stratified calibration and improves external validity when comparing model outputs against observed data.
 
@@ -200,7 +204,7 @@ From a Git Bash-style shell, run the console app with a config file and optional
 First argument path: built executable HealthGPS.Console.exe.
 -c: path to your JSON configuration (input / scenario).
 -T: number of threads TBB may use for parallel work (example: 2).
-If you omit -T, the model uses the maximum parallelism available on your machine (effectively up to the number of logical CPUs), subject to TBB defaults. 
+If you omit -T, the model uses the maximum parallelism available on your machine (effectively up to the number of logical CPUs), subject to TBB defaults.
 
 NOTE: If you specify the number of threads, a minimum of 2 threads is required.
 
