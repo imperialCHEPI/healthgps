@@ -15,7 +15,7 @@ The *Health GPS microsimulation* is being developed in collaboration between the
 
 ## February 2026 updates
 
-The **[HealthGPS Update Report – 20th Feb 2026](https://github.com/imperialCHEPI/healthgps/blob/main/HealthGPS%20Update%20Report-%2020th%20Feb%202026.md)** summarises integrated changes (demographics, socioeconomic/income, static and dynamic risk factors, analysis/output, disease/PIF, policy, config/schema), parallelisation notes, and a developer file map. Snippets below are taken from that report.
+The **[HealthGPS Update Report – 20th Feb 2026](https://github.com/imperialCHEPI/healthgps/blob/main/Technical%20Documentations/HealthGPS%20Update%20Report-%2020th%20Feb%202026.md)** summarises integrated changes (demographics, socioeconomic/income, static and dynamic risk factors, analysis/output, disease/PIF, policy, config/schema), parallelisation notes, and a developer file map. Snippets below are taken from that report.
 
 **Supported use cases:** India, ABD, and FINCH on a shared codebase; backward compatibility with older India-style configs is retained alongside newer schema options.
 
@@ -137,11 +137,53 @@ flowchart TB
     Q --> R[Disease Model]
 ```
 
-**Progress (as of 20 February 2026, from the report):** trended adjustment, schema validation, risk factors from config, dynamic age cap, dynamic schemas, income-based files, consistent data loading, age limits, log energy intake, FINCH age cap, and trended factors mean are marked **completed**.
+## Project Status and Recent Progress
 
-For tables on **where parallelisation is used**, PIF, income/ID tracking, and links to design docs (`individual_id_tracking_csv-plan.md`, `same_person_id_across_baseline_and_intervention-plan.md`), see the [full update report](https://github.com/imperialCHEPI/healthgps/blob/main/HealthGPS%20Update%20Report-%2020th%20Feb%202026.md).
+**Last updated**
+Significant progress has been made across the HealthGPS codebase. The following features and improvements are now **completed**:
 
-NOTE: For the project FINCH, we added a new feature (in progress) where we adjust our model to real world for validation using age, gender and income quintiles. For plan and further details, see [here](https://github.com/imperialCHEPI/healthgps/blob/main/income_quintile_factor_means_plan.md)
+- Trended adjustment framework  
+- Schema validation and dynamic schema handling  
+- Risk factor configuration via external config files  
+- Dynamic age caps and age limits  
+- Income-based input and output files
+- Individual ID based tracking and output
+- Consistent data loading across modules  
+- Log-transformed energy intake handling  
+- FINCH-specific age cap implementation  
+- Trended factor mean calculations  
+
+These updates improve robustness, extensibility, and consistency across both baseline and intervention workflows.
+
+---
+
+## Parallelisation and Data Flow Documentation
+
+Detailed tables describing:
+- **Where parallelisation is applied**
+- **Population Impact Fraction (PIF) handling**
+- **Income and individual ID tracking mechanisms**
+are available in the full update report: [here](https://github.com/imperialCHEPI/healthgps/blob/main/Technical%20Documentations/HealthGPS%20Update%20Report-%2020th%20Feb%202026.md)
+
+Relevant design documents:
+- [individual ID tracking](https://github.com/imperialCHEPI/healthgps/blob/main/Technical%20Documentations/individual_id_tracking_csv-plan.md) 
+- [consistent person IDs across scenarios](https://github.com/imperialCHEPI/healthgps/blob/main/Technical%20Documentations/same_person_id_across_baseline_and_intervention-plan.md)  
+
+---
+
+## Project Specific Requirements
+Currently HealthGPS allows user flexibility in the following areas. View [Project Requirements](https://github.com/imperialCHEPI/healthgps/blob/main/Technical%20Documentations/PROJECT_REQUIREMENTS_PLAN.md) for more details. 
+
+## FINCH: Income-Quintile Model Validation
+As part of the **FINCH** project, a new validation feature is currently under development. This work adjusts model outputs to better reflect real-world population distributions using:
+
+- Age  
+- Gender  
+- Income quintiles (or any number of income categroies the user specifies)
+
+This enables income-stratified calibration and improves external validity when comparing model outputs against observed data.
+
+The design and implementation plan for this feature is available [here](https://github.com/imperialCHEPI/healthgps/blob/main/Technical%20Documentations/income_quintile_factor_means-plan.md)
 
 ## Quick Start
 
@@ -158,7 +200,9 @@ From a Git Bash-style shell, run the console app with a config file and optional
 First argument path: built executable HealthGPS.Console.exe.
 -c: path to your JSON configuration (input / scenario).
 -T: number of threads TBB may use for parallel work (example: 2).
-If you omit -T, the model uses the maximum parallelism available on your machine (effectively up to the number of logical CPUs), subject to TBB defaults. NOTE: If you specify the number of threads, a minimum of 2 threads is required.
+If you omit -T, the model uses the maximum parallelism available on your machine (effectively up to the number of logical CPUs), subject to TBB defaults. 
+
+NOTE: If you specify the number of threads, a minimum of 2 threads is required.
 
 Adjust the two paths to match where you built Health-GPS and where your `config.json` lives (e.g. PowerShell):
 
