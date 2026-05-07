@@ -86,3 +86,8 @@ endif()
 install(DIRECTORY ../../schemas DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
 
 set(ROOT_NAMESPACE hgps)
+
+if(MSVC)
+    target_compile_options(HealthGPS.Console PRIVATE /EHsc)
+    target_compile_options(HealthGPS.LibConsole PRIVATE /EHsc)
+endif()
