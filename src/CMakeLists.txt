@@ -32,13 +32,13 @@ target_include_directories(HealthGPS PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/external
 # Set the start-up project for the "play" button in MSVC
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT HealthGPS.Console)
 
-if (MSVC)
+if(MSVC)
     target_compile_options(HealthGPS.Core PRIVATE /EHsc)
     target_compile_options(HealthGPS.Input PRIVATE /EHsc)
     target_compile_options(HealthGPS PRIVATE /EHsc)
     target_compile_options(HealthGPS.Console PRIVATE /EHsc)
 
-    if (BUILD_TESTING)
+    if(BUILD_TESTING)
         target_compile_options(HealthGPS.Tests PRIVATE /EHsc)
     endif()
 endif()
