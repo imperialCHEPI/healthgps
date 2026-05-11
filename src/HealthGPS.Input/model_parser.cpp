@@ -20,97 +20,98 @@
 
 #if USE_TIMER
 #define MEASURE_FUNCTION()
-hgps::core::ScopedTimer timer { __func__ }
+hgps::core::ScopedTimer timer{__func__}
 #else
 #define MEASURE_FUNCTION()
 #endif
 
 namespace {
-// The latest schema version for each model
-constexpr int DummyModelSchemaVersion = 1;
-constexpr int EBHLMModelSchemaVersion = 1;
-constexpr int KevinHallModelSchemaVersion = 2;
-constexpr int HLMModelSchemaVersion = 1;
-constexpr int StaticLinearModelSchemaVersion = 2;
+    // The latest schema version for each model
+    constexpr int DummyModelSchemaVersion = 1;
+    constexpr int EBHLMModelSchemaVersion = 1;
+    constexpr int KevinHallModelSchemaVersion = 2;
+    constexpr int HLMModelSchemaVersion = 1;
+    constexpr int StaticLinearModelSchemaVersion = 2;
 
-//! Get the latest schema version for the given model
-int get_model_schema_version(const std::string &model_name) {
-    if (model_name == "dummy") {
-        return DummyModelSchemaVersion;
-    }
-    if (model_name == "ebhlm") {
-        return EBHLMModelSchemaVersion;
-    }
-    if (model_name == "kevinhall") {
-        return KevinHallModelSchemaVersion;
-    }
-    if (model_name == "hlm") {
-        return HLMModelSchemaVersion;
-    }
-    if (model_name == "staticlinear") {
-        return StaticLinearModelSchemaVersion;
-    }
-
-    throw std::invalid_argument(fmt::format("Unknown model: {}", model_name));
-}
-// MAHIMA- Dynamic income category mapping from config.json to codebase
-/// @brief Maps income category name to enum value based on category count
-/// @param key The income category name from JSON
-/// @param category_count The number of income categories (3 or 4)
-/// @return The corresponding Income enum value
-/// @throws core::HgpsException if the category name is unrecognized
-hgps::core::Income map_income_category(const std::string &key, const std::string &category_count) {
-    if (hgps::core::case_insensitive::equals(key, "unknown")) {
-        return hgps::core::Income::unknown;
-    }
-
-    if (hgps::core::case_insensitive::equals(key, "low")) {
-        return hgps::core::Income::low;
-    }
-
-    if (hgps::core::case_insensitive::equals(key, "high")) {
-        return hgps::core::Income::high;
-    }
-
-    // Handle middle categories based on count
-    if (category_count == "3") {
-        // 3-category system: low, middle, high
-        if (hgps::core::case_insensitive::equals(key, "middle")) {
-            return hgps::core::Income::middle;
+    //! Get the latest schema version for the given model
+    int get_model_schema_version(const std::string &model_name) {
+        if (model_name == "dummy") {
+            return DummyModelSchemaVersion;
         }
-    } else if (category_count == "4") {
-        // 4-category system: low, lowermiddle, uppermiddle, high
-        if (hgps::core::case_insensitive::equals(key, "lowermiddle")) {
-            return hgps::core::Income::lowermiddle;
+        if (model_name == "ebhlm") {
+            return EBHLMModelSchemaVersion;
         }
-        if (hgps::core::case_insensitive::equals(key, "uppermiddle")) {
-            return hgps::core::Income::uppermiddle;
+        if (model_name == "kevinhall") {
+            return KevinHallModelSchemaVersion;
         }
+        if (model_name == "hlm") {
+            return HLMModelSchemaVersion;
+        }
+        if (model_name == "staticlinear") {
+            return StaticLinearModelSchemaVersion;
+        }
+
+        throw std::invalid_argument(fmt::format("Unknown model: {}", model_name));
+    }
+    // MAHIMA- Dynamic income category mapping from config.json to codebase
+    /// @brief Maps income category name to enum value based on category count
+    /// @param key The income category name from JSON
+    /// @param category_count The number of income categories (3 or 4)
+    /// @return The corresponding Income enum value
+    /// @throws core::HgpsException if the category name is unrecognized
+    hgps::core::Income map_income_category(const std::string &key,
+                                           const std::string &category_count) {
+        if (hgps::core::case_insensitive::equals(key, "unknown")) {
+            return hgps::core::Income::unknown;
+        }
+
+        if (hgps::core::case_insensitive::equals(key, "low")) {
+            return hgps::core::Income::low;
+        }
+
+        if (hgps::core::case_insensitive::equals(key, "high")) {
+            return hgps::core::Income::high;
+        }
+
+        // Handle middle categories based on count
+        if (category_count == "3") {
+            // 3-category system: low, middle, high
+            if (hgps::core::case_insensitive::equals(key, "middle")) {
+                return hgps::core::Income::middle;
+            }
+        } else if (category_count == "4") {
+            // 4-category system: low, lowermiddle, uppermiddle, high
+            if (hgps::core::case_insensitive::equals(key, "lowermiddle")) {
+                return hgps::core::Income::lowermiddle;
+            }
+            if (hgps::core::case_insensitive::equals(key, "uppermiddle")) {
+                return hgps::core::Income::uppermiddle;
+            }
+        }
+
+        throw hgps::core::HgpsException(fmt::format(
+            "Income category '{}' is unrecognized for {} category system", key, category_count));
     }
 
-    throw hgps::core::HgpsException(fmt::format(
-        "Income category '{}' is unrecognized for {} category system", key, category_count));
-}
+    /// @brief Load the model's JSON config file and validate with the appropriate schema
+    /// @param model_path The path to the model config file
+    /// @return A pair including the name of the model and the JSON contents of the file
+    std::pair<std::string, nlohmann::json> load_and_validate_model_json(
+        const std::filesystem::path &model_path) {
+        std::ifstream ifs{model_path};
+        if (!ifs) {
+            throw std::runtime_error(fmt::format("Could not read file: {}", model_path.string()));
+        }
 
-/// @brief Load the model's JSON config file and validate with the appropriate schema
-/// @param model_path The path to the model config file
-/// @return A pair including the name of the model and the JSON contents of the file
-std::pair<std::string, nlohmann::json>
-load_and_validate_model_json(const std::filesystem::path &model_path) {
-    std::ifstream ifs{model_path};
-    if (!ifs) {
-        throw std::runtime_error(fmt::format("Could not read file: {}", model_path.string()));
+        auto opt = nlohmann::json::parse(ifs);
+        auto model_name = hgps::core::to_lower(opt["ModelName"].get<std::string>());
+        const auto model_schema_name = fmt::format("config/models/{}.json", model_name);
+
+        ifs.seekg(0); // Rewind to start
+        hgps::input::validate_json(ifs, model_schema_name, get_model_schema_version(model_name));
+
+        return std::make_pair(std::move(model_name), std::move(opt));
     }
-
-    auto opt = nlohmann::json::parse(ifs);
-    auto model_name = hgps::core::to_lower(opt["ModelName"].get<std::string>());
-    const auto model_schema_name = fmt::format("config/models/{}.json", model_name);
-
-    ifs.seekg(0); // Rewind to start
-    hgps::input::validate_json(ifs, model_schema_name, get_model_schema_version(model_name));
-
-    return std::make_pair(std::move(model_name), std::move(opt));
-}
 } // anonymous namespace
 
 namespace hgps::input {
