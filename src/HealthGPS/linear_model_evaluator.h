@@ -9,10 +9,10 @@ namespace hgps {
 
 struct LinearModelEvalOptions {
     /// @brief When set, age/age2/Age/Age2 predictors use this value instead of person.age.
-    std::optional<double> capped_age{};
+    std::optional<double> capped_age;
 
     /// @brief Optional fallback when a predictor cannot be resolved (e.g. expected mean lookup).
-    std::function<std::optional<double>(const core::Identifier &)> missing_predictor_fallback{};
+    std::function<std::optional<double>(const core::Identifier &)> missing_predictor_fallback;
 };
 
 /// @brief Sum intercept + coefficients * predictor values; skips metadata rows.

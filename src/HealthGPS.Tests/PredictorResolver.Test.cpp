@@ -6,18 +6,25 @@
 #include <cmath>
 #include <gtest/gtest.h>
 
+namespace {
+double expect_resolved(const hgps::Person &person, const std::string &key) {
+    const auto value = hgps::resolve_derived_predictor(person, key);
+    EXPECT_TRUE(value.has_value()) << key;
+    return value.value_or(0.0);
+}
+} // namespace
+
 TEST(TestHealthGPS_PredictorResolver, IncomePolynomialAndLog) {
     using namespace hgps;
 
     Person person;
     person.risk_factors["income"_id] = 100.0;
 
-    EXPECT_DOUBLE_EQ(100.0, resolve_derived_predictor(person, "income").value());
-    EXPECT_DOUBLE_EQ(10000.0, resolve_derived_predictor(person, "income2").value());
-    EXPECT_NEAR(std::log(100.0), resolve_derived_predictor(person, "log_income").value(), 1e-9);
+    EXPECT_DOUBLE_EQ(100.0, expect_resolved(person, "income"));
+    EXPECT_DOUBLE_EQ(10000.0, expect_resolved(person, "income2"));
+    EXPECT_NEAR(std::log(100.0), expect_resolved(person, "log_income"), 1e-9);
     const double log_income = std::log(100.0);
-    EXPECT_NEAR(log_income * log_income, resolve_derived_predictor(person, "log_income2").value(),
-                1e-9);
+    EXPECT_NEAR(log_income * log_income, expect_resolved(person, "log_income2"), 1e-9);
 }
 
 TEST(TestHealthGPS_PredictorResolver, RegionDummy) {
@@ -26,8 +33,8 @@ TEST(TestHealthGPS_PredictorResolver, RegionDummy) {
     Person person;
     person.region = "region2";
 
-    EXPECT_DOUBLE_EQ(1.0, resolve_derived_predictor(person, "region2").value());
-    EXPECT_DOUBLE_EQ(0.0, resolve_derived_predictor(person, "region3").value());
+    EXPECT_DOUBLE_EQ(1.0, expect_resolved(person, "region2"));
+    EXPECT_DOUBLE_EQ(0.0, expect_resolved(person, "region3"));
 }
 
 TEST(TestHealthGPS_PredictorResolver, GetRiskFactorValueUsesResolver) {
@@ -62,7 +69,7 @@ TEST(TestHealthGPS_LinearModelEvaluator, SkipsMetadataRows) {
     model.coefficients["min"_id] = 1.0;
 
     const double linear = evaluate_linear_model(person, model);
-    EXPECT_DOUBLE_EQ(5.0 + 2.0 * 20.0, linear);
+    EXPECT_DOUBLE_EQ(5.0 + (2.0 * 20.0), linear);
 }
 
 TEST(TestHealthGPS_LinearModelEvaluator, CappedAgeOption) {

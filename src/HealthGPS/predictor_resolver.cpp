@@ -43,7 +43,7 @@ double income_base_value(const Person &person) {
 }
 
 double age_polynomial(const Person &person, int power) {
-    const double age = static_cast<double>(person.age);
+    const auto age = static_cast<double>(person.age);
     return std::pow(age, power);
 }
 

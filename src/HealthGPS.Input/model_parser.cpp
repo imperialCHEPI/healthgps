@@ -1364,7 +1364,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                 auto loaded = load_two_column_regression_csv(csv_path, parse_delimiter_char(delimiter),
                                                              csv_filename);
                 model.intercept = loaded.model.intercept;
-                model.coefficients = std::move(loaded.model.coefficients);
+                model.coefficients = loaded.model.coefficients;
                 if (loaded.min_value.has_value()) {
                     model.min_value = *loaded.min_value;
                 }
@@ -1413,7 +1413,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                 continuous_json.contains("delimiter") ? continuous_json["delimiter"] : ",";
             auto loaded = load_two_column_regression_csv(csv_path, parse_delimiter_char(delimiter),
                                                          csv_filename);
-            continuous_income_model = std::move(loaded.model);
+            continuous_income_model = loaded.model;
             if (loaded.min_value.has_value()) {
                 continuous_income_model.coefficients["min"_id] = *loaded.min_value;
             }
