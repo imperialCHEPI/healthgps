@@ -1361,8 +1361,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                 std::filesystem::path csv_path = config.root_path / csv_filename;
                 const std::string delimiter =
                     model_config.contains("delimiter") ? model_config["delimiter"] : ",";
-                auto loaded = load_two_column_regression_csv(csv_path, parse_delimiter_char(delimiter),
-                                                             csv_filename);
+                auto loaded = load_two_column_regression_csv(
+                    csv_path, parse_delimiter_char(delimiter), csv_filename);
                 model.intercept = loaded.model.intercept;
                 model.coefficients = std::move(loaded.model.coefficients);
                 if (loaded.min_value.has_value()) {
