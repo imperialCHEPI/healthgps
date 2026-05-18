@@ -169,8 +169,8 @@ void print_static_linear_load_summary(const StaticLinearLoadSummary &summary) {
     print_box_section("Risk factors");
 
     if (summary.matrix_based) {
-        print_box_row(fmt::format("  Box-Cox CSV        : {} ({} rows x {} cols)", summary.boxcox_file,
-                                  summary.boxcox_rows, summary.boxcox_cols));
+        print_box_row(fmt::format("  Box-Cox CSV        : {} ({} rows x {} cols)",
+                                  summary.boxcox_file, summary.boxcox_rows, summary.boxcox_cols));
         if (!summary.policy_file.empty()) {
             print_box_row(fmt::format("  Policy CSV         : {} ({} coefficient types)",
                                       summary.policy_file, summary.policy_coef_types));
@@ -180,9 +180,10 @@ void print_static_linear_load_summary(const StaticLinearLoadSummary &summary) {
                                       summary.logistic_file, summary.logistic_coef_rows,
                                       summary.logistic_rf_count));
         }
-        print_box_row(fmt::format("  Outcomes loaded    : {} risk factors", summary.risk_factor_count));
-        print_box_row(fmt::format("  Box-Cox predictors : {} coefficient types",
-                                  summary.boxcox_coef_types));
+        print_box_row(
+            fmt::format("  Outcomes loaded    : {} risk factors", summary.risk_factor_count));
+        print_box_row(
+            fmt::format("  Box-Cox predictors : {} coefficient types", summary.boxcox_coef_types));
         if (!summary.with_logistic.empty()) {
             print_box_row(fmt::format("  Two-stage ({} outcomes):", summary.with_logistic.size()));
             print_wrapped_factor_list("    ", summary.with_logistic);
@@ -195,7 +196,8 @@ void print_static_linear_load_summary(const StaticLinearLoadSummary &summary) {
     }
 
     print_box_section("Income");
-    print_box_row(fmt::format("  Categories         : {} (project_requirements)", summary.income_categories));
+    print_box_row(
+        fmt::format("  Categories         : {} (project_requirements)", summary.income_categories));
     print_box_row(fmt::format("  Mode               : {}", summary.income_type));
     if (!summary.income_csv.empty()) {
         print_box_row(fmt::format("  Regression CSV     : {}", summary.income_csv));
@@ -205,7 +207,8 @@ void print_static_linear_load_summary(const StaticLinearLoadSummary &summary) {
 
     print_box_section("Physical activity");
     if (summary.pa_enabled) {
-        print_box_row(fmt::format("  Mode               : {} (project_requirements)", summary.pa_type));
+        print_box_row(
+            fmt::format("  Mode               : {} (project_requirements)", summary.pa_type));
         if (!summary.pa_csv.empty()) {
             print_box_row(fmt::format("  Regression CSV     : {}", summary.pa_csv));
             print_box_row(fmt::format("  Intercept          : {:.6g}", summary.pa_intercept));
@@ -1566,7 +1569,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             std::move(logistic_models));
 
         return result;
-    } catch (const std::exception&) {
+    } catch (const std::exception &) {
         g_pending_static_linear_summary.reset();
         throw;
     } catch (...) {

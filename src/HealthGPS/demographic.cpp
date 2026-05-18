@@ -82,8 +82,9 @@ std::vector<std::string> extract_region_names(
 }
 
 std::vector<std::string> extract_ethnicity_names(
-    const std::map<hgps::core::Identifier,
-                   std::map<hgps::core::Gender, std::map<std::string, std::map<std::string, double>>>>
+    const std::map<
+        hgps::core::Identifier,
+        std::map<hgps::core::Gender, std::map<std::string, std::map<std::string, double>>>>
         &ethnicity_data) {
     if (ethnicity_data.empty()) {
         return {};
@@ -131,8 +132,8 @@ void print_demographic_module_load_summary(const DemographicModuleLoadSummary &s
         print_demographic_box_row(
             "  Status             : enabled, no repository data (OK for some projects)");
     } else {
-        print_demographic_box_row(
-            fmt::format("  Status             : loaded ({} age groups)", summary.region_age_groups));
+        print_demographic_box_row(fmt::format("  Status             : loaded ({} age groups)",
+                                              summary.region_age_groups));
         print_wrapped_list("  Regions            : ", summary.region_names);
     }
 
@@ -166,10 +167,9 @@ void print_demographic_population_init_summary(const DemographicPopulationInitSu
     std::lock_guard lock(demographic_console_mutex());
     fmt::print("\n");
     print_demographic_border();
-    print_demographic_box_row(fmt::format(" Demographic population init ({})",
-                                          summary.scenario_name));
     print_demographic_box_row(
-        fmt::format("  Population         : {}", summary.population_size));
+        fmt::format(" Demographic population init ({})", summary.scenario_name));
+    print_demographic_box_row(fmt::format("  Population         : {}", summary.population_size));
     print_demographic_box_row(fmt::format("  Age groups         : {}", summary.age_groups));
 
     print_demographic_box_section("Assignment");
@@ -187,9 +187,8 @@ void print_demographic_population_init_summary(const DemographicPopulationInitSu
     } else if (!summary.ethnicity_data_ok) {
         print_demographic_box_row("  Ethnicity          : enabled, no prevalence data");
     } else {
-        print_demographic_box_row(
-            fmt::format("  Ethnicity          : {} age groups in prevalence",
-                        summary.ethnicity_prevalence_ages));
+        print_demographic_box_row(fmt::format("  Ethnicity          : {} age groups in prevalence",
+                                              summary.ethnicity_prevalence_ages));
     }
 
     print_demographic_border();
@@ -882,8 +881,7 @@ std::unique_ptr<DemographicModule> build_population_module(Repository &repositor
     }
 
     static std::once_flag load_summary_once;
-    std::call_once(load_summary_once,
-                   [&] { print_demographic_module_load_summary(load_summary); });
+    std::call_once(load_summary_once, [&] { print_demographic_module_load_summary(load_summary); });
 
     return demographic_module;
 }

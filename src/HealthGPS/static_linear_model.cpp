@@ -72,13 +72,12 @@ void print_trend_validation_summary(const TrendValidationSummary &summary) {
     print_trend_validation_row(" Static linear model trend validation");
     print_trend_validation_row(
         fmt::format("  Trend type         : {}", trend_type_label(summary.trend_type)));
+    print_trend_validation_row(
+        fmt::format("  UPF trend          : {}", summary.upf_validated ? "validated" : "skipped"));
+    print_trend_validation_row(fmt::format("  Income trend       : {}",
+                                           summary.income_validated ? "validated" : "skipped"));
     print_trend_validation_row(fmt::format(
-        "  UPF trend          : {}", summary.upf_validated ? "validated" : "skipped"));
-    print_trend_validation_row(fmt::format(
-        "  Income trend       : {}", summary.income_validated ? "validated" : "skipped"));
-    print_trend_validation_row(fmt::format(
-        "  Income RF params   : {}",
-        summary.income_rf_params_validated ? "validated" : "skipped"));
+        "  Income RF params   : {}", summary.income_rf_params_validated ? "validated" : "skipped"));
     print_trend_validation_border();
 }
 
