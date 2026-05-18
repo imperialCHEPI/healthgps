@@ -3,8 +3,8 @@
 #include "HealthGPS/linear_model_evaluator.h"
 #include "HealthGPS/person.h"
 #include "HealthGPS/predictor_resolver.h"
-#include <gtest/gtest.h>
 #include <cmath>
+#include <gtest/gtest.h>
 
 TEST(TestHealthGPS_PredictorResolver, IncomePolynomialAndLog) {
     using namespace hgps;

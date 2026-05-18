@@ -44,9 +44,9 @@ TwoColumnRegressionCsv load_two_column_regression_csv(const std::filesystem::pat
                            rapidcsv::SeparatorParams(delimiter));
 
     if (doc.GetColumnCount() != 2) {
-        throw hgps::core::HgpsException{fmt::format(
-            "Regression CSV file {} must have exactly 2 columns. Found {} columns", csv_filename,
-            doc.GetColumnCount())};
+        throw hgps::core::HgpsException{
+            fmt::format("Regression CSV file {} must have exactly 2 columns. Found {} columns",
+                        csv_filename, doc.GetColumnCount())};
     }
 
     TwoColumnRegressionCsv result;
@@ -1233,7 +1233,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             auto table = load_risk_factor_expected_pair(
                 config, stratum.factorsmean_male, stratum.factorsmean_female, base_info.delimiter,
                 fmt::format("income stratum '{}'", stratum.id));
-            validate_expected_has_all_factors(*table, fmt::format("income stratum '{}'", stratum.id));
+            validate_expected_has_all_factors(*table,
+                                              fmt::format("income stratum '{}'", stratum.id));
             income_stratum_expected_tables.emplace_back(
                 stratum.id, std::shared_ptr<RiskFactorSexAgeTable>{std::move(table)});
         }

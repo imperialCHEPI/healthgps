@@ -1790,8 +1790,8 @@ StaticLinearModel::compute_linear_models(RuntimeContext &context, Person &person
     LinearModelEvalOptions options{};
     options.capped_age = capped_age;
     options.missing_predictor_fallback =
-        [this, &context, &person](const core::Identifier &coefficient_name)
-        -> std::optional<double> {
+        [this, &context,
+         &person](const core::Identifier &coefficient_name) -> std::optional<double> {
         try {
             if (coefficient_name == log_energy_intake_id) {
                 double expected_value = get_expected(context, person.gender, person.age,

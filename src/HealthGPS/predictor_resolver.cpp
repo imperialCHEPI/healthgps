@@ -2,8 +2,8 @@
 
 #include "HealthGPS.Core/string_util.h"
 
-#include <cmath>
 #include <cctype>
+#include <cmath>
 #include <string>
 
 namespace hgps {
@@ -151,7 +151,8 @@ std::optional<double> resolve_derived_predictor(const Person &person, const std:
         const double base = income_base_value(person);
         return std::pow(base, power);
     }
-    if (core::case_insensitive::equals(key, "income") || core::case_insensitive::equals(key, "Income")) {
+    if (core::case_insensitive::equals(key, "income") ||
+        core::case_insensitive::equals(key, "Income")) {
         return income_base_value(person);
     }
 
