@@ -1,5 +1,6 @@
 #include "pch.h"
 
+#include "TestConsoleCapture.h"
 #include "data_config.h"
 
 #include "HealthGPS.Input/api.h"
@@ -7,33 +8,31 @@
 #include "HealthGPS/baseline_scenario.h"
 #include "HealthGPS/event_bus.h"
 
-#include <functional>
 #include <gtest/gtest.h>
-#include <sstream>
 
 namespace {
-
-std::string capture_stdout(const std::function<void()> &action) {
-    std::ostringstream buffer;
-    auto *original = std::cout.rdbuf(buffer.rdbuf());
-    action();
-    std::cout.rdbuf(original);
-    return buffer.str();
-}
 
 void register_sample_demographics(hgps::CachedRepository &repository) {
     using namespace hgps;
 
     std::map<core::Identifier, std::map<core::Gender, std::map<std::string, double>>> region_data;
-    region_data["age_0"_id][core::Gender::male]["region1"] = 0.6;
-    region_data["age_0"_id][core::Gender::male]["region2"] = 0.4;
+    for (const auto gender : {core::Gender::male, core::Gender::female}) {
+        region_data["age_0"_id][gender]["region1"] = 0.5;
+        region_data["age_0"_id][gender]["region2"] = 0.5;
+    }
     repository.register_region_prevalence(region_data);
 
     std::map<core::Identifier,
              std::map<core::Gender, std::map<std::string, std::map<std::string, double>>>>
         ethnicity_data;
-    ethnicity_data["Under18"_id][core::Gender::male]["region1"]["1"] = 0.7;
-    ethnicity_data["Under18"_id][core::Gender::male]["region1"]["2"] = 0.3;
+    for (const auto age_group : {core::Identifier("Under18"), core::Identifier("Over18")}) {
+        for (const auto gender : {core::Gender::male, core::Gender::female}) {
+            for (const auto *region : {"region1", "region2"}) {
+                ethnicity_data[age_group][gender][region]["1"] = 0.5;
+                ethnicity_data[age_group][gender][region]["2"] = 0.5;
+            }
+        }
+    }
     repository.register_ethnicity_prevalence(ethnicity_data);
 }
 
@@ -66,8 +65,6 @@ std::shared_ptr<hgps::ModelInput> create_demographic_test_input(hgps::core::Data
     auto uk = Country{.code = 826, .name = "United Kingdom", .alpha2 = "GB", .alpha3 = "GBR"};
     auto settings = Settings{uk, 0.1f, IntegerInterval(0, 30)};
     auto info = RunInfo{.start_time = 2018, .stop_time = 2025, .seed = std::nullopt};
-    auto ses_mapping = std::map<std::string, std::string>{
-        {"gender", "Gender"}, {"age", "Age"}, {"education", "Education"}, {"income", "Income"}};
     auto ses = SESDefinition{.fuction_name = "normal", .parameters = std::vector<double>{0.0, 1.0}};
     auto mapping = HierarchicalMapping(std::vector<MappingEntry>{});
 
@@ -80,22 +77,30 @@ std::shared_ptr<hgps::ModelInput> create_demographic_test_input(hgps::core::Data
                                               project_requirements, hgps::input::PIFInfo{});
 }
 
+std::unique_ptr<hgps::DemographicModule>
+build_test_demographic_module(hgps::CachedRepository &repository,
+                            const hgps::ModelInput &inputs) {
+    register_sample_demographics(repository);
+    return build_population_module(repository, inputs);
+}
+
 } // namespace
 
 TEST(DemographicSummary, ModuleLoadSummaryBox) {
     using namespace hgps;
     using namespace hgps::input;
+    using hgps::test::capture_stdout;
 
     core::DataTable data;
     auto inputs = create_demographic_test_input(data);
 
     auto manager = DataManager(test_datastore_path);
     auto repository = CachedRepository(manager);
-    register_sample_demographics(repository);
 
     const auto output = capture_stdout([&] {
-        auto module = build_population_module(repository, *inputs);
+        auto module = build_test_demographic_module(repository, *inputs);
         ASSERT_NE(module, nullptr);
+        EXPECT_GT(module->get_total_population_size(inputs->start_time()), 0u);
     });
 
     EXPECT_NE(output.find("Demographic module data"), std::string::npos);
@@ -104,18 +109,17 @@ TEST(DemographicSummary, ModuleLoadSummaryBox) {
     EXPECT_NE(output.find("Ethnicity assignment"), std::string::npos);
 }
 
-TEST(DemographicSummary, PopulationInitSummaryBox) {
+TEST(DemographicSummary, PopulationInitAssignsRegionAndEthnicity) {
     using namespace hgps;
     using namespace hgps::input;
+    using hgps::test::capture_stdout;
 
     core::DataTable data;
     auto inputs = create_demographic_test_input(data);
 
     auto manager = DataManager(test_datastore_path);
     auto repository = CachedRepository(manager);
-    register_sample_demographics(repository);
-
-    auto pop_module = build_population_module(repository, *inputs);
+    auto pop_module = build_test_demographic_module(repository, *inputs);
 
     auto bus = std::make_shared<DefaultEventBus>();
     auto channel = SyncChannel{};
@@ -126,6 +130,8 @@ TEST(DemographicSummary, PopulationInitSummaryBox) {
     const auto output = capture_stdout([&] { pop_module->initialise_population(context); });
 
     EXPECT_NE(output.find("Demographic population init"), std::string::npos);
-    EXPECT_NE(output.find("Population"), std::string::npos);
-    EXPECT_NE(output.find("Assignment"), std::string::npos);
+    for (const auto &person : context.population()) {
+        EXPECT_FALSE(person.region.empty());
+        EXPECT_FALSE(person.ethnicity.empty());
+    }
 }

@@ -7,6 +7,7 @@
 #include <climits>
 #include <fmt/format.h>
 #include <functional>
+#include <cstdio>
 #include <limits>
 #include <mutex>
 #include <string>
@@ -149,6 +150,7 @@ void print_demographic_module_load_summary(const DemographicModuleLoadSummary &s
     }
 
     print_demographic_border();
+    std::fflush(stdout);
 }
 
 struct DemographicPopulationInitSummary {
@@ -192,6 +194,7 @@ void print_demographic_population_init_summary(const DemographicPopulationInitSu
     }
 
     print_demographic_border();
+    std::fflush(stdout);
 }
 
 } // anonymous namespace
@@ -880,8 +883,7 @@ std::unique_ptr<DemographicModule> build_population_module(Repository &repositor
         load_summary.ethnicity_names = extract_ethnicity_names(ethnicity_data);
     }
 
-    static std::once_flag load_summary_once;
-    std::call_once(load_summary_once, [&] { print_demographic_module_load_summary(load_summary); });
+    print_demographic_module_load_summary(load_summary);
 
     return demographic_module;
 }

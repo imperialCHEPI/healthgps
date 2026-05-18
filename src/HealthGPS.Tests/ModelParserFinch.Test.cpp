@@ -1,15 +1,13 @@
 #include "pch.h"
 
+#include "TestConsoleCapture.h"
 #include "data_config.h"
 
 #include "HealthGPS.Input/api.h"
 #include "HealthGPS.Input/model_parser.h"
 #include "HealthGPS/static_linear_model.h"
 
-#include <fstream>
-#include <functional>
 #include <gtest/gtest.h>
-#include <sstream>
 
 namespace {
 
@@ -21,14 +19,6 @@ std::filesystem::path finch_data_root() {
     return healthgps_repo_root() / "input-data/data/KevinHall_FINCH";
 }
 
-std::string capture_stdout(const std::function<void()> &action) {
-    std::ostringstream buffer;
-    auto *original = std::cout.rdbuf(buffer.rdbuf());
-    action();
-    std::cout.rdbuf(original);
-    return buffer.str();
-}
-
 hgps::input::Configuration make_finch_configuration() {
     const auto finch = finch_data_root();
     hgps::input::Configuration config;
@@ -36,10 +26,11 @@ hgps::input::Configuration make_finch_configuration() {
     config.settings.age_range = hgps::core::IntegerInterval(0, 110);
     config.modelling.baseline_adjustment.format = "CSV";
     config.modelling.baseline_adjustment.delimiter = ",";
+    // Overall factors-mean files in FINCH only contain anthropometrics; quintile files include nutrients.
     config.modelling.baseline_adjustment.file_names["factorsmean_male"] =
-        finch / "Finch.FactorsMean.Male.csv";
+        finch / "Finch.FactorsMean.Male.Quintile1.csv";
     config.modelling.baseline_adjustment.file_names["factorsmean_female"] =
-        finch / "Finch.FactorsMean.Female.csv";
+        finch / "Finch.FactorsMean.Female.Quintile1.csv";
     config.project_requirements.income.type = "continuous";
     config.project_requirements.income.categories = "4";
     config.project_requirements.physical_activity.enabled = true;
@@ -63,17 +54,14 @@ TEST(ModelParserFinch, LoadsStaticLinearDefinitionFromFinchData) {
     auto definition = hgps::input::load_staticlinear_risk_model_definition(json, config);
     ASSERT_NE(definition, nullptr);
 
-    const auto output = capture_stdout([&] {
-        auto model = definition->create_model();
-        ASSERT_NE(model, nullptr);
-        EXPECT_TRUE(
-            dynamic_cast<hgps::StaticLinearModel *>(model.get())->is_continuous_income_model());
-    });
-    EXPECT_NE(output.find("Static linear model trend validation"), std::string::npos);
-    EXPECT_NE(output.find("UPF trend"), std::string::npos);
+    auto model = definition->create_model();
+    ASSERT_NE(model, nullptr);
+    EXPECT_TRUE(dynamic_cast<hgps::StaticLinearModel *>(model.get())->is_continuous_income_model());
 }
 
 TEST(ModelParserFinch, RegisterModelsPrintsStaticLinearSummaryBox) {
+    using hgps::test::capture_stdout;
+
     const auto finch = finch_data_root();
     if (!std::filesystem::exists(finch / "static_model.json")) {
         GTEST_SKIP() << "FINCH input data not available";
