@@ -66,7 +66,7 @@ struct TrendValidationSummary {
 };
 
 void print_trend_validation_summary(const TrendValidationSummary &summary) {
-    std::lock_guard lock(trend_validation_console_mutex());
+    std::scoped_lock lock(trend_validation_console_mutex());
     fmt::print("\n");
     print_trend_validation_border();
     print_trend_validation_row(" Static linear model trend validation");

@@ -87,3 +87,93 @@ TEST(TestHealthGPS_LinearModelEvaluator, CappedAgeOption) {
 
     EXPECT_DOUBLE_EQ(2500.0, evaluate_linear_model(person, model, options));
 }
+
+TEST(TestHealthGPS_LinearModelEvaluator, CappedAgePredictorDirect) {
+    using namespace hgps;
+
+    Person person;
+    person.age = 100;
+
+    LinearModelEvalOptions options;
+    options.capped_age = 40.0;
+
+    EXPECT_DOUBLE_EQ(40.0, get_linear_predictor_value(person, "age"_id, options));
+    EXPECT_DOUBLE_EQ(1600.0, get_linear_predictor_value(person, "age2"_id, options));
+    EXPECT_DOUBLE_EQ(64000.0, get_linear_predictor_value(person, "age3"_id, options));
+}
+
+TEST(TestHealthGPS_LinearModelEvaluator, LogCoefficientsAndFallback) {
+    using namespace hgps;
+
+    Person person;
+    person.risk_factors["foodcarbohydrate"_id] = 4.0;
+
+    LinearModelParams model;
+    model.intercept = 1.0;
+    model.log_coefficients["foodcarbohydrate"_id] = 2.0;
+    model.coefficients["missing_factor"_id] = 3.0;
+
+    LinearModelEvalOptions options;
+    options.missing_predictor_fallback = [](const core::Identifier &name) -> std::optional<double> {
+        if (name == "missing_factor"_id) {
+            return 5.0;
+        }
+        return std::nullopt;
+    };
+
+    const double expected = 1.0 + (2.0 * std::log(4.0)) + (3.0 * 5.0);
+    EXPECT_NEAR(expected, evaluate_linear_model(person, model, options), 1e-9);
+}
+
+TEST(TestHealthGPS_LinearModelEvaluator, LogCoefficientUsesFloorForNonPositive) {
+    using namespace hgps;
+
+    Person person;
+    person.risk_factors["foodcarbohydrate"_id] = 0.0;
+
+    LinearModelParams model;
+    model.log_coefficients["foodcarbohydrate"_id] = 1.0;
+
+    const double linear = evaluate_linear_model(person, model);
+    EXPECT_NEAR(std::log(1e-10), linear, 1e-12);
+}
+
+TEST(TestHealthGPS_PredictorResolver, AgeEthnicityGenderSector) {
+    using namespace hgps;
+
+    Person person;
+    person.age = 5;
+    person.gender = core::Gender::male;
+    person.ethnicity = "ethnicity3";
+    person.region = "region1";
+    person.sector = core::Sector::urban;
+
+    EXPECT_DOUBLE_EQ(5.0, expect_resolved(person, "age"));
+    EXPECT_DOUBLE_EQ(25.0, expect_resolved(person, "age2"));
+    EXPECT_DOUBLE_EQ(1.0, expect_resolved(person, "ethnicity3"));
+    EXPECT_DOUBLE_EQ(0.0, expect_resolved(person, "ethnicity2"));
+    EXPECT_DOUBLE_EQ(1.0, expect_resolved(person, "gender2"));
+    EXPECT_DOUBLE_EQ(person.gender_to_value(), expect_resolved(person, "gender"));
+    EXPECT_DOUBLE_EQ(person.sector_to_value(), expect_resolved(person, "sector"));
+    EXPECT_DOUBLE_EQ(std::pow(person.sector_to_value(), 2), expect_resolved(person, "sector2"));
+}
+
+TEST(TestHealthGPS_PredictorResolver, IncomeFromContinuousWhenRiskFactorMissing) {
+    using namespace hgps;
+
+    Person person;
+    person.income_continuous = 42.0;
+
+    EXPECT_DOUBLE_EQ(42.0, expect_resolved(person, "income"));
+    EXPECT_DOUBLE_EQ(42.0 * 42.0, expect_resolved(person, "income2"));
+}
+
+TEST(TestHealthGPS_PredictorResolver, MetadataPredictorReturnsNullopt) {
+    using namespace hgps;
+
+    Person person;
+    EXPECT_FALSE(resolve_derived_predictor(person, "stddev").has_value());
+    EXPECT_FALSE(resolve_derived_predictor(person, "Intercept").has_value());
+    EXPECT_TRUE(is_metadata_predictor(std::string("min")));
+    EXPECT_TRUE(is_metadata_predictor(core::Identifier("lambda")));
+}

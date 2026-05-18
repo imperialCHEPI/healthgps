@@ -119,7 +119,7 @@ struct DemographicModuleLoadSummary {
 };
 
 void print_demographic_module_load_summary(const DemographicModuleLoadSummary &summary) {
-    std::lock_guard lock(demographic_console_mutex());
+    std::scoped_lock lock(demographic_console_mutex());
     fmt::print("\n");
     print_demographic_border();
     print_demographic_box_row(" Demographic module data");
@@ -164,7 +164,7 @@ struct DemographicPopulationInitSummary {
 };
 
 void print_demographic_population_init_summary(const DemographicPopulationInitSummary &summary) {
-    std::lock_guard lock(demographic_console_mutex());
+    std::scoped_lock lock(demographic_console_mutex());
     fmt::print("\n");
     print_demographic_border();
     print_demographic_box_row(

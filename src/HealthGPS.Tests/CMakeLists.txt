@@ -37,6 +37,8 @@ target_sources(
             "Map2d.Test.cpp"
             "Population.Test.cpp"
             "PredictorResolver.Test.cpp"
+            "DemographicSummary.Test.cpp"
+            "ModelParserFinch.Test.cpp"
             "RelativeRiskLookup.Test.cpp"
             "RuntimeMetric.Test.cpp"
             "Scenario.Test.cpp"
