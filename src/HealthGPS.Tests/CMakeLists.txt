@@ -36,6 +36,7 @@ target_sources(
             "LifeTable.Test.cpp"
             "Map2d.Test.cpp"
             "Population.Test.cpp"
+            "PredictorResolver.Test.cpp"
             "RelativeRiskLookup.Test.cpp"
             "RuntimeMetric.Test.cpp"
             "Scenario.Test.cpp"

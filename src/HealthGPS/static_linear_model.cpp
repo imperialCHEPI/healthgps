@@ -1,7 +1,9 @@
 #include "static_linear_model.h"
 #include "HealthGPS.Core/exception.h"
 #include "HealthGPS.Input/poco.h"
+#include "linear_model_evaluator.h"
 #include "population.h"
+#include "predictor_resolver.h"
 #include "risk_factor_adjustable_model.h"
 #include "runtime_context.h"
 
@@ -1773,33 +1775,40 @@ StaticLinearModel::compute_linear_models(RuntimeContext &context, Person &person
 
     // MAHIMA: Age for linear models is user-specific. If project_requirements.demographics
     // max_age_for_linear_models is set and > 0, cap age to that value for age/age2/age3 terms.
-    // If not set or 0, use person.age as-is (no cap). No hardcoded cap.
-    const double age_for_models = [&]() {
-        const auto &req = context.inputs().project_requirements();
-        const auto &max_age_opt = req.demographics.max_age_for_linear_models;
-        if (max_age_opt.has_value() && *max_age_opt > 0) {
-            auto person_age_d = static_cast<double>(person.age);
-            auto cap_d = static_cast<double>(*max_age_opt);
-            return person_age_d < cap_d ? person_age_d : cap_d;
-        }
-        return static_cast<double>(person.age);
-    }();
-    const double age_squared = age_for_models * age_for_models;
-    const double age_cubed = age_squared * age_for_models;
+    const auto &req = context.inputs().project_requirements();
+    const auto &max_age_opt = req.demographics.max_age_for_linear_models;
+    std::optional<double> capped_age{};
+    if (max_age_opt.has_value() && *max_age_opt > 0) {
+        const auto person_age_d = static_cast<double>(person.age);
+        const auto cap_d = static_cast<double>(*max_age_opt);
+        capped_age = person_age_d < cap_d ? person_age_d : cap_d;
+    }
 
-    // Cache common age identifiers for faster comparison using case sensitive approach for Age and
-    // age- Mahima
-    static const core::Identifier age_id("age");
-    static const core::Identifier age2_id("age2");
-    static const core::Identifier age3_id("age3");
-    static const core::Identifier Age_id("Age");
-    static const core::Identifier Age2_id("Age2");
-    static const core::Identifier Age3_id("Age3");
-    static const core::Identifier stddev_id("stddev");
     static const core::Identifier log_energy_intake_id("log_energy_intake");
     static const core::Identifier energyintake_id("energyintake");
 
-    // Approximate risk factors with linear models
+    LinearModelEvalOptions options{};
+    options.capped_age = capped_age;
+    options.missing_predictor_fallback =
+        [this, &context, &person](const core::Identifier &coefficient_name)
+        -> std::optional<double> {
+        try {
+            if (coefficient_name == log_energy_intake_id) {
+                double expected_value = get_expected(context, person.gender, person.age,
+                                                     energyintake_id, std::nullopt, false);
+                if (expected_value <= 0) {
+                    expected_value = 1e-10;
+                }
+                return std::log(expected_value);
+            }
+            double expected_value = get_expected(context, person.gender, person.age,
+                                                 coefficient_name, std::nullopt, false);
+            return expected_value;
+        } catch (...) {
+            return std::nullopt;
+        }
+    };
+
     for (size_t i = 0; i < names_.size(); i++) {
         if (i >= models.size()) {
             std::cout << "\nERROR: compute_linear_models - Index " << i
@@ -1807,93 +1816,13 @@ StaticLinearModel::compute_linear_models(RuntimeContext &context, Person &person
             continue;
         }
 
-        auto name = names_[i];
-        auto model = models[i];
-        double factor = model.intercept;
-
-        for (const auto &[coefficient_name, coefficient_value] : model.coefficients) {
-            // Skip the standard deviation entry as it's not a factor
-            if (coefficient_name == stddev_id) {
-                continue;
-            }
-
-            // Efficiently handle age-related coefficients (use age_for_models: capped if user set
-            // max)
-            if (coefficient_name == age_id || coefficient_name == Age_id) {
-                factor += coefficient_value * age_for_models;
-            } else if (coefficient_name == age2_id || coefficient_name == Age2_id) {
-                factor += coefficient_value * age_squared;
-            } else if (coefficient_name == age3_id || coefficient_name == Age3_id) {
-                factor += coefficient_value * age_cubed;
-            } else {
-                // Regular coefficient processing
-                try {
-                    double value = person.get_risk_factor_value(coefficient_name);
-                    factor += coefficient_value * value;
-                } catch (const std::exception &) {
-                    // If factor is missing, try to use expected value as fallback.
-                    // Policy CSV row "EnergyIntake" is mapped to log_energy_intake; factors mean
-                    // has "energyintake" (raw). Use expected raw energy and apply log so we never
-                    // call get_expected("log_energy_intake") which would terminate if key is
-                    // missing.
-                    double expected_value = 0.0;
-                    if (coefficient_name == log_energy_intake_id) {
-                        expected_value = get_expected(context, person.gender, person.age,
-                                                      energyintake_id, std::nullopt, false);
-                        if (expected_value <= 0) {
-                            expected_value = 1e-10;
-                        }
-                        factor += coefficient_value * std::log(expected_value);
-                    } else {
-                        try {
-                            expected_value = get_expected(context, person.gender, person.age,
-                                                          coefficient_name, std::nullopt, false);
-                            factor += coefficient_value * expected_value;
-                        } catch (const std::exception &e) {
-                            std::cout << "\n[MISSING_FACTOR] Factor missing: "
-                                      << coefficient_name.to_string() << " for model "
-                                      << name.to_string() << " (i=" << i << ") - " << e.what();
-                            throw;
-                        }
-                    }
-                }
-            }
+        try {
+            linear.emplace_back(evaluate_linear_model(person, models[i], options));
+        } catch (const std::exception &e) {
+            std::cout << "\n[MISSING_FACTOR] Factor missing for model " << names_[i].to_string()
+                      << " (i=" << i << ") - " << e.what();
+            throw;
         }
-
-        for (const auto &[coefficient_name, coefficient_value] : model.log_coefficients) {
-            try {
-                double value = person.get_risk_factor_value(coefficient_name);
-                if (value <= 0) {
-                    value = 1e-10; // Avoid log of zero or negative
-                }
-                factor += coefficient_value * log(value);
-            } catch (const std::exception &) {
-                // If factor is missing, try expected value. For log_energy_intake use expected
-                // "energyintake" (raw) and apply log, since factors mean has energyintake not
-                // log_energy_intake.
-                double expected_value = 0.0;
-                if (coefficient_name == log_energy_intake_id) {
-                    expected_value = get_expected(context, person.gender, person.age,
-                                                  energyintake_id, std::nullopt, false);
-                } else {
-                    try {
-                        expected_value = get_expected(context, person.gender, person.age,
-                                                      coefficient_name, std::nullopt, false);
-                    } catch (const std::exception &e) {
-                        std::cout << "\n[MISSING_FACTOR] Factor missing (log): "
-                                  << coefficient_name.to_string() << " for model "
-                                  << name.to_string() << " (i=" << i << ") - " << e.what();
-                        throw;
-                    }
-                }
-                if (expected_value <= 0) {
-                    expected_value = 1e-10;
-                }
-                factor += coefficient_value * log(expected_value);
-            }
-        }
-
-        linear.emplace_back(factor);
     }
 
     return linear;
@@ -1904,14 +1833,7 @@ double StaticLinearModel::calculate_zero_probability(Person &person,
                                                      size_t risk_factor_index) const {
     // Get the logistic model for this risk factor
     const auto &logistic_model = logistic_models_[risk_factor_index];
-
-    // Calculate the linear predictor using the logistic model
-    double logistic_linear_term = logistic_model.intercept;
-
-    // Add the coefficients
-    for (const auto &[coef_name, coef_value] : logistic_model.coefficients) {
-        logistic_linear_term += coef_value * person.get_risk_factor_value(coef_name);
-    }
+    const double logistic_linear_term = evaluate_linear_model(person, logistic_model);
 
     // logistic function: p = 1 / (1 + exp(-linear_term))
     double probability = 1.0 / (1.0 + std::exp(-logistic_linear_term));
@@ -2083,167 +2005,8 @@ void StaticLinearModel::initialise_continuous_income(RuntimeContext &context, Pe
         convert_income_continuous_to_category(continuous_income, context.population(), random);
 }
 
-// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 double StaticLinearModel::calculate_continuous_income(Person &person, Random &random) {
-    // Calculate continuous income using the continuous income model
-    double income = continuous_income_model_.intercept;
-
-    // Add coefficient contributions for each person attribute
-    for (const auto &[factor, coefficient] : continuous_income_model_.coefficients) {
-        std::string factor_name = factor.to_string();
-
-        // Skip special coefficients that are not part of the regression
-        if (factor_name == "stddev" || factor_name == "min" || factor_name == "max") {
-            continue;
-        }
-
-        // Dynamic coefficient matching based on factor name patterns
-        double factor_value = 0.0;
-
-        // Age effects - handle age, age2, age3, etc. dynamically
-        if (factor_name.starts_with("age")) {
-            if (factor_name == "age") {
-                factor_value = static_cast<double>(person.age);
-            } else if (factor_name == "age2") {
-                factor_value = person.age * person.age;
-            } else if (factor_name == "age3") {
-                factor_value = person.age * person.age * person.age;
-            } else {
-                // Handle age4, age5, etc. dynamically
-                int power = 1;
-                if (factor_name.length() > 3) {
-                    try {
-                        power = std::stoi(factor_name.substr(3));
-                    } catch (...) {
-                        std::cout << "Warning: Could not parse age power from factor name: "
-                                  << factor_name << '\n';
-                        continue;
-                    }
-                }
-                factor_value = std::pow(person.age, power);
-            }
-        }
-        // Gender effects - handle gender, gender2, etc. dynamically
-        else if (factor_name.starts_with("gender")) {
-            if (factor_name == "gender") {
-                factor_value = person.gender_to_value();
-            } else if (factor_name == "gender2") {
-                factor_value = person.gender == core::Gender::male ? 1.0 : 0.0;
-            } else {
-                // Handle gender3, gender4, etc. dynamically
-                int power = 1;
-                if (factor_name.length() > 6) {
-                    try {
-                        power = std::stoi(factor_name.substr(6));
-                    } catch (...) {
-                        std::cout << "Warning: Could not parse gender power from factor name: "
-                                  << factor_name << '\n';
-                        continue;
-                    }
-                }
-                double base_value = person.gender == core::Gender::male ? 1.0 : 0.0;
-                factor_value = std::pow(base_value, power);
-            }
-        }
-        // Region effects - handle region2, region3, region56, etc. dynamically
-        else if (factor_name.starts_with("region")) {
-            if (factor_name == "region") {
-                // If person.region is a number, use it directly
-                try {
-                    factor_value = std::stod(person.region);
-                } catch (...) {
-                    // If not a number, check if it matches the factor name
-                    factor_value =
-                        (person.region == factor_name)
-                            ? 1.0
-                            : 0.0; // this shows if the factor value is 1 (available )then use
-                                   // else if it is 0 (not available) then move on.
-                }
-            } else {
-                // Handle region2, region3, region56, etc. dynamically
-                // std::string region_number = factor_name.substr(6); // Remove "region" prefix
-                factor_value = (person.region == factor_name) ? 1.0 : 0.0;
-            }
-        }
-        // Ethnicity effects - handle ethnicity2, ethnicity3, ethnicity90, etc. dynamically
-        else if (factor_name.starts_with("ethnicity")) {
-            if (factor_name == "ethnicity") {
-                // If person.ethnicity is a number, use it directly
-                try {
-                    factor_value = std::stod(person.ethnicity);
-                } catch (...) {
-                    // If not a number, check if it matches the factor name
-                    factor_value = (person.ethnicity == factor_name) ? 1.0 : 0.0;
-                }
-            } else {
-                // Handle ethnicity2, ethnicity3, ethnicity90, etc. dynamically
-                // std::string ethnicity_number = factor_name.substr(9); // Remove "ethnicity"
-                // prefix
-                factor_value = (person.ethnicity == factor_name) ? 1.0 : 0.0;
-            }
-        }
-        // Sector effects - handle sector, sector2, etc. dynamically
-        else if (factor_name.starts_with("sector")) {
-            if (factor_name == "sector") {
-                factor_value = person.sector_to_value();
-            } else {
-                // Handle sector2, sector3, etc. dynamically
-                int power = 1;
-                if (factor_name.length() > 6) {
-                    try {
-                        power = std::stoi(factor_name.substr(6));
-                    } catch (...) {
-                        std::cout << "Warning: Could not parse sector power from factor name: "
-                                  << factor_name << '\n';
-                        continue;
-                    }
-                }
-                double base_value = person.sector_to_value();
-                factor_value = std::pow(base_value, power);
-            }
-        }
-        // Income effects - handle income, income2, etc. dynamically
-        else if (factor_name.starts_with("income")) {
-            if (factor_name == "income") {
-                factor_value = static_cast<double>(person.income);
-            } else if (factor_name == "income_continuous") {
-                factor_value = person.income_continuous;
-            } else {
-                // Handle income2, income3, etc. dynamically
-                int power = 1;
-                if (factor_name.length() > 6) {
-                    try {
-                        power = std::stoi(factor_name.substr(6));
-                    } catch (...) {
-                        std::cout << "Warning: Could not parse income power from factor name: "
-                                  << factor_name << '\n';
-                        continue;
-                    }
-                }
-                auto base_value = static_cast<double>(person.income);
-                factor_value = std::pow(base_value, power);
-            }
-        }
-        // Region value effects - handle any region values dynamically
-        else if (factor_name == person.region || factor_name == person.ethnicity) {
-            // Check if person's region or ethnicity matches this factor name exactly
-            factor_value = 1.0;
-        }
-        // Risk factor effects - try to get from risk factors
-        else {
-            try {
-                factor_value = person.get_risk_factor_value(factor);
-            } catch (...) {
-                // Factor not found, skip it
-                std::cout << "Warning: Factor " << factor_name
-                          << " not found for continuous income calculation, skipping.\n";
-                continue;
-            }
-        }
-
-        // Add the coefficient contribution
-        income += coefficient * factor_value;
-    }
+    double income = evaluate_linear_model(person, continuous_income_model_);
 
     // Add random noise based on standard deviation
     double stddev = 0.0;
@@ -2485,169 +2248,15 @@ void StaticLinearModel::initialise_physical_activity(RuntimeContext &context, Pe
     }
 }
 
-// MAHIMA: Function to initialise continuous physical activity model using regression.
-// This is for Finch or any project that has region, ethnicity, income continuous etc in the CSV
-// file.
-// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void StaticLinearModel::initialise_continuous_physical_activity(
     [[maybe_unused]] RuntimeContext &context, Person &person, Random &random,
     const PhysicalActivityModel &model) {
-    // Start with the intercept
-    double value = model.intercept;
+    LinearModelParams linear_model{
+        .intercept = model.intercept,
+        .coefficients = model.coefficients,
+    };
+    double value = evaluate_linear_model(person, linear_model);
 
-    // Process coefficients dynamically from CSV file
-    for (const auto &[factor_name, coefficient] : model.coefficients) {
-        std::string factor_name_str = factor_name.to_string();
-
-        // Skip special coefficients that are not part of the regression
-        if (factor_name_str == "stddev" || factor_name_str == "min" || factor_name_str == "max") {
-            continue;
-        }
-
-        // Dynamic coefficient matching based on factor name patterns
-        double factor_value = 0.0;
-
-        // Age effects - handle age, age2, age3, etc. dynamically
-        if (factor_name_str.starts_with("age")) {
-            if (factor_name_str == "age") {
-                factor_value = static_cast<double>(person.age);
-            } else if (factor_name_str == "age2") {
-                factor_value = person.age * person.age;
-            } else if (factor_name_str == "age3") {
-                factor_value = person.age * person.age * person.age;
-            } else {
-                // Handle age4, age5, etc. dynamically
-                int power = 1;
-                if (factor_name_str.length() > 3) {
-                    try {
-                        power = std::stoi(factor_name_str.substr(3));
-                    } catch (...) {
-                        std::cout << "Warning: Could not parse age power from factor name: "
-                                  << factor_name_str << '\n';
-                        continue;
-                    }
-                }
-                factor_value = std::pow(person.age, power);
-            }
-        }
-        // Gender effects - handle gender, gender2, etc. dynamically
-        else if (factor_name_str.starts_with("gender")) {
-            if (factor_name_str == "gender") {
-                factor_value = person.gender_to_value();
-            } else if (factor_name_str == "gender2") {
-                factor_value = person.gender == core::Gender::male ? 1.0 : 0.0;
-            } else {
-                // Handle gender3, gender4, etc. dynamically
-                int power = 1;
-                if (factor_name_str.length() > 6) {
-                    try {
-                        power = std::stoi(factor_name_str.substr(6));
-                    } catch (...) {
-                        std::cout << "Warning: Could not parse gender power from factor name: "
-                                  << factor_name_str << '\n';
-                        continue;
-                    }
-                }
-                double base_value = person.gender == core::Gender::male ? 1.0 : 0.0;
-                factor_value = std::pow(base_value, power);
-            }
-        }
-        // Region effects - handle region2, region3, region56, etc. dynamically
-        else if (factor_name_str.starts_with("region")) {
-            if (factor_name_str == "region") {
-                // If person.region is a number, use it directly
-                try {
-                    factor_value = std::stod(person.region);
-                } catch (...) {
-                    // If not a number, check if it matches the factor name
-                    factor_value = (person.region == factor_name_str) ? 1.0 : 0.0;
-                }
-            } else {
-                // Handle region2, region3,.... region56, etc. dynamically
-                factor_value = (person.region == factor_name_str) ? 1.0 : 0.0;
-            }
-        }
-        // Ethnicity effects - handle ethnicity2, ethnicity3, ethnicity90, etc. dynamically
-        else if (factor_name_str.starts_with("ethnicity")) {
-            if (factor_name_str == "ethnicity") {
-                // If person.ethnicity is a number, use it directly
-                try {
-                    factor_value = std::stod(person.ethnicity);
-                } catch (...) {
-                    // If not a number, check if it matches the factor name
-                    factor_value = (person.ethnicity == factor_name_str) ? 1.0 : 0.0;
-                }
-            } else {
-                // Handle ethnicity2, ethnicity3, ethnicity90, etc. dynamically
-                // std::string ethnicity_number =
-                //     factor_name_str.substr(9); // Remove "ethnicity" prefix
-                factor_value = (person.ethnicity == factor_name_str) ? 1.0 : 0.0;
-            }
-        }
-        // Sector effects - handle sector, sector2, etc. dynamically
-        else if (factor_name_str.starts_with("sector")) {
-            if (factor_name_str == "sector") {
-                factor_value = person.sector_to_value();
-            } else {
-                // Handle sector2, sector3, etc. dynamically
-                int power = 1;
-                if (factor_name_str.length() > 6) {
-                    try {
-                        power = std::stoi(factor_name_str.substr(6));
-                    } catch (...) {
-                        std::cout << "Warning: Could not parse sector power from factor name: "
-                                  << factor_name_str << '\n';
-                        continue;
-                    }
-                }
-                double base_value = person.sector_to_value();
-                factor_value = std::pow(base_value, power);
-            }
-        }
-        // Income effects - handle income, income2, etc. dynamically
-        else if (factor_name_str.starts_with("income")) {
-            if (factor_name_str == "income") {
-                factor_value = static_cast<double>(person.income);
-            } else if (factor_name_str == "income_continuous") {
-                factor_value = person.income_continuous;
-            } else {
-                // Handle income2, income3, etc. dynamically
-                int power = 1;
-                if (factor_name_str.length() > 6) {
-                    try {
-                        power = std::stoi(factor_name_str.substr(6));
-                    } catch (...) {
-                        std::cout << "Warning: Could not parse income power from factor name: "
-                                  << factor_name_str << '\n';
-                        continue;
-                    }
-                }
-                auto base_value = static_cast<double>(person.income);
-                factor_value = std::pow(base_value, power);
-            }
-        }
-        // Region value effects - handle any region values dynamically
-        else if (factor_name_str == person.region || factor_name_str == person.ethnicity) {
-            // Check if person's region or ethnicity matches this factor name exactly
-            factor_value = 1.0;
-        }
-        // Risk factor effects - try to get from risk factors
-        else {
-            try {
-                factor_value = person.get_risk_factor_value(factor_name);
-            } catch (...) {
-                // Factor not found, skip it
-                std::cout << "Warning: Factor " << factor_name_str
-                          << " not found for continuous physical activity calculation, skipping.\n";
-                continue;
-            }
-        }
-
-        // Add the coefficient contribution
-        value += coefficient * factor_value;
-    }
-
-    // Add random noise using the model's standard deviation
     double rand_noise = random.next_normal(0.0, model.stddev);
     double final_value = value + rand_noise;
 

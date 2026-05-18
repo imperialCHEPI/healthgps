@@ -6,6 +6,8 @@
 
 #include "HealthGPS.Core/exception.h"
 #include "HealthGPS.Core/scoped_timer.h"
+#include "HealthGPS.Core/string_util.h"
+#include "HealthGPS/predictor_resolver.h"
 
 #include <Eigen/Cholesky>
 #include <Eigen/Dense>
@@ -24,6 +26,67 @@ hgps::core::ScopedTimer timer { __func__ }
 #else
 #define MEASURE_FUNCTION()
 #endif
+
+namespace {
+
+struct TwoColumnRegressionCsv {
+    hgps::LinearModelParams model;
+    std::optional<double> min_value;
+    std::optional<double> max_value;
+    std::optional<double> stddev;
+};
+
+/// @brief Load factor,coefficient rows from a two-column regression CSV (no header row required).
+TwoColumnRegressionCsv load_two_column_regression_csv(const std::filesystem::path &path,
+                                                      char delimiter,
+                                                      const std::string &csv_filename) {
+    rapidcsv::Document doc(path.string(), rapidcsv::LabelParams(-1, -1),
+                           rapidcsv::SeparatorParams(delimiter));
+
+    if (doc.GetColumnCount() != 2) {
+        throw hgps::core::HgpsException{fmt::format(
+            "Regression CSV file {} must have exactly 2 columns. Found {} columns", csv_filename,
+            doc.GetColumnCount())};
+    }
+
+    TwoColumnRegressionCsv result;
+    size_t start_row = 0;
+    if (doc.GetRowCount() > 0) {
+        const auto first_cell = doc.GetCell<std::string>(0, 0);
+        if (hgps::core::case_insensitive::equals(first_cell, "Factor")) {
+            start_row = 1;
+        }
+    }
+
+    for (size_t row_idx = start_row; row_idx < doc.GetRowCount(); ++row_idx) {
+        auto factor_name = doc.GetCell<std::string>(0, row_idx);
+        auto coefficient_value = doc.GetCell<double>(1, row_idx);
+
+        if (hgps::core::case_insensitive::equals(factor_name, "Intercept")) {
+            result.model.intercept = coefficient_value;
+        } else if (hgps::core::case_insensitive::equals(factor_name, "min")) {
+            result.min_value = coefficient_value;
+        } else if (hgps::core::case_insensitive::equals(factor_name, "max")) {
+            result.max_value = coefficient_value;
+        } else if (hgps::core::case_insensitive::equals(factor_name, "stddev")) {
+            result.stddev = coefficient_value;
+        } else if (hgps::is_metadata_predictor(factor_name)) {
+            continue;
+        } else {
+            result.model.coefficients[hgps::core::Identifier(factor_name)] = coefficient_value;
+        }
+    }
+    return result;
+}
+
+char parse_delimiter_char(const std::string &delimiter) {
+    if (delimiter == "\\t") {
+        return '\t';
+    }
+    return delimiter.empty() ? ',' : delimiter.front();
+}
+
+} // namespace
 
 namespace {
 // The latest schema version for each model
@@ -1170,8 +1233,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             auto table = load_risk_factor_expected_pair(
                 config, stratum.factorsmean_male, stratum.factorsmean_female, base_info.delimiter,
                 fmt::format("income stratum '{}'", stratum.id));
-            validate_expected_has_all_factors(*table,
-                                              fmt::format("income stratum '{}'", stratum.id));
+            validate_expected_has_all_factors(*table, fmt::format("income stratum '{}'", stratum.id));
             income_stratum_expected_tables.emplace_back(
                 stratum.id, std::shared_ptr<RiskFactorSexAgeTable>{std::move(table)});
         }
@@ -1295,48 +1357,21 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                 std::string csv_filename = model_config["csv_file"].get<std::string>();
                 std::cout << "\n  Loading model '" << model_name << "' from file: " << csv_filename;
 
-                // For physical activity models, load CSV directly without column mapping
-                // This avoids the column mapping requirement of the CSV parser
                 std::filesystem::path csv_path = config.root_path / csv_filename;
-
-                // Handle tab delimiter properly
-                std::string delimiter =
+                const std::string delimiter =
                     model_config.contains("delimiter") ? model_config["delimiter"] : ",";
-                if (delimiter == "\\t") {
-                    delimiter = "\t"; // Convert escaped tab to actual tab character
+                const auto loaded = load_two_column_regression_csv(
+                    csv_path, parse_delimiter_char(delimiter), csv_filename);
+                model.intercept = loaded.model.intercept;
+                model.coefficients = std::move(loaded.model.coefficients);
+                if (loaded.min_value.has_value()) {
+                    model.min_value = *loaded.min_value;
                 }
-
-                // Use rapidcsv directly to load the CSV file (no headers)
-                rapidcsv::Document doc(csv_path.string(), rapidcsv::LabelParams(-1, -1),
-                                       rapidcsv::SeparatorParams(delimiter.front()));
-
-                // Check that we have exactly 2 columns
-                if (doc.GetColumnCount() != 2) {
-                    throw core::HgpsException{
-                        fmt::format("Physical activity CSV file {} must have exactly 2 columns. "
-                                    "Found {} columns",
-                                    csv_filename, doc.GetColumnCount())};
+                if (loaded.max_value.has_value()) {
+                    model.max_value = *loaded.max_value;
                 }
-
-                // Parse CSV into PhysicalActivityModel (using existing model variable)
-                // Parse each row (all rows are data, no headers)
-                for (size_t row_idx = 0; row_idx < doc.GetRowCount(); row_idx++) {
-                    // Get factor name and coefficient value directly from rapidcsv
-                    auto factor_name = doc.GetCell<std::string>(0, row_idx);
-                    auto coefficient_value = doc.GetCell<double>(1, row_idx);
-
-                    if (factor_name == "Intercept") {
-                        model.intercept = coefficient_value;
-                    } else if (factor_name == "min") {
-                        model.min_value = coefficient_value;
-                    } else if (factor_name == "max") {
-                        model.max_value = coefficient_value;
-                    } else if (factor_name == "stddev") {
-                        model.stddev = coefficient_value;
-                    } else {
-                        // All other rows are coefficients
-                        model.coefficients[core::Identifier(factor_name)] = coefficient_value;
-                    }
+                if (loaded.stddev.has_value()) {
+                    model.stddev = *loaded.stddev;
                 }
 
                 std::cout << "\n      Parsed values:";
@@ -1372,46 +1407,20 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             std::string csv_filename = continuous_json["csv_file"].get<std::string>();
             std::cout << "\n  Loading continuous income model from file: " << csv_filename;
 
-            // Load CSV file directly using rapidcsv
             std::filesystem::path csv_path = config.root_path / csv_filename;
-
-            // Handle tab delimiter properly
-            std::string delimiter =
+            const std::string delimiter =
                 continuous_json.contains("delimiter") ? continuous_json["delimiter"] : ",";
-            if (delimiter == "\\t") {
-                delimiter = "\t"; // Convert escaped tab to actual tab character
+            const auto loaded = load_two_column_regression_csv(
+                csv_path, parse_delimiter_char(delimiter), csv_filename);
+            continuous_income_model = std::move(loaded.model);
+            if (loaded.min_value.has_value()) {
+                continuous_income_model.coefficients["min"_id] = *loaded.min_value;
             }
-
-            // Use rapidcsv directly to load the CSV file (no headers, like physical activity)
-            char sep_char = (delimiter == "\\t") ? '\t' : delimiter.front();
-            rapidcsv::Document doc(csv_path.string(), rapidcsv::LabelParams(-1, -1),
-                                   rapidcsv::SeparatorParams(sep_char));
-
-            // Check that we have exactly 2 columns
-            std::cout << "\n      CSV file loaded: " << doc.GetRowCount() << " rows, "
-                      << doc.GetColumnCount() << " columns";
-            if (doc.GetColumnCount() != 2) {
-                throw core::HgpsException{
-                    fmt::format("Continuous income CSV file {} must have exactly 2 columns. "
-                                "Found {} columns",
-                                csv_filename, doc.GetColumnCount())};
+            if (loaded.max_value.has_value()) {
+                continuous_income_model.coefficients["max"_id] = *loaded.max_value;
             }
-
-            // Parse CSV into LinearModelParams
-            // Skip header row (row 0) and parse data rows
-            std::cout << "\n      Parsing CSV data:";
-            for (size_t row_idx = 1; row_idx < doc.GetRowCount(); row_idx++) {
-                // Get factor name and coefficient value directly from rapidcsv
-                auto factor_name = doc.GetCell<std::string>(0, row_idx);
-                auto coefficient_value = doc.GetCell<double>(1, row_idx);
-
-                if (factor_name == "Intercept") {
-                    continuous_income_model.intercept = coefficient_value;
-                } else {
-                    // All other rows are coefficients
-                    continuous_income_model.coefficients[core::Identifier(factor_name)] =
-                        coefficient_value;
-                }
+            if (loaded.stddev.has_value()) {
+                continuous_income_model.coefficients["stddev"_id] = *loaded.stddev;
             }
 
             std::cout << "\n      Parsed values:";
