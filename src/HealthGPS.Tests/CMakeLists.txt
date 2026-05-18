@@ -12,7 +12,7 @@ target_compile_features(HealthGPS.Tests PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
 
 target_sources(
     HealthGPS.Tests
-    PRIVATE             "pch.cpp"
+    PRIVATE "pch.cpp"
             "pch.h"
             "TestConsoleCapture.h"
             "data_config.h"

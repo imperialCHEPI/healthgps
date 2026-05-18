@@ -5,9 +5,9 @@
 #include <algorithm>
 #include <cassert>
 #include <climits>
+#include <cstdio>
 #include <fmt/format.h>
 #include <functional>
-#include <cstdio>
 #include <limits>
 #include <mutex>
 #include <string>

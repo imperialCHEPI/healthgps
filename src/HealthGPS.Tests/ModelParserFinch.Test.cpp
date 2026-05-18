@@ -26,7 +26,8 @@ hgps::input::Configuration make_finch_configuration() {
     config.settings.age_range = hgps::core::IntegerInterval(0, 110);
     config.modelling.baseline_adjustment.format = "CSV";
     config.modelling.baseline_adjustment.delimiter = ",";
-    // Overall factors-mean files in FINCH only contain anthropometrics; quintile files include nutrients.
+    // Overall factors-mean files in FINCH only contain anthropometrics; quintile files include
+    // nutrients.
     config.modelling.baseline_adjustment.file_names["factorsmean_male"] =
         finch / "Finch.FactorsMean.Male.Quintile1.csv";
     config.modelling.baseline_adjustment.file_names["factorsmean_female"] =

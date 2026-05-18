@@ -78,8 +78,7 @@ std::shared_ptr<hgps::ModelInput> create_demographic_test_input(hgps::core::Data
 }
 
 std::unique_ptr<hgps::DemographicModule>
-build_test_demographic_module(hgps::CachedRepository &repository,
-                            const hgps::ModelInput &inputs) {
+build_test_demographic_module(hgps::CachedRepository &repository, const hgps::ModelInput &inputs) {
     register_sample_demographics(repository);
     return build_population_module(repository, inputs);
 }
