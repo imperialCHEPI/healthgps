@@ -30,6 +30,58 @@ template <typename T> std::shared_ptr<T> create_shared_from_unique(std::unique_p
     return ptr ? std::make_shared<T>(*ptr) : nullptr;
 }
 
+constexpr size_t k_trend_box_inner_width = 78;
+
+std::mutex &trend_validation_console_mutex() {
+    static std::mutex mutex;
+    return mutex;
+}
+
+void print_trend_validation_border() {
+    fmt::print("+{}+\n", std::string(k_trend_box_inner_width + 2, '-'));
+}
+
+void print_trend_validation_row(const std::string &text) {
+    fmt::print("| {:<{}} |\n", text, k_trend_box_inner_width);
+}
+
+const char *trend_type_label(hgps::TrendType trend_type) {
+    switch (trend_type) {
+    case hgps::TrendType::Null:
+        return "Null";
+    case hgps::TrendType::UPFTrend:
+        return "UPFTrend";
+    case hgps::TrendType::IncomeTrend:
+        return "IncomeTrend";
+    default:
+        return "Unknown";
+    }
+}
+
+struct TrendValidationSummary {
+    hgps::TrendType trend_type{hgps::TrendType::Null};
+    bool upf_validated{false};
+    bool income_validated{false};
+    bool income_rf_params_validated{false};
+};
+
+void print_trend_validation_summary(const TrendValidationSummary &summary) {
+    std::lock_guard lock(trend_validation_console_mutex());
+    fmt::print("\n");
+    print_trend_validation_border();
+    print_trend_validation_row(" Static linear model trend validation");
+    print_trend_validation_row(
+        fmt::format("  Trend type         : {}", trend_type_label(summary.trend_type)));
+    print_trend_validation_row(fmt::format(
+        "  UPF trend          : {}", summary.upf_validated ? "validated" : "skipped"));
+    print_trend_validation_row(fmt::format(
+        "  Income trend       : {}", summary.income_validated ? "validated" : "skipped"));
+    print_trend_validation_row(fmt::format(
+        "  Income RF params   : {}",
+        summary.income_rf_params_validated ? "validated" : "skipped"));
+    print_trend_validation_border();
+}
+
 } // anonymous namespace
 
 namespace hgps {
@@ -484,9 +536,12 @@ StaticLinearModel::StaticLinearModel(
         throw core::HgpsException("Intervention policy Cholesky matrix contains non-finite values");
     }
 
+    TrendValidationSummary trend_summary;
+    trend_summary.trend_type = trend_type_;
+
     // Validate UPF trend parameters only if trend type is UPFTrend
     if (trend_type_ == TrendType::UPFTrend) {
-        std::cout << "\nDEBUG: Validating UPF trend parameters...";
+        trend_summary.upf_validated = true;
         if (trend_models_->empty()) {
             throw core::HgpsException("Time trend model list is empty");
         }
@@ -496,13 +551,11 @@ StaticLinearModel::StaticLinearModel(
         if (trend_lambda_->empty()) {
             throw core::HgpsException("Time trend lambda list is empty");
         }
-    } else {
-        std::cout << "\nDEBUG: Skipping UPF trend validation (trend_type_ != UPFTrend)";
     }
 
     // Validate income trend parameters if income trend is enabled
     if (trend_type_ == TrendType::IncomeTrend) {
-        std::cout << "\nDEBUG: Validating income trend parameters...";
+        trend_summary.income_validated = true;
         if (!expected_income_trend_) {
             throw core::HgpsException(
                 "Income trend is enabled but expected_income_trend is missing");
@@ -527,8 +580,6 @@ StaticLinearModel::StaticLinearModel(
             throw core::HgpsException(
                 "Income trend is enabled but income_trend_decay_factors is missing");
         }
-    } else {
-        std::cout << "\nDEBUG: Skipping income trend validation (trend_type_ != IncomeTrend)";
     }
 
     // Validate income trend data consistency
@@ -545,6 +596,7 @@ StaticLinearModel::StaticLinearModel(
     // Validate that all risk factors have income trend parameters
     // Only validate income trend parameters if income trend is enabled
     if (trend_type_ == TrendType::IncomeTrend && expected_income_trend_) {
+        trend_summary.income_rf_params_validated = true;
         for (const auto &name : names_) {
             if (!expected_income_trend_->contains(name)) {
                 throw core::HgpsException(
@@ -569,9 +621,6 @@ StaticLinearModel::StaticLinearModel(
                     name.to_string());
             }
         }
-    } else {
-        std::cout << "\nDEBUG: Skipping risk factor income trend parameter validation (trend_type_ "
-                     "!= IncomeTrend or expected_income_trend_ is null)";
     }
     if (rural_prevalence_.empty()) {
         throw core::HgpsException("Rural prevalence mapping is empty");
@@ -591,6 +640,10 @@ StaticLinearModel::StaticLinearModel(
             }
         }
     }
+
+    static std::once_flag trend_validation_summary_once;
+    std::call_once(trend_validation_summary_once,
+                   [&] { print_trend_validation_summary(trend_summary); });
 }
 
 RiskFactorModelType StaticLinearModel::type() const noexcept { return RiskFactorModelType::Static; }

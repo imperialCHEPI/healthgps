@@ -8,7 +8,7 @@ namespace hgps {
 namespace {
 
 bool is_capped_age_predictor(const core::Identifier &name) {
-    const std::string key = name.to_string();
+    const std::string &key = name.to_string();
     return key.starts_with("age") || key.starts_with("Age");
 }
 

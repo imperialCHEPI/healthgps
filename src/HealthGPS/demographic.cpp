@@ -7,9 +7,10 @@
 #include <climits>
 #include <fmt/format.h>
 #include <functional>
-#include <iostream>
 #include <limits>
 #include <mutex>
+#include <string>
+#include <vector>
 
 #include <oneapi/tbb/parallel_for_each.h>
 
@@ -17,6 +18,182 @@ namespace { // anonymous namespace
 
 /// @brief Defines the residual mortality synchronisation message
 using ResidualMortalityMessage = hgps::SyncDataMessage<hgps::GenderTable<int, double>>;
+
+constexpr size_t k_demographic_box_inner_width = 78;
+
+std::mutex &demographic_console_mutex() {
+    static std::mutex mutex;
+    return mutex;
+}
+
+void print_demographic_border() {
+    fmt::print("+{}+\n", std::string(k_demographic_box_inner_width + 2, '-'));
+}
+
+void print_demographic_box_row(const std::string &text) {
+    fmt::print("| {:<{}} |\n", text, k_demographic_box_inner_width);
+}
+
+void print_demographic_box_section(const std::string &title) {
+    std::string line = "+- " + title + ' ';
+    const size_t total_width = k_demographic_box_inner_width + 2;
+    if (line.size() < total_width) {
+        line.append(total_width - line.size(), '-');
+    }
+    line.push_back('+');
+    fmt::print("{}\n", line);
+}
+
+void print_wrapped_list(const std::string &prefix, const std::vector<std::string> &items) {
+    if (items.empty()) {
+        return;
+    }
+    std::string line = prefix;
+    line += items.front();
+    for (size_t i = 1; i < items.size(); ++i) {
+        const std::string next = ", " + items[i];
+        if (line.size() + next.size() > k_demographic_box_inner_width) {
+            print_demographic_box_row(line);
+            line = std::string(4, ' ') + items[i];
+        } else {
+            line += next;
+        }
+    }
+    print_demographic_box_row(line);
+}
+
+std::vector<std::string> extract_region_names(
+    const std::map<hgps::core::Identifier,
+                   std::map<hgps::core::Gender, std::map<std::string, double>>> &region_data) {
+    if (region_data.empty()) {
+        return {};
+    }
+    const auto &first_age = region_data.begin()->second;
+    if (first_age.empty()) {
+        return {};
+    }
+    const auto &first_gender = first_age.begin()->second;
+    std::vector<std::string> names;
+    names.reserve(first_gender.size());
+    for (const auto &[region, _] : first_gender) {
+        names.push_back(region);
+    }
+    return names;
+}
+
+std::vector<std::string> extract_ethnicity_names(
+    const std::map<hgps::core::Identifier,
+                   std::map<hgps::core::Gender, std::map<std::string, std::map<std::string, double>>>>
+        &ethnicity_data) {
+    if (ethnicity_data.empty()) {
+        return {};
+    }
+    const auto &first_age_group = ethnicity_data.begin()->second;
+    if (first_age_group.empty()) {
+        return {};
+    }
+    const auto &first_gender = first_age_group.begin()->second;
+    if (first_gender.empty()) {
+        return {};
+    }
+    const auto &first_region = first_gender.begin()->second;
+    std::vector<std::string> names;
+    names.reserve(first_region.size());
+    for (const auto &[ethnicity, _] : first_region) {
+        names.push_back(ethnicity);
+    }
+    return names;
+}
+
+struct DemographicModuleLoadSummary {
+    std::string country;
+    bool region_required{false};
+    bool region_loaded{false};
+    size_t region_age_groups{0};
+    std::vector<std::string> region_names;
+    bool ethnicity_required{false};
+    bool ethnicity_loaded{false};
+    size_t ethnicity_age_groups{0};
+    std::vector<std::string> ethnicity_names;
+};
+
+void print_demographic_module_load_summary(const DemographicModuleLoadSummary &summary) {
+    std::lock_guard lock(demographic_console_mutex());
+    fmt::print("\n");
+    print_demographic_border();
+    print_demographic_box_row(" Demographic module data");
+    print_demographic_box_row(fmt::format("  Country            : {}", summary.country));
+
+    print_demographic_box_section("Region assignment");
+    if (!summary.region_required) {
+        print_demographic_box_row("  Status             : disabled (project_requirements)");
+    } else if (!summary.region_loaded) {
+        print_demographic_box_row(
+            "  Status             : enabled, no repository data (OK for some projects)");
+    } else {
+        print_demographic_box_row(
+            fmt::format("  Status             : loaded ({} age groups)", summary.region_age_groups));
+        print_wrapped_list("  Regions            : ", summary.region_names);
+    }
+
+    print_demographic_box_section("Ethnicity assignment");
+    if (!summary.ethnicity_required) {
+        print_demographic_box_row("  Status             : disabled (project_requirements)");
+    } else if (!summary.ethnicity_loaded) {
+        print_demographic_box_row("  Status             : enabled, no repository data");
+    } else {
+        print_demographic_box_row(fmt::format("  Status             : loaded ({} age groups)",
+                                              summary.ethnicity_age_groups));
+        print_wrapped_list("  Ethnicities        : ", summary.ethnicity_names);
+    }
+
+    print_demographic_border();
+}
+
+struct DemographicPopulationInitSummary {
+    std::string scenario_name;
+    int population_size{0};
+    int age_groups{0};
+    bool region_enabled{false};
+    bool region_data_ok{false};
+    size_t region_prevalence_ages{0};
+    bool ethnicity_enabled{false};
+    bool ethnicity_data_ok{false};
+    size_t ethnicity_prevalence_ages{0};
+};
+
+void print_demographic_population_init_summary(const DemographicPopulationInitSummary &summary) {
+    std::lock_guard lock(demographic_console_mutex());
+    fmt::print("\n");
+    print_demographic_border();
+    print_demographic_box_row(fmt::format(" Demographic population init ({})",
+                                          summary.scenario_name));
+    print_demographic_box_row(
+        fmt::format("  Population         : {}", summary.population_size));
+    print_demographic_box_row(fmt::format("  Age groups         : {}", summary.age_groups));
+
+    print_demographic_box_section("Assignment");
+    if (!summary.region_enabled) {
+        print_demographic_box_row("  Region             : disabled");
+    } else if (!summary.region_data_ok) {
+        print_demographic_box_row("  Region             : enabled, no prevalence data");
+    } else {
+        print_demographic_box_row(fmt::format("  Region             : {} age groups in prevalence",
+                                              summary.region_prevalence_ages));
+    }
+
+    if (!summary.ethnicity_enabled) {
+        print_demographic_box_row("  Ethnicity          : disabled");
+    } else if (!summary.ethnicity_data_ok) {
+        print_demographic_box_row("  Ethnicity          : enabled, no prevalence data");
+    } else {
+        print_demographic_box_row(
+            fmt::format("  Ethnicity          : {} age groups in prevalence",
+                        summary.ethnicity_prevalence_ages));
+    }
+
+    print_demographic_border();
+}
 
 } // anonymous namespace
 
@@ -129,12 +306,23 @@ double DemographicModule::get_residual_death_rate(int age, core::Gender gender) 
 }
 
 void DemographicModule::initialise_population(RuntimeContext &context) {
-    std::cout << "\n=== DEMOGRAPHIC MODULE: INITIALIZING POPULATION ===";
     auto age_gender_dist = get_age_gender_distribution(context.start_time());
     auto index = 0;
     auto pop_size = static_cast<int>(context.population().size());
     auto entry_total = static_cast<int>(age_gender_dist.size());
-    std::cout << "\nPopulation size: " << pop_size << ", Age groups: " << entry_total;
+
+    const auto &demographics_req = context.inputs().project_requirements().demographics;
+    DemographicPopulationInitSummary init_summary;
+    init_summary.scenario_name = context.scenario().name();
+    init_summary.population_size = pop_size;
+    init_summary.age_groups = entry_total;
+    init_summary.region_enabled = demographics_req.region;
+    init_summary.region_data_ok = !region_prevalence_.empty();
+    init_summary.region_prevalence_ages = region_prevalence_.size();
+    init_summary.ethnicity_enabled = demographics_req.ethnicity;
+    init_summary.ethnicity_data_ok = !ethnicity_prevalence_.empty();
+    init_summary.ethnicity_prevalence_ages = ethnicity_prevalence_.size();
+    print_demographic_population_init_summary(init_summary);
     for (auto entry_count = 1; auto &entry : age_gender_dist) {
         auto num_males = static_cast<int>(std::round(pop_size * entry.second.males));
         auto num_females = static_cast<int>(std::round(pop_size * entry.second.females));
@@ -439,17 +627,6 @@ void DemographicModule::initialise_region(RuntimeContext &context, Person &perso
     if (!context.inputs().project_requirements().demographics.region) {
         return;
     }
-    static bool first_call = true;
-    if (first_call) {
-        std::cout << "\nStarting region initialization...";
-        if (region_prevalence_.empty()) {
-            std::cout << "\n  WARNING: No region data available (region=true but no data loaded)";
-        } else {
-            std::cout << "\n  Region data available for " << region_prevalence_.size()
-                      << " age groups";
-        }
-        first_call = false;
-    }
     if (region_prevalence_.empty()) {
         return;
     }
@@ -546,17 +723,6 @@ void DemographicModule::initialise_ethnicity(RuntimeContext &context, Person &pe
                                              Random &random) {
     if (!context.inputs().project_requirements().demographics.ethnicity) {
         return;
-    }
-    static bool first_call = true;
-    if (first_call) {
-        std::cout << "\nStarting ethnicity initialization...";
-        if (ethnicity_prevalence_.empty()) {
-            std::cout << "\n  WARNING: No ethnicity data available (ethnicity=true but no data)";
-        } else {
-            std::cout << "\n  Ethnicity data available for " << ethnicity_prevalence_.size()
-                      << " age groups";
-        }
-        first_call = false;
     }
     if (ethnicity_prevalence_.empty()) {
         return;
@@ -659,26 +825,6 @@ void DemographicModule::set_region_prevalence(
     const std::map<core::Identifier, std::map<core::Gender, std::map<std::string, double>>>
         &region_data) {
     region_prevalence_ = region_data;
-
-    // Print summary of loaded region data
-    if (!region_data.empty()) {
-
-        // Get unique region names from the first age entry
-        auto first_age = region_data.begin();
-        if (first_age != region_data.end()) {
-            auto first_gender = first_age->second.begin();
-            if (first_gender != first_age->second.end()) {
-                std::vector<std::string> region_names;
-                for (const auto &[region, _] : first_gender->second) {
-                    region_names.push_back(region);
-                }
-                std::cout << "Regions found: " << fmt::format("[{}]", fmt::join(region_names, ", "))
-                          << '\n';
-            }
-        }
-
-        std::cout << "Age groups: " << region_data.size() << '\n';
-    }
 }
 
 void DemographicModule::set_ethnicity_prevalence(
@@ -686,29 +832,6 @@ void DemographicModule::set_ethnicity_prevalence(
                    std::map<core::Gender, std::map<std::string, std::map<std::string, double>>>>
         &ethnicity_data) {
     ethnicity_prevalence_ = ethnicity_data;
-
-    // Print summary of loaded ethnicity data
-    if (!ethnicity_data.empty()) {
-
-        // Get unique ethnicity names from the first entry
-        auto first_age_group = ethnicity_data.begin();
-        if (first_age_group != ethnicity_data.end()) {
-            auto first_gender = first_age_group->second.begin();
-            if (first_gender != first_age_group->second.end()) {
-                auto first_region = first_gender->second.begin();
-                if (first_region != first_gender->second.end()) {
-                    std::vector<std::string> ethnicity_names;
-                    for (const auto &[ethnicity, _] : first_region->second) {
-                        ethnicity_names.push_back(ethnicity);
-                    }
-                    std::cout << "Ethnicities found: "
-                              << fmt::format("[{}]", fmt::join(ethnicity_names, ", ")) << '\n';
-                }
-            }
-        }
-
-        std::cout << "Age groups: " << ethnicity_data.size() << '\n';
-    }
 }
 
 std::unique_ptr<DemographicModule> build_population_module(Repository &repository,
@@ -737,26 +860,30 @@ std::unique_ptr<DemographicModule> build_population_module(Repository &repositor
     auto demographic_module =
         std::make_unique<DemographicModule>(std::move(pop_data), std::move(life_table));
 
-    // Set region and ethnicity data from repository
+    DemographicModuleLoadSummary load_summary;
+    load_summary.country = config.settings().country().name;
+    load_summary.region_required = config.project_requirements().demographics.region;
+    load_summary.ethnicity_required = config.project_requirements().demographics.ethnicity;
+
     const auto &region_data = repository.get_region_prevalence();
     if (!region_data.empty()) {
         demographic_module->set_region_prevalence(region_data);
-        std::cout << "\nDEBUG: Region data set in DemographicModule (" << region_data.size()
-                  << " age groups)";
-    } else {
-        std::cout << "\nDEBUG: No region data available in repository (this is OK for India/PIF "
-                     "projects)";
+        load_summary.region_loaded = true;
+        load_summary.region_age_groups = region_data.size();
+        load_summary.region_names = extract_region_names(region_data);
     }
 
     const auto &ethnicity_data = repository.get_ethnicity_prevalence();
     if (!ethnicity_data.empty()) {
         demographic_module->set_ethnicity_prevalence(ethnicity_data);
-        std::cout << "\nDEBUG: Ethnicity data set in DemographicModule (" << ethnicity_data.size()
-                  << " age groups)";
-    } else {
-        std::cout << "\nDEBUG: No ethnicity data in repository "
-                     "(project_requirements.demographics.ethnicity may be false)";
+        load_summary.ethnicity_loaded = true;
+        load_summary.ethnicity_age_groups = ethnicity_data.size();
+        load_summary.ethnicity_names = extract_ethnicity_names(ethnicity_data);
     }
+
+    static std::once_flag load_summary_once;
+    std::call_once(load_summary_once,
+                   [&] { print_demographic_module_load_summary(load_summary); });
 
     return demographic_module;
 }
