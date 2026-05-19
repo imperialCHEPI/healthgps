@@ -19,6 +19,7 @@
 #include <filesystem>
 #include <fstream>
 #include <optional>
+#include <ranges>
 
 #if USE_TIMER
 #define MEASURE_FUNCTION()
@@ -93,6 +94,7 @@ struct StaticLinearLoadSummary {
     size_t boxcox_cols{0};
     std::string policy_file;
     size_t policy_coef_types{0};
+    std::vector<std::string> policy_coefficient_rows;
     std::string logistic_file;
     size_t logistic_coef_rows{0};
     size_t logistic_rf_count{0};
@@ -113,6 +115,10 @@ struct StaticLinearLoadSummary {
     std::string income_csv;
     double income_intercept{0};
     size_t income_coef_count{0};
+    std::vector<std::string> income_predictors;
+    std::vector<std::string> income_metadata;
+    std::vector<std::string> pa_predictors;
+    std::vector<std::string> pa_metadata;
     std::string region_file;
     size_t region_rows{0};
     size_t region_cols{0};
@@ -152,7 +158,7 @@ void print_wrapped_factor_list(const std::string &prefix, const std::vector<std:
     line += items.front();
     for (size_t i = 1; i < items.size(); ++i) {
         const std::string next = ", " + items[i];
-        if (line.size() + next.size() > 78) {
+        if (line.size() + next.size() > k_summary_box_inner_width) {
             print_box_row(line);
             line = std::string(4, ' ') + items[i];
         } else {
@@ -160,6 +166,61 @@ void print_wrapped_factor_list(const std::string &prefix, const std::vector<std:
         }
     }
     print_box_row(line);
+}
+
+void collect_regression_csv_factors(const hgps::LinearModelParams &model,
+                                    std::vector<std::string> &predictors_out,
+                                    std::vector<std::string> &metadata_out) {
+    predictors_out.clear();
+    metadata_out.clear();
+    predictors_out.reserve(model.coefficients.size() + model.log_coefficients.size());
+    metadata_out.reserve(4);
+
+    for (const auto &[id, value] : model.coefficients) {
+        const std::string name = id.to_string();
+        if (hgps::is_metadata_predictor(name)) {
+            metadata_out.push_back(fmt::format("{}={:.6g}", name, value));
+        } else {
+            predictors_out.push_back(name);
+        }
+    }
+    for (const auto &[id, coef] : model.log_coefficients) {
+        predictors_out.push_back(fmt::format("log:{} ({:.6g})", id.to_string(), coef));
+    }
+
+    std::ranges::sort(predictors_out);
+    std::ranges::sort(metadata_out);
+}
+
+void append_unique_metadata(std::vector<std::string> &metadata_out, const std::string &name,
+                            double value) {
+    const std::string entry = fmt::format("{}={:.6g}", name, value);
+    if (std::ranges::find(metadata_out, entry) != metadata_out.end()) {
+        return;
+    }
+    const std::string prefix = name + '=';
+    for (auto it = metadata_out.begin(); it != metadata_out.end(); ++it) {
+        if (it->starts_with(prefix)) {
+            *it = entry;
+            return;
+        }
+    }
+    metadata_out.push_back(entry);
+    std::ranges::sort(metadata_out);
+}
+
+void print_regression_csv_factors(const std::vector<std::string> &predictors,
+                                  const std::vector<std::string> &metadata) {
+    if (!predictors.empty()) {
+        print_box_row(fmt::format("  Predictors ({})  :", predictors.size()));
+        print_wrapped_factor_list("    ", predictors);
+    } else {
+        print_box_row("  Predictors         : (none)");
+    }
+    if (!metadata.empty()) {
+        print_box_row("  CSV metadata       :");
+        print_wrapped_factor_list("    ", metadata);
+    }
 }
 
 void print_static_linear_load_summary(const StaticLinearLoadSummary &summary) {
@@ -174,6 +235,10 @@ void print_static_linear_load_summary(const StaticLinearLoadSummary &summary) {
         if (!summary.policy_file.empty()) {
             print_box_row(fmt::format("  Policy CSV         : {} ({} coefficient types)",
                                       summary.policy_file, summary.policy_coef_types));
+            if (!summary.policy_coefficient_rows.empty()) {
+                print_box_row("  Policy coef. rows  :");
+                print_wrapped_factor_list("    ", summary.policy_coefficient_rows);
+            }
         }
         if (!summary.logistic_file.empty()) {
             print_box_row(fmt::format("  Logistic CSV       : {} ({} types, {} outcomes)",
@@ -202,7 +267,7 @@ void print_static_linear_load_summary(const StaticLinearLoadSummary &summary) {
     if (!summary.income_csv.empty()) {
         print_box_row(fmt::format("  Regression CSV     : {}", summary.income_csv));
         print_box_row(fmt::format("  Intercept          : {:.6g}", summary.income_intercept));
-        print_box_row(fmt::format("  Predictors         : {}", summary.income_coef_count));
+        print_regression_csv_factors(summary.income_predictors, summary.income_metadata);
     }
 
     print_box_section("Physical activity");
@@ -212,10 +277,10 @@ void print_static_linear_load_summary(const StaticLinearLoadSummary &summary) {
         if (!summary.pa_csv.empty()) {
             print_box_row(fmt::format("  Regression CSV     : {}", summary.pa_csv));
             print_box_row(fmt::format("  Intercept          : {:.6g}", summary.pa_intercept));
-            print_box_row(fmt::format("  Predictors         : {}", summary.pa_coef_count));
-            print_box_row(fmt::format("  Range              : {:.6g} - {:.6g}", summary.pa_min,
+            print_regression_csv_factors(summary.pa_predictors, summary.pa_metadata);
+            print_box_row(fmt::format("  Applied range      : {:.6g} - {:.6g}", summary.pa_min,
                                       summary.pa_max));
-            print_box_row(fmt::format("  Std. deviation     : {:.6g}", summary.pa_stddev));
+            print_box_row(fmt::format("  Applied stddev     : {:.6g}", summary.pa_stddev));
         }
     } else {
         print_box_row("  Disabled in project_requirements");
@@ -746,6 +811,12 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                     csv_policy_coefficients[coefficient_name][risk_factor_name] = coefficient_value;
                 }
             }
+            load_summary.policy_coefficient_rows.reserve(csv_policy_coefficients.size());
+            for (const auto &[coef_name, _] : csv_policy_coefficients) {
+                load_summary.policy_coefficient_rows.push_back(coef_name);
+            }
+            std::ranges::sort(load_summary.policy_coefficient_rows);
+            load_summary.policy_coef_types = load_summary.policy_coefficient_rows.size();
         }
 
         // Load logistic regression coefficients if they exist (for two-stage modeling)
@@ -1502,6 +1573,14 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                 load_summary.pa_min = model.min_value;
                 load_summary.pa_max = model.max_value;
                 load_summary.pa_stddev = model.stddev;
+                hgps::LinearModelParams pa_linear;
+                pa_linear.intercept = model.intercept;
+                pa_linear.coefficients = model.coefficients;
+                collect_regression_csv_factors(pa_linear, load_summary.pa_predictors,
+                                               load_summary.pa_metadata);
+                append_unique_metadata(load_summary.pa_metadata, "min", model.min_value);
+                append_unique_metadata(load_summary.pa_metadata, "max", model.max_value);
+                append_unique_metadata(load_summary.pa_metadata, "stddev", model.stddev);
             } else {
                 throw core::HgpsException{fmt::format(
                     "Continuous physical activity model '{}' must specify 'csv_file'", model_name)};
@@ -1543,6 +1622,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
             load_summary.income_intercept = continuous_income_model.intercept;
             load_summary.income_coef_count = continuous_income_model.coefficients.size();
+            collect_regression_csv_factors(continuous_income_model, load_summary.income_predictors,
+                                           load_summary.income_metadata);
         } else {
             throw core::HgpsException{
                 fmt::format("Continuous income model must specify 'csv_file'")};

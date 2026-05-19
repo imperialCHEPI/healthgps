@@ -25,7 +25,7 @@ void register_sample_demographics(hgps::CachedRepository &repository) {
     std::map<core::Identifier,
              std::map<core::Gender, std::map<std::string, std::map<std::string, double>>>>
         ethnicity_data;
-    for (const auto age_group : {core::Identifier("Under18"), core::Identifier("Over18")}) {
+    for (const auto &age_group : {core::Identifier("Under18"), core::Identifier("Over18")}) {
         for (const auto gender : {core::Gender::male, core::Gender::female}) {
             for (const auto *region : {"region1", "region2"}) {
                 ethnicity_data[age_group][gender][region]["1"] = 0.5;

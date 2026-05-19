@@ -79,7 +79,9 @@ TEST(ModelParserFinch, RegisterModelsPrintsStaticLinearSummaryBox) {
         [&] { hgps::input::register_risk_factor_model_definitions(repository, config); });
 
     EXPECT_NE(output.find("Static linear model configuration"), std::string::npos);
-    EXPECT_NE(output.find("Income"), std::string::npos);
     EXPECT_NE(output.find("income_model.csv"), std::string::npos);
+    EXPECT_NE(output.find("physicalactivity_model.csv"), std::string::npos);
+    EXPECT_NE(output.find("income2"), std::string::npos);
+    EXPECT_NE(output.find("log_income"), std::string::npos);
     EXPECT_NE(output.find("Demographics (assignment CSVs)"), std::string::npos);
 }
