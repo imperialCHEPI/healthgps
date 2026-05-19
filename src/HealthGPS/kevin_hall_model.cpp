@@ -87,10 +87,13 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
 
     // Adjust weight mean to match expected.
     adjust_risk_factors(context, {"Weight"_id}, std::nullopt, true);
-   //MAHIMA: Validate weight after adjusting the weight mean to match expected. This is done after adjusting the weight mean to match expected to ensure that the weight is within the configured range.
+    // MAHIMA: Validate weight after adjusting the weight mean to match expected. This is done after
+    // adjusting the weight mean to match expected to ensure that the weight is within the
+    // configured range.
     for (const auto &person : context.population()) {
         if (person.is_active()) {
-            validate_weight_in_config_range(context, person, "generate_risk_factors:after_weight_mean_adjustment");
+            validate_weight_in_config_range(context, person,
+                                            "generate_risk_factors:after_weight_mean_adjustment");
         }
     }
 
@@ -770,10 +773,11 @@ void KevinHallModel::adjust_weight(const RuntimeContext &context, Person &person
     validate_weight_in_config_range(context, person, "adjust_weight");
 }
 
-//MAHIMA: Added context and phase parameters to the validate_weight_in_config_range method
-// to provide more detailed error messages and allow for more specific validation in different contexts.
-//The context parameter is used to access the context's mapping and time information,
-// while the phase parameter is used to provide a more specific message about the validation error.
+// MAHIMA: Added context and phase parameters to the validate_weight_in_config_range method
+//  to provide more detailed error messages and allow for more specific validation in different
+//  contexts.
+// The context parameter is used to access the context's mapping and time information,
+//  while the phase parameter is used to provide a more specific message about the validation error.
 void KevinHallModel::validate_weight_in_config_range(const RuntimeContext &context,
                                                      const Person &person,
                                                      std::string_view phase) const {
@@ -797,15 +801,14 @@ void KevinHallModel::validate_weight_in_config_range(const RuntimeContext &conte
         return;
     }
 
-    const char *boundary =
-        (weight < range->lower()) ? "below minimum" : "above maximum";
+    const char *boundary = (weight < range->lower()) ? "below minimum" : "above maximum";
 
-    //MAHIMA: Throw detailed error message with all relevant information about the person and the context.
+    // MAHIMA: Throw detailed error message with all relevant information about the person and the
+    // context.
     std::ostringstream message;
     message << std::fixed << std::setprecision(6);
-    message << "Weight (" << weight << " kg) is " << boundary
-            << " configured range [" << range->lower() << ", " << range->upper()
-            << "] kg during phase '" << phase << "'.\n"
+    message << "Weight (" << weight << " kg) is " << boundary << " configured range ["
+            << range->lower() << ", " << range->upper() << "] kg during phase '" << phase << "'.\n"
             << "  person_id=" << person.id() << "\n"
             << "  age=" << person.age << " years\n"
             << "  gender=" << gender_label(person) << "\n"

@@ -101,7 +101,6 @@ std::string normalize_policy_coefficient_row(const std::string &raw_row_name) {
     return raw_row_name;
 }
 
-
 struct StaticLinearLoadSummary {
     bool matrix_based{false};
     std::string boxcox_file;
