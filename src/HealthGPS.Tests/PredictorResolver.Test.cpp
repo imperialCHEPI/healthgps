@@ -168,6 +168,17 @@ TEST(TestHealthGPS_PredictorResolver, IncomeFromContinuousWhenRiskFactorMissing)
     EXPECT_DOUBLE_EQ(42.0 * 42.0, expect_resolved(person, "income2"));
 }
 
+TEST(TestHealthGPS_PredictorResolver, LogEnergyIntakeFromEnergyIntakeRiskFactor) {
+    using namespace hgps;
+
+    Person person;
+    person.risk_factors["EnergyIntake"_id] = 2000.0;
+
+    const auto value = resolve_derived_predictor(person, "log_energyintake");
+    ASSERT_TRUE(value.has_value());
+    EXPECT_NEAR(std::log(2000.0), *value, 1e-9);
+}
+
 TEST(TestHealthGPS_PredictorResolver, MetadataPredictorReturnsNullopt) {
     using namespace hgps;
 

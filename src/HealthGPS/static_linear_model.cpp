@@ -1,5 +1,6 @@
 #include "static_linear_model.h"
 #include "HealthGPS.Core/exception.h"
+#include "HealthGPS.Core/string_util.h"
 #include "HealthGPS.Input/poco.h"
 #include "linear_model_evaluator.h"
 #include "population.h"
@@ -1845,7 +1846,9 @@ StaticLinearModel::compute_linear_models(RuntimeContext &context, Person &person
         [this, &context,
          &person](const core::Identifier &coefficient_name) -> std::optional<double> {
         try {
-            if (coefficient_name == log_energy_intake_id) {
+            const std::string &coef_key = coefficient_name.to_string();
+            if (coefficient_name == log_energy_intake_id ||
+                core::case_insensitive::equals(coef_key, "log_energyintake")) {
                 double expected_value = get_expected(context, person.gender, person.age,
                                                      energyintake_id, std::nullopt, false);
                 if (expected_value <= 0) {

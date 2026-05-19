@@ -184,6 +184,17 @@ std::optional<double> resolve_derived_predictor(const Person &person, const std:
         return person.sector_to_value();
     }
 
+    if (core::case_insensitive::equals(key, "energyintake")) {
+        const core::Identifier energy_intake_id("EnergyIntake");
+        const core::Identifier energyintake_lower("energyintake");
+        if (person.risk_factors.contains(energyintake_lower)) {
+            return person.risk_factors.at(energyintake_lower);
+        }
+        if (person.risk_factors.contains(energy_intake_id)) {
+            return person.risk_factors.at(energy_intake_id);
+        }
+    }
+
     return std::nullopt;
 }
 

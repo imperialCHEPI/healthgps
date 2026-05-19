@@ -87,6 +87,21 @@ char parse_delimiter_char(const std::string &delimiter) {
     return delimiter.empty() ? ',' : delimiter.front();
 }
 
+/// @brief Map legacy policy CSV row names for log(energy intake) to the canonical predictor name.
+/// @details Other policy row names are kept as in the CSV. Only energy-intake log predictors are
+/// normalized so evaluation always uses `log_energy_intake` with `EnergyIntake` on the person.
+std::string normalize_policy_coefficient_row(const std::string &raw_row_name) {
+    if (hgps::core::case_insensitive::equals(raw_row_name, "EnergyIntake")) {
+        return "log_energy_intake";
+    }
+    const std::string lower = hgps::core::to_lower(raw_row_name);
+    if (lower == "log_energyintake" || lower == "log_energy_intake") {
+        return "log_energy_intake";
+    }
+    return raw_row_name;
+}
+
+
 struct StaticLinearLoadSummary {
     bool matrix_based{false};
     std::string boxcox_file;
@@ -797,10 +812,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             // Normalise EnergyIntake -> log_energy_intake so policy uses the same factor name as
             // correlation/BoxCox (log energy intake is stored under "log_energy_intake").
             for (size_t row_idx = 0; row_idx < policy_doc.GetRowCount(); ++row_idx) {
-                auto coefficient_name = policy_doc.GetCell<std::string>(0, row_idx);
-                if (core::case_insensitive::equals(coefficient_name, "EnergyIntake")) {
-                    coefficient_name = "log_energy_intake";
-                }
+                const std::string raw_row_name = policy_doc.GetCell<std::string>(0, row_idx);
+                const std::string coefficient_name = normalize_policy_coefficient_row(raw_row_name);
                 csv_policy_coefficients[coefficient_name] = {};
 
                 for (size_t col_idx = 1; col_idx < policy_doc.GetColumnCount(); ++col_idx) {
