@@ -162,8 +162,7 @@ std::optional<double> resolve_sector_predictor(const Person &person, const std::
     return std::nullopt;
 }
 
-std::optional<double> resolve_energyintake_predictor(const Person &person,
-                                                     const std::string &key) {
+std::optional<double> resolve_energyintake_predictor(const Person &person, const std::string &key) {
     if (!core::case_insensitive::equals(key, "energyintake")) {
         return std::nullopt;
     }
