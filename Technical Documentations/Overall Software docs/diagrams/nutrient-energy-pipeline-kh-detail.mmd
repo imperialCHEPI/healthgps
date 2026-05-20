@@ -1,0 +1,15 @@
+%%{init: {
+  "theme": "base",
+  "themeVariables": { "fontSize": "18px", "fontFamily": "Segoe UI, Arial, sans-serif" },
+  "flowchart": { "nodeSpacing": 44, "rankSpacing": 52 }
+}}%%
+flowchart TB
+  IN["Food* from static model<br/>e.g. FoodCarbohydrate"]
+  LAG["update_nutrient_intakes<br/>Carbohydrate_previous <- Carbohydrate"]
+  NUT["compute_nutrient_intakes<br/>Carbohydrate = sum Food x coeff"]
+  EI["compute_energy_intake<br/>EnergyIntake = sum nutrient x kcal/g"]
+  KH["kevin_hall_run<br/>uses CI_0, CI, EI, glycogen, ECF"]
+  WADJ["Bucket weight adjustment<br/>Weight, KH_BW, KH_adjustment"]
+  OUT["IndividualIDTracking CSV<br/>FoodCarbohydrate | Carbohydrate | Carbohydrate_previous"]
+
+  IN --> LAG --> NUT --> EI --> KH --> WADJ --> OUT
