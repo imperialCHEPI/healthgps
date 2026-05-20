@@ -51,7 +51,7 @@ hgps::ResultFileWriter create_results_file_logger(const hgps::input::Configurati
                                                      : "",
                                  .job_id = config.job_id,
                                  .seed = input.seed().value_or(0u)},
-            write_income_csv};
+            write_income_csv, input.project_requirements().income.categories};
 }
 
 /// @brief Prints application exit message
