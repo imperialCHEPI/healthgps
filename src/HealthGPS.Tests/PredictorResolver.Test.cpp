@@ -176,7 +176,7 @@ TEST(TestHealthGPS_PredictorResolver, LogEnergyIntakeFromEnergyIntakeRiskFactor)
 
     const auto value = resolve_derived_predictor(person, "log_energyintake");
     ASSERT_TRUE(value.has_value());
-    EXPECT_NEAR(std::log(2000.0), *value, 1e-9);
+    EXPECT_NEAR(std::log(2000.0), value.value(), 1e-9);
 }
 
 TEST(TestHealthGPS_PredictorResolver, MetadataPredictorReturnsNullopt) {

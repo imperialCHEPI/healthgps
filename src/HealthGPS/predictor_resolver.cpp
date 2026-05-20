@@ -104,8 +104,78 @@ std::optional<double> resolve_log_predictor(const Person &person, const std::str
     if (!base_value.has_value()) {
         return std::nullopt;
     }
-    const double logged = std::log(std::max(*base_value, k_log_floor));
+    const double logged = std::log(std::max(base_value.value(), k_log_floor));
     return std::pow(logged, log_power);
+}
+
+std::optional<double> resolve_age_predictor(const Person &person, const std::string &key) {
+    if (core::case_insensitive::equals(key, "age") || core::case_insensitive::equals(key, "Age")) {
+        return age_polynomial(person, 1);
+    }
+    int power = 0;
+    if (parse_trailing_power(key, "age", power) || parse_trailing_power(key, "Age", power)) {
+        return age_polynomial(person, power);
+    }
+    return std::nullopt;
+}
+
+std::optional<double> resolve_income_predictor(const Person &person, const std::string &key) {
+    if (key == "income_continuous") {
+        return person.income_continuous;
+    }
+    int power = 0;
+    if (parse_trailing_power(key, "income", power)) {
+        return std::pow(income_base_value(person), power);
+    }
+    if (core::case_insensitive::equals(key, "income") ||
+        core::case_insensitive::equals(key, "Income")) {
+        return income_base_value(person);
+    }
+    return std::nullopt;
+}
+
+std::optional<double> resolve_gender_predictor(const Person &person, const std::string &key) {
+    int power = 0;
+    if (parse_trailing_power(key, "gender", power)) {
+        if (power == 1 && key == "gender2") {
+            return gender_dummy(person);
+        }
+        return std::pow(gender_dummy(person), power);
+    }
+    if (key == "gender2") {
+        return gender_dummy(person);
+    }
+    if (key == "gender") {
+        return person.gender_to_value();
+    }
+    return std::nullopt;
+}
+
+std::optional<double> resolve_sector_predictor(const Person &person, const std::string &key) {
+    int power = 0;
+    if (parse_trailing_power(key, "sector", power)) {
+        return std::pow(person.sector_to_value(), power);
+    }
+    if (key == "sector") {
+        return person.sector_to_value();
+    }
+    return std::nullopt;
+}
+
+std::optional<double> resolve_energyintake_predictor(const Person &person,
+                                                     const std::string &key) {
+    if (!core::case_insensitive::equals(key, "energyintake")) {
+        return std::nullopt;
+    }
+    const core::Identifier energy_intake_id("EnergyIntake");
+    const core::Identifier energyintake_lower("energyintake");
+    if (person.risk_factors.contains(energyintake_lower)) {
+        return person.risk_factors.at(energyintake_lower);
+    }
+    if (person.risk_factors.contains(energy_intake_id)) {
+        return person.risk_factors.at(energy_intake_id);
+    }
+    return std::nullopt;
 }
 
 } // namespace
@@ -126,76 +196,31 @@ std::optional<double> resolve_derived_predictor(const Person &person, const std:
     if (key.empty() || is_metadata_predictor(key)) {
         return std::nullopt;
     }
-
     if (auto log_value = resolve_log_predictor(person, key)) {
         return log_value;
     }
-
-    if (key == "income_continuous") {
-        return person.income_continuous;
+    if (auto income_value = resolve_income_predictor(person, key)) {
+        return income_value;
     }
-
     if (key == person.region || key == person.ethnicity) {
         return 1.0;
     }
-
-    if (core::case_insensitive::equals(key, "age") || core::case_insensitive::equals(key, "Age")) {
-        return age_polynomial(person, 1);
+    if (auto age_value = resolve_age_predictor(person, key)) {
+        return age_value;
     }
-    int power = 0;
-    if (parse_trailing_power(key, "age", power) || parse_trailing_power(key, "Age", power)) {
-        return age_polynomial(person, power);
+    if (auto gender_value = resolve_gender_predictor(person, key)) {
+        return gender_value;
     }
-
-    if (parse_trailing_power(key, "income", power)) {
-        const double base = income_base_value(person);
-        return std::pow(base, power);
-    }
-    if (core::case_insensitive::equals(key, "income") ||
-        core::case_insensitive::equals(key, "Income")) {
-        return income_base_value(person);
-    }
-
-    if (parse_trailing_power(key, "gender", power)) {
-        if (power == 1 && key == "gender2") {
-            return gender_dummy(person);
-        }
-        return std::pow(gender_dummy(person), power);
-    }
-    if (key == "gender2") {
-        return gender_dummy(person);
-    }
-    if (key == "gender") {
-        return person.gender_to_value();
-    }
-
     if (key.starts_with("region")) {
         return region_dummy(person, key);
     }
     if (key.starts_with("ethnicity")) {
         return ethnicity_dummy(person, key);
     }
-
-    if (parse_trailing_power(key, "sector", power)) {
-        const double base = person.sector_to_value();
-        return std::pow(base, power);
+    if (auto sector_value = resolve_sector_predictor(person, key)) {
+        return sector_value;
     }
-    if (key == "sector") {
-        return person.sector_to_value();
-    }
-
-    if (core::case_insensitive::equals(key, "energyintake")) {
-        const core::Identifier energy_intake_id("EnergyIntake");
-        const core::Identifier energyintake_lower("energyintake");
-        if (person.risk_factors.contains(energyintake_lower)) {
-            return person.risk_factors.at(energyintake_lower);
-        }
-        if (person.risk_factors.contains(energy_intake_id)) {
-            return person.risk_factors.at(energy_intake_id);
-        }
-    }
-
-    return std::nullopt;
+    return resolve_energyintake_predictor(person, key);
 }
 
 } // namespace hgps

@@ -213,9 +213,9 @@ void append_unique_metadata(std::vector<std::string> &metadata_out, const std::s
         return;
     }
     const std::string prefix = name + '=';
-    for (auto it = metadata_out.begin(); it != metadata_out.end(); ++it) {
-        if (it->starts_with(prefix)) {
-            *it = entry;
+    for (auto &item : metadata_out) {
+        if (item.starts_with(prefix)) {
+            item = entry;
             return;
         }
     }
@@ -811,8 +811,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             // Normalise EnergyIntake -> log_energy_intake so policy uses the same factor name as
             // correlation/BoxCox (log energy intake is stored under "log_energy_intake").
             for (size_t row_idx = 0; row_idx < policy_doc.GetRowCount(); ++row_idx) {
-                const std::string raw_row_name = policy_doc.GetCell<std::string>(0, row_idx);
-                const std::string coefficient_name = normalize_policy_coefficient_row(raw_row_name);
+                const auto raw_row_name = policy_doc.GetCell<std::string>(0, row_idx);
+                const auto coefficient_name = normalize_policy_coefficient_row(raw_row_name);
                 csv_policy_coefficients[coefficient_name] = {};
 
                 for (size_t col_idx = 1; col_idx < policy_doc.GetColumnCount(); ++col_idx) {
