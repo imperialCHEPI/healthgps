@@ -40,6 +40,8 @@ target_sources(
             "PredictorResolver.Test.cpp"
             "DemographicSummary.Test.cpp"
             "ModelParserFinch.Test.cpp"
+            "KevinHallWeightValidation.Test.cpp"
+            "EventMonitor.Test.cpp"
             "RelativeRiskLookup.Test.cpp"
             "RuntimeMetric.Test.cpp"
             "Scenario.Test.cpp"

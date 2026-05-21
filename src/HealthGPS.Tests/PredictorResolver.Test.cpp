@@ -179,6 +179,41 @@ TEST(TestHealthGPS_PredictorResolver, LogEnergyIntakeFromEnergyIntakeRiskFactor)
     EXPECT_NEAR(std::log(2000.0), value.value(), 1e-9);
 }
 
+TEST(TestHealthGPS_PredictorResolver, EnergyIntakeDirectLookupCaseInsensitive) {
+    using namespace hgps;
+
+    Person person;
+    person.risk_factors["EnergyIntake"_id] = 1800.0;
+
+    const auto from_mixed_case = resolve_derived_predictor(person, "energyintake");
+    ASSERT_TRUE(from_mixed_case.has_value());
+    EXPECT_DOUBLE_EQ(1800.0, from_mixed_case.value());
+
+    person.risk_factors.erase("EnergyIntake"_id);
+    person.risk_factors["energyintake"_id] = 1500.0;
+    const auto from_lower_key = resolve_derived_predictor(person, "energyintake");
+    ASSERT_TRUE(from_lower_key.has_value());
+    EXPECT_DOUBLE_EQ(1500.0, from_lower_key.value());
+}
+
+TEST(TestHealthGPS_PredictorResolver, LogEnergyIntakeAliasAndIncomeContinuous) {
+    using namespace hgps;
+
+    Person person;
+    person.risk_factors["EnergyIntake"_id] = 100.0;
+    const auto log_alias = resolve_derived_predictor(person, "log_energyintake");
+    ASSERT_TRUE(log_alias.has_value());
+    EXPECT_NEAR(std::log(100.0), log_alias.value(), 1e-9);
+
+    person.income_continuous = 99.0;
+    const auto income_cont = resolve_derived_predictor(person, "income_continuous");
+    ASSERT_TRUE(income_cont.has_value());
+    EXPECT_DOUBLE_EQ(99.0, income_cont.value());
+
+    person.region = "region2";
+    EXPECT_DOUBLE_EQ(1.0, expect_resolved(person, "region2"));
+}
+
 TEST(TestHealthGPS_PredictorResolver, MetadataPredictorReturnsNullopt) {
     using namespace hgps;
 

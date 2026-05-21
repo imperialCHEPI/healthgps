@@ -85,3 +85,27 @@ TEST(ModelParserFinch, RegisterModelsPrintsStaticLinearSummaryBox) {
     EXPECT_NE(output.find("log_income"), std::string::npos);
     EXPECT_NE(output.find("Demographics (assignment CSVs)"), std::string::npos);
 }
+
+TEST(ModelParserFinch, PolicyEnergyIntakeRowNormalizedToLogEnergyIntake) {
+    using hgps::test::capture_stdout;
+
+    const auto finch = finch_data_root();
+    if (!std::filesystem::exists(finch / "static_model.json")) {
+        GTEST_SKIP() << "FINCH input data not available";
+    }
+
+    auto config = make_finch_configuration();
+    hgps::input::DataManager manager(test_datastore_path);
+    hgps::CachedRepository repository(manager);
+
+    const auto output = capture_stdout(
+        [&] { hgps::input::register_risk_factor_model_definitions(repository, config); });
+
+    const auto policy_rows_pos = output.find("Policy coef. rows");
+    ASSERT_NE(policy_rows_pos, std::string::npos)
+        << "Expected policy coefficient summary in static linear load output";
+    const auto policy_section = output.substr(policy_rows_pos);
+    EXPECT_NE(policy_section.find("log_energy_intake"), std::string::npos);
+    EXPECT_EQ(policy_section.find("EnergyIntake"), std::string::npos)
+        << "Raw policy row EnergyIntake should be normalized to log_energy_intake";
+}

@@ -55,6 +55,10 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
 
     void update_risk_factors(RuntimeContext &context) override;
 
+    /// @brief Throws if person weight is outside the range from config modelling.risk_factors.
+    void validate_weight_in_config_range(const RuntimeContext &context, const Person &person,
+                                         std::string_view phase) const;
+
   private:
     /// @brief Handle the update (initialisation) of newborns separately
     /// @param context The runtime context
@@ -150,10 +154,6 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @param person The person fo update the weight for.
     /// @param adjustment The weight adjustment term
     void adjust_weight(const RuntimeContext &context, Person &person, double adjustment) const;
-
-    /// @brief Throws if person weight is outside the range from config modelling.risk_factors.
-    void validate_weight_in_config_range(const RuntimeContext &context, const Person &person,
-                                         std::string_view phase) const;
 
     /// @brief Computes weight adjustments or receives them from the baseline scenario
     /// @param context The runtime context

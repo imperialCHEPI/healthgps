@@ -1,10 +1,12 @@
 #include "HealthGPS.Core/exception.h"
 
 #include "kevin_hall_model.h"
+#include "HealthGPS/agent_debug_log.h"
 #include "runtime_context.h"
 #include "sync_message.h"
 
 #include <algorithm>
+#include <fmt/format.h>
 #include <iomanip>
 #include <iostream>
 #include <iterator>
@@ -110,6 +112,11 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
 }
 
 void KevinHallModel::update_risk_factors(RuntimeContext &context) {
+    // #region agent log
+    agent_debug::log("kevin_hall_model.cpp:update_risk_factors", "enter", "D",
+                     fmt::format("{{\"time\":{},\"scenario\":\"{}\"}}", context.time_now(),
+                                 context.identifier()));
+    // #endregion
 
     // Update (initialise) newborns.
     update_newborns(context);
@@ -126,6 +133,11 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
 
         compute_bmi(person);
     }
+    // #region agent log
+    agent_debug::log("kevin_hall_model.cpp:update_risk_factors", "exit", "D",
+                     fmt::format("{{\"time\":{},\"scenario\":\"{}\"}}", context.time_now(),
+                                 context.identifier()));
+    // #endregion
 }
 
 void KevinHallModel::update_newborns(RuntimeContext &context) const {
@@ -835,6 +847,11 @@ void KevinHallModel::validate_weight_in_config_range(const RuntimeContext &conte
         message << "\n  physical_activity=" << person.risk_factors.at("PhysicalActivity"_id);
     }
 
+    // #region agent log
+    agent_debug::log("kevin_hall_model.cpp:validate_weight_in_config_range", "throw", "E",
+                     fmt::format("{{\"phase\":\"{}\",\"weight\":{},\"person_id\":{},\"time\":{}}}",
+                                 phase, weight, person.id(), context.time_now()));
+    // #endregion
     throw core::HgpsException(message.str());
 }
 

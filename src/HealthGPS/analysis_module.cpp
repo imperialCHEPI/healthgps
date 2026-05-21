@@ -32,6 +32,19 @@ std::vector<core::Income> configured_income_strata(const RuntimeContext &context
     return {core::Income::low, core::Income::middle, core::Income::high};
 }
 
+/// @brief Configured strata plus any person.income values present (e.g. unknown on deaths).
+std::vector<core::Income> income_strata_for_channel_setup(const RuntimeContext &context) {
+    auto strata = configured_income_strata(context);
+    std::unordered_set<core::Income> seen(strata.begin(), strata.end());
+    for (const auto &person : context.population()) {
+        if (!seen.contains(person.income)) {
+            seen.insert(person.income);
+            strata.push_back(person.income);
+        }
+    }
+    return strata;
+}
+
 } // namespace
 
 /// @brief DALYs result unit conversion constant.
@@ -1024,6 +1037,7 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
     }
 
     const auto income_strata = configured_income_strata(context);
+    const auto channel_strata = income_strata_for_channel_setup(context);
 
     // Create a list of only the channels that are actually used in income-based analysis
     auto income_channels = std::vector<std::string>();
@@ -1148,7 +1162,7 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
     // MAHIMA: Always allocate income-stratified series for every configured stratum, even when no
     // active person has that person.income this year (so the writer can emit zero rows instead of
     // skipping the timestep).
-    series.add_income_channels_for_categories(income_channels, income_strata);
+    series.add_income_channels_for_categories(income_channels, channel_strata);
 
     // Initialize standard deviation channels with zeros (with safe access)
     const auto age_range = context.age_range();
@@ -1163,10 +1177,11 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
                               &added_income_channels](core::Gender gender, core::Income income,
                                                       const std::string &channel, int age) {
         std::string channel_key = core::to_lower(channel);
-        // Only initialize if channel was added
-        if (added_income_channels.contains(channel_key)) {
-            series.at(gender, income, channel_key).at(age) = 0.0;
+        if (!added_income_channels.contains(channel_key) ||
+            !series.has_income_channel(gender, income, channel_key)) {
+            return;
         }
+        series.at(gender, income, channel_key).at(age) = 0.0;
     };
 
     for (const auto &income : income_strata) {
@@ -1211,20 +1226,22 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
         [&series, &added_income_channels](core::Gender gender, core::Income income,
                                           const std::string &channel, int age, double value) {
             std::string channel_key = core::to_lower(channel);
-            // Only access if channel was added
-            if (added_income_channels.contains(channel_key)) {
-                series.at(gender, income, channel_key).at(age) += value;
+            if (!added_income_channels.contains(channel_key) ||
+                !series.has_income_channel(gender, income, channel_key)) {
+                return;
             }
+            series.at(gender, income, channel_key).at(age) += value;
         };
 
     auto safe_increment_channel = [&series,
                                    &added_income_channels](core::Gender gender, core::Income income,
                                                            const std::string &channel, int age) {
         std::string channel_key = core::to_lower(channel);
-        // Only access if channel was added
-        if (added_income_channels.contains(channel_key)) {
-            series.at(gender, income, channel_key).at(age)++;
+        if (!added_income_channels.contains(channel_key) ||
+            !series.has_income_channel(gender, income, channel_key)) {
+            return;
         }
+        series.at(gender, income, channel_key).at(age)++;
     };
 
     // MAHIMA: Use cached is_active[i] instead of person.is_active() to avoid repeated calls.
@@ -1361,10 +1378,11 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
         [&series, &added_income_channels](core::Gender gender, core::Income income,
                                           const std::string &channel, int age, double count) {
             std::string channel_key = core::to_lower(channel);
-            // Only access if channel was added
-            if (count > 0 && added_income_channels.contains(channel_key)) {
-                series.at(gender, income, channel_key).at(age) /= count;
+            if (count <= 0 || !added_income_channels.contains(channel_key) ||
+                !series.has_income_channel(gender, income, channel_key)) {
+                return;
             }
+            series.at(gender, income, channel_key).at(age) /= count;
         };
 
     const std::unordered_set<std::string> income_demo_mean_channels = {
@@ -1391,19 +1409,22 @@ void AnalysisModule::calculate_income_based_population_statistics(RuntimeContext
 
             // Set mean_age, mean_age2, mean_age3 to age, age², age³ (same as main series), not
             // averages
-            if (added_income_channels.contains("mean_age")) {
+            if (added_income_channels.contains("mean_age") &&
+                series.has_income_channel(core::Gender::female, income, "mean_age")) {
                 series.at(core::Gender::female, income, "mean_age").at(age) =
                     static_cast<double>(age);
                 series.at(core::Gender::male, income, "mean_age").at(age) =
                     static_cast<double>(age);
             }
-            if (added_income_channels.contains("mean_age2")) {
+            if (added_income_channels.contains("mean_age2") &&
+                series.has_income_channel(core::Gender::female, income, "mean_age2")) {
                 series.at(core::Gender::female, income, "mean_age2").at(age) =
                     static_cast<double>(age) * static_cast<double>(age);
                 series.at(core::Gender::male, income, "mean_age2").at(age) =
                     static_cast<double>(age) * static_cast<double>(age);
             }
-            if (added_income_channels.contains("mean_age3")) {
+            if (added_income_channels.contains("mean_age3") &&
+                series.has_income_channel(core::Gender::female, income, "mean_age3")) {
                 series.at(core::Gender::female, income, "mean_age3").at(age) =
                     static_cast<double>(age) * static_cast<double>(age) * static_cast<double>(age);
                 series.at(core::Gender::male, income, "mean_age3").at(age) =
@@ -1592,6 +1613,9 @@ void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &c
     income_channels.emplace_back("std_yld");
     income_channels.emplace_back("std_daly");
 
+    const auto channel_strata = income_strata_for_channel_setup(context);
+    series.add_income_channels_for_categories(income_channels, channel_strata);
+
     // Track which channels were actually added (lowercase keys)
     std::unordered_set<std::string> added_income_channels;
     for (const auto &channel : income_channels) {
@@ -1604,13 +1628,15 @@ void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &c
                                           core::Income income, int age, double value) {
             std::string mean_channel = core::to_lower("mean_" + chan);
             std::string std_channel = core::to_lower("std_" + chan);
-            // Only accumulate if both mean and std channels were added
-            if (added_income_channels.contains(mean_channel) &&
-                added_income_channels.contains(std_channel)) {
-                const double mean = series.at(sex, income, mean_channel).at(age);
-                const double diff = value - mean;
-                series.at(sex, income, std_channel).at(age) += diff * diff;
+            if (!added_income_channels.contains(mean_channel) ||
+                !added_income_channels.contains(std_channel) ||
+                !series.has_income_channel(sex, income, mean_channel) ||
+                !series.has_income_channel(sex, income, std_channel)) {
+                return;
             }
+            const double mean = series.at(sex, income, mean_channel).at(age);
+            const double diff = value - mean;
+            series.at(sex, income, std_channel).at(age) += diff * diff;
         };
 
     auto current_time = static_cast<unsigned int>(context.time_now());
@@ -1712,15 +1738,16 @@ void AnalysisModule::calculate_income_based_standard_deviation(RuntimeContext &c
         [&series, &added_income_channels](const std::string &chan, core::Gender sex,
                                           core::Income income, int age, double count) {
             std::string std_channel = core::to_lower("std_" + chan);
-            // Only access if channel was added
-            if (added_income_channels.contains(std_channel)) {
-                if (count > 0) {
-                    const double sum = series.at(sex, income, std_channel).at(age);
-                    const double std = std::sqrt(sum / count);
-                    series.at(sex, income, std_channel).at(age) = std;
-                } else {
-                    series.at(sex, income, std_channel).at(age) = 0.0;
-                }
+            if (!added_income_channels.contains(std_channel) ||
+                !series.has_income_channel(sex, income, std_channel)) {
+                return;
+            }
+            if (count > 0) {
+                const double sum = series.at(sex, income, std_channel).at(age);
+                const double std = std::sqrt(sum / count);
+                series.at(sex, income, std_channel).at(age) = std;
+            } else {
+                series.at(sex, income, std_channel).at(age) = 0.0;
             }
         };
 

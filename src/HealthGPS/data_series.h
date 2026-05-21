@@ -105,6 +105,10 @@ class DataSeries {
     /// @return true if the income category exists, false otherwise
     bool has_income_category(core::Gender gender, core::Income income) const;
 
+    /// @brief True if an income-stratified channel key exists (gender, income, key).
+    bool has_income_channel(core::Gender gender, core::Income income,
+                            const std::string &key) const;
+
     /// @brief Converts income category enum to string representation
     /// @param income The income enumeration
     /// @return String representation of the income category
