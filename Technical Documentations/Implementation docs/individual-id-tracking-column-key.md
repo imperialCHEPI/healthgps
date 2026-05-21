@@ -68,7 +68,7 @@ Config column list: `output.individual_id_tracking.risk_factors` in `new_config.
 
 ## E. Simulation order (why columns differ)
 
-```
+```text
 Demographics / SES
   → StaticLinearModel (Food*, Carb_pre/post/delta, policy, trends)
   → KevinHallModel (Carb_nutrient_*, Carbohydrate, EnergyIntake, Weight, Height, BMI)
