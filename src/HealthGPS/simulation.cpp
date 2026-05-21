@@ -1,7 +1,7 @@
 #include "simulation.h"
-#include "HealthGPS/agent_debug_log.h"
 #include "HealthGPS.Core/thread_util.h"
 #include "HealthGPS.Core/univariate_summary.h"
+#include "HealthGPS/agent_debug_log.h"
 #include "converter.h"
 #include "info_message.h"
 #include "mtrandom.h"

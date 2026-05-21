@@ -1,7 +1,7 @@
 #include "HealthGPS.Core/exception.h"
 
-#include "kevin_hall_model.h"
 #include "HealthGPS/agent_debug_log.h"
+#include "kevin_hall_model.h"
 #include "runtime_context.h"
 #include "sync_message.h"
 

@@ -1,8 +1,8 @@
 #include "static_linear_model.h"
-#include "HealthGPS/agent_debug_log.h"
 #include "HealthGPS.Core/exception.h"
 #include "HealthGPS.Core/string_util.h"
 #include "HealthGPS.Input/poco.h"
+#include "HealthGPS/agent_debug_log.h"
 #include "linear_model_evaluator.h"
 #include "population.h"
 #include "predictor_resolver.h"
@@ -1184,8 +1184,9 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
     }
     // #region agent log
     agent_debug::log("static_linear_model.cpp:update_risk_factors", "after_income_category_table",
-                     "C", fmt::format("{{\"time\":{},\"scenario\":\"{}\"}}", context.time_now(),
-                                      context.identifier()));
+                     "C",
+                     fmt::format("{{\"time\":{},\"scenario\":\"{}\"}}", context.time_now(),
+                                 context.identifier()));
     // #endregion
 
     // Initialise newborns and update others with policies and trends.
@@ -1358,7 +1359,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
     // #region agent log
     agent_debug::log("static_linear_model.cpp:update_risk_factors", "after_policy_loop", "C",
                      fmt::format("{{\"time\":{},\"scenario\":\"{}\"}}", context.time_now(),
-                                  context.identifier()));
+                                 context.identifier()));
     // #endregion
 }
 

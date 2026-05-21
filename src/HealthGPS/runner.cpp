@@ -115,14 +115,14 @@ void Runner::cancel() noexcept {
 void Runner::run_model_thread(const std::stop_token &token, Simulation &model, unsigned int run,
                               const unsigned int seed) {
     // #region agent log
-    agent_debug::log("runner.cpp:run_model_thread", "thread_start", "A",
-                     fmt::format("{{\"model\":\"{}\",\"run\":{},\"seed\":{}}}", model.name(), run,
-                                 seed));
+    agent_debug::log(
+        "runner.cpp:run_model_thread", "thread_start", "A",
+        fmt::format("{{\"model\":\"{}\",\"run\":{},\"seed\":{}}}", model.name(), run, seed));
     // #endregion
     auto run_start = std::chrono::steady_clock::now();
     try {
-        notify(std::make_unique<RunnerEventMessage>(fmt::format("{} - {}", runner_id_, model.name()),
-                                                    RunnerAction::run_begin, run));
+        notify(std::make_unique<RunnerEventMessage>(
+            fmt::format("{} - {}", runner_id_, model.name()), RunnerAction::run_begin, run));
 
         /* Create the simulation engine */
         adevs::Simulator<int> sim;
@@ -137,17 +137,19 @@ void Runner::run_model_thread(const std::stop_token &token, Simulation &model, u
         }
 
         ElapsedTime elapsed = std::chrono::steady_clock::now() - run_start;
-        notify(std::make_unique<RunnerEventMessage>(fmt::format("{} - {}", runner_id_, model.name()),
-                                                    RunnerAction::run_end, run, elapsed.count()));
+        notify(
+            std::make_unique<RunnerEventMessage>(fmt::format("{} - {}", runner_id_, model.name()),
+                                                 RunnerAction::run_end, run, elapsed.count()));
         // #region agent log
-        agent_debug::log("runner.cpp:run_model_thread", "thread_finished_ok", "A",
-                         fmt::format("{{\"model\":\"{}\",\"elapsed_ms\":{}}}", model.name(),
-                                     elapsed.count()));
+        agent_debug::log(
+            "runner.cpp:run_model_thread", "thread_finished_ok", "A",
+            fmt::format("{{\"model\":\"{}\",\"elapsed_ms\":{}}}", model.name(), elapsed.count()));
         // #endregion
     } catch (const std::exception &ex) {
         // #region agent log
-        agent_debug::log("runner.cpp:run_model_thread", "thread_exception", "A",
-                         fmt::format("{{\"model\":\"{}\",\"what\":\"{}\"}}", model.name(), ex.what()));
+        agent_debug::log(
+            "runner.cpp:run_model_thread", "thread_exception", "A",
+            fmt::format("{{\"model\":\"{}\",\"what\":\"{}\"}}", model.name(), ex.what()));
         // #endregion
         fmt::print(stderr, "FATAL simulation thread ({}): {}\n", model.name(), ex.what());
         throw;
