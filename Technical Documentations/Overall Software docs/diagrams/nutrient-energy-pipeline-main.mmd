@@ -1,0 +1,42 @@
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "fontSize": "18px",
+    "fontFamily": "Segoe UI, Arial, sans-serif",
+    "primaryColor": "#e8f4fc",
+    "primaryBorderColor": "#2563eb",
+    "lineColor": "#475569",
+    "clusterBkg": "#f8fafc",
+    "clusterBorder": "#64748b",
+    "titleColor": "#0f172a"
+  },
+  "flowchart": { "htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 56 }
+}}%%
+flowchart LR
+  subgraph CFG["Config at load"]
+    direction TB
+    DM["dynamic_model.json Nutrients<br/>energy_equation + nutrient_ranges"]
+    DM2["dynamic_model.json Foods<br/>nutrient_equations + food trends"]
+    SM["static_model.json + CSVs<br/>Food* linear / BoxCox / policy / trends"]
+    FM["Factors-mean CSVs<br/>sex x age and stratum targets"]
+  end
+
+  subgraph YEAR["Each simulation year"]
+    direction TB
+    DEMO["Demographics / SES"]
+    STATIC["StaticLinearModel<br/>update Food* on person.risk_factors"]
+    ADJ["adjust_risk_factors<br/>factors-mean + trends + policy"]
+    LAG["Kevin Hall lag<br/>Carbohydrate_previous from Carbohydrate"]
+    NUT["compute_nutrient_intakes<br/>Carbohydrate etc. from Food*"]
+    EI["compute_energy_intake<br/>EnergyIntake from energy_equation_"]
+    KH["kevin_hall_run<br/>CI_0, CI, EI, glycogen, ECF, weight"]
+    WADJ["Sex x age weight adjustment<br/>baseline bucket mean"]
+    OUT["Analysis + optional<br/>IndividualIDTracking CSV"]
+    DEMO --> STATIC --> ADJ --> LAG --> NUT --> EI --> KH --> WADJ --> OUT
+  end
+
+  DM -->|"1 nutrient keys"| NUT
+  DM -->|"2 kcal/g coeffs"| EI
+  DM2 -->|"3 food to nutrient map"| NUT
+  SM -->|"4 Food* models"| STATIC
+  FM -->|"5 cohort targets"| ADJ
