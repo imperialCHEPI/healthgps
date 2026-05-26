@@ -1,7 +1,6 @@
 #include "simulation.h"
 #include "HealthGPS.Core/thread_util.h"
 #include "HealthGPS.Core/univariate_summary.h"
-#include "HealthGPS/agent_debug_log.h"
 #include "converter.h"
 #include "info_message.h"
 #include "mtrandom.h"
@@ -164,12 +163,6 @@ void Simulation::initialise_population() {
 
 void Simulation::update_population() {
     /* Note: order is very important */
-    // #region agent log
-    agent_debug::log("simulation.cpp:update_population", "enter", "B",
-                     fmt::format("{{\"scenario\":\"{}\",\"time\":{},\"run\":{}}}",
-                                 context_.identifier(), context_.time_now(),
-                                 context_.current_run()));
-    // #endregion
 
     // update basic information: demographics + diseases
     demographic_->update_population(context_, *disease_);
@@ -188,11 +181,6 @@ void Simulation::update_population() {
 
     // Publish results to data logger
     analysis_->update_population(context_);
-    // #region agent log
-    agent_debug::log("simulation.cpp:update_population", "exit", "B",
-                     fmt::format("{{\"scenario\":\"{}\",\"time\":{}}}", context_.identifier(),
-                                 context_.time_now()));
-    // #endregion
 }
 
 void Simulation::update_net_immigration() {
