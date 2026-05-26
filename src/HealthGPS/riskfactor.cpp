@@ -1,5 +1,4 @@
 #include "riskfactor.h"
-#include "HealthGPS/agent_debug_log.h"
 #include <fmt/format.h>
 #include <iostream>
 
@@ -72,25 +71,11 @@ void RiskFactorModule::initialise_population(RuntimeContext &context) {
 }
 
 void RiskFactorModule::update_population(RuntimeContext &context) {
-    // #region agent log
-    agent_debug::log("riskfactor.cpp:update_population", "static_update_begin", "C",
-                     fmt::format("{{\"time\":{}}}", context.time_now()));
-    // #endregion
     auto &static_model = models_.at(RiskFactorModelType::Static);
     static_model->update_risk_factors(context);
-    // #region agent log
-    agent_debug::log("riskfactor.cpp:update_population", "static_update_end", "C",
-                     fmt::format("{{\"time\":{}}}", context.time_now()));
-    agent_debug::log("riskfactor.cpp:update_population", "dynamic_update_begin", "D",
-                     fmt::format("{{\"time\":{}}}", context.time_now()));
-    // #endregion
 
     auto &dynamic_model = models_.at(RiskFactorModelType::Dynamic);
     dynamic_model->update_risk_factors(context);
-    // #region agent log
-    agent_debug::log("riskfactor.cpp:update_population", "dynamic_update_end", "D",
-                     fmt::format("{{\"time\":{}}}", context.time_now()));
-    // #endregion
 }
 
 std::unique_ptr<RiskFactorModule>
