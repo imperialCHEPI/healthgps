@@ -1,5 +1,6 @@
 #include "pch.h"
 
+#include "TestConsoleCapture.h"
 #include "HealthGPS.Core/api.h"
 #include "HealthGPS.Core/exception.h"
 #include "HealthGPS.Core/identifier.h"
@@ -510,6 +511,85 @@ TEST(IncomeStratumAdjustment, LoadExpectedFailsWhenCsvFilesMissing) {
     // MAHIMA: Phase-3 parser/load failure coverage for missing files.
     // We assert fail-fast behavior so invalid baseline-adjustment paths are reported immediately.
     EXPECT_THROW((void)input::load_risk_factor_expected(config), core::HgpsException);
+}
+
+TEST(IncomeStratumAdjustment, AdjustmentStratumPersistsAfterFinalIncomeCategories) {
+    using namespace hgps;
+
+    core::DataTable data;
+    auto inputs = create_minimal_model_input(data);
+    auto bus = std::make_shared<DefaultEventBus>();
+    auto channel = SyncChannel{};
+    auto scenario = std::make_unique<BaselineScenario>(channel);
+    auto context = RuntimeContext(bus, inputs, std::move(scenario));
+    context.reset_population(8);
+
+    for (std::size_t i = 0; i < context.population().size(); ++i) {
+        auto &p = context.population()[i];
+        p.gender = (i % 2 == 0) ? core::Gender::male : core::Gender::female;
+        p.age = 0;
+        p.risk_factors["income"_id] = 400.0 + static_cast<double>(i) * 50.0;
+    }
+
+    const auto factor = core::Identifier("foodcarbohydrate");
+    auto overall_expected = make_expected_table_with_income_and_pa(factor, 100.0, 600.0, 1.8);
+    auto q1_expected = make_expected_table_with_income_and_pa(factor, 90.0, 600.0, 1.6);
+    auto q2_expected = make_expected_table_with_income_and_pa(factor, 110.0, 600.0, 2.0);
+    std::vector<IncomeStratumExpectedTableEntry> stratum_tables{
+        {"Quintile1", q1_expected},
+        {"Quintile2", q2_expected},
+    };
+    auto bundle =
+        create_test_static_linear_model_bundle(overall_expected, stratum_tables, true, 2u);
+
+    bundle->model->generate_risk_factors(context);
+
+    for (const auto &p : context.population()) {
+        if (!p.is_active()) {
+            continue;
+        }
+        EXPECT_TRUE(p.has_income_adjustment_stratum);
+        EXPECT_LT(p.income_adjustment_stratum, 2u);
+        EXPECT_NE(core::Income::unknown, p.income);
+    }
+}
+
+TEST(IncomeStratumAdjustment, GeneratePrintsIncomeStratumAndFinalCategoryTables) {
+    using namespace hgps;
+    using hgps::test::capture_stdout;
+
+    core::DataTable data;
+    auto inputs = create_minimal_model_input(data);
+    auto bus = std::make_shared<DefaultEventBus>();
+    auto channel = SyncChannel{};
+    auto scenario = std::make_unique<BaselineScenario>(channel);
+    auto context = RuntimeContext(bus, inputs, std::move(scenario));
+    context.reset_population(8);
+
+    for (std::size_t i = 0; i < context.population().size(); ++i) {
+        auto &p = context.population()[i];
+        p.gender = (i % 2 == 0) ? core::Gender::male : core::Gender::female;
+        p.age = 0;
+        p.risk_factors["income"_id] = 300.0 + static_cast<double>(i) * 80.0;
+    }
+
+    const auto factor = core::Identifier("foodcarbohydrate");
+    auto overall_expected = make_expected_table_with_income_and_pa(factor, 100.0, 600.0, 1.8);
+    auto q1_expected = make_expected_table_with_income_and_pa(factor, 90.0, 600.0, 1.6);
+    auto q2_expected = make_expected_table_with_income_and_pa(factor, 110.0, 600.0, 2.0);
+    std::vector<IncomeStratumExpectedTableEntry> stratum_tables{
+        {"Quintile1", q1_expected},
+        {"Quintile2", q2_expected},
+    };
+    auto bundle =
+        create_test_static_linear_model_bundle(overall_expected, stratum_tables, true, 2u);
+
+    const auto output = capture_stdout([&] { bundle->model->generate_risk_factors(context); });
+
+    EXPECT_NE(output.find("[INCOME BASED FACTOR MEANS ADJUSTMENT][INCOME-STRATUM ASSIGNMENT]"),
+              std::string::npos);
+    EXPECT_NE(output.find("[YEAR 2 UPDATE INCOME CATEGORIES]"), std::string::npos);
+    EXPECT_NE(output.find("Quintile1"), std::string::npos);
 }
 
 TEST(IncomeStratumAdjustment, TrendedYearlyPathKeepsStrataAndFinalIncomeAssigned) {

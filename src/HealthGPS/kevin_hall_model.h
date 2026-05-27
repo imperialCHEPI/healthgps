@@ -49,7 +49,7 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
         const std::unordered_map<core::Identifier, std::optional<double>> &food_prices,
         const std::unordered_map<core::Gender, std::vector<double>> &weight_quantiles,
         const std::vector<double> &epa_quantiles,
-        const std::unordered_map<core::Gender, std::vector<HeightModelParams>> &height_params);
+        std::unordered_map<core::Gender, std::vector<HeightModelParams>> height_params);
 
     RiskFactorModelType type() const noexcept override;
 
@@ -204,9 +204,9 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
         Population &population,
         std::optional<std::unordered_map<core::Gender, double>> power = std::nullopt,
         std::optional<unsigned> age = std::nullopt) const;
-    KevinHallAdjustmentTable
-    compute_mean_weight_for_height(Population &population,
-                                   std::optional<unsigned> age = std::nullopt) const;
+    KevinHallAdjustmentTable compute_mean_weight_for_height(Population &population,
+                                                            std::optional<unsigned> age =
+                                                                std::nullopt) const;
 
     /// @brief Initialises the height of a person.
     /// @param context The runtime context
@@ -222,6 +222,9 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @param W_power_mean The mean hweight power for the person's sex and age
     void update_height(RuntimeContext &context, Person &person, double W_power_mean) const;
 
+    /// @brief Print height stratum and final-income-category summary tables (baseline only).
+    void print_height_summary_tables(RuntimeContext &context, std::string_view phase) const;
+
     const std::unordered_map<core::Identifier, double> &energy_equation_;
     const std::unordered_map<core::Identifier, core::DoubleInterval> &nutrient_ranges_;
     const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
@@ -229,7 +232,7 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     const std::unordered_map<core::Identifier, std::optional<double>> &food_prices_;
     const std::unordered_map<core::Gender, std::vector<double>> &weight_quantiles_;
     const std::vector<double> &epa_quantiles_;
-    const std::unordered_map<core::Gender, std::vector<HeightModelParams>> &height_params_;
+    std::unordered_map<core::Gender, std::vector<HeightModelParams>> height_params_;
 
     // Model parameters.
     static constexpr int kevin_hall_age_min = 19; // Start age for the main Kevin Hall model.
