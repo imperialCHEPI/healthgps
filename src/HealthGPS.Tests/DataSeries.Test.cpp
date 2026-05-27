@@ -12,8 +12,7 @@ TEST(DataSeries, HasIncomeChannelReflectsCategorySetup) {
     EXPECT_FALSE(series.has_income_channel(Gender::male, Income::unknown, "deaths"));
     EXPECT_FALSE(series.has_income_channel(Gender::female, Income::low, "count"));
 
-    series.add_income_channels_for_categories({"deaths", "count"},
-                                              {Income::unknown, Income::low});
+    series.add_income_channels_for_categories({"deaths", "count"}, {Income::unknown, Income::low});
 
     EXPECT_TRUE(series.has_income_channel(Gender::male, Income::unknown, "deaths"));
     EXPECT_TRUE(series.has_income_channel(Gender::female, Income::low, "count"));
