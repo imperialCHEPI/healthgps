@@ -93,12 +93,23 @@ TEST(KevinHallWeightValidation, ValidateWeightThrowsWhenOutsideConfiguredRange) 
     person.region = "region1";
     person.ethnicity = "ethnicity1";
     person.income = Income::low;
-    person.risk_factors["Weight"_id] = 150.0;
+    person.risk_factors["Weight"_id] = 100.0;
     person.risk_factors["Height"_id] = 165.0;
     person.risk_factors["BMI"_id] = 28.0;
     person.risk_factors["EnergyIntake"_id] = 2000.0;
 
     EXPECT_NO_THROW(kevin_hall->validate_weight_in_config_range(context, person, "unit_test"));
+
+    person.risk_factors["Weight"_id] = 150.0;
+    try {
+        kevin_hall->validate_weight_in_config_range(context, person, "unit_test");
+        FAIL() << "Expected weight validation to throw for weight above range";
+    } catch (const HgpsException &ex) {
+        const std::string message = ex.what();
+        EXPECT_NE(message.find("above maximum"), std::string::npos);
+        EXPECT_NE(message.find("person_id=42"), std::string::npos);
+        EXPECT_NE(message.find("unit_test"), std::string::npos);
+    }
 
     person.risk_factors["Weight"_id] = 200.0;
     try {

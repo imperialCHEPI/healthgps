@@ -39,6 +39,7 @@ target_sources(
             "Population.Test.cpp"
             "PredictorResolver.Test.cpp"
             "DemographicSummary.Test.cpp"
+            "DataSeries.Test.cpp"
             "ModelParserFinch.Test.cpp"
             "KevinHallWeightValidation.Test.cpp"
             "EventMonitor.Test.cpp"
