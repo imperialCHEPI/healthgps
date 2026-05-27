@@ -105,10 +105,9 @@ std::vector<HeightRow> load_height_params_csv(const std::filesystem::path &path,
     if (doc.GetRowCount() > 0) {
         const auto slope_header = doc.GetCell<std::string>(slope_column, 0);
         const auto std_header = doc.GetCell<std::string>(std_column, 0);
-        const bool has_header =
-            hgps::core::case_insensitive::equals(slope_header, "slope") &&
-            (hgps::core::case_insensitive::equals(std_header, "std") ||
-             hgps::core::case_insensitive::equals(std_header, "stddev"));
+        const bool has_header = hgps::core::case_insensitive::equals(slope_header, "slope") &&
+                                (hgps::core::case_insensitive::equals(std_header, "std") ||
+                                 hgps::core::case_insensitive::equals(std_header, "stddev"));
         if (has_header) {
             start_row = 1;
         }
