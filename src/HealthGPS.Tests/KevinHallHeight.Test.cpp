@@ -138,9 +138,9 @@ TEST(KevinHallHeight, KeyedThreeColumnCsvLoads) {
         GTEST_SKIP() << "FINCH input data not available at " << finch.string();
     }
 
-    const std::string rows =
-        ",slope,std\nincome_quintile1,0.11,0.041\nincome_quintile2,0.12,0.042\nincome_quintile3,0.13,"
-        "0.043\nincome_quintile4,0.14,0.044\nincome_quintile5,0.15,0.045\n";
+    const std::string rows = ",slope,std\nincome_quintile1,0.11,0.041\nincome_quintile2,0.12,0."
+                             "042\nincome_quintile3,0.13,"
+                             "0.043\nincome_quintile4,0.14,0.044\nincome_quintile5,0.15,0.045\n";
     auto female_csv = create_temp_height_csv("height_female_keyed.csv", rows);
     auto male_csv = create_temp_height_csv("height_male_keyed.csv", rows);
 

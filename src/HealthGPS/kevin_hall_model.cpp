@@ -81,11 +81,10 @@ struct HeightBucketSummary {
     double height_sum{0.0};
 };
 
-const hgps::HeightModelParams &
-resolve_height_params_for_person(const hgps::Person &person,
-                                 const std::unordered_map<hgps::core::Gender,
-                                                          std::vector<hgps::HeightModelParams>>
-                                     &height_params) {
+const hgps::HeightModelParams &resolve_height_params_for_person(
+    const hgps::Person &person,
+    const std::unordered_map<hgps::core::Gender, std::vector<hgps::HeightModelParams>>
+        &height_params) {
     const auto by_gender = height_params.find(person.gender);
     if (by_gender == height_params.end() || by_gender->second.empty()) {
         throw hgps::core::HgpsException("Height model parameters missing for person gender");
@@ -100,7 +99,8 @@ resolve_height_params_for_person(const hgps::Person &person,
 
 void print_height_stratum_assignment_table(
     const hgps::Population &population,
-    const std::unordered_map<hgps::core::Gender, std::vector<hgps::HeightModelParams>> &height_params,
+    const std::unordered_map<hgps::core::Gender, std::vector<hgps::HeightModelParams>>
+        &height_params,
     std::size_t bucket_count, int year, std::string_view phase) {
     if (bucket_count == 0) {
         return;
@@ -216,7 +216,7 @@ void print_height_by_final_income_category_table(const hgps::Population &populat
     out << "+----------+--------+-------------+-------------+-------------+\n";
     const std::vector<std::string> labels =
         categories == "4" ? std::vector<std::string>{"Low", "LowerMid", "UpperMid", "High"}
-                        : std::vector<std::string>{"Low", "Middle", "High"};
+                          : std::vector<std::string>{"Low", "Middle", "High"};
     for (std::size_t i = 0; i < summaries.size(); ++i) {
         const auto &summary = summaries[i];
         out << "| " << std::setw(8) << std::left << labels[i] << std::right << " | " << std::setw(6)
@@ -1105,12 +1105,12 @@ KevinHallModel::compute_mean_weight(Population &population,
 
     return means;
 }
-//MAHIMA: This function computes the mean weight for height for each person in the population.
-// It uses the height model parameters to compute the mean weight for height for each person.
-// It returns a table of mean weight for height by sex and age.
-// The height model parameters are stored in the height_params_ member variable.
-// The height model parameters are indexed by gender and income adjustment stratum.
-// The height model parameters are stored in the height_params_ member variable.
+// MAHIMA: This function computes the mean weight for height for each person in the population.
+//  It uses the height model parameters to compute the mean weight for height for each person.
+//  It returns a table of mean weight for height by sex and age.
+//  The height model parameters are stored in the height_params_ member variable.
+//  The height model parameters are indexed by gender and income adjustment stratum.
+//  The height model parameters are stored in the height_params_ member variable.
 KevinHallAdjustmentTable
 KevinHallModel::compute_mean_weight_for_height(Population &population,
                                                std::optional<unsigned> age) const {
@@ -1201,7 +1201,7 @@ void KevinHallModel::print_height_summary_tables(RuntimeContext &context,
     }
 
     print_height_stratum_assignment_table(context.population(), height_params_, bucket_count,
-                                            context.time_now(), phase);
+                                          context.time_now(), phase);
 
     const auto &categories = context.inputs().project_requirements().income.categories;
     print_height_by_final_income_category_table(context.population(), categories,
@@ -1255,10 +1255,9 @@ KevinHallModelDefinition::KevinHallModelDefinition(
 }
 
 std::unique_ptr<RiskFactorModel> KevinHallModelDefinition::create_model() const {
-    return std::make_unique<KevinHallModel>(expected_, expected_trend_, trend_steps_,
-                                            energy_equation_, nutrient_ranges_, nutrient_equations_,
-                                            food_prices_, weight_quantiles_, epa_quantiles_,
-                                            height_params_);
+    return std::make_unique<KevinHallModel>(
+        expected_, expected_trend_, trend_steps_, energy_equation_, nutrient_ranges_,
+        nutrient_equations_, food_prices_, weight_quantiles_, epa_quantiles_, height_params_);
 }
 
 } // namespace hgps

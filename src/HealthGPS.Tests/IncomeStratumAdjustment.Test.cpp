@@ -1,6 +1,5 @@
 #include "pch.h"
 
-#include "TestConsoleCapture.h"
 #include "HealthGPS.Core/api.h"
 #include "HealthGPS.Core/exception.h"
 #include "HealthGPS.Core/identifier.h"
@@ -11,6 +10,7 @@
 #include "HealthGPS/risk_factor_adjustable_model.h"
 #include "HealthGPS/runtime_context.h"
 #include "HealthGPS/static_linear_model.h"
+#include "TestConsoleCapture.h"
 
 #include <algorithm>
 #include <fstream>
