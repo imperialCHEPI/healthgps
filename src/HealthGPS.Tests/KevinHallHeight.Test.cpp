@@ -90,7 +90,7 @@ TEST(KevinHallHeight, MultiRowHeightLoadsWhenMatchingStrataCount) {
     }
 
     const std::string rows =
-        "slope,std\n0.11,0.041\n0.12,0.042\n0.13,0.043\n0.14,0.044\n0.15,0.045\n";
+        ",slope,std\nq1,0.11,0.041\nq2,0.12,0.042\nq3,0.13,0.043\nq4,0.14,0.044\nq5,0.15,0.045\n";
     auto female_csv = create_temp_height_csv("height_female_multi.csv", rows);
     auto male_csv = create_temp_height_csv("height_male_multi.csv", rows);
 

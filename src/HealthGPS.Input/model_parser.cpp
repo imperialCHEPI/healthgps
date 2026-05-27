@@ -91,20 +91,24 @@ std::vector<HeightRow> load_height_params_csv(const std::filesystem::path &path,
     rapidcsv::Document doc(path.string(), rapidcsv::LabelParams(-1, -1),
                            rapidcsv::SeparatorParams(delimiter));
 
-    if (doc.GetColumnCount() != 2) {
+    const auto column_count = doc.GetColumnCount();
+    if (column_count != 2 && column_count != 3) {
         throw hgps::core::HgpsException{
-            fmt::format("Height CSV file {} must have exactly 2 columns (slope,std). Found {} "
-                        "columns",
-                        csv_filename, doc.GetColumnCount())};
+            fmt::format("Height CSV file {} must have 2 columns (slope,std) or 3 columns "
+                        "(key,slope,std). Found {} columns",
+                        csv_filename, column_count)};
     }
+    const std::size_t slope_column = column_count == 3 ? 1u : 0u;
+    const std::size_t std_column = column_count == 3 ? 2u : 1u;
 
     std::size_t start_row = 0;
     if (doc.GetRowCount() > 0) {
-        const auto first = doc.GetCell<std::string>(0, 0);
-        const auto second = doc.GetCell<std::string>(1, 0);
-        const bool has_header = hgps::core::case_insensitive::equals(first, "slope") &&
-                                (hgps::core::case_insensitive::equals(second, "std") ||
-                                 hgps::core::case_insensitive::equals(second, "stddev"));
+        const auto slope_header = doc.GetCell<std::string>(slope_column, 0);
+        const auto std_header = doc.GetCell<std::string>(std_column, 0);
+        const bool has_header =
+            hgps::core::case_insensitive::equals(slope_header, "slope") &&
+            (hgps::core::case_insensitive::equals(std_header, "std") ||
+             hgps::core::case_insensitive::equals(std_header, "stddev"));
         if (has_header) {
             start_row = 1;
         }
@@ -113,8 +117,8 @@ std::vector<HeightRow> load_height_params_csv(const std::filesystem::path &path,
     std::vector<HeightRow> rows;
     rows.reserve(doc.GetRowCount());
     for (std::size_t row_idx = start_row; row_idx < doc.GetRowCount(); ++row_idx) {
-        rows.push_back(HeightRow{.slope = doc.GetCell<double>(0, row_idx),
-                                 .stddev = doc.GetCell<double>(1, row_idx)});
+        rows.push_back(HeightRow{.slope = doc.GetCell<double>(slope_column, row_idx),
+                                 .stddev = doc.GetCell<double>(std_column, row_idx)});
     }
 
     if (rows.empty()) {
