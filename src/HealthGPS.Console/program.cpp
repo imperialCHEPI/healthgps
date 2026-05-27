@@ -3,7 +3,6 @@
 #include "HealthGPS.Input/configuration.h"
 #include "HealthGPS.Input/csvparser.h"
 #include "HealthGPS.Input/model_parser.h"
-#include "HealthGPS/agent_debug_log.h"
 #include "HealthGPS/api.h"
 #include "HealthGPS/event_bus.h"
 #include "command_options.h"
@@ -232,10 +231,6 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
 
 #ifdef CATCH_EXCEPTIONS
     } catch (const std::exception &ex) {
-        // #region agent log
-        hgps::agent_debug::log("program.cpp:main", "main_caught_exception", "A",
-                               fmt::format("{{\"what\":\"{}\"}}", ex.what()));
-        // #endregion
         fmt::print(fg(fmt::color::red), "\n\nFailed with message: {}.\n\n", ex.what());
 
         // Rethrow exception so it can be handled by OS's default handler

@@ -1,5 +1,4 @@
 #include "runner.h"
-#include "HealthGPS/agent_debug_log.h"
 #include "finally.h"
 #include "runner_message.h"
 
@@ -114,46 +113,25 @@ void Runner::cancel() noexcept {
 
 void Runner::run_model_thread(const std::stop_token &token, Simulation &model, unsigned int run,
                               const unsigned int seed) {
-    // #region agent log
-    agent_debug::log(
-        "runner.cpp:run_model_thread", "thread_start", "A",
-        fmt::format("{{\"model\":\"{}\",\"run\":{},\"seed\":{}}}", model.name(), run, seed));
-    // #endregion
     auto run_start = std::chrono::steady_clock::now();
-    try {
-        notify(std::make_unique<RunnerEventMessage>(
-            fmt::format("{} - {}", runner_id_, model.name()), RunnerAction::run_begin, run));
+    notify(std::make_unique<RunnerEventMessage>(fmt::format("{} - {}", runner_id_, model.name()),
+                                                RunnerAction::run_begin, run));
 
-        /* Create the simulation engine */
-        adevs::Simulator<int> sim;
+    /* Create the simulation engine */
+    adevs::Simulator<int> sim;
 
-        /* Update model and add to engine */
-        model.setup_run(run, seed);
-        sim.add(&model);
+    /* Update model and add to engine */
+    model.setup_run(run, seed);
+    sim.add(&model);
 
-        /* Run until the next event is at infinity */
-        while (!token.stop_requested() && sim.next_event_time() < adevs_inf<adevs::Time>()) {
-            sim.exec_next_event();
-        }
-
-        ElapsedTime elapsed = std::chrono::steady_clock::now() - run_start;
-        notify(
-            std::make_unique<RunnerEventMessage>(fmt::format("{} - {}", runner_id_, model.name()),
-                                                 RunnerAction::run_end, run, elapsed.count()));
-        // #region agent log
-        agent_debug::log(
-            "runner.cpp:run_model_thread", "thread_finished_ok", "A",
-            fmt::format("{{\"model\":\"{}\",\"elapsed_ms\":{}}}", model.name(), elapsed.count()));
-        // #endregion
-    } catch (const std::exception &ex) {
-        // #region agent log
-        agent_debug::log(
-            "runner.cpp:run_model_thread", "thread_exception", "A",
-            fmt::format("{{\"model\":\"{}\",\"what\":\"{}\"}}", model.name(), ex.what()));
-        // #endregion
-        fmt::print(stderr, "FATAL simulation thread ({}): {}\n", model.name(), ex.what());
-        throw;
+    /* Run until the next event is at infinity */
+    while (!token.stop_requested() && sim.next_event_time() < adevs_inf<adevs::Time>()) {
+        sim.exec_next_event();
     }
+
+    ElapsedTime elapsed = std::chrono::steady_clock::now() - run_start;
+    notify(std::make_unique<RunnerEventMessage>(fmt::format("{} - {}", runner_id_, model.name()),
+                                                RunnerAction::run_end, run, elapsed.count()));
 }
 
 void Runner::notify(std::unique_ptr<hgps::EventMessage> message) {
