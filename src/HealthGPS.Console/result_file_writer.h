@@ -24,8 +24,10 @@ class ResultFileWriter final : public ResultWriter {
     /// @param info The associated experiment information
     /// @param write_income_csv When true, write income-based CSV files (one per category). When
     /// false, do not.
+    /// @param income_categories Final person.income bucket count from project_requirements ("3"
+    /// or "4"); controls which *_Income.csv files are created.
     ResultFileWriter(const std::filesystem::path &file_name, ExperimentInfo info,
-                     bool write_income_csv = true);
+                     bool write_income_csv = true, std::string income_categories = "4");
 
     ResultFileWriter(const ResultFileWriter &) = delete;
     ResultFileWriter &operator=(const ResultFileWriter &) = delete;
@@ -46,6 +48,7 @@ class ResultFileWriter final : public ResultWriter {
     std::map<core::Income, std::unique_ptr<std::mutex>> income_mutexes_;
     ExperimentInfo info_;
     bool write_income_csv_{true};
+    std::string income_categories_{"4"};
     std::filesystem::path base_filename_;
     std::atomic<bool> first_row_{true};
     std::mutex lock_mutex_;
@@ -98,7 +101,9 @@ class ResultFileWriter final : public ResultWriter {
     std::vector<core::Income>
     get_available_income_categories(const hgps::ResultEventMessage &message) const;
 
+    void merge_configured_income_strata(std::vector<core::Income> &categories) const;
     void initialize_income_streams(const hgps::ResultEventMessage &message);
+    void ensure_income_stream_open(core::Income income, const hgps::ResultEventMessage &message);
     void write_income_csv_channels(const hgps::ResultEventMessage &message);
 };
 } // namespace hgps

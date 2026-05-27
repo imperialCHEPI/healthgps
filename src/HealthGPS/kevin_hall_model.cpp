@@ -5,14 +5,43 @@
 #include "sync_message.h"
 
 #include <algorithm>
+#include <iomanip>
 #include <iostream>
 #include <iterator>
+#include <sstream>
 #include <utility>
 
 namespace { // anonymous namespace
 
 using KevinHallAdjustmentMessage =
     hgps::SyncDataMessage<hgps::UnorderedMap2d<hgps::core::Gender, int, double>>;
+
+std::string income_category_label(hgps::core::Income income) {
+    switch (income) {
+    case hgps::core::Income::low:
+        return "low";
+    case hgps::core::Income::lowermiddle:
+        return "lowermiddle";
+    case hgps::core::Income::middle:
+        return "middle";
+    case hgps::core::Income::uppermiddle:
+        return "uppermiddle";
+    case hgps::core::Income::high:
+        return "high";
+    default:
+        return "unknown";
+    }
+}
+
+std::string gender_label(const hgps::Person &person) {
+    if (person.gender == hgps::core::Gender::male) {
+        return "male";
+    }
+    if (person.gender == hgps::core::Gender::female) {
+        return "female";
+    }
+    return "unknown";
+}
 
 } // anonymous namespace
 
@@ -58,6 +87,15 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
 
     // Adjust weight mean to match expected.
     adjust_risk_factors(context, {"Weight"_id}, std::nullopt, true);
+    // MAHIMA: Validate weight after adjusting the weight mean to match expected. This is done after
+    // adjusting the weight mean to match expected to ensure that the weight is within the
+    // configured range.
+    for (const auto &person : context.population()) {
+        if (person.is_active()) {
+            validate_weight_in_config_range(context, person,
+                                            "generate_risk_factors:after_weight_mean_adjustment");
+        }
+    }
 
     // Compute weight power means by sex and age.
     auto W_power_means = compute_mean_weight(context.population(), height_slope_);
@@ -66,7 +104,7 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
     for (auto &person : context.population()) {
         double W_power_mean = W_power_means.at(person.gender, person.age);
         initialise_height(context, person, W_power_mean, context.random());
-        initialise_kevin_hall_state(person);
+        initialise_kevin_hall_state(context, person);
         compute_bmi(person);
     }
 }
@@ -126,6 +164,8 @@ void KevinHallModel::update_newborns(RuntimeContext &context) const {
 
         double adjustment = adjustments.at(person.gender, person.age);
         person.risk_factors.at("Weight"_id) += adjustment;
+        validate_weight_in_config_range(context, person,
+                                        "update_newborns:after_newborn_weight_adjustment");
     }
 
     // NOTE: FOR REFACTORING: End of semi-redundant block.
@@ -142,7 +182,7 @@ void KevinHallModel::update_newborns(RuntimeContext &context) const {
 
         double W_power_mean = W_power_means.at(person.gender, person.age);
         initialise_height(context, person, W_power_mean, context.random());
-        initialise_kevin_hall_state(person);
+        initialise_kevin_hall_state(context, person);
     }
 }
 
@@ -169,7 +209,7 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
         if (person.age < kevin_hall_age_min) {
             initialise_weight(context, person);
         } else {
-            kevin_hall_run(person);
+            kevin_hall_run(context, person);
         }
     }
 
@@ -191,9 +231,9 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
         }
 
         if (person.age < kevin_hall_age_min) {
-            initialise_kevin_hall_state(person, adjustment);
+            initialise_kevin_hall_state(context, person, adjustment);
         } else {
-            adjust_weight(person, adjustment);
+            adjust_weight(context, person, adjustment);
         }
     }
 
@@ -452,12 +492,14 @@ void KevinHallModel::compute_energy_intake(Person &person) const {
     }
 }
 
-void KevinHallModel::initialise_kevin_hall_state(Person &person,
+void KevinHallModel::initialise_kevin_hall_state(const RuntimeContext &context, Person &person,
                                                  std::optional<double> adjustment) const {
 
     // Apply optional weight adjustment.
     if (adjustment.has_value()) {
         person.risk_factors.at("Weight"_id) += adjustment.value();
+        validate_weight_in_config_range(context, person,
+                                        "initialise_kevin_hall_state:after_weight_adjustment");
     }
 
     // Get already computed values.
@@ -526,7 +568,7 @@ void KevinHallModel::initialise_kevin_hall_state(Person &person,
     person.risk_factors["EnergyExpenditure"_id] = EE;
 }
 
-void KevinHallModel::kevin_hall_run(Person &person) const {
+void KevinHallModel::kevin_hall_run(const RuntimeContext &context, Person &person) const {
 
     // Get initial body weight.
     double BW_0 = person.risk_factors.at("Weight"_id);
@@ -604,6 +646,7 @@ void KevinHallModel::kevin_hall_run(Person &person) const {
     person.risk_factors.at("BodyFat"_id) = F;
     person.risk_factors.at("LeanTissue"_id) = L;
     person.risk_factors.at("Weight"_id) = BW;
+    validate_weight_in_config_range(context, person, "kevin_hall_run");
 }
 
 double KevinHallModel::compute_G(double CI, double CI_0, double G_0) const {
@@ -676,9 +719,11 @@ void KevinHallModel::initialise_weight(RuntimeContext &context, Person &person) 
         get_expected(context, person.gender, person.age, "Weight"_id, std::nullopt, true);
     double w_quantile = get_weight_quantile(epa_quantile, person.gender);
     person.risk_factors["Weight"_id] = w_expected * w_quantile;
+    validate_weight_in_config_range(context, person, "initialise_weight");
 }
 
-void KevinHallModel::adjust_weight(Person &person, double adjustment) const {
+void KevinHallModel::adjust_weight(const RuntimeContext &context, Person &person,
+                                   double adjustment) const {
     double H = person.risk_factors.at("Height"_id);
     double BW_0 = person.risk_factors.at("Weight"_id);
     double F_0 = person.risk_factors.at("BodyFat"_id);
@@ -725,6 +770,72 @@ void KevinHallModel::adjust_weight(Person &person, double adjustment) const {
 
     // Set new energy expenditure (may not exist yet).
     person.risk_factors["EnergyExpenditure"_id] = EE;
+    validate_weight_in_config_range(context, person, "adjust_weight");
+}
+
+// MAHIMA: Added context and phase parameters to the validate_weight_in_config_range method
+//  to provide more detailed error messages and allow for more specific validation in different
+//  contexts.
+// The context parameter is used to access the context's mapping and time information,
+//  while the phase parameter is used to provide a more specific message about the validation error.
+void KevinHallModel::validate_weight_in_config_range(const RuntimeContext &context,
+                                                     const Person &person,
+                                                     std::string_view phase) const {
+    const auto weight_key = "Weight"_id;
+    if (!person.risk_factors.contains(weight_key)) {
+        return;
+    }
+
+    const double weight = person.risk_factors.at(weight_key);
+    hgps::OptionalInterval range;
+    try {
+        range = context.mapping().at(weight_key).range();
+    } catch (const std::out_of_range &) {
+        return;
+    }
+    if (!range.has_value()) {
+        return;
+    }
+
+    if (weight >= range->lower() && weight <= range->upper()) {
+        return;
+    }
+
+    const char *boundary = (weight < range->lower()) ? "below minimum" : "above maximum";
+
+    // MAHIMA: Throw detailed error message with all relevant information about the person and the
+    // context.
+    std::ostringstream message;
+    message << std::fixed << std::setprecision(6);
+    message << "Weight (" << weight << " kg) is " << boundary << " configured range ["
+            << range->lower() << ", " << range->upper() << "] kg during phase '" << phase << "'.\n"
+            << "  person_id=" << person.id() << "\n"
+            << "  age=" << person.age << " years\n"
+            << "  gender=" << gender_label(person) << "\n"
+            << "  region=" << person.region << "\n"
+            << "  ethnicity=" << person.ethnicity << "\n"
+            << "  sector=" << static_cast<int>(person.sector) << "\n"
+            << "  income_category=" << income_category_label(person.income) << "\n"
+            << "  income_continuous=" << person.income_continuous << "\n"
+            << "  simulation_time=" << context.time_now() << "\n"
+            << "  simulation_run=" << context.current_run() << "\n"
+            << "  scenario=" << context.identifier() << "\n"
+            << "  active=" << (person.is_active() ? "true" : "false");
+
+    if (person.risk_factors.contains("Height"_id)) {
+        message << "\n  height_cm=" << person.risk_factors.at("Height"_id);
+    }
+    if (person.risk_factors.contains("BMI"_id)) {
+        message << "\n  bmi=" << person.risk_factors.at("BMI"_id);
+    }
+    if (person.risk_factors.contains("EnergyIntake"_id)) {
+        message << "\n  energy_intake=" << person.risk_factors.at("EnergyIntake"_id);
+    }
+    if (person.risk_factors.contains("PhysicalActivity"_id)) {
+        message << "\n  physical_activity=" << person.risk_factors.at("PhysicalActivity"_id);
+    }
+
+    throw core::HgpsException(message.str());
 }
 
 double KevinHallModel::get_weight_quantile(double epa_quantile, core::Gender sex) const {

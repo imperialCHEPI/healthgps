@@ -88,3 +88,132 @@ TEST(ResultFileWriter, IncomeCsvIncludesZeroCountAgeGenderRows) {
 
     std::filesystem::remove_all(temp_dir);
 }
+
+TEST(ResultFileWriter, FourIncomeCategoriesCreateAllStratumFiles) {
+    using namespace hgps;
+    using namespace hgps::core;
+
+    const auto temp_dir =
+        std::filesystem::temp_directory_path() /
+        ("healthgps_income_4cat_" +
+         std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()));
+    std::filesystem::create_directories(temp_dir);
+    const auto base_file = temp_dir / "result.json";
+
+    const std::vector<Income> strata = {Income::low, Income::lowermiddle, Income::uppermiddle,
+                                        Income::high};
+
+    ModelResult result(1u);
+    result.series.add_channels({"count"});
+    result.series.add_income_channels_for_categories({"count"}, strata);
+    result.population_by_income = ResultByIncome{};
+    result.population_by_income->low = 1.0;
+    result.series.at(Gender::male, Income::low, "count").at(0) = 1.0;
+
+    const auto message = ResultEventMessage("baseline", 1u, 2022, std::move(result));
+    auto info = ExperimentInfo{
+        .model = "test", .version = "1", .intervention = "none", .job_id = 1, .seed = 1u};
+
+    {
+        ResultFileWriter writer(base_file, info, true, "4");
+        writer.write(message);
+    }
+
+    EXPECT_TRUE(std::filesystem::exists(temp_dir / "result_LowIncome.csv"));
+    EXPECT_TRUE(std::filesystem::exists(temp_dir / "result_LowerMiddleIncome.csv"));
+    EXPECT_TRUE(std::filesystem::exists(temp_dir / "result_UpperMiddleIncome.csv"));
+    EXPECT_TRUE(std::filesystem::exists(temp_dir / "result_HighIncome.csv"));
+    EXPECT_FALSE(std::filesystem::exists(temp_dir / "result_MiddleIncome.csv"));
+
+    std::filesystem::remove_all(temp_dir);
+}
+
+TEST(ResultFileWriter, HighIncomeFileGetsTimestepWhenOnlyHighHasPopulation) {
+    using namespace hgps;
+    using namespace hgps::core;
+
+    const auto temp_dir =
+        std::filesystem::temp_directory_path() /
+        ("healthgps_income_high_" +
+         std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()));
+    std::filesystem::create_directories(temp_dir);
+    const auto base_file = temp_dir / "result.json";
+
+    const std::vector<Income> strata = {Income::low, Income::lowermiddle, Income::uppermiddle,
+                                        Income::high};
+
+    auto make_message = [&](int year, double high_pop) {
+        ModelResult result(1u);
+        result.series.add_channels({"count"});
+        result.series.add_income_channels_for_categories({"count"}, strata);
+        result.population_by_income = ResultByIncome{};
+        result.population_by_income->high = high_pop;
+        result.series.at(Gender::male, Income::high, "count").at(0) = high_pop;
+        return ResultEventMessage("intervention", 1u, year, std::move(result));
+    };
+
+    auto info = ExperimentInfo{
+        .model = "test", .version = "1", .intervention = "policy", .job_id = 1, .seed = 1u};
+
+    {
+        ResultFileWriter writer(base_file, info, true, "4");
+        writer.write(make_message(2026, 0.0));
+        writer.write(make_message(2027, 3.0));
+    }
+
+    const auto high_lines = read_lines(temp_dir / "result_HighIncome.csv");
+    ASSERT_GE(high_lines.size(), 3u);
+
+    std::size_t rows_2026 = 0;
+    std::size_t rows_2027 = 0;
+    for (const auto &line : high_lines) {
+        if (line.find(",2026,") != std::string::npos) {
+            ++rows_2026;
+        }
+        if (line.find(",2027,") != std::string::npos) {
+            ++rows_2027;
+        }
+    }
+    EXPECT_EQ(2u, rows_2026);
+    EXPECT_EQ(2u, rows_2027);
+
+    std::filesystem::remove_all(temp_dir);
+}
+
+TEST(ResultFileWriter, ThreeIncomeCategoriesExcludeFourCategoryMiddleStrata) {
+    using namespace hgps;
+    using namespace hgps::core;
+
+    const auto temp_dir =
+        std::filesystem::temp_directory_path() /
+        ("healthgps_income_3cat_" +
+         std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()));
+    std::filesystem::create_directories(temp_dir);
+    const auto base_file = temp_dir / "result.json";
+
+    const std::vector<Income> strata = {Income::low, Income::middle, Income::high};
+
+    ModelResult result(1u);
+    result.series.add_channels({"count"});
+    result.series.add_income_channels_for_categories({"count"}, strata);
+    result.population_by_income = ResultByIncome{};
+    result.population_by_income->middle = 2.0;
+    result.series.at(Gender::female, Income::middle, "count").at(0) = 2.0;
+
+    const auto message = ResultEventMessage("baseline", 1u, 2024, std::move(result));
+    auto info = ExperimentInfo{
+        .model = "test", .version = "1", .intervention = "none", .job_id = 1, .seed = 1u};
+
+    {
+        ResultFileWriter writer(base_file, info, true, "3");
+        writer.write(message);
+    }
+
+    EXPECT_TRUE(std::filesystem::exists(temp_dir / "result_LowIncome.csv"));
+    EXPECT_TRUE(std::filesystem::exists(temp_dir / "result_MiddleIncome.csv"));
+    EXPECT_TRUE(std::filesystem::exists(temp_dir / "result_HighIncome.csv"));
+    EXPECT_FALSE(std::filesystem::exists(temp_dir / "result_LowerMiddleIncome.csv"));
+    EXPECT_FALSE(std::filesystem::exists(temp_dir / "result_UpperMiddleIncome.csv"));
+
+    std::filesystem::remove_all(temp_dir);
+}

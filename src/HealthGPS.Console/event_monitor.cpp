@@ -3,6 +3,7 @@
 #include "HealthGPS/error_message.h"
 #include "HealthGPS/individual_tracking_message.h"
 #include "HealthGPS/info_message.h"
+#include "HealthGPS/result_message.h"
 #include "HealthGPS/runner_message.h"
 
 #include <fmt/color.h>
@@ -37,9 +38,9 @@ EventMonitor::EventMonitor(hgps::EventAggregator &event_bus, ResultWriter &resul
     }));
 
     tg_.run([this] { info_dispatch_thread(); });
-    tg_.run([this] { result_dispatch_thread(); });
-    // MAHIMA: Start tracking dispatch thread so main result and tracking CSV writes run in
-    // parallel.
+    // MAHIMA: Result CSV/JSON writes run synchronously in result_event_handler (no results
+    // queue) so the last baseline/intervention timesteps cannot be dropped when stop() cancels
+    // background threads.
     tg_.run([this] { tracking_dispatch_thread(); });
 }
 
@@ -54,6 +55,12 @@ EventMonitor::~EventMonitor() noexcept {
 void EventMonitor::stop() noexcept {
     tg_context_.cancel_group_execution();
     tg_.wait();
+
+    // Safety net: drain any results still queued (legacy path) before shutdown completes.
+    std::shared_ptr<hgps::EventMessage> m;
+    while (results_queue_.try_pop(m)) {
+        m->accept(*this);
+    }
 }
 
 void EventMonitor::visit(const hgps::RunnerEventMessage &message) {
@@ -86,7 +93,7 @@ void EventMonitor::error_event_handler(const std::shared_ptr<hgps::EventMessage>
 }
 
 void EventMonitor::result_event_handler(std::shared_ptr<hgps::EventMessage> message) {
-    results_queue_.emplace(std::move(message));
+    message->accept(*this);
 }
 
 // MAHIMA: Push to tracking queue only; tracking_dispatch_thread pops and writes to tracking CSV.
@@ -108,21 +115,7 @@ void EventMonitor::info_dispatch_thread() {
     fmt::print(fg(fmt::color::light_blue), "Info event thread exited.\n");
 }
 
-void EventMonitor::result_dispatch_thread() {
-    fmt::print(fg(fmt::color::gray), "Result event thread started...\n");
-    while (!tg_context_.is_group_execution_cancelled()) {
-        std::shared_ptr<hgps::EventMessage> m;
-        if (results_queue_.try_pop(m)) {
-            m->accept(*this);
-        } else {
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        }
-    }
-
-    fmt::print(fg(fmt::color::gray), "Result event thread exited.\n");
-}
-
-// MAHIMA: Runs in parallel with result_dispatch_thread; writes only IndividualIDTracking CSV so
+// MAHIMA: Runs in parallel with synchronous result writes; writes only IndividualIDTracking CSV so
 // main JSON/CSV and tracking CSV are written concurrently for better throughput.
 void EventMonitor::tracking_dispatch_thread() {
     fmt::print(fg(fmt::color::gray), "Tracking result thread started...\n");
@@ -133,6 +126,11 @@ void EventMonitor::tracking_dispatch_thread() {
         } else {
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
+    }
+
+    std::shared_ptr<hgps::EventMessage> m;
+    while (tracking_results_queue_.try_pop(m)) {
+        m->accept(*this);
     }
 
     fmt::print(fg(fmt::color::gray), "Tracking result thread exited.\n");

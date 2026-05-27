@@ -1,22 +1,24 @@
+#include <chrono>
+#include <ctime>
+#include <fstream>
+#include <sstream>
+#include <unordered_set>
+#include <utility>
+
+#include <oneapi/tbb/parallel_for_each.h>
+
+#include <fmt/color.h>
+#include <fmt/core.h>
+#include <nlohmann/json.hpp>
+
 #include "result_file_writer.h"
 
 #include "HealthGPS.Core/forward_type.h"
 #include "HealthGPS/data_series.h"
 
-#include <oneapi/tbb/parallel_for_each.h>
-
-#include <chrono>
-#include <ctime>
-#include <fmt/color.h>
-#include <fmt/core.h>
-#include <fstream>
-#include <nlohmann/json.hpp>
-#include <sstream>
-#include <unordered_set>
-#include <utility>
-
 namespace hgps {
 namespace {
+
 /// Numeric value for mean_income_category column (matches Person::income_to_value).
 /// Each income-stratified file contains only that category, so mean_income_category is fixed.
 double income_category_numeric(core::Income inc) {
@@ -37,8 +39,9 @@ double income_category_numeric(core::Income inc) {
 } // namespace
 
 ResultFileWriter::ResultFileWriter(const std::filesystem::path &file_name, ExperimentInfo info,
-                                   bool write_income_csv)
-    : info_{std::move(info)}, write_income_csv_{write_income_csv}, base_filename_{file_name} {
+                                   bool write_income_csv, std::string income_categories)
+    : info_{std::move(info)}, write_income_csv_{write_income_csv},
+      income_categories_{std::move(income_categories)}, base_filename_{file_name} {
     stream_.open(file_name, std::ofstream::out | std::ofstream::app);
     if (stream_.fail() || !stream_.is_open()) {
         throw std::invalid_argument(fmt::format("Cannot open output file: {}", file_name.string()));
@@ -60,7 +63,9 @@ ResultFileWriter::ResultFileWriter(ResultFileWriter &&other) noexcept
       income_csvstreams_{std::move(other.income_csvstreams_)},
       income_first_row_{std::move(other.income_first_row_)},
       income_mutexes_{std::move(other.income_mutexes_)}, info_{std::move(other.info_)},
-      write_income_csv_{other.write_income_csv_}, base_filename_{std::move(other.base_filename_)} {}
+      write_income_csv_{other.write_income_csv_},
+      income_categories_{std::move(other.income_categories_)},
+      base_filename_{std::move(other.base_filename_)} {}
 
 ResultFileWriter &ResultFileWriter::operator=(ResultFileWriter &&other) noexcept {
     stream_.close();
@@ -82,6 +87,7 @@ ResultFileWriter &ResultFileWriter::operator=(ResultFileWriter &&other) noexcept
     info_ = std::move(other.info_);
     base_filename_ = std::move(other.base_filename_);
     write_income_csv_ = other.write_income_csv_;
+    income_categories_ = other.income_categories_;
     return *this;
 }
 
@@ -136,6 +142,25 @@ void ResultFileWriter::write(const hgps::ResultEventMessage &message) {
                 }
             }
             income_categories = get_available_income_categories(message);
+            merge_configured_income_strata(income_categories);
+            // MAHIMA: Always append a timestep block to every income CSV that was opened at init,
+            // even when population_by_income for that stratum is zero this year (e.g. stochastic
+            // mortality leaves no high-income survivors). get_available_income_categories() alone
+            // would skip the file and create a missing calendar year in the stratum CSV.
+            if (!income_csvstreams_.empty()) {
+                std::unordered_set<core::Income> seen_in_write(income_categories.begin(),
+                                                               income_categories.end());
+                for (const auto &[inc, stream] : income_csvstreams_) {
+                    (void)stream;
+                    if (!seen_in_write.contains(inc)) {
+                        income_categories.push_back(inc);
+                        seen_in_write.insert(inc);
+                    }
+                }
+            }
+            for (core::Income inc : income_categories) {
+                ensure_income_stream_open(inc, message);
+            }
         }
     }
 
@@ -151,6 +176,7 @@ void ResultFileWriter::write(const hgps::ResultEventMessage &message) {
                 write_income_csv_header(message, income_stream);
             }
             write_income_csv_data(message, income, income_stream);
+            income_stream.flush();
         });
     }
 }
@@ -272,12 +298,34 @@ void ResultFileWriter::write_csv_channels(const hgps::ResultEventMessage &messag
     }
 }
 
+void ResultFileWriter::merge_configured_income_strata(std::vector<core::Income> &categories) const {
+    std::unordered_set<core::Income> seen(categories.begin(), categories.end());
+    const auto add = [&](core::Income inc) {
+        if (!seen.contains(inc)) {
+            categories.push_back(inc);
+            seen.insert(inc);
+        }
+    };
+    if (income_categories_ == "4") {
+        add(core::Income::low);
+        add(core::Income::lowermiddle);
+        add(core::Income::uppermiddle);
+        add(core::Income::high);
+    } else {
+        add(core::Income::low);
+        add(core::Income::middle);
+        add(core::Income::high);
+    }
+}
+
 void ResultFileWriter::initialize_income_streams(const hgps::ResultEventMessage &message) {
     auto available_income_categories = get_available_income_categories(message);
+    merge_configured_income_strata(available_income_categories);
 
     for (const auto &income : available_income_categories) {
         auto income_filename = generate_income_filename(base_filename_.string(), income);
-        std::ofstream income_stream(income_filename, std::ofstream::out | std::ofstream::app);
+        // Truncate on first open for this run so a new seed/job does not append to stale CSVs.
+        std::ofstream income_stream(income_filename, std::ofstream::out | std::ofstream::trunc);
 
         if (income_stream.fail() || !income_stream.is_open()) {
             throw std::invalid_argument(
@@ -287,6 +335,23 @@ void ResultFileWriter::initialize_income_streams(const hgps::ResultEventMessage 
         income_csvstreams_[income] = std::move(income_stream);
         income_first_row_[income] = true;
     }
+}
+
+void ResultFileWriter::ensure_income_stream_open(core::Income income,
+                                                 const hgps::ResultEventMessage &message) {
+    if (income_csvstreams_.contains(income)) {
+        return;
+    }
+    auto income_filename = generate_income_filename(base_filename_.string(), income);
+    std::ofstream income_stream(income_filename, std::ofstream::out | std::ofstream::app);
+    if (income_stream.fail() || !income_stream.is_open()) {
+        throw std::invalid_argument(
+            fmt::format("Cannot open income-based output file: {}", income_filename));
+    }
+    income_csvstreams_[income] = std::move(income_stream);
+    income_first_row_[income] = true;
+    income_mutexes_[income] = std::make_unique<std::mutex>();
+    (void)message;
 }
 
 void ResultFileWriter::write_income_csv_channels(const hgps::ResultEventMessage &message) {

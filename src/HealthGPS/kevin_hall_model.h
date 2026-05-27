@@ -8,6 +8,7 @@
 #include "risk_factor_adjustable_model.h"
 
 #include <optional>
+#include <string_view>
 #include <vector>
 
 namespace hgps {
@@ -53,6 +54,10 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     void generate_risk_factors(RuntimeContext &context) override;
 
     void update_risk_factors(RuntimeContext &context) override;
+
+    /// @brief Throws if person weight is outside the range from config modelling.risk_factors.
+    void validate_weight_in_config_range(const RuntimeContext &context, const Person &person,
+                                         std::string_view phase) const;
 
   private:
     /// @brief Handle the update (initialisation) of newborns separately
@@ -133,19 +138,22 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     void initialise_weight(RuntimeContext &context, Person &person) const;
 
     /// @brief  Initialise the Kevin Hall state variables of a person
+    /// @param context The runtime context (for configured weight range validation)
     /// @param person The person to initialise
     /// @param adjustment An optional weight adjustment term (default is zero)
-    void initialise_kevin_hall_state(Person &person,
+    void initialise_kevin_hall_state(const RuntimeContext &context, Person &person,
                                      std::optional<double> adjustment = std::nullopt) const;
 
     /// @brief Run the Kevin Hall energy balance model for a given person
+    /// @param context The runtime context (for configured weight range validation)
     /// @param person The person to simulate
-    void kevin_hall_run(Person &person) const;
+    void kevin_hall_run(const RuntimeContext &context, Person &person) const;
 
     /// @brief Adjusts the weight of a person to baseline.
+    /// @param context The runtime context (for configured weight range validation)
     /// @param person The person fo update the weight for.
     /// @param adjustment The weight adjustment term
-    void adjust_weight(Person &person, double adjustment) const;
+    void adjust_weight(const RuntimeContext &context, Person &person, double adjustment) const;
 
     /// @brief Computes weight adjustments or receives them from the baseline scenario
     /// @param context The runtime context

@@ -172,6 +172,20 @@ bool DataSeries::has_income_category(core::Gender gender, core::Income income) c
     return income_it != gender_it->second.end();
 }
 
+bool DataSeries::has_income_channel(core::Gender gender, core::Income income,
+                                    const std::string &key) const {
+    const auto gender_it = income_data_.find(gender);
+    if (gender_it == income_data_.end()) {
+        return false;
+    }
+    const auto income_it = gender_it->second.find(income);
+    if (income_it == gender_it->second.end()) {
+        return false;
+    }
+    const auto channel_key = core::to_lower(key);
+    return income_it->second.contains(channel_key);
+}
+
 std::string DataSeries::income_category_to_string(core::Income income) const {
     switch (income) {
     case core::Income::unknown:

@@ -1,6 +1,7 @@
 #include "person.h"
 
 #include "HealthGPS.Core/exception.h"
+#include "predictor_resolver.h"
 
 namespace hgps {
 
@@ -73,6 +74,9 @@ double Person::get_risk_factor_value(const core::Identifier &key) const {
     if (risk_factors.contains(key)) {
         // Dynamic properties
         return risk_factors.at(key);
+    }
+    if (auto derived = resolve_derived_predictor(*this, key.to_string())) {
+        return *derived;
     }
     throw std::out_of_range("Risk factor not found: " + key.to_string());
 }

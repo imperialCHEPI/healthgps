@@ -70,11 +70,9 @@ void RiskFactorModule::initialise_population(RuntimeContext &context) {
 }
 
 void RiskFactorModule::update_population(RuntimeContext &context) {
-    // Generate risk factors for newborns
     auto &static_model = models_.at(RiskFactorModelType::Static);
     static_model->update_risk_factors(context);
 
-    // Update risk factors for population
     auto &dynamic_model = models_.at(RiskFactorModelType::Dynamic);
     dynamic_model->update_risk_factors(context);
 }

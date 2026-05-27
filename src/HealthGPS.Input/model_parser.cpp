@@ -6,6 +6,8 @@
 
 #include "HealthGPS.Core/exception.h"
 #include "HealthGPS.Core/scoped_timer.h"
+#include "HealthGPS.Core/string_util.h"
+#include "HealthGPS/predictor_resolver.h"
 
 #include <Eigen/Cholesky>
 #include <Eigen/Dense>
@@ -17,6 +19,7 @@
 #include <filesystem>
 #include <fstream>
 #include <optional>
+#include <ranges>
 
 #if USE_TIMER
 #define MEASURE_FUNCTION()
@@ -24,6 +27,297 @@ hgps::core::ScopedTimer timer { __func__ }
 #else
 #define MEASURE_FUNCTION()
 #endif
+
+namespace {
+
+struct TwoColumnRegressionCsv {
+    hgps::LinearModelParams model;
+    std::optional<double> min_value;
+    std::optional<double> max_value;
+    std::optional<double> stddev;
+};
+
+/// @brief Load factor,coefficient rows from a two-column regression CSV (no header row required).
+TwoColumnRegressionCsv load_two_column_regression_csv(const std::filesystem::path &path,
+                                                      char delimiter,
+                                                      const std::string &csv_filename) {
+    rapidcsv::Document doc(path.string(), rapidcsv::LabelParams(-1, -1),
+                           rapidcsv::SeparatorParams(delimiter));
+
+    if (doc.GetColumnCount() != 2) {
+        throw hgps::core::HgpsException{
+            fmt::format("Regression CSV file {} must have exactly 2 columns. Found {} columns",
+                        csv_filename, doc.GetColumnCount())};
+    }
+
+    TwoColumnRegressionCsv result;
+    size_t start_row = 0;
+    if (doc.GetRowCount() > 0) {
+        const auto first_cell = doc.GetCell<std::string>(0, 0);
+        if (hgps::core::case_insensitive::equals(first_cell, "Factor")) {
+            start_row = 1;
+        }
+    }
+
+    for (size_t row_idx = start_row; row_idx < doc.GetRowCount(); ++row_idx) {
+        auto factor_name = doc.GetCell<std::string>(0, row_idx);
+        auto coefficient_value = doc.GetCell<double>(1, row_idx);
+
+        if (hgps::core::case_insensitive::equals(factor_name, "Intercept")) {
+            result.model.intercept = coefficient_value;
+        } else if (hgps::core::case_insensitive::equals(factor_name, "min")) {
+            result.min_value = coefficient_value;
+        } else if (hgps::core::case_insensitive::equals(factor_name, "max")) {
+            result.max_value = coefficient_value;
+        } else if (hgps::core::case_insensitive::equals(factor_name, "stddev")) {
+            result.stddev = coefficient_value;
+        } else if (hgps::is_metadata_predictor(factor_name)) {
+            continue;
+        } else {
+            result.model.coefficients[hgps::core::Identifier(factor_name)] = coefficient_value;
+        }
+    }
+    return result;
+}
+
+char parse_delimiter_char(const std::string &delimiter) {
+    if (delimiter == "\\t") {
+        return '\t';
+    }
+    return delimiter.empty() ? ',' : delimiter.front();
+}
+
+/// @brief Map legacy policy CSV row names for log(energy intake) to the canonical predictor name.
+/// @details Other policy row names are kept as in the CSV. Only energy-intake log predictors are
+/// normalized so evaluation always uses `log_energy_intake` with `EnergyIntake` on the person.
+std::string normalize_policy_coefficient_row(const std::string &raw_row_name) {
+    if (hgps::core::case_insensitive::equals(raw_row_name, "EnergyIntake")) {
+        return "log_energy_intake";
+    }
+    const std::string lower = hgps::core::to_lower(raw_row_name);
+    if (lower == "log_energyintake" || lower == "log_energy_intake") {
+        return "log_energy_intake";
+    }
+    return raw_row_name;
+}
+
+struct StaticLinearLoadSummary {
+    bool matrix_based{false};
+    std::string boxcox_file;
+    size_t boxcox_rows{0};
+    size_t boxcox_cols{0};
+    std::string policy_file;
+    size_t policy_coef_types{0};
+    std::vector<std::string> policy_coefficient_rows;
+    std::string logistic_file;
+    size_t logistic_coef_rows{0};
+    size_t logistic_rf_count{0};
+    size_t risk_factor_count{0};
+    size_t boxcox_coef_types{0};
+    std::vector<std::string> with_logistic;
+    std::vector<std::string> without_logistic;
+    std::string income_categories;
+    std::string income_type;
+    bool pa_enabled{false};
+    std::string pa_type;
+    std::string pa_csv;
+    double pa_intercept{0};
+    size_t pa_coef_count{0};
+    double pa_min{0};
+    double pa_max{0};
+    double pa_stddev{0};
+    std::string income_csv;
+    double income_intercept{0};
+    size_t income_coef_count{0};
+    std::vector<std::string> income_predictors;
+    std::vector<std::string> income_metadata;
+    std::vector<std::string> pa_predictors;
+    std::vector<std::string> pa_metadata;
+    std::string region_file;
+    size_t region_rows{0};
+    size_t region_cols{0};
+    std::string ethnicity_file;
+    size_t ethnicity_rows{0};
+    size_t ethnicity_cols{0};
+};
+
+std::optional<StaticLinearLoadSummary> g_pending_static_linear_summary;
+
+// ASCII box drawing only (Windows console often mangles UTF-8 box-drawing characters).
+constexpr size_t k_summary_box_inner_width = 78;
+
+void print_summary_border() {
+    fmt::print("+{}+\n", std::string(k_summary_box_inner_width + 2, '-'));
+}
+
+void print_box_row(const std::string &text) {
+    fmt::print("| {:<{}} |\n", text, k_summary_box_inner_width);
+}
+
+void print_box_section(const std::string &title) {
+    std::string line = "+- " + title + ' ';
+    const size_t total_width = k_summary_box_inner_width + 2;
+    if (line.size() < total_width) {
+        line.append(total_width - line.size(), '-');
+    }
+    line.push_back('+');
+    fmt::print("{}\n", line);
+}
+
+void print_wrapped_factor_list(const std::string &prefix, const std::vector<std::string> &items) {
+    if (items.empty()) {
+        return;
+    }
+    std::string line = prefix;
+    line += items.front();
+    for (size_t i = 1; i < items.size(); ++i) {
+        const std::string next = ", " + items[i];
+        if (line.size() + next.size() > k_summary_box_inner_width) {
+            print_box_row(line);
+            line = std::string(4, ' ') + items[i];
+        } else {
+            line += next;
+        }
+    }
+    print_box_row(line);
+}
+
+void collect_regression_csv_factors(const hgps::LinearModelParams &model,
+                                    std::vector<std::string> &predictors_out,
+                                    std::vector<std::string> &metadata_out) {
+    predictors_out.clear();
+    metadata_out.clear();
+    predictors_out.reserve(model.coefficients.size() + model.log_coefficients.size());
+    metadata_out.reserve(4);
+
+    for (const auto &[id, value] : model.coefficients) {
+        const std::string name = id.to_string();
+        if (hgps::is_metadata_predictor(name)) {
+            metadata_out.push_back(fmt::format("{}={:.6g}", name, value));
+        } else {
+            predictors_out.push_back(name);
+        }
+    }
+    for (const auto &[id, coef] : model.log_coefficients) {
+        predictors_out.push_back(fmt::format("log:{} ({:.6g})", id.to_string(), coef));
+    }
+
+    std::ranges::sort(predictors_out);
+    std::ranges::sort(metadata_out);
+}
+
+void append_unique_metadata(std::vector<std::string> &metadata_out, const std::string &name,
+                            double value) {
+    const std::string entry = fmt::format("{}={:.6g}", name, value);
+    if (std::ranges::find(metadata_out, entry) != metadata_out.end()) {
+        return;
+    }
+    const std::string prefix = name + '=';
+    for (auto &item : metadata_out) {
+        if (item.starts_with(prefix)) {
+            item = entry;
+            return;
+        }
+    }
+    metadata_out.push_back(entry);
+    std::ranges::sort(metadata_out);
+}
+
+void print_regression_csv_factors(const std::vector<std::string> &predictors,
+                                  const std::vector<std::string> &metadata) {
+    if (!predictors.empty()) {
+        print_box_row(fmt::format("  Predictors ({})  :", predictors.size()));
+        print_wrapped_factor_list("    ", predictors);
+    } else {
+        print_box_row("  Predictors         : (none)");
+    }
+    if (!metadata.empty()) {
+        print_box_row("  CSV metadata       :");
+        print_wrapped_factor_list("    ", metadata);
+    }
+}
+
+void print_static_linear_load_summary(const StaticLinearLoadSummary &summary) {
+    fmt::print("\n");
+    print_summary_border();
+    print_box_row(" Static linear model configuration");
+    print_box_section("Risk factors");
+
+    if (summary.matrix_based) {
+        print_box_row(fmt::format("  Box-Cox CSV        : {} ({} rows x {} cols)",
+                                  summary.boxcox_file, summary.boxcox_rows, summary.boxcox_cols));
+        if (!summary.policy_file.empty()) {
+            print_box_row(fmt::format("  Policy CSV         : {} ({} coefficient types)",
+                                      summary.policy_file, summary.policy_coef_types));
+            if (!summary.policy_coefficient_rows.empty()) {
+                print_box_row("  Policy coef. rows  :");
+                print_wrapped_factor_list("    ", summary.policy_coefficient_rows);
+            }
+        }
+        if (!summary.logistic_file.empty()) {
+            print_box_row(fmt::format("  Logistic CSV       : {} ({} types, {} outcomes)",
+                                      summary.logistic_file, summary.logistic_coef_rows,
+                                      summary.logistic_rf_count));
+        }
+        print_box_row(
+            fmt::format("  Outcomes loaded    : {} risk factors", summary.risk_factor_count));
+        print_box_row(
+            fmt::format("  Box-Cox predictors : {} coefficient types", summary.boxcox_coef_types));
+        if (!summary.with_logistic.empty()) {
+            print_box_row(fmt::format("  Two-stage ({} outcomes):", summary.with_logistic.size()));
+            print_wrapped_factor_list("    ", summary.with_logistic);
+        }
+        if (!summary.without_logistic.empty()) {
+            print_box_row(
+                fmt::format("  Box-Cox only ({} outcomes):", summary.without_logistic.size()));
+            print_wrapped_factor_list("    ", summary.without_logistic);
+        }
+    }
+
+    print_box_section("Income");
+    print_box_row(
+        fmt::format("  Categories         : {} (project_requirements)", summary.income_categories));
+    print_box_row(fmt::format("  Mode               : {}", summary.income_type));
+    if (!summary.income_csv.empty()) {
+        print_box_row(fmt::format("  Regression CSV     : {}", summary.income_csv));
+        print_box_row(fmt::format("  Intercept          : {:.6g}", summary.income_intercept));
+        print_regression_csv_factors(summary.income_predictors, summary.income_metadata);
+    }
+
+    print_box_section("Physical activity");
+    if (summary.pa_enabled) {
+        print_box_row(
+            fmt::format("  Mode               : {} (project_requirements)", summary.pa_type));
+        if (!summary.pa_csv.empty()) {
+            print_box_row(fmt::format("  Regression CSV     : {}", summary.pa_csv));
+            print_box_row(fmt::format("  Intercept          : {:.6g}", summary.pa_intercept));
+            print_regression_csv_factors(summary.pa_predictors, summary.pa_metadata);
+            print_box_row(fmt::format("  Applied range      : {:.6g} - {:.6g}", summary.pa_min,
+                                      summary.pa_max));
+            print_box_row(fmt::format("  Applied stddev     : {:.6g}", summary.pa_stddev));
+        }
+    } else {
+        print_box_row("  Disabled in project_requirements");
+    }
+
+    if (!summary.region_file.empty() || !summary.ethnicity_file.empty()) {
+        print_box_section("Demographics (assignment CSVs)");
+        if (!summary.region_file.empty()) {
+            print_box_row(fmt::format("  Region             : {} ({} rows x {} cols)",
+                                      summary.region_file, summary.region_rows,
+                                      summary.region_cols));
+        }
+        if (!summary.ethnicity_file.empty()) {
+            print_box_row(fmt::format("  Ethnicity          : {} ({} rows x {} cols)",
+                                      summary.ethnicity_file, summary.ethnicity_rows,
+                                      summary.ethnicity_cols));
+        }
+    }
+
+    print_summary_border();
+}
+
+} // namespace
 
 namespace {
 // The latest schema version for each model
@@ -284,11 +578,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
     // CSV structure (matrix-based vs legacy) for loading risk factor models only
     bool is_matrix_based_structure = opt["RiskFactorModels"].contains("boxcox_coefficients");
-    if (is_matrix_based_structure) {
-        std::cout << "\nDEBUG: Using matrix-based CSV structure for risk factors";
-    } else {
-        std::cout << "\nDEBUG: Using legacy CSV structure for risk factors";
-    }
+    StaticLinearLoadSummary load_summary;
+    load_summary.matrix_based = is_matrix_based_structure;
 
     // Risk factor correlation matrix.
     const auto correlation_file_info =
@@ -479,9 +770,9 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         rapidcsv::Document boxcox_doc(boxcox_path.string(), rapidcsv::LabelParams{},
                                       rapidcsv::SeparatorParams{boxcox_delimiter.front()});
 
-        std::cout << "\n  Loading boxcox coefficients from: " << boxcox_filename;
-        std::cout << "\n    CSV dimensions: " << boxcox_doc.GetRowCount() << " rows, "
-                  << boxcox_doc.GetColumnCount() << " columns";
+        load_summary.boxcox_file = boxcox_filename;
+        load_summary.boxcox_rows = boxcox_doc.GetRowCount();
+        load_summary.boxcox_cols = boxcox_doc.GetColumnCount();
 
         // Load boxcox coefficients: row names (coefficients) -> column names (risk factors) ->
         // values
@@ -512,6 +803,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             std::filesystem::path policy_path = config.root_path / policy_filename;
             rapidcsv::Document policy_doc(policy_path.string(), rapidcsv::LabelParams{},
                                           rapidcsv::SeparatorParams{policy_delimiter.front()});
+            load_summary.policy_file = policy_filename;
 
             // Load policy coefficients: row names (coefficients) -> column names (risk factors) ->
             // values
@@ -519,10 +811,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             // Normalise EnergyIntake -> log_energy_intake so policy uses the same factor name as
             // correlation/BoxCox (log energy intake is stored under "log_energy_intake").
             for (size_t row_idx = 0; row_idx < policy_doc.GetRowCount(); ++row_idx) {
-                auto coefficient_name = policy_doc.GetCell<std::string>(0, row_idx);
-                if (core::case_insensitive::equals(coefficient_name, "EnergyIntake")) {
-                    coefficient_name = "log_energy_intake";
-                }
+                const auto raw_row_name = policy_doc.GetCell<std::string>(0, row_idx);
+                const auto coefficient_name = normalize_policy_coefficient_row(raw_row_name);
                 csv_policy_coefficients[coefficient_name] = {};
 
                 for (size_t col_idx = 1; col_idx < policy_doc.GetColumnCount(); ++col_idx) {
@@ -533,6 +823,12 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                     csv_policy_coefficients[coefficient_name][risk_factor_name] = coefficient_value;
                 }
             }
+            load_summary.policy_coefficient_rows.reserve(csv_policy_coefficients.size());
+            for (const auto &[coef_name, _] : csv_policy_coefficients) {
+                load_summary.policy_coefficient_rows.push_back(coef_name);
+            }
+            std::ranges::sort(load_summary.policy_coefficient_rows);
+            load_summary.policy_coef_types = load_summary.policy_coefficient_rows.size();
         }
 
         // Load logistic regression coefficients if they exist (for two-stage modeling)
@@ -571,9 +867,9 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                 logistic_risk_factors_count = csv_logistic_coefficients.at("Intercept").size();
             }
 
-            std::cout << "\nLoading logistic regression CSV: " << logistic_filename << " ("
-                      << logistic_doc.GetRowCount() << " coefficient types, "
-                      << logistic_risk_factors_count << " risk factors)";
+            load_summary.logistic_file = logistic_filename;
+            load_summary.logistic_coef_rows = logistic_doc.GetRowCount();
+            load_summary.logistic_rf_count = logistic_risk_factors_count;
         }
     }
 
@@ -1037,31 +1333,11 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
     } // NOLINTEND(readability-function-cognitive-complexity)
 
-    // Print summary of loaded data
-    std::cout << "\nLoaded risk factor models: " << names.size() << " risk factors";
-    std::cout << "\n  BoxCox coefficients: " << csv_coefficients.size() << " coefficient types";
-    std::cout << "\n  Policy coefficients: " << csv_policy_coefficients.size()
-              << " coefficient types";
-    if (!csv_logistic_coefficients.empty()) {
-        std::cout << "\n  Logistic regression: " << csv_logistic_coefficients.size()
-                  << " coefficient types for " << logistic_risk_factors_count << " risk factors";
-
-        // Print which risk factors have logistic regression (Stage 1 + Stage 2)
-        if (!risk_factors_with_logistic.empty()) {
-            std::cout << "\n    Risk factors with logistic regression (2-stage modeling): "
-                      << risk_factors_with_logistic.size();
-            std::cout << "\n      "
-                      << fmt::format("{}", fmt::join(risk_factors_with_logistic, ", "));
-        }
-
-        // Print which risk factors don't have logistic regression (Stage 2 only)
-        if (!risk_factors_without_logistic.empty()) {
-            std::cout << "\n    Risk factors without logistic regression (BoxCox only): "
-                      << risk_factors_without_logistic.size();
-            std::cout << "\n      "
-                      << fmt::format("{}", fmt::join(risk_factors_without_logistic, ", "));
-        }
-    }
+    load_summary.risk_factor_count = names.size();
+    load_summary.boxcox_coef_types = csv_coefficients.size();
+    load_summary.policy_coef_types = csv_policy_coefficients.size();
+    load_summary.with_logistic = std::move(risk_factors_with_logistic);
+    load_summary.without_logistic = std::move(risk_factors_without_logistic);
 
     // Check risk factor correlation matrix column count matches risk factor count.
     if (is_matrix_based_structure) {
@@ -1199,8 +1475,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             fmt::format(R"(project_requirements.income.categories must be "3" or "4". Got: "{}")",
                         income_categories)};
     }
-    std::cout << "\nUsing " << income_categories
-              << " income categories (from project_requirements)\n";
+    load_summary.income_categories = income_categories;
 
     bool is_continuous_model = (inc_req.type == "continuous");
     bool model_has_continuous = opt["IncomeModels"].contains("continuous");
@@ -1217,8 +1492,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             throw core::HgpsException("Continuous income model missing required fields: "
                                       "Intercept/Coefficients or csv_file");
         }
-        std::cout
-            << "\nIncome type from project_requirements: continuous (regression then categories)\n";
+        load_summary.income_type = "continuous (regression, then categories)";
 
         income_models.emplace(core::Income::low, LinearModelParams{});
         if (income_categories == "4") {
@@ -1235,8 +1509,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                 "IncomeModels only has \"continuous\". Add categorical income models or set "
                 "income.type to \"continuous\" in config.json."};
         }
-        std::cout << "\nIncome type from project_requirements: categorical (direct category "
-                     "assignment)\n";
+        load_summary.income_type = "categorical (direct assignment)";
 
         for (const auto &[key, json_params] : opt["IncomeModels"].items()) {
             if (key == "simple" || key == "continuous") {
@@ -1256,6 +1529,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     std::unordered_map<core::Identifier, PhysicalActivityModel> physical_activity_models;
     double physical_activity_stddev = 0.0;
 
+    load_summary.pa_enabled = pa_req.enabled;
     if (pa_req.enabled && opt.contains("PhysicalActivityModels")) {
         const std::string &pa_type = pa_req.type; // "simple" or "continuous"
         if (!opt["PhysicalActivityModels"].contains(pa_type)) {
@@ -1265,8 +1539,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                 "in config.json.",
                 pa_type, pa_type)};
         }
-        std::cout << "\nLoading PhysicalActivityModels (from project_requirements: type=" << pa_type
-                  << ")...";
+        load_summary.pa_type = pa_type;
 
         const auto &model_config = opt["PhysicalActivityModels"][pa_type];
         const std::string model_name = pa_type;
@@ -1274,76 +1547,52 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         model.model_type = model_name;
 
         if (model_name == "simple") {
-            std::cout << "\n  Loading simple PA model";
-
             if (model_config.contains("PhysicalActivityStdDev")) {
                 model.stddev = model_config["PhysicalActivityStdDev"].get<double>();
-                std::cout << "\n    Standard deviation: " << model.stddev;
             } else {
                 physical_activity_stddev = opt.contains("PhysicalActivityStdDev")
                                                ? opt["PhysicalActivityStdDev"].get<double>()
                                                : 0.0;
                 model.stddev = physical_activity_stddev;
-                std::cout << "\n    Using global standard deviation: " << model.stddev;
             }
+            load_summary.pa_stddev = model.stddev;
             physical_activity_models[core::Identifier(model_name)] = std::move(model);
 
         } else if (model_name == "continuous") {
-            std::cout << "\n  Loading continuous PA model";
-
             if (model_config.contains("csv_file")) {
                 std::string csv_filename = model_config["csv_file"].get<std::string>();
-                std::cout << "\n  Loading model '" << model_name << "' from file: " << csv_filename;
+                load_summary.pa_csv = csv_filename;
 
-                // For physical activity models, load CSV directly without column mapping
-                // This avoids the column mapping requirement of the CSV parser
                 std::filesystem::path csv_path = config.root_path / csv_filename;
-
-                // Handle tab delimiter properly
-                std::string delimiter =
+                const std::string delimiter =
                     model_config.contains("delimiter") ? model_config["delimiter"] : ",";
-                if (delimiter == "\\t") {
-                    delimiter = "\t"; // Convert escaped tab to actual tab character
+                auto loaded = load_two_column_regression_csv(
+                    csv_path, parse_delimiter_char(delimiter), csv_filename);
+                model.intercept = loaded.model.intercept;
+                model.coefficients = loaded.model.coefficients;
+                if (loaded.min_value.has_value()) {
+                    model.min_value = *loaded.min_value;
+                }
+                if (loaded.max_value.has_value()) {
+                    model.max_value = *loaded.max_value;
+                }
+                if (loaded.stddev.has_value()) {
+                    model.stddev = *loaded.stddev;
                 }
 
-                // Use rapidcsv directly to load the CSV file (no headers)
-                rapidcsv::Document doc(csv_path.string(), rapidcsv::LabelParams(-1, -1),
-                                       rapidcsv::SeparatorParams(delimiter.front()));
-
-                // Check that we have exactly 2 columns
-                if (doc.GetColumnCount() != 2) {
-                    throw core::HgpsException{
-                        fmt::format("Physical activity CSV file {} must have exactly 2 columns. "
-                                    "Found {} columns",
-                                    csv_filename, doc.GetColumnCount())};
-                }
-
-                // Parse CSV into PhysicalActivityModel (using existing model variable)
-                // Parse each row (all rows are data, no headers)
-                for (size_t row_idx = 0; row_idx < doc.GetRowCount(); row_idx++) {
-                    // Get factor name and coefficient value directly from rapidcsv
-                    auto factor_name = doc.GetCell<std::string>(0, row_idx);
-                    auto coefficient_value = doc.GetCell<double>(1, row_idx);
-
-                    if (factor_name == "Intercept") {
-                        model.intercept = coefficient_value;
-                    } else if (factor_name == "min") {
-                        model.min_value = coefficient_value;
-                    } else if (factor_name == "max") {
-                        model.max_value = coefficient_value;
-                    } else if (factor_name == "stddev") {
-                        model.stddev = coefficient_value;
-                    } else {
-                        // All other rows are coefficients
-                        model.coefficients[core::Identifier(factor_name)] = coefficient_value;
-                    }
-                }
-
-                std::cout << "\n      Parsed values:";
-                std::cout << "\n        Intercept: " << model.intercept;
-                std::cout << "\n        Coefficients: " << model.coefficients.size();
-                std::cout << "\n        Min: " << model.min_value << ", Max: " << model.max_value;
-                std::cout << "\n        Standard deviation: " << model.stddev;
+                load_summary.pa_intercept = model.intercept;
+                load_summary.pa_coef_count = model.coefficients.size();
+                load_summary.pa_min = model.min_value;
+                load_summary.pa_max = model.max_value;
+                load_summary.pa_stddev = model.stddev;
+                hgps::LinearModelParams pa_linear;
+                pa_linear.intercept = model.intercept;
+                pa_linear.coefficients = model.coefficients;
+                collect_regression_csv_factors(pa_linear, load_summary.pa_predictors,
+                                               load_summary.pa_metadata);
+                append_unique_metadata(load_summary.pa_metadata, "min", model.min_value);
+                append_unique_metadata(load_summary.pa_metadata, "max", model.max_value);
+                append_unique_metadata(load_summary.pa_metadata, "stddev", model.stddev);
             } else {
                 throw core::HgpsException{fmt::format(
                     "Continuous physical activity model '{}' must specify 'csv_file'", model_name)};
@@ -1351,79 +1600,49 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             physical_activity_models[core::Identifier(model_name)] = std::move(model);
         }
     } else if (!pa_req.enabled) {
-        std::cout << "\nPhysical activity disabled in project_requirements, skipping PA models";
+        load_summary.pa_enabled = false;
     } else {
-        std::cout
-            << "\nNo PhysicalActivityModels in static_model.json, using PhysicalActivityStdDev";
         physical_activity_stddev = opt.contains("PhysicalActivityStdDev")
                                        ? opt["PhysicalActivityStdDev"].get<double>()
                                        : 0.0;
     }
 
-    std::cout << "\nDEBUG: Physical activity models loading completed successfully";
-
     // Parse continuous income model outside constructor to avoid issues
     LinearModelParams continuous_income_model;
     if (is_continuous_model) {
-        std::cout << "\nDEBUG: Parsing continuous income model...";
         const auto &continuous_json = opt["IncomeModels"]["continuous"];
 
         if (continuous_json.contains("csv_file")) {
             std::string csv_filename = continuous_json["csv_file"].get<std::string>();
-            std::cout << "\n  Loading continuous income model from file: " << csv_filename;
+            load_summary.income_csv = csv_filename;
 
-            // Load CSV file directly using rapidcsv
             std::filesystem::path csv_path = config.root_path / csv_filename;
-
-            // Handle tab delimiter properly
-            std::string delimiter =
+            const std::string delimiter =
                 continuous_json.contains("delimiter") ? continuous_json["delimiter"] : ",";
-            if (delimiter == "\\t") {
-                delimiter = "\t"; // Convert escaped tab to actual tab character
+            auto loaded = load_two_column_regression_csv(csv_path, parse_delimiter_char(delimiter),
+                                                         csv_filename);
+            continuous_income_model = loaded.model;
+            if (loaded.min_value.has_value()) {
+                continuous_income_model.coefficients["min"_id] = *loaded.min_value;
+            }
+            if (loaded.max_value.has_value()) {
+                continuous_income_model.coefficients["max"_id] = *loaded.max_value;
+            }
+            if (loaded.stddev.has_value()) {
+                continuous_income_model.coefficients["stddev"_id] = *loaded.stddev;
             }
 
-            // Use rapidcsv directly to load the CSV file (no headers, like physical activity)
-            char sep_char = (delimiter == "\\t") ? '\t' : delimiter.front();
-            rapidcsv::Document doc(csv_path.string(), rapidcsv::LabelParams(-1, -1),
-                                   rapidcsv::SeparatorParams(sep_char));
-
-            // Check that we have exactly 2 columns
-            std::cout << "\n      CSV file loaded: " << doc.GetRowCount() << " rows, "
-                      << doc.GetColumnCount() << " columns";
-            if (doc.GetColumnCount() != 2) {
-                throw core::HgpsException{
-                    fmt::format("Continuous income CSV file {} must have exactly 2 columns. "
-                                "Found {} columns",
-                                csv_filename, doc.GetColumnCount())};
-            }
-
-            // Parse CSV into LinearModelParams
-            // Skip header row (row 0) and parse data rows
-            std::cout << "\n      Parsing CSV data:";
-            for (size_t row_idx = 1; row_idx < doc.GetRowCount(); row_idx++) {
-                // Get factor name and coefficient value directly from rapidcsv
-                auto factor_name = doc.GetCell<std::string>(0, row_idx);
-                auto coefficient_value = doc.GetCell<double>(1, row_idx);
-
-                if (factor_name == "Intercept") {
-                    continuous_income_model.intercept = coefficient_value;
-                } else {
-                    // All other rows are coefficients
-                    continuous_income_model.coefficients[core::Identifier(factor_name)] =
-                        coefficient_value;
-                }
-            }
-
-            std::cout << "\n      Parsed values:";
-            std::cout << "\n        Intercept: " << continuous_income_model.intercept;
-            std::cout << "\n        Coefficients: " << continuous_income_model.coefficients.size();
+            load_summary.income_intercept = continuous_income_model.intercept;
+            load_summary.income_coef_count = continuous_income_model.coefficients.size();
+            collect_regression_csv_factors(continuous_income_model, load_summary.income_predictors,
+                                           load_summary.income_metadata);
         } else {
             throw core::HgpsException{
                 fmt::format("Continuous income model must specify 'csv_file'")};
         }
-
-        std::cout << "\nDEBUG: Continuous income model parsing completed";
     }
+
+    g_pending_static_linear_summary = std::move(load_summary);
 
     try {
         auto result = std::make_unique<StaticLinearModelDefinition>(
@@ -1442,13 +1661,12 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             stratum_cfg.adjustment_income_stratum_count, has_active_policies,
             std::move(logistic_models));
 
-        std::cout << "\nDEBUG: StaticLinearModelDefinition created successfully";
         return result;
-    } catch (const std::exception &e) {
-        std::cout << "\nDEBUG: Exception in StaticLinearModelDefinition constructor: " << e.what();
+    } catch (const std::exception &) {
+        g_pending_static_linear_summary.reset();
         throw;
     } catch (...) {
-        std::cout << "\nDEBUG: Unknown exception in StaticLinearModelDefinition constructor";
+        g_pending_static_linear_summary.reset();
         throw;
     }
 }
@@ -1704,20 +1922,20 @@ void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
     }
 
     // Load region and ethnicity data if present in static model
-    std::cout << "\nDEBUG: Loading region and ethnicity data...";
     for (const auto &[model_type_str, model_path] : config.modelling.risk_factor_models) {
         if (model_type_str == "static") {
             const auto &[model_name, opt] = load_and_validate_model_json(model_path);
 
             if (opt.contains("RegionFile")) {
                 std::string region_filename = opt["RegionFile"]["name"].get<std::string>();
-                std::cout << "\n  Loading region file: " << region_filename;
 
-                // Load region data using the existing CSV parser
                 auto region_table = load_datatable_from_csv(
                     input::get_file_info(opt["RegionFile"], config.root_path));
-                std::cout << "\n    Region data loaded: " << region_table.num_rows() << " rows, "
-                          << region_table.num_columns() << " columns";
+                if (g_pending_static_linear_summary) {
+                    g_pending_static_linear_summary->region_file = region_filename;
+                    g_pending_static_linear_summary->region_rows = region_table.num_rows();
+                    g_pending_static_linear_summary->region_cols = region_table.num_columns();
+                }
 
                 // Process region data and store in repository
                 std::map<core::Identifier, std::map<core::Gender, std::map<std::string, double>>>
@@ -1749,20 +1967,19 @@ void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
                     }
                 }
 
-                // Store in repository
                 repository.register_region_prevalence(region_data);
-                std::cout << "\n    Region data stored in repository";
             }
 
             if (opt.contains("EthnicityFile")) {
                 std::string ethnicity_filename = opt["EthnicityFile"]["name"].get<std::string>();
-                std::cout << "\n  Loading ethnicity file: " << ethnicity_filename;
 
-                // Load ethnicity data using the existing CSV parser
                 auto ethnicity_table = load_datatable_from_csv(
                     input::get_file_info(opt["EthnicityFile"], config.root_path));
-                std::cout << "\n    Ethnicity data loaded: " << ethnicity_table.num_rows()
-                          << " rows, " << ethnicity_table.num_columns() << " columns";
+                if (g_pending_static_linear_summary) {
+                    g_pending_static_linear_summary->ethnicity_file = ethnicity_filename;
+                    g_pending_static_linear_summary->ethnicity_rows = ethnicity_table.num_rows();
+                    g_pending_static_linear_summary->ethnicity_cols = ethnicity_table.num_columns();
+                }
 
                 // Process ethnicity data and store in repository
                 std::map<
@@ -1799,12 +2016,15 @@ void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
                     }
                 }
 
-                // Store in repository
                 repository.register_ethnicity_prevalence(ethnicity_data);
-                std::cout << "\n    Ethnicity data stored in repository";
             }
             break; // Only process the first static model
         }
+    }
+
+    if (g_pending_static_linear_summary) {
+        print_static_linear_load_summary(*g_pending_static_linear_summary);
+        g_pending_static_linear_summary.reset();
     }
 
     fmt::print(fmt::fg(fmt::color::cyan), "\nFINISHED ALL THE LOADING REQUIRED CUTIEPIE :)\n");

@@ -786,3 +786,80 @@ TEST(TestSimulation, AnalysisModuleDoesNotDoubleCountIncomeFieldsWhenMapped) {
     EXPECT_DOUBLE_EQ(series.at(core::Gender::male, core::Income::low, "std_income").at(person.age),
                      0.0);
 }
+
+TEST(TestSimulation, IncomeAnalysisAllocatesChannelsForUnknownStratumDeaths) {
+    using namespace hgps;
+    using namespace hgps::input;
+
+    core::DataTable data;
+    create_test_datatable(data);
+
+    auto uk = core::Country{.code = 826, .name = "United Kingdom", .alpha2 = "GB", .alpha3 = "GBR"};
+    auto settings = Settings{uk, 0.1f, core::IntegerInterval(0, 30)};
+    auto run = RunInfo{.start_time = 2018, .stop_time = 2025, .seed = std::nullopt};
+    auto ses = SESDefinition{.fuction_name = "normal", .parameters = {0.0, 1.0}};
+
+    auto mapping = HierarchicalMapping(
+        {{"Gender", 0}, {"Age", 0}, {"Income", 0}, {"income_category", 0}, {"SmokingStatus", 1}});
+
+    auto diseases = std::vector<core::DiseaseInfo>{
+        core::DiseaseInfo{.group = core::DiseaseGroup::other,
+                          .code = core::Identifier{"asthma"},
+                          .name = "Asthma"},
+    };
+
+    auto project_requirements = hgps::input::ProjectRequirements{};
+    project_requirements.income.categories = "4";
+
+    auto inputs = std::make_shared<ModelInput>(data, settings, run, ses, mapping, diseases,
+                                               project_requirements, hgps::input::PIFInfo{});
+
+    auto manager = DataManager(test_datastore_path);
+    auto repository = CachedRepository(manager);
+
+    auto bus = std::make_shared<DefaultEventBus>();
+    std::optional<ModelResult> captured_result;
+    auto result_sub = bus->subscribe(
+        EventType::result, [&captured_result](const std::shared_ptr<EventMessage> &msg) {
+            auto result_msg = std::dynamic_pointer_cast<ResultEventMessage>(msg);
+            if (result_msg != nullptr) {
+                captured_result = result_msg->content;
+            }
+        });
+
+    auto channel = SyncChannel{};
+    auto scenario = std::make_unique<BaselineScenario>(channel);
+    auto context = RuntimeContext(bus, inputs, std::move(scenario));
+    context.reset_population(2);
+    context.set_current_time(inputs->start_time());
+    context.set_current_run(1);
+
+    auto &alive = context.population()[0];
+    alive.gender = core::Gender::male;
+    alive.age = 12;
+    alive.income = core::Income::low;
+    alive.risk_factors["bmi"_id] = 21.0;
+
+    auto &deceased = context.population()[1];
+    deceased.gender = core::Gender::male;
+    deceased.age = 8;
+    deceased.income = core::Income::unknown;
+    deceased.risk_factors["bmi"_id] = 20.0;
+    deceased.die(static_cast<unsigned int>(inputs->start_time()));
+
+    auto module = build_analysis_module(repository, *inputs);
+    ASSERT_NE(module, nullptr);
+    module->set_income_analysis_enabled(true);
+    module->initialise_population(context);
+
+    if (!captured_result.has_value()) {
+        FAIL() << "Expected analysis module to publish a ResultEventMessage";
+    }
+    const auto &series = captured_result.value().series;
+
+    ASSERT_TRUE(series.has_income_channel(core::Gender::male, core::Income::unknown, "deaths"));
+    EXPECT_DOUBLE_EQ(
+        series.at(core::Gender::male, core::Income::unknown, "deaths").at(deceased.age), 1.0);
+    ASSERT_TRUE(series.has_income_channel(core::Gender::male, core::Income::low, "count"));
+    EXPECT_DOUBLE_EQ(series.at(core::Gender::male, core::Income::low, "count").at(alive.age), 1.0);
+}
