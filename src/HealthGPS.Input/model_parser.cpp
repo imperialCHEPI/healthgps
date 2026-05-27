@@ -102,10 +102,9 @@ std::vector<HeightRow> load_height_params_csv(const std::filesystem::path &path,
     if (doc.GetRowCount() > 0) {
         const auto first = doc.GetCell<std::string>(0, 0);
         const auto second = doc.GetCell<std::string>(1, 0);
-        const bool has_header =
-            hgps::core::case_insensitive::equals(first, "slope") &&
-            (hgps::core::case_insensitive::equals(second, "std") ||
-             hgps::core::case_insensitive::equals(second, "stddev"));
+        const bool has_header = hgps::core::case_insensitive::equals(first, "slope") &&
+                                (hgps::core::case_insensitive::equals(second, "std") ||
+                                 hgps::core::case_insensitive::equals(second, "stddev"));
         if (has_header) {
             start_row = 1;
         }
@@ -114,8 +113,8 @@ std::vector<HeightRow> load_height_params_csv(const std::filesystem::path &path,
     std::vector<HeightRow> rows;
     rows.reserve(doc.GetRowCount());
     for (std::size_t row_idx = start_row; row_idx < doc.GetRowCount(); ++row_idx) {
-        rows.push_back(
-            HeightRow{.slope = doc.GetCell<double>(0, row_idx), .stddev = doc.GetCell<double>(1, row_idx)});
+        rows.push_back(HeightRow{.slope = doc.GetCell<double>(0, row_idx),
+                                 .stddev = doc.GetCell<double>(1, row_idx)});
     }
 
     if (rows.empty()) {
@@ -1901,9 +1900,9 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
         auto load_gender_height_csv = [&](const char *gender_key, hgps::core::Gender gender) {
             const auto file_info =
                 hgps::input::get_file_info(height_csv_block[gender_key], config.root_path);
-            const auto csv_rows = load_height_params_csv(
-                file_info.name, parse_delimiter_char(file_info.delimiter),
-                file_info.name.filename().string());
+            const auto csv_rows =
+                load_height_params_csv(file_info.name, parse_delimiter_char(file_info.delimiter),
+                                       file_info.name.filename().string());
 
             if (csv_rows.size() == 1u) {
                 const std::size_t broadcast_count =
@@ -1916,11 +1915,11 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
             }
 
             if (stratum_enabled && csv_rows.size() != stratum_count) {
-                throw hgps::core::HgpsException{
-                    fmt::format("Height CSV '{}' has {} rows but adjustment income stratum count is "
-                                "{}. Use 1 row (broadcast) or exactly {} rows.",
-                                file_info.name.filename().string(), csv_rows.size(), stratum_count,
-                                stratum_count)};
+                throw hgps::core::HgpsException{fmt::format(
+                    "Height CSV '{}' has {} rows but adjustment income stratum count is "
+                    "{}. Use 1 row (broadcast) or exactly {} rows.",
+                    file_info.name.filename().string(), csv_rows.size(), stratum_count,
+                    stratum_count)};
             }
 
             std::vector<hgps::HeightModelParams> values;
@@ -1934,12 +1933,12 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
         load_gender_height_csv("Female", hgps::core::Gender::female);
         load_gender_height_csv("Male", hgps::core::Gender::male);
     } else {
-        height_params[hgps::core::Gender::female] = {hgps::HeightModelParams{
-            .slope = opt["HeightSlope"]["Female"].get<double>(),
-            .stddev = opt["HeightStdDev"]["Female"].get<double>()}};
-        height_params[hgps::core::Gender::male] = {hgps::HeightModelParams{
-            .slope = opt["HeightSlope"]["Male"].get<double>(),
-            .stddev = opt["HeightStdDev"]["Male"].get<double>()}};
+        height_params[hgps::core::Gender::female] = {
+            hgps::HeightModelParams{.slope = opt["HeightSlope"]["Female"].get<double>(),
+                                    .stddev = opt["HeightStdDev"]["Female"].get<double>()}};
+        height_params[hgps::core::Gender::male] = {
+            hgps::HeightModelParams{.slope = opt["HeightSlope"]["Male"].get<double>(),
+                                    .stddev = opt["HeightStdDev"]["Male"].get<double>()}};
     }
 
     return std::make_unique<hgps::KevinHallModelDefinition>(

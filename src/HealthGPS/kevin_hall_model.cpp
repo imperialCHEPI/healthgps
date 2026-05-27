@@ -1056,10 +1056,9 @@ KevinHallModelDefinition::KevinHallModelDefinition(
 }
 
 std::unique_ptr<RiskFactorModel> KevinHallModelDefinition::create_model() const {
-    return std::make_unique<KevinHallModel>(expected_, expected_trend_, trend_steps_,
-                                            energy_equation_, nutrient_ranges_, nutrient_equations_,
-                                            food_prices_, weight_quantiles_, epa_quantiles_,
-                                            height_params_);
+    return std::make_unique<KevinHallModel>(
+        expected_, expected_trend_, trend_steps_, energy_equation_, nutrient_ranges_,
+        nutrient_equations_, food_prices_, weight_quantiles_, epa_quantiles_, height_params_);
 }
 
 } // namespace hgps

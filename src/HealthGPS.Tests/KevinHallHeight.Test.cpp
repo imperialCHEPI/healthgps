@@ -33,7 +33,8 @@ hgps::input::Configuration make_finch_configuration() {
     return config;
 }
 
-std::filesystem::path create_temp_height_csv(const std::string &filename, const std::string &content) {
+std::filesystem::path create_temp_height_csv(const std::string &filename,
+                                             const std::string &content) {
     const auto dir = std::filesystem::temp_directory_path() / "hgps_height_tests";
     std::filesystem::create_directories(dir);
     const auto path = dir / filename;
@@ -74,8 +75,8 @@ TEST(KevinHallHeight, SingleRowHeightBroadcastLoadsWithFiveStrata) {
     json["Height"]["Male"]["name"] = male_csv.string();
     auto config = make_finch_configuration();
     config.modelling.baseline_adjustment.income_stratum_factors_mean.enabled = true;
-    config.modelling.baseline_adjustment.income_stratum_factors_mean.adjustment_income_stratum_count =
-        5u;
+    config.modelling.baseline_adjustment.income_stratum_factors_mean
+        .adjustment_income_stratum_count = 5u;
 
     auto definition = hgps::input::load_kevinhall_risk_model_definition(json, config);
     ASSERT_NE(definition, nullptr);
@@ -98,8 +99,8 @@ TEST(KevinHallHeight, MultiRowHeightLoadsWhenMatchingStrataCount) {
     json["Height"]["Male"]["name"] = male_csv.string();
     auto config = make_finch_configuration();
     config.modelling.baseline_adjustment.income_stratum_factors_mean.enabled = true;
-    config.modelling.baseline_adjustment.income_stratum_factors_mean.adjustment_income_stratum_count =
-        5u;
+    config.modelling.baseline_adjustment.income_stratum_factors_mean
+        .adjustment_income_stratum_count = 5u;
 
     auto definition = hgps::input::load_kevinhall_risk_model_definition(json, config);
     ASSERT_NE(definition, nullptr);
@@ -121,8 +122,8 @@ TEST(KevinHallHeight, MultiRowHeightThrowsWhenRowCountMismatchesStrataCount) {
     json["Height"]["Male"]["name"] = male_csv.string();
     auto config = make_finch_configuration();
     config.modelling.baseline_adjustment.income_stratum_factors_mean.enabled = true;
-    config.modelling.baseline_adjustment.income_stratum_factors_mean.adjustment_income_stratum_count =
-        5u;
+    config.modelling.baseline_adjustment.income_stratum_factors_mean
+        .adjustment_income_stratum_count = 5u;
 
     EXPECT_THROW(
         {
@@ -149,8 +150,8 @@ TEST(KevinHallHeight, FemaleAndMaleHeightCanUseDifferentValidShapes) {
     json["Height"]["Male"]["name"] = male_csv.string();
     auto config = make_finch_configuration();
     config.modelling.baseline_adjustment.income_stratum_factors_mean.enabled = true;
-    config.modelling.baseline_adjustment.income_stratum_factors_mean.adjustment_income_stratum_count =
-        5u;
+    config.modelling.baseline_adjustment.income_stratum_factors_mean
+        .adjustment_income_stratum_count = 5u;
 
     auto definition = hgps::input::load_kevinhall_risk_model_definition(json, config);
     ASSERT_NE(definition, nullptr);

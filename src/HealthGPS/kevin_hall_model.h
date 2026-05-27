@@ -204,9 +204,9 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
         Population &population,
         std::optional<std::unordered_map<core::Gender, double>> power = std::nullopt,
         std::optional<unsigned> age = std::nullopt) const;
-    KevinHallAdjustmentTable compute_mean_weight_for_height(Population &population,
-                                                            std::optional<unsigned> age =
-                                                                std::nullopt) const;
+    KevinHallAdjustmentTable
+    compute_mean_weight_for_height(Population &population,
+                                   std::optional<unsigned> age = std::nullopt) const;
 
     /// @brief Initialises the height of a person.
     /// @param context The runtime context

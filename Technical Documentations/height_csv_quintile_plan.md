@@ -23,7 +23,9 @@ isProject: false
 # Height CSV Quintile Integration Plan
 
 ## Goal
+
 Support new `height_female.csv` and `height_male.csv` inputs in KevinHall dynamic model config, with either:
+
 - 1 row (`slope`, `std`) broadcast to all adjustment strata, or
 - multiple rows mapped by row order to strata `1..N` (`N = adjustment_income_stratum_count`).
 
@@ -32,6 +34,7 @@ Keep existing `HeightSlope` / `HeightStdDev` JSON fields working for backward co
 ## Person Lifecycle Walkthrough (with new height quintile logic)
 
 ### 1) Start-of-run initialization (`generate_risk_factors`)
+
 - **Current behavior**
   - KevinHall initializes nutrient intake, energy intake, and weight for everyone.
   - Weight is globally adjusted to expected means.
@@ -49,6 +52,7 @@ Keep existing `HeightSlope` / `HeightStdDev` JSON fields working for backward co
   - Keep final `person.income` categories from project requirements (`3` or `4`) as downstream output buckets.
 
 ### 2) Yearly update (`update_risk_factors`) split by age
+
 - **Newborns (`age == 0`)**
   - Reinitialize nutrient/energy/weight.
   - Apply newborn weight adjustment.
@@ -65,6 +69,7 @@ Keep existing `HeightSlope` / `HeightStdDev` JSON fields working for backward co
   - No new height update behavior unless future requirements explicitly extend adult height updates.
 
 ### 3) 5-strata adjustment with 4-category output (example)
+
 - If `adjustment_income_stratum_count = 5` and `project_requirements.income.categories = 4`:
   - Assign people into 5 rank-balanced adjustment strata from continuous income.
   - Apply height quintile parameters using those 5 strata.
@@ -72,6 +77,7 @@ Keep existing `HeightSlope` / `HeightStdDev` JSON fields working for backward co
   - Outputs/channels remain 4-category, but height assignment benefited from 5-strata resolution.
 
 ## Flowchart
+
 ```mermaid
 flowchart TD
     runStart[RunStepStart] --> modeCheck{Phase}
@@ -106,6 +112,7 @@ flowchart TD
 ```
 
 ## Implementation Steps
+
 - Extend KevinHall dynamic model schema to allow optional CSV file blocks for male/female height parameters in addition to legacy scalar fields.
   - Update [`C:/healthgps/schemas/v2/config/models/kevinhall.json`](C:/healthgps/schemas/v2/config/models/kevinhall.json)
   - Update [`C:/healthgps/schemas/v1/config/models/kevinhall.json`](C:/healthgps/schemas/v1/config/models/kevinhall.json)
@@ -137,6 +144,7 @@ flowchart TD
   - Start with KevinHall fixture under [`C:/healthgps/input-data/data/KevinHall_FINCH/dynamic_model.json`](C:/healthgps/input-data/data/KevinHall_FINCH/dynamic_model.json).
 
 ## Validation Strategy
+
 - Build and run targeted KevinHall tests.
 - Run any config/schema validation tests that exercise KevinHall dynamic model parsing.
 - Spot-check one end-to-end run where adjustment strata count differs from final income categories (e.g., 5 -> 4) to confirm height uses stratum values during assignment while outputs remain in configured final categories.
