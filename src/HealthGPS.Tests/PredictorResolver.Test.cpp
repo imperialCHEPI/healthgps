@@ -4,6 +4,7 @@
 #include "HealthGPS/person.h"
 #include "HealthGPS/predictor_resolver.h"
 #include <cmath>
+#include <limits>
 #include <gtest/gtest.h>
 
 namespace {
@@ -176,7 +177,8 @@ TEST(TestHealthGPS_PredictorResolver, LogEnergyIntakeFromEnergyIntakeRiskFactor)
 
     const auto value = resolve_derived_predictor(person, "log_energyintake");
     ASSERT_TRUE(value.has_value());
-    EXPECT_NEAR(std::log(2000.0), value.value(), 1e-9);
+    const double resolved = value.value_or(std::numeric_limits<double>::quiet_NaN());
+    EXPECT_NEAR(std::log(2000.0), resolved, 1e-9);
 }
 
 TEST(TestHealthGPS_PredictorResolver, EnergyIntakeDirectLookupCaseInsensitive) {
@@ -187,13 +189,15 @@ TEST(TestHealthGPS_PredictorResolver, EnergyIntakeDirectLookupCaseInsensitive) {
 
     const auto from_mixed_case = resolve_derived_predictor(person, "energyintake");
     ASSERT_TRUE(from_mixed_case.has_value());
-    EXPECT_DOUBLE_EQ(1800.0, from_mixed_case.value());
+    const double mixed = from_mixed_case.value_or(std::numeric_limits<double>::quiet_NaN());
+    EXPECT_DOUBLE_EQ(1800.0, mixed);
 
     person.risk_factors.erase("EnergyIntake"_id);
     person.risk_factors["energyintake"_id] = 1500.0;
     const auto from_lower_key = resolve_derived_predictor(person, "energyintake");
     ASSERT_TRUE(from_lower_key.has_value());
-    EXPECT_DOUBLE_EQ(1500.0, from_lower_key.value());
+    const double lower = from_lower_key.value_or(std::numeric_limits<double>::quiet_NaN());
+    EXPECT_DOUBLE_EQ(1500.0, lower);
 }
 
 TEST(TestHealthGPS_PredictorResolver, LogEnergyIntakeAliasAndIncomeContinuous) {
@@ -203,12 +207,14 @@ TEST(TestHealthGPS_PredictorResolver, LogEnergyIntakeAliasAndIncomeContinuous) {
     person.risk_factors["EnergyIntake"_id] = 100.0;
     const auto log_alias = resolve_derived_predictor(person, "log_energyintake");
     ASSERT_TRUE(log_alias.has_value());
-    EXPECT_NEAR(std::log(100.0), log_alias.value(), 1e-9);
+    const double logged = log_alias.value_or(std::numeric_limits<double>::quiet_NaN());
+    EXPECT_NEAR(std::log(100.0), logged, 1e-9);
 
     person.income_continuous = 99.0;
     const auto income_cont = resolve_derived_predictor(person, "income_continuous");
     ASSERT_TRUE(income_cont.has_value());
-    EXPECT_DOUBLE_EQ(99.0, income_cont.value());
+    const double inc = income_cont.value_or(std::numeric_limits<double>::quiet_NaN());
+    EXPECT_DOUBLE_EQ(99.0, inc);
 
     person.region = "region2";
     EXPECT_DOUBLE_EQ(1.0, expect_resolved(person, "region2"));
