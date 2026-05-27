@@ -119,6 +119,18 @@
                 }
             },
             "additionalProperties": false
+        },
+        "Height": {
+            "type": "object",
+            "propertyNames": {
+                "enum": [
+                    "Male",
+                    "Female"
+                ]
+            },
+            "additionalProperties": {
+                "$ref": "../../../v1/config/csv_file.json"
+            }
         }
     },
     "required": [
@@ -126,9 +138,20 @@
         "Nutrients",
         "Foods",
         "WeightQuantiles",
-        "EnergyPhysicalActivityQuantiles",
-        "HeightStdDev",
-        "HeightSlope"
+        "EnergyPhysicalActivityQuantiles"
+    ],
+    "anyOf": [
+        {
+            "required": [
+                "HeightStdDev",
+                "HeightSlope"
+            ]
+        },
+        {
+            "required": [
+                "Height"
+            ]
+        }
     ],
     "additionalProperties": false
 }

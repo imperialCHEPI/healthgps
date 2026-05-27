@@ -13,6 +13,11 @@
 
 namespace hgps {
 
+struct HeightModelParams {
+    double slope{};
+    double stddev{};
+};
+
 /// @brief Defines a table type for Kevin Hall adjustments by sex and age
 using KevinHallAdjustmentTable = UnorderedMap2d<core::Gender, int, double>;
 
@@ -31,8 +36,8 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @param food_prices The unit price for each food group
     /// @param weight_quantiles The weight quantiles (must be sorted)
     /// @param epa_quantiles The Energy / Physical Activity quantiles (must be sorted)
-    /// @param height_stddev The height model female/male standard deviations
-    /// @param height_slope The height female/male model slopes
+    /// @param height_params Height model parameters by gender and income adjustment stratum.
+    ///        Index 0 is the fallback/default stratum used for legacy scalar config.
     KevinHallModel(
         std::shared_ptr<RiskFactorSexAgeTable> expected,
         std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
@@ -44,8 +49,7 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
         const std::unordered_map<core::Identifier, std::optional<double>> &food_prices,
         const std::unordered_map<core::Gender, std::vector<double>> &weight_quantiles,
         const std::vector<double> &epa_quantiles,
-        const std::unordered_map<core::Gender, double> &height_stddev,
-        const std::unordered_map<core::Gender, double> &height_slope);
+        const std::unordered_map<core::Gender, std::vector<HeightModelParams>> &height_params);
 
     RiskFactorModelType type() const noexcept override;
 
@@ -200,6 +204,9 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
         Population &population,
         std::optional<std::unordered_map<core::Gender, double>> power = std::nullopt,
         std::optional<unsigned> age = std::nullopt) const;
+    KevinHallAdjustmentTable compute_mean_weight_for_height(Population &population,
+                                                            std::optional<unsigned> age =
+                                                                std::nullopt) const;
 
     /// @brief Initialises the height of a person.
     /// @param context The runtime context
@@ -222,8 +229,7 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     const std::unordered_map<core::Identifier, std::optional<double>> &food_prices_;
     const std::unordered_map<core::Gender, std::vector<double>> &weight_quantiles_;
     const std::vector<double> &epa_quantiles_;
-    const std::unordered_map<core::Gender, double> &height_stddev_;
-    const std::unordered_map<core::Gender, double> &height_slope_;
+    const std::unordered_map<core::Gender, std::vector<HeightModelParams>> &height_params_;
 
     // Model parameters.
     static constexpr int kevin_hall_age_min = 19; // Start age for the main Kevin Hall model.
@@ -253,8 +259,7 @@ class KevinHallModelDefinition final : public RiskFactorAdjustableModelDefinitio
     /// @param food_prices The unit price for each food group
     /// @param weight_quantiles The weight quantiles (must be sorted)
     /// @param epa_quantiles The Energy / Physical Activity quantiles (must be sorted)
-    /// @param height_stddev The height model female/male standard deviations
-    /// @param height_slope The height model female/male slopes
+    /// @param height_params Height model parameters by gender and income adjustment stratum.
     /// @throws std::invalid_argument for empty arguments
     KevinHallModelDefinition(
         std::unique_ptr<RiskFactorSexAgeTable> expected,
@@ -265,8 +270,8 @@ class KevinHallModelDefinition final : public RiskFactorAdjustableModelDefinitio
         std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
         std::unordered_map<core::Identifier, std::optional<double>> food_prices,
         std::unordered_map<core::Gender, std::vector<double>> weight_quantiles,
-        std::vector<double> epa_quantiles, std::unordered_map<core::Gender, double> height_stddev,
-        std::unordered_map<core::Gender, double> height_slope);
+        std::vector<double> epa_quantiles,
+        std::unordered_map<core::Gender, std::vector<HeightModelParams>> height_params);
 
     /// @brief Construct a new KevinHallModel from this definition
     /// @return A unique pointer to the new KevinHallModel instance
@@ -279,8 +284,7 @@ class KevinHallModelDefinition final : public RiskFactorAdjustableModelDefinitio
     std::unordered_map<core::Identifier, std::optional<double>> food_prices_;
     std::unordered_map<core::Gender, std::vector<double>> weight_quantiles_;
     std::vector<double> epa_quantiles_;
-    std::unordered_map<core::Gender, double> height_stddev_;
-    std::unordered_map<core::Gender, double> height_slope_;
+    std::unordered_map<core::Gender, std::vector<HeightModelParams>> height_params_;
 };
 
 } // namespace hgps

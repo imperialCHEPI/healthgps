@@ -42,6 +42,7 @@ target_sources(
             "DataSeries.Test.cpp"
             "ModelParserFinch.Test.cpp"
             "KevinHallWeightValidation.Test.cpp"
+            "KevinHallHeight.Test.cpp"
             "EventMonitor.Test.cpp"
             "RelativeRiskLookup.Test.cpp"
             "RuntimeMetric.Test.cpp"

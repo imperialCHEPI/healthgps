@@ -63,14 +63,13 @@ KevinHallModel::KevinHallModel(
     const std::unordered_map<core::Identifier, std::optional<double>> &food_prices,
     const std::unordered_map<core::Gender, std::vector<double>> &weight_quantiles,
     const std::vector<double> &epa_quantiles,
-    const std::unordered_map<core::Gender, double> &height_stddev,
-    const std::unordered_map<core::Gender, double> &height_slope)
+    const std::unordered_map<core::Gender, std::vector<HeightModelParams>> &height_params)
     : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend),
                                 std::move(trend_steps)},
       energy_equation_{energy_equation}, nutrient_ranges_{nutrient_ranges},
       nutrient_equations_{nutrient_equations}, food_prices_{food_prices},
       weight_quantiles_{weight_quantiles}, epa_quantiles_{epa_quantiles},
-      height_stddev_{height_stddev}, height_slope_{height_slope} {}
+      height_params_{height_params} {}
 
 RiskFactorModelType KevinHallModel::type() const noexcept { return RiskFactorModelType::Dynamic; }
 
@@ -98,7 +97,7 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
     }
 
     // Compute weight power means by sex and age.
-    auto W_power_means = compute_mean_weight(context.population(), height_slope_);
+    auto W_power_means = compute_mean_weight_for_height(context.population());
 
     // Initialise everyone.
     for (auto &person : context.population()) {
@@ -171,7 +170,7 @@ void KevinHallModel::update_newborns(RuntimeContext &context) const {
     // NOTE: FOR REFACTORING: End of semi-redundant block.
 
     // Compute newborn weight power means by sex.
-    auto W_power_means = compute_mean_weight(context.population(), height_slope_, 0);
+    auto W_power_means = compute_mean_weight_for_height(context.population(), 0);
 
     // Initialise height and other Kevin Hall state for newborns.
     for (auto &person : context.population()) {
@@ -241,7 +240,7 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
     send_weight_adjustments(context, std::move(adjustments));
 
     // Compute weight power means by sex and age.
-    auto W_power_means = compute_mean_weight(context.population(), height_slope_);
+    auto W_power_means = compute_mean_weight_for_height(context.population());
 
     // Update: (no newborns or at least the Kevin Hall minimum age).
     for (auto &person : context.population()) {
@@ -907,11 +906,78 @@ KevinHallModel::compute_mean_weight(Population &population,
     return means;
 }
 
+KevinHallAdjustmentTable
+KevinHallModel::compute_mean_weight_for_height(Population &population,
+                                               std::optional<unsigned> age) const {
+
+    struct SumCount {
+      public:
+        void append(double value) noexcept {
+            sum_ += value;
+            count_++;
+        }
+        double mean() const noexcept { return sum_ / count_; }
+
+      private:
+        double sum_{};
+        int count_{};
+    };
+
+    auto resolve_params = [this](const Person &person) -> const HeightModelParams & {
+        const auto by_gender = height_params_.find(person.gender);
+        if (by_gender == height_params_.end() || by_gender->second.empty()) {
+            throw core::HgpsException("Height model parameters missing for person gender");
+        }
+        const auto &params = by_gender->second;
+        if (!person.has_income_adjustment_stratum) {
+            return params.front();
+        }
+        const std::size_t index = std::min(person.income_adjustment_stratum, params.size() - 1);
+        return params[index];
+    };
+
+    auto sumcounts = UnorderedMap2d<core::Gender, int, SumCount>{};
+    sumcounts.emplace_row(core::Gender::female, std::unordered_map<int, SumCount>{});
+    sumcounts.emplace_row(core::Gender::male, std::unordered_map<int, SumCount>{});
+    for (const auto &person : population) {
+        if (!person.is_active()) {
+            continue;
+        }
+        if (age.has_value() && person.age != age.value()) {
+            continue;
+        }
+
+        const double slope = resolve_params(person).slope;
+        const double value = pow(person.risk_factors.at("Weight"_id), slope);
+        sumcounts.at(person.gender)[person.age].append(value);
+    }
+
+    auto means = KevinHallAdjustmentTable{};
+    for (const auto &[sumcount_sex, sumcounts_by_sex] : sumcounts) {
+        means.emplace_row(sumcount_sex, std::unordered_map<int, double>{});
+        for (const auto &[sumcount_age, sumcount] : sumcounts_by_sex) {
+            means.at(sumcount_sex)[sumcount_age] = sumcount.mean();
+        }
+    }
+
+    return means;
+}
+
 void KevinHallModel::initialise_height(RuntimeContext &context, Person &person, double W_power_mean,
                                        Random &random) const {
 
+    const auto by_gender = height_params_.find(person.gender);
+    if (by_gender == height_params_.end() || by_gender->second.empty()) {
+        throw core::HgpsException("Height model parameters missing for person gender");
+    }
+    const auto &params = by_gender->second;
+    const std::size_t index = person.has_income_adjustment_stratum
+                                  ? std::min(person.income_adjustment_stratum, params.size() - 1)
+                                  : 0u;
+    const auto &height_params = params[index];
+
     // Initialise lifelong height residual.
-    double H_residual = random.next_normal(0, height_stddev_.at(person.gender));
+    double H_residual = random.next_normal(0, height_params.stddev);
     person.risk_factors["Height_residual"_id] = H_residual;
 
     // Initialise height.
@@ -924,8 +990,16 @@ void KevinHallModel::update_height(RuntimeContext &context, Person &person,
     double H_expected =
         get_expected(context, person.gender, person.age, "Height"_id, std::nullopt, false);
     double H_residual = person.risk_factors.at("Height_residual"_id);
-    double stddev = height_stddev_.at(person.gender);
-    double slope = height_slope_.at(person.gender);
+    const auto by_gender = height_params_.find(person.gender);
+    if (by_gender == height_params_.end() || by_gender->second.empty()) {
+        throw core::HgpsException("Height model parameters missing for person gender");
+    }
+    const auto &params = by_gender->second;
+    const std::size_t index = person.has_income_adjustment_stratum
+                                  ? std::min(person.income_adjustment_stratum, params.size() - 1)
+                                  : 0u;
+    const double stddev = params[index].stddev;
+    const double slope = params[index].slope;
 
     // Compute height.
     double exp_norm_mean = exp(0.5 * stddev * stddev);
@@ -944,14 +1018,14 @@ KevinHallModelDefinition::KevinHallModelDefinition(
     std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
     std::unordered_map<core::Identifier, std::optional<double>> food_prices,
     std::unordered_map<core::Gender, std::vector<double>> weight_quantiles,
-    std::vector<double> epa_quantiles, std::unordered_map<core::Gender, double> height_stddev,
-    std::unordered_map<core::Gender, double> height_slope)
+    std::vector<double> epa_quantiles,
+    std::unordered_map<core::Gender, std::vector<HeightModelParams>> height_params)
     : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend),
                                           std::move(trend_steps)},
       energy_equation_{std::move(energy_equation)}, nutrient_ranges_{std::move(nutrient_ranges)},
       nutrient_equations_{std::move(nutrient_equations)}, food_prices_{std::move(food_prices)},
       weight_quantiles_{std::move(weight_quantiles)}, epa_quantiles_{std::move(epa_quantiles)},
-      height_stddev_{std::move(height_stddev)}, height_slope_{std::move(height_slope)} {
+      height_params_{std::move(height_params)} {
 
     if (energy_equation_.empty()) {
         throw core::HgpsException("Energy equation mapping is empty");
@@ -971,11 +1045,13 @@ KevinHallModelDefinition::KevinHallModelDefinition(
     if (epa_quantiles_.empty()) {
         throw core::HgpsException("Energy Physical Activity quantiles mapping is empty");
     }
-    if (height_stddev_.empty()) {
-        throw core::HgpsException("Height standard deviation mapping is empty");
+    if (height_params_.empty()) {
+        throw core::HgpsException("Height parameter mapping is empty");
     }
-    if (height_slope_.empty()) {
-        throw core::HgpsException("Height slope mapping is empty");
+    for (const auto &[gender, params] : height_params_) {
+        if (params.empty()) {
+            throw core::HgpsException("Height parameter mapping contains empty gender entry");
+        }
     }
 }
 
@@ -983,7 +1059,7 @@ std::unique_ptr<RiskFactorModel> KevinHallModelDefinition::create_model() const 
     return std::make_unique<KevinHallModel>(expected_, expected_trend_, trend_steps_,
                                             energy_equation_, nutrient_ranges_, nutrient_equations_,
                                             food_prices_, weight_quantiles_, epa_quantiles_,
-                                            height_stddev_, height_slope_);
+                                            height_params_);
 }
 
 } // namespace hgps
