@@ -52,7 +52,8 @@ std::shared_ptr<hgps::ModelInput> make_weight_validation_input(hgps::core::DataT
     const auto mapping = HierarchicalMapping(
         {MappingEntry{"Weight", 0, DoubleInterval{40.0, 120.0}}, MappingEntry{"Age", 0}});
 
-    return std::make_shared<ModelInput>(data, settings, run, ses, mapping, std::vector<DiseaseInfo>{},
+    return std::make_shared<ModelInput>(data, settings, run, ses, mapping,
+                                        std::vector<DiseaseInfo>{},
                                         hgps::input::ProjectRequirements{}, hgps::input::PIFInfo{});
 }
 
