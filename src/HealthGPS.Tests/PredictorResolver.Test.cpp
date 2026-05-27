@@ -4,8 +4,8 @@
 #include "HealthGPS/person.h"
 #include "HealthGPS/predictor_resolver.h"
 #include <cmath>
-#include <limits>
 #include <gtest/gtest.h>
+#include <limits>
 
 namespace {
 double expect_resolved(const hgps::Person &person, const std::string &key) {
