@@ -151,8 +151,8 @@ nlohmann::json set_quintile_weight_quantiles(nlohmann::json json,
             const auto path = create_temp_weight_quantile_csv(
                 base.filename().string() + "_q" + std::to_string(q) + ".csv",
                 ",quantile\n1," + std::to_string(scale * static_cast<double>(q)) + "\n2," +
-                    std::to_string(scale * static_cast<double>(q) + 0.1) + "\n3," +
-                    std::to_string(scale * static_cast<double>(q) + 0.2) + "\n");
+                    std::to_string((scale * static_cast<double>(q)) + 0.1) + "\n3," +
+                    std::to_string((scale * static_cast<double>(q)) + 0.2) + "\n");
             block["Quintile" + std::to_string(q)] = make_csv_file_json(path);
         }
         return block;
