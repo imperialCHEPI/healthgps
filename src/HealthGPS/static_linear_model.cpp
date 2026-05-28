@@ -90,6 +90,8 @@ namespace {
 
 std::optional<core::DoubleInterval>
 get_physical_activity_mapping_range(const RuntimeContext &context) {
+    // MAHIMA: Use PhysicalActivity range from config mapping as the single source of truth
+    // for PA clamping across initialization and adjustment paths.
     const core::Identifier physical_activity_id("PhysicalActivity");
     try {
         return context.mapping().at(physical_activity_id).range();
@@ -2324,7 +2326,7 @@ void StaticLinearModel::initialise_continuous_physical_activity(
     double rand_noise = random.next_normal(0.0, model.stddev);
     double final_value = value + rand_noise;
 
-    // Prefer configured mapping range from config.json; fallback to model-level min/max.
+    // MAHIMA: Prefer configured mapping range from config.json; fallback to model-level min/max.
     const auto mapping_range = get_physical_activity_mapping_range(context);
     if (mapping_range.has_value()) {
         final_value = mapping_range->clamp(final_value);
@@ -2350,7 +2352,7 @@ void StaticLinearModel::initialise_simple_physical_activity(
     double rand = random.next_normal(0.0, model.stddev);
     double factor = expected * exp(rand - (0.5 * pow(model.stddev, 2)));
 
-    // Prefer configured mapping range from config.json; fallback to model-level min/max.
+    // MAHIMA: Prefer configured mapping range from config.json; fallback to model-level min/max.
     const auto mapping_range = get_physical_activity_mapping_range(context);
     if (mapping_range.has_value()) {
         factor = mapping_range->clamp(factor);

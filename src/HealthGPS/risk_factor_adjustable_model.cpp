@@ -336,9 +336,8 @@ void RiskFactorAdjustableModel::adjust_risk_factors(
 
                     // Apply adjustment: new_value = current_value + delta
                     double adjusted_value = current_value + delta;
-                    // Prefer configured PhysicalActivity range from mapping (config.json).
-                    // Fallback to passed ranges to preserve legacy behavior if mapping range is
-                    // unavailable.
+                    // MAHIMA: Prefer configured PhysicalActivity range from config mapping.
+                    // MAHIMA: Fallback to passed ranges only if mapping range is unavailable.
                     bool clamped = false;
                     const auto &mapping_entries = context.mapping().entries();
                     const auto mapping_it = std::find_if(

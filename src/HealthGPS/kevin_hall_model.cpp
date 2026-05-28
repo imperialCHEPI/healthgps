@@ -47,6 +47,8 @@ std::string gender_label(const hgps::Person &person) {
 }
 
 bool should_print_height_summary_tables(const hgps::RuntimeContext &context) {
+    // MAHIMA: Keep console reporting limited to baseline start and first update year so
+    // diagnostics remain useful without flooding long simulation logs.
     if (context.scenario().type() != hgps::ScenarioType::baseline) {
         return false;
     }
@@ -68,6 +70,8 @@ const hgps::HeightModelParams &resolve_height_params_for_person(
     const hgps::Person &person,
     const std::unordered_map<hgps::core::Gender, std::vector<hgps::HeightModelParams>>
         &height_params) {
+    // MAHIMA: Height slope/stddev are selected by gender first, then by income adjustment
+    // stratum when available (single-row CSV is treated as broadcast via params.front()).
     const auto by_gender = height_params.find(person.gender);
     if (by_gender == height_params.end() || by_gender->second.empty()) {
         throw hgps::core::HgpsException("Height model parameters missing for person gender");

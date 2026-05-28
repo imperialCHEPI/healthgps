@@ -206,3 +206,46 @@ TEST(KevinHallHeight, FemaleAndMaleHeightCanUseDifferentValidShapes) {
     ASSERT_NE(definition, nullptr);
     EXPECT_NE(definition->create_model(), nullptr);
 }
+
+TEST(KevinHallHeight, MultiRowHeightLoadsWhenStratumAdjustmentDisabled) {
+    const auto finch = finch_data_root();
+    if (!std::filesystem::exists(finch / "dynamic_model.json")) {
+        GTEST_SKIP() << "FINCH input data not available at " << finch.string();
+    }
+
+    const std::string rows = "slope,std\n0.11,0.041\n0.12,0.042\n0.13,0.043\n";
+    auto female_csv = create_temp_height_csv("height_female_nostratum.csv", rows);
+    auto male_csv = create_temp_height_csv("height_male_nostratum.csv", rows);
+
+    auto json = hgps::input::load_json(finch / "dynamic_model.json");
+    json["Height"]["Female"]["name"] = female_csv.string();
+    json["Height"]["Male"]["name"] = male_csv.string();
+    auto config = make_finch_configuration();
+    config.modelling.baseline_adjustment.income_stratum_factors_mean.enabled = false;
+
+    auto definition = hgps::input::load_kevinhall_risk_model_definition(json, config);
+    ASSERT_NE(definition, nullptr);
+    EXPECT_NE(definition->create_model(), nullptr);
+}
+
+TEST(KevinHallHeight, HeaderOnlyHeightCsvThrows) {
+    const auto finch = finch_data_root();
+    if (!std::filesystem::exists(finch / "dynamic_model.json")) {
+        GTEST_SKIP() << "FINCH input data not available at " << finch.string();
+    }
+
+    auto female_csv = create_temp_height_csv("height_female_header_only.csv", "slope,std\n");
+    auto male_csv = create_temp_height_csv("height_male_header_only.csv", "slope,std\n");
+
+    auto json = hgps::input::load_json(finch / "dynamic_model.json");
+    json["Height"]["Female"]["name"] = female_csv.string();
+    json["Height"]["Male"]["name"] = male_csv.string();
+    auto config = make_finch_configuration();
+
+    EXPECT_THROW(
+        {
+            auto definition = hgps::input::load_kevinhall_risk_model_definition(json, config);
+            (void)definition;
+        },
+        hgps::core::HgpsException);
+}
