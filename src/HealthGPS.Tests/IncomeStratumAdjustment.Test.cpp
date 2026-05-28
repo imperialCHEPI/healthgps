@@ -147,6 +147,48 @@ std::shared_ptr<hgps::ModelInput> create_trended_model_input(hgps::core::DataTab
                                         project_requirements, hgps::input::PIFInfo{});
 }
 
+std::shared_ptr<hgps::ModelInput> create_physical_activity_model_input(hgps::core::DataTable &data,
+                                                                        std::string pa_type) {
+    using namespace hgps;
+    using namespace hgps::core;
+
+    IntegerDataTableColumnBuilder age_builder("Age");
+    age_builder.append(0);
+    data.add(age_builder.build());
+
+    auto country = Country{.code = 826, .name = "United Kingdom", .alpha2 = "GB", .alpha3 = "GBR"};
+    auto settings = Settings{country, 0.1f, IntegerInterval(0, 2)};
+    auto run = RunInfo{.start_time = 2022,
+                       .stop_time = 2023,
+                       .sync_timeout_ms = 1000,
+                       .seed = 123u,
+                       .verbosity = core::VerboseMode::none,
+                       .comorbidities = 0,
+                       .policy_start_year = 0};
+    auto ses = SESDefinition{.fuction_name = "normal", .parameters = {0.0, 1.0}};
+    auto mapping = HierarchicalMapping({MappingEntry{"Age", 0},
+                                        MappingEntry{"foodcarbohydrate", 1,
+                                                     core::DoubleInterval(0.0, 500.0)},
+                                        MappingEntry{"PhysicalActivity", 1,
+                                                     core::DoubleInterval(1.2, 1.4)}});
+    std::vector<core::DiseaseInfo> diseases{};
+    auto project_requirements = hgps::input::ProjectRequirements{};
+    project_requirements.risk_factors.adjust_to_factors_mean = true;
+    project_requirements.risk_factors.trended = false;
+    project_requirements.income.enabled = true;
+    project_requirements.income.type = "continuous";
+    project_requirements.income.categories = "4";
+    project_requirements.income.adjust_to_factors_mean = true;
+    project_requirements.income.trended = false;
+    project_requirements.physical_activity.enabled = true;
+    project_requirements.physical_activity.type = std::move(pa_type);
+    project_requirements.physical_activity.adjust_to_factors_mean = true;
+    project_requirements.physical_activity.trended = false;
+    project_requirements.trend.enabled = false;
+    return std::make_shared<ModelInput>(data, settings, run, ses, mapping, diseases,
+                                        project_requirements, hgps::input::PIFInfo{});
+}
+
 std::shared_ptr<hgps::RiskFactorSexAgeTable>
 make_expected_table(const hgps::core::Identifier &factor, double value) {
     auto expected = std::make_shared<hgps::RiskFactorSexAgeTable>();
@@ -231,7 +273,9 @@ struct StaticLinearModelTestBundle {
 std::shared_ptr<StaticLinearModelTestBundle> create_test_static_linear_model_bundle(
     const std::shared_ptr<hgps::RiskFactorSexAgeTable> &overall_expected,
     const std::vector<hgps::IncomeStratumExpectedTableEntry> &stratum_tables, bool stratum_enabled,
-    std::size_t adjustment_income_stratum_count) {
+    std::size_t adjustment_income_stratum_count,
+    const std::unordered_map<hgps::core::Identifier, hgps::PhysicalActivityModel>
+        &physical_activity_models = {}) {
     using namespace hgps;
     auto bundle = std::make_shared<StaticLinearModelTestBundle>();
     bundle->names = {core::Identifier("foodcarbohydrate")};
@@ -264,7 +308,6 @@ std::shared_ptr<StaticLinearModelTestBundle> create_test_static_linear_model_bun
 
     // MAHIMA: StaticLinearModel stores many constructor inputs by reference.
     // Heap-own the bundle so reference members remain valid after helper returns.
-    const std::unordered_map<core::Identifier, PhysicalActivityModel> physical_activity_models{};
     bundle->model = std::make_unique<StaticLinearModel>(
         overall_expected, bundle->expected_trend, bundle->trend_steps,
         bundle->expected_trend_boxcox, bundle->names, bundle->models, bundle->ranges,
@@ -634,5 +677,128 @@ TEST(IncomeStratumAdjustment, TrendedYearlyPathKeepsStrataAndFinalIncomeAssigned
         EXPECT_TRUE(p.has_income_adjustment_stratum);
         EXPECT_LT(p.income_adjustment_stratum, 2u);
         EXPECT_NE(core::Income::unknown, p.income);
+    }
+}
+
+TEST(IncomeStratumAdjustment, PhysicalActivityAdjustmentUsesConfiguredMappingRange) {
+    using namespace hgps;
+
+    core::DataTable data;
+    auto inputs = create_physical_activity_model_input(data, "simple");
+    auto bus = std::make_shared<DefaultEventBus>();
+    auto channel = SyncChannel{};
+    auto scenario = std::make_unique<BaselineScenario>(channel);
+    auto context = RuntimeContext(bus, inputs, std::move(scenario));
+    context.reset_population(1);
+
+    auto &person = context.population()[0];
+    person.gender = core::Gender::female;
+    person.age = 0;
+    person.physical_activity = 0.8;
+    person.risk_factors["PhysicalActivity"_id] = 0.8;
+
+    auto expected = std::make_shared<RiskFactorSexAgeTable>();
+    expected->emplace(core::Gender::female, "PhysicalActivity"_id,
+                      std::vector<double>{2.2, 2.2, 2.2});
+    expected->emplace(core::Gender::male, "PhysicalActivity"_id,
+                      std::vector<double>{2.2, 2.2, 2.2});
+
+    auto expected_trend = std::make_shared<std::unordered_map<core::Identifier, double>>();
+    auto trend_steps = std::make_shared<std::unordered_map<core::Identifier, int>>();
+    auto model = TestAdjustableModel(expected, expected_trend, trend_steps, TrendType::Null,
+                                     nullptr, nullptr);
+
+    const std::vector<core::Identifier> factors{"PhysicalActivity"_id};
+    const std::vector<core::DoubleInterval> ranges{core::DoubleInterval(0.0, 10.0)};
+    model.adjust_risk_factors(context, factors, std::cref(ranges), false);
+
+    EXPECT_NEAR(1.4, person.physical_activity, 1e-9);
+    EXPECT_NEAR(1.4, person.risk_factors.at("PhysicalActivity"_id), 1e-9);
+}
+
+TEST(IncomeStratumAdjustment, SimplePhysicalActivityInitialisationUsesConfiguredMappingRange) {
+    using namespace hgps;
+
+    core::DataTable data;
+    auto inputs = create_physical_activity_model_input(data, "simple");
+    auto bus = std::make_shared<DefaultEventBus>();
+    auto channel = SyncChannel{};
+    auto scenario = std::make_unique<BaselineScenario>(channel);
+    auto context = RuntimeContext(bus, inputs, std::move(scenario));
+    context.reset_population(4);
+    for (std::size_t i = 0; i < context.population().size(); ++i) {
+        auto &p = context.population()[i];
+        p.gender = (i % 2 == 0) ? core::Gender::male : core::Gender::female;
+        p.age = 0;
+    }
+
+    const auto factor = core::Identifier("foodcarbohydrate");
+    auto expected = make_expected_table_with_income_and_pa(factor, 100.0, 600.0, 2.2);
+    std::vector<IncomeStratumExpectedTableEntry> stratum_tables{};
+
+    PhysicalActivityModel simple_model;
+    simple_model.model_type = "simple";
+    simple_model.stddev = 0.01;
+    simple_model.min_value = 0.0;
+    simple_model.max_value = 5.0;
+    std::unordered_map<core::Identifier, PhysicalActivityModel> pa_models{
+        {core::Identifier("simple"), simple_model}};
+
+    auto bundle = create_test_static_linear_model_bundle(expected, stratum_tables, false, 0u,
+                                                         pa_models);
+    context.set_current_time(inputs->run().start_time);
+    bundle->model->generate_risk_factors(context);
+
+    for (const auto &p : context.population()) {
+        if (!p.is_active()) {
+            continue;
+        }
+        ASSERT_TRUE(p.risk_factors.contains("PhysicalActivity"_id));
+        EXPECT_GE(p.risk_factors.at("PhysicalActivity"_id), 1.2);
+        EXPECT_LE(p.risk_factors.at("PhysicalActivity"_id), 1.4);
+    }
+}
+
+TEST(IncomeStratumAdjustment, ContinuousPhysicalActivityInitialisationUsesConfiguredMappingRange) {
+    using namespace hgps;
+
+    core::DataTable data;
+    auto inputs = create_physical_activity_model_input(data, "continuous");
+    auto bus = std::make_shared<DefaultEventBus>();
+    auto channel = SyncChannel{};
+    auto scenario = std::make_unique<BaselineScenario>(channel);
+    auto context = RuntimeContext(bus, inputs, std::move(scenario));
+    context.reset_population(4);
+    for (std::size_t i = 0; i < context.population().size(); ++i) {
+        auto &p = context.population()[i];
+        p.gender = (i % 2 == 0) ? core::Gender::male : core::Gender::female;
+        p.age = 0;
+    }
+
+    const auto factor = core::Identifier("foodcarbohydrate");
+    auto expected = make_expected_table_with_income_and_pa(factor, 100.0, 600.0, 2.2);
+    std::vector<IncomeStratumExpectedTableEntry> stratum_tables{};
+
+    PhysicalActivityModel continuous_model;
+    continuous_model.model_type = "continuous";
+    continuous_model.intercept = 3.0;
+    continuous_model.stddev = 0.01;
+    continuous_model.min_value = 0.0;
+    continuous_model.max_value = 5.0;
+    std::unordered_map<core::Identifier, PhysicalActivityModel> pa_models{
+        {core::Identifier("continuous"), continuous_model}};
+
+    auto bundle = create_test_static_linear_model_bundle(expected, stratum_tables, false, 0u,
+                                                         pa_models);
+    context.set_current_time(inputs->run().start_time);
+    bundle->model->generate_risk_factors(context);
+
+    for (const auto &p : context.population()) {
+        if (!p.is_active()) {
+            continue;
+        }
+        ASSERT_TRUE(p.risk_factors.contains("PhysicalActivity"_id));
+        EXPECT_GE(p.risk_factors.at("PhysicalActivity"_id), 1.2);
+        EXPECT_LE(p.risk_factors.at("PhysicalActivity"_id), 1.4);
     }
 }

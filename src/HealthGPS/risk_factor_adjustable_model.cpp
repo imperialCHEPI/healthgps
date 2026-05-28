@@ -218,6 +218,9 @@ void RiskFactorAdjustableModel::adjust_risk_factors(
                     if (!has_value) {
                         continue;
                     }
+                    // MAHIMA: These numbers are carefully chosen hash‑mixing constants that turn
+                    // simple inputs (ID, age, bucket) into a well‑distributed, deterministic,
+                    // random‑looking score without bias or collisions.
                     const auto hash_seed =
                         (static_cast<std::uint64_t>(person.id()) * 1315423911ULL) ^
                         (static_cast<std::uint64_t>(row.age) * 2654435761ULL) ^
@@ -321,7 +324,7 @@ void RiskFactorAdjustableModel::adjust_risk_factors(
                     if (person.income_continuous > 0.0) {
                         person.income_continuous = adjusted_value;
                     }
-                } else if (factor_name == "PhysicalActivity") {
+                } else if (factor_name_lower == "physicalactivity") {
                     // Factor name "PhysicalActivity" from expected table maps to
                     // person.physical_activity internally Get current value from member variable
                     double current_value = person.physical_activity;
