@@ -256,7 +256,8 @@ TEST(KevinHallHeight, SingleRowHeightLoadsWhenStratumCountIsOne) {
         GTEST_SKIP() << "FINCH input data not available at " << finch.string();
     }
 
-    auto female_csv = create_temp_height_csv("height_female_one_stratum.csv", "slope,std\n0.18,0.05\n");
+    auto female_csv =
+        create_temp_height_csv("height_female_one_stratum.csv", "slope,std\n0.18,0.05\n");
     auto male_csv = create_temp_height_csv("height_male_one_stratum.csv", "slope,std\n0.20,0.06\n");
 
     auto json = hgps::input::load_json(finch / "dynamic_model.json");
