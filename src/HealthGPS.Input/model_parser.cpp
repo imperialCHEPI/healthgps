@@ -128,6 +128,133 @@ std::vector<HeightRow> load_height_params_csv(const std::filesystem::path &path,
     return rows;
 }
 
+//
+bool is_weight_quantile_csv_file_block(const nlohmann::json &node) {
+    return node.is_object() && node.contains("name") && node.contains("format");
+}
+
+std::optional<std::size_t> parse_weight_quintile_key_index(const std::string &key) {
+    static constexpr std::string_view prefix = "Quintile";
+    if (!key.starts_with(prefix)) {
+        return std::nullopt;
+    }
+    const auto suffix = key.substr(prefix.size());
+    if (suffix.empty()) {
+        return std::nullopt;
+    }
+    for (const char ch : suffix) {
+        if (ch < '0' || ch > '9') {
+            return std::nullopt;
+        }
+    }
+    try {
+        const auto index = std::stoull(suffix);
+        if (index == 0) {
+            return std::nullopt;
+        }
+        return static_cast<std::size_t>(index - 1);
+    } catch (...) {
+        return std::nullopt;
+    }
+}
+
+std::vector<double> load_sorted_weight_quantiles_from_table(const hgps::core::DataTable &table) {
+    std::vector<double> quantiles;
+    quantiles.reserve(table.num_rows());
+    for (std::size_t row = 0; row < table.num_rows(); ++row) {
+        quantiles.push_back(std::any_cast<double>(table.column(0).value(row)));
+    }
+    std::ranges::sort(quantiles);
+    return quantiles;
+}
+
+std::vector<double> load_sorted_weight_quantiles_from_csv(const hgps::input::FileInfo &file_info) {
+    const auto table = load_datatable_from_csv(file_info);
+    if (table.num_rows() == 0) {
+        throw hgps::core::HgpsException{
+            fmt::format("Weight quantile CSV '{}' does not contain any data rows",
+                        file_info.name.filename().string())};
+    }
+    return load_sorted_weight_quantiles_from_table(table);
+}
+
+std::vector<std::vector<double>>
+load_gender_weight_quantiles_by_stratum(const nlohmann::json &gender_node,
+                                        const std::filesystem::path &root_path,
+                                        std::string_view gender_label, bool stratum_enabled,
+                                        std::size_t stratum_count) {
+    if (is_weight_quantile_csv_file_block(gender_node)) {
+        const auto file_info = hgps::input::get_file_info(gender_node, root_path);
+        const auto quantiles = load_sorted_weight_quantiles_from_csv(file_info);
+        const std::size_t broadcast_count =
+            (stratum_enabled && stratum_count > 1u) ? stratum_count : 1u;
+        return std::vector<std::vector<double>>(broadcast_count, quantiles);
+    }
+
+    if (!gender_node.is_object()) {
+        throw hgps::core::HgpsException{
+            fmt::format("WeightQuantiles.{} must be a csv_file block or Quintile1..N object",
+                        gender_label)};
+    }
+
+    if (!stratum_enabled) {
+        throw hgps::core::HgpsException{fmt::format(
+            "WeightQuantiles.{} uses Quintile1..N files but "
+            "baseline_adjustments.income_stratum_factors_mean.enabled is false",
+            gender_label)};
+    }
+
+    if (stratum_count < 2u) {
+        throw hgps::core::HgpsException{fmt::format(
+            "WeightQuantiles.{} uses Quintile1..N files but adjustment_income_stratum_count "
+            "must be >= 2",
+            gender_label)};
+    }
+
+    std::vector<std::pair<std::size_t, std::string>> quintile_keys;
+    for (const auto &[key, value] : gender_node.items()) {
+        const auto index = parse_weight_quintile_key_index(key);
+        if (!index.has_value()) {
+            throw hgps::core::HgpsException{fmt::format(
+                "WeightQuantiles.{} contains unsupported key '{}'. Use Quintile1, Quintile2, ...",
+                gender_label, key)};
+        }
+        if (!is_weight_quantile_csv_file_block(value)) {
+            throw hgps::core::HgpsException{fmt::format(
+                "WeightQuantiles.{}.{} must be a csv_file block", gender_label, key)};
+        }
+        quintile_keys.emplace_back(index.value(), key);
+    }
+
+    if (quintile_keys.size() != stratum_count) {
+        throw hgps::core::HgpsException{fmt::format(
+            "WeightQuantiles.{} defines {} quintile file(s) but adjustment_income_stratum_count "
+            "is {}. Provide exactly {} Quintile keys or use a single legacy csv_file.",
+            gender_label, quintile_keys.size(), stratum_count, stratum_count)};
+    }
+
+    std::ranges::sort(quintile_keys, [](const auto &lhs, const auto &rhs) {
+        return lhs.first < rhs.first;
+    });
+
+    for (std::size_t i = 0; i < quintile_keys.size(); ++i) {
+        if (quintile_keys[i].first != i) {
+            throw hgps::core::HgpsException{fmt::format(
+                "WeightQuantiles.{} quintile keys must be contiguous Quintile1..Quintile{}",
+                gender_label, stratum_count)};
+        }
+    }
+
+    std::vector<std::vector<double>> by_stratum;
+    by_stratum.reserve(stratum_count);
+    for (const auto &[index, key] : quintile_keys) {
+        (void)index;
+        const auto file_info = hgps::input::get_file_info(gender_node.at(key), root_path);
+        by_stratum.push_back(load_sorted_weight_quantiles_from_csv(file_info));
+    }
+    return by_stratum;
+}
+
 char parse_delimiter_char(const std::string &delimiter) {
     if (delimiter == "\\t") {
         return '\t';
@@ -1861,26 +1988,19 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
         }
     }
 
-    // Weight quantiles.
-    const auto weight_quantiles_table_F = load_datatable_from_csv(
-        hgps::input::get_file_info(opt["WeightQuantiles"]["Female"], config.root_path));
-    const auto weight_quantiles_table_M = load_datatable_from_csv(
-        hgps::input::get_file_info(opt["WeightQuantiles"]["Male"], config.root_path));
-    std::unordered_map<hgps::core::Gender, std::vector<double>> weight_quantiles = {
-        {hgps::core::Gender::female, {}}, {hgps::core::Gender::male, {}}};
-    weight_quantiles[hgps::core::Gender::female].reserve(weight_quantiles_table_F.num_rows());
-    weight_quantiles[hgps::core::Gender::male].reserve(weight_quantiles_table_M.num_rows());
-    for (size_t j = 0; j < weight_quantiles_table_F.num_rows(); j++) {
-        weight_quantiles[hgps::core::Gender::female].push_back(
-            std::any_cast<double>(weight_quantiles_table_F.column(0).value(j)));
-    }
-    for (size_t j = 0; j < weight_quantiles_table_M.num_rows(); j++) {
-        weight_quantiles[hgps::core::Gender::male].push_back(
-            std::any_cast<double>(weight_quantiles_table_M.column(0).value(j)));
-    }
-    for (auto &[unused, quantiles] : weight_quantiles) {
-        std::sort(quantiles.begin(), quantiles.end());
-    }
+    const auto &stratum_cfg = config.modelling.baseline_adjustment.income_stratum_factors_mean;
+    const bool stratum_enabled = stratum_cfg.enabled;
+    const std::size_t stratum_count = stratum_cfg.adjustment_income_stratum_count;
+
+    // Weight quantiles (legacy single csv_file per gender, or Quintile1..N per gender).
+    std::unordered_map<hgps::core::Gender, std::vector<std::vector<double>>>
+        weight_quantiles_by_stratum;
+    weight_quantiles_by_stratum[hgps::core::Gender::female] =
+        load_gender_weight_quantiles_by_stratum(opt["WeightQuantiles"]["Female"], config.root_path,
+                                              "Female", stratum_enabled, stratum_count);
+    weight_quantiles_by_stratum[hgps::core::Gender::male] =
+        load_gender_weight_quantiles_by_stratum(opt["WeightQuantiles"]["Male"], config.root_path,
+                                              "Male", stratum_enabled, stratum_count);
 
     // Energy Physical Activity quantiles.
     const auto epa_quantiles_table = load_datatable_from_csv(
@@ -1894,9 +2014,6 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
 
     // Load height model parameters.
     std::unordered_map<hgps::core::Gender, std::vector<hgps::HeightModelParams>> height_params;
-    const auto &stratum_cfg = config.modelling.baseline_adjustment.income_stratum_factors_mean;
-    const bool stratum_enabled = stratum_cfg.enabled;
-    const std::size_t stratum_count = stratum_cfg.adjustment_income_stratum_count;
 
     if (opt.contains("Height")) {
         const auto &height_csv_block = opt["Height"];
@@ -1947,7 +2064,7 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
     return std::make_unique<hgps::KevinHallModelDefinition>(
         std::move(expected), std::move(expected_trend), std::move(trend_steps),
         std::move(energy_equation), std::move(nutrient_ranges), std::move(nutrient_equations),
-        std::move(food_prices), std::move(weight_quantiles), std::move(epa_quantiles),
+        std::move(food_prices), std::move(weight_quantiles_by_stratum), std::move(epa_quantiles),
         std::move(height_params));
 }
 // NOLINTEND(readability-function-cognitive-complexity)

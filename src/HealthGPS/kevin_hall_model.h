@@ -34,7 +34,8 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @param nutrient_ranges The interval boundaries for nutrient values
     /// @param nutrient_equations The nutrient coefficients for each food group
     /// @param food_prices The unit price for each food group
-    /// @param weight_quantiles The weight quantiles (must be sorted)
+    /// @param weight_quantiles_by_stratum Weight quantiles by gender and income adjustment stratum
+    /// (each inner vector must be sorted).
     /// @param epa_quantiles The Energy / Physical Activity quantiles (must be sorted)
     /// @param height_params Height model parameters by gender and income adjustment stratum.
     ///        Index 0 is the fallback/default stratum used for legacy scalar config.
@@ -47,7 +48,8 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
         const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
             &nutrient_equations,
         const std::unordered_map<core::Identifier, std::optional<double>> &food_prices,
-        const std::unordered_map<core::Gender, std::vector<double>> &weight_quantiles,
+        const std::unordered_map<core::Gender, std::vector<std::vector<double>>>
+            &weight_quantiles_by_stratum,
         const std::vector<double> &epa_quantiles,
         std::unordered_map<core::Gender, std::vector<HeightModelParams>> height_params);
 
@@ -190,10 +192,11 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
                         const core::Identifier &factor, OptionalRange range,
                         bool apply_trend) const override;
 
-    /// @brief Returns the weight quantile for the given E overPA quantile and sex.
+    /// @brief Returns the weight quantile for the given E/PA quantile and stratum quantile curve.
     /// @param epa_quantile The Energy / Physical Activity quantile.
-    /// @param sex The sex of the person.
-    double get_weight_quantile(double epa_quantile, core::Gender sex) const;
+    /// @param quantiles Sorted weight quantiles for the person's adjustment stratum.
+    double get_weight_quantile(double epa_quantile,
+                               const std::vector<double> &quantiles) const;
 
     /// @brief Compute the mean of weight (optionally raised to a power) for each sex and age
     /// @param population The population to compute the mean for
@@ -225,12 +228,16 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @brief Print height stratum and final-income-category summary tables (baseline only).
     void print_height_summary_tables(RuntimeContext &context, std::string_view phase) const;
 
+    /// @brief Print weight stratum and final-income-category summary tables (baseline only).
+    void print_weight_summary_tables(RuntimeContext &context, std::string_view phase) const;
+
     const std::unordered_map<core::Identifier, double> &energy_equation_;
     const std::unordered_map<core::Identifier, core::DoubleInterval> &nutrient_ranges_;
     const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
         &nutrient_equations_;
     const std::unordered_map<core::Identifier, std::optional<double>> &food_prices_;
-    const std::unordered_map<core::Gender, std::vector<double>> &weight_quantiles_;
+    const std::unordered_map<core::Gender, std::vector<std::vector<double>>>
+        &weight_quantiles_by_stratum_;
     const std::vector<double> &epa_quantiles_;
     std::unordered_map<core::Gender, std::vector<HeightModelParams>> height_params_;
 
@@ -260,7 +267,8 @@ class KevinHallModelDefinition final : public RiskFactorAdjustableModelDefinitio
     /// @param nutrient_ranges The interval boundaries for nutrient values
     /// @param nutrient_equations The nutrient coefficients for each food group
     /// @param food_prices The unit price for each food group
-    /// @param weight_quantiles The weight quantiles (must be sorted)
+    /// @param weight_quantiles_by_stratum Weight quantiles by gender and income adjustment stratum
+    /// (each inner vector must be sorted).
     /// @param epa_quantiles The Energy / Physical Activity quantiles (must be sorted)
     /// @param height_params Height model parameters by gender and income adjustment stratum.
     /// @throws std::invalid_argument for empty arguments
@@ -272,7 +280,8 @@ class KevinHallModelDefinition final : public RiskFactorAdjustableModelDefinitio
         std::unordered_map<core::Identifier, core::DoubleInterval> nutrient_ranges,
         std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
         std::unordered_map<core::Identifier, std::optional<double>> food_prices,
-        std::unordered_map<core::Gender, std::vector<double>> weight_quantiles,
+        std::unordered_map<core::Gender, std::vector<std::vector<double>>>
+            weight_quantiles_by_stratum,
         std::vector<double> epa_quantiles,
         std::unordered_map<core::Gender, std::vector<HeightModelParams>> height_params);
 
@@ -285,7 +294,7 @@ class KevinHallModelDefinition final : public RiskFactorAdjustableModelDefinitio
     std::unordered_map<core::Identifier, core::DoubleInterval> nutrient_ranges_;
     std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations_;
     std::unordered_map<core::Identifier, std::optional<double>> food_prices_;
-    std::unordered_map<core::Gender, std::vector<double>> weight_quantiles_;
+    std::unordered_map<core::Gender, std::vector<std::vector<double>>> weight_quantiles_by_stratum_;
     std::vector<double> epa_quantiles_;
     std::unordered_map<core::Gender, std::vector<HeightModelParams>> height_params_;
 };

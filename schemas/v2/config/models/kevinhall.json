@@ -1,6 +1,25 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v2/config/models/kevinhall.json",
+    "$defs": {
+        "weightQuantileGenderEntry": {
+            "oneOf": [
+                {
+                    "$ref": "../../../v1/config/csv_file.json"
+                },
+                {
+                    "type": "object",
+                    "propertyNames": {
+                        "pattern": "^Quintile[1-9][0-9]*$"
+                    },
+                    "additionalProperties": {
+                        "$ref": "../../../v1/config/csv_file.json"
+                    },
+                    "minProperties": 1
+                }
+            ]
+        }
+    },
     "type": "object",
     "properties": {
         "$schema": {
@@ -83,6 +102,7 @@
             }
         },
         "WeightQuantiles": {
+            "type": "object",
             "propertyNames": {
                 "enum": [
                     "Male",
@@ -90,7 +110,7 @@
                 ]
             },
             "additionalProperties": {
-                "$ref": "../../../v1/config/csv_file.json"
+                "$ref": "#/$defs/weightQuantileGenderEntry"
             }
         },
         "EnergyPhysicalActivityQuantiles": {
