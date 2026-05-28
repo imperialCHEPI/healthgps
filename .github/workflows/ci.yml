@@ -133,6 +133,9 @@ jobs:
       - name: Upload coverage reports to Codecov
         if: matrix.compiler == 'gcc-default'
         uses: codecov/codecov-action@v6
+        with:
+          files: out/build/linux-debug/main_coverage.info
+          fail_ci_if_error: false
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 

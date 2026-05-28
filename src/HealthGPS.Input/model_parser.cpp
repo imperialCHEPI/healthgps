@@ -37,6 +37,11 @@ struct TwoColumnRegressionCsv {
     std::optional<double> stddev;
 };
 
+struct HeightRow {
+    double slope{};
+    double stddev{};
+};
+
 /// @brief Load factor,coefficient rows from a two-column regression CSV (no header row required).
 TwoColumnRegressionCsv load_two_column_regression_csv(const std::filesystem::path &path,
                                                       char delimiter,
@@ -78,6 +83,49 @@ TwoColumnRegressionCsv load_two_column_regression_csv(const std::filesystem::pat
         }
     }
     return result;
+}
+
+// Load height parameters from CSV as (slope, stddev) rows.
+std::vector<HeightRow> load_height_params_csv(const std::filesystem::path &path, char delimiter,
+                                              const std::string &csv_filename) {
+    rapidcsv::Document doc(path.string(), rapidcsv::LabelParams(-1, -1),
+                           rapidcsv::SeparatorParams(delimiter));
+
+    const auto column_count = doc.GetColumnCount();
+    if (column_count != 2 && column_count != 3) {
+        throw hgps::core::HgpsException{
+            fmt::format("Height CSV file {} must have 2 columns (slope,std) or 3 columns "
+                        "(key,slope,std). Found {} columns",
+                        csv_filename, column_count)};
+    }
+    const std::size_t slope_column = column_count == 3 ? 1u : 0u;
+    const std::size_t std_column = column_count == 3 ? 2u : 1u;
+
+    std::size_t start_row = 0;
+    if (doc.GetRowCount() > 0) {
+        const auto slope_header = doc.GetCell<std::string>(slope_column, 0);
+        const auto std_header = doc.GetCell<std::string>(std_column, 0);
+        const bool has_header = hgps::core::case_insensitive::equals(slope_header, "slope") &&
+                                (hgps::core::case_insensitive::equals(std_header, "std") ||
+                                 hgps::core::case_insensitive::equals(std_header, "stddev"));
+        if (has_header) {
+            start_row = 1;
+        }
+    }
+
+    std::vector<HeightRow> rows;
+    rows.reserve(doc.GetRowCount());
+    for (std::size_t row_idx = start_row; row_idx < doc.GetRowCount(); ++row_idx) {
+        rows.push_back(HeightRow{.slope = doc.GetCell<double>(slope_column, row_idx),
+                                 .stddev = doc.GetCell<double>(std_column, row_idx)});
+    }
+
+    if (rows.empty()) {
+        throw hgps::core::HgpsException{
+            fmt::format("Height CSV file {} does not contain any data rows", csv_filename)};
+    }
+
+    return rows;
 }
 
 char parse_delimiter_char(const std::string &delimiter) {
@@ -1845,18 +1893,62 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
     std::sort(epa_quantiles.begin(), epa_quantiles.end());
 
     // Load height model parameters.
-    std::unordered_map<hgps::core::Gender, double> height_stddev = {
-        {hgps::core::Gender::female, opt["HeightStdDev"]["Female"].get<double>()},
-        {hgps::core::Gender::male, opt["HeightStdDev"]["Male"].get<double>()}};
-    std::unordered_map<hgps::core::Gender, double> height_slope = {
-        {hgps::core::Gender::female, opt["HeightSlope"]["Female"].get<double>()},
-        {hgps::core::Gender::male, opt["HeightSlope"]["Male"].get<double>()}};
+    std::unordered_map<hgps::core::Gender, std::vector<hgps::HeightModelParams>> height_params;
+    const auto &stratum_cfg = config.modelling.baseline_adjustment.income_stratum_factors_mean;
+    const bool stratum_enabled = stratum_cfg.enabled;
+    const std::size_t stratum_count = stratum_cfg.adjustment_income_stratum_count;
+
+    if (opt.contains("Height")) {
+        const auto &height_csv_block = opt["Height"];
+        auto load_gender_height_csv = [&](const char *gender_key, hgps::core::Gender gender) {
+            const auto file_info =
+                hgps::input::get_file_info(height_csv_block[gender_key], config.root_path);
+            const auto csv_rows =
+                load_height_params_csv(file_info.name, parse_delimiter_char(file_info.delimiter),
+                                       file_info.name.filename().string());
+
+            if (csv_rows.size() == 1u) {
+                const std::size_t broadcast_count =
+                    (stratum_enabled && stratum_count > 1u) ? stratum_count : 1u;
+                std::vector<hgps::HeightModelParams> values(
+                    broadcast_count, hgps::HeightModelParams{.slope = csv_rows[0].slope,
+                                                             .stddev = csv_rows[0].stddev});
+                height_params[gender] = std::move(values);
+                return;
+            }
+
+            if (stratum_enabled && csv_rows.size() != stratum_count) {
+                throw hgps::core::HgpsException{fmt::format(
+                    "Height CSV '{}' has {} rows but adjustment income stratum count is "
+                    "{}. Use 1 row (broadcast) or exactly {} rows.",
+                    file_info.name.filename().string(), csv_rows.size(), stratum_count,
+                    stratum_count)};
+            }
+
+            std::vector<hgps::HeightModelParams> values;
+            values.reserve(csv_rows.size());
+            for (const auto &row : csv_rows) {
+                values.push_back(hgps::HeightModelParams{.slope = row.slope, .stddev = row.stddev});
+            }
+            height_params[gender] = std::move(values);
+        };
+
+        load_gender_height_csv("Female", hgps::core::Gender::female);
+        load_gender_height_csv("Male", hgps::core::Gender::male);
+    } else {
+        height_params[hgps::core::Gender::female] = {
+            hgps::HeightModelParams{.slope = opt["HeightSlope"]["Female"].get<double>(),
+                                    .stddev = opt["HeightStdDev"]["Female"].get<double>()}};
+        height_params[hgps::core::Gender::male] = {
+            hgps::HeightModelParams{.slope = opt["HeightSlope"]["Male"].get<double>(),
+                                    .stddev = opt["HeightStdDev"]["Male"].get<double>()}};
+    }
 
     return std::make_unique<hgps::KevinHallModelDefinition>(
         std::move(expected), std::move(expected_trend), std::move(trend_steps),
         std::move(energy_equation), std::move(nutrient_ranges), std::move(nutrient_equations),
         std::move(food_prices), std::move(weight_quantiles), std::move(epa_quantiles),
-        std::move(height_stddev), std::move(height_slope));
+        std::move(height_params));
 }
 // NOLINTEND(readability-function-cognitive-complexity)
 

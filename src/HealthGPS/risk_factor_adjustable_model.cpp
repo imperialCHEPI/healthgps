@@ -93,7 +93,7 @@ double RiskFactorAdjustableModel::get_expected(RuntimeContext &context, core::Ge
     }
     double expected = expected_->at(sex, factor).at(age);
 
-    // Apply trend to expected value based on trend type
+    // MAHIMA: Apply trend to expected value based on trend type
     if (apply_trend && trend_type_ != TrendType::Null) {
         int elapsed_time = context.time_now() - context.start_time();
 
@@ -324,7 +324,7 @@ void RiskFactorAdjustableModel::adjust_risk_factors(
                     if (person.income_continuous > 0.0) {
                         person.income_continuous = adjusted_value;
                     }
-                } else if (factor_name == "PhysicalActivity") {
+                } else if (factor_name_lower == "physicalactivity") {
                     // Factor name "PhysicalActivity" from expected table maps to
                     // person.physical_activity internally Get current value from member variable
                     double current_value = person.physical_activity;
@@ -336,8 +336,21 @@ void RiskFactorAdjustableModel::adjust_risk_factors(
 
                     // Apply adjustment: new_value = current_value + delta
                     double adjusted_value = current_value + delta;
-                    // Clamp value to an optionally specified range
-                    if (ranges.has_value() && i < ranges.value().get().size()) {
+                    // MAHIMA: Prefer configured PhysicalActivity range from config mapping.
+                    // MAHIMA: Fallback to passed ranges only if mapping range is unavailable.
+                    bool clamped = false;
+                    const auto &mapping_entries = context.mapping().entries();
+                    const auto mapping_it = std::find_if(
+                        mapping_entries.begin(), mapping_entries.end(),
+                        [&](const auto &entry) { return entry.key() == physical_activity_id; });
+                    if (mapping_it != mapping_entries.end()) {
+                        const auto maybe_range = mapping_it->range();
+                        if (maybe_range.has_value()) {
+                            adjusted_value = maybe_range->clamp(adjusted_value);
+                            clamped = true;
+                        }
+                    }
+                    if (!clamped && ranges.has_value() && i < ranges.value().get().size()) {
                         const auto &range = ranges.value().get()[i];
                         adjusted_value = range.clamp(adjusted_value);
                     }

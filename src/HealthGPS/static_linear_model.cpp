@@ -88,6 +88,18 @@ namespace hgps {
 
 namespace {
 
+std::optional<core::DoubleInterval>
+get_physical_activity_mapping_range(const RuntimeContext &context) {
+    // MAHIMA: Use PhysicalActivity range from config mapping as the single source of truth
+    // for PA clamping across initialization and adjustment paths.
+    const core::Identifier physical_activity_id("PhysicalActivity");
+    try {
+        return context.mapping().at(physical_activity_id).range();
+    } catch (const std::out_of_range &) {
+        return std::nullopt;
+    }
+}
+
 core::Income income_category_from_rank_bucket(std::size_t bucket, std::size_t bucket_count) {
     if (bucket_count == 4) {
         switch (bucket) {
@@ -2304,8 +2316,7 @@ void StaticLinearModel::initialise_physical_activity(RuntimeContext &context, Pe
 }
 
 void StaticLinearModel::initialise_continuous_physical_activity(
-    [[maybe_unused]] RuntimeContext &context, Person &person, Random &random,
-    const PhysicalActivityModel &model) {
+    RuntimeContext &context, Person &person, Random &random, const PhysicalActivityModel &model) {
     LinearModelParams linear_model{
         .intercept = model.intercept,
         .coefficients = model.coefficients,
@@ -2315,8 +2326,13 @@ void StaticLinearModel::initialise_continuous_physical_activity(
     double rand_noise = random.next_normal(0.0, model.stddev);
     double final_value = value + rand_noise;
 
-    // Apply min/max constraints
-    final_value = std::max(model.min_value, std::min(final_value, model.max_value));
+    // MAHIMA: Prefer configured mapping range from config.json; fallback to model-level min/max.
+    const auto mapping_range = get_physical_activity_mapping_range(context);
+    if (mapping_range.has_value()) {
+        final_value = mapping_range->clamp(final_value);
+    } else {
+        final_value = std::max(model.min_value, std::min(final_value, model.max_value));
+    }
 
     // Set the physical activity value (store in both member variable and risk_factors for
     // compatibility)
@@ -2336,7 +2352,15 @@ void StaticLinearModel::initialise_simple_physical_activity(
     double rand = random.next_normal(0.0, model.stddev);
     double factor = expected * exp(rand - (0.5 * pow(model.stddev, 2)));
 
-    // Store in both physical_activity and risk_factors for compatibility
+    // MAHIMA: Prefer configured mapping range from config.json; fallback to model-level min/max.
+    const auto mapping_range = get_physical_activity_mapping_range(context);
+    if (mapping_range.has_value()) {
+        factor = mapping_range->clamp(factor);
+    } else {
+        factor = std::max(model.min_value, std::min(factor, model.max_value));
+    }
+
+    // Store in both physical_activity and risk_factors for compatibility.
     person.physical_activity = factor;
     person.risk_factors["PhysicalActivity"_id] = factor;
 }
@@ -2381,7 +2405,12 @@ StaticLinearModel::build_extended_factors_list(RuntimeContext &context,
             get_expected(context, core::Gender::male, 0, PhysicalActivity_id, std::nullopt, false);
             extended_factors.push_back(PhysicalActivity_id);
             if (!base_ranges.empty()) {
-                extended_ranges.push_back(base_ranges.back());
+                const auto pa_range = get_physical_activity_mapping_range(context);
+                if (pa_range.has_value()) {
+                    extended_ranges.push_back(*pa_range);
+                } else {
+                    extended_ranges.push_back(base_ranges.back());
+                }
             }
         } catch (...) {
             // Physical activity not in expected table - skip

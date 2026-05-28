@@ -5,10 +5,13 @@
 #include "sync_message.h"
 
 #include <algorithm>
+#include <fmt/core.h>
 #include <iomanip>
 #include <iostream>
 #include <iterator>
+#include <limits>
 #include <sstream>
+#include <syncstream>
 #include <utility>
 
 namespace { // anonymous namespace
@@ -43,6 +46,184 @@ std::string gender_label(const hgps::Person &person) {
     return "unknown";
 }
 
+bool should_print_height_summary_tables(const hgps::RuntimeContext &context) {
+    // MAHIMA: Keep console reporting limited to baseline start and first update year so
+    // diagnostics remain useful without flooding long simulation logs.
+    if (context.scenario().type() != hgps::ScenarioType::baseline) {
+        return false;
+    }
+    const int current_year = context.time_now();
+    const int start_year = context.start_time();
+    return current_year == start_year || current_year == (start_year + 1);
+}
+
+struct HeightBucketSummary {
+    std::size_t count{0};
+    double slope_sum{0.0};
+    double std_sum{0.0};
+    double height_min{std::numeric_limits<double>::max()};
+    double height_max{std::numeric_limits<double>::lowest()};
+    double height_sum{0.0};
+};
+
+const hgps::HeightModelParams &resolve_height_params_for_person(
+    const hgps::Person &person,
+    const std::unordered_map<hgps::core::Gender, std::vector<hgps::HeightModelParams>>
+        &height_params) {
+    // MAHIMA: Height slope/stddev are selected by gender first, then by income adjustment
+    // stratum when available (single-row CSV is treated as broadcast via params.front()).
+    const auto by_gender = height_params.find(person.gender);
+    if (by_gender == height_params.end() || by_gender->second.empty()) {
+        throw hgps::core::HgpsException("Height model parameters missing for person gender");
+    }
+    const auto &params = by_gender->second;
+    if (!person.has_income_adjustment_stratum) {
+        return params.front();
+    }
+    const std::size_t index = std::min(person.income_adjustment_stratum, params.size() - 1);
+    return params[index];
+}
+
+void print_height_stratum_assignment_table(
+    const hgps::Population &population,
+    const std::unordered_map<hgps::core::Gender, std::vector<hgps::HeightModelParams>>
+        &height_params,
+    std::size_t bucket_count, int year, std::string_view phase) {
+    if (bucket_count == 0) {
+        return;
+    }
+
+    const hgps::core::Identifier height_id("Height");
+    std::vector<HeightBucketSummary> summaries(bucket_count);
+    for (const auto &person : population) {
+        if (!person.is_active() || !person.has_income_adjustment_stratum ||
+            person.income_adjustment_stratum >= bucket_count) {
+            continue;
+        }
+        auto height_it = person.risk_factors.find(height_id);
+        if (height_it == person.risk_factors.end()) {
+            continue;
+        }
+
+        const auto &height_model = resolve_height_params_for_person(person, height_params);
+        auto &summary = summaries[person.income_adjustment_stratum];
+        summary.count++;
+        summary.slope_sum += height_model.slope;
+        summary.std_sum += height_model.stddev;
+        const double height = height_it->second;
+        summary.height_sum += height;
+        summary.height_min = std::min(summary.height_min, height);
+        summary.height_max = std::max(summary.height_max, height);
+    }
+
+    std::ostringstream out;
+    out << "\n[HEIGHT STRATUM ASSIGNMENT] Year " << year << " phase=" << phase
+        << " (uses person.income_adjustment_stratum from static model)\n";
+    out << "+--------+----------------------+-------+-------------+-------------+-------------+"
+           "-------------+-------------+\n";
+    out << "| Bucket | Stratum ID           | Count | Slope       | StdDev      | Height Min  | "
+           "Height Max  | Height Mean |\n";
+    out << "+--------+----------------------+-------+-------------+-------------+-------------+"
+           "-------------+-------------+\n";
+    for (std::size_t k = 0; k < bucket_count; ++k) {
+        const auto &summary = summaries[k];
+        const std::string stratum_id = "Quintile" + std::to_string(k + 1);
+        out << "| " << std::setw(6) << k << " | " << std::setw(20) << std::left << stratum_id
+            << std::right << " | " << std::setw(5) << summary.count << " | ";
+        if (summary.count == 0) {
+            out << std::setw(11) << "n/a"
+                << " | " << std::setw(11) << "n/a"
+                << " | " << std::setw(11) << "n/a"
+                << " | " << std::setw(11) << "n/a"
+                << " | " << std::setw(11) << "n/a";
+        } else {
+            const auto n = static_cast<double>(summary.count);
+            out << std::setw(11) << fmt::format("{:.6f}", summary.slope_sum / n) << " | "
+                << std::setw(11) << fmt::format("{:.6f}", summary.std_sum / n) << " | "
+                << std::setw(11) << fmt::format("{:.3f}", summary.height_min) << " | "
+                << std::setw(11) << fmt::format("{:.3f}", summary.height_max) << " | "
+                << std::setw(11) << fmt::format("{:.3f}", summary.height_sum / n);
+        }
+        out << " |\n";
+    }
+    out << "+--------+----------------------+-------+-------------+-------------+-------------+"
+           "-------------+-------------+\n";
+    std::osyncstream(std::cout) << out.str();
+}
+
+void print_height_by_final_income_category_table(const hgps::Population &population,
+                                                 std::string_view categories, int year,
+                                                 std::string_view phase) {
+    const auto cat_count = categories == "4" ? 4u : 3u;
+    const hgps::core::Identifier height_id("Height");
+    std::vector<HeightBucketSummary> summaries(cat_count);
+
+    for (const auto &person : population) {
+        if (!person.is_active()) {
+            continue;
+        }
+        auto height_it = person.risk_factors.find(height_id);
+        if (height_it == person.risk_factors.end()) {
+            continue;
+        }
+
+        std::size_t idx = 0;
+        switch (person.income) {
+        case hgps::core::Income::low:
+            idx = 0;
+            break;
+        case hgps::core::Income::lowermiddle:
+        case hgps::core::Income::middle:
+            idx = 1;
+            break;
+        case hgps::core::Income::uppermiddle:
+            idx = 2;
+            break;
+        case hgps::core::Income::high:
+            idx = categories == "4" ? 3u : 2u;
+            break;
+        default:
+            continue;
+        }
+
+        auto &summary = summaries[idx];
+        summary.count++;
+        const double height = height_it->second;
+        summary.height_sum += height;
+        summary.height_min = std::min(summary.height_min, height);
+        summary.height_max = std::max(summary.height_max, height);
+    }
+
+    std::ostringstream out;
+    out << "\n[HEIGHT BY FINAL INCOME CATEGORY] Year " << year << " phase=" << phase
+        << " project_requirements.categories=" << categories
+        << " (person.income set by static model after quintile adjustment)\n";
+    out << "+----------+--------+-------------+-------------+-------------+\n";
+    out << "| Category | Count  | Height Min  | Height Max  | Height Mean |\n";
+    out << "+----------+--------+-------------+-------------+-------------+\n";
+    const std::vector<std::string> labels =
+        categories == "4" ? std::vector<std::string>{"Low", "LowerMid", "UpperMid", "High"}
+                          : std::vector<std::string>{"Low", "Middle", "High"};
+    for (std::size_t i = 0; i < summaries.size(); ++i) {
+        const auto &summary = summaries[i];
+        out << "| " << std::setw(8) << std::left << labels[i] << std::right << " | " << std::setw(6)
+            << summary.count << " | ";
+        if (summary.count == 0) {
+            out << std::setw(11) << "n/a"
+                << " | " << std::setw(11) << "n/a"
+                << " | " << std::setw(11) << "n/a";
+        } else {
+            out << std::setw(11) << fmt::format("{:.3f}", summary.height_min) << " | "
+                << std::setw(11) << fmt::format("{:.3f}", summary.height_max) << " | "
+                << std::setw(11)
+                << fmt::format("{:.3f}", summary.height_sum / static_cast<double>(summary.count));
+        }
+        out << " |\n";
+    }
+    out << "+----------+--------+-------------+-------------+-------------+\n";
+    std::osyncstream(std::cout) << out.str();
+}
+
 } // anonymous namespace
 
 /*
@@ -63,14 +244,13 @@ KevinHallModel::KevinHallModel(
     const std::unordered_map<core::Identifier, std::optional<double>> &food_prices,
     const std::unordered_map<core::Gender, std::vector<double>> &weight_quantiles,
     const std::vector<double> &epa_quantiles,
-    const std::unordered_map<core::Gender, double> &height_stddev,
-    const std::unordered_map<core::Gender, double> &height_slope)
+    std::unordered_map<core::Gender, std::vector<HeightModelParams>> height_params)
     : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend),
                                 std::move(trend_steps)},
       energy_equation_{energy_equation}, nutrient_ranges_{nutrient_ranges},
       nutrient_equations_{nutrient_equations}, food_prices_{food_prices},
       weight_quantiles_{weight_quantiles}, epa_quantiles_{epa_quantiles},
-      height_stddev_{height_stddev}, height_slope_{height_slope} {}
+      height_params_{std::move(height_params)} {}
 
 RiskFactorModelType KevinHallModel::type() const noexcept { return RiskFactorModelType::Dynamic; }
 
@@ -98,7 +278,7 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
     }
 
     // Compute weight power means by sex and age.
-    auto W_power_means = compute_mean_weight(context.population(), height_slope_);
+    auto W_power_means = compute_mean_weight_for_height(context.population());
 
     // Initialise everyone.
     for (auto &person : context.population()) {
@@ -107,6 +287,8 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
         initialise_kevin_hall_state(context, person);
         compute_bmi(person);
     }
+
+    print_height_summary_tables(context, "generate");
 }
 
 void KevinHallModel::update_risk_factors(RuntimeContext &context) {
@@ -171,7 +353,7 @@ void KevinHallModel::update_newborns(RuntimeContext &context) const {
     // NOTE: FOR REFACTORING: End of semi-redundant block.
 
     // Compute newborn weight power means by sex.
-    auto W_power_means = compute_mean_weight(context.population(), height_slope_, 0);
+    auto W_power_means = compute_mean_weight_for_height(context.population(), 0);
 
     // Initialise height and other Kevin Hall state for newborns.
     for (auto &person : context.population()) {
@@ -184,6 +366,8 @@ void KevinHallModel::update_newborns(RuntimeContext &context) const {
         initialise_height(context, person, W_power_mean, context.random());
         initialise_kevin_hall_state(context, person);
     }
+
+    print_height_summary_tables(context, "update-newborns");
 }
 
 void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
@@ -241,7 +425,7 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
     send_weight_adjustments(context, std::move(adjustments));
 
     // Compute weight power means by sex and age.
-    auto W_power_means = compute_mean_weight(context.population(), height_slope_);
+    auto W_power_means = compute_mean_weight_for_height(context.population());
 
     // Update: (no newborns or at least the Kevin Hall minimum age).
     for (auto &person : context.population()) {
@@ -253,6 +437,8 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
         double W_power_mean = W_power_means.at(person.gender, person.age);
         update_height(context, person, W_power_mean);
     }
+
+    print_height_summary_tables(context, "update-children");
 }
 
 KevinHallAdjustmentTable KevinHallModel::receive_weight_adjustments(RuntimeContext &context) const {
@@ -906,12 +1092,63 @@ KevinHallModel::compute_mean_weight(Population &population,
 
     return means;
 }
+// MAHIMA: This function computes the mean weight for height for each person in the population.
+//  It uses the height model parameters to compute the mean weight for height for each person.
+//  It returns a table of mean weight for height by sex and age.
+//  The height model parameters are stored in the height_params_ member variable.
+//  The height model parameters are indexed by gender and income adjustment stratum.
+//  The height model parameters are stored in the height_params_ member variable.
+KevinHallAdjustmentTable
+KevinHallModel::compute_mean_weight_for_height(Population &population,
+                                               std::optional<unsigned> age) const {
+
+    struct SumCount {
+      public:
+        void append(double value) noexcept {
+            sum_ += value;
+            count_++;
+        }
+        double mean() const noexcept { return sum_ / count_; }
+
+      private:
+        double sum_{};
+        int count_{};
+    };
+
+    auto sumcounts = UnorderedMap2d<core::Gender, int, SumCount>{};
+    sumcounts.emplace_row(core::Gender::female, std::unordered_map<int, SumCount>{});
+    sumcounts.emplace_row(core::Gender::male, std::unordered_map<int, SumCount>{});
+    for (const auto &person : population) {
+        if (!person.is_active()) {
+            continue;
+        }
+        if (age.has_value() && person.age != age.value()) {
+            continue;
+        }
+
+        const double slope = resolve_height_params_for_person(person, height_params_).slope;
+        const double value = pow(person.risk_factors.at("Weight"_id), slope);
+        sumcounts.at(person.gender)[person.age].append(value);
+    }
+
+    auto means = KevinHallAdjustmentTable{};
+    for (const auto &[sumcount_sex, sumcounts_by_sex] : sumcounts) {
+        means.emplace_row(sumcount_sex, std::unordered_map<int, double>{});
+        for (const auto &[sumcount_age, sumcount] : sumcounts_by_sex) {
+            means.at(sumcount_sex)[sumcount_age] = sumcount.mean();
+        }
+    }
+
+    return means;
+}
 
 void KevinHallModel::initialise_height(RuntimeContext &context, Person &person, double W_power_mean,
                                        Random &random) const {
 
+    const auto &height_params = resolve_height_params_for_person(person, height_params_);
+
     // Initialise lifelong height residual.
-    double H_residual = random.next_normal(0, height_stddev_.at(person.gender));
+    double H_residual = random.next_normal(0, height_params.stddev);
     person.risk_factors["Height_residual"_id] = H_residual;
 
     // Initialise height.
@@ -924,8 +1161,9 @@ void KevinHallModel::update_height(RuntimeContext &context, Person &person,
     double H_expected =
         get_expected(context, person.gender, person.age, "Height"_id, std::nullopt, false);
     double H_residual = person.risk_factors.at("Height_residual"_id);
-    double stddev = height_stddev_.at(person.gender);
-    double slope = height_slope_.at(person.gender);
+    const auto &height_params = resolve_height_params_for_person(person, height_params_);
+    const double stddev = height_params.stddev;
+    const double slope = height_params.slope;
 
     // Compute height.
     double exp_norm_mean = exp(0.5 * stddev * stddev);
@@ -933,6 +1171,26 @@ void KevinHallModel::update_height(RuntimeContext &context, Person &person,
 
     // Set height (may not exist yet).
     person.risk_factors["Height"_id] = H;
+}
+
+void KevinHallModel::print_height_summary_tables(RuntimeContext &context,
+                                                 std::string_view phase) const {
+    if (!should_print_height_summary_tables(context)) {
+        return;
+    }
+
+    std::size_t bucket_count = 0;
+    for (const auto &[gender, params] : height_params_) {
+        bucket_count = std::max(bucket_count, params.size());
+    }
+    bucket_count = std::max<std::size_t>(bucket_count, 1);
+
+    print_height_stratum_assignment_table(context.population(), height_params_, bucket_count,
+                                          context.time_now(), phase);
+
+    const auto &categories = context.inputs().project_requirements().income.categories;
+    print_height_by_final_income_category_table(context.population(), categories,
+                                                context.time_now(), phase);
 }
 
 KevinHallModelDefinition::KevinHallModelDefinition(
@@ -944,14 +1202,14 @@ KevinHallModelDefinition::KevinHallModelDefinition(
     std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
     std::unordered_map<core::Identifier, std::optional<double>> food_prices,
     std::unordered_map<core::Gender, std::vector<double>> weight_quantiles,
-    std::vector<double> epa_quantiles, std::unordered_map<core::Gender, double> height_stddev,
-    std::unordered_map<core::Gender, double> height_slope)
+    std::vector<double> epa_quantiles,
+    std::unordered_map<core::Gender, std::vector<HeightModelParams>> height_params)
     : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend),
                                           std::move(trend_steps)},
       energy_equation_{std::move(energy_equation)}, nutrient_ranges_{std::move(nutrient_ranges)},
       nutrient_equations_{std::move(nutrient_equations)}, food_prices_{std::move(food_prices)},
       weight_quantiles_{std::move(weight_quantiles)}, epa_quantiles_{std::move(epa_quantiles)},
-      height_stddev_{std::move(height_stddev)}, height_slope_{std::move(height_slope)} {
+      height_params_{std::move(height_params)} {
 
     if (energy_equation_.empty()) {
         throw core::HgpsException("Energy equation mapping is empty");
@@ -971,19 +1229,20 @@ KevinHallModelDefinition::KevinHallModelDefinition(
     if (epa_quantiles_.empty()) {
         throw core::HgpsException("Energy Physical Activity quantiles mapping is empty");
     }
-    if (height_stddev_.empty()) {
-        throw core::HgpsException("Height standard deviation mapping is empty");
+    if (height_params_.empty()) {
+        throw core::HgpsException("Height parameter mapping is empty");
     }
-    if (height_slope_.empty()) {
-        throw core::HgpsException("Height slope mapping is empty");
+    for (const auto &[gender, params] : height_params_) {
+        if (params.empty()) {
+            throw core::HgpsException("Height parameter mapping contains empty gender entry");
+        }
     }
 }
 
 std::unique_ptr<RiskFactorModel> KevinHallModelDefinition::create_model() const {
-    return std::make_unique<KevinHallModel>(expected_, expected_trend_, trend_steps_,
-                                            energy_equation_, nutrient_ranges_, nutrient_equations_,
-                                            food_prices_, weight_quantiles_, epa_quantiles_,
-                                            height_stddev_, height_slope_);
+    return std::make_unique<KevinHallModel>(
+        expected_, expected_trend_, trend_steps_, energy_equation_, nutrient_ranges_,
+        nutrient_equations_, food_prices_, weight_quantiles_, epa_quantiles_, height_params_);
 }
 
 } // namespace hgps

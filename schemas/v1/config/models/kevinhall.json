@@ -100,7 +100,32 @@
                 }
             },
             "additionalProperties": false
+        },
+        "Height": {
+            "type": "object",
+            "propertyNames": {
+                "enum": [
+                    "Male",
+                    "Female"
+                ]
+            },
+            "additionalProperties": {
+                "$ref": "../csv_file.json"
+            }
         }
     },
+    "anyOf": [
+        {
+            "required": [
+                "HeightStdDev",
+                "HeightSlope"
+            ]
+        },
+        {
+            "required": [
+                "Height"
+            ]
+        }
+    ],
     "additionalProperties": false
 }
