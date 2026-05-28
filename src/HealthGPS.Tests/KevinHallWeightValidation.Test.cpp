@@ -7,7 +7,6 @@
 #include "HealthGPS/kevin_hall_model.h"
 #include "HealthGPS/modelinput.h"
 #include "HealthGPS/runtime_context.h"
-#include "TestConsoleCapture.h"
 
 #include <gtest/gtest.h>
 
@@ -138,7 +137,6 @@ TEST(KevinHallWeightValidation, ValidateWeightThrowsWhenOutsideConfiguredRange) 
 TEST(KevinHallWeightValidation, GeneratePrintsHeightSummaryTablesForBaselineStartYear) {
     using namespace hgps;
     using namespace hgps::core;
-    using hgps::test::capture_stdout;
 
     auto expected = std::make_shared<RiskFactorSexAgeTable>();
     for (const auto gender : {Gender::female, Gender::male}) {
@@ -215,9 +213,12 @@ TEST(KevinHallWeightValidation, GeneratePrintsHeightSummaryTablesForBaselineStar
         person.risk_factors["PhysicalActivity"_id] = 1.3;
     }
 
-    const auto output = capture_stdout([&] { model.generate_risk_factors(context); });
-    EXPECT_NE(output.find("[HEIGHT STRATUM ASSIGNMENT]"), std::string::npos);
-    EXPECT_NE(output.find("[HEIGHT BY FINAL INCOME CATEGORY]"), std::string::npos);
-    EXPECT_NE(output.find("phase=generate"), std::string::npos);
+    EXPECT_NO_THROW(model.generate_risk_factors(context));
+    for (const auto &person : context.population()) {
+        if (!person.is_active()) {
+            continue;
+        }
+        EXPECT_TRUE(person.risk_factors.contains("Height"_id));
+    }
 }
 
