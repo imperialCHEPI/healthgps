@@ -230,7 +230,8 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @brief Print weight stratum and final-income-category summary tables (baseline only).
     void print_weight_summary_tables(RuntimeContext &context, std::string_view phase) const;
 
-    // NOLINTBEGIN(cppcoreguidelines-avoid-const-or-ref-data-members) references to model definition data
+    // NOLINTBEGIN(cppcoreguidelines-avoid-const-or-ref-data-members) references to model definition
+    // data
     const std::unordered_map<core::Identifier, double> &energy_equation_;
     const std::unordered_map<core::Identifier, core::DoubleInterval> &nutrient_ranges_;
     const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
