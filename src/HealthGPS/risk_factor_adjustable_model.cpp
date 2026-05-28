@@ -93,7 +93,7 @@ double RiskFactorAdjustableModel::get_expected(RuntimeContext &context, core::Ge
     }
     double expected = expected_->at(sex, factor).at(age);
 
-    // Apply trend to expected value based on trend type
+    // MAHIMA: Apply trend to expected value based on trend type
     if (apply_trend && trend_type_ != TrendType::Null) {
         int elapsed_time = context.time_now() - context.start_time();
 
@@ -218,9 +218,6 @@ void RiskFactorAdjustableModel::adjust_risk_factors(
                     if (!has_value) {
                         continue;
                     }
-                    // MAHIMA: These numbers are carefully chosen hash‑mixing constants that turn
-                    // simple inputs (ID, age, bucket) into a well‑distributed, deterministic,
-                    // random‑looking score without bias or collisions.
                     const auto hash_seed =
                         (static_cast<std::uint64_t>(person.id()) * 1315423911ULL) ^
                         (static_cast<std::uint64_t>(row.age) * 2654435761ULL) ^
@@ -336,8 +333,19 @@ void RiskFactorAdjustableModel::adjust_risk_factors(
 
                     // Apply adjustment: new_value = current_value + delta
                     double adjusted_value = current_value + delta;
-                    // Clamp value to an optionally specified range
-                    if (ranges.has_value() && i < ranges.value().get().size()) {
+                    // Prefer configured PhysicalActivity range from mapping (config.json).
+                    // Fallback to passed ranges to preserve legacy behavior if mapping range is
+                    // unavailable.
+                    bool clamped = false;
+                    try {
+                        const auto maybe_range = context.mapping().at(physical_activity_id).range();
+                        if (maybe_range.has_value()) {
+                            adjusted_value = maybe_range->clamp(adjusted_value);
+                            clamped = true;
+                        }
+                    } catch (const std::out_of_range &) {
+                    }
+                    if (!clamped && ranges.has_value() && i < ranges.value().get().size()) {
                         const auto &range = ranges.value().get()[i];
                         adjusted_value = range.clamp(adjusted_value);
                     }
