@@ -340,13 +340,16 @@ void RiskFactorAdjustableModel::adjust_risk_factors(
                     // Fallback to passed ranges to preserve legacy behavior if mapping range is
                     // unavailable.
                     bool clamped = false;
-                    try {
-                        const auto maybe_range = context.mapping().at(physical_activity_id).range();
+                    const auto &mapping_entries = context.mapping().entries();
+                    const auto mapping_it = std::find_if(
+                        mapping_entries.begin(), mapping_entries.end(),
+                        [&](const auto &entry) { return entry.key() == physical_activity_id; });
+                    if (mapping_it != mapping_entries.end()) {
+                        const auto maybe_range = mapping_it->range();
                         if (maybe_range.has_value()) {
                             adjusted_value = maybe_range->clamp(adjusted_value);
                             clamped = true;
                         }
-                    } catch (const std::out_of_range &) {
                     }
                     if (!clamped && ranges.has_value() && i < ranges.value().get().size()) {
                         const auto &range = ranges.value().get()[i];
