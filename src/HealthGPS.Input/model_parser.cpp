@@ -178,11 +178,9 @@ std::vector<double> load_sorted_weight_quantiles_from_csv(const hgps::input::Fil
     return load_sorted_weight_quantiles_from_table(table);
 }
 
-std::vector<std::vector<double>>
-load_gender_weight_quantiles_by_stratum(const nlohmann::json &gender_node,
-                                        const std::filesystem::path &root_path,
-                                        std::string_view gender_label, bool stratum_enabled,
-                                        std::size_t stratum_count) {
+std::vector<std::vector<double>> load_gender_weight_quantiles_by_stratum(
+    const nlohmann::json &gender_node, const std::filesystem::path &root_path,
+    std::string_view gender_label, bool stratum_enabled, std::size_t stratum_count) {
     if (is_weight_quantile_csv_file_block(gender_node)) {
         const auto file_info = hgps::input::get_file_info(gender_node, root_path);
         const auto quantiles = load_sorted_weight_quantiles_from_csv(file_info);
@@ -192,16 +190,15 @@ load_gender_weight_quantiles_by_stratum(const nlohmann::json &gender_node,
     }
 
     if (!gender_node.is_object()) {
-        throw hgps::core::HgpsException{
-            fmt::format("WeightQuantiles.{} must be a csv_file block or Quintile1..N object",
-                        gender_label)};
+        throw hgps::core::HgpsException{fmt::format(
+            "WeightQuantiles.{} must be a csv_file block or Quintile1..N object", gender_label)};
     }
 
     if (!stratum_enabled) {
-        throw hgps::core::HgpsException{fmt::format(
-            "WeightQuantiles.{} uses Quintile1..N files but "
-            "baseline_adjustments.income_stratum_factors_mean.enabled is false",
-            gender_label)};
+        throw hgps::core::HgpsException{
+            fmt::format("WeightQuantiles.{} uses Quintile1..N files but "
+                        "baseline_adjustments.income_stratum_factors_mean.enabled is false",
+                        gender_label)};
     }
 
     if (stratum_count < 2u) {
@@ -220,8 +217,8 @@ load_gender_weight_quantiles_by_stratum(const nlohmann::json &gender_node,
                 gender_label, key)};
         }
         if (!is_weight_quantile_csv_file_block(value)) {
-            throw hgps::core::HgpsException{fmt::format(
-                "WeightQuantiles.{}.{} must be a csv_file block", gender_label, key)};
+            throw hgps::core::HgpsException{
+                fmt::format("WeightQuantiles.{}.{} must be a csv_file block", gender_label, key)};
         }
         quintile_keys.emplace_back(index.value(), key);
     }
@@ -233,9 +230,8 @@ load_gender_weight_quantiles_by_stratum(const nlohmann::json &gender_node,
             gender_label, quintile_keys.size(), stratum_count, stratum_count)};
     }
 
-    std::ranges::sort(quintile_keys, [](const auto &lhs, const auto &rhs) {
-        return lhs.first < rhs.first;
-    });
+    std::ranges::sort(quintile_keys,
+                      [](const auto &lhs, const auto &rhs) { return lhs.first < rhs.first; });
 
     for (std::size_t i = 0; i < quintile_keys.size(); ++i) {
         if (quintile_keys[i].first != i) {
@@ -1997,10 +1993,9 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
         weight_quantiles_by_stratum;
     weight_quantiles_by_stratum[hgps::core::Gender::female] =
         load_gender_weight_quantiles_by_stratum(opt["WeightQuantiles"]["Female"], config.root_path,
-                                              "Female", stratum_enabled, stratum_count);
-    weight_quantiles_by_stratum[hgps::core::Gender::male] =
-        load_gender_weight_quantiles_by_stratum(opt["WeightQuantiles"]["Male"], config.root_path,
-                                              "Male", stratum_enabled, stratum_count);
+                                                "Female", stratum_enabled, stratum_count);
+    weight_quantiles_by_stratum[hgps::core::Gender::male] = load_gender_weight_quantiles_by_stratum(
+        opt["WeightQuantiles"]["Male"], config.root_path, "Male", stratum_enabled, stratum_count);
 
     // Energy Physical Activity quantiles.
     const auto epa_quantiles_table = load_datatable_from_csv(

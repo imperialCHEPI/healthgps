@@ -412,8 +412,8 @@ KevinHallModel::KevinHallModel(
                                 std::move(trend_steps)},
       energy_equation_{energy_equation}, nutrient_ranges_{nutrient_ranges},
       nutrient_equations_{nutrient_equations}, food_prices_{food_prices},
-      weight_quantiles_by_stratum_{weight_quantiles_by_stratum},
-      epa_quantiles_{epa_quantiles}, height_params_{std::move(height_params)} {}
+      weight_quantiles_by_stratum_{weight_quantiles_by_stratum}, epa_quantiles_{epa_quantiles},
+      height_params_{std::move(height_params)} {}
 
 RiskFactorModelType KevinHallModel::type() const noexcept { return RiskFactorModelType::Dynamic; }
 
@@ -1346,7 +1346,7 @@ void KevinHallModel::update_height(RuntimeContext &context, Person &person,
 }
 
 void KevinHallModel::print_weight_summary_tables(RuntimeContext &context,
-                                               std::string_view phase) const {
+                                                 std::string_view phase) const {
     if (!should_print_kevin_hall_summary_tables(context)) {
         return;
     }
@@ -1394,8 +1394,7 @@ KevinHallModelDefinition::KevinHallModelDefinition(
     std::unordered_map<core::Identifier, core::DoubleInterval> nutrient_ranges,
     std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
     std::unordered_map<core::Identifier, std::optional<double>> food_prices,
-    std::unordered_map<core::Gender, std::vector<std::vector<double>>>
-        weight_quantiles_by_stratum,
+    std::unordered_map<core::Gender, std::vector<std::vector<double>>> weight_quantiles_by_stratum,
     std::vector<double> epa_quantiles,
     std::unordered_map<core::Gender, std::vector<HeightModelParams>> height_params)
     : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend),
@@ -1447,10 +1446,10 @@ KevinHallModelDefinition::KevinHallModelDefinition(
 }
 
 std::unique_ptr<RiskFactorModel> KevinHallModelDefinition::create_model() const {
-    return std::make_unique<KevinHallModel>(
-        expected_, expected_trend_, trend_steps_, energy_equation_, nutrient_ranges_,
-        nutrient_equations_, food_prices_, weight_quantiles_by_stratum_, epa_quantiles_,
-        height_params_);
+    return std::make_unique<KevinHallModel>(expected_, expected_trend_, trend_steps_,
+                                            energy_equation_, nutrient_ranges_, nutrient_equations_,
+                                            food_prices_, weight_quantiles_by_stratum_,
+                                            epa_quantiles_, height_params_);
 }
 
 } // namespace hgps

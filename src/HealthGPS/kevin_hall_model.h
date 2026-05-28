@@ -195,8 +195,7 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @brief Returns the weight quantile for the given E/PA quantile and stratum quantile curve.
     /// @param epa_quantile The Energy / Physical Activity quantile.
     /// @param quantiles Sorted weight quantiles for the person's adjustment stratum.
-    double get_weight_quantile(double epa_quantile,
-                               const std::vector<double> &quantiles) const;
+    double get_weight_quantile(double epa_quantile, const std::vector<double> &quantiles) const;
 
     /// @brief Compute the mean of weight (optionally raised to a power) for each sex and age
     /// @param population The population to compute the mean for

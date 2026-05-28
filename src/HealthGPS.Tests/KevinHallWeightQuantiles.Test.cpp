@@ -110,7 +110,8 @@ KevinHallWeightRuntime make_kevin_hall_weight_runtime(const nlohmann::json &dyna
     age_builder.append(30);
     data.add(age_builder.build());
 
-    const auto country = Country{.code = 826, .name = "United Kingdom", .alpha2 = "GB", .alpha3 = "GBR"};
+    const auto country =
+        Country{.code = 826, .name = "United Kingdom", .alpha2 = "GB", .alpha3 = "GBR"};
     const auto settings = Settings{country, 0.1f, IntegerInterval(0, 110)};
     const auto run = RunInfo{.start_time = static_cast<unsigned int>(start_year),
                              .stop_time = static_cast<unsigned int>(start_year + 5),
@@ -122,9 +123,9 @@ KevinHallWeightRuntime make_kevin_hall_weight_runtime(const nlohmann::json &dyna
     auto project_requirements = hgps::input::ProjectRequirements{};
     project_requirements.income.type = "continuous";
     project_requirements.income.categories = "4";
-    auto inputs = std::make_shared<ModelInput>(data, settings, run, ses, mapping,
-                                               std::vector<DiseaseInfo>{}, project_requirements,
-                                               hgps::input::PIFInfo{});
+    auto inputs =
+        std::make_shared<ModelInput>(data, settings, run, ses, mapping, std::vector<DiseaseInfo>{},
+                                     project_requirements, hgps::input::PIFInfo{});
 
     auto bus = std::make_shared<hgps::DefaultEventBus>();
     hgps::SyncChannel channel;
