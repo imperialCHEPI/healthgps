@@ -53,6 +53,8 @@ TEST(KevinHallHeight, LegacyHeightScalarConfigStillLoads) {
 
     auto json = hgps::input::load_json(finch / "dynamic_model.json");
     json.erase("Height");
+    json["HeightSlope"] = {{"Female", 0.123}, {"Male", 0.127}};
+    json["HeightStdDev"] = {{"Female", 0.041}, {"Male", 0.043}};
     auto config = make_finch_configuration();
 
     auto definition = hgps::input::load_kevinhall_risk_model_definition(json, config);
