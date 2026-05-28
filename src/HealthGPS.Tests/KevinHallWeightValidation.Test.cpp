@@ -153,7 +153,7 @@ TEST(KevinHallWeightValidation, GeneratePrintsHeightSummaryTablesForBaselineStar
     auto trend_steps = std::make_shared<std::unordered_map<Identifier, int>>();
 
     const std::unordered_map<Identifier, double> energy_equation{{"Carbohydrate"_id, 1.0},
-                                                                  {"Sodium"_id, 1.0}};
+                                                                 {"Sodium"_id, 1.0}};
     const std::unordered_map<Identifier, DoubleInterval> nutrient_ranges{
         {"Carbohydrate"_id, DoubleInterval{0.0, 5000.0}},
         {"Sodium"_id, DoubleInterval{0.0, 5000.0}},
@@ -191,10 +191,9 @@ TEST(KevinHallWeightValidation, GeneratePrintsHeightSummaryTablesForBaselineStar
     const auto ses = SESDefinition{.fuction_name = "normal", .parameters = {0.0, 1.0}};
     const auto mapping = HierarchicalMapping(
         {MappingEntry{"Weight", 0, DoubleInterval{0.0, 250.0}}, MappingEntry{"Age", 0}});
-    auto inputs = std::make_shared<ModelInput>(data, settings, run, ses, mapping,
-                                               std::vector<DiseaseInfo>{},
-                                               hgps::input::ProjectRequirements{},
-                                               hgps::input::PIFInfo{});
+    auto inputs =
+        std::make_shared<ModelInput>(data, settings, run, ses, mapping, std::vector<DiseaseInfo>{},
+                                     hgps::input::ProjectRequirements{}, hgps::input::PIFInfo{});
 
     auto bus = std::make_shared<DefaultEventBus>();
     SyncChannel channel;
@@ -220,4 +219,3 @@ TEST(KevinHallWeightValidation, GeneratePrintsHeightSummaryTablesForBaselineStar
     EXPECT_NE(output.find("[HEIGHT BY FINAL INCOME CATEGORY]"), std::string::npos);
     EXPECT_NE(output.find("phase=generate"), std::string::npos);
 }
-
