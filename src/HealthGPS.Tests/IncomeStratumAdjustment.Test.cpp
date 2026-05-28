@@ -528,7 +528,7 @@ TEST(IncomeStratumAdjustment, AdjustmentStratumPersistsAfterFinalIncomeCategorie
         auto &p = context.population()[i];
         p.gender = (i % 2 == 0) ? core::Gender::male : core::Gender::female;
         p.age = 0;
-        p.risk_factors["income"_id] = 400.0 + static_cast<double>(i) * 50.0;
+        p.risk_factors["income"_id] = 400.0 + (static_cast<double>(i) * 50.0);
     }
 
     const auto factor = core::Identifier("foodcarbohydrate");
@@ -570,7 +570,7 @@ TEST(IncomeStratumAdjustment, GeneratePrintsIncomeStratumAndFinalCategoryTables)
         auto &p = context.population()[i];
         p.gender = (i % 2 == 0) ? core::Gender::male : core::Gender::female;
         p.age = 0;
-        p.risk_factors["income"_id] = 300.0 + static_cast<double>(i) * 80.0;
+        p.risk_factors["income"_id] = 300.0 + (static_cast<double>(i) * 80.0);
     }
 
     const auto factor = core::Identifier("foodcarbohydrate");
@@ -584,6 +584,7 @@ TEST(IncomeStratumAdjustment, GeneratePrintsIncomeStratumAndFinalCategoryTables)
     auto bundle =
         create_test_static_linear_model_bundle(overall_expected, stratum_tables, true, 2u);
 
+    context.set_current_time(inputs->run().start_time);
     const auto output = capture_stdout([&] { bundle->model->generate_risk_factors(context); });
 
     EXPECT_NE(output.find("[INCOME BASED FACTOR MEANS ADJUSTMENT][INCOME-STRATUM ASSIGNMENT]"),

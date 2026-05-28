@@ -46,23 +46,6 @@ std::string gender_label(const hgps::Person &person) {
     return "unknown";
 }
 
-std::string final_income_category_label(hgps::core::Income income, std::string_view categories) {
-    switch (income) {
-    case hgps::core::Income::low:
-        return "Low";
-    case hgps::core::Income::lowermiddle:
-        return "LowerMid";
-    case hgps::core::Income::middle:
-        return categories == "4" ? "Middle" : "Middle";
-    case hgps::core::Income::uppermiddle:
-        return "UpperMid";
-    case hgps::core::Income::high:
-        return "High";
-    default:
-        return "unknown";
-    }
-}
-
 bool should_print_height_summary_tables(const hgps::RuntimeContext &context) {
     if (context.scenario().type() != hgps::ScenarioType::baseline) {
         return false;
@@ -150,7 +133,7 @@ void print_height_stratum_assignment_table(
                 << " | " << std::setw(11) << "n/a"
                 << " | " << std::setw(11) << "n/a";
         } else {
-            const double n = static_cast<double>(summary.count);
+            const auto n = static_cast<double>(summary.count);
             out << std::setw(11) << fmt::format("{:.6f}", summary.slope_sum / n) << " | "
                 << std::setw(11) << fmt::format("{:.6f}", summary.std_sum / n) << " | "
                 << std::setw(11) << fmt::format("{:.3f}", summary.height_min) << " | "
@@ -1196,9 +1179,7 @@ void KevinHallModel::print_height_summary_tables(RuntimeContext &context,
     for (const auto &[gender, params] : height_params_) {
         bucket_count = std::max(bucket_count, params.size());
     }
-    if (bucket_count <= 1) {
-        bucket_count = 1;
-    }
+    bucket_count = std::max<std::size_t>(bucket_count, 1);
 
     print_height_stratum_assignment_table(context.population(), height_params_, bucket_count,
                                           context.time_now(), phase);
