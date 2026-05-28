@@ -249,3 +249,73 @@ TEST(KevinHallHeight, HeaderOnlyHeightCsvThrows) {
         },
         hgps::core::HgpsException);
 }
+
+TEST(KevinHallHeight, SingleRowHeightLoadsWhenStratumCountIsOne) {
+    const auto finch = finch_data_root();
+    if (!std::filesystem::exists(finch / "dynamic_model.json")) {
+        GTEST_SKIP() << "FINCH input data not available at " << finch.string();
+    }
+
+    auto female_csv = create_temp_height_csv("height_female_one_stratum.csv", "slope,std\n0.18,0.05\n");
+    auto male_csv = create_temp_height_csv("height_male_one_stratum.csv", "slope,std\n0.20,0.06\n");
+
+    auto json = hgps::input::load_json(finch / "dynamic_model.json");
+    json["Height"]["Female"]["name"] = female_csv.string();
+    json["Height"]["Male"]["name"] = male_csv.string();
+    auto config = make_finch_configuration();
+    config.modelling.baseline_adjustment.income_stratum_factors_mean.enabled = true;
+    config.modelling.baseline_adjustment.income_stratum_factors_mean
+        .adjustment_income_stratum_count = 1u;
+
+    auto definition = hgps::input::load_kevinhall_risk_model_definition(json, config);
+    ASSERT_NE(definition, nullptr);
+    EXPECT_NE(definition->create_model(), nullptr);
+}
+
+TEST(KevinHallHeight, MultiRowHeightThrowsWhenStratumCountIsOne) {
+    const auto finch = finch_data_root();
+    if (!std::filesystem::exists(finch / "dynamic_model.json")) {
+        GTEST_SKIP() << "FINCH input data not available at " << finch.string();
+    }
+
+    const std::string rows = "slope,std\n0.11,0.041\n0.12,0.042\n";
+    auto female_csv = create_temp_height_csv("height_female_bad_one_stratum.csv", rows);
+    auto male_csv = create_temp_height_csv("height_male_bad_one_stratum.csv", rows);
+
+    auto json = hgps::input::load_json(finch / "dynamic_model.json");
+    json["Height"]["Female"]["name"] = female_csv.string();
+    json["Height"]["Male"]["name"] = male_csv.string();
+    auto config = make_finch_configuration();
+    config.modelling.baseline_adjustment.income_stratum_factors_mean.enabled = true;
+    config.modelling.baseline_adjustment.income_stratum_factors_mean
+        .adjustment_income_stratum_count = 1u;
+
+    EXPECT_THROW(
+        {
+            auto definition = hgps::input::load_kevinhall_risk_model_definition(json, config);
+            (void)definition;
+        },
+        hgps::core::HgpsException);
+}
+
+TEST(KevinHallHeight, HeightCsvSupportsSemicolonDelimiter) {
+    const auto finch = finch_data_root();
+    if (!std::filesystem::exists(finch / "dynamic_model.json")) {
+        GTEST_SKIP() << "FINCH input data not available at " << finch.string();
+    }
+
+    auto female_csv =
+        create_temp_height_csv("height_female_semicolon.csv", "slope;std\n0.18;0.05\n");
+    auto male_csv = create_temp_height_csv("height_male_semicolon.csv", "slope;std\n0.20;0.06\n");
+
+    auto json = hgps::input::load_json(finch / "dynamic_model.json");
+    json["Height"]["Female"]["name"] = female_csv.string();
+    json["Height"]["Male"]["name"] = male_csv.string();
+    json["Height"]["Female"]["delimiter"] = ";";
+    json["Height"]["Male"]["delimiter"] = ";";
+    auto config = make_finch_configuration();
+
+    auto definition = hgps::input::load_kevinhall_risk_model_definition(json, config);
+    ASSERT_NE(definition, nullptr);
+    EXPECT_NE(definition->create_model(), nullptr);
+}

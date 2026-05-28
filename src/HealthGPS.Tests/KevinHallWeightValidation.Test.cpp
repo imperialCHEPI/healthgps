@@ -133,3 +133,4 @@ TEST(KevinHallWeightValidation, ValidateWeightThrowsWhenOutsideConfiguredRange) 
     person.risk_factors.erase("Weight"_id);
     EXPECT_NO_THROW(kevin_hall->validate_weight_in_config_range(context, person, "no_weight"));
 }
+
