@@ -148,7 +148,7 @@ std::shared_ptr<hgps::ModelInput> create_trended_model_input(hgps::core::DataTab
 }
 
 std::shared_ptr<hgps::ModelInput> create_physical_activity_model_input(hgps::core::DataTable &data,
-                                                                        std::string pa_type) {
+                                                                       std::string pa_type) {
     using namespace hgps;
     using namespace hgps::core;
 
@@ -166,11 +166,10 @@ std::shared_ptr<hgps::ModelInput> create_physical_activity_model_input(hgps::cor
                        .comorbidities = 0,
                        .policy_start_year = 0};
     auto ses = SESDefinition{.fuction_name = "normal", .parameters = {0.0, 1.0}};
-    auto mapping = HierarchicalMapping({MappingEntry{"Age", 0},
-                                        MappingEntry{"foodcarbohydrate", 1,
-                                                     core::DoubleInterval(0.0, 500.0)},
-                                        MappingEntry{"PhysicalActivity", 1,
-                                                     core::DoubleInterval(1.2, 1.4)}});
+    auto mapping =
+        HierarchicalMapping({MappingEntry{"Age", 0},
+                             MappingEntry{"foodcarbohydrate", 1, core::DoubleInterval(0.0, 500.0)},
+                             MappingEntry{"PhysicalActivity", 1, core::DoubleInterval(1.2, 1.4)}});
     std::vector<core::DiseaseInfo> diseases{};
     auto project_requirements = hgps::input::ProjectRequirements{};
     project_requirements.risk_factors.adjust_to_factors_mean = true;
@@ -744,8 +743,8 @@ TEST(IncomeStratumAdjustment, SimplePhysicalActivityInitialisationUsesConfigured
     std::unordered_map<core::Identifier, PhysicalActivityModel> pa_models{
         {core::Identifier("simple"), simple_model}};
 
-    auto bundle = create_test_static_linear_model_bundle(expected, stratum_tables, false, 0u,
-                                                         pa_models);
+    auto bundle =
+        create_test_static_linear_model_bundle(expected, stratum_tables, false, 0u, pa_models);
     context.set_current_time(inputs->run().start_time);
     bundle->model->generate_risk_factors(context);
 
@@ -788,8 +787,8 @@ TEST(IncomeStratumAdjustment, ContinuousPhysicalActivityInitialisationUsesConfig
     std::unordered_map<core::Identifier, PhysicalActivityModel> pa_models{
         {core::Identifier("continuous"), continuous_model}};
 
-    auto bundle = create_test_static_linear_model_bundle(expected, stratum_tables, false, 0u,
-                                                         pa_models);
+    auto bundle =
+        create_test_static_linear_model_bundle(expected, stratum_tables, false, 0u, pa_models);
     context.set_current_time(inputs->run().start_time);
     bundle->model->generate_risk_factors(context);
 
