@@ -1,0 +1,19 @@
+# Codecov PR status configuration.
+#
+# Patch status is disabled: height-quintile tests need KevinHall_FINCH input data,
+# which is not available in CI, so new lines in kevin_hall_model.cpp never execute
+# during coverage runs and patch % stays artificially low.
+#
+# Project coverage remains enabled for overall regression signal.
+# To show patch on PRs without blocking merges, replace `patch: off` with:
+#   patch:
+#     default:
+#       informational: true
+
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 5%
+    patch: off
