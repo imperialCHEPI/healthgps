@@ -1,6 +1,5 @@
 #include "pch.h"
 
-#include "TestConsoleCapture.h"
 #include "HealthGPS.Core/identifier.h"
 #include "HealthGPS.Input/api.h"
 #include "HealthGPS.Input/model_parser.h"
@@ -10,6 +9,7 @@
 #include "HealthGPS/kevin_hall_model.h"
 #include "HealthGPS/modelinput.h"
 #include "HealthGPS/runtime_context.h"
+#include "TestConsoleCapture.h"
 
 #include <gtest/gtest.h>
 
@@ -63,13 +63,27 @@ hgps::input::Configuration make_quintile_height_finch_configuration() {
 
 void seed_finch_kevin_hall_food_factors(hgps::Person &person) {
     using namespace hgps;
-    static constexpr std::array<const char *, 21> k_food_keys = {
-        "FoodCarbohydrate",       "FoodProtein",     "FoodFat",           "FoodSodium",
-        "FoodAlcohol",            "FoodLegume",      "FoodVegetable",     "FoodFruit",
-        "FoodProcessedMeat",      "FoodRedMeat",     "FoodFibre",         "FoodTotalSugar",
-        "FoodAddedSugar",         "FoodSaturatedFat", "FoodPolyunsaturatedFattyAcid",
-        "FoodMonounsaturatedFat", "FoodIron",        "FoodCalcium",       "FoodVitaminC",
-        "FoodCopper",             "FoodZinc"};
+    static constexpr std::array<const char *, 21> k_food_keys = {"FoodCarbohydrate",
+                                                                 "FoodProtein",
+                                                                 "FoodFat",
+                                                                 "FoodSodium",
+                                                                 "FoodAlcohol",
+                                                                 "FoodLegume",
+                                                                 "FoodVegetable",
+                                                                 "FoodFruit",
+                                                                 "FoodProcessedMeat",
+                                                                 "FoodRedMeat",
+                                                                 "FoodFibre",
+                                                                 "FoodTotalSugar",
+                                                                 "FoodAddedSugar",
+                                                                 "FoodSaturatedFat",
+                                                                 "FoodPolyunsaturatedFattyAcid",
+                                                                 "FoodMonounsaturatedFat",
+                                                                 "FoodIron",
+                                                                 "FoodCalcium",
+                                                                 "FoodVitaminC",
+                                                                 "FoodCopper",
+                                                                 "FoodZinc"};
     for (const auto *key : k_food_keys) {
         person.risk_factors[hgps::core::Identifier(key)] = 50.0;
     }
@@ -89,11 +103,10 @@ make_kevin_hall_height_model_input(hgps::core::DataTable &data, int start_year,
     const auto country =
         Country{.code = 826, .name = "United Kingdom", .alpha2 = "GB", .alpha3 = "GBR"};
     const auto settings = Settings{country, 0.1f, IntegerInterval(0, 110)};
-    const auto run =
-        RunInfo{.start_time = static_cast<unsigned int>(start_year),
-                .stop_time = static_cast<unsigned int>(start_year + 5),
-                .sync_timeout_ms = 1000,
-                .seed = 42u};
+    const auto run = RunInfo{.start_time = static_cast<unsigned int>(start_year),
+                             .stop_time = static_cast<unsigned int>(start_year + 5),
+                             .sync_timeout_ms = 1000,
+                             .seed = 42u};
     const auto ses = SESDefinition{.fuction_name = "normal", .parameters = {0.0, 1.0}};
     // Allow newborn weights from initialise_weight (often below 15 kg).
     const auto mapping = HierarchicalMapping(
@@ -130,7 +143,8 @@ KevinHallHeightRuntime make_kevin_hall_height_runtime(const nlohmann::json &dyna
     }
 
     hgps::core::DataTable data;
-    auto inputs = make_kevin_hall_height_model_input(data, start_year, std::move(income_categories));
+    auto inputs =
+        make_kevin_hall_height_model_input(data, start_year, std::move(income_categories));
     auto bus = std::make_shared<hgps::DefaultEventBus>();
     hgps::SyncChannel channel;
     auto scenario = std::make_unique<hgps::BaselineScenario>(channel);
@@ -474,11 +488,9 @@ TEST(KevinHallHeight, GenerateInitialisesHeightWithQuintileParams) {
     auto config = make_quintile_height_finch_configuration();
     auto runtime = make_kevin_hall_height_runtime(json, config, 5, start_year);
 
-    const std::array<hgps::core::Income, 5> incomes = {hgps::core::Income::low,
-                                                       hgps::core::Income::lowermiddle,
-                                                       hgps::core::Income::middle,
-                                                       hgps::core::Income::uppermiddle,
-                                                       hgps::core::Income::high};
+    const std::array<hgps::core::Income, 5> incomes = {
+        hgps::core::Income::low, hgps::core::Income::lowermiddle, hgps::core::Income::middle,
+        hgps::core::Income::uppermiddle, hgps::core::Income::high};
     for (std::size_t i = 0; i < runtime.context.population().size(); ++i) {
         auto &person = runtime.context.population()[i];
         person.gender = (i % 2 == 0) ? hgps::core::Gender::female : hgps::core::Gender::male;
@@ -649,9 +661,8 @@ TEST(KevinHallHeight, GeneratePrintsHeightTablesForThreeIncomeCategories) {
     auto runtime =
         make_kevin_hall_height_runtime(json, config, 3, start_year, /*income_categories=*/"3");
 
-    const std::array<hgps::core::Income, 3> incomes = {hgps::core::Income::low,
-                                                       hgps::core::Income::middle,
-                                                       hgps::core::Income::high};
+    const std::array<hgps::core::Income, 3> incomes = {
+        hgps::core::Income::low, hgps::core::Income::middle, hgps::core::Income::high};
     for (std::size_t i = 0; i < runtime.context.population().size(); ++i) {
         auto &person = runtime.context.population()[i];
         person.gender = hgps::core::Gender::female;
