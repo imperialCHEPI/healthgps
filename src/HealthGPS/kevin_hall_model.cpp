@@ -46,7 +46,7 @@ std::string gender_label(const hgps::Person &person) {
     return "unknown";
 }
 
-bool should_print_height_summary_tables(const hgps::RuntimeContext &context) {
+bool should_print_kevin_hall_summary_tables(const hgps::RuntimeContext &context) {
     // MAHIMA: Keep console reporting limited to baseline start and first update year so
     // diagnostics remain useful without flooding long simulation logs.
     if (context.scenario().type() != hgps::ScenarioType::baseline) {
@@ -65,6 +65,22 @@ struct HeightBucketSummary {
     double height_max{std::numeric_limits<double>::lowest()};
     double height_sum{0.0};
 };
+
+const std::vector<double> &resolve_weight_quantiles_for_person(
+    const hgps::Person &person,
+    const std::unordered_map<hgps::core::Gender, std::vector<std::vector<double>>>
+        &weight_quantiles_by_stratum) {
+    const auto by_gender = weight_quantiles_by_stratum.find(person.gender);
+    if (by_gender == weight_quantiles_by_stratum.end() || by_gender->second.empty()) {
+        throw hgps::core::HgpsException("Weight quantiles missing for person gender");
+    }
+    const auto &params = by_gender->second;
+    if (!person.has_income_adjustment_stratum) {
+        return params.front();
+    }
+    const std::size_t index = std::min(person.income_adjustment_stratum, params.size() - 1);
+    return params[index];
+}
 
 const hgps::HeightModelParams &resolve_height_params_for_person(
     const hgps::Person &person,
@@ -148,6 +164,152 @@ void print_height_stratum_assignment_table(
     }
     out << "+--------+----------------------+-------+-------------+-------------+-------------+"
            "-------------+-------------+\n";
+    std::osyncstream(std::cout) << out.str();
+}
+
+struct WeightBucketSummary {
+    std::size_t count{0};
+    std::size_t quantile_size{0};
+    double weight_min{std::numeric_limits<double>::max()};
+    double weight_max{std::numeric_limits<double>::lowest()};
+    double weight_sum{0.0};
+};
+
+void print_weight_stratum_assignment_table(
+    const hgps::Population &population,
+    const std::unordered_map<hgps::core::Gender, std::vector<std::vector<double>>>
+        &weight_quantiles_by_stratum,
+    std::size_t bucket_count, int year, std::string_view phase) {
+    if (bucket_count == 0) {
+        return;
+    }
+
+    const hgps::core::Identifier weight_id("Weight");
+    std::vector<WeightBucketSummary> summaries(bucket_count);
+    for (const auto &person : population) {
+        if (!person.is_active() || !person.has_income_adjustment_stratum ||
+            person.income_adjustment_stratum >= bucket_count) {
+            continue;
+        }
+        auto weight_it = person.risk_factors.find(weight_id);
+        if (weight_it == person.risk_factors.end()) {
+            continue;
+        }
+
+        const auto &quantiles =
+            resolve_weight_quantiles_for_person(person, weight_quantiles_by_stratum);
+        auto &summary = summaries[person.income_adjustment_stratum];
+        summary.count++;
+        summary.quantile_size = quantiles.size();
+        const double weight = weight_it->second;
+        summary.weight_sum += weight;
+        summary.weight_min = std::min(summary.weight_min, weight);
+        summary.weight_max = std::max(summary.weight_max, weight);
+    }
+
+    std::ostringstream out;
+    out << "\n[WEIGHT STRATUM ASSIGNMENT] Year " << year << " phase=" << phase
+        << " (uses person.income_adjustment_stratum from static model)\n";
+    out << "+--------+----------------------+-------+---------------+-------------+-------------+"
+           "-------------+\n";
+    out << "| Bucket | Stratum ID           | Count | Quantile Size | Weight Min  | Weight Max  | "
+           "Weight Mean |\n";
+    out << "+--------+----------------------+-------+---------------+-------------+-------------+"
+           "-------------+\n";
+    for (std::size_t k = 0; k < bucket_count; ++k) {
+        const auto &summary = summaries[k];
+        const std::string stratum_id = "Quintile" + std::to_string(k + 1);
+        out << "| " << std::setw(6) << k << " | " << std::setw(20) << std::left << stratum_id
+            << std::right << " | " << std::setw(5) << summary.count << " | ";
+        if (summary.count == 0) {
+            out << std::setw(13) << "n/a"
+                << " | " << std::setw(11) << "n/a"
+                << " | " << std::setw(11) << "n/a"
+                << " | " << std::setw(11) << "n/a";
+        } else {
+            const auto n = static_cast<double>(summary.count);
+            out << std::setw(13) << summary.quantile_size << " | " << std::setw(11)
+                << fmt::format("{:.3f}", summary.weight_min) << " | " << std::setw(11)
+                << fmt::format("{:.3f}", summary.weight_max) << " | " << std::setw(11)
+                << fmt::format("{:.3f}", summary.weight_sum / n);
+        }
+        out << " |\n";
+    }
+    out << "+--------+----------------------+-------+---------------+-------------+-------------+"
+           "-------------+\n";
+    std::osyncstream(std::cout) << out.str();
+}
+
+void print_weight_by_final_income_category_table(const hgps::Population &population,
+                                                 std::string_view categories, int year,
+                                                 std::string_view phase) {
+    const auto cat_count = categories == "4" ? 4u : 3u;
+    const hgps::core::Identifier weight_id("Weight");
+    std::vector<WeightBucketSummary> summaries(cat_count);
+
+    for (const auto &person : population) {
+        if (!person.is_active()) {
+            continue;
+        }
+        auto weight_it = person.risk_factors.find(weight_id);
+        if (weight_it == person.risk_factors.end()) {
+            continue;
+        }
+
+        std::size_t idx = 0;
+        switch (person.income) {
+        case hgps::core::Income::low:
+            idx = 0;
+            break;
+        case hgps::core::Income::lowermiddle:
+        case hgps::core::Income::middle:
+            idx = 1;
+            break;
+        case hgps::core::Income::uppermiddle:
+            idx = 2;
+            break;
+        case hgps::core::Income::high:
+            idx = categories == "4" ? 3u : 2u;
+            break;
+        default:
+            continue;
+        }
+
+        auto &summary = summaries[idx];
+        summary.count++;
+        const double weight = weight_it->second;
+        summary.weight_sum += weight;
+        summary.weight_min = std::min(summary.weight_min, weight);
+        summary.weight_max = std::max(summary.weight_max, weight);
+    }
+
+    std::ostringstream out;
+    out << "\n[WEIGHT BY FINAL INCOME CATEGORY] Year " << year << " phase=" << phase
+        << " project_requirements.categories=" << categories
+        << " (person.income set by static model after quintile adjustment)\n";
+    out << "+----------+--------+-------------+-------------+-------------+\n";
+    out << "| Category | Count  | Weight Min  | Weight Max  | Weight Mean |\n";
+    out << "+----------+--------+-------------+-------------+-------------+\n";
+    const std::vector<std::string> labels =
+        categories == "4" ? std::vector<std::string>{"Low", "LowerMid", "UpperMid", "High"}
+                          : std::vector<std::string>{"Low", "Middle", "High"};
+    for (std::size_t i = 0; i < summaries.size(); ++i) {
+        const auto &summary = summaries[i];
+        out << "| " << std::setw(8) << std::left << labels[i] << std::right << " | " << std::setw(6)
+            << summary.count << " | ";
+        if (summary.count == 0) {
+            out << std::setw(11) << "n/a"
+                << " | " << std::setw(11) << "n/a"
+                << " | " << std::setw(11) << "n/a";
+        } else {
+            out << std::setw(11) << fmt::format("{:.3f}", summary.weight_min) << " | "
+                << std::setw(11) << fmt::format("{:.3f}", summary.weight_max) << " | "
+                << std::setw(11)
+                << fmt::format("{:.3f}", summary.weight_sum / static_cast<double>(summary.count));
+        }
+        out << " |\n";
+    }
+    out << "+----------+--------+-------------+-------------+-------------+\n";
     std::osyncstream(std::cout) << out.str();
 }
 
@@ -242,14 +404,15 @@ KevinHallModel::KevinHallModel(
     const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
         &nutrient_equations,
     const std::unordered_map<core::Identifier, std::optional<double>> &food_prices,
-    const std::unordered_map<core::Gender, std::vector<double>> &weight_quantiles,
+    const std::unordered_map<core::Gender, std::vector<std::vector<double>>>
+        &weight_quantiles_by_stratum,
     const std::vector<double> &epa_quantiles,
     std::unordered_map<core::Gender, std::vector<HeightModelParams>> height_params)
     : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend),
                                 std::move(trend_steps)},
       energy_equation_{energy_equation}, nutrient_ranges_{nutrient_ranges},
       nutrient_equations_{nutrient_equations}, food_prices_{food_prices},
-      weight_quantiles_{weight_quantiles}, epa_quantiles_{epa_quantiles},
+      weight_quantiles_by_stratum_{weight_quantiles_by_stratum}, epa_quantiles_{epa_quantiles},
       height_params_{std::move(height_params)} {}
 
 RiskFactorModelType KevinHallModel::type() const noexcept { return RiskFactorModelType::Dynamic; }
@@ -289,6 +452,7 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
     }
 
     print_height_summary_tables(context, "generate");
+    print_weight_summary_tables(context, "generate");
 }
 
 void KevinHallModel::update_risk_factors(RuntimeContext &context) {
@@ -368,6 +532,7 @@ void KevinHallModel::update_newborns(RuntimeContext &context) const {
     }
 
     print_height_summary_tables(context, "update-newborns");
+    print_weight_summary_tables(context, "update-newborns");
 }
 
 void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
@@ -439,6 +604,7 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
     }
 
     print_height_summary_tables(context, "update-children");
+    print_weight_summary_tables(context, "update-children");
 }
 
 KevinHallAdjustmentTable KevinHallModel::receive_weight_adjustments(RuntimeContext &context) const {
@@ -903,7 +1069,9 @@ void KevinHallModel::initialise_weight(RuntimeContext &context, Person &person) 
     // Compute new weight.
     double w_expected =
         get_expected(context, person.gender, person.age, "Weight"_id, std::nullopt, true);
-    double w_quantile = get_weight_quantile(epa_quantile, person.gender);
+    const auto &weight_quantiles =
+        resolve_weight_quantiles_for_person(person, weight_quantiles_by_stratum_);
+    double w_quantile = get_weight_quantile(epa_quantile, weight_quantiles);
     person.risk_factors["Weight"_id] = w_expected * w_quantile;
     validate_weight_in_config_range(context, person, "initialise_weight");
 }
@@ -1024,7 +1192,11 @@ void KevinHallModel::validate_weight_in_config_range(const RuntimeContext &conte
     throw core::HgpsException(message.str());
 }
 
-double KevinHallModel::get_weight_quantile(double epa_quantile, core::Gender sex) const {
+double KevinHallModel::get_weight_quantile(double epa_quantile,
+                                           const std::vector<double> &quantiles) const {
+    if (quantiles.empty()) {
+        throw core::HgpsException("Weight quantile curve is empty");
+    }
 
     // Compute Energy Physical Activity percentile (taking midpoint of duplicates).
     auto epa_range = std::equal_range(epa_quantiles_.begin(), epa_quantiles_.end(), epa_quantile);
@@ -1033,9 +1205,9 @@ double KevinHallModel::get_weight_quantile(double epa_quantile, core::Gender sex
     auto epa_percentile = epa_index / epa_quantiles_.size();
 
     // Find weight quantile.
-    size_t weight_index_last = weight_quantiles_.at(sex).size() - 1;
-    auto weight_index = static_cast<size_t>(epa_percentile * weight_index_last);
-    return weight_quantiles_.at(sex)[weight_index];
+    const size_t weight_index_last = quantiles.size() - 1;
+    const auto weight_index = static_cast<size_t>(epa_percentile * weight_index_last);
+    return quantiles[weight_index];
 }
 
 KevinHallAdjustmentTable
@@ -1173,9 +1345,30 @@ void KevinHallModel::update_height(RuntimeContext &context, Person &person,
     person.risk_factors["Height"_id] = H;
 }
 
+void KevinHallModel::print_weight_summary_tables(RuntimeContext &context,
+                                                 std::string_view phase) const {
+    if (!should_print_kevin_hall_summary_tables(context)) {
+        return;
+    }
+
+    std::size_t bucket_count = 0;
+    for (const auto &[gender, by_stratum] : weight_quantiles_by_stratum_) {
+        (void)gender;
+        bucket_count = std::max(bucket_count, by_stratum.size());
+    }
+    bucket_count = std::max<std::size_t>(bucket_count, 1);
+
+    print_weight_stratum_assignment_table(context.population(), weight_quantiles_by_stratum_,
+                                          bucket_count, context.time_now(), phase);
+
+    const auto &categories = context.inputs().project_requirements().income.categories;
+    print_weight_by_final_income_category_table(context.population(), categories,
+                                                context.time_now(), phase);
+}
+
 void KevinHallModel::print_height_summary_tables(RuntimeContext &context,
                                                  std::string_view phase) const {
-    if (!should_print_height_summary_tables(context)) {
+    if (!should_print_kevin_hall_summary_tables(context)) {
         return;
     }
 
@@ -1201,15 +1394,15 @@ KevinHallModelDefinition::KevinHallModelDefinition(
     std::unordered_map<core::Identifier, core::DoubleInterval> nutrient_ranges,
     std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
     std::unordered_map<core::Identifier, std::optional<double>> food_prices,
-    std::unordered_map<core::Gender, std::vector<double>> weight_quantiles,
+    std::unordered_map<core::Gender, std::vector<std::vector<double>>> weight_quantiles_by_stratum,
     std::vector<double> epa_quantiles,
     std::unordered_map<core::Gender, std::vector<HeightModelParams>> height_params)
     : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend),
                                           std::move(trend_steps)},
       energy_equation_{std::move(energy_equation)}, nutrient_ranges_{std::move(nutrient_ranges)},
       nutrient_equations_{std::move(nutrient_equations)}, food_prices_{std::move(food_prices)},
-      weight_quantiles_{std::move(weight_quantiles)}, epa_quantiles_{std::move(epa_quantiles)},
-      height_params_{std::move(height_params)} {
+      weight_quantiles_by_stratum_{std::move(weight_quantiles_by_stratum)},
+      epa_quantiles_{std::move(epa_quantiles)}, height_params_{std::move(height_params)} {
 
     if (energy_equation_.empty()) {
         throw core::HgpsException("Energy equation mapping is empty");
@@ -1223,8 +1416,21 @@ KevinHallModelDefinition::KevinHallModelDefinition(
     if (food_prices_.empty()) {
         throw core::HgpsException("Food prices mapping is empty");
     }
-    if (weight_quantiles_.empty()) {
+    if (weight_quantiles_by_stratum_.empty()) {
         throw core::HgpsException("Weight quantiles mapping is empty");
+    }
+    for (const auto &[gender, by_stratum] : weight_quantiles_by_stratum_) {
+        if (by_stratum.empty()) {
+            throw core::HgpsException(
+                fmt::format("Weight quantiles mapping contains empty stratum list for gender {}",
+                            gender == core::Gender::male ? "male" : "female"));
+        }
+        for (const auto &quantiles : by_stratum) {
+            if (quantiles.empty()) {
+                throw core::HgpsException(
+                    "Weight quantiles mapping contains an empty quantile curve");
+            }
+        }
     }
     if (epa_quantiles_.empty()) {
         throw core::HgpsException("Energy Physical Activity quantiles mapping is empty");
@@ -1240,9 +1446,10 @@ KevinHallModelDefinition::KevinHallModelDefinition(
 }
 
 std::unique_ptr<RiskFactorModel> KevinHallModelDefinition::create_model() const {
-    return std::make_unique<KevinHallModel>(
-        expected_, expected_trend_, trend_steps_, energy_equation_, nutrient_ranges_,
-        nutrient_equations_, food_prices_, weight_quantiles_, epa_quantiles_, height_params_);
+    return std::make_unique<KevinHallModel>(expected_, expected_trend_, trend_steps_,
+                                            energy_equation_, nutrient_ranges_, nutrient_equations_,
+                                            food_prices_, weight_quantiles_by_stratum_,
+                                            epa_quantiles_, height_params_);
 }
 
 } // namespace hgps

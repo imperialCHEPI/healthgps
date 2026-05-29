@@ -43,6 +43,7 @@ target_sources(
             "ModelParserFinch.Test.cpp"
             "KevinHallWeightValidation.Test.cpp"
             "KevinHallHeight.Test.cpp"
+            "KevinHallWeightQuantiles.Test.cpp"
             "EventMonitor.Test.cpp"
             "RelativeRiskLookup.Test.cpp"
             "RuntimeMetric.Test.cpp"
