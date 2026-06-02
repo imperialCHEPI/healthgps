@@ -15,6 +15,7 @@ target_sources(
     PRIVATE "pch.cpp"
             "pch.h"
             "TestConsoleCapture.h"
+            "TestConsoleCapture.cpp"
             "data_config.h"
             "data_config.cpp"
             "AgeGenderTable.Test.cpp"

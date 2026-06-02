@@ -68,7 +68,20 @@ TEST(KevinHallWeightValidation, ValidateWeightThrowsWhenOutsideConfiguredRange) 
         GTEST_SKIP() << "FINCH input data not available at " << finch.string();
     }
 
-    const auto json = hgps::input::load_json(finch / "dynamic_model.json");
+    auto json = hgps::input::load_json(finch / "dynamic_model.json");
+    // FINCH WeightQuantiles is configured as Quintile1..N, which requires stratum adjustment to be
+    // enabled. This test only validates weight range checking, so use the legacy single-file
+    // weight quantiles to avoid coupling to income stratum configuration.
+    json["WeightQuantiles"]["Female"] = {{"name", "weight_quantiles_NCDRisk_female.csv"},
+                                         {"format", "csv"},
+                                         {"delimiter", ","},
+                                         {"encoding", "ASCII"},
+                                         {"columns", {{"quantile", "double"}}}};
+    json["WeightQuantiles"]["Male"] = {{"name", "weight_quantiles_NCDRisk_male.csv"},
+                                       {"format", "csv"},
+                                       {"delimiter", ","},
+                                       {"encoding", "ASCII"},
+                                       {"columns", {{"quantile", "double"}}}};
     auto config = make_finch_configuration();
     auto definition = hgps::input::load_kevinhall_risk_model_definition(json, config);
     ASSERT_NE(definition, nullptr);

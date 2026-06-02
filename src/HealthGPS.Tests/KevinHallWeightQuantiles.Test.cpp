@@ -71,8 +71,27 @@ nlohmann::json make_csv_file_json(const std::filesystem::path &path) {
 
 void seed_finch_kevin_hall_food_factors(hgps::Person &person) {
     using namespace hgps;
-    static constexpr std::array<const char *, 3> k_food_keys = {"FoodCarbohydrate", "FoodProtein",
-                                                                "FoodFat"};
+    static constexpr std::array<const char *, 21> k_food_keys = {"FoodCarbohydrate",
+                                                                 "FoodProtein",
+                                                                 "FoodFat",
+                                                                 "FoodSodium",
+                                                                 "FoodAlcohol",
+                                                                 "FoodLegume",
+                                                                 "FoodVegetable",
+                                                                 "FoodFruit",
+                                                                 "FoodProcessedMeat",
+                                                                 "FoodRedMeat",
+                                                                 "FoodFibre",
+                                                                 "FoodTotalSugar",
+                                                                 "FoodAddedSugar",
+                                                                 "FoodSaturatedFat",
+                                                                 "FoodPolyunsaturatedFattyAcid",
+                                                                 "FoodMonounsaturatedFat",
+                                                                 "FoodIron",
+                                                                 "FoodCalcium",
+                                                                 "FoodVitaminC",
+                                                                 "FoodCopper",
+                                                                 "FoodZinc"};
     for (const auto *key : k_food_keys) {
         person.risk_factors[core::Identifier(key)] = 50.0;
     }
@@ -141,6 +160,20 @@ KevinHallWeightRuntime make_kevin_hall_weight_runtime(const nlohmann::json &dyna
                                   .context = std::move(context)};
 }
 
+nlohmann::json set_legacy_weight_quantiles(nlohmann::json json) {
+    json["WeightQuantiles"]["Female"] = {{"name", "weight_quantiles_NCDRisk_female.csv"},
+                                         {"format", "csv"},
+                                         {"delimiter", ","},
+                                         {"encoding", "ASCII"},
+                                         {"columns", {{"quantile", "double"}}}};
+    json["WeightQuantiles"]["Male"] = {{"name", "weight_quantiles_NCDRisk_male.csv"},
+                                       {"format", "csv"},
+                                       {"delimiter", ","},
+                                       {"encoding", "ASCII"},
+                                       {"columns", {{"quantile", "double"}}}};
+    return json;
+}
+
 nlohmann::json set_quintile_weight_quantiles(nlohmann::json json,
                                              const std::filesystem::path &female_base,
                                              const std::filesystem::path &male_base,
@@ -172,6 +205,7 @@ TEST(KevinHallWeightQuantiles, LegacySingleFileConfigStillLoads) {
     }
 
     auto json = hgps::input::load_json(finch / "dynamic_model.json");
+    json = set_legacy_weight_quantiles(json);
     auto config = make_finch_configuration();
     auto definition = hgps::input::load_kevinhall_risk_model_definition(json, config);
     ASSERT_NE(definition, nullptr);
@@ -255,8 +289,8 @@ TEST(KevinHallWeightQuantiles, GeneratePrintsWeightStratumAndIncomeCategoryTable
 
     constexpr int start_year = 2020;
     auto json = hgps::input::load_json(finch / "dynamic_model.json");
-    json = set_quintile_weight_quantiles(json, finch / "weight_female", finch / "weight_male", 1.0,
-                                         1.0);
+    // Use FINCH on-disk Quintile1..N curves (full quantile tables). Temp 3-row CSVs from
+    // set_quintile_weight_quantiles are only for parser-load tests; generate can abort/hang.
     auto config = make_quintile_stratum_configuration();
     auto runtime = make_kevin_hall_weight_runtime(json, config, 6, start_year);
 
@@ -281,6 +315,7 @@ TEST(KevinHallWeightQuantiles, GeneratePrintsWeightStratumAndIncomeCategoryTable
 
 TEST(KevinHallWeightQuantiles, DifferentStrataCanProduceDifferentWeights) {
     using namespace hgps;
+    using hgps::test::capture_stdout;
 
     const auto finch = finch_data_root();
     if (!std::filesystem::exists(finch / "dynamic_model.json")) {
@@ -288,8 +323,6 @@ TEST(KevinHallWeightQuantiles, DifferentStrataCanProduceDifferentWeights) {
     }
 
     auto json = hgps::input::load_json(finch / "dynamic_model.json");
-    json = set_quintile_weight_quantiles(json, finch / "weight_female", finch / "weight_male", 1.0,
-                                         1.0);
     auto config = make_quintile_stratum_configuration();
     auto runtime = make_kevin_hall_weight_runtime(json, config, 2, 2020);
 
@@ -307,7 +340,7 @@ TEST(KevinHallWeightQuantiles, DifferentStrataCanProduceDifferentWeights) {
     person1.income_adjustment_stratum = 4;
     seed_finch_kevin_hall_food_factors(person1);
 
-    runtime.model->generate_risk_factors(runtime.context);
+    capture_stdout([&] { runtime.model->generate_risk_factors(runtime.context); });
 
     const double weight0 = person0.risk_factors.at("Weight"_id);
     const double weight1 = person1.risk_factors.at("Weight"_id);

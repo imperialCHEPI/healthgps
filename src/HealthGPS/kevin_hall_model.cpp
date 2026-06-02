@@ -11,7 +11,6 @@
 #include <iterator>
 #include <limits>
 #include <sstream>
-#include <syncstream>
 #include <utility>
 
 namespace { // anonymous namespace
@@ -164,7 +163,9 @@ void print_height_stratum_assignment_table(
     }
     out << "+--------+----------------------+-------+-------------+-------------+-------------+"
            "-------------+-------------+\n";
-    std::osyncstream(std::cout) << out.str();
+    // MAHIMA: Avoid std::osyncstream here — it can block when gtest redirects stdout
+    // (CaptureStdout) in unit tests, making the suite appear hung.
+    std::cout << out.str() << std::flush;
 }
 
 struct WeightBucketSummary {
@@ -237,7 +238,7 @@ void print_weight_stratum_assignment_table(
     }
     out << "+--------+----------------------+-------+---------------+-------------+-------------+"
            "-------------+\n";
-    std::osyncstream(std::cout) << out.str();
+    std::cout << out.str() << std::flush;
 }
 
 void print_weight_by_final_income_category_table(const hgps::Population &population,
@@ -310,7 +311,7 @@ void print_weight_by_final_income_category_table(const hgps::Population &populat
         out << " |\n";
     }
     out << "+----------+--------+-------------+-------------+-------------+\n";
-    std::osyncstream(std::cout) << out.str();
+    std::cout << out.str() << std::flush;
 }
 
 void print_height_by_final_income_category_table(const hgps::Population &population,
@@ -383,7 +384,7 @@ void print_height_by_final_income_category_table(const hgps::Population &populat
         out << " |\n";
     }
     out << "+----------+--------+-------------+-------------+-------------+\n";
-    std::osyncstream(std::cout) << out.str();
+    std::cout << out.str() << std::flush;
 }
 
 } // anonymous namespace
