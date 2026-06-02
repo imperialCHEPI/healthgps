@@ -229,9 +229,9 @@ TEST(TestHealthGPS_Population, AddMultipleNewEntities) {
     ASSERT_TRUE(p[start_size].is_active());
 }
 
-// MAHIMA: Verifies index-based ID so the same logical person has the same ID in baseline and
-// intervention (ID = slot index + 1).
-TEST(TestHealthGPS_Population, PersonIdEqualsSlotIndexPlusOne) {
+// MAHIMA: Initial IDs are deterministic (1..N) for baseline/intervention alignment, while
+// post-initial entrants get lifetime-unique IDs that are never reused, including recycled slots.
+TEST(TestHealthGPS_Population, PersonIdInitialDeterministicAndPostInitialLifetimeUnique) {
     using namespace hgps;
 
     constexpr auto init_size = 10u;
@@ -251,12 +251,14 @@ TEST(TestHealthGPS_Population, PersonIdEqualsSlotIndexPlusOne) {
     pop.add_newborn_babies(2, core::Gender::female, time_now);
     ASSERT_TRUE(pop[3].is_active());
     ASSERT_TRUE(pop[7].is_active());
-    ASSERT_EQ(pop[3].id(), 4u);
-    ASSERT_EQ(pop[7].id(), 8u);
+    ASSERT_EQ(pop[3].id(), 11u);
+    ASSERT_EQ(pop[7].id(), 12u);
+    ASSERT_NE(pop[3].id(), 4u);
+    ASSERT_NE(pop[7].id(), 8u);
 
     pop.add_newborn_babies(1, core::Gender::male, time_now);
     ASSERT_EQ(pop.size(), init_size + 1u);
-    ASSERT_EQ(pop[pop.size() - 1].id(), pop.size());
+    ASSERT_EQ(pop[pop.size() - 1].id(), 13u);
 }
 
 TEST(TestHealthGPS_Population, PersonIncomeValues) {
