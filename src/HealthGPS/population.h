@@ -95,9 +95,9 @@ class Population {
   private:
     std::size_t initial_size_;
     // MAHIMA: Lifetime-unique person ID counter for post-initial entrants.
-    // Initial cohort keeps deterministic IDs [1..initial_size_] for baseline/intervention alignment.
-    // All later entrants (births/immigration) get IDs from this monotonic counter and IDs are never
-    // reused even when slots are recycled.
+    // Initial cohort keeps deterministic IDs [1..initial_size_] for baseline/intervention
+    // alignment. All later entrants (births/immigration) get IDs from this monotonic counter and
+    // IDs are never reused even when slots are recycled.
     std::size_t next_person_id_{1};
     std::vector<Person> people_;
 

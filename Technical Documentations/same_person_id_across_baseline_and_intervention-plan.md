@@ -31,7 +31,8 @@ Make the same logical person have the **same ID** in both baseline and intervent
 - **No global ID key**: No code keys data globally by Person ID across runs; IDs are only used within one population.
 - **result_file_writer.cpp** `message.id()` is `ResultEventMessage::id()` (event type enum), not Person ID — no change.
 
-## What data is transferred 
+## What data is transferred
+
 Only aggregate tables, not person-level records:
 
 NetImmigrationMessage = age x gender net migration table
@@ -319,5 +320,6 @@ xychart-beta
 ```
 
 Notes:
+
 - Bar = normalized runtime (effectively unchanged at this resolution).
 - Line = normalized extra memory factor (tiny constant increase shown illustratively).
