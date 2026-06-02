@@ -551,8 +551,7 @@ TEST(KevinHallHeight, GenerateInitialisesHeightWithQuintileParams) {
         seed_finch_kevin_hall_food_factors(person);
     }
 
-    ASSERT_NO_THROW(
-        capture_stdout([&] { runtime.model->generate_risk_factors(runtime.context); }));
+    ASSERT_NO_THROW(capture_stdout([&] { runtime.model->generate_risk_factors(runtime.context); }));
 
     for (const auto &person : runtime.context.population()) {
         ASSERT_TRUE(person.is_active());
@@ -664,8 +663,7 @@ TEST(KevinHallHeight, UpdateChildrenRefreshesHeightForSubAdultAges) {
     person.risk_factors["Height_residual"_id] += 0.05;
 
     runtime.context.set_current_time(start_year + 3);
-    ASSERT_NO_THROW(
-        capture_stdout([&] { runtime.model->update_risk_factors(runtime.context); }));
+    ASSERT_NO_THROW(capture_stdout([&] { runtime.model->update_risk_factors(runtime.context); }));
 
     const double height_after = person.risk_factors.at("Height"_id);
     EXPECT_NE(height_before, height_after);
