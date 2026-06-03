@@ -59,15 +59,15 @@ std::string sector_label(hgps::core::Sector sector) {
 }
 
 std::string format_weight_range_violation_message(const hgps::RuntimeContext &context,
-                                                const hgps::Person &person,
-                                                std::string_view phase, double weight,
-                                                const hgps::core::DoubleInterval &range,
-                                                bool above_maximum) {
+                                                  const hgps::Person &person,
+                                                  std::string_view phase, double weight,
+                                                  const hgps::core::DoubleInterval &range,
+                                                  bool above_maximum) {
     const char *bound_phrase =
         above_maximum ? "above maximum configured range" : "below minimum configured range";
     std::ostringstream message;
-    message << "Weight (" << std::fixed << std::setprecision(6) << weight
-            << " kg) is " << bound_phrase << " [" << range.lower() << ", " << range.upper()
+    message << "Weight (" << std::fixed << std::setprecision(6) << weight << " kg) is "
+            << bound_phrase << " [" << range.lower() << ", " << range.upper()
             << "] kg during phase '" << phase << "'.\n"
             << "  person_id=" << person.id() << "\n"
             << "  age=" << person.age << " years\n"
@@ -1211,8 +1211,8 @@ void KevinHallModel::validate_weight_in_config_range(const RuntimeContext &conte
     }
 
     const bool above_maximum = weight > range->upper();
-    const auto message =
-        format_weight_range_violation_message(context, person, phase, weight, *range, above_maximum);
+    const auto message = format_weight_range_violation_message(context, person, phase, weight,
+                                                               *range, above_maximum);
 
     if (above_maximum) {
         std::osyncstream(std::cout) << "\n[WEIGHT RANGE WARNING] " << message << '\n';
