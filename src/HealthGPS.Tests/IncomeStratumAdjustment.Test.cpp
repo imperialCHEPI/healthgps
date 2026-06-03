@@ -157,7 +157,7 @@ std::shared_ptr<hgps::ModelInput> create_physical_activity_model_input(hgps::cor
     data.add(age_builder.build());
 
     auto country = Country{.code = 826, .name = "United Kingdom", .alpha2 = "GB", .alpha3 = "GBR"};
-    auto settings = Settings{country, 0.1f, IntegerInterval(0, 2)};
+    auto settings = Settings{country, 0.1f, IntegerInterval(0, 3)};
     auto run = RunInfo{.start_time = 2022,
                        .stop_time = 2023,
                        .sync_timeout_ms = 1000,
@@ -198,11 +198,12 @@ make_expected_table(const hgps::core::Identifier &factor, double value) {
 
 std::shared_ptr<hgps::RiskFactorSexAgeTable>
 make_expected_table_with_income_and_pa(const hgps::core::Identifier &factor, double factor_value,
-                                       double income_value, double pa_value) {
+                                       const std::vector<double> &income_by_age, double pa_value) {
     auto expected = std::make_shared<hgps::RiskFactorSexAgeTable>();
-    const std::vector<double> factor_row{factor_value, factor_value, factor_value};
-    const std::vector<double> income_row{income_value, income_value, income_value};
-    const std::vector<double> pa_row{pa_value, pa_value, pa_value};
+    const std::size_t age_count = std::max<std::size_t>(income_by_age.size(), 1u);
+    std::vector<double> factor_row(age_count, factor_value);
+    std::vector<double> pa_row(age_count, pa_value);
+    const std::vector<double> &income_row = income_by_age;
     expected->emplace(hgps::core::Gender::male, factor, factor_row);
     expected->emplace(hgps::core::Gender::female, factor, factor_row);
     expected->emplace(hgps::core::Gender::male, hgps::core::Identifier("income"), income_row);
@@ -211,6 +212,14 @@ make_expected_table_with_income_and_pa(const hgps::core::Identifier &factor, dou
     expected->emplace(hgps::core::Gender::female, hgps::core::Identifier("PhysicalActivity"),
                       pa_row);
     return expected;
+}
+
+std::shared_ptr<hgps::RiskFactorSexAgeTable>
+make_expected_table_with_income_and_pa(const hgps::core::Identifier &factor, double factor_value,
+                                       double income_value, double pa_value) {
+    return make_expected_table_with_income_and_pa(
+        factor, factor_value, std::vector<double>{income_value, income_value, income_value},
+        pa_value);
 }
 
 TempCsvPair write_temp_expected_csv_pair(std::string_view suffix, std::size_t age_rows) {
@@ -697,10 +706,11 @@ TEST(IncomeStratumAdjustment, PhysicalActivityAdjustmentUsesConfiguredMappingRan
     person.risk_factors["PhysicalActivity"_id] = 0.8;
 
     auto expected = std::make_shared<RiskFactorSexAgeTable>();
+    // Match create_physical_activity_model_input age range (0..3).
     expected->emplace(core::Gender::female, "PhysicalActivity"_id,
-                      std::vector<double>{2.2, 2.2, 2.2});
+                      std::vector<double>{2.2, 2.2, 2.2, 2.2});
     expected->emplace(core::Gender::male, "PhysicalActivity"_id,
-                      std::vector<double>{2.2, 2.2, 2.2});
+                      std::vector<double>{2.2, 2.2, 2.2, 2.2});
 
     auto expected_trend = std::make_shared<std::unordered_map<core::Identifier, double>>();
     auto trend_steps = std::make_shared<std::unordered_map<core::Identifier, int>>();
@@ -728,11 +738,13 @@ TEST(IncomeStratumAdjustment, SimplePhysicalActivityInitialisationUsesConfigured
     for (std::size_t i = 0; i < context.population().size(); ++i) {
         auto &p = context.population()[i];
         p.gender = (i % 2 == 0) ? core::Gender::male : core::Gender::female;
-        p.age = 0;
+        p.age = static_cast<unsigned>(i);
     }
 
     const auto factor = core::Identifier("foodcarbohydrate");
-    auto expected = make_expected_table_with_income_and_pa(factor, 100.0, 600.0, 2.2);
+    // Per-age income targets so factors-mean adjustment does not collapse everyone to 600.
+    auto expected = make_expected_table_with_income_and_pa(
+        factor, 100.0, std::vector<double>{400.0, 500.0, 600.0, 700.0}, 2.2);
     std::vector<IncomeStratumExpectedTableEntry> stratum_tables{};
 
     PhysicalActivityModel simple_model;
@@ -771,11 +783,12 @@ TEST(IncomeStratumAdjustment, ContinuousPhysicalActivityInitialisationUsesConfig
     for (std::size_t i = 0; i < context.population().size(); ++i) {
         auto &p = context.population()[i];
         p.gender = (i % 2 == 0) ? core::Gender::male : core::Gender::female;
-        p.age = 0;
+        p.age = static_cast<unsigned>(i);
     }
 
     const auto factor = core::Identifier("foodcarbohydrate");
-    auto expected = make_expected_table_with_income_and_pa(factor, 100.0, 600.0, 2.2);
+    auto expected = make_expected_table_with_income_and_pa(
+        factor, 100.0, std::vector<double>{400.0, 500.0, 600.0, 700.0}, 2.2);
     std::vector<IncomeStratumExpectedTableEntry> stratum_tables{};
 
     PhysicalActivityModel continuous_model;

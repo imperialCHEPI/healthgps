@@ -312,9 +312,9 @@ TEST(TestHealthGPS_Population, AllPopulationIdsArePairwiseDistinct) {
         ASSERT_TRUE(person.has_assigned_id());
         ids.push_back(person.id());
     }
-    std::sort(ids.begin(), ids.end());
-    const auto unique_end = std::unique(ids.begin(), ids.end());
-    ASSERT_EQ(unique_end, ids.end()) << "Duplicate person IDs in population vector";
+    std::ranges::sort(ids);
+    ASSERT_TRUE(std::ranges::adjacent_find(ids) == ids.end())
+        << "Duplicate person IDs in population vector";
 }
 
 TEST(TestHealthGPS_Population, PersonIncomeValues) {
