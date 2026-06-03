@@ -61,7 +61,9 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
 
     void update_risk_factors(RuntimeContext &context) override;
 
-    /// @brief Throws if person weight is outside the range from config modelling.risk_factors.
+    /// @brief Checks person weight against modelling.risk_factors.Weight range from config.
+    /// Below minimum: throws and stops the run. Above maximum: prints a console warning and
+    /// continues (weight is not modified).
     void validate_weight_in_config_range(const RuntimeContext &context, const Person &person,
                                          std::string_view phase) const;
 

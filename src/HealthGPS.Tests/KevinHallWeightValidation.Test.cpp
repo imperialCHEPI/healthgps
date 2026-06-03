@@ -59,7 +59,7 @@ std::shared_ptr<hgps::ModelInput> make_weight_validation_input(hgps::core::DataT
 
 } // namespace
 
-TEST(KevinHallWeightValidation, ValidateWeightThrowsWhenOutsideConfiguredRange) {
+TEST(KevinHallWeightValidation, WarnsAboveMaxAndThrowsBelowMinForConfiguredWeightRange) {
     using namespace hgps;
     using namespace hgps::core;
 
@@ -112,36 +112,20 @@ TEST(KevinHallWeightValidation, ValidateWeightThrowsWhenOutsideConfiguredRange) 
     person.risk_factors["EnergyIntake"_id] = 2000.0;
 
     EXPECT_NO_THROW(kevin_hall->validate_weight_in_config_range(context, person, "unit_test"));
+    EXPECT_DOUBLE_EQ(100.0, person.risk_factors.at("Weight"_id));
 
     person.risk_factors["Weight"_id] = 150.0;
-    try {
-        kevin_hall->validate_weight_in_config_range(context, person, "unit_test");
-        FAIL() << "Expected weight validation to throw for weight above range";
-    } catch (const HgpsException &ex) {
-        const std::string message = ex.what();
-        EXPECT_NE(message.find("above maximum"), std::string::npos);
-        EXPECT_NE(message.find("person_id=42"), std::string::npos);
-        EXPECT_NE(message.find("unit_test"), std::string::npos);
-    }
+    EXPECT_NO_THROW(kevin_hall->validate_weight_in_config_range(context, person, "unit_test"));
+    EXPECT_DOUBLE_EQ(150.0, person.risk_factors.at("Weight"_id));
 
     person.risk_factors["Weight"_id] = 200.0;
-    try {
-        kevin_hall->validate_weight_in_config_range(context, person, "unit_test");
-        FAIL() << "Expected weight validation to throw";
-    } catch (const HgpsException &ex) {
-        const std::string message = ex.what();
-        EXPECT_NE(message.find("above maximum"), std::string::npos);
-        EXPECT_NE(message.find("person_id=42"), std::string::npos);
-        EXPECT_NE(message.find("unit_test"), std::string::npos);
-    }
+    EXPECT_NO_THROW(kevin_hall->validate_weight_in_config_range(context, person, "unit_test"));
+    EXPECT_DOUBLE_EQ(200.0, person.risk_factors.at("Weight"_id));
 
     person.risk_factors["Weight"_id] = 30.0;
-    try {
-        kevin_hall->validate_weight_in_config_range(context, person, "below_min");
-        FAIL() << "Expected weight validation to throw";
-    } catch (const HgpsException &ex) {
-        EXPECT_NE(std::string(ex.what()).find("below minimum"), std::string::npos);
-    }
+    EXPECT_THROW(kevin_hall->validate_weight_in_config_range(context, person, "below_min"),
+                 hgps::core::HgpsException);
+    EXPECT_DOUBLE_EQ(30.0, person.risk_factors.at("Weight"_id));
 
     person.risk_factors.erase("Weight"_id);
     EXPECT_NO_THROW(kevin_hall->validate_weight_in_config_range(context, person, "no_weight"));
