@@ -5,8 +5,8 @@
 #include "HealthGPS/person.h"
 #include "HealthGPS/static_linear_model.h"
 #include "HealthGPS/two_step_value.h"
-#include <gtest/gtest.h>
 #include <algorithm>
+#include <gtest/gtest.h>
 #include <memory> // Ensure this header is included for std::addressof
 #include <vector>
 

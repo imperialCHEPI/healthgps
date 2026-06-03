@@ -66,8 +66,8 @@ struct Person {
 
     /// @brief Gets this instance unique identifier
     /// @note Unique for the person's lifetime within one Population (simulation run). IDs are not
-    /// reused after death or emigration. Default-constructed persons return @ref unassigned_id until
-    /// placed by Population.
+    /// reused after death or emigration. Default-constructed persons return @ref unassigned_id
+    /// until placed by Population.
     /// @return Unique identifier
     std::size_t id() const noexcept;
 
