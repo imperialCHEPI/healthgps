@@ -5,8 +5,6 @@
 
 namespace hgps {
 
-std::atomic<std::size_t> Person::newUID{0};
-
 std::map<core::Identifier, std::function<double(const Person &)>> Person::current_dispatcher{
     {"Intercept"_id, [](const Person &) { return 1.0; }},
     {"Gender"_id, [](const Person &p) { return p.gender_to_value(); }},
@@ -33,13 +31,11 @@ std::map<core::Identifier, std::function<double(const Person &)>> Person::curren
     {"region4"_id, [](const Person &p) { return p.region_to_value() == 4.0 ? 1.0 : 0.0; }},
 };
 
-Person::Person() : id_{++Person::newUID} {}
+// MAHIMA: Default constructors leave id_ unassigned; Population assigns lifetime-unique IDs.
+Person::Person() = default;
 
-Person::Person(const core::Gender birth_gender) noexcept
-    : gender{birth_gender}, id_{++Person::newUID} {}
+Person::Person(const core::Gender birth_gender) noexcept : gender{birth_gender} {}
 
-// MAHIMA: Index-based ID constructors for Population; same logical person gets same ID in
-// baseline and intervention (ID = slot index + 1).
 Person::Person(std::size_t id) noexcept : id_{id} {}
 
 Person::Person(const core::Gender birth_gender, std::size_t id) noexcept
@@ -183,5 +179,4 @@ void Person::die(const unsigned int time) {
     time_of_death_ = time;
 }
 
-void Person::reset_id() { Person::newUID = 0; }
 } // namespace hgps

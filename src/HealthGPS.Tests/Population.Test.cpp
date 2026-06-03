@@ -6,13 +6,16 @@
 #include "HealthGPS/static_linear_model.h"
 #include "HealthGPS/two_step_value.h"
 #include <gtest/gtest.h>
+#include <algorithm>
 #include <memory> // Ensure this header is included for std::addressof
+#include <vector>
 
 TEST(TestHealthGPS_Population, CreateDefaultPerson) {
     using namespace hgps;
 
     auto p = Person{};
-    ASSERT_GT(p.id(), 0);
+    ASSERT_EQ(Person::unassigned_id, p.id());
+    ASSERT_FALSE(p.has_assigned_id());
     ASSERT_EQ(0u, p.age);
     ASSERT_EQ(core::Gender::unknown, p.gender);
     ASSERT_TRUE(p.is_alive());
@@ -32,9 +35,14 @@ TEST(TestHealthGPS_Population, CreateUniquePerson) {
     auto p2 = Person{};
     const auto &p3 = p1;
 
-    ASSERT_GT(p1.id(), 0);
-    ASSERT_GT(p2.id(), p1.id());
+    ASSERT_FALSE(p1.has_assigned_id());
+    ASSERT_FALSE(p2.has_assigned_id());
     ASSERT_EQ(p1.id(), p3.id());
+
+    p1.set_id(1);
+    p2.set_id(2);
+    ASSERT_TRUE(p1.has_assigned_id());
+    ASSERT_GT(p2.id(), p1.id());
 }
 
 TEST(TestHealthGPS_Population, PersonStateIsActive) {
@@ -185,6 +193,7 @@ TEST(TestHealthGPS_Population, AddSingleNewEntity) {
     auto start_size = p.size();
     p.add(Person{core::Gender::male}, time_now);
     ASSERT_GT(p.size(), start_size);
+    ASSERT_EQ(p[start_size].id(), init_size + 1u);
 
     p[start_size].die(time_now);
     ASSERT_FALSE(p[start_size].is_active());
@@ -194,6 +203,8 @@ TEST(TestHealthGPS_Population, AddSingleNewEntity) {
     p.add(Person{core::Gender::female}, time_now);
     ASSERT_EQ(p.size(), current_size);
     ASSERT_TRUE(p[start_size].is_active());
+    ASSERT_EQ(p[start_size].id(), init_size + 2u);
+    ASSERT_NE(p[start_size].id(), init_size + 1u);
 }
 
 TEST(TestHealthGPS_Population, AddMultipleNewEntities) {
@@ -259,6 +270,50 @@ TEST(TestHealthGPS_Population, PersonIdInitialDeterministicAndPostInitialLifetim
     pop.add_newborn_babies(1, core::Gender::male, time_now);
     ASSERT_EQ(pop.size(), init_size + 1u);
     ASSERT_EQ(pop[pop.size() - 1].id(), 13u);
+}
+
+TEST(TestHealthGPS_Population, PersonAddAssignsLifetimeUniqueId) {
+    using namespace hgps;
+
+    constexpr auto init_size = 5u;
+    auto pop = Population{init_size};
+    auto time_now = 2020u;
+
+    auto immigrant = Person{core::Gender::male};
+    ASSERT_FALSE(immigrant.has_assigned_id());
+    pop.add(std::move(immigrant), time_now);
+    ASSERT_EQ(pop.size(), init_size + 1u);
+    ASSERT_EQ(pop[init_size].id(), init_size + 1u);
+    ASSERT_TRUE(pop[init_size].has_assigned_id());
+
+    pop[2].die(time_now);
+    time_now++;
+    auto replacement = Person{core::Gender::female};
+    pop.add(std::move(replacement), time_now);
+    ASSERT_TRUE(pop[2].is_active());
+    ASSERT_EQ(pop[2].id(), init_size + 2u);
+    ASSERT_NE(pop[2].id(), 3u);
+}
+
+TEST(TestHealthGPS_Population, AllPopulationIdsArePairwiseDistinct) {
+    using namespace hgps;
+
+    auto pop = Population{4u};
+    auto time_now = 2021u;
+    pop[1].die(time_now);
+    pop[3].emigrate(time_now);
+    time_now++;
+    pop.add_newborn_babies(1, core::Gender::female, time_now);
+    pop.add(Person{core::Gender::male}, time_now);
+
+    std::vector<std::size_t> ids;
+    ids.reserve(pop.size());
+    for (const auto &person : pop) {
+        ASSERT_TRUE(person.has_assigned_id());
+        ids.push_back(person.id());
+    }
+    const auto unique_end = std::unique(ids.begin(), ids.end());
+    ASSERT_EQ(unique_end, ids.end()) << "Duplicate person IDs in population vector";
 }
 
 TEST(TestHealthGPS_Population, PersonIncomeValues) {

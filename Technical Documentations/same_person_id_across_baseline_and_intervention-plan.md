@@ -73,7 +73,7 @@ flowchart LR
   - `Person(std::size_t id)` — sets `id_ = id` (for initial population construction).
   - `Person(core::Gender gender, std::size_t id)` — sets gender and `id_ = id` (for newborns).
 - **Add** `void set_id(std::size_t id)` — allows Population to assign ID after placing a person (e.g. immigration clone). Document that it is for internal use by Population.
-- **Keep** existing `Person()` and `Person(gender)` using `++Person::newUID` so standalone construction (tests, any code outside Population) remains unchanged and tests that expect distinct IDs for sequentially created persons still pass.
+- **Person()** / **Person(gender)** leave `id_` at `Person::unassigned_id` (0) until `Population` assigns a lifetime-unique ID via `set_id` or explicit-ID constructors. Removed global `Person::newUID` to avoid duplicate-ID space separate from `Population::next_person_id_`.
 - **Comments**: Add a short MAHIMA block at the top of the ID-related section explaining index-based ID for same-person tracking across baseline and intervention.
 
 ### 2. Population ([population.h](src/HealthGPS/population.h), [population.cpp](src/HealthGPS/population.cpp))
@@ -91,8 +91,8 @@ flowchart LR
 
 ### 3. Tests ([Population.Test.cpp](src/HealthGPS.Tests/Population.Test.cpp))
 
-- **CreateUniquePerson**: Currently expects `p2.id() > p1.id()` and `p1.id() == p3.id()`. `p3` is a reference to `p1`, so the second assertion is unchanged. The first relies on global uniqueness for two standalone `Person{}` — leave as-is (still using newUID).
-- **CreateDefaultPerson**: Only checks `p.id() > 0` — still true for newUID.
+- **CreateUniquePerson**: Asserts unassigned default IDs and explicit `set_id` ordering.
+- **CreateDefaultPerson**: Asserts `unassigned_id` until Population placement.
 - **AddSingleNewEntity / AddMultipleNewEntities**: They use `Population(init_size)` and then `add(Person{...})` or `add_newborn_babies(...)`. After our changes:
   - Initial population will have IDs 1..init_size.
   - Added persons will get IDs set by Population (recycled slot ID or new size). No change to test logic required; only IDs may differ from current (still positive and stable per slot).
@@ -100,10 +100,10 @@ flowchart LR
 
 ### 4. No changes to
 
-- **Simulation::partial_clone_entity**: Still returns `Person{}` (newUID). When that clone is passed to `population().add()`, Population will assign the correct slot-based ID via `set_id` — no change to this function.
+- **Simulation::partial_clone_entity**: Returns `Person{}` (unassigned ID). `population().add()` assigns the next lifetime-unique ID via `set_id`.
 - **DemographicModule**: Only assigns age, gender, region, ethnicity to existing `context.population()[index]`; does not create Person objects.
 - **Scenario classes**: They only use `entity.id()` as key within their own map; same ID in baseline and intervention is desired and safe.
-- **reset_id()**: Leave in place; can remain unused or used by tests. No need to call it for index-based ID.
+- **reset_id()** / **newUID**: Removed; all simulation IDs come from `Population::next_person_id_` (and initial `1..N`).
 
 ### 5. Commenting convention (MAHIMA)
 

@@ -11,6 +11,7 @@ namespace hgps {
 /// to births, deaths and emigration. When possible, the Population class
 /// recycles the dead and migrated individuals slots with newborn babies
 /// to minimise memory allocation and clear-up the inactive population.
+/// Person IDs are lifetime-unique within a run: slots may be reused, IDs are not.
 class Population {
   public:
     /// @brief Population iterator
