@@ -348,7 +348,8 @@ TEST(TestHealthGPS_Population, InitialCohortIdsAreConsecutiveFromOne) {
 }
 
 // MAHIMA: Regression for allocate_next_person_id debug guard — each entrant must receive an ID that
-// was not already present in the population (monotonic assignment, no reuse after death/emigration).
+// was not already present in the population (monotonic assignment, no reuse after
+// death/emigration).
 TEST(TestHealthGPS_Population, MahimaNewEntrantIdsAreNotAlreadyAssigned) {
     using namespace hgps;
 
