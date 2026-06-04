@@ -205,6 +205,8 @@ tracking), which breaks lifetime person identity.
 3. Smoke-check individual tracking CSV:
    - Same ID should not switch to a different person profile due to slot recycling.
 4. Confirm no changes to scenario sync behavior between baseline/intervention.
+5. Debug builds: `Population::allocate_next_person_id()` asserts each new ID equals `next_person_id_`
+   before increment (MAHIMA; no hash set; zero release cost).
 
 ### Summary of why this is better than current implemented version
 

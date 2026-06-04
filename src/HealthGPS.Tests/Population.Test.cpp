@@ -8,7 +8,23 @@
 #include <algorithm>
 #include <gtest/gtest.h>
 #include <memory> // Ensure this header is included for std::addressof
+#include <unordered_set>
 #include <vector>
+
+namespace {
+
+std::unordered_set<std::size_t> assigned_person_ids(const hgps::Population &pop) {
+    std::unordered_set<std::size_t> ids;
+    ids.reserve(pop.size());
+    for (const auto &person : pop) {
+        if (person.has_assigned_id()) {
+            ids.insert(person.id());
+        }
+    }
+    return ids;
+}
+
+} // namespace
 
 TEST(TestHealthGPS_Population, CreateDefaultPerson) {
     using namespace hgps;
@@ -242,6 +258,7 @@ TEST(TestHealthGPS_Population, AddMultipleNewEntities) {
 
 // MAHIMA: Initial IDs are deterministic (1..N) for baseline/intervention alignment, while
 // post-initial entrants get lifetime-unique IDs that are never reused, including recycled slots.
+// Debug builds also assert via Population::allocate_next_person_id (see MahimaNewEntrantIds...).
 TEST(TestHealthGPS_Population, PersonIdInitialDeterministicAndPostInitialLifetimeUnique) {
     using namespace hgps;
 
@@ -315,6 +332,57 @@ TEST(TestHealthGPS_Population, AllPopulationIdsArePairwiseDistinct) {
     std::ranges::sort(ids);
     ASSERT_TRUE(std::ranges::adjacent_find(ids) == ids.end())
         << "Duplicate person IDs in population vector";
+}
+
+TEST(TestHealthGPS_Population, InitialCohortIdsAreConsecutiveFromOne) {
+    using namespace hgps;
+
+    constexpr std::size_t init_size = 8u;
+    const auto pop = Population{init_size};
+    const auto ids = assigned_person_ids(pop);
+
+    ASSERT_EQ(ids.size(), init_size);
+    for (std::size_t i = 1; i <= init_size; ++i) {
+        ASSERT_TRUE(ids.contains(i)) << "Missing initial cohort ID " << i;
+    }
+}
+
+// MAHIMA: Regression for allocate_next_person_id debug guard — each entrant must receive an ID that
+// was not already present in the population (monotonic assignment, no reuse after death/emigration).
+TEST(TestHealthGPS_Population, MahimaNewEntrantIdsAreNotAlreadyAssigned) {
+    using namespace hgps;
+
+    constexpr std::size_t init_size = 6u;
+    auto pop = Population{init_size};
+    auto ids_before = assigned_person_ids(pop);
+    ASSERT_EQ(ids_before.size(), init_size);
+
+    auto time_now = 2022u;
+    pop[1].die(time_now);
+    pop[4].emigrate(time_now);
+    time_now++;
+
+    pop.add_newborn_babies(2, core::Gender::female, time_now);
+    const auto ids_after_recycled_births = assigned_person_ids(pop);
+    // Recycled slots: new IDs 7 and 8 replace retired 2 and 5; vector size stays init_size.
+    ASSERT_EQ(ids_after_recycled_births.size(), init_size);
+    EXPECT_FALSE(ids_after_recycled_births.contains(2u));
+    EXPECT_FALSE(ids_after_recycled_births.contains(5u));
+    EXPECT_TRUE(ids_after_recycled_births.contains(7u));
+    EXPECT_TRUE(ids_after_recycled_births.contains(8u));
+    for (const auto &person : pop) {
+        if (person.id() == 7u || person.id() == 8u) {
+            ASSERT_FALSE(ids_before.contains(person.id()));
+            ASSERT_GT(person.id(), init_size);
+        }
+    }
+
+    pop.add(Person{core::Gender::male}, time_now);
+    ASSERT_EQ(pop.size(), init_size + 1u);
+    const auto ids_final = assigned_person_ids(pop);
+    ASSERT_EQ(ids_final.size(), init_size + 1u);
+    EXPECT_TRUE(ids_final.contains(init_size + 3u));
+    EXPECT_FALSE(ids_after_recycled_births.contains(init_size + 3u));
 }
 
 TEST(TestHealthGPS_Population, PersonIncomeValues) {

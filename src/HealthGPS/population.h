@@ -1,6 +1,10 @@
 #pragma once
 #include "person.h"
 
+#ifndef NDEBUG
+#include <cassert>
+#endif
+
 #include <vector>
 
 namespace hgps {
@@ -104,5 +108,18 @@ class Population {
 
     std::vector<int> find_index_of_recyclables(unsigned int time,
                                                std::size_t top = 0) const noexcept;
+
+    /// @brief Returns the next lifetime-unique person ID and advances the counter.
+    /// Debug builds assert the ID was not previously assigned (monotonic, no reuse).
+    std::size_t allocate_next_person_id() noexcept {
+        const std::size_t id = next_person_id_;
+#ifndef NDEBUG
+        // MAHIMA: Debug-only duplicate-ID guard; compiled out in release (no extra memory or work).
+        assert(id != Person::unassigned_id);
+        assert(id == next_person_id_ && "Person ID must be the next unused value (no reuse)");
+#endif
+        ++next_person_id_;
+        return id;
+    }
 };
 } // namespace hgps
