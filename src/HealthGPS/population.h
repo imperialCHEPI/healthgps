@@ -1,6 +1,10 @@
 #pragma once
 #include "person.h"
 
+#ifndef NDEBUG
+#include <cassert>
+#endif
+
 #include <vector>
 
 namespace hgps {
@@ -11,6 +15,7 @@ namespace hgps {
 /// to births, deaths and emigration. When possible, the Population class
 /// recycles the dead and migrated individuals slots with newborn babies
 /// to minimise memory allocation and clear-up the inactive population.
+/// Person IDs are lifetime-unique within a run: slots may be reused, IDs are not.
 class Population {
   public:
     /// @brief Population iterator
@@ -94,9 +99,27 @@ class Population {
 
   private:
     std::size_t initial_size_;
+    // MAHIMA: Lifetime-unique person ID counter for post-initial entrants.
+    // Initial cohort keeps deterministic IDs [1..initial_size_] for baseline/intervention
+    // alignment. All later entrants (births/immigration) get IDs from this monotonic counter and
+    // IDs are never reused even when slots are recycled.
+    std::size_t next_person_id_{1};
     std::vector<Person> people_;
 
     std::vector<int> find_index_of_recyclables(unsigned int time,
                                                std::size_t top = 0) const noexcept;
+
+    /// @brief Returns the next lifetime-unique person ID and advances the counter.
+    /// Debug builds assert the ID was not previously assigned (monotonic, no reuse).
+    std::size_t allocate_next_person_id() noexcept {
+        const std::size_t id = next_person_id_;
+#ifndef NDEBUG
+        // MAHIMA: Debug-only duplicate-ID guard; compiled out in release (no extra memory or work).
+        assert(id != Person::unassigned_id);
+        assert(id == next_person_id_ && "Person ID must be the next unused value (no reuse)");
+#endif
+        ++next_person_id_;
+        return id;
+    }
 };
 } // namespace hgps

@@ -3,7 +3,6 @@
 #include "HealthGPS.Core/forward_type.h"
 #include "HealthGPS.Core/identifier.h"
 
-#include <atomic>
 #include <map>
 
 namespace hgps {
@@ -38,32 +37,37 @@ struct Disease {
 
 /// @brief Defines a virtual population person data type.
 struct Person {
-    /// @brief Initialise a new instance of the Person structure
+    /// @brief Initialise a new instance without an assigned ID (@ref unassigned_id).
     Person();
 
-    /// @brief Initialise a new instance of the Person structure
+    /// @brief Initialise a new instance with gender; ID remains @ref unassigned_id until Population
+    /// placement.
     /// @param gender The new person gender
     Person(const core::Gender gender) noexcept;
 
-    // MAHIMA: Index-based ID for same-person tracking across baseline and intervention.
-    // When a Person is created by Population (initial slot, newborn, or add), ID = slot index + 1
-    // so the same logical person has the same ID in both baseline and intervention runs.
+    /// @brief Sentinel returned by default constructors until Population assigns an ID.
+    static constexpr std::size_t unassigned_id = 0;
 
-    /// @brief Initialise a new instance with an explicit ID (for Population slot assignment).
-    /// @param id The identifier to assign (typically slot index + 1).
+    /// @brief Initialise a new instance with an explicit ID (Population initial cohort / entrants).
+    /// @param id Lifetime-unique identifier assigned by Population.
     Person(std::size_t id) noexcept;
 
-    /// @brief Initialise a new instance with gender and explicit ID (for Population newborns).
+    /// @brief Initialise a new instance with gender and explicit ID (Population newborns).
     /// @param gender The new person gender
-    /// @param id The identifier to assign (typically slot index + 1).
+    /// @param id Lifetime-unique identifier assigned by Population.
     Person(const core::Gender gender, std::size_t id) noexcept;
 
-    /// @brief Set the person identifier (internal use by Population when placing clones).
-    /// @param id The identifier to assign (slot index + 1 after placement).
+    /// @brief Set the person identifier (Population use when placing or recycling slots).
+    /// @param id Lifetime-unique identifier; must not reuse a previously assigned population ID.
     void set_id(std::size_t id) noexcept;
 
+    /// @brief Whether Population has assigned a lifetime ID to this instance.
+    [[nodiscard]] bool has_assigned_id() const noexcept { return id_ != unassigned_id; }
+
     /// @brief Gets this instance unique identifier
-    /// @note The identifier is unique within a virtual population only, not global unique.
+    /// @note Unique for the person's lifetime within one Population (simulation run). IDs are not
+    /// reused after death or emigration. Default-constructed persons return @ref unassigned_id
+    /// until placed by Population.
     /// @return Unique identifier
     std::size_t id() const noexcept;
 
@@ -184,9 +188,6 @@ struct Person {
     /// @throws std::logic_error for attempting to set to non-active individuals.
     void die(const unsigned int time);
 
-    /// @brief Resets the unique identifier sequence to zero.
-    static void reset_id();
-
   private:
     std::size_t id_{};
     bool is_alive_{true};
@@ -194,7 +195,6 @@ struct Person {
     unsigned int time_of_death_{};
     unsigned int time_of_migration_{};
 
-    static std::atomic<std::size_t> newUID;
     static std::map<core::Identifier, std::function<double(const Person &)>> current_dispatcher;
 };
 } // namespace hgps

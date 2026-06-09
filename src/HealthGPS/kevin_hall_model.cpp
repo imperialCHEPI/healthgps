@@ -12,6 +12,7 @@
 #include <limits>
 #include <sstream>
 #include <syncstream>
+#include <unordered_map>
 #include <utility>
 
 namespace { // anonymous namespace
@@ -44,6 +45,63 @@ std::string gender_label(const hgps::Person &person) {
         return "female";
     }
     return "unknown";
+}
+
+std::string sector_label(hgps::core::Sector sector) {
+    switch (sector) {
+    case hgps::core::Sector::urban:
+        return "0";
+    case hgps::core::Sector::rural:
+        return "1";
+    default:
+        return "unknown";
+    }
+}
+
+std::string format_weight_range_violation_message(const hgps::RuntimeContext &context,
+                                                  const hgps::Person &person,
+                                                  std::string_view phase, double weight,
+                                                  const hgps::core::DoubleInterval &range,
+                                                  bool above_maximum) {
+    const char *bound_phrase =
+        above_maximum ? "above maximum configured range" : "below minimum configured range";
+    std::ostringstream message;
+    message << "Weight (" << std::fixed << std::setprecision(6) << weight << " kg) is "
+            << bound_phrase << " [" << range.lower() << ", " << range.upper()
+            << "] kg during phase '" << phase << "'.\n"
+            << "  person_id=" << person.id() << "\n"
+            << "  age=" << person.age << " years\n"
+            << "  gender=" << gender_label(person) << "\n"
+            << "  region=" << person.region << "\n"
+            << "  ethnicity=" << person.ethnicity << "\n"
+            << "  sector=" << sector_label(person.sector) << "\n"
+            << "  income_category=" << income_category_label(person.income) << "\n"
+            << "  income_continuous=" << std::setprecision(6) << person.income_continuous << "\n"
+            << "  simulation_time=" << context.time_now() << "\n"
+            << "  simulation_run=" << context.current_run() << "\n"
+            << "  scenario=" << context.scenario().name() << "\n"
+            << "  active=" << (person.is_active() ? "true" : "false");
+
+    const auto append_if_present = [&](const char *key, const char *label, bool as_cm = false) {
+        const hgps::core::Identifier id(key);
+        if (!person.risk_factors.contains(id)) {
+            return;
+        }
+        const double value = person.risk_factors.at(id);
+        message << "\n  " << label << '=';
+        if (as_cm) {
+            message << std::setprecision(6) << (value * 100.0);
+        } else {
+            message << std::setprecision(6) << value;
+        }
+    };
+
+    append_if_present("Height", "height_cm", true);
+    append_if_present("BMI", "bmi");
+    append_if_present("EnergyIntake", "energy_intake");
+    append_if_present("PhysicalActivity", "physical_activity");
+
+    return message.str();
 }
 
 bool should_print_kevin_hall_summary_tables(const hgps::RuntimeContext &context) {
@@ -164,7 +222,9 @@ void print_height_stratum_assignment_table(
     }
     out << "+--------+----------------------+-------+-------------+-------------+-------------+"
            "-------------+-------------+\n";
-    std::osyncstream(std::cout) << out.str();
+    // MAHIMA: Avoid std::osyncstream here — it can block when gtest redirects stdout
+    // (CaptureStdout) in unit tests, making the suite appear hung.
+    std::cout << out.str() << std::flush;
 }
 
 struct WeightBucketSummary {
@@ -237,7 +297,7 @@ void print_weight_stratum_assignment_table(
     }
     out << "+--------+----------------------+-------+---------------+-------------+-------------+"
            "-------------+\n";
-    std::osyncstream(std::cout) << out.str();
+    std::cout << out.str() << std::flush;
 }
 
 void print_weight_by_final_income_category_table(const hgps::Population &population,
@@ -310,7 +370,7 @@ void print_weight_by_final_income_category_table(const hgps::Population &populat
         out << " |\n";
     }
     out << "+----------+--------+-------------+-------------+-------------+\n";
-    std::osyncstream(std::cout) << out.str();
+    std::cout << out.str() << std::flush;
 }
 
 void print_height_by_final_income_category_table(const hgps::Population &population,
@@ -383,7 +443,7 @@ void print_height_by_final_income_category_table(const hgps::Population &populat
         out << " |\n";
     }
     out << "+----------+--------+-------------+-------------+-------------+\n";
-    std::osyncstream(std::cout) << out.str();
+    std::cout << out.str() << std::flush;
 }
 
 } // anonymous namespace
@@ -433,7 +493,7 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
     // MAHIMA: Validate weight after adjusting the weight mean to match expected. This is done after
     // adjusting the weight mean to match expected to ensure that the weight is within the
     // configured range.
-    for (const auto &person : context.population()) {
+    for (auto &person : context.population()) {
         if (person.is_active()) {
             validate_weight_in_config_range(context, person,
                                             "generate_risk_factors:after_weight_mean_adjustment");
@@ -1127,11 +1187,6 @@ void KevinHallModel::adjust_weight(const RuntimeContext &context, Person &person
     validate_weight_in_config_range(context, person, "adjust_weight");
 }
 
-// MAHIMA: Added context and phase parameters to the validate_weight_in_config_range method
-//  to provide more detailed error messages and allow for more specific validation in different
-//  contexts.
-// The context parameter is used to access the context's mapping and time information,
-//  while the phase parameter is used to provide a more specific message about the validation error.
 void KevinHallModel::validate_weight_in_config_range(const RuntimeContext &context,
                                                      const Person &person,
                                                      std::string_view phase) const {
@@ -1155,41 +1210,16 @@ void KevinHallModel::validate_weight_in_config_range(const RuntimeContext &conte
         return;
     }
 
-    const char *boundary = (weight < range->lower()) ? "below minimum" : "above maximum";
+    const bool above_maximum = weight > range->upper();
+    const auto message = format_weight_range_violation_message(context, person, phase, weight,
+                                                               *range, above_maximum);
 
-    // MAHIMA: Throw detailed error message with all relevant information about the person and the
-    // context.
-    std::ostringstream message;
-    message << std::fixed << std::setprecision(6);
-    message << "Weight (" << weight << " kg) is " << boundary << " configured range ["
-            << range->lower() << ", " << range->upper() << "] kg during phase '" << phase << "'.\n"
-            << "  person_id=" << person.id() << "\n"
-            << "  age=" << person.age << " years\n"
-            << "  gender=" << gender_label(person) << "\n"
-            << "  region=" << person.region << "\n"
-            << "  ethnicity=" << person.ethnicity << "\n"
-            << "  sector=" << static_cast<int>(person.sector) << "\n"
-            << "  income_category=" << income_category_label(person.income) << "\n"
-            << "  income_continuous=" << person.income_continuous << "\n"
-            << "  simulation_time=" << context.time_now() << "\n"
-            << "  simulation_run=" << context.current_run() << "\n"
-            << "  scenario=" << context.identifier() << "\n"
-            << "  active=" << (person.is_active() ? "true" : "false");
-
-    if (person.risk_factors.contains("Height"_id)) {
-        message << "\n  height_cm=" << person.risk_factors.at("Height"_id);
-    }
-    if (person.risk_factors.contains("BMI"_id)) {
-        message << "\n  bmi=" << person.risk_factors.at("BMI"_id);
-    }
-    if (person.risk_factors.contains("EnergyIntake"_id)) {
-        message << "\n  energy_intake=" << person.risk_factors.at("EnergyIntake"_id);
-    }
-    if (person.risk_factors.contains("PhysicalActivity"_id)) {
-        message << "\n  physical_activity=" << person.risk_factors.at("PhysicalActivity"_id);
+    if (above_maximum) {
+        std::osyncstream(std::cout) << "\n[WEIGHT RANGE WARNING] " << message << '\n';
+        return;
     }
 
-    throw core::HgpsException(message.str());
+    throw core::HgpsException(message);
 }
 
 double KevinHallModel::get_weight_quantile(double epa_quantile,

@@ -1,16 +1,31 @@
 #include "population.h"
 #include <execution>
 
+#ifndef NDEBUG
+#include <cassert>
+#endif
+
 namespace hgps {
 
-// MAHIMA: IDs are assigned from slot index (id = index + 1) so the same logical person has the
-// same ID in baseline and intervention runs; Population is the only place that assigns these IDs.
+// MAHIMA: Initial cohort IDs are slot-aligned (id = index + 1) across baseline/intervention.
+// Post-initial entrants use a monotonic Population counter so IDs are lifetime-unique and never
+// reused when slots are recycled.
 
 Population::Population(const std::size_t size) : initial_size_{size} {
-    // MAHIMA: Create each slot with ID = index + 1 for cross-scenario same-person tracking.
+    // MAHIMA: Initial cohort uses deterministic IDs for cross-scenario same-person alignment.
     people_.reserve(size);
+#ifndef NDEBUG
+    // MAHIMA: Initial IDs must be consecutive and unused before post-initial counter takes over.
+    assert(next_person_id_ == 1u);
+#endif
     for (std::size_t i = 0; i < size; ++i) {
-        people_.emplace_back(i + 1);
+        const std::size_t id = i + 1u;
+#ifndef NDEBUG
+        assert(id == next_person_id_);
+        assert(id != Person::unassigned_id);
+#endif
+        people_.emplace_back(id);
+        ++next_person_id_;
     }
 }
 
@@ -38,12 +53,12 @@ void Population::add(Person person, unsigned int time) noexcept {
     if (!recycle.empty()) {
         const auto slot_index = static_cast<std::size_t>(recycle.at(0));
         people_.at(slot_index) = std::move(person);
-        // MAHIMA: Assign slot-based ID so this person is tracked with same ID across scenarios.
-        people_.at(slot_index).set_id(slot_index + 1);
+        // MAHIMA: Reused slot gets a fresh lifetime-unique ID (slot reuse != ID reuse).
+        people_.at(slot_index).set_id(allocate_next_person_id());
     } else {
         people_.emplace_back(std::move(person));
-        // MAHIMA: New slot gets ID = current size (index + 1).
-        people_.back().set_id(people_.size());
+        // MAHIMA: Appended entrant also gets a fresh lifetime-unique ID.
+        people_.back().set_id(allocate_next_person_id());
     }
 }
 
@@ -55,15 +70,15 @@ void Population::add_newborn_babies(std::size_t number, core::Gender gender,
         auto replacebles = std::min(number, recycle.size());
         for (auto index = std::size_t{0}; index < replacebles; index++) {
             const auto slot_index = static_cast<std::size_t>(recycle.at(index));
-            // MAHIMA: Newborn in recycled slot keeps that slot's ID (index + 1).
-            people_.at(slot_index) = Person{gender, slot_index + 1};
+            // MAHIMA: Newborn in recycled slot gets a fresh lifetime-unique ID.
+            people_.at(slot_index) = Person{gender, allocate_next_person_id()};
             remaining--;
         }
     }
 
     for (auto i = std::size_t{0}; i < remaining; i++) {
-        // MAHIMA: New slot gets ID = current size + 1 (next index + 1).
-        people_.emplace_back(gender, people_.size() + 1);
+        // MAHIMA: Newborn in appended slot also gets a fresh lifetime-unique ID.
+        people_.emplace_back(gender, allocate_next_person_id());
     }
 }
 

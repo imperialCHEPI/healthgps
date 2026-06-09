@@ -168,6 +168,19 @@ TEST(KevinHallHeight, LegacyHeightScalarConfigStillLoads) {
     }
 
     auto json = hgps::input::load_json(finch / "dynamic_model.json");
+    // WeightQuantiles in FINCH is often configured as Quintile1..N, which requires the income
+    // stratum adjustment feature to be enabled. This test is about legacy Height scalar loading,
+    // so switch WeightQuantiles to the legacy single-file form to avoid coupling.
+    json["WeightQuantiles"]["Female"] = {{"name", "weight_quantiles_NCDRisk_female.csv"},
+                                         {"format", "csv"},
+                                         {"delimiter", ","},
+                                         {"encoding", "ASCII"},
+                                         {"columns", {{"quantile", "double"}}}};
+    json["WeightQuantiles"]["Male"] = {{"name", "weight_quantiles_NCDRisk_male.csv"},
+                                       {"format", "csv"},
+                                       {"delimiter", ","},
+                                       {"encoding", "ASCII"},
+                                       {"columns", {{"quantile", "double"}}}};
     json.erase("Height");
     json["HeightSlope"] = {{"Female", 0.123}, {"Male", 0.127}};
     json["HeightStdDev"] = {{"Female", 0.041}, {"Male", 0.043}};
@@ -334,6 +347,19 @@ TEST(KevinHallHeight, MultiRowHeightLoadsWhenStratumAdjustmentDisabled) {
     auto male_csv = create_temp_height_csv("height_male_nostratum.csv", rows);
 
     auto json = hgps::input::load_json(finch / "dynamic_model.json");
+    // This test only targets Height CSV parsing when stratum adjustment is disabled. FINCH
+    // WeightQuantiles is configured as Quintile1..N, which requires stratum adjustment; switch it
+    // to the legacy single-file form so the test remains focused.
+    json["WeightQuantiles"]["Female"] = {{"name", "weight_quantiles_NCDRisk_female.csv"},
+                                         {"format", "csv"},
+                                         {"delimiter", ","},
+                                         {"encoding", "ASCII"},
+                                         {"columns", {{"quantile", "double"}}}};
+    json["WeightQuantiles"]["Male"] = {{"name", "weight_quantiles_NCDRisk_male.csv"},
+                                       {"format", "csv"},
+                                       {"delimiter", ","},
+                                       {"encoding", "ASCII"},
+                                       {"columns", {{"quantile", "double"}}}};
     json["Height"]["Female"]["name"] = female_csv.string();
     json["Height"]["Male"]["name"] = male_csv.string();
     auto config = make_finch_configuration();
@@ -377,6 +403,18 @@ TEST(KevinHallHeight, SingleRowHeightLoadsWhenStratumCountIsOne) {
     auto male_csv = create_temp_height_csv("height_male_one_stratum.csv", "slope,std\n0.20,0.06\n");
 
     auto json = hgps::input::load_json(finch / "dynamic_model.json");
+    // With adjustment_income_stratum_count == 1, WeightQuantiles cannot use Quintile1..N files.
+    // Use legacy single-file quantiles so this test remains focused on Height CSV broadcasting.
+    json["WeightQuantiles"]["Female"] = {{"name", "weight_quantiles_NCDRisk_female.csv"},
+                                         {"format", "csv"},
+                                         {"delimiter", ","},
+                                         {"encoding", "ASCII"},
+                                         {"columns", {{"quantile", "double"}}}};
+    json["WeightQuantiles"]["Male"] = {{"name", "weight_quantiles_NCDRisk_male.csv"},
+                                       {"format", "csv"},
+                                       {"delimiter", ","},
+                                       {"encoding", "ASCII"},
+                                       {"columns", {{"quantile", "double"}}}};
     json["Height"]["Female"]["name"] = female_csv.string();
     json["Height"]["Male"]["name"] = male_csv.string();
     auto config = make_finch_configuration();
@@ -426,6 +464,17 @@ TEST(KevinHallHeight, HeightCsvSupportsSemicolonDelimiter) {
     auto male_csv = create_temp_height_csv("height_male_semicolon.csv", "slope;std\n0.20;0.06\n");
 
     auto json = hgps::input::load_json(finch / "dynamic_model.json");
+    // This test is about Height delimiter parsing; decouple from WeightQuantiles stratum settings.
+    json["WeightQuantiles"]["Female"] = {{"name", "weight_quantiles_NCDRisk_female.csv"},
+                                         {"format", "csv"},
+                                         {"delimiter", ","},
+                                         {"encoding", "ASCII"},
+                                         {"columns", {{"quantile", "double"}}}};
+    json["WeightQuantiles"]["Male"] = {{"name", "weight_quantiles_NCDRisk_male.csv"},
+                                       {"format", "csv"},
+                                       {"delimiter", ","},
+                                       {"encoding", "ASCII"},
+                                       {"columns", {{"quantile", "double"}}}};
     json["Height"]["Female"]["name"] = female_csv.string();
     json["Height"]["Male"]["name"] = male_csv.string();
     json["Height"]["Female"]["delimiter"] = ";";
@@ -478,6 +527,7 @@ TEST(KevinHallHeight, HeightCsvWrongColumnCountThrows) {
 
 TEST(KevinHallHeight, GenerateInitialisesHeightWithQuintileParams) {
     using namespace hgps;
+    using hgps::test::capture_stdout;
     const auto finch = finch_data_root();
     if (!std::filesystem::exists(finch / "dynamic_model.json")) {
         GTEST_SKIP() << "FINCH input data not available at " << finch.string();
@@ -501,7 +551,7 @@ TEST(KevinHallHeight, GenerateInitialisesHeightWithQuintileParams) {
         seed_finch_kevin_hall_food_factors(person);
     }
 
-    ASSERT_NO_THROW(runtime.model->generate_risk_factors(runtime.context));
+    ASSERT_NO_THROW(capture_stdout([&] { runtime.model->generate_risk_factors(runtime.context); }));
 
     for (const auto &person : runtime.context.population()) {
         ASSERT_TRUE(person.is_active());
@@ -565,11 +615,13 @@ TEST(KevinHallHeight, GenerateHeightSummarySkippedAfterFirstUpdateYear) {
         seed_finch_kevin_hall_food_factors(person);
     }
 
-    runtime.model->generate_risk_factors(runtime.context);
+    capture_stdout([&] { runtime.model->generate_risk_factors(runtime.context); });
+    std::fflush(stdout);
     runtime.context.set_current_time(start_year + 2);
 
     const auto output =
         capture_stdout([&] { runtime.model->generate_risk_factors(runtime.context); });
+    std::fflush(stdout);
 
     EXPECT_EQ(output.find("[HEIGHT STRATUM ASSIGNMENT]"), std::string::npos);
     EXPECT_EQ(output.find("[HEIGHT BY FINAL INCOME CATEGORY]"), std::string::npos);
@@ -577,6 +629,7 @@ TEST(KevinHallHeight, GenerateHeightSummarySkippedAfterFirstUpdateYear) {
 
 TEST(KevinHallHeight, UpdateChildrenRefreshesHeightForSubAdultAges) {
     using namespace hgps;
+    using hgps::test::capture_stdout;
     const auto finch = finch_data_root();
     if (!std::filesystem::exists(finch / "dynamic_model.json")) {
         GTEST_SKIP() << "FINCH input data not available at " << finch.string();
@@ -597,7 +650,11 @@ TEST(KevinHallHeight, UpdateChildrenRefreshesHeightForSubAdultAges) {
         seed_finch_kevin_hall_food_factors(person);
     }
 
-    runtime.model->generate_risk_factors(runtime.context);
+    // Keep this test focused on update semantics (height refresh for sub-adults) rather than
+    // console reporting. Summary tables are only printed at start_year and start_year+1.
+    // Running outside that window avoids very verbose output and potential test-runner stalls.
+    runtime.context.set_current_time(start_year + 2);
+    capture_stdout([&] { runtime.model->generate_risk_factors(runtime.context); });
     auto &person = runtime.context.population()[0];
     const double height_before = person.risk_factors.at("Height"_id);
 
@@ -605,8 +662,8 @@ TEST(KevinHallHeight, UpdateChildrenRefreshesHeightForSubAdultAges) {
     // Height_residual is preserved and update_height uses it for sub-adult ages.
     person.risk_factors["Height_residual"_id] += 0.05;
 
-    runtime.context.set_current_time(start_year + 1);
-    ASSERT_NO_THROW(runtime.model->update_risk_factors(runtime.context));
+    runtime.context.set_current_time(start_year + 3);
+    ASSERT_NO_THROW(capture_stdout([&] { runtime.model->update_risk_factors(runtime.context); }));
 
     const double height_after = person.risk_factors.at("Height"_id);
     EXPECT_NE(height_before, height_after);
@@ -634,7 +691,7 @@ TEST(KevinHallHeight, UpdateNewbornsInitialisesHeight) {
     person.income_adjustment_stratum = 0;
     seed_finch_kevin_hall_food_factors(person);
 
-    runtime.model->generate_risk_factors(runtime.context);
+    capture_stdout([&] { runtime.model->generate_risk_factors(runtime.context); });
     person.risk_factors.erase("Height"_id);
     person.risk_factors.erase("Height_residual"_id);
 
@@ -683,6 +740,7 @@ TEST(KevinHallHeight, GeneratePrintsHeightTablesForThreeIncomeCategories) {
 
 TEST(KevinHallHeight, GenerateUsesBroadcastHeightWhenStratumNotAssigned) {
     using namespace hgps;
+    using hgps::test::capture_stdout;
     const auto finch = finch_data_root();
     if (!std::filesystem::exists(finch / "dynamic_model.json")) {
         GTEST_SKIP() << "FINCH input data not available at " << finch.string();
@@ -702,6 +760,6 @@ TEST(KevinHallHeight, GenerateUsesBroadcastHeightWhenStratumNotAssigned) {
         seed_finch_kevin_hall_food_factors(person);
     }
 
-    ASSERT_NO_THROW(runtime.model->generate_risk_factors(runtime.context));
+    capture_stdout([&] { runtime.model->generate_risk_factors(runtime.context); });
     EXPECT_GT(runtime.context.population()[0].risk_factors.at("Height"_id), 0.0);
 }
