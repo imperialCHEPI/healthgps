@@ -1,6 +1,7 @@
 #include "TestConsoleCapture.h"
 
 #include <cstdio>
+#include <memory>
 
 namespace hgps::test {
 
@@ -16,7 +17,10 @@ class FlushStdoutListener : public ::testing::EmptyTestEventListener {
 
 struct RegisterFlushStdoutListener {
     RegisterFlushStdoutListener() {
-        ::testing::UnitTest::GetInstance()->listeners().Append(new FlushStdoutListener);
+        auto listener = std::make_unique<FlushStdoutListener>();
+        // gtest::TestEventListeners::Append takes ownership; freed when UnitTest tears down.
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+        ::testing::UnitTest::GetInstance()->listeners().Append(listener.release());
     }
 };
 
