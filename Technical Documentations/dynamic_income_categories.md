@@ -133,12 +133,12 @@ void assign_equal_rank_buckets(Population &pop, std::size_t bucket_count, SetBuc
 - `assign_income_adjustment_strata_equal_split` → sets `income_adjustment_stratum` (unchanged behavior, N from config).
 - `assign_income_categories_equal_split` → uses `layout.count` + `income_from_equal_split_bucket`.
 
-2. **Replace all `income_categories_ == "4"` branches** with `income_category_layout_.count`:
+1. **Replace all `income_categories_ == "4"` branches** with `income_category_layout_.count`:
 
 - Threshold selection for debug printouts: add `calculate_percentile_thresholds(population, layout.count)` (generalizes existing `calculate_income_tertiles` / `calculate_income_quartiles`; keep old functions as thin wrappers or inline callers to minimize diff).
 - `convert_income_continuous_to_category` / `convert_income_to_category`: branch on `layout.count` (3/4/5) using shared thresholds helper.
 
-3. **Fix summary tables** (`print_final_income_category_table`):
+1. **Fix summary tables** (`print_final_income_category_table`):
 
 - Use `layout.count`, `layout.labels`, and `income_table_index(person.income, layout)` — **do not** merge `lowermiddle` + `middle` when count is 5.
 
@@ -190,5 +190,5 @@ Register new test file in `[src/HealthGPS.Tests/CMakeLists.txt](src/HealthGPS.Te
 ## Verification checklist
 
 1. Build + run `HealthGPS.Tests` (especially new layout test, ResultFileWriter, IncomeStratumAdjustment, KevinHallHeight).
-2. Manual smoke: config with `categories: "5"` and `income_stratum_factors_mean.enabled: true`, `adjustment_income_stratum_count: 5` — Kevin Hall uses quintile strata; final output has five income CSVs.
-3. Regression: existing `"3"` and `"4"` tests pass unchanged behavior.
+1. Manual smoke: config with `categories: "5"` and `income_stratum_factors_mean.enabled: true`, `adjustment_income_stratum_count: 5` — Kevin Hall uses quintile strata; final output has five income CSVs.
+1. Regression: existing `"3"` and `"4"` tests pass unchanged behavior.
