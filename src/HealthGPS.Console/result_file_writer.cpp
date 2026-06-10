@@ -13,35 +13,17 @@
 
 #include "result_file_writer.h"
 
+#include "HealthGPS.Core/exception.h"
 #include "HealthGPS.Core/forward_type.h"
 #include "HealthGPS/data_series.h"
 
 namespace hgps {
-namespace {
-
-/// Numeric value for mean_income_category column (matches Person::income_to_value).
-/// Each income-stratified file contains only that category, so mean_income_category is fixed.
-double income_category_numeric(core::Income inc) {
-    switch (inc) {
-    case core::Income::low:
-        return 1.0;
-    case core::Income::lowermiddle:
-    case core::Income::middle:
-        return 2.0;
-    case core::Income::uppermiddle:
-        return 3.0;
-    case core::Income::high:
-        return 4.0;
-    default:
-        return 0.0;
-    }
-}
-} // namespace
 
 ResultFileWriter::ResultFileWriter(const std::filesystem::path &file_name, ExperimentInfo info,
-                                   bool write_income_csv, std::string income_categories)
+                                   bool write_income_csv,
+                                   core::IncomeCategoryLayout income_category_layout)
     : info_{std::move(info)}, write_income_csv_{write_income_csv},
-      income_categories_{std::move(income_categories)}, base_filename_{file_name} {
+      income_category_layout_{std::move(income_category_layout)}, base_filename_{file_name} {
     stream_.open(file_name, std::ofstream::out | std::ofstream::app);
     if (stream_.fail() || !stream_.is_open()) {
         throw std::invalid_argument(fmt::format("Cannot open output file: {}", file_name.string()));
@@ -64,7 +46,7 @@ ResultFileWriter::ResultFileWriter(ResultFileWriter &&other) noexcept
       income_first_row_{std::move(other.income_first_row_)},
       income_mutexes_{std::move(other.income_mutexes_)}, info_{std::move(other.info_)},
       write_income_csv_{other.write_income_csv_},
-      income_categories_{std::move(other.income_categories_)},
+      income_category_layout_{std::move(other.income_category_layout_)},
       base_filename_{std::move(other.base_filename_)} {}
 
 ResultFileWriter &ResultFileWriter::operator=(ResultFileWriter &&other) noexcept {
@@ -87,7 +69,7 @@ ResultFileWriter &ResultFileWriter::operator=(ResultFileWriter &&other) noexcept
     info_ = std::move(other.info_);
     base_filename_ = std::move(other.base_filename_);
     write_income_csv_ = other.write_income_csv_;
-    income_categories_ = other.income_categories_;
+    income_category_layout_ = other.income_category_layout_;
     return *this;
 }
 
@@ -306,15 +288,8 @@ void ResultFileWriter::merge_configured_income_strata(std::vector<core::Income> 
             seen.insert(inc);
         }
     };
-    if (income_categories_ == "4") {
-        add(core::Income::low);
-        add(core::Income::lowermiddle);
-        add(core::Income::uppermiddle);
-        add(core::Income::high);
-    } else {
-        add(core::Income::low);
-        add(core::Income::middle);
-        add(core::Income::high);
+    for (const auto income : income_category_layout_.strata) {
+        add(income);
     }
 }
 
@@ -416,7 +391,13 @@ void ResultFileWriter::write_income_csv_data(const hgps::ResultEventMessage &mes
 
     const auto *sep = ",";
     const auto &series = message.content.series;
-    const double file_income_category_value = income_category_numeric(income);
+    double file_income_category_value = 0.0;
+    try {
+        file_income_category_value =
+            core::income_category_numeric(income, income_category_layout_);
+    } catch (const core::HgpsException &) {
+        file_income_category_value = 0.0;
+    }
 
     // MAHIMA: Always write full age x gender coverage for each income file.
     // If an age/gender cell has no people in this income category, its values stay 0.0 so analysts

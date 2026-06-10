@@ -29,10 +29,11 @@
             "type": "string",
             "enum": [
                 "3",
-                "4"
+                "4",
+                "5"
             ],
             "default": "3",
-            "description": "Number of income categories to use. '3' = low, middle, high. '4' = low, lowermiddle, uppermiddle, high"
+            "description": "Number of income categories to use. '3' = low, middle, high. '4' = low, lowermiddle, uppermiddle, high. '5' = low, lowermiddle, middle, uppermiddle, high"
         },
         "data": {
             "$ref": "config/data.json"

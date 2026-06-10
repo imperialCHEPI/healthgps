@@ -2,6 +2,7 @@
 
 #include "HealthGPS.Core/api.h"
 #include "HealthGPS.Core/exception.h"
+#include "HealthGPS.Core/income_category_layout.h"
 #include "HealthGPS.Core/identifier.h"
 #include "HealthGPS.Input/model_parser.h"
 #include "HealthGPS/baseline_scenario.h"
@@ -14,6 +15,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <unordered_set>
 
 namespace {
 struct TempCsvPair {
@@ -36,7 +38,8 @@ class TestAdjustableModel final : public hgps::RiskFactorAdjustableModel {
     void update_risk_factors(hgps::RuntimeContext & /*context*/) override {}
 };
 
-std::shared_ptr<hgps::ModelInput> create_minimal_model_input(hgps::core::DataTable &data) {
+std::shared_ptr<hgps::ModelInput> create_minimal_model_input(hgps::core::DataTable &data,
+                                                             std::string income_categories = "4") {
     using namespace hgps;
     using namespace hgps::core;
 
@@ -61,7 +64,7 @@ std::shared_ptr<hgps::ModelInput> create_minimal_model_input(hgps::core::DataTab
     project_requirements.risk_factors.trended = false;
     project_requirements.income.enabled = true;
     project_requirements.income.type = "continuous";
-    project_requirements.income.categories = "4";
+    project_requirements.income.categories = std::move(income_categories);
     project_requirements.income.adjust_to_factors_mean = true;
     project_requirements.income.trended = false;
     project_requirements.physical_activity.enabled = false;
@@ -283,7 +286,9 @@ std::shared_ptr<StaticLinearModelTestBundle> create_test_static_linear_model_bun
     const std::vector<hgps::IncomeStratumExpectedTableEntry> &stratum_tables, bool stratum_enabled,
     std::size_t adjustment_income_stratum_count,
     const std::unordered_map<hgps::core::Identifier, hgps::PhysicalActivityModel>
-        &physical_activity_models = {}) {
+        &physical_activity_models = {},
+    hgps::core::IncomeCategoryLayout income_layout =
+        hgps::core::income_category_layout_from_config("4")) {
     using namespace hgps;
     auto bundle = std::make_shared<StaticLinearModelTestBundle>();
     bundle->names = {core::Identifier("foodcarbohydrate")};
@@ -302,10 +307,9 @@ std::shared_ptr<StaticLinearModelTestBundle> create_test_static_linear_model_bun
     bundle->rural_prevalence = {
         {"Under18"_id, {{core::Gender::male, 0.2}, {core::Gender::female, 0.2}}},
         {"Over18"_id, {{core::Gender::male, 0.2}, {core::Gender::female, 0.2}}}};
-    bundle->income_models = {{core::Income::low, LinearModelParams{}},
-                             {core::Income::lowermiddle, LinearModelParams{}},
-                             {core::Income::uppermiddle, LinearModelParams{}},
-                             {core::Income::high, LinearModelParams{}}};
+    for (const auto income : income_layout.strata) {
+        bundle->income_models.emplace(income, LinearModelParams{});
+    }
     bundle->continuous_income_model = LinearModelParams{.intercept = 650.0};
     bundle->logistic_models = {LinearModelParams{}};
     bundle->expected_trend = std::make_shared<std::unordered_map<core::Identifier, double>>();
@@ -323,7 +327,7 @@ std::shared_ptr<StaticLinearModelTestBundle> create_test_static_linear_model_bun
         bundle->policy_ranges, bundle->policy_cholesky, bundle->trend_models, bundle->trend_ranges,
         bundle->trend_lambda, 0.0, bundle->rural_prevalence, bundle->income_models, 0.01,
         TrendType::Null, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, true,
-        bundle->continuous_income_model, "4", physical_activity_models, stratum_tables,
+        bundle->continuous_income_model, income_layout, physical_activity_models, stratum_tables,
         stratum_enabled, adjustment_income_stratum_count, false, bundle->logistic_models);
     return bundle;
 }
@@ -562,6 +566,55 @@ TEST(IncomeStratumAdjustment, LoadExpectedFailsWhenCsvFilesMissing) {
     // MAHIMA: Phase-3 parser/load failure coverage for missing files.
     // We assert fail-fast behavior so invalid baseline-adjustment paths are reported immediately.
     EXPECT_THROW((void)input::load_risk_factor_expected(config), core::HgpsException);
+}
+
+TEST(IncomeStratumAdjustment, FiveFinalCategoriesWithFiveAdjustmentStrata) {
+    using namespace hgps;
+
+    core::DataTable data;
+    auto inputs = create_minimal_model_input(data, "5");
+    auto bus = std::make_shared<DefaultEventBus>();
+    auto channel = SyncChannel{};
+    auto scenario = std::make_unique<BaselineScenario>(channel);
+    auto context = RuntimeContext(bus, inputs, std::move(scenario));
+    context.reset_population(10);
+
+    for (std::size_t i = 0; i < context.population().size(); ++i) {
+        auto &p = context.population()[i];
+        p.gender = (i % 2 == 0) ? core::Gender::male : core::Gender::female;
+        p.age = 0;
+        p.risk_factors["income"_id] = 200.0 + (static_cast<double>(i) * 40.0);
+    }
+
+    const auto factor = core::Identifier("foodcarbohydrate");
+    auto overall_expected = make_expected_table_with_income_and_pa(factor, 100.0, 600.0, 1.8);
+    std::vector<IncomeStratumExpectedTableEntry> stratum_tables;
+    for (std::size_t q = 0; q < 5u; ++q) {
+        stratum_tables.push_back(
+            {"Quintile" + std::to_string(q + 1),
+             make_expected_table_with_income_and_pa(factor, 90.0 + static_cast<double>(q) * 5.0,
+                                                    600.0, 1.6 + static_cast<double>(q) * 0.1)});
+    }
+
+    const auto income_layout = core::income_category_layout_from_config("5");
+    auto bundle = create_test_static_linear_model_bundle(overall_expected, stratum_tables, true, 5u,
+                                                         {}, income_layout);
+
+    bundle->model->generate_risk_factors(context);
+
+    std::unordered_set<core::Income> seen_income;
+    for (const auto &p : context.population()) {
+        if (!p.is_active()) {
+            continue;
+        }
+        EXPECT_TRUE(p.has_income_adjustment_stratum);
+        EXPECT_LT(p.income_adjustment_stratum, 5u);
+        EXPECT_NE(core::Income::unknown, p.income);
+        seen_income.insert(p.income);
+    }
+    for (const auto income : income_layout.strata) {
+        EXPECT_TRUE(seen_income.contains(income));
+    }
 }
 
 TEST(IncomeStratumAdjustment, AdjustmentStratumPersistsAfterFinalIncomeCategories) {

@@ -60,7 +60,7 @@ struct IncomeStratumFactorsMeanStratumEntry {
 // 2+ simulation behaviour).
 //! Optional income-stratum factors-mean adjustment: extra male/female tables per stratum.
 //! When disabled, the simulator uses only file_names.factorsmean_male/female (legacy behaviour).
-//! Final output income bucket count remains in project_requirements.income.categories ("3"/"4").
+//! Final output income bucket count remains in project_requirements.income.categories ("3"/"4"/"5").
 struct IncomeStratumFactorsMeanConfig {
     bool enabled{false};
     /// Rank buckets formed from continuous income for adjustment (N). Must equal strata.size()
@@ -232,7 +232,7 @@ struct ProjectRequirements {
     struct Income {
         bool enabled{true};
         std::string type{"categorical"}; // "continuous" | "categorical"
-        std::string categories{"3"};     // "3" | "4"
+        std::string categories{"3"};     // "3" | "4" | "5"
         bool adjust_to_factors_mean{false};
         bool trended{false};
         /// When true, write income-based CSV files (categorize results by income_category). When

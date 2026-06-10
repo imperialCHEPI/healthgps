@@ -9,6 +9,7 @@
 #include <unordered_set>
 #include <utility>
 
+#include "HealthGPS.Core/income_category_layout.h"
 #include "HealthGPS.Core/string_util.h"
 #include "HealthGPS.Core/thread_util.h"
 
@@ -24,12 +25,9 @@ namespace {
 
 /// @brief Income strata for income-stratified series output (must match project_requirements).
 std::vector<core::Income> configured_income_strata(const RuntimeContext &context) {
-    const auto &categories = context.inputs().project_requirements().income.categories;
-    if (categories == "4") {
-        return {core::Income::low, core::Income::lowermiddle, core::Income::uppermiddle,
-                core::Income::high};
-    }
-    return {core::Income::low, core::Income::middle, core::Income::high};
+    const auto layout = core::income_category_layout_from_config(
+        context.inputs().project_requirements().income.categories);
+    return layout.strata;
 }
 
 /// @brief Configured strata plus any person.income values present (e.g. unknown on deaths).

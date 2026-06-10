@@ -5,6 +5,7 @@
 #include "schema.h"
 
 #include "HealthGPS.Core/exception.h"
+#include "HealthGPS.Core/income_category_layout.h"
 #include "HealthGPS.Core/scoped_timer.h"
 #include "HealthGPS.Core/string_util.h"
 #include "HealthGPS/predictor_resolver.h"
@@ -521,7 +522,7 @@ int get_model_schema_version(const std::string &model_name) {
 // MAHIMA- Dynamic income category mapping from config.json to codebase
 /// @brief Maps income category name to enum value based on category count
 /// @param key The income category name from JSON
-/// @param category_count The number of income categories (3 or 4)
+/// @param category_count The number of income categories (3, 4, or 5)
 /// @return The corresponding Income enum value
 /// @throws core::HgpsException if the category name is unrecognized
 hgps::core::Income map_income_category(const std::string &key, const std::string &category_count) {
@@ -547,6 +548,17 @@ hgps::core::Income map_income_category(const std::string &key, const std::string
         // 4-category system: low, lowermiddle, uppermiddle, high
         if (hgps::core::case_insensitive::equals(key, "lowermiddle")) {
             return hgps::core::Income::lowermiddle;
+        }
+        if (hgps::core::case_insensitive::equals(key, "uppermiddle")) {
+            return hgps::core::Income::uppermiddle;
+        }
+    } else if (category_count == "5") {
+        // 5-category system: low, lowermiddle, middle, uppermiddle, high
+        if (hgps::core::case_insensitive::equals(key, "lowermiddle")) {
+            return hgps::core::Income::lowermiddle;
+        }
+        if (hgps::core::case_insensitive::equals(key, "middle")) {
+            return hgps::core::Income::middle;
         }
         if (hgps::core::case_insensitive::equals(key, "uppermiddle")) {
             return hgps::core::Income::uppermiddle;
@@ -1640,12 +1652,9 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
     // Income: use project_requirements (required in config); no fallback
     const auto &inc_req = config.project_requirements.income;
-    std::string income_categories = inc_req.categories;
-    if (income_categories != "3" && income_categories != "4") {
-        throw core::HgpsException{
-            fmt::format(R"(project_requirements.income.categories must be "3" or "4". Got: "{}")",
-                        income_categories)};
-    }
+    const std::string income_categories = inc_req.categories;
+    const core::IncomeCategoryLayout income_layout =
+        core::income_category_layout_from_config(income_categories);
     load_summary.income_categories = income_categories;
 
     bool is_continuous_model = (inc_req.type == "continuous");
@@ -1665,14 +1674,9 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         }
         load_summary.income_type = "continuous (regression, then categories)";
 
-        income_models.emplace(core::Income::low, LinearModelParams{});
-        if (income_categories == "4") {
-            income_models.emplace(core::Income::lowermiddle, LinearModelParams{});
-            income_models.emplace(core::Income::uppermiddle, LinearModelParams{});
-        } else {
-            income_models.emplace(core::Income::middle, LinearModelParams{});
+        for (const auto income : income_layout.strata) {
+            income_models.emplace(income, LinearModelParams{});
         }
-        income_models.emplace(core::Income::high, LinearModelParams{});
     } else {
         if (model_has_continuous && opt["IncomeModels"].size() == 1u) {
             throw core::HgpsException{
@@ -1682,6 +1686,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         }
         load_summary.income_type = "categorical (direct assignment)";
 
+        std::size_t categorical_model_count = 0u;
         for (const auto &[key, json_params] : opt["IncomeModels"].items()) {
             if (key == "simple" || key == "continuous") {
                 continue;
@@ -1692,6 +1697,13 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             model.coefficients =
                 json_params["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
             income_models.emplace(category, std::move(model));
+            ++categorical_model_count;
+        }
+        if (categorical_model_count != income_layout.count) {
+            throw core::HgpsException{fmt::format(
+                "project_requirements.income.categories is \"{}\" but static_model.json "
+                "IncomeModels defines {} categorical income model(s). Expected {}.",
+                income_categories, categorical_model_count, income_layout.count)};
         }
     }
 
@@ -1827,7 +1839,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             std::move(income_trend_steps), std::move(income_trend_models),
             std::move(income_trend_ranges), std::move(income_trend_lambda),
             std::move(income_trend_decay_factors), is_continuous_model, continuous_income_model,
-            income_categories, std::move(physical_activity_models),
+            income_layout, std::move(physical_activity_models),
             std::move(income_stratum_expected_tables), stratum_cfg.enabled,
             stratum_cfg.adjustment_income_stratum_count, has_active_policies,
             std::move(logistic_models));
