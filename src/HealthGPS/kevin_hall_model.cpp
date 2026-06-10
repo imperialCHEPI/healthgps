@@ -1,4 +1,5 @@
 #include "HealthGPS.Core/exception.h"
+#include "HealthGPS.Core/income_category_layout.h"
 
 #include "kevin_hall_model.h"
 #include "runtime_context.h"
@@ -301,11 +302,10 @@ void print_weight_stratum_assignment_table(
 }
 
 void print_weight_by_final_income_category_table(const hgps::Population &population,
-                                                 std::string_view categories, int year,
-                                                 std::string_view phase) {
-    const auto cat_count = categories == "4" ? 4u : 3u;
+                                                 const hgps::core::IncomeCategoryLayout &layout,
+                                                 int year, std::string_view phase) {
     const hgps::core::Identifier weight_id("Weight");
-    std::vector<WeightBucketSummary> summaries(cat_count);
+    std::vector<WeightBucketSummary> summaries(layout.count);
 
     for (const auto &person : population) {
         if (!person.is_active()) {
@@ -317,21 +317,9 @@ void print_weight_by_final_income_category_table(const hgps::Population &populat
         }
 
         std::size_t idx = 0;
-        switch (person.income) {
-        case hgps::core::Income::low:
-            idx = 0;
-            break;
-        case hgps::core::Income::lowermiddle:
-        case hgps::core::Income::middle:
-            idx = 1;
-            break;
-        case hgps::core::Income::uppermiddle:
-            idx = 2;
-            break;
-        case hgps::core::Income::high:
-            idx = categories == "4" ? 3u : 2u;
-            break;
-        default:
+        try {
+            idx = hgps::core::income_table_index(person.income, layout);
+        } catch (const hgps::core::HgpsException &) {
             continue;
         }
 
@@ -345,18 +333,15 @@ void print_weight_by_final_income_category_table(const hgps::Population &populat
 
     std::ostringstream out;
     out << "\n[WEIGHT BY FINAL INCOME CATEGORY] Year " << year << " phase=" << phase
-        << " project_requirements.categories=" << categories
+        << " project_requirements.categories=" << layout.count
         << " (person.income set by static model after quintile adjustment)\n";
     out << "+----------+--------+-------------+-------------+-------------+\n";
     out << "| Category | Count  | Weight Min  | Weight Max  | Weight Mean |\n";
     out << "+----------+--------+-------------+-------------+-------------+\n";
-    const std::vector<std::string> labels =
-        categories == "4" ? std::vector<std::string>{"Low", "LowerMid", "UpperMid", "High"}
-                          : std::vector<std::string>{"Low", "Middle", "High"};
     for (std::size_t i = 0; i < summaries.size(); ++i) {
         const auto &summary = summaries[i];
-        out << "| " << std::setw(8) << std::left << labels[i] << std::right << " | " << std::setw(6)
-            << summary.count << " | ";
+        out << "| " << std::setw(8) << std::left << layout.labels[i] << std::right << " | "
+            << std::setw(6) << summary.count << " | ";
         if (summary.count == 0) {
             out << std::setw(11) << "n/a"
                 << " | " << std::setw(11) << "n/a"
@@ -374,11 +359,10 @@ void print_weight_by_final_income_category_table(const hgps::Population &populat
 }
 
 void print_height_by_final_income_category_table(const hgps::Population &population,
-                                                 std::string_view categories, int year,
-                                                 std::string_view phase) {
-    const auto cat_count = categories == "4" ? 4u : 3u;
+                                                 const hgps::core::IncomeCategoryLayout &layout,
+                                                 int year, std::string_view phase) {
     const hgps::core::Identifier height_id("Height");
-    std::vector<HeightBucketSummary> summaries(cat_count);
+    std::vector<HeightBucketSummary> summaries(layout.count);
 
     for (const auto &person : population) {
         if (!person.is_active()) {
@@ -390,21 +374,9 @@ void print_height_by_final_income_category_table(const hgps::Population &populat
         }
 
         std::size_t idx = 0;
-        switch (person.income) {
-        case hgps::core::Income::low:
-            idx = 0;
-            break;
-        case hgps::core::Income::lowermiddle:
-        case hgps::core::Income::middle:
-            idx = 1;
-            break;
-        case hgps::core::Income::uppermiddle:
-            idx = 2;
-            break;
-        case hgps::core::Income::high:
-            idx = categories == "4" ? 3u : 2u;
-            break;
-        default:
+        try {
+            idx = hgps::core::income_table_index(person.income, layout);
+        } catch (const hgps::core::HgpsException &) {
             continue;
         }
 
@@ -418,18 +390,15 @@ void print_height_by_final_income_category_table(const hgps::Population &populat
 
     std::ostringstream out;
     out << "\n[HEIGHT BY FINAL INCOME CATEGORY] Year " << year << " phase=" << phase
-        << " project_requirements.categories=" << categories
+        << " project_requirements.categories=" << layout.count
         << " (person.income set by static model after quintile adjustment)\n";
     out << "+----------+--------+-------------+-------------+-------------+\n";
     out << "| Category | Count  | Height Min  | Height Max  | Height Mean |\n";
     out << "+----------+--------+-------------+-------------+-------------+\n";
-    const std::vector<std::string> labels =
-        categories == "4" ? std::vector<std::string>{"Low", "LowerMid", "UpperMid", "High"}
-                          : std::vector<std::string>{"Low", "Middle", "High"};
     for (std::size_t i = 0; i < summaries.size(); ++i) {
         const auto &summary = summaries[i];
-        out << "| " << std::setw(8) << std::left << labels[i] << std::right << " | " << std::setw(6)
-            << summary.count << " | ";
+        out << "| " << std::setw(8) << std::left << layout.labels[i] << std::right << " | "
+            << std::setw(6) << summary.count << " | ";
         if (summary.count == 0) {
             out << std::setw(11) << "n/a"
                 << " | " << std::setw(11) << "n/a"
@@ -1187,6 +1156,11 @@ void KevinHallModel::adjust_weight(const RuntimeContext &context, Person &person
     validate_weight_in_config_range(context, person, "adjust_weight");
 }
 
+// MAHIMA: Added context and phase parameters to the validate_weight_in_config_range method
+//  to provide more detailed error messages and allow for more specific validation in different
+//  contexts.
+// The context parameter is used to access the context's mapping and time information,
+//  while the phase parameter is used to provide a more specific message about the validation error.
 void KevinHallModel::validate_weight_in_config_range(const RuntimeContext &context,
                                                      const Person &person,
                                                      std::string_view phase) const {
@@ -1391,8 +1365,9 @@ void KevinHallModel::print_weight_summary_tables(RuntimeContext &context,
     print_weight_stratum_assignment_table(context.population(), weight_quantiles_by_stratum_,
                                           bucket_count, context.time_now(), phase);
 
-    const auto &categories = context.inputs().project_requirements().income.categories;
-    print_weight_by_final_income_category_table(context.population(), categories,
+    const auto income_layout = hgps::core::income_category_layout_from_config(
+        context.inputs().project_requirements().income.categories);
+    print_weight_by_final_income_category_table(context.population(), income_layout,
                                                 context.time_now(), phase);
 }
 
@@ -1411,8 +1386,9 @@ void KevinHallModel::print_height_summary_tables(RuntimeContext &context,
     print_height_stratum_assignment_table(context.population(), height_params_, bucket_count,
                                           context.time_now(), phase);
 
-    const auto &categories = context.inputs().project_requirements().income.categories;
-    print_height_by_final_income_category_table(context.population(), categories,
+    const auto income_layout = hgps::core::income_category_layout_from_config(
+        context.inputs().project_requirements().income.categories);
+    print_height_by_final_income_category_table(context.population(), income_layout,
                                                 context.time_now(), phase);
 }
 

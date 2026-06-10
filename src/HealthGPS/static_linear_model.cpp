@@ -1,5 +1,6 @@
 #include "static_linear_model.h"
 #include "HealthGPS.Core/exception.h"
+#include "HealthGPS.Core/income_category_layout.h"
 #include "HealthGPS.Core/string_util.h"
 #include "HealthGPS.Input/poco.h"
 #include "linear_model_evaluator.h"
@@ -100,29 +101,43 @@ get_physical_activity_mapping_range(const RuntimeContext &context) {
     }
 }
 
-core::Income income_category_from_rank_bucket(std::size_t bucket, std::size_t bucket_count) {
-    if (bucket_count == 4) {
-        switch (bucket) {
-        case 0:
-            return core::Income::low;
-        case 1:
-            return core::Income::lowermiddle;
-        case 2:
-            return core::Income::uppermiddle;
-        default:
-            return core::Income::high;
-        }
+template <typename SetBucket>
+void assign_equal_rank_buckets(Population &population, std::size_t bucket_count,
+                               const SetBucket &set_bucket) {
+    if (bucket_count < 1u) {
+        return;
     }
 
-    // MAHIMA: For the current legacy path we support 3-category split as
-    // low/middle/high and keep the existing enum contract unchanged.
-    switch (bucket) {
-    case 0:
-        return core::Income::low;
-    case 1:
-        return core::Income::middle;
-    default:
-        return core::Income::high;
+    std::vector<std::pair<double, std::size_t>> ranked_people;
+    ranked_people.reserve(population.size());
+
+    for (std::size_t i = 0; i < population.size(); ++i) {
+        auto &person = population[i];
+        if (!person.is_active()) {
+            continue;
+        }
+        auto it = person.risk_factors.find("income"_id);
+        if (it == person.risk_factors.end()) {
+            continue;
+        }
+        ranked_people.emplace_back(it->second, i);
+    }
+
+    if (ranked_people.empty()) {
+        return;
+    }
+
+    std::ranges::sort(ranked_people, [](const auto &lhs, const auto &rhs) {
+        if (lhs.first != rhs.first) {
+            return lhs.first < rhs.first;
+        }
+        return lhs.second < rhs.second;
+    });
+
+    const std::size_t n = ranked_people.size();
+    for (std::size_t rank = 0; rank < n; ++rank) {
+        const std::size_t bucket = (rank * bucket_count) / n;
+        set_bucket(population[ranked_people[rank].second], bucket);
     }
 }
 
@@ -137,43 +152,10 @@ bool should_print_income_summary_tables(const RuntimeContext &context) {
 }
 
 void assign_income_categories_equal_split(Population &population,
-                                          std::string_view income_categories) {
-    const std::size_t bucket_count = income_categories == "4" ? 4u : 3u;
-    std::vector<std::pair<double, std::size_t>> ranked_people;
-    ranked_people.reserve(population.size());
-
-    for (std::size_t i = 0; i < population.size(); ++i) {
-        auto &person = population[i];
-        if (!person.is_active()) {
-            continue;
-        }
-        auto it = person.risk_factors.find("income"_id);
-        if (it == person.risk_factors.end()) {
-            continue;
-        }
-        ranked_people.emplace_back(it->second, i);
-    }
-
-    if (ranked_people.empty()) {
-        return;
-    }
-
-    // MAHIMA: Assign income categories by sorted rank (not threshold cutoffs) so
-    // configured buckets stay balanced (difference <= 1), even when many people tie
-    // at the clamped max income value.
-    std::ranges::sort(ranked_people, [](const auto &lhs, const auto &rhs) {
-        if (lhs.first != rhs.first) {
-            return lhs.first < rhs.first;
-        }
-        return lhs.second < rhs.second;
+                                          const core::IncomeCategoryLayout &layout) {
+    assign_equal_rank_buckets(population, layout.count, [&](Person &person, std::size_t bucket) {
+        person.income = core::income_from_equal_split_bucket(bucket, layout);
     });
-
-    const std::size_t n = ranked_people.size();
-    for (std::size_t rank = 0; rank < n; ++rank) {
-        const std::size_t bucket = (rank * bucket_count) / n;
-        population[ranked_people[rank].second].income =
-            income_category_from_rank_bucket(bucket, bucket_count);
-    }
 }
 
 void assign_income_adjustment_strata_equal_split(Population &population, std::size_t bucket_count) {
@@ -181,46 +163,16 @@ void assign_income_adjustment_strata_equal_split(Population &population, std::si
         return;
     }
 
-    std::vector<std::pair<double, std::size_t>> ranked_people;
-    ranked_people.reserve(population.size());
-
     // MAHIMA: Reset flags first so callers can reliably test assignment status per-step.
     for (auto &person : population) {
         person.has_income_adjustment_stratum = false;
         person.income_adjustment_stratum = 0u;
     }
 
-    for (std::size_t i = 0; i < population.size(); ++i) {
-        auto &person = population[i];
-        if (!person.is_active()) {
-            continue;
-        }
-        auto it = person.risk_factors.find("income"_id);
-        if (it == person.risk_factors.end()) {
-            continue;
-        }
-        ranked_people.emplace_back(it->second, i);
-    }
-
-    if (ranked_people.empty()) {
-        return;
-    }
-
-    // MAHIMA: Rank-based equal split keeps strata balanced (difference <= 1) and deterministic.
-    std::ranges::sort(ranked_people, [](const auto &lhs, const auto &rhs) {
-        if (lhs.first != rhs.first) {
-            return lhs.first < rhs.first;
-        }
-        return lhs.second < rhs.second;
-    });
-
-    const std::size_t n = ranked_people.size();
-    for (std::size_t rank = 0; rank < n; ++rank) {
-        const std::size_t bucket = (rank * bucket_count) / n;
-        auto &person = population[ranked_people[rank].second];
+    assign_equal_rank_buckets(population, bucket_count, [](Person &person, std::size_t bucket) {
         person.income_adjustment_stratum = bucket;
         person.has_income_adjustment_stratum = true;
-    }
+    });
 }
 
 struct IncomeBucketSummary {
@@ -284,12 +236,12 @@ void print_income_adjustment_strata_table(
     std::osyncstream(std::cout) << out.str();
 }
 
-void print_final_income_category_table(const Population &population, std::string_view categories,
+void print_final_income_category_table(const Population &population,
+                                       const core::IncomeCategoryLayout &layout,
                                        const std::vector<double> &thresholds, int year,
                                        std::string_view phase) {
     const core::Identifier income_id("income");
-    auto cat_count = categories == "4" ? 4u : 3u;
-    std::vector<IncomeBucketSummary> summaries(cat_count);
+    std::vector<IncomeBucketSummary> summaries(layout.count);
     bool has_observed_income = false;
     double observed_income_max = std::numeric_limits<double>::lowest();
     for (const auto &person : population) {
@@ -301,21 +253,9 @@ void print_final_income_category_table(const Population &population, std::string
             continue;
         }
         std::size_t idx = 0;
-        switch (person.income) {
-        case core::Income::low:
-            idx = 0;
-            break;
-        case core::Income::lowermiddle:
-        case core::Income::middle:
-            idx = 1;
-            break;
-        case core::Income::uppermiddle:
-            idx = 2;
-            break;
-        case core::Income::high:
-            idx = categories == "4" ? 3u : 2u;
-            break;
-        default:
+        try {
+            idx = core::income_table_index(person.income, layout);
+        } catch (const core::HgpsException &) {
             continue;
         }
         auto &s = summaries[idx];
@@ -330,28 +270,26 @@ void print_final_income_category_table(const Population &population, std::string
 
     std::ostringstream out;
     out << "\n[YEAR 2 UPDATE INCOME CATEGORIES] Year " << year << " phase=" << phase
-        << " project_requirements.categories=" << categories << '\n';
-    if (categories == "4" && thresholds.size() >= 3) {
-        out << "Thresholds: Q1=" << fmt::format("{:.3f}", thresholds[0])
-            << ", Q2=" << fmt::format("{:.3f}", thresholds[1])
-            << ", Q3=" << fmt::format("{:.3f}", thresholds[2]) << ", Q4="
-            << (has_observed_income ? fmt::format("{:.3f}", observed_income_max)
-                                    : std::string("n/a"))
-            << '\n';
-    } else if (categories != "4" && thresholds.size() >= 2) {
-        out << "Thresholds: T1=" << fmt::format("{:.3f}", thresholds[0])
-            << ", T2=" << fmt::format("{:.3f}", thresholds[1]) << '\n';
+        << " project_requirements.categories=" << layout.count << '\n';
+    if (!thresholds.empty()) {
+        out << "Thresholds:";
+        for (std::size_t i = 0; i < thresholds.size(); ++i) {
+            out << " P" << (i + 1) << "=" << fmt::format("{:.3f}", thresholds[i]);
+        }
+        if (layout.count > thresholds.size()) {
+            out << ", P" << (thresholds.size() + 1) << "="
+                << (has_observed_income ? fmt::format("{:.3f}", observed_income_max)
+                                        : std::string("n/a"));
+        }
+        out << '\n';
     }
     out << "+----------+--------+-------------+-------------+-------------+\n";
     out << "| Category | Count  | Income Min  | Income Max  | Income Mean |\n";
     out << "+----------+--------+-------------+-------------+-------------+\n";
-    const std::vector<std::string> labels =
-        categories == "4" ? std::vector<std::string>{"Low", "LowerMid", "UpperMid", "High"}
-                          : std::vector<std::string>{"Low", "Middle", "High"};
     for (std::size_t i = 0; i < summaries.size(); ++i) {
         const auto &s = summaries[i];
-        out << "| " << std::setw(8) << std::left << labels[i] << std::right << " | " << std::setw(6)
-            << s.count << " | ";
+        out << "| " << std::setw(8) << std::left << layout.labels[i] << std::right << " | "
+            << std::setw(6) << s.count << " | ";
         if (s.count == 0) {
             out << std::setw(11) << "n/a"
                 << " | " << std::setw(11) << "n/a"
@@ -471,7 +409,7 @@ StaticLinearModel::StaticLinearModel(
     std::shared_ptr<std::vector<double>> income_trend_lambda,
     std::shared_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors,
     bool is_continuous_income_model, const LinearModelParams &continuous_income_model,
-    std::string income_categories,
+    core::IncomeCategoryLayout income_category_layout,
     const std::unordered_map<core::Identifier, PhysicalActivityModel> &physical_activity_models,
     const std::vector<IncomeStratumExpectedTableEntry> &income_stratum_expected_tables,
     bool income_stratum_adjustment_enabled, std::size_t adjustment_income_stratum_count,
@@ -483,7 +421,7 @@ StaticLinearModel::StaticLinearModel(
       // Continuous income model support (FINCH approach) - must come first
       is_continuous_income_model_{is_continuous_income_model},
       continuous_income_model_{continuous_income_model},
-      income_categories_{std::move(income_categories)},
+      income_category_layout_{std::move(income_category_layout)},
       // Regular trend member variables - these are shared_ptr, so we can move them
       expected_trend_{std::move(expected_trend)},
       expected_trend_boxcox_{std::move(expected_trend_boxcox)},
@@ -899,13 +837,12 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
                       << " max=" << max_inc << " mean=" << (sum_inc / static_cast<double>(n_inc))
                       << " n=" << n_inc;
         }
-        const std::vector<double> thresholds =
-            income_categories_ == "4" ? calculate_income_quartiles(context.population())
-                                      : calculate_income_tertiles(context.population());
-        assign_income_categories_equal_split(context.population(), income_categories_);
+        const std::vector<double> thresholds = calculate_income_percentile_thresholds(
+            context.population(), income_category_layout_.count);
+        assign_income_categories_equal_split(context.population(), income_category_layout_);
         if (should_print_income_summary_tables(context)) {
-            print_final_income_category_table(context.population(), income_categories_, thresholds,
-                                              context.time_now(), "initial");
+            print_final_income_category_table(context.population(), income_category_layout_,
+                                              thresholds, context.time_now(), "initial");
         }
     }
 
@@ -1035,7 +972,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         if (is_continuous_income_model_) {
             // MAHIMA: Clamping is intentionally disabled in the trended path as well,
             // to keep bucketing based on full adjusted income variation.
-            assign_income_categories_equal_split(context.population(), income_categories_);
+            assign_income_categories_equal_split(context.population(), income_category_layout_);
         }
     } else {
         // MAHIMA: Skipped because user set trend.enabled or risk_factors.trended false in
@@ -1184,13 +1121,12 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
         // MAHIMA: Reassign using equal-population rank buckets; this
         // removes redundant quartile/tertile recalculation and avoids tie-at-max
         // edge cases where the highest category can become empty.
-        const std::vector<double> thresholds =
-            income_categories_ == "4" ? calculate_income_quartiles(context.population())
-                                      : calculate_income_tertiles(context.population());
-        assign_income_categories_equal_split(context.population(), income_categories_);
+        const std::vector<double> thresholds = calculate_income_percentile_thresholds(
+            context.population(), income_category_layout_.count);
+        assign_income_categories_equal_split(context.population(), income_category_layout_);
         if (should_print_income_summary_tables(context)) {
-            print_final_income_category_table(context.population(), income_categories_, thresholds,
-                                              context.time_now(), "yearly-initial");
+            print_final_income_category_table(context.population(), income_category_layout_,
+                                              thresholds, context.time_now(), "yearly-initial");
         }
     }
 
@@ -1340,12 +1276,11 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             // MAHIMA: Trended path uses the same balanced rank assignment,
             // keeping behaviour identical to initial assignment and avoiding
             // repeated threshold scans.
-            assign_income_categories_equal_split(context.population(), income_categories_);
+            assign_income_categories_equal_split(context.population(), income_category_layout_);
             if (should_print_income_summary_tables(context)) {
-                const std::vector<double> thresholds =
-                    income_categories_ == "4" ? calculate_income_quartiles(context.population())
-                                              : calculate_income_tertiles(context.population());
-                print_final_income_category_table(context.population(), income_categories_,
+                const std::vector<double> thresholds = calculate_income_percentile_thresholds(
+                    context.population(), income_category_layout_.count);
+                print_final_income_category_table(context.population(), income_category_layout_,
                                                   thresholds, context.time_now(), "yearly-trended");
             }
         }
@@ -2211,79 +2146,74 @@ std::vector<double> StaticLinearModel::calculate_income_tertiles(const Populatio
     return tertile_thresholds;
 }
 
+std::vector<double>
+StaticLinearModel::calculate_income_percentile_thresholds(const Population &population,
+                                                          std::size_t bucket_count) {
+    if (bucket_count < 2u) {
+        return {};
+    }
+    if (bucket_count == 3u) {
+        return calculate_income_tertiles(population);
+    }
+    if (bucket_count == 4u) {
+        return calculate_income_quartiles(population);
+    }
+
+    std::vector<double> sorted_incomes;
+    sorted_incomes.reserve(population.size());
+    for (const auto &person : population) {
+        if (person.is_active()) {
+            auto it = person.risk_factors.find("income"_id);
+            if (it != person.risk_factors.end()) {
+                sorted_incomes.push_back(it->second);
+            }
+        }
+    }
+    if (sorted_incomes.empty()) {
+        throw core::HgpsException(
+            "No continuous income values found in population for percentile calculation");
+    }
+
+    std::ranges::sort(sorted_incomes);
+    const std::size_t n = sorted_incomes.size();
+    std::vector<double> thresholds(bucket_count - 1u);
+    for (std::size_t i = 0; i < thresholds.size(); ++i) {
+        const double percentile = static_cast<double>(i + 1u) / static_cast<double>(bucket_count);
+        auto index = static_cast<std::size_t>(std::round((n - 1) * percentile));
+        if (index >= n) {
+            index = n - 1;
+        }
+        thresholds[i] = sorted_incomes[index];
+    }
+    return thresholds;
+}
+
 core::Income StaticLinearModel::convert_income_continuous_to_category(double continuous_income,
                                                                       const Population &population,
                                                                       Random & /*random*/) const {
-    if (income_categories_ == "4") {
-        // 4-category system: low, lowermiddle, uppermiddle, high
-        // Use quartiles: 0-25% (low), 26-50% (lowermiddle), 51-75% (uppermiddle), above 75% (high)
-        // Q1 = 25th percentile, Q2 = 50th percentile, Q3 = 75th percentile
-        std::vector<double> quartile_thresholds = calculate_income_quartiles(population);
-        if (continuous_income <= quartile_thresholds[0]) {
-            return core::Income::low; // 0-25%: income <= Q1
-        }
-        if (continuous_income <= quartile_thresholds[1]) {
-            return core::Income::lowermiddle; // 26-50%: Q1 < income <= Q2
-        }
-        if (continuous_income <= quartile_thresholds[2]) {
-            return core::Income::uppermiddle; // 51-75%: Q2 < income <= Q3
-        }
-        return core::Income::high; // above 75%: income > Q3
-    }
-    // 3-category system: low, middle, high
-    // Use tertiles: 0-33% (low), 34-67% (middle), above 67% (high)
-    std::vector<double> tertile_thresholds = calculate_income_tertiles(population);
-    if (continuous_income <= tertile_thresholds[0]) {
-        return core::Income::low; // 0-33%
-    }
-    if (continuous_income <= tertile_thresholds[1]) {
-        return core::Income::middle; // 34-67%
-    }
-    return core::Income::high; // above 67%
+    const std::vector<double> thresholds =
+        calculate_income_percentile_thresholds(population, income_category_layout_.count);
+    return convert_income_to_category(continuous_income, thresholds);
 }
 
-// Optimized version: uses pre-calculated thresholds (no population scan)
-// For 4 categories: thresholds contains quartiles [Q1, Q2, Q3] (25th, 50th, 75th percentiles)
-// For 3 categories: thresholds contains tertiles [T1, T2] (33rd, 67th percentiles)
+// Optimized version: uses pre-calculated thresholds (no population scan).
 core::Income
 StaticLinearModel::convert_income_to_category(double continuous_income,
                                               const std::vector<double> &thresholds) const {
-    if (income_categories_ == "4") {
-        // 4-category system: low, lowermiddle, uppermiddle, high
-        // Use quartiles: 0-25% (low), 26-50% (lowermiddle), 51-75% (uppermiddle), above 75% (high)
-        // Q1 = 25th percentile, Q2 = 50th percentile, Q3 = 75th percentile
-        // thresholds should contain [Q1, Q2, Q3]
-        if (thresholds.size() < 3) {
-            throw core::HgpsException("Invalid quartile thresholds for 4-category income system. "
-                                      "Expected 3 thresholds, got " +
-                                      std::to_string(thresholds.size()));
-        }
-        if (continuous_income <= thresholds[0]) {
-            return core::Income::low; // 0-25%: income <= Q1
-        }
-        if (continuous_income <= thresholds[1]) {
-            return core::Income::lowermiddle; // 26-50%: Q1 < income <= Q2
-        }
-        if (continuous_income <= thresholds[2]) {
-            return core::Income::uppermiddle; // 51-75%: Q2 < income <= Q3
-        }
-        return core::Income::high; // above 75%: income > Q3
+    const std::size_t expected_thresholds =
+        income_category_layout_.count > 0u ? income_category_layout_.count - 1u : 0u;
+    if (thresholds.size() < expected_thresholds) {
+        throw core::HgpsException(fmt::format(
+            "Invalid income thresholds for {}-category income system. Expected {}, got {}",
+            income_category_layout_.count, expected_thresholds, thresholds.size()));
     }
-    // 3-category system: low, middle, high
-    // Use tertiles: 0-33% (low), 34-67% (middle), above 67% (high)
-    // thresholds should contain [T1, T2]
-    if (thresholds.size() < 2) {
-        throw core::HgpsException("Invalid tertile thresholds for 3-category income system. "
-                                  "Expected 2 thresholds, got " +
-                                  std::to_string(thresholds.size()));
+
+    for (std::size_t i = 0; i < expected_thresholds; ++i) {
+        if (continuous_income <= thresholds[i]) {
+            return income_category_layout_.strata[i];
+        }
     }
-    if (continuous_income <= thresholds[0]) {
-        return core::Income::low; // 0-33%
-    }
-    if (continuous_income <= thresholds[1]) {
-        return core::Income::middle; // 34-67%
-    }
-    return core::Income::high; // above 67%
+    return income_category_layout_.strata.back();
 }
 
 void StaticLinearModel::initialise_physical_activity(RuntimeContext &context, Person &person,
@@ -2444,7 +2374,7 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::unique_ptr<std::vector<double>> income_trend_lambda,
     std::unique_ptr<std::unordered_map<core::Identifier, double>> income_trend_decay_factors,
     bool is_continuous_income_model, const LinearModelParams &continuous_income_model,
-    std::string income_categories,
+    core::IncomeCategoryLayout income_category_layout,
     const std::unordered_map<core::Identifier, PhysicalActivityModel> &physical_activity_models,
     const std::vector<IncomeStratumExpectedTableEntry> &income_stratum_expected_tables,
     bool income_stratum_adjustment_enabled, std::size_t adjustment_income_stratum_count,
@@ -2523,7 +2453,7 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
       // Continuous income model support (FINCH approach) - must be in declaration order
       is_continuous_income_model_{is_continuous_income_model},
       continuous_income_model_{continuous_income_model},
-      income_categories_{std::move(income_categories)},
+      income_category_layout_{std::move(income_category_layout)},
       // Policy optimization flag - Mahima - must be last (declaration order)
       has_active_policies_{has_active_policies} {
 
@@ -2663,7 +2593,7 @@ std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() con
         physical_activity_stddev_, trend_type_, expected_income_trend_,
         expected_income_trend_boxcox_, income_trend_steps_, income_trend_models_,
         income_trend_ranges_, income_trend_lambda_, income_trend_decay_factors_,
-        is_continuous_income_model_, continuous_income_model_, income_categories_,
+        is_continuous_income_model_, continuous_income_model_, income_category_layout_,
         physical_activity_models_, income_stratum_expected_tables_,
         income_stratum_adjustment_enabled_, adjustment_income_stratum_count_, has_active_policies_,
         logistic_models_);

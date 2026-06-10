@@ -58,9 +58,10 @@
                     "type": "string",
                     "enum": [
                         "3",
-                        "4"
+                        "4",
+                        "5"
                     ],
-                    "description": "Number of income categories (3 or 4)"
+                    "description": "Number of income categories (3, 4, or 5)"
                 },
                 "adjust_to_factors_mean": {
                     "type": "boolean",

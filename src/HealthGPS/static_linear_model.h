@@ -1,5 +1,6 @@
 #pragma once
 
+#include "HealthGPS.Core/income_category_layout.h"
 #include "interfaces.h"
 #include "mapping.h"
 #include "risk_factor_adjustable_model.h"
@@ -82,7 +83,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// (FINCH approach)
     /// @param continuous_income_model The continuous income model parameters (if using FINCH
     /// approach)
-    /// @param income_categories The number of income categories (3 or 4)
+    /// @param income_category_layout Final income category buckets from project_requirements
     /// @throws HgpsException for invalid arguments
     StaticLinearModel(
         std::shared_ptr<RiskFactorSexAgeTable> expected,
@@ -114,7 +115,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
             nullptr,
         bool is_continuous_income_model = false,
         const LinearModelParams &continuous_income_model = LinearModelParams{},
-        std::string income_categories = "3",
+        core::IncomeCategoryLayout income_category_layout = {},
         /// @param physical_activity_models Physical activity models for both India (simple) and
         /// FINCH (continuous) approaches
         const std::unordered_map<core::Identifier, PhysicalActivityModel>
@@ -215,7 +216,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     // Continuous income model support (FINCH approach)
     bool is_continuous_income_model_;
     LinearModelParams continuous_income_model_;
-    std::string income_categories_;
+    core::IncomeCategoryLayout income_category_layout_;
 
     /// @brief Calculate continuous income using FINCH approach
     /// @param person The person to calculate income for
@@ -249,6 +250,10 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param population The population to calculate tertiles from
     /// @return Vector of tertile thresholds [T1 (33rd), T2 (67th)]
     static std::vector<double> calculate_income_tertiles(const Population &population);
+
+    /// @brief Calculate percentile thresholds for debug output (bucket_count - 1 cut points).
+    static std::vector<double> calculate_income_percentile_thresholds(const Population &population,
+                                                                      std::size_t bucket_count);
 
     /// @brief Initialise income using categorical approach (India method)
     /// @param person The person to initialise income for
@@ -382,7 +387,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     /// (FINCH approach)
     /// @param continuous_income_model The continuous income model parameters (if using FINCH
     /// approach)
-    /// @param income_categories The number of income categories (3 or 4)
+    /// @param income_category_layout Final income category buckets from project_requirements
     /// @throws HgpsException for invalid arguments
     StaticLinearModelDefinition(
         std::unique_ptr<RiskFactorSexAgeTable> expected,
@@ -413,7 +418,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
             nullptr,
         bool is_continuous_income_model = false,
         const LinearModelParams &continuous_income_model = LinearModelParams{},
-        std::string income_categories = "3",
+        core::IncomeCategoryLayout income_category_layout = {},
         const std::unordered_map<core::Identifier, PhysicalActivityModel>
             &physical_activity_models = {},
         const std::vector<IncomeStratumExpectedTableEntry> &income_stratum_expected_tables = {},
@@ -474,7 +479,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     // Continuous income model support (FINCH approach)
     bool is_continuous_income_model_;
     LinearModelParams continuous_income_model_;
-    std::string income_categories_;
+    core::IncomeCategoryLayout income_category_layout_;
     // Policy optimization flag - Mahima
     bool has_active_policies_;
 };

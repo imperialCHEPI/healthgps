@@ -6,6 +6,7 @@
 #include <memory>
 #include <mutex>
 
+#include "HealthGPS.Core/income_category_layout.h"
 #include "model_info.h"
 #include "result_writer.h"
 
@@ -24,10 +25,10 @@ class ResultFileWriter final : public ResultWriter {
     /// @param info The associated experiment information
     /// @param write_income_csv When true, write income-based CSV files (one per category). When
     /// false, do not.
-    /// @param income_categories Final person.income bucket count from project_requirements ("3"
-    /// or "4"); controls which *_Income.csv files are created.
+    /// @param income_category_layout Final person.income buckets from project_requirements.
     ResultFileWriter(const std::filesystem::path &file_name, ExperimentInfo info,
-                     bool write_income_csv = true, std::string income_categories = "4");
+                     bool write_income_csv = true,
+                     core::IncomeCategoryLayout income_category_layout = {});
 
     ResultFileWriter(const ResultFileWriter &) = delete;
     ResultFileWriter &operator=(const ResultFileWriter &) = delete;
@@ -48,7 +49,7 @@ class ResultFileWriter final : public ResultWriter {
     std::map<core::Income, std::unique_ptr<std::mutex>> income_mutexes_;
     ExperimentInfo info_;
     bool write_income_csv_{true};
-    std::string income_categories_{"4"};
+    core::IncomeCategoryLayout income_category_layout_{};
     std::filesystem::path base_filename_;
     std::atomic<bool> first_row_{true};
     std::mutex lock_mutex_;
@@ -80,8 +81,8 @@ class ResultFileWriter final : public ResultWriter {
     /// @param message The result event message
     /// @param income The income category
     /// @param income_csv The output file stream for this income category
-    static void write_income_csv_data(const hgps::ResultEventMessage &message, core::Income income,
-                                      std::ofstream &income_csv);
+    void write_income_csv_data(const hgps::ResultEventMessage &message, core::Income income,
+                               std::ofstream &income_csv);
 
     /// @brief Generates filename for income-based CSV files
     /// @param base_filename The base filename

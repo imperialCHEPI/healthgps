@@ -1,3 +1,4 @@
+#include "HealthGPS.Core/income_category_layout.h"
 #include "HealthGPS.Core/thread_util.h"
 #include "HealthGPS.Input/api.h"
 #include "HealthGPS.Input/configuration.h"
@@ -51,7 +52,9 @@ hgps::ResultFileWriter create_results_file_logger(const hgps::input::Configurati
                                                      : "",
                                  .job_id = config.job_id,
                                  .seed = input.seed().value_or(0u)},
-            write_income_csv, input.project_requirements().income.categories};
+            write_income_csv,
+            hgps::core::income_category_layout_from_config(
+                input.project_requirements().income.categories)};
 }
 
 /// @brief Prints application exit message

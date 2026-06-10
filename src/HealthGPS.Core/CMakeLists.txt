@@ -31,6 +31,8 @@ target_sources(
             "datastore.h"
             "disease.h"
             "forward_type.h"
+            "income_category_layout.cpp"
+            "income_category_layout.h"
             "indicator.h"
             "mortality.h"
             "poco.h"
