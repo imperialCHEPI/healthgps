@@ -10,7 +10,10 @@
 #include "configuration.h"
 #include "poco.h"
 
+#include "HealthGPS.Core/income_category_layout.h"
+
 #include <fmt/color.h>
+#include <fmt/core.h>
 #include <nlohmann/json.hpp>
 
 #include <filesystem>
@@ -110,4 +113,78 @@ BaselineInfo get_baseline_info(const nlohmann::json &j, const std::filesystem::p
 /// @param config Config object to update
 /// @throw ConfigurationError: Could not load interventions
 void load_interventions(const nlohmann::json &running, Configuration &config);
+
+/// @brief Reject deprecated root-level fields when project_requirements is the source of truth.
+inline void reject_deprecated_root_config_fields(const nlohmann::json &opt) {
+    if (!opt.contains("project_requirements")) {
+        return;
+    }
+    if (opt.contains("trend_type") || opt.contains("income_categories")) {
+        throw ConfigurationError{
+            "Deprecated root-level trend_type and/or income_categories are not allowed when "
+            "project_requirements is present. Use project_requirements.trend and "
+            "project_requirements.income.categories instead."};
+    }
+}
+
+inline void validate_legacy_trend_type_string(const std::string &trend_type) {
+    if (trend_type != "null" && trend_type != "trend" && trend_type != "upf_trend" &&
+        trend_type != "UPFTrend" && trend_type != "income_trend") {
+        throw ConfigurationError{fmt::format("Invalid trend_type: {}. Must be one of: null, trend, "
+                                             "upf_trend, UPFTrend, income_trend",
+                                             trend_type)};
+    }
+}
+
+/// @brief Map legacy root-level trend_type / income_categories into project_requirements.
+inline void apply_legacy_root_config_fields(const nlohmann::json &opt, ProjectRequirements &req) {
+    if (opt.contains("trend_type")) {
+        const auto trend_type = opt["trend_type"].get<std::string>();
+        validate_legacy_trend_type_string(trend_type);
+        req.trend.type = trend_type;
+        req.trend.enabled = trend_type != "null";
+    }
+    if (opt.contains("income_categories")) {
+        const auto categories = opt["income_categories"].get<std::string>();
+        (void)core::income_category_layout_from_config(categories);
+        req.income.categories = categories;
+    }
+}
+
+/// @brief Parse project_requirements block from config.json.
+inline void parse_project_requirements_block(const nlohmann::json &pr, ProjectRequirements &req) {
+    const auto &d = pr["demographics"];
+    req.demographics.age = d["age"].get<bool>();
+    req.demographics.gender = d["gender"].get<bool>();
+    req.demographics.region = d["region"].get<bool>();
+    req.demographics.ethnicity = d["ethnicity"].get<bool>();
+    if (d.contains("max_age_for_linear_models") && !d["max_age_for_linear_models"].is_null()) {
+        req.demographics.max_age_for_linear_models = d["max_age_for_linear_models"].get<int>();
+    }
+    const auto &inc = pr["income"];
+    req.income.enabled = inc["enabled"].get<bool>();
+    req.income.type = inc["type"].get<std::string>();
+    req.income.categories = inc["categories"].get<std::string>();
+    req.income.adjust_to_factors_mean = inc["adjust_to_factors_mean"].get<bool>();
+    req.income.trended = inc["trended"].get<bool>();
+    if (inc.contains("income_based_csv_output")) {
+        req.income.income_based_csv_output = inc["income_based_csv_output"].get<bool>();
+    }
+    const auto &pa = pr["physical_activity"];
+    req.physical_activity.enabled = pa["enabled"].get<bool>();
+    req.physical_activity.type = pa["type"].get<std::string>();
+    req.physical_activity.adjust_to_factors_mean = pa["adjust_to_factors_mean"].get<bool>();
+    req.physical_activity.trended = pa["trended"].get<bool>();
+    const auto &rf = pr["risk_factors"];
+    req.risk_factors.adjust_to_factors_mean = rf["adjust_to_factors_mean"].get<bool>();
+    req.risk_factors.trended = rf["trended"].get<bool>();
+    const auto &tr = pr["trend"];
+    req.trend.enabled = tr["enabled"].get<bool>();
+    req.trend.type = tr["type"].get<std::string>();
+    const auto &ts = pr["two_stage"];
+    req.two_stage.use_logistic = ts["use_logistic"].get<bool>();
+    if (ts.contains("logistic_file") && !ts["logistic_file"].is_null()) {
+        req.two_stage.logistic_file = ts["logistic_file"].get<std::string>();
+    }
+}
 } // namespace hgps::input
