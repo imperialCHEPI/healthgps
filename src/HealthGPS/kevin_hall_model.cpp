@@ -301,9 +301,9 @@ void print_weight_stratum_assignment_table(
     std::cout << out.str() << std::flush;
 }
 
-void print_weight_by_final_income_category_table(
-    const hgps::Population &population, const hgps::core::IncomeCategoryLayout &layout, int year,
-    std::string_view phase) {
+void print_weight_by_final_income_category_table(const hgps::Population &population,
+                                                 const hgps::core::IncomeCategoryLayout &layout,
+                                                 int year, std::string_view phase) {
     const hgps::core::Identifier weight_id("Weight");
     std::vector<WeightBucketSummary> summaries(layout.count);
 
@@ -341,8 +341,7 @@ void print_weight_by_final_income_category_table(
     for (std::size_t i = 0; i < summaries.size(); ++i) {
         const auto &summary = summaries[i];
         out << "| " << std::setw(8) << std::left << layout.labels[i] << std::right << " | "
-            << std::setw(6)
-            << summary.count << " | ";
+            << std::setw(6) << summary.count << " | ";
         if (summary.count == 0) {
             out << std::setw(11) << "n/a"
                 << " | " << std::setw(11) << "n/a"
@@ -359,9 +358,9 @@ void print_weight_by_final_income_category_table(
     std::cout << out.str() << std::flush;
 }
 
-void print_height_by_final_income_category_table(
-    const hgps::Population &population, const hgps::core::IncomeCategoryLayout &layout, int year,
-    std::string_view phase) {
+void print_height_by_final_income_category_table(const hgps::Population &population,
+                                                 const hgps::core::IncomeCategoryLayout &layout,
+                                                 int year, std::string_view phase) {
     const hgps::core::Identifier height_id("Height");
     std::vector<HeightBucketSummary> summaries(layout.count);
 
@@ -399,8 +398,7 @@ void print_height_by_final_income_category_table(
     for (std::size_t i = 0; i < summaries.size(); ++i) {
         const auto &summary = summaries[i];
         out << "| " << std::setw(8) << std::left << layout.labels[i] << std::right << " | "
-            << std::setw(6)
-            << summary.count << " | ";
+            << std::setw(6) << summary.count << " | ";
         if (summary.count == 0) {
             out << std::setw(11) << "n/a"
                 << " | " << std::setw(11) << "n/a"

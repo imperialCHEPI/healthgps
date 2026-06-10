@@ -2,8 +2,8 @@
 
 #include "HealthGPS.Core/api.h"
 #include "HealthGPS.Core/exception.h"
-#include "HealthGPS.Core/income_category_layout.h"
 #include "HealthGPS.Core/identifier.h"
+#include "HealthGPS.Core/income_category_layout.h"
 #include "HealthGPS.Input/model_parser.h"
 #include "HealthGPS/baseline_scenario.h"
 #include "HealthGPS/event_bus.h"

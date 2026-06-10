@@ -2178,8 +2178,7 @@ StaticLinearModel::calculate_income_percentile_thresholds(const Population &popu
     const std::size_t n = sorted_incomes.size();
     std::vector<double> thresholds(bucket_count - 1u);
     for (std::size_t i = 0; i < thresholds.size(); ++i) {
-        const double percentile =
-            static_cast<double>(i + 1u) / static_cast<double>(bucket_count);
+        const double percentile = static_cast<double>(i + 1u) / static_cast<double>(bucket_count);
         auto index = static_cast<std::size_t>(std::round((n - 1) * percentile));
         if (index >= n) {
             index = n - 1;
@@ -2200,10 +2199,9 @@ core::Income StaticLinearModel::convert_income_continuous_to_category(double con
 // Optimized version: uses pre-calculated thresholds (no population scan).
 core::Income
 StaticLinearModel::convert_income_to_category(double continuous_income,
-                                            const std::vector<double> &thresholds) const {
-    const std::size_t expected_thresholds = income_category_layout_.count > 0u
-                                                ? income_category_layout_.count - 1u
-                                                : 0u;
+                                              const std::vector<double> &thresholds) const {
+    const std::size_t expected_thresholds =
+        income_category_layout_.count > 0u ? income_category_layout_.count - 1u : 0u;
     if (thresholds.size() < expected_thresholds) {
         throw core::HgpsException(fmt::format(
             "Invalid income thresholds for {}-category income system. Expected {}, got {}",

@@ -393,8 +393,7 @@ void ResultFileWriter::write_income_csv_data(const hgps::ResultEventMessage &mes
     const auto &series = message.content.series;
     double file_income_category_value = 0.0;
     try {
-        file_income_category_value =
-            core::income_category_numeric(income, income_category_layout_);
+        file_income_category_value = core::income_category_numeric(income, income_category_layout_);
     } catch (const core::HgpsException &) {
         file_income_category_value = 0.0;
     }
