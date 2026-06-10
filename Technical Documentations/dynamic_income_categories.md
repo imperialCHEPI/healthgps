@@ -54,8 +54,6 @@ flowchart TD
     FC --> AN
 ```
 
-
-
 **Enum ceiling:** `core::Income` supports at most 5 final buckets (`low`, `lowermiddle`, `middle`, `uppermiddle`, `high`). No `Person` or enum changes required.
 
 ---
@@ -79,13 +77,11 @@ double income_category_numeric(core::Income income, const IncomeCategoryLayout &
 
 **Mapping tables (single definition):**
 
-
 | count | strata (in order)                           |
 | ----- | ------------------------------------------- |
 | 3     | low, middle, high                           |
 | 4     | low, lowermiddle, uppermiddle, high         |
 | 5     | low, lowermiddle, middle, uppermiddle, high |
-
 
 **Numeric encoding** (`income_category_numeric`):
 
@@ -133,13 +129,18 @@ void assign_equal_rank_buckets(Population &pop, std::size_t bucket_count, SetBuc
 ```
 
 1. **Refactor existing functions** to call it:
-  - `assign_income_adjustment_strata_equal_split` → sets `income_adjustment_stratum` (unchanged behavior, N from config).
-  - `assign_income_categories_equal_split` → uses `layout.count` + `income_from_equal_split_bucket`.
+
+- `assign_income_adjustment_strata_equal_split` → sets `income_adjustment_stratum` (unchanged behavior, N from config).
+- `assign_income_categories_equal_split` → uses `layout.count` + `income_from_equal_split_bucket`.
+
 2. **Replace all `income_categories_ == "4"` branches** with `income_category_layout_.count`:
-  - Threshold selection for debug printouts: add `calculate_percentile_thresholds(population, layout.count)` (generalizes existing `calculate_income_tertiles` / `calculate_income_quartiles`; keep old functions as thin wrappers or inline callers to minimize diff).
-  - `convert_income_continuous_to_category` / `convert_income_to_category`: branch on `layout.count` (3/4/5) using shared thresholds helper.
+
+- Threshold selection for debug printouts: add `calculate_percentile_thresholds(population, layout.count)` (generalizes existing `calculate_income_tertiles` / `calculate_income_quartiles`; keep old functions as thin wrappers or inline callers to minimize diff).
+- `convert_income_continuous_to_category` / `convert_income_to_category`: branch on `layout.count` (3/4/5) using shared thresholds helper.
+
 3. **Fix summary tables** (`print_final_income_category_table`):
-  - Use `layout.count`, `layout.labels`, and `income_table_index(person.income, layout)` — **do not** merge `lowermiddle` + `middle` when count is 5.
+
+- Use `layout.count`, `layout.labels`, and `income_table_index(person.income, layout)` — **do not** merge `lowermiddle` + `middle` when count is 5.
 
 No change to stratum adjustment gating (`income_stratum_adjustment_enabled_`, `adjustment_income_stratum_count_`) — already dynamic.
 
@@ -147,14 +148,12 @@ No change to stratum adjustment gating (`income_stratum_adjustment_enabled_`, `a
 
 ## Phase 4 — Downstream consumers
 
-
 | File                                                                                            | Change                                                                                                                                                                                            |
 | ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `[src/HealthGPS/analysis_module.cpp](src/HealthGPS/analysis_module.cpp)`                        | `configured_income_strata` returns `layout.strata` from `project_requirements.income.categories`. Use `income_category_numeric` where category count is known for income-stratified output paths. |
 | `[src/HealthGPS.Console/result_file_writer.h/.cpp](src/HealthGPS.Console/result_file_writer.h)` | Store `IncomeCategoryLayout` instead of `std::string income_categories_`; `merge_configured_income_strata` and `income_category_numeric` delegate to layout.                                      |
 | `[src/HealthGPS.Console/program.cpp](src/HealthGPS.Console/program.cpp)`                        | Pass `income_category_layout_from_config(input.project_requirements().income.categories)` to `ResultFileWriter`.                                                                                  |
 | `[src/HealthGPS/kevin_hall_model.cpp](src/HealthGPS/kevin_hall_model.cpp)`                      | `print_weight_by_final_income_category_table` / `print_height_by_final_income_category_table`: take `IncomeCategoryLayout` (or parse once at call site from context); fix 5-way indexing.         |
-
 
 **Optional small win** — `[src/HealthGPS/data_series.cpp](src/HealthGPS/data_series.cpp)`: where analysis sets up channels, prefer `add_income_channels_for_categories(keys, layout.strata)` over hardcoded 5-enum loop (only if a natural call site exists after analysis refactor; skip if it adds scope).
 
@@ -193,4 +192,3 @@ Register new test file in `[src/HealthGPS.Tests/CMakeLists.txt](src/HealthGPS.Te
 1. Build + run `HealthGPS.Tests` (especially new layout test, ResultFileWriter, IncomeStratumAdjustment, KevinHallHeight).
 2. Manual smoke: config with `categories: "5"` and `income_stratum_factors_mean.enabled: true`, `adjustment_income_stratum_count: 5` — Kevin Hall uses quintile strata; final output has five income CSVs.
 3. Regression: existing `"3"` and `"4"` tests pass unchanged behavior.
-

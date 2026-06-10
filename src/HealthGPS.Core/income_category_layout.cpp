@@ -10,9 +10,8 @@ namespace {
 
 IncomeCategoryLayout make_layout(std::size_t count, std::vector<Income> strata,
                                  std::vector<std::string> labels) {
-    return IncomeCategoryLayout{.count = count,
-                                .strata = std::move(strata),
-                                .labels = std::move(labels)};
+    return IncomeCategoryLayout{
+        .count = count, .strata = std::move(strata), .labels = std::move(labels)};
 }
 
 } // namespace
@@ -23,18 +22,19 @@ IncomeCategoryLayout income_category_layout_from_config(std::string_view categor
                            {"Low", "Middle", "High"});
     }
     if (categories == "4") {
-        return make_layout(4u, {Income::low, Income::lowermiddle, Income::uppermiddle, Income::high},
+        return make_layout(4u,
+                           {Income::low, Income::lowermiddle, Income::uppermiddle, Income::high},
                            {"Low", "LowerMid", "UpperMid", "High"});
     }
     if (categories == "5") {
-        return make_layout(5u,
-                           {Income::low, Income::lowermiddle, Income::middle, Income::uppermiddle,
-                            Income::high},
-                           {"Low", "LowerMid", "Middle", "UpperMid", "High"});
+        return make_layout(
+            5u,
+            {Income::low, Income::lowermiddle, Income::middle, Income::uppermiddle, Income::high},
+            {"Low", "LowerMid", "Middle", "UpperMid", "High"});
     }
-    throw HgpsException{fmt::format(
-        R"(project_requirements.income.categories must be "3", "4", or "5". Got: "{}")",
-        categories)};
+    throw HgpsException{
+        fmt::format(R"(project_requirements.income.categories must be "3", "4", or "5". Got: "{}")",
+                    categories)};
 }
 
 std::size_t income_table_index(Income income, const IncomeCategoryLayout &layout) {
@@ -43,9 +43,8 @@ std::size_t income_table_index(Income income, const IncomeCategoryLayout &layout
             return i;
         }
     }
-    throw HgpsException{
-        fmt::format("Income category is not part of the configured {}-category layout",
-                    layout.count)};
+    throw HgpsException{fmt::format(
+        "Income category is not part of the configured {}-category layout", layout.count)};
 }
 
 Income income_from_equal_split_bucket(std::size_t bucket, const IncomeCategoryLayout &layout) {
