@@ -160,6 +160,7 @@ export interface ScenarioTimeline {
   current_year: number;
   progress_pct: number;
   active: boolean;
+  status?: "waiting" | "running" | "complete" | "skipped";
 }
 
 export interface PipelineModule {
@@ -211,7 +212,6 @@ export interface VisualizationBundle {
     variables: { id: string; label: string; category: string; unit: string }[];
     time_axis: { id: string; label: string; category: string };
     chart_types: { id: string; label: string }[];
-    default_charts: (ResultChart & { chart_type?: string; variable_id?: string })[];
     result_file: string | null;
   };
   scenario1: { pipeline: { modules: PipelineModule[] }; validation_hint: string };

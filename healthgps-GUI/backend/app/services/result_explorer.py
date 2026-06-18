@@ -82,7 +82,18 @@ def extract_result_variables(rows: list[dict]) -> list[dict[str, str]]:
 
 
 TIME_AXIS = "__time__"
-CHART_TYPES = ("line", "bar", "scatter")
+CHART_TYPES = (
+    "line",
+    "area",
+    "bar",
+    "column",
+    "scatter",
+    "step",
+    "smooth",
+    "pie",
+    "stacked_bar",
+    "combo",
+)
 
 
 def _label_for_var(var_id: str, variables: list[dict[str, str]] | None = None) -> str:
@@ -128,7 +139,7 @@ def chart_for_axes(
 
         by_source.setdefault(source, []).append({"x": float(x_val), "y": float(y_val)})
 
-    min_points = 1 if chart_type == "scatter" else 2
+    min_points = 1 if chart_type in ("scatter", "pie") else 2
     out: list[dict[str, Any]] = []
     for source in sorted(by_source.keys()):
         points = sorted(by_source[source], key=lambda p: (p["x"], p["y"]))
@@ -207,17 +218,24 @@ def scenario_timelines(
                 "current_year": start_year,
                 "progress_pct": 0.0,
                 "active": False,
+                "status": "waiting",
             }
-        latest = max(matched, key=lambda r: int(r.get("time", 0)))
-        year = int(latest.get("time", start_year))
-        pct = min(100.0, max(0.0, ((year - start_year) / span) * 100.0))
+        year = max(int(r.get("time", start_year)) for r in matched)
+        done = year >= stop_year
+        pct = 100.0 if done else min(100.0, ((year - start_year) / span) * 100.0)
         return {
-            "current_year": year,
+            "current_year": stop_year if done else year,
             "progress_pct": round(pct, 1),
-            "active": True,
+            "active": not done,
+            "status": "complete" if done else "running",
         }
 
-    return {
-        "baseline": timeline_for("Baseline"),
-        "intervention": timeline_for("Intervention"),
-    }
+    baseline = timeline_for("Baseline")
+    intervention = timeline_for("Intervention")
+
+    if baseline["status"] != "complete":
+        intervention["active"] = False
+    elif intervention["status"] == "running":
+        baseline["active"] = False
+
+    return {"baseline": baseline, "intervention": intervention}

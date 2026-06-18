@@ -367,32 +367,6 @@ def load_visualization_bundle(workspace_id: str) -> dict[str, Any]:
             trajectories.append(t)
 
     variables = extract_result_variables(rows) if rows else []
-    starter_ids = [
-        "indicators.DALY",
-        "disease_prevalence.diabetes",
-        "risk_factors_average.BMI",
-        "population.alive",
-    ]
-    default_charts = []
-    for var_id in starter_ids:
-        if not any(v["id"] == var_id for v in variables):
-            continue
-        built = chart_for_axes(
-            rows,
-            TIME_AXIS,
-            var_id,
-            chart_type="line",
-            variables=variables,
-        )
-        if not built:
-            continue
-        default_charts.append(
-            {
-                "id": var_id.replace(".", "_"),
-                "variable_id": var_id,
-                **built,
-            }
-        )
 
     return {
         "pipeline": pipeline,
@@ -401,10 +375,16 @@ def load_visualization_bundle(workspace_id: str) -> dict[str, Any]:
             "time_axis": {"id": TIME_AXIS, "label": "Year", "category": "Time"},
             "chart_types": [
                 {"id": "line", "label": "Line"},
+                {"id": "area", "label": "Area"},
+                {"id": "smooth", "label": "Smooth line"},
+                {"id": "step", "label": "Step line"},
                 {"id": "bar", "label": "Bar"},
+                {"id": "column", "label": "Column"},
+                {"id": "stacked_bar", "label": "Stacked bar"},
                 {"id": "scatter", "label": "Scatter"},
+                {"id": "pie", "label": "Pie (latest year)"},
+                {"id": "combo", "label": "Combo (bar + line)"},
             ],
-            "default_charts": default_charts,
             "result_file": json_files[0]["name"] if json_files else None,
         },
         "scenario1": {

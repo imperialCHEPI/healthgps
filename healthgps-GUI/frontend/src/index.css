@@ -1533,12 +1533,21 @@ input[type="text"] {
   font-weight: 700;
 }
 
+.sim-timeline--done .sim-timeline-fill {
+  background: linear-gradient(90deg, #15803d, #22c55e);
+}
+
 .sim-timeline-foot {
   display: flex;
   justify-content: space-between;
+  gap: 0.35rem;
   font-size: 0.62rem;
   color: #94a3b8;
   margin-top: 0.15rem;
+}
+
+.sim-timeline-status {
+  font-weight: 600;
 }
 
 .sim-age-bars--scroll {
@@ -2004,14 +2013,26 @@ input[type="text"] {
 .chart-explorer-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1rem;
+  gap: 1.25rem;
   margin-top: 0.75rem;
 }
 
-@media (min-width: 1100px) {
-  .chart-explorer-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.chart-explorer-grid--suggested {
+  margin-top: 0.5rem;
+}
+
+.chart-explorer-empty {
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--muted);
+  margin-top: 0.75rem;
+}
+
+.chart-builder-hint {
+  margin: 0 0 0.65rem;
+  font-size: 0.78rem;
 }
 
 .chart-explorer-card {
@@ -2019,14 +2040,95 @@ input[type="text"] {
   background: #fff;
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 0.65rem 0.75rem 0.5rem;
-  min-height: 340px;
+  padding: 0.85rem 0.9rem 0.65rem;
+  min-height: 480px;
+}
+
+.chart-explorer-card--suggested {
+  opacity: 0.92;
 }
 
 .chart-explorer-card .flexible-chart-svg {
   width: 100%;
   height: auto;
-  max-height: none;
+  min-height: 420px;
+}
+
+.flexible-chart--interactive {
+  position: relative;
+}
+
+.chart-tooltip {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: #0f172a;
+  color: #f8fafc;
+  border-radius: 6px;
+  padding: 0.45rem 0.6rem;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  pointer-events: none;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.25);
+  z-index: 3;
+}
+
+.chart-tooltip--static {
+  top: auto;
+  bottom: 0.75rem;
+}
+
+.chart-crosshair {
+  stroke: #64748b;
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+  opacity: 0.55;
+}
+
+.chart-hit-point {
+  cursor: crosshair;
+}
+
+.flexible-chart-tick {
+  fill: #475569;
+  font-size: 12px;
+}
+
+.flexible-chart-axis-label {
+  fill: #334155;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.viz-run-details {
+  margin-top: 1rem;
+  font-size: 0.82rem;
+}
+
+.viz-headline-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.viz-headline-chip {
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.35rem 0.55rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.viz-suggested-section {
+  margin-top: 0.75rem;
+}
+
+.viz-live-note {
+  margin: 0 0 0.35rem;
+  font-size: 0.72rem;
 }
 
 .chart-type-badge {

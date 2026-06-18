@@ -91,11 +91,10 @@ def result_chart(
     x: str = "__time__",
     y: str = "",
     chart_type: str = "line",
-    sources: str = "Baseline,Intervention",
 ) -> dict:
     try:
         from app.services.result_explorer import (
-            TIME_AXIS,
+            CHART_TYPES,
             chart_for_axes,
             extract_result_variables,
         )
@@ -103,6 +102,11 @@ def result_chart(
 
         if not y:
             raise HTTPException(status_code=400, detail="Query parameter 'y' is required.")
+        if chart_type not in CHART_TYPES:
+            raise HTTPException(
+                status_code=400,
+                detail=f"chart_type must be one of: {', '.join(CHART_TYPES)}",
+            )
 
         rows = _load_result_rows(workspace_id)
         if not rows:

@@ -287,11 +287,18 @@ def _population_from_result_json(workspace_id: str) -> dict[str, Any] | None:
     return out or None
 
 
-def _timeline_entry(year: int, pct: float, active: bool) -> dict[str, Any]:
+def _timeline_entry(
+    year: int,
+    pct: float,
+    active: bool,
+    *,
+    status: str = "running",
+) -> dict[str, Any]:
     return {
         "current_year": year,
         "progress_pct": round(min(100.0, max(0.0, pct)), 1),
         "active": active,
+        "status": status,
     }
 
 
@@ -310,18 +317,26 @@ def _scenario_timelines_for_run(
     rows = _load_result_rows(workspace_id)
     if rows:
         timelines = scenario_timelines(rows, start_year, stop_year)
-        if phase in ("initializing", "baseline"):
+        if phase == "complete":
+            timelines["baseline"] = _timeline_entry(
+                stop_year, 100.0, False, status="complete"
+            )
+            if intervention:
+                timelines["intervention"] = _timeline_entry(
+                    stop_year, 100.0, False, status="complete"
+                )
+            else:
+                timelines["intervention"] = _timeline_entry(
+                    start_year, 0.0, False, status="skipped"
+                )
+        elif phase in ("initializing", "baseline"):
             timelines["intervention"]["active"] = False
-        elif phase == "complete":
-            timelines["baseline"]["active"] = True
-            timelines["intervention"]["active"] = bool(intervention)
+            timelines["intervention"]["status"] = "waiting"
         elif phase == "policy":
             timelines["baseline"]["active"] = False
+            timelines["baseline"]["status"] = "complete"
             timelines["intervention"]["active"] = True
-        elif phase == "simulating" and intervention:
-            has_inter = any(r.get("source") == "Intervention" for r in rows)
-            timelines["baseline"]["active"] = not has_inter
-            timelines["intervention"]["active"] = has_inter
+            timelines["intervention"]["status"] = "running"
         return timelines
 
     idle = _timeline_entry(start_year, 0.0, False)
@@ -350,9 +365,12 @@ def _scenario_timelines_for_run(
 
     if phase == "complete":
         return {
-            "baseline": _timeline_entry(stop_year, 100.0, True),
+            "baseline": _timeline_entry(stop_year, 100.0, False, status="complete"),
             "intervention": _timeline_entry(
-                stop_year, 100.0 if intervention else 0.0, bool(intervention)
+                stop_year,
+                100.0 if intervention else 0.0,
+                False,
+                status="complete" if intervention else "skipped",
             ),
         }
 
