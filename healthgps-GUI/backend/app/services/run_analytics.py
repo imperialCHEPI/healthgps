@@ -6,6 +6,8 @@ import re
 import time
 from typing import Any
 
+from pathlib import Path
+
 from app.services.terminal_runner import RUN_START, _active_processes, read_run_status
 from app.services.workspace import get_workspace, workspace_dir
 
@@ -15,7 +17,13 @@ except ImportError:  # pragma: no cover
     psutil = None  # type: ignore[assignment]
 
 YEAR_RE = re.compile(r"(?:year|simulation\s+year)\s*[:=]?\s*(\d{4})", re.I)
+YEAR_TICK_RE = re.compile(r"\[(\d{4}),\d+\]")
+POP_SIZE_RE = re.compile(r"population size:\s*(\d+)", re.I)
 POP_RE = re.compile(r"(\d[\d,]*)\s+(?:people|persons|agents|individuals)", re.I)
+GENDER_ROW_RE = re.compile(
+    r"\|\s*Gender\s+:\s*[\d.n/a]+\s*:\s*([\d.]+)\s*:",
+    re.I,
+)
 
 _history: dict[str, dict[str, Any]] = {}
 
@@ -150,18 +158,20 @@ def _phase_steps(
 
 
 def _target_population(size_fraction: float) -> int:
-    return max(100, int(20000 * (size_fraction / 0.0001)))
+    """Deprecated estimate — prefer engine log `population size:` value."""
+    return 0
 
 
-def _age_distribution(total: int, enabled_age: bool) -> list[dict[str, Any]]:
+def _age_distribution(
+    total: int,
+    enabled_age: bool,
+    *,
+    age_min: int = 0,
+    age_max: int = 110,
+) -> list[dict[str, Any]]:
     if not enabled_age or total <= 0:
         return []
-    fractions = [0.12, 0.14, 0.16, 0.18, 0.15, 0.12, 0.08, 0.05]
-    labels = ["0–9", "10–19", "20–29", "30–39", "40–49", "50–59", "60–69", "70+"]
-    return [
-        {"label": label, "count": int(total * frac)}
-        for label, frac in zip(labels, fractions)
-    ]
+    return _age_bins_for_range(total, age_min, age_max)
 
 
 def _enabled_attributes(pr: dict[str, Any], risk_factors: list[str]) -> list[str]:
@@ -186,8 +196,123 @@ def _enabled_attributes(pr: dict[str, Any], risk_factors: list[str]) -> list[str
 
 
 def _parse_year_from_log(log_text: str) -> int | None:
+    tick_years = [int(m.group(1)) for m in YEAR_TICK_RE.finditer(log_text)]
+    if tick_years:
+        return tick_years[-1]
     years = [int(m.group(1)) for m in YEAR_RE.finditer(log_text)]
     return years[-1] if years else None
+
+
+def _parse_pop_size_from_log(log_text: str) -> int | None:
+    sizes = [int(m.group(1)) for m in POP_SIZE_RE.finditer(log_text)]
+    if sizes:
+        return sizes[-1]
+    return _parse_pop_from_log(log_text)
+
+
+def _parse_gender_male_pct_from_log(log_text: str) -> float | None:
+    matches = GENDER_ROW_RE.findall(log_text)
+    if not matches:
+        return None
+    try:
+        mean_gender = float(matches[-1])
+        # Gender coded 0/1 in model; mean approximates male share
+        if 0.0 <= mean_gender <= 1.0:
+            return round(mean_gender * 100.0, 1)
+    except ValueError:
+        return None
+    return None
+
+
+def _population_from_result_json(workspace_id: str) -> dict[str, Any] | None:
+    """Read latest aggregate JSON if the engine has started writing results."""
+    try:
+        import json
+
+        from app.services.results import discover_results_dirs, latest_run_files
+        from app.services.workspace import active_config_path
+
+        config_path = active_config_path(workspace_id)
+        with config_path.open(encoding="utf-8") as f:
+            config = json.load(f)
+        dirs = discover_results_dirs(config_path, config)
+        _stamp, files, _ = latest_run_files(dirs)
+        json_files = [
+            f
+            for f in files
+            if f["name"].endswith(".json")
+            and "_Income" not in f["name"]
+            and "_Individual" not in f["name"]
+        ]
+        if not json_files:
+            return None
+        main = Path(json_files[0]["path"])
+        if not main.is_file() or main.stat().st_size < 64:
+            return None
+        with main.open(encoding="utf-8") as f:
+            data = json.load(f)
+        rows = data.get("result")
+        if not isinstance(rows, list) or not rows:
+            return None
+        latest = max(
+            (r for r in rows if isinstance(r, dict)),
+            key=lambda r: int(r.get("time", 0)),
+            default=None,
+        )
+        if not latest:
+            return None
+        pop = latest.get("population") or {}
+        alive = pop.get("alive")
+        male = pop.get("alive_male")
+        female = pop.get("alive_female")
+        out: dict[str, Any] = {}
+        if isinstance(alive, (int, float)):
+            out["alive"] = int(alive)
+        if isinstance(male, (int, float)) and isinstance(female, (int, float)):
+            total = float(male) + float(female)
+            if total > 0:
+                out["male_pct"] = round(100.0 * float(male) / total, 1)
+        return out or None
+    except (OSError, json.JSONDecodeError, ValueError):
+        return None
+
+
+def _age_bins_for_range(
+    total: int,
+    age_min: int,
+    age_max: int,
+) -> list[dict[str, Any]]:
+    """Ten-year bins across configured age range using UK-shaped weights."""
+    if total <= 0:
+        return []
+    age_min = max(0, age_min)
+    age_max = max(age_min + 1, age_max)
+    # Peak weight around working age; tail for 70+
+    base_weights = {
+        (0, 9): 0.11,
+        (10, 19): 0.12,
+        (20, 29): 0.13,
+        (30, 39): 0.14,
+        (40, 49): 0.14,
+        (50, 59): 0.13,
+        (60, 69): 0.11,
+        (70, 79): 0.07,
+        (80, 89): 0.04,
+        (90, 110): 0.01,
+    }
+    bins: list[dict[str, Any]] = []
+    for (lo, hi), weight in base_weights.items():
+        if hi < age_min or lo > age_max:
+            continue
+        label = f"{lo}–{hi}" if hi < 90 else f"{lo}+"
+        bins.append({"label": label, "count": int(total * weight)})
+    if not bins:
+        bins.append({"label": f"{age_min}–{age_max}", "count": total})
+    # Normalise rounding so counts sum to total
+    assigned = sum(b["count"] for b in bins)
+    if assigned != total and bins:
+        bins[-1]["count"] += total - assigned
+    return bins
 
 
 def _parse_pop_from_log(log_text: str) -> int | None:
@@ -253,15 +378,24 @@ def get_run_telemetry(workspace_id: str) -> dict[str, Any]:
         hist["last_phase"] = "idle"
 
     dry_run = "--dry-run" in (status.get("command") or "")
-    target_pop = _target_population(size_fraction)
-    log_pop = _parse_pop_from_log(log_text)
+    size_fraction_pct = round(size_fraction * 100.0, 4)
+
+    log_pop = _parse_pop_size_from_log(log_text)
+    result_pop = _population_from_result_json(workspace_id)
+    if result_pop and result_pop.get("alive"):
+        log_pop = int(result_pop["alive"])
+
+    target_pop = log_pop or 0
+    population_source = "engine_log" if log_pop else "pending"
     log_year = _parse_year_from_log(log_text)
 
     demo = pr.get("demographics", {})
     gender_enabled = bool(demo.get("gender", True))
     age_enabled = bool(demo.get("age", True))
+    age_min = int(run_settings.get("age_range_min", 0))
+    age_max = int(run_settings.get("age_range_max", 110))
 
-    # Phase inference for interactive dashboard (demo-friendly; enriched by log when present)
+    # Phase inference — prefer engine log over time-based guesses
     phase = "idle"
     phase_message = "Ready — configure options on the left, then Validate or Run."
     population_initialized = 0
@@ -275,19 +409,26 @@ def get_run_telemetry(workspace_id: str) -> dict[str, Any]:
         baseline_end = init_end + (6.0 if dry_run else 12.0)
         if elapsed < init_end:
             phase = "initializing"
-            phase_message = "Initializing virtual population with selected attributes…"
-            population_initialized = int(target_pop * (elapsed / init_end) * 0.35)
+            if log_pop:
+                population_initialized = int(log_pop * min(1.0, elapsed / init_end) * 0.4)
+                phase_message = f"Initializing {log_pop:,} agents ({size_fraction_pct:g}% of national cohort)…"
+            else:
+                population_initialized = 0
+                phase_message = (
+                    f"Initializing virtual population ({size_fraction_pct:g}% of national cohort)…"
+                )
             _append_event(hist, "Assigning demographics and risk-factor draws per agent")
         elif elapsed < baseline_end:
             phase = "baseline"
-            phase_message = f"Baseline cohort created — {target_pop:,} people initialized"
-            t = (elapsed - init_end) / (baseline_end - init_end)
-            population_initialized = int(target_pop * (0.35 + 0.65 * t))
-            if hist["last_phase"] != "baseline":
-                _append_event(
-                    hist,
-                    f"{target_pop:,} people created in baseline",
-                )
+            if log_pop:
+                t = (elapsed - init_end) / (baseline_end - init_end)
+                population_initialized = int(log_pop * (0.4 + 0.6 * t))
+                phase_message = f"Baseline cohort — {log_pop:,} people (reported by HealthGPS)"
+                if hist["last_phase"] != "baseline":
+                    _append_event(hist, f"HealthGPS reported population size: {log_pop:,}")
+            else:
+                population_initialized = 0
+                phase_message = "Building baseline cohort — waiting for engine population size…"
         else:
             phase = "simulating"
             sim_t = min(1.0, (elapsed - baseline_end) / (30.0 if dry_run else 90.0))
@@ -297,7 +438,7 @@ def get_run_telemetry(workspace_id: str) -> dict[str, Any]:
                 100.0,
                 ((current_year - start_year) / year_span) * 100.0,
             )
-            population_initialized = log_pop or target_pop
+            population_initialized = log_pop or population_initialized
             if intervention and sim_t > 0.35:
                 phase = "policy"
                 phase_message = f"Policy scenario applied: {intervention}"
@@ -309,23 +450,32 @@ def get_run_telemetry(workspace_id: str) -> dict[str, Any]:
     elif state == "succeeded":
         phase = "complete"
         phase_message = "Simulation finished successfully"
-        population_initialized = log_pop or target_pop
+        population_initialized = log_pop or population_initialized
         current_year = log_year or stop_year
         year_progress_pct = 100.0
         _append_event(hist, "Run completed")
     elif state == "failed":
         phase = "failed"
         phase_message = "Simulation run failed — see terminal log below"
-        population_initialized = log_pop or int(target_pop * 0.5)
+        population_initialized = log_pop or int(population_initialized * 0.5) if log_pop else 0
         _append_event(hist, "Run failed")
 
     hist["last_phase"] = phase
 
     if log_pop:
         population_initialized = log_pop
+        target_pop = log_pop
 
-    male_pct = 48.5 if gender_enabled else 50.0
+    male_pct = 50.0
+    if gender_enabled:
+        if result_pop and result_pop.get("male_pct") is not None:
+            male_pct = float(result_pop["male_pct"])
+        else:
+            parsed_male = _parse_gender_male_pct_from_log(log_text)
+            male_pct = parsed_male if parsed_male is not None else 48.5
     female_pct = 100.0 - male_pct
+
+    pop_for_age = population_initialized if population_initialized > 0 else target_pop
 
     init_end = 4.0 if dry_run else 8.0
     baseline_end = init_end + (6.0 if dry_run else 12.0)
@@ -347,6 +497,8 @@ def get_run_telemetry(workspace_id: str) -> dict[str, Any]:
         "year_progress_pct": round(year_progress_pct, 1),
         "population_initialized": population_initialized,
         "target_population": target_pop,
+        "population_source": population_source,
+        "size_fraction_pct": size_fraction_pct,
         "policy_label": policy_label,
         "cpu_percent": cpu,
         "memory_mb": mem,
@@ -354,7 +506,12 @@ def get_run_telemetry(workspace_id: str) -> dict[str, Any]:
         "memory_history": list(hist["memory"]),
         "gender_male_pct": male_pct,
         "gender_female_pct": female_pct,
-        "age_bins": _age_distribution(population_initialized, age_enabled),
+        "age_bins": _age_distribution(
+            pop_for_age,
+            age_enabled,
+            age_min=age_min,
+            age_max=age_max,
+        ),
         "enabled_attributes": _enabled_attributes(pr, enabled_rf),
         "events": list(hist["events"]),
         "phase_steps": steps,

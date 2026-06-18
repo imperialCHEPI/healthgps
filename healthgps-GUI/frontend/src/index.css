@@ -1401,6 +1401,139 @@ input[type="text"] {
   font-weight: 400;
 }
 
+.sim-kpi-hint {
+  display: block;
+  font-size: 0.58rem;
+  margin-top: 0.1rem;
+}
+
+.sim-timeline {
+  background: #0f172a;
+  border-radius: 6px;
+  padding: 0.45rem 0.55rem 0.4rem;
+  color: #e2e8f0;
+  margin-bottom: 0.35rem;
+}
+
+.sim-timeline--pulse .sim-timeline-fill {
+  animation: sim-timeline-pulse 1.2s ease-in-out infinite;
+}
+
+.sim-timeline--policy .sim-timeline-fill {
+  background: linear-gradient(90deg, #b91c3c, #f59e0b);
+}
+
+@keyframes sim-timeline-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.65;
+  }
+}
+
+.sim-timeline-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.35rem;
+}
+
+.sim-timeline-label {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #94a3b8;
+}
+
+.sim-timeline-year {
+  font-size: 1.35rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #f8fafc;
+  line-height: 1;
+}
+
+.sim-timeline-track-wrap {
+  position: relative;
+  padding-bottom: 1.1rem;
+}
+
+.sim-timeline-track {
+  position: relative;
+  height: 8px;
+  background: #334155;
+  border-radius: 999px;
+  overflow: visible;
+}
+
+.sim-timeline-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #b91c3c, #64748b);
+  border-radius: 999px;
+  transition: width 0.6s ease;
+}
+
+.sim-timeline-playhead {
+  position: absolute;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  margin-left: -6px;
+  margin-top: -6px;
+  background: #f8fafc;
+  border: 2px solid #b91c3c;
+  border-radius: 50%;
+  transition: left 0.6s ease;
+  box-shadow: 0 0 8px rgba(185, 28, 60, 0.6);
+}
+
+.sim-timeline-ticks {
+  position: relative;
+  height: 1rem;
+  margin-top: 0.35rem;
+}
+
+.sim-timeline-tick {
+  position: absolute;
+  transform: translateX(-50%);
+  font-size: 0.62rem;
+  color: #94a3b8;
+  white-space: nowrap;
+}
+
+.sim-timeline-tick--current {
+  color: #f8fafc;
+  font-weight: 700;
+}
+
+.sim-timeline-foot {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.62rem;
+  color: #94a3b8;
+  margin-top: 0.15rem;
+}
+
+.sim-age-bars--scroll {
+  max-height: 5.5rem;
+  overflow-y: auto;
+  padding-right: 0.15rem;
+}
+
+.sim-chart-note {
+  font-size: 0.6rem;
+  margin: 0 0 0.25rem;
+}
+
+.sim-age-count {
+  font-size: 0.62rem;
+  min-width: 2rem;
+  text-align: right;
+  color: var(--muted);
+}
+
 .sim-progress-track {
   height: 10px;
   background: #e8edf3;

@@ -289,6 +289,8 @@ export interface RunTelemetry {
   year_progress_pct: number;
   population_initialized: number;
   target_population: number;
+  population_source: string;
+  size_fraction_pct: number;
   policy_label: string;
   cpu_percent: number;
   memory_mb: number;

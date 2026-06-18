@@ -184,6 +184,8 @@ class RunTelemetry(BaseModel):
     year_progress_pct: float
     population_initialized: int
     target_population: int
+    population_source: str = "pending"
+    size_fraction_pct: float = 0.0
     policy_label: str
     cpu_percent: float
     memory_mb: float

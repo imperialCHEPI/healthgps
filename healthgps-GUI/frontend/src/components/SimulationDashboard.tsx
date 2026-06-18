@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, type RunTelemetry } from "../api/client";
 import ResourceMonitorChart from "./ResourceMonitorChart";
+import SimulationTimeline from "./SimulationTimeline";
 import VisualizationHub from "./VisualizationHub";
 
 const IDLE_TELEMETRY: RunTelemetry = {
@@ -13,6 +14,8 @@ const IDLE_TELEMETRY: RunTelemetry = {
   year_progress_pct: 0,
   population_initialized: 0,
   target_population: 0,
+  population_source: "pending",
+  size_fraction_pct: 0,
   policy_label: "—",
   cpu_percent: 0,
   memory_mb: 0,
@@ -101,31 +104,28 @@ export default function SimulationDashboard({
             <div className="sim-kpi">
               <span className="sim-kpi-label">Population</span>
               <strong>
-                {t.population_initialized.toLocaleString()}
-                {t.target_population > 0 && (
-                  <span className="muted">
-                    /{t.target_population.toLocaleString()}
-                  </span>
+                {t.population_source === "engine_log" && t.population_initialized > 0 ? (
+                  <>{t.population_initialized.toLocaleString()} agents</>
+                ) : t.population_initialized > 0 ? (
+                  <>{t.population_initialized.toLocaleString()}…</>
+                ) : (
+                  <>{t.size_fraction_pct || "—"}% cohort</>
                 )}
               </strong>
+              {t.population_source === "engine_log" && (
+                <span className="sim-kpi-hint muted">from HealthGPS log</span>
+              )}
+              {t.population_source === "pending" && (
+                <span className="sim-kpi-hint muted">waiting for engine…</span>
+              )}
             </div>
             <div className="sim-kpi">
               <span className="sim-kpi-label">Policy</span>
               <strong>{t.policy_label}</strong>
             </div>
-            <div className="sim-kpi sim-kpi--wide">
-              <span className="sim-kpi-label">
-                Years {t.start_year}–{t.stop_year}
-                {t.current_year != null ? ` · ${t.current_year}` : ""}
-              </span>
-              <div className="sim-progress-track sim-progress-track--thin">
-                <div
-                  className="sim-progress-fill"
-                  style={{ width: `${t.year_progress_pct}%` }}
-                />
-              </div>
-            </div>
           </div>
+
+          <SimulationTimeline telemetry={t} active={active} />
 
           <div className="sim-charts-row sim-charts-row--compact">
             <div className="sim-chart-card sim-chart-card--compact">
@@ -155,23 +155,29 @@ export default function SimulationDashboard({
             </div>
 
             <div className="sim-chart-card sim-chart-card--compact">
-              <h4 className="sim-chart-title">Age</h4>
+              <h4 className="sim-chart-title">Age distribution</h4>
               {t.age_bins.length === 0 ? (
                 <p className="muted sim-chart-empty">Enable age</p>
               ) : (
-                <div className="sim-age-bars sim-age-bars--compact">
-                  {t.age_bins.slice(0, 4).map((bin) => (
-                    <div key={bin.label} className="sim-age-row">
-                      <span className="sim-age-label">{bin.label}</span>
-                      <div className="sim-bar-track">
-                        <div
-                          className="sim-bar-fill sim-bar-fill--age"
-                          style={{ width: `${(bin.count / maxAge) * 100}%` }}
-                        />
+                <>
+                  {t.population_source === "pending" && (
+                    <p className="sim-chart-note muted">Profile appears once engine reports size</p>
+                  )}
+                  <div className="sim-age-bars sim-age-bars--scroll">
+                    {t.age_bins.map((bin) => (
+                      <div key={bin.label} className="sim-age-row">
+                        <span className="sim-age-label">{bin.label}</span>
+                        <div className="sim-bar-track">
+                          <div
+                            className="sim-bar-fill sim-bar-fill--age"
+                            style={{ width: `${(bin.count / maxAge) * 100}%` }}
+                          />
+                        </div>
+                        <span className="sim-age-count">{bin.count.toLocaleString()}</span>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                </>
               )}
             </div>
           </div>
