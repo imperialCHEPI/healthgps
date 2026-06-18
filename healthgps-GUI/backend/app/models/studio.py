@@ -139,9 +139,19 @@ class WorkspaceMeta(BaseModel):
     session_label: str | None = None
 
 
+class SchemaValidationError(BaseModel):
+    field: str
+    message: str
+    validator: str
+    expected: str | None = None
+    supplied: str | None = None
+    summary: str
+
+
 class SchemaValidationResult(BaseModel):
     valid: bool
     errors: list[str] = Field(default_factory=list)
+    error_details: list[SchemaValidationError] = Field(default_factory=list)
 
 
 class RunStatus(BaseModel):

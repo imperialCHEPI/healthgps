@@ -10,7 +10,7 @@ from app.models.studio import (
     WorkspaceCreateRequest,
     WorkspaceMeta,
 )
-from app.services.schema_validator import validate_config_file
+from app.services.schema_validator import validate_config_file, validate_config_file_structured
 from app.services.workspace import (
     WorkspaceError,
     create_workspace,
@@ -77,8 +77,12 @@ def validate_schema(workspace_id: str) -> SchemaValidationResult:
     except WorkspaceError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
 
-    valid, errors = validate_config_file(config_path)
-    return SchemaValidationResult(valid=valid, errors=errors)
+    valid, details = validate_config_file_structured(config_path)
+    return SchemaValidationResult(
+        valid=valid,
+        errors=[d["summary"] for d in details],
+        error_details=[SchemaValidationError(**d) for d in details],
+    )
 
 
 @router.post("/{workspace_id}/validate")
@@ -86,10 +90,12 @@ def validate_workspace(workspace_id: str, consent: ConsentRequest) -> dict:
     _require_consent(consent)
     try:
         valid, errors = validate_config_file(active_config_path(workspace_id))
+        _, details = validate_config_file_structured(active_config_path(workspace_id))
         if not valid:
             return {
                 "schema_valid": False,
                 "schema_errors": errors,
+                "schema_error_details": details,
                 "terminal_launched": False,
             }
         from app.services.run_analytics import reset_telemetry

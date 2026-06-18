@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, type RunTelemetry } from "../api/client";
 import ResourceMonitorChart from "./ResourceMonitorChart";
-import ResultLineCharts from "./ResultLineCharts";
+import VisualizationHub from "./VisualizationHub";
 
 const IDLE_TELEMETRY: RunTelemetry = {
   state: "idle",
@@ -189,8 +189,12 @@ export default function SimulationDashboard({
         )}
       </div>
 
-      {workspaceId && (
-        <ResultLineCharts workspaceId={workspaceId} show={showResults} />
+      {workspaceId && (active || showResults) && (
+        <VisualizationHub
+          workspaceId={workspaceId}
+          show={showResults}
+          live={active}
+        />
       )}
 
       {t.events.length > 0 && (

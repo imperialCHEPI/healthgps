@@ -69,11 +69,42 @@ def get_validator() -> Draft202012Validator:
 
 
 def validate_config(config: dict[str, Any]) -> tuple[bool, list[str]]:
+    valid, structured = validate_config_structured(config)
+    return valid, [e["summary"] for e in structured]
+
+
+def validate_config_structured(config: dict[str, Any]) -> tuple[bool, list[dict[str, Any]]]:
     validator = get_validator()
-    errors: list[str] = []
+    errors: list[dict[str, Any]] = []
     for error in sorted(validator.iter_errors(config), key=lambda e: e.path):
         path = ".".join(str(p) for p in error.path) if error.path else "(root)"
-        errors.append(f"{path}: {error.message}")
+        supplied = error.instance
+        if isinstance(supplied, (dict, list)):
+            supplied_str = json.dumps(supplied, default=str)
+            if len(supplied_str) > 120:
+                supplied_str = supplied_str[:117] + "..."
+        else:
+            supplied_str = str(supplied)
+
+        expected = error.validator_value
+        if isinstance(expected, (dict, list)):
+            expected_str = json.dumps(expected, default=str)
+            if len(expected_str) > 120:
+                expected_str = expected_str[:117] + "..."
+        else:
+            expected_str = str(expected) if expected is not None else None
+
+        summary = f"{path}: {error.message}"
+        errors.append(
+            {
+                "field": path,
+                "message": error.message,
+                "validator": error.validator,
+                "expected": expected_str,
+                "supplied": supplied_str,
+                "summary": summary,
+            }
+        )
     return len(errors) == 0, errors
 
 
@@ -81,3 +112,9 @@ def validate_config_file(config_path: Path) -> tuple[bool, list[str]]:
     with config_path.open(encoding="utf-8") as f:
         config = json.load(f)
     return validate_config(config)
+
+
+def validate_config_file_structured(config_path: Path) -> tuple[bool, list[dict[str, Any]]]:
+    with config_path.open(encoding="utf-8") as f:
+        config = json.load(f)
+    return validate_config_structured(config)

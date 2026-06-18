@@ -10,6 +10,7 @@ import {
   type RunSettings,
 } from "../api/client";
 import ConsentModal from "../components/ConsentModal";
+import SchemaValidationBanner from "../components/viz/SchemaValidationBanner";
 import ProjectRequirementsPanel from "../components/ProjectRequirementsPanel";
 import SimulationDashboard from "../components/SimulationDashboard";
 import RunMonitor from "./RunMonitor";
@@ -32,6 +33,9 @@ export default function StudioWorkspace() {
   const [wsId, setWsId] = useState<string | null>(workspaceId ?? null);
   const [error, setError] = useState<string | null>(null);
   const [schemaErrors, setSchemaErrors] = useState<string[]>([]);
+  const [schemaErrorDetails, setSchemaErrorDetails] = useState<
+    import("../api/client").SchemaValidationError[]
+  >([]);
   const [consentOpen, setConsentOpen] = useState(false);
   const [consentAction, setConsentAction] = useState<"validate" | "run">(
     "validate"
@@ -156,6 +160,7 @@ export default function StudioWorkspace() {
   const openConsent = async (action: "validate" | "run") => {
     setError(null);
     setSchemaErrors([]);
+    setSchemaErrorDetails([]);
     setBusy(true);
     try {
       const id = await persistWorkspace();
@@ -191,6 +196,7 @@ export default function StudioWorkspace() {
         const schema = await api.validateSchema(id);
         if (!schema.valid) {
           setSchemaErrors(schema.errors);
+          setSchemaErrorDetails(schema.error_details ?? []);
           return;
         }
         await api.validate(id, consent);
@@ -273,14 +279,11 @@ export default function StudioWorkspace() {
       )}
       {error && <div className="alert alert-error">{error}</div>}
       {schemaErrors.length > 0 && (
-        <div className="alert alert-error">
-          <strong>Schema validation failed:</strong>
-          <ul>
-            {schemaErrors.map((e) => (
-              <li key={e}>{e}</li>
-            ))}
-          </ul>
-        </div>
+        <SchemaValidationBanner
+          valid={false}
+          errors={schemaErrors}
+          details={schemaErrorDetails}
+        />
       )}
 
       <div className="workspace-split">

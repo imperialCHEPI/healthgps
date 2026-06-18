@@ -75,6 +75,16 @@ def list_results(workspace_id: str) -> dict:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
 
 
+@router.get("/{workspace_id}/visualizations")
+def workspace_visualizations(workspace_id: str) -> dict:
+    try:
+        from app.services.visualizations import load_visualization_bundle
+
+        return load_visualization_bundle(workspace_id)
+    except WorkspaceError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
 @router.get("/{workspace_id}/results/charts")
 def result_charts(workspace_id: str) -> dict:
     try:

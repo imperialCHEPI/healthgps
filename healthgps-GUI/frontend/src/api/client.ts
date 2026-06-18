@@ -147,6 +147,110 @@ export interface PhaseStep {
   status: string;
 }
 
+export interface SchemaValidationError {
+  field: string;
+  message: string;
+  validator: string;
+  expected: string | null;
+  supplied: string | null;
+  summary: string;
+}
+
+export interface PipelineModule {
+  id: string;
+  label: string;
+  description: string;
+  status: "pending" | "active" | "done" | "disabled";
+  enabled: boolean;
+}
+
+export interface HeadlineMetric {
+  id: string;
+  label: string;
+  baseline: number;
+  intervention: number;
+  delta: number;
+  delta_pct: number | null;
+  unit: string;
+  year: number;
+  headline: string;
+}
+
+export interface BurdenBar {
+  id: string;
+  label: string;
+  baseline: number;
+  intervention: number;
+  delta: number;
+}
+
+export interface StratumDumbbell {
+  stratum: string;
+  baseline: number;
+  intervention: number;
+  delta: number;
+}
+
+export interface ComorbidityCell {
+  level: string;
+  label: string;
+  male: number;
+  female: number;
+  average: number;
+}
+
+export interface VisualizationBundle {
+  pipeline: { modules: PipelineModule[]; active_module_id: string | null };
+  scenario1: { pipeline: { modules: PipelineModule[] }; validation_hint: string };
+  scenario2: {
+    headlines: HeadlineMetric[];
+    burden_bars: BurdenBar[];
+    trajectories: ResultChart[];
+    charts: ResultChart[];
+    uncertainty_note: string;
+  };
+  scenario3: {
+    dumbbells: StratumDumbbell[];
+    outcome: string;
+    strata_type: string;
+    note: string;
+  };
+  scenario4: {
+    reproducibility: {
+      model?: string;
+      version?: string;
+      seed?: number | string;
+      intervention?: string;
+      message?: string;
+    };
+    individual_tracking: { id: string; title: string; status: string; message: string };
+  };
+  modelling: {
+    population_pyramid: {
+      year: number;
+      male: number;
+      female: number;
+      male_pct: number;
+      female_pct: number;
+    } | null;
+    comorbidity_matrix: { title: string; cells: ComorbidityCell[] } | null;
+    risk_factor_trends: ResultChart[];
+    calibration: { id: string; title: string; status: string; message: string };
+    convergence: { id: string; title: string; status: string; message: string };
+    tornado: { id: string; title: string; status: string; message: string };
+    sankey: { id: string; title: string; status: string; message: string };
+    live_progress: Record<string, unknown>;
+  };
+  meta: {
+    results_dir: string;
+    result_file: string | null;
+    years: number[];
+    target_year: number;
+    intervention: string;
+    trial_runs: number;
+  };
+}
+
 export interface ResultChartPoint {
   x: number;
   y: number;
@@ -317,10 +421,11 @@ export const api = {
       body: JSON.stringify(body),
     }),
   validateSchema: (id: string) =>
-    request<{ valid: boolean; errors: string[] }>(
-      `/api/workspaces/${id}/validate-schema`,
-      { method: "POST" }
-    ),
+    request<{
+      valid: boolean;
+      errors: string[];
+      error_details?: SchemaValidationError[];
+    }>(`/api/workspaces/${id}/validate-schema`, { method: "POST" }),
   validate: (id: string, consent_acknowledged: boolean) =>
     request<Record<string, unknown>>(`/api/workspaces/${id}/validate`, {
       method: "POST",
@@ -349,6 +454,8 @@ export const api = {
     }>(`/api/workspaces/${id}/results`),
   resultCharts: (id: string) =>
     request<ResultChartsResponse>(`/api/workspaces/${id}/results/charts`),
+  visualizations: (id: string) =>
+    request<VisualizationBundle>(`/api/workspaces/${id}/visualizations`),
   countries: async () => {
     try {
       return await request<CountryOption[]>("/api/custom/countries");
