@@ -295,8 +295,8 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param random Random number generator
     /// @param model The physical activity model to use
     void initialise_continuous_physical_activity(RuntimeContext &context, Person &person,
-                                                   Random &random,
-                                                   const PhysicalActivityModel &model) const;
+                                                 Random &random,
+                                                 const PhysicalActivityModel &model) const;
 
     /// @brief Initialise physical activity using simple model approach (India method)
     /// @param context The runtime context

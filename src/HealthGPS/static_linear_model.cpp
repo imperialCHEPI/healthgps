@@ -2250,7 +2250,8 @@ void StaticLinearModel::initialise_physical_activity(RuntimeContext &context, Pe
 }
 
 void StaticLinearModel::initialise_continuous_physical_activity(
-    RuntimeContext &context, Person &person, Random &random, const PhysicalActivityModel &model) const {
+    RuntimeContext &context, Person &person, Random &random,
+    const PhysicalActivityModel &model) const {
     (void)context;
     LinearModelParams linear_model{
         .intercept = model.intercept,

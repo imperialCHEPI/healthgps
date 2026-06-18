@@ -81,8 +81,7 @@ double get_linear_predictor_value(const Person &person, const core::Identifier &
     }
 
     if (is_gender2_predictor(name.to_string())) {
-        const core::Gender indicator =
-            options.gender2_indicator.value_or(core::Gender::male);
+        const core::Gender indicator = options.gender2_indicator.value_or(core::Gender::male);
         return gender2_regression_value(person, indicator);
     }
 
