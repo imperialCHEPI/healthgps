@@ -37,7 +37,7 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:5173 — the Vite dev server proxies `/api` to the backend.
+Open <http://localhost:5173> — the Vite dev server proxies `/api` to the backend.
 
 ## Workflow
 
