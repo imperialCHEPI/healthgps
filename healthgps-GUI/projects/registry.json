@@ -1,0 +1,98 @@
+{
+  "projects": [
+    {
+      "id": "hlm_france",
+      "name": "STOP — France",
+      "description": "HLM France example from healthgps-examples/HLM_France",
+      "example_dir": "HLM_France",
+      "config_options": [
+        { "id": "config", "label": "config.json", "file": "config.json" }
+      ],
+      "locked_fields": [],
+      "has_pif": false,
+      "local_defaults": {
+        "size_fraction": 0.0001,
+        "trial_runs": 1,
+        "start_time": 2010,
+        "stop_time": 2050,
+        "active_intervention": "",
+        "thread_count": 4
+      },
+      "intervention_ids": ["", "simple"]
+    },
+    {
+      "id": "finch",
+      "name": "FINCH (UK)",
+      "description": "FINCH project — configs from healthgps-examples/KevinHall_FINCH",
+      "example_dir": "KevinHall_FINCH",
+      "config_options": [
+        { "id": "config", "label": "config.json", "file": "config.json" },
+        { "id": "new_config", "label": "new_config.json", "file": "new_config.json" },
+        { "id": "new_json", "label": "new_JSON/config.json", "file": "new_JSON/config.json" }
+      ],
+      "locked_fields": [],
+      "has_pif": false,
+      "local_defaults": {
+        "size_fraction": 0.0001,
+        "trial_runs": 1,
+        "start_time": 2022,
+        "stop_time": 2025,
+        "active_intervention": "simple",
+        "thread_count": 4
+      },
+      "intervention_ids": ["", "simple"]
+    },
+    {
+      "id": "india",
+      "name": "India",
+      "description": "India project — configs from healthgps-examples/KevinHall_India",
+      "example_dir": "KevinHall_India",
+      "config_options": [
+        { "id": "config", "label": "config.json", "file": "config.json" },
+        { "id": "new_config", "label": "new_config.json", "file": "new_config.json" }
+      ],
+      "locked_fields": [
+        "demographics.region",
+        "demographics.ethnicity",
+        "income.type",
+        "physical_activity.type"
+      ],
+      "has_pif": false,
+      "local_defaults": {
+        "size_fraction": 0.0001,
+        "trial_runs": 1,
+        "start_time": 2022,
+        "stop_time": 2025,
+        "active_intervention": "simple",
+        "thread_count": 4
+      },
+      "intervention_ids": ["", "simple"]
+    },
+    {
+      "id": "pif",
+      "name": "PIF",
+      "description": "PIF project — configs from healthgps-examples/KevinHall_PIF",
+      "example_dir": "KevinHall_PIF",
+      "config_options": [
+        { "id": "config", "label": "config.json", "file": "config.json" },
+        { "id": "new_config", "label": "new_config.json", "file": "new_config.json" }
+      ],
+      "locked_fields": [
+        "demographics.region",
+        "demographics.ethnicity",
+        "income.type",
+        "physical_activity.type"
+      ],
+      "has_pif": true,
+      "local_defaults": {
+        "size_fraction": 0.0001,
+        "trial_runs": 1,
+        "start_time": 2022,
+        "stop_time": 2025,
+        "active_intervention": "simple",
+        "thread_count": 4
+      },
+      "intervention_ids": ["", "simple"]
+    }
+  ]
+}
