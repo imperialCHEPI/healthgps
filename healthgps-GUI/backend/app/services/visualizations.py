@@ -16,76 +16,20 @@ from app.services.results import (
     latest_run_files,
     parse_healthgps_result_charts,
 )
-from app.services.run_analytics import get_run_telemetry
+from app.services.result_explorer import (
+    TIME_AXIS,
+    chart_for_axes,
+    extract_result_variables,
+    series_for_variable,
+)
 from app.services.workspace import active_config_path, get_workspace
+from app.services.pipeline_progress import build_pipeline_modules as build_pipeline_graph
+from app.services.run_analytics import get_run_telemetry
 
 INCOME_STRATA_RE = re.compile(
     r"_(LowIncome|LowerMiddleIncome|MiddleIncome|UpperMiddleIncome|HighIncome)\.csv$",
     re.I,
 )
-
-PIPELINE_MODULES = [
-    {"id": "demographics", "label": "Demographics", "description": "Age, gender, region, ethnicity"},
-    {"id": "ses", "label": "Socioeconomic", "description": "Income / SES stratification"},
-    {"id": "risk_factors", "label": "Risk factors", "description": "Diet, activity, BMI draws"},
-    {"id": "diseases", "label": "Diseases", "description": "Incidence, prevalence, comorbidity"},
-    {"id": "analysis", "label": "Analysis", "description": "Burden, outputs, policy comparison"},
-]
-
-PHASE_TO_MODULE = {
-    "idle": None,
-    "initializing": "demographics",
-    "baseline": "demographics",
-    "simulating": "diseases",
-    "policy": "analysis",
-    "complete": "analysis",
-    "failed": None,
-}
-
-
-def build_pipeline_graph(
-    project_requirements: dict[str, Any],
-    *,
-    active_phase: str,
-    enabled_risk_factors: list[str] | None = None,
-) -> dict[str, Any]:
-    demo = project_requirements.get("demographics", {})
-    income = project_requirements.get("income", {})
-    pa = project_requirements.get("physical_activity", {})
-    rf = project_requirements.get("risk_factors", {})
-
-    enabled = {
-        "demographics": any(
-            demo.get(k) for k in ("age", "gender", "region", "ethnicity")
-        ),
-        "ses": bool(income.get("enabled", True)),
-        "risk_factors": bool(enabled_risk_factors) or bool(rf),
-        "diseases": True,
-        "analysis": True,
-    }
-
-    active_id = PHASE_TO_MODULE.get(active_phase)
-    active_index = next(
-        (i for i, m in enumerate(PIPELINE_MODULES) if m["id"] == active_id),
-        -1,
-    )
-
-    modules = []
-    for i, mod in enumerate(PIPELINE_MODULES):
-        mid = mod["id"]
-        if not enabled.get(mid, True):
-            status = "disabled"
-        elif active_id is None:
-            status = "pending"
-        elif i < active_index:
-            status = "done"
-        elif i == active_index:
-            status = "active"
-        else:
-            status = "pending"
-        modules.append({**mod, "status": status, "enabled": enabled.get(mid, True)})
-
-    return {"modules": modules, "active_module_id": active_id}
 
 
 def _rows_for_source(rows: list[dict], source: str) -> list[dict]:
@@ -366,9 +310,10 @@ def load_visualization_bundle(workspace_id: str) -> dict[str, Any]:
     run_settings = meta.get("run_settings", {})
     telemetry = get_run_telemetry(workspace_id)
 
-    pipeline = build_pipeline_graph(
+    pipeline = telemetry.get("pipeline") or build_pipeline_graph(
         pr,
-        active_phase=telemetry.get("phase", "idle"),
+        phase=telemetry.get("phase", "idle"),
+        elapsed=0.0,
         enabled_risk_factors=run_settings.get("enabled_risk_factors"),
     )
 
@@ -421,8 +366,47 @@ def load_visualization_bundle(workspace_id: str) -> dict[str, Any]:
         if t:
             trajectories.append(t)
 
+    variables = extract_result_variables(rows) if rows else []
+    starter_ids = [
+        "indicators.DALY",
+        "disease_prevalence.diabetes",
+        "risk_factors_average.BMI",
+        "population.alive",
+    ]
+    default_charts = []
+    for var_id in starter_ids:
+        if not any(v["id"] == var_id for v in variables):
+            continue
+        built = chart_for_axes(
+            rows,
+            TIME_AXIS,
+            var_id,
+            chart_type="line",
+            variables=variables,
+        )
+        if not built:
+            continue
+        default_charts.append(
+            {
+                "id": var_id.replace(".", "_"),
+                "variable_id": var_id,
+                **built,
+            }
+        )
+
     return {
         "pipeline": pipeline,
+        "chart_builder": {
+            "variables": variables,
+            "time_axis": {"id": TIME_AXIS, "label": "Year", "category": "Time"},
+            "chart_types": [
+                {"id": "line", "label": "Line"},
+                {"id": "bar", "label": "Bar"},
+                {"id": "scatter", "label": "Scatter"},
+            ],
+            "default_charts": default_charts,
+            "result_file": json_files[0]["name"] if json_files else None,
+        },
         "scenario1": {
             "pipeline": pipeline,
             "validation_hint": "Run Validate before compute to check schema and dry-run wiring.",

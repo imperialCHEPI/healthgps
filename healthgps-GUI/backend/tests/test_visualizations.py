@@ -8,17 +8,18 @@ from app.services.visualizations import (
 )
 
 
-def test_build_pipeline_graph_active_module():
+def test_build_pipeline_graph_cycles_modules():
     pr = {
         "demographics": {"age": True, "gender": True},
         "income": {"enabled": True},
         "risk_factors": {},
     }
-    graph = build_pipeline_graph(pr, active_phase="simulating")
-    assert graph["active_module_id"] == "diseases"
-    statuses = {m["id"]: m["status"] for m in graph["modules"]}
-    assert statuses["demographics"] == "done"
-    assert statuses["diseases"] == "active"
+    active_ids = {
+        build_pipeline_graph(pr, phase="simulating", elapsed=float(t))["active_module_id"]
+        for t in range(0, 24)
+    }
+    assert active_ids.issubset({"demographics", "ses", "risk_factors", "diseases", "analysis"})
+    assert len(active_ids) > 1
 
 
 def test_headlines_from_result_rows():
@@ -46,3 +47,41 @@ def test_headlines_from_result_rows():
 
 def test_parse_income_strata_empty_without_files():
     assert _parse_income_strata([]) == []
+
+
+def test_chart_for_axes_time_vs_indicator():
+    from app.services.result_explorer import TIME_AXIS, chart_for_axes
+
+    rows = [
+        {"source": "Baseline", "time": 2022, "indicators": {"DALY": 50.0}},
+        {"source": "Baseline", "time": 2025, "indicators": {"DALY": 60.0}},
+        {"source": "Intervention", "time": 2022, "indicators": {"DALY": 48.0}},
+        {"source": "Intervention", "time": 2025, "indicators": {"DALY": 55.0}},
+    ]
+    payload = chart_for_axes(rows, TIME_AXIS, "indicators.DALY", chart_type="line")
+    assert payload["chart_type"] == "line"
+    assert len(payload["series"]) == 2
+    assert payload["series"][0]["points"][0]["x"] == 2022.0
+
+
+def test_chart_for_axes_scatter_two_variables():
+    from app.services.result_explorer import chart_for_axes
+
+    rows = [
+        {
+            "source": "Baseline",
+            "time": 2025,
+            "risk_factors_average": {"BMI": {"male": 25.0, "female": 26.0}},
+            "disease_prevalence": {"diabetes": {"male": 10.0, "female": 12.0}},
+        },
+    ]
+    payload = chart_for_axes(
+        rows,
+        "risk_factors_average.BMI",
+        "disease_prevalence.diabetes",
+        chart_type="scatter",
+        sources=["Baseline"],
+    )
+    assert payload["chart_type"] == "scatter"
+    assert len(payload["series"]) == 1
+    assert len(payload["series"][0]["points"]) == 1

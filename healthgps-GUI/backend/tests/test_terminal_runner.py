@@ -33,3 +33,24 @@ def test_build_command_missing_console_raises():
         get_settings.cache_clear()
         with pytest.raises(TerminalRunnerError):
             build_command(Path("a.json"), 4)
+
+
+def test_infer_completion_from_healthgps_goodbye():
+    from app.services.terminal_runner import _infer_completion_from_log
+
+    lines = [
+        "=== HealthGPS Studio run started ===",
+        "Source: Intervention, run # 1, stop, time: 2032",
+        "Completed, elapsed time: 111969.658ms",
+        "Tracking result thread exited.",
+        "Goodbye. 2026-06-18 12:25:59 UTC.",
+    ]
+    result = _infer_completion_from_log(lines)
+    assert result == ("succeeded", 0)
+
+
+def test_infer_completion_from_studio_marker():
+    from app.services.terminal_runner import _infer_completion_from_log
+
+    lines = ["=== HealthGPS Studio run finished: exit 0 ==="]
+    assert _infer_completion_from_log(lines) == ("succeeded", 0)

@@ -43,6 +43,7 @@ export default function StudioWorkspace() {
   const [previewCommand, setPreviewCommand] = useState("");
   const [polling, setPolling] = useState(false);
   const [simActive, setSimActive] = useState(false);
+  const [runFinished, setRunFinished] = useState(false);
   const [busy, setBusy] = useState(false);
   const [noConsole, setNoConsole] = useState(false);
   const [configVariant, setConfigVariant] = useState("config");
@@ -203,6 +204,7 @@ export default function StudioWorkspace() {
       } else {
         await api.run(id, consent);
       }
+      setRunFinished(false);
       setSimActive(true);
       setPolling(true);
     } catch (e) {
@@ -425,12 +427,16 @@ export default function StudioWorkspace() {
             workspaceId={wsId}
             polling={polling}
             active={simActive}
+            runFinished={runFinished}
+            onRunComplete={() => setRunFinished(true)}
           />
           {wsId && (
             <RunMonitor
               workspaceId={wsId}
               polling={polling}
               onPollingChange={setPolling}
+              collapsed={runFinished}
+              onRunComplete={() => setRunFinished(true)}
             />
           )}
         </section>

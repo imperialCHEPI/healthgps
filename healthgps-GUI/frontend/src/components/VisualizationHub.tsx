@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, type VisualizationBundle } from "../api/client";
+import ChartExplorer from "./ChartExplorer";
 import LabeledLineChart from "./LabeledLineChart";
 import BurdenDeltaChart from "./viz/BurdenDeltaChart";
 import ComorbidityMatrix from "./viz/ComorbidityMatrix";
@@ -8,32 +9,57 @@ import HeadlineMetrics from "./viz/HeadlineMetrics";
 import PipelineGraph from "./viz/PipelineGraph";
 import VizPlaceholder from "./viz/VizPlaceholder";
 
-type Tab = "construction" | "policy" | "equity" | "inspection" | "modelling";
+type Tab = "construction" | "policy" | "equity" | "inspection" | "modelling" | "explorer";
 
 interface Props {
   workspaceId: string;
   show: boolean;
   live?: boolean;
+  generating?: boolean;
+  onReady?: () => void;
+  livePipeline?: VisualizationBundle["pipeline"] | null;
 }
 
-export default function VisualizationHub({ workspaceId, show, live = false }: Props) {
-  const [tab, setTab] = useState<Tab>(show ? "policy" : "construction");
+export default function VisualizationHub({
+  workspaceId,
+  show,
+  live = false,
+  generating = false,
+  onReady,
+  livePipeline = null,
+}: Props) {
+  const [tab, setTab] = useState<Tab>(show ? "explorer" : "construction");
   const [data, setData] = useState<VisualizationBundle | null>(null);
 
-  useEffect(() => {
-    if (!workspaceId || (!show && !live)) return;
-    const load = () => api.visualizations(workspaceId).then(setData).catch(() => {});
-    load();
-    if (!live) return;
-    const id = window.setInterval(load, 2000);
-    return () => window.clearInterval(id);
-  }, [workspaceId, show, live]);
+  const pipeline = livePipeline ?? data?.pipeline ?? null;
+  const chartBuilder = data?.chart_builder;
+  const hasResultData = Boolean(chartBuilder?.variables?.length);
+  const showCharts = show || hasResultData;
 
-  const pipeline = data?.pipeline ?? null;
+  useEffect(() => {
+    if (!workspaceId || (!show && !live && !generating)) return;
+    const load = () =>
+      api
+        .visualizations(workspaceId)
+        .then((bundle) => {
+          setData(bundle);
+          if (show || bundle.chart_builder?.variables?.length) onReady?.();
+        })
+        .catch(() => {});
+    load();
+    if (!live && !generating && !show) return;
+    const id = window.setInterval(load, generating ? 1500 : 2000);
+    return () => window.clearInterval(id);
+  }, [workspaceId, show, live, generating, onReady]);
+
+  useEffect(() => {
+    if (showCharts) setTab("explorer");
+  }, [showCharts]);
 
   if (!show && !live && !pipeline) return null;
 
   const tabs: { id: Tab; label: string }[] = [
+    { id: "explorer", label: "Chart builder" },
     { id: "construction", label: "Construction" },
     { id: "policy", label: "Policy impact" },
     { id: "equity", label: "Equity" },
@@ -45,18 +71,27 @@ export default function VisualizationHub({ workspaceId, show, live = false }: Pr
     <div className="viz-hub">
       <div className="viz-hub-header">
         <h3 className="grid-card-title">Visualisations</h3>
-        {data?.meta?.result_file && (
-          <span className="muted viz-hub-meta">{data.meta.result_file}</span>
+        {(data?.meta?.result_file || chartBuilder?.result_file) && (
+          <span className="muted viz-hub-meta">
+            {data?.meta?.result_file ?? chartBuilder?.result_file}
+          </span>
         )}
       </div>
 
-      {pipeline && (live || show) && (
+      {generating && !hasResultData && (
+        <div className="viz-generating" role="status">
+          <div className="viz-generating-spinner" aria-hidden />
+          <p>Generating visualisations from HealthGPS result JSON…</p>
+        </div>
+      )}
+
+      {pipeline && (live || showCharts) && (
         <div className="viz-hub-pipeline">
           <PipelineGraph modules={pipeline.modules} />
         </div>
       )}
 
-      {show && (
+      {showCharts && (
         <>
           <div className="viz-tabs" role="tablist">
             {tabs.map((t) => (
@@ -74,6 +109,26 @@ export default function VisualizationHub({ workspaceId, show, live = false }: Pr
           </div>
 
           <div className="viz-panel">
+            {tab === "explorer" && (
+              <div className="viz-panel-section">
+                {chartBuilder ? (
+                  <ChartExplorer
+                    workspaceId={workspaceId}
+                    variables={chartBuilder.variables}
+                    timeAxis={chartBuilder.time_axis ?? { id: "__time__", label: "Year", category: "Time" }}
+                    chartTypes={(chartBuilder.chart_types ?? [
+                      { id: "line", label: "Line" },
+                      { id: "bar", label: "Bar" },
+                      { id: "scatter", label: "Scatter" },
+                    ]) as { id: "line" | "bar" | "scatter"; label: string }[]}
+                    defaultCharts={chartBuilder.default_charts}
+                  />
+                ) : (
+                  <p className="muted">Loading result variables…</p>
+                )}
+              </div>
+            )}
+
             {tab === "construction" && (
               <div className="viz-panel-section">
                 <p className="muted">{data?.scenario1?.validation_hint}</p>
@@ -151,11 +206,17 @@ export default function VisualizationHub({ workspaceId, show, live = false }: Pr
                     <div className="pyramid-bars">
                       <div className="pyramid-side">
                         <span>M {data.modelling.population_pyramid.male.toLocaleString()}</span>
-                        <div className="pyramid-bar pyramid-bar--male" style={{ width: `${data.modelling.population_pyramid.male_pct}%` }} />
+                        <div
+                          className="pyramid-bar pyramid-bar--male"
+                          style={{ width: `${data.modelling.population_pyramid.male_pct}%` }}
+                        />
                       </div>
                       <div className="pyramid-side">
                         <span>F {data.modelling.population_pyramid.female.toLocaleString()}</span>
-                        <div className="pyramid-bar pyramid-bar--female" style={{ width: `${data.modelling.population_pyramid.female_pct}%` }} />
+                        <div
+                          className="pyramid-bar pyramid-bar--female"
+                          style={{ width: `${data.modelling.population_pyramid.female_pct}%` }}
+                        />
                       </div>
                     </div>
                   </div>
@@ -181,7 +242,9 @@ export default function VisualizationHub({ workspaceId, show, live = false }: Pr
               </div>
             )}
 
-            {!data && show && <p className="muted">Loading visualisations…</p>}
+            {!data && showCharts && !generating && (
+              <p className="muted">Loading visualisations…</p>
+            )}
           </div>
         </>
       )}

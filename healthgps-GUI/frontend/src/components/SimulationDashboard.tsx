@@ -28,20 +28,31 @@ const IDLE_TELEMETRY: RunTelemetry = {
   events: [],
   phase_steps: [],
   dry_run: false,
+  baseline_timeline: { current_year: 2022, progress_pct: 0, active: false },
+  intervention_timeline: { current_year: 2022, progress_pct: 0, active: false },
 };
 
 interface Props {
   workspaceId: string | null;
   polling: boolean;
   active: boolean;
+  runFinished?: boolean;
+  onRunComplete?: () => void;
 }
 
 export default function SimulationDashboard({
   workspaceId,
   polling,
   active,
+  runFinished = false,
+  onRunComplete,
 }: Props) {
   const [telemetry, setTelemetry] = useState<RunTelemetry>(IDLE_TELEMETRY);
+  const [vizReady, setVizReady] = useState(false);
+
+  useEffect(() => {
+    if (!runFinished) setVizReady(false);
+  }, [runFinished, workspaceId]);
 
   useEffect(() => {
     if (!workspaceId) return;
@@ -49,16 +60,27 @@ export default function SimulationDashboard({
   }, [workspaceId]);
 
   useEffect(() => {
-    if (!workspaceId || !polling) return;
+    if (!workspaceId || (!polling && !active && !runFinished)) return;
     const tick = () => api.runTelemetry(workspaceId).then(setTelemetry).catch(() => {});
     tick();
     const id = window.setInterval(tick, 1000);
     return () => window.clearInterval(id);
-  }, [workspaceId, polling]);
+  }, [workspaceId, polling, active, runFinished]);
+
+  useEffect(() => {
+    if (
+      telemetry.state === "succeeded" ||
+      telemetry.phase === "complete"
+    ) {
+      onRunComplete?.();
+    }
+  }, [telemetry.state, telemetry.phase, onRunComplete]);
 
   const t = active ? telemetry : IDLE_TELEMETRY;
   const maxAge = Math.max(...t.age_bins.map((b) => b.count), 1);
-  const showResults = t.phase === "complete" && Boolean(workspaceId);
+  const showResults = (t.phase === "complete" || runFinished) && Boolean(workspaceId);
+  const generatingViz = showResults && !vizReady;
+  const livePipeline = t.pipeline ?? null;
   const hasResourceChart =
     t.cpu_history.length > 1 ||
     t.memory_history.length > 1 ||
@@ -200,6 +222,11 @@ export default function SimulationDashboard({
           workspaceId={workspaceId}
           show={showResults}
           live={active}
+          generating={generatingViz}
+          livePipeline={livePipeline}
+          onReady={() => {
+            setVizReady(true);
+          }}
         />
       )}
 

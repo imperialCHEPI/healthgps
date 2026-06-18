@@ -8,6 +8,8 @@ from typing import Any
 
 from pathlib import Path
 
+from app.services.pipeline_progress import build_pipeline_modules
+from app.services.result_explorer import scenario_timelines
 from app.services.terminal_runner import RUN_START, _active_processes, read_run_status
 from app.services.workspace import get_workspace, workspace_dir
 
@@ -224,8 +226,8 @@ def _parse_gender_male_pct_from_log(log_text: str) -> float | None:
     return None
 
 
-def _population_from_result_json(workspace_id: str) -> dict[str, Any] | None:
-    """Read latest aggregate JSON if the engine has started writing results."""
+def _load_result_json(workspace_id: str) -> dict[str, Any] | None:
+    """Read latest aggregate HealthGPS_Result JSON if available."""
     try:
         import json
 
@@ -250,31 +252,124 @@ def _population_from_result_json(workspace_id: str) -> dict[str, Any] | None:
         if not main.is_file() or main.stat().st_size < 64:
             return None
         with main.open(encoding="utf-8") as f:
-            data = json.load(f)
-        rows = data.get("result")
-        if not isinstance(rows, list) or not rows:
-            return None
-        latest = max(
-            (r for r in rows if isinstance(r, dict)),
-            key=lambda r: int(r.get("time", 0)),
-            default=None,
-        )
-        if not latest:
-            return None
-        pop = latest.get("population") or {}
-        alive = pop.get("alive")
-        male = pop.get("alive_male")
-        female = pop.get("alive_female")
-        out: dict[str, Any] = {}
-        if isinstance(alive, (int, float)):
-            out["alive"] = int(alive)
-        if isinstance(male, (int, float)) and isinstance(female, (int, float)):
-            total = float(male) + float(female)
-            if total > 0:
-                out["male_pct"] = round(100.0 * float(male) / total, 1)
-        return out or None
+            return json.load(f)
     except (OSError, json.JSONDecodeError, ValueError):
         return None
+
+
+def _load_result_rows(workspace_id: str) -> list[dict]:
+    data = _load_result_json(workspace_id)
+    if not isinstance(data, dict):
+        return []
+    rows = data.get("result")
+    if not isinstance(rows, list):
+        return []
+    return [r for r in rows if isinstance(r, dict)]
+
+
+def _population_from_result_json(workspace_id: str) -> dict[str, Any] | None:
+    """Population snapshot from latest aggregate JSON row."""
+    rows = _load_result_rows(workspace_id)
+    if not rows:
+        return None
+    latest = max(rows, key=lambda r: int(r.get("time", 0)))
+    pop = latest.get("population") or {}
+    alive = pop.get("alive")
+    male = pop.get("alive_male")
+    female = pop.get("alive_female")
+    out: dict[str, Any] = {}
+    if isinstance(alive, (int, float)):
+        out["alive"] = int(alive)
+    if isinstance(male, (int, float)) and isinstance(female, (int, float)):
+        total = float(male) + float(female)
+        if total > 0:
+            out["male_pct"] = round(100.0 * float(male) / total, 1)
+    return out or None
+
+
+def _timeline_entry(year: int, pct: float, active: bool) -> dict[str, Any]:
+    return {
+        "current_year": year,
+        "progress_pct": round(min(100.0, max(0.0, pct)), 1),
+        "active": active,
+    }
+
+
+def _scenario_timelines_for_run(
+    *,
+    workspace_id: str,
+    state: str,
+    phase: str,
+    elapsed: float,
+    start_year: int,
+    stop_year: int,
+    intervention: str,
+    dry_run: bool,
+    log_year: int | None,
+) -> dict[str, dict[str, Any]]:
+    rows = _load_result_rows(workspace_id)
+    if rows:
+        timelines = scenario_timelines(rows, start_year, stop_year)
+        if phase in ("initializing", "baseline"):
+            timelines["intervention"]["active"] = False
+        elif phase == "complete":
+            timelines["baseline"]["active"] = True
+            timelines["intervention"]["active"] = bool(intervention)
+        elif phase == "policy":
+            timelines["baseline"]["active"] = False
+            timelines["intervention"]["active"] = True
+        elif phase == "simulating" and intervention:
+            has_inter = any(r.get("source") == "Intervention" for r in rows)
+            timelines["baseline"]["active"] = not has_inter
+            timelines["intervention"]["active"] = has_inter
+        return timelines
+
+    idle = _timeline_entry(start_year, 0.0, False)
+    if state in ("idle", "failed"):
+        return {"baseline": idle, "intervention": dict(idle)}
+
+    init_end = 4.0 if dry_run else 8.0
+    baseline_end = init_end + (6.0 if dry_run else 12.0)
+    year_span = max(1, stop_year - start_year)
+    sim_duration = 30.0 if dry_run else 90.0
+    sim_elapsed = max(0.0, elapsed - baseline_end)
+    sim_t = min(1.0, sim_elapsed / sim_duration) if elapsed > baseline_end else 0.0
+
+    if phase in ("initializing", "baseline"):
+        if phase == "baseline":
+            t = (elapsed - init_end) / max(0.1, baseline_end - init_end)
+            year = int(start_year + year_span * t * 0.15)
+            return {
+                "baseline": _timeline_entry(year, t * 15, True),
+                "intervention": _timeline_entry(start_year, 0.0, False),
+            }
+        return {
+            "baseline": _timeline_entry(start_year, 0.0, True),
+            "intervention": _timeline_entry(start_year, 0.0, False),
+        }
+
+    if phase == "complete":
+        return {
+            "baseline": _timeline_entry(stop_year, 100.0, True),
+            "intervention": _timeline_entry(
+                stop_year, 100.0 if intervention else 0.0, bool(intervention)
+            ),
+        }
+
+    if intervention and (phase == "policy" or sim_t > 0.55):
+        t2 = min(1.0, (sim_t - 0.55) / 0.45) if sim_t > 0.55 else sim_t
+        inter_year = log_year or int(start_year + year_span * t2)
+        return {
+            "baseline": _timeline_entry(stop_year, 100.0, False),
+            "intervention": _timeline_entry(inter_year, t2 * 100.0, True),
+        }
+
+    base_year = log_year or int(start_year + year_span * sim_t)
+    base_pct = sim_t * 100.0
+    return {
+        "baseline": _timeline_entry(base_year, base_pct, True),
+        "intervention": _timeline_entry(start_year, 0.0, False),
+    }
 
 
 def _age_bins_for_range(
@@ -487,6 +582,24 @@ def get_run_telemetry(workspace_id: str) -> dict[str, Any]:
         dry_run=dry_run,
     )
 
+    timelines = _scenario_timelines_for_run(
+        workspace_id=workspace_id,
+        state=state,
+        phase=phase,
+        elapsed=elapsed,
+        start_year=start_year,
+        stop_year=stop_year,
+        intervention=intervention,
+        dry_run=dry_run,
+        log_year=log_year,
+    )
+    pipeline = build_pipeline_modules(
+        pr,
+        phase=phase,
+        elapsed=elapsed,
+        enabled_risk_factors=enabled_rf,
+    )
+
     return {
         "state": state,
         "phase": phase,
@@ -516,6 +629,9 @@ def get_run_telemetry(workspace_id: str) -> dict[str, Any]:
         "events": list(hist["events"]),
         "phase_steps": steps,
         "dry_run": dry_run,
+        "baseline_timeline": timelines["baseline"],
+        "intervention_timeline": timelines["intervention"],
+        "pipeline": pipeline,
     }
 
 

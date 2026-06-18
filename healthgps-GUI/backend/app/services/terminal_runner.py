@@ -22,8 +22,36 @@ RUN_START = "=== HealthGPS Studio run started ==="
 RUN_FINISH_RE = re.compile(
     r"=== HealthGPS Studio run finished: exit (-?\d+) ==="
 )
+HEALTHGPS_GOODBYE_RE = re.compile(r"Goodbye\.\s+\d{4}-\d{2}-\d{2}", re.I)
+HEALTHGPS_COMPLETED_RE = re.compile(r"Completed,\s+elapsed time:", re.I)
 
 _active_processes: dict[str, subprocess.Popen] = {}
+
+
+def _infer_completion_from_log(lines: list[str]) -> tuple[str, int] | None:
+    """Detect HealthGPS.Console completion from log lines."""
+    for line in reversed(lines):
+        match = RUN_FINISH_RE.search(line)
+        if match:
+            code = int(match.group(1))
+            return ("succeeded" if code == 0 else "failed", code)
+
+    text = "\n".join(lines)
+    if HEALTHGPS_GOODBYE_RE.search(text) or (
+        HEALTHGPS_COMPLETED_RE.search(text) and "Tracking result thread exited" in text
+    ):
+        return ("succeeded", 0)
+    return None
+
+
+def _append_finish_marker_if_missing(log_path: Path, exit_code: int) -> None:
+    if not log_path.is_file():
+        return
+    text = log_path.read_text(encoding="utf-8", errors="replace")
+    if RUN_FINISH_RE.search(text):
+        return
+    with log_path.open("a", encoding="utf-8") as log:
+        log.write(f"\n=== HealthGPS Studio run finished: exit {exit_code} ===\n")
 
 
 class TerminalRunnerError(Exception):
@@ -156,16 +184,12 @@ def read_run_status(workspace_id: str, tail_lines: int = 120) -> dict:
         log_tail = "\n".join(lines[-tail_lines:])
 
         if state not in ("succeeded", "failed"):
-            found_finish = False
-            for line in reversed(lines):
-                match = RUN_FINISH_RE.search(line)
-                if match:
-                    exit_code = int(match.group(1))
-                    state = "succeeded" if exit_code == 0 else "failed"
-                    set_run_status(workspace_id, state, exit_code)
-                    found_finish = True
-                    break
-            if not found_finish and RUN_START in "\n".join(lines):
+            inferred = _infer_completion_from_log(lines)
+            if inferred:
+                state, exit_code = inferred
+                set_run_status(workspace_id, state, exit_code)
+                _append_finish_marker_if_missing(log_path, exit_code or 0)
+            elif RUN_START in "\n".join(lines):
                 state = "running"
 
     command = None

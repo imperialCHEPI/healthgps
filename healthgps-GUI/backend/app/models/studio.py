@@ -174,6 +174,25 @@ class PhaseStep(BaseModel):
     status: str
 
 
+class ScenarioTimeline(BaseModel):
+    current_year: int
+    progress_pct: float
+    active: bool = False
+
+
+class PipelineModuleState(BaseModel):
+    id: str
+    label: str
+    description: str
+    status: str
+    enabled: bool = True
+
+
+class PipelineState(BaseModel):
+    modules: list[PipelineModuleState]
+    active_module_id: str | None = None
+
+
 class RunTelemetry(BaseModel):
     state: str
     phase: str
@@ -198,6 +217,9 @@ class RunTelemetry(BaseModel):
     events: list[str]
     phase_steps: list[PhaseStep] = Field(default_factory=list)
     dry_run: bool = False
+    baseline_timeline: ScenarioTimeline | None = None
+    intervention_timeline: ScenarioTimeline | None = None
+    pipeline: PipelineState | None = None
 
 
 class SettingsResponse(BaseModel):

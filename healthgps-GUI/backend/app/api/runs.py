@@ -85,6 +85,73 @@ def workspace_visualizations(workspace_id: str) -> dict:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
 
 
+@router.get("/{workspace_id}/results/chart")
+def result_chart(
+    workspace_id: str,
+    x: str = "__time__",
+    y: str = "",
+    chart_type: str = "line",
+    sources: str = "Baseline,Intervention",
+) -> dict:
+    try:
+        from app.services.result_explorer import (
+            TIME_AXIS,
+            chart_for_axes,
+            extract_result_variables,
+        )
+        from app.services.run_analytics import _load_result_rows
+
+        if not y:
+            raise HTTPException(status_code=400, detail="Query parameter 'y' is required.")
+
+        rows = _load_result_rows(workspace_id)
+        if not rows:
+            raise HTTPException(status_code=404, detail="No result JSON available yet.")
+        want = [s.strip() for s in sources.split(",") if s.strip()]
+        variables = extract_result_variables(rows)
+        payload = chart_for_axes(
+            rows,
+            x,
+            y,
+            sources=want,
+            chart_type=chart_type,
+            variables=variables,
+        )
+        if not payload:
+            raise HTTPException(
+                status_code=404,
+                detail=f"No chart data for x={x!r}, y={y!r}, type={chart_type!r}.",
+            )
+        return payload
+    except WorkspaceError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@router.get("/{workspace_id}/results/series")
+def result_series(
+    workspace_id: str,
+    variable: str,
+    sources: str = "Baseline,Intervention",
+) -> dict:
+    try:
+        from app.services.result_explorer import series_for_variable
+        from app.services.run_analytics import _load_result_rows
+
+        rows = _load_result_rows(workspace_id)
+        if not rows:
+            raise HTTPException(status_code=404, detail="No result JSON available yet.")
+        want = [s.strip() for s in sources.split(",") if s.strip()]
+        series = series_for_variable(rows, variable, sources=want)
+        if not series:
+            raise HTTPException(
+                status_code=404,
+                detail=f"No series for variable '{variable}' with sources {want}.",
+            )
+        return {"variable": variable, "sources": want, "series": series}
+    except WorkspaceError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
 @router.get("/{workspace_id}/results/charts")
 def result_charts(workspace_id: str) -> dict:
     try:

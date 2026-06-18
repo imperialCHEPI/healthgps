@@ -156,6 +156,12 @@ export interface SchemaValidationError {
   summary: string;
 }
 
+export interface ScenarioTimeline {
+  current_year: number;
+  progress_pct: number;
+  active: boolean;
+}
+
 export interface PipelineModule {
   id: string;
   label: string;
@@ -201,6 +207,13 @@ export interface ComorbidityCell {
 
 export interface VisualizationBundle {
   pipeline: { modules: PipelineModule[]; active_module_id: string | null };
+  chart_builder: {
+    variables: { id: string; label: string; category: string; unit: string }[];
+    time_axis: { id: string; label: string; category: string };
+    chart_types: { id: string; label: string }[];
+    default_charts: (ResultChart & { chart_type?: string; variable_id?: string })[];
+    result_file: string | null;
+  };
   scenario1: { pipeline: { modules: PipelineModule[] }; validation_hint: string };
   scenario2: {
     headlines: HeadlineMetric[];
@@ -303,6 +316,9 @@ export interface RunTelemetry {
   events: string[];
   phase_steps: PhaseStep[];
   dry_run: boolean;
+  baseline_timeline?: ScenarioTimeline | null;
+  intervention_timeline?: ScenarioTimeline | null;
+  pipeline?: { modules: PipelineModule[]; active_module_id: string | null } | null;
 }
 
 export interface SettingsResponse {
@@ -456,6 +472,29 @@ export const api = {
     }>(`/api/workspaces/${id}/results`),
   resultCharts: (id: string) =>
     request<ResultChartsResponse>(`/api/workspaces/${id}/results/charts`),
+  resultSeries: (id: string, variable: string, sources = "Baseline,Intervention") =>
+    request<{ variable: string; sources: string[]; series: ResultChartSeries[] }>(
+      `/api/workspaces/${id}/results/series?variable=${encodeURIComponent(variable)}&sources=${encodeURIComponent(sources)}`
+    ),
+  resultChart: (
+    id: string,
+    opts: { x?: string; y: string; chartType?: string; sources?: string }
+  ) => {
+    const params = new URLSearchParams();
+    params.set("y", opts.y);
+    if (opts.x) params.set("x", opts.x);
+    if (opts.chartType) params.set("chart_type", opts.chartType);
+    if (opts.sources) params.set("sources", opts.sources);
+    return request<{
+      title: string;
+      x_label: string;
+      y_label: string;
+      chart_type: string;
+      x_var: string;
+      y_var: string;
+      series: ResultChartSeries[];
+    }>(`/api/workspaces/${id}/results/chart?${params.toString()}`);
+  },
   visualizations: (id: string) =>
     request<VisualizationBundle>(`/api/workspaces/${id}/visualizations`),
   countries: async () => {
