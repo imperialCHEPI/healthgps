@@ -80,6 +80,12 @@ double get_linear_predictor_value(const Person &person, const core::Identifier &
         return capped_age_term(name.to_string(), *options.capped_age);
     }
 
+    if (is_gender2_predictor(name.to_string())) {
+        const core::Gender indicator =
+            options.gender2_indicator.value_or(core::Gender::male);
+        return gender2_regression_value(person, indicator);
+    }
+
     if (auto derived = resolve_derived_predictor(person, name.to_string())) {
         return *derived;
     }

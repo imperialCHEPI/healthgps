@@ -19,7 +19,6 @@ std::map<core::Identifier, std::function<double(const Person &)>> Person::curren
     {"SES"_id, [](const Person &p) { return p.ses; }},
 
     // FINCH-specific coefficient mappings (lowercase with numbers)
-    {"gender2"_id, [](const Person &p) { return p.gender_to_value(); }},
     {"age1"_id, [](const Person &p) { return static_cast<double>(p.age); }},
     {"age2"_id, [](const Person &p) { return pow(p.age, 2); }},
     {"ethnicity2"_id, [](const Person &p) { return p.ethnicity_to_value() == 2.0 ? 1.0 : 0.0; }},

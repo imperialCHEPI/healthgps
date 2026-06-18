@@ -130,7 +130,8 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
         std::size_t adjustment_income_stratum_count = 0u, bool has_active_policies = true,
         /// @param logistic_models Logistic regression models for two-stage modeling (optional)
         /// Empty models indicate no logistic regression for that risk factor
-        const std::vector<LinearModelParams> &logistic_models = {});
+        const std::vector<LinearModelParams> &logistic_models = {},
+        core::Gender gender2_indicator = core::Gender::male);
 
     RiskFactorModelType type() const noexcept override;
 
@@ -285,14 +286,17 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
                                 const std::vector<core::DoubleInterval> &base_ranges,
                                 bool for_trended_adjustment = false) const;
 
+    /// @brief Base linear-model options from project_requirements (gender2 indicator, etc.).
+    LinearModelEvalOptions base_linear_eval_options() const noexcept;
+
     /// @brief Initialise physical activity using continuous model approach (FINCH method)
     /// @param context The runtime context
     /// @param person The person to initialise physical activity for
     /// @param random Random number generator
     /// @param model The physical activity model to use
-    static void initialise_continuous_physical_activity(RuntimeContext &context, Person &person,
-                                                        Random &random,
-                                                        const PhysicalActivityModel &model);
+    void initialise_continuous_physical_activity(RuntimeContext &context, Person &person,
+                                                   Random &random,
+                                                   const PhysicalActivityModel &model) const;
 
     /// @brief Initialise physical activity using simple model approach (India method)
     /// @param context The runtime context
@@ -349,6 +353,9 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     // Two-stage modeling: Logistic regression for zero probability (optional)
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-const-or-ref-data-members) reference to model data
     const std::vector<LinearModelParams> &logistic_models_;
+
+    /// @brief Sex that receives 1 for the gender2 CSV regression row (from project_requirements).
+    core::Gender gender2_indicator_{core::Gender::male};
 };
 
 /// @brief Defines the static linear model data type
@@ -425,7 +432,8 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
         bool income_stratum_adjustment_enabled = false,
         std::size_t adjustment_income_stratum_count = 0u, bool has_active_policies = true,
         /// @param logistic_models Logistic regression models for two-stage modeling (optional)
-        std::vector<LinearModelParams> logistic_models = {});
+        std::vector<LinearModelParams> logistic_models = {},
+        core::Gender gender2_indicator = core::Gender::male);
 
     /// @brief Construct a new StaticLinearModel from this definition
     /// @return A unique pointer to the new StaticLinearModel instance
@@ -482,6 +490,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     core::IncomeCategoryLayout income_category_layout_;
     // Policy optimization flag - Mahima
     bool has_active_policies_;
+    core::Gender gender2_indicator_{core::Gender::male};
 };
 
 } // namespace hgps

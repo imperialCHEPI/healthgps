@@ -228,6 +228,8 @@ struct ProjectRequirements {
         /// Optional. If set and > 0, cap age to this value in linear models (age/age2/age3). Else
         /// no cap.
         std::optional<int> max_age_for_linear_models;
+        /// Which sex gets value 1 for the gender2 CSV regression row ("male" or "female").
+        std::string gender2{"male"};
     } demographics;
 
     struct Income {

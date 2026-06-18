@@ -28,6 +28,14 @@
                     "type": "integer",
                     "minimum": 1,
                     "description": "Optional. If set, cap age to this value when computing linear models (age/age2/age3 terms). If omitted or 0, age is not capped."
+                },
+                "gender2": {
+                    "type": "string",
+                    "enum": [
+                        "male",
+                        "female"
+                    ],
+                    "description": "Which sex receives value 1 for the gender2 regression predictor row in model CSVs. The other sex is the reference (0). Default when omitted: male."
                 }
             },
             "required": [

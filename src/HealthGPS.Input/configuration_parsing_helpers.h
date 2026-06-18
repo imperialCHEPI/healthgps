@@ -161,6 +161,9 @@ inline void parse_project_requirements_block(const nlohmann::json &pr, ProjectRe
     if (d.contains("max_age_for_linear_models") && !d["max_age_for_linear_models"].is_null()) {
         req.demographics.max_age_for_linear_models = d["max_age_for_linear_models"].get<int>();
     }
+    if (d.contains("gender2") && !d["gender2"].is_null()) {
+        req.demographics.gender2 = d["gender2"].get<std::string>();
+    }
     const auto &inc = pr["income"];
     req.income.enabled = inc["enabled"].get<bool>();
     req.income.type = inc["type"].get<std::string>();

@@ -413,7 +413,8 @@ StaticLinearModel::StaticLinearModel(
     const std::unordered_map<core::Identifier, PhysicalActivityModel> &physical_activity_models,
     const std::vector<IncomeStratumExpectedTableEntry> &income_stratum_expected_tables,
     bool income_stratum_adjustment_enabled, std::size_t adjustment_income_stratum_count,
-    bool has_active_policies, const std::vector<LinearModelParams> &logistic_models)
+    bool has_active_policies, const std::vector<LinearModelParams> &logistic_models,
+    core::Gender gender2_indicator)
     : RiskFactorAdjustableModel{std::move(expected),       expected_trend,
                                 std::move(trend_steps),    trend_type,
                                 expected_income_trend,       // Pass by value, not moved
@@ -448,7 +449,8 @@ StaticLinearModel::StaticLinearModel(
       income_stratum_expected_tables_{income_stratum_expected_tables},
       income_stratum_adjustment_enabled_{income_stratum_adjustment_enabled},
       adjustment_income_stratum_count_{adjustment_income_stratum_count},
-      has_active_policies_{has_active_policies}, logistic_models_{logistic_models} {
+      has_active_policies_{has_active_policies}, logistic_models_{logistic_models},
+      gender2_indicator_{gender2_indicator} {
 
     if (names_.empty()) {
         throw core::HgpsException("Risk factor names list is empty");
@@ -1787,7 +1789,7 @@ StaticLinearModel::compute_linear_models(RuntimeContext &context, Person &person
     static const core::Identifier log_energy_intake_id("log_energy_intake");
     static const core::Identifier energyintake_id("energyintake");
 
-    LinearModelEvalOptions options{};
+    LinearModelEvalOptions options = base_linear_eval_options();
     options.capped_age = capped_age;
     options.missing_predictor_fallback =
         [this, &context,
@@ -1835,7 +1837,8 @@ double StaticLinearModel::calculate_zero_probability(Person &person,
                                                      size_t risk_factor_index) const {
     // Get the logistic model for this risk factor
     const auto &logistic_model = logistic_models_[risk_factor_index];
-    const double logistic_linear_term = evaluate_linear_model(person, logistic_model);
+    const double logistic_linear_term =
+        evaluate_linear_model(person, logistic_model, base_linear_eval_options());
 
     // logistic function: p = 1 / (1 + exp(-linear_term))
     double probability = 1.0 / (1.0 + std::exp(-logistic_linear_term));
@@ -2008,7 +2011,8 @@ void StaticLinearModel::initialise_continuous_income(RuntimeContext &context, Pe
 }
 
 double StaticLinearModel::calculate_continuous_income(Person &person, Random &random) {
-    double income = evaluate_linear_model(person, continuous_income_model_);
+    double income =
+        evaluate_linear_model(person, continuous_income_model_, base_linear_eval_options());
 
     // Add random noise based on standard deviation
     double stddev = 0.0;
@@ -2246,12 +2250,13 @@ void StaticLinearModel::initialise_physical_activity(RuntimeContext &context, Pe
 }
 
 void StaticLinearModel::initialise_continuous_physical_activity(
-    RuntimeContext &context, Person &person, Random &random, const PhysicalActivityModel &model) {
+    RuntimeContext &context, Person &person, Random &random, const PhysicalActivityModel &model) const {
+    (void)context;
     LinearModelParams linear_model{
         .intercept = model.intercept,
         .coefficients = model.coefficients,
     };
-    double value = evaluate_linear_model(person, linear_model);
+    double value = evaluate_linear_model(person, linear_model, base_linear_eval_options());
 
     double rand_noise = random.next_normal(0.0, model.stddev);
     double final_value = value + rand_noise;
@@ -2350,6 +2355,12 @@ StaticLinearModel::build_extended_factors_list(RuntimeContext &context,
     return std::make_pair(std::move(extended_factors), std::move(extended_ranges));
 }
 
+LinearModelEvalOptions StaticLinearModel::base_linear_eval_options() const noexcept {
+    LinearModelEvalOptions options;
+    options.gender2_indicator = gender2_indicator_;
+    return options;
+}
+
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::unique_ptr<RiskFactorSexAgeTable> expected,
@@ -2378,7 +2389,8 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     const std::unordered_map<core::Identifier, PhysicalActivityModel> &physical_activity_models,
     const std::vector<IncomeStratumExpectedTableEntry> &income_stratum_expected_tables,
     bool income_stratum_adjustment_enabled, std::size_t adjustment_income_stratum_count,
-    bool has_active_policies, std::vector<LinearModelParams> logistic_models)
+    bool has_active_policies, std::vector<LinearModelParams> logistic_models,
+    core::Gender gender2_indicator)
     // NOLINTNEXTLINE(readability-function-cognitive-complexity)
     : RiskFactorAdjustableModelDefinition{std::move(expected),
                                           expected_trend
@@ -2455,7 +2467,7 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
       continuous_income_model_{continuous_income_model},
       income_category_layout_{std::move(income_category_layout)},
       // Policy optimization flag - Mahima - must be last (declaration order)
-      has_active_policies_{has_active_policies} {
+      has_active_policies_{has_active_policies}, gender2_indicator_{gender2_indicator} {
 
     if (names_.empty()) {
         throw core::HgpsException("Risk factor names list is empty");
@@ -2596,7 +2608,7 @@ std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() con
         is_continuous_income_model_, continuous_income_model_, income_category_layout_,
         physical_activity_models_, income_stratum_expected_tables_,
         income_stratum_adjustment_enabled_, adjustment_income_stratum_count_, has_active_policies_,
-        logistic_models_);
+        logistic_models_, gender2_indicator_);
 }
 
 } // namespace hgps
