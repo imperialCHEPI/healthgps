@@ -54,25 +54,6 @@ double gender_dummy(const Person &person) {
     return person.gender == core::Gender::male ? 1.0 : 0.0;
 }
 
-bool is_gender2_predictor(const std::string &key) {
-    return core::case_insensitive::equals(key, "gender2");
-}
-
-double gender2_regression_value(const Person &person, core::Gender indicator_sex) {
-    return person.gender == indicator_sex ? 1.0 : 0.0;
-}
-
-core::Gender parse_gender2_indicator(const std::string &indicator_label) {
-    const auto gender = hgps::detail::StoreConverter::to_gender(indicator_label);
-    if (gender == core::Gender::unknown) {
-        throw core::HgpsException{
-            fmt::format("project_requirements.demographics.gender2 must be \"male\" or \"female\", "
-                        "got: {}",
-                        indicator_label)};
-    }
-    return gender;
-}
-
 double region_dummy(const Person &person, const std::string &factor_name) {
     if (factor_name == "region") {
         try {
@@ -197,6 +178,25 @@ std::optional<double> resolve_energyintake_predictor(const Person &person, const
 }
 
 } // namespace
+
+bool is_gender2_predictor(const std::string &key) {
+    return core::case_insensitive::equals(key, "gender2");
+}
+
+double gender2_regression_value(const Person &person, core::Gender indicator_sex) {
+    return person.gender == indicator_sex ? 1.0 : 0.0;
+}
+
+core::Gender parse_gender2_indicator(const std::string &indicator_label) {
+    const auto gender = hgps::detail::StoreConverter::to_gender(indicator_label);
+    if (gender == core::Gender::unknown) {
+        throw core::HgpsException{
+            fmt::format("project_requirements.demographics.gender2 must be \"male\" or \"female\", "
+                        "got: {}",
+                        indicator_label)};
+    }
+    return gender;
+}
 
 bool is_metadata_predictor(const std::string &name) {
     return core::case_insensitive::equals(name, "stddev") ||
