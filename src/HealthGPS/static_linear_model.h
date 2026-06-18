@@ -2,6 +2,7 @@
 
 #include "HealthGPS.Core/income_category_layout.h"
 #include "interfaces.h"
+#include "linear_model_eval_options.h"
 #include "mapping.h"
 #include "risk_factor_adjustable_model.h"
 

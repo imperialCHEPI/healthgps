@@ -287,7 +287,7 @@ std::shared_ptr<StaticLinearModelTestBundle> create_test_static_linear_model_bun
     std::size_t adjustment_income_stratum_count,
     const std::unordered_map<hgps::core::Identifier, hgps::PhysicalActivityModel>
         &physical_activity_models = {},
-    hgps::core::IncomeCategoryLayout income_layout =
+    const hgps::core::IncomeCategoryLayout &income_layout =
         hgps::core::income_category_layout_from_config("4")) {
     using namespace hgps;
     auto bundle = std::make_shared<StaticLinearModelTestBundle>();
@@ -589,11 +589,12 @@ TEST(IncomeStratumAdjustment, FiveFinalCategoriesWithFiveAdjustmentStrata) {
     const auto factor = core::Identifier("foodcarbohydrate");
     auto overall_expected = make_expected_table_with_income_and_pa(factor, 100.0, 600.0, 1.8);
     std::vector<IncomeStratumExpectedTableEntry> stratum_tables;
+    stratum_tables.reserve(5u);
     for (std::size_t q = 0; q < 5u; ++q) {
-        stratum_tables.push_back(
-            {"Quintile" + std::to_string(q + 1),
-             make_expected_table_with_income_and_pa(factor, 90.0 + static_cast<double>(q) * 5.0,
-                                                    600.0, 1.6 + static_cast<double>(q) * 0.1)});
+        stratum_tables.emplace_back(
+            "Quintile" + std::to_string(q + 1),
+            make_expected_table_with_income_and_pa(factor, 90.0 + (static_cast<double>(q) * 5.0),
+                                                   600.0, 1.6 + (static_cast<double>(q) * 0.1)));
     }
 
     const auto income_layout = core::income_category_layout_from_config("5");

@@ -74,6 +74,7 @@ target_sources(
             "mtrandom.h"
             "nutrients.h"
             "nutrients.cpp"
+            "linear_model_eval_options.h"
             "linear_model_evaluator.cpp"
             "linear_model_evaluator.h"
             "person.cpp"
