@@ -1,43 +1,79 @@
----
-name: HealthGPS Project Report Doc
-overview: Create a single, detailed project report markdown document (authored by Mahima, first-person and developer-friendly) that documents all integrated codebase changes (demographic, socioeconomic, risk factors, analysis, disease, policy, config/schema), progress as of Feb 2026, order of person initialization, verification notes, tests updated/written, links to ID-tracking design docs (individual_id_tracking_csv-plan.md, same_person_id_across_baseline_and_intervention-plan.md), and remaining to-dos (remove Food section, DataFile.csv, SES model from config; remove Level from schemas), suitable for GitHub and developer onboarding.
-todos: []
-isProject: false
----
+# HealthGPS Project Update Report
 
-# HealthGPS Project Updates – Detailed Documentation
-
-Author: Mahima Ghosh
-
-Date started: 1st November 2025
-
-Date last updated: 20th February 2026
+**Author:** Mahima Ghosh  
+**Period:** September 2025 – February 2026  
+**Last updated:** 20 February 2026
 
 **Related documentation:** [FINCH linear models guide](finch-linear-models-and-income-adjustment.md) · [Income quintile factor means plan](../plans/income-quintile-factor-means-plan.md) · [Individual ID tracking plan](../plans/individual-id-tracking-csv-plan.md) · [Same person ID plan](../plans/same-person-id-baseline-intervention-plan.md) · [Architecture guide](../../developer/architecture.md) · [Technical index](../README.md)
 
-## Objective
+---
 
-Produce one **detailed project report** (Markdown) that can be committed to the HealthGPS GitHub repo. It should serve as:
+## Executive summary
 
-- **User-facing**: What changed and how the project works now (India, ABD, FINCH).
-- **Developer-facing**: Where to look in code, config, and schema; how modules interact; what to verify or extend.
+This report documents the integrated Health-GPS codebase changes delivered between November 2025 and February 2026. The work unifies support for **India**, **ADB**, and **FINCH** within a single branch, extends demographic and socioeconomic modelling, refines static and dynamic risk-factor pipelines, and adds analysis, disease, policy, and configuration capabilities described below.
 
-The document will be structured into clear sections, with minimal duplication of the existing [architecture guide](../../developer/architecture.md) and [README.md](../../../README.md), and will focus on **changes and integrated behaviour** described in your summary.
+The report is intended for modellers, economists, and developers who need a single reference for **what changed**, **how modules interact**, and **where to look in the source tree**. It complements the existing [architecture guide](../../developer/architecture.md), [user guide](../../user/userguide.md), and [quick start](../../user/getstarted.md) rather than replacing them.
 
 ---
 
-## Proposed Document Location and Name
+## Table of contents
 
-- **Path**: `documentation/technical/guides/healthgps-update-report-2026-02-20.md`.
-- **Format**: Markdown, with optional table of contents and cross-links to existing docs.
+1. [Introduction and scope](#1-introduction-and-scope)
+2. [Supported projects and compatibility](#2-supported-projects-and-compatibility)
+3. [Application workflow](#3-application-workflow)
+4. [Parallelization](#4-parallelization)
+5. [Demographic module](#5-demographic-module)
+6. [Socioeconomic module (income)](#6-socioeconomic-module-income)
+7. [Risk factors — static linear model](#7-risk-factors--static-linear-model)
+8. [Risk factors — Kevin Hall (dynamic) model](#8-risk-factors--kevin-hall-dynamic-model)
+9. [Analysis module and output](#9-analysis-module-and-output)
+10. [Disease module](#10-disease-module)
+11. [Policy](#11-policy)
+12. [Configuration and schema](#12-configuration-and-schema)
+13. [Data loading and model parser](#13-data-loading-and-model-parser)
+14. [Person initialization sequence](#14-person-initialization-sequence)
+15. [Progress and outstanding work](#15-progress-and-outstanding-work)
+16. [Verification and testing](#16-verification-and-testing)
+17. [Related documentation](#17-related-documentation)
 
 ---
 
-## Overall workflow diagram
+## 1. Introduction and scope
 
-It describes the **overall HealthGPS flow** (where the program starts, what it goes through, where it ends), not the per-person initialization (which stays in Section 12).
+The updates described in this report extend Health-GPS from a project-specific codebase into an integrated platform that supports multiple country and study configurations through shared modules, schemas, and input conventions.
 
-**Modules in HealthGPS (simplified pipeline):**
+Scope includes:
+
+- Demographic assignment (region, ethnicity, individual ID tracking)
+- Socioeconomic modelling (categorical and continuous income)
+- Static linear and Kevin Hall dynamic risk-factor models
+- Analysis output (aggregates, income-stratified files, individual ID tracking)
+- Disease modelling (including Population Impact Fraction)
+- Policy timing and configuration/schema extensions
+
+Behaviour is documented relative to the main branch as of **20 February 2026**.
+
+---
+
+## 2. Supported projects and compatibility
+
+| Project | Status                             |
+| ------- | ---------------------------------- |
+| India   | Supported on the integrated branch |
+| ADB     | Supported on the integrated branch |
+| FINCH   | Supported on the integrated branch |
+
+**Backward compatibility:** Legacy India configuration formats continue to work. Configurations may be migrated to the new format incrementally; the code accepts both old and revised schemas where stated in Section 12.
+
+**Repository note:** When uploading JSON to `healthgps-examples`, existing Kevin Hall folders should be preserved. New JSON files should be added in a separate folder rather than replacing or deleting legacy examples.
+
+---
+
+## 3. Application workflow
+
+The diagrams below describe the overall Health-GPS execution path — from program entry through simulation and output — rather than the per-person initialization sequence (see Section 14).
+
+### 3.1 Module pipeline
 
 ```mermaid
 flowchart LR
@@ -47,7 +83,9 @@ flowchart LR
     DIS --> IO[Read/write to files]
 ```
 
-**Caption:** High-level workflow: host application entry, configuration and data loading, simulation composition, run loop (trials and time steps), module execution order, and output. Where to look: `program.cpp` (main), `runner.cpp` (run loop), `simulation.cpp` (init/update, initialise_population, update_population).
+### 3.2 Host application and run loop
+
+Entry point: `program.cpp`. Run loop: `runner.cpp`. Population lifecycle: `simulation.cpp` (`initialise_population`, `update_population`).
 
 ```mermaid
 flowchart TB
@@ -121,7 +159,7 @@ flowchart TB
     A_UPD --> PUB
 ```
 
-**Where to look for what (developer map):**
+### 3.3 Developer file map
 
 | Area                                           | Entry / main files                                                                                                                                                                                                                 |
 | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -129,7 +167,7 @@ flowchart TB
 | Run loop, trials, ADEVS                        | [runner.cpp](src/HealthGPS/runner.cpp)                                                                                                                                                                                             |
 | Simulation init/update, module order           | [simulation.cpp](src/HealthGPS/simulation.cpp)                                                                                                                                                                                     |
 | Demographic (age, gender, region, ethnicity)   | [demographic.cpp](src/HealthGPS/demographic.cpp)                                                                                                                                                                                   |
-| SES (income)                                   | SES module via factory (see [demographic](src/HealthGPS/demographic.cpp) / config)                                                                                                                                                 |
+| SES (income)                                   | SES module via factory (see [demographic.cpp](src/HealthGPS/demographic.cpp) and config)                                                                                                                                           |
 | Risk factors (static, dynamic e.g. Kevin Hall) | [static_linear_model.cpp](src/HealthGPS/static_linear_model.cpp), [kevin_hall_model.cpp](src/HealthGPS/kevin_hall_model.cpp), [riskfactor.cpp](src/HealthGPS/riskfactor.cpp)                                                       |
 | Disease, PIF                                   | [default_disease_model.cpp](src/HealthGPS/default_disease_model.cpp), disease host module                                                                                                                                          |
 | Analysis, results aggregation                  | [analysis_module.cpp](src/HealthGPS/analysis_module.cpp)                                                                                                                                                                           |
@@ -138,212 +176,262 @@ flowchart TB
 
 ---
 
-## Parallelization: where we parallelize and where we don’t
+## 4. Parallelization
 
-Add a **Parallelization** subsection to the final document (e.g. after the overall workflow / developer map, or as its own section) so developers and users know where concurrency is used and why some code stays sequential.
+Health-GPS uses Intel TBB and core threading helpers in selected hot paths. The tables below summarise where concurrency is applied and where sequential execution is retained for correctness or reproducibility.
 
-### Where we parallelize
+### 4.1 Parallelized components
 
-| Location                                                                                                                                                                                         | What                                                                                                                                                                                                                                                      | Why                                                                                                                                                                         |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Runner** ([runner.cpp](src/HealthGPS/runner.cpp))                                                                                                                                              | Baseline and intervention run in **parallel** (two `std::jthread`s per trial when intervention is configured).                                                                                                                                            | Two independent simulations for the same run; no shared mutable state between them.                                                                                         |
-| **Program** ([program.cpp](src/HealthGPS.Console/program.cpp))                                                                                                                                   | Config parsing and **async load** of datatable (`core::run_async(load_datatable_from_csv, ...)`). Thread count via `tbb::global_control::max_allowed_parallelism` (optional `-T`).                                                                        | Overlap I/O with other startup work; user can cap TBB parallelism.                                                                                                          |
-| **Simulation** ([simulation.cpp](src/HealthGPS/simulation.cpp))                                                                                                                                  | `get_current_simulated_population`: `tbb::parallel_for_each` over population to count by age/gender; `get_current_expected_population` and `create_input_data_summary` launched with `core::run_async`.                                                   | Per-person independence when aggregating counts; overlap two heavy reads.                                                                                                   |
-| **Demographic** ([demographic.cpp](src/HealthGPS/demographic.cpp))                                                                                                                               | `initialise_population` (e.g. region/ethnicity): `tbb::parallel_for_each` over population; residual mortality updated via `core::run_async`.                                                                                                              | Per-person assignment is independent; residual calculation can run alongside other work.                                                                                    |
-| **Risk factor adjustable** ([risk_factor_adjustable_model.cpp](src/HealthGPS/risk_factor_adjustable_model.cpp))                                                                                  | Adjustment pass: `tbb::parallel_for_each` over population.                                                                                                                                                                                                | Each person’s adjustment is independent.                                                                                                                                    |
-| **Disease** ([default_disease_model.cpp](src/HealthGPS/default_disease_model.cpp), [default_cancer_model.cpp](src/HealthGPS/default_cancer_model.cpp), [disease.cpp](src/HealthGPS/disease.cpp)) | Incidence/remission over population: `tbb::parallel_for_each`; disease host iterates sub-models in parallel. Per-disease aggregates use a mutex when reducing into shared counters.                                                                       | Per-person disease updates are independent; only the reduction step is shared.                                                                                              |
-| **Analysis** ([analysis_module.cpp](src/HealthGPS/analysis_module.cpp))                                                                                                                          | Many loops over population use `core::parallel_for` (index-based) or similar; `calculate_historical_statistics` and `calculate_dalys` run concurrently via `core::run_async`. Aggregations use a mutex (`sum_mutex`) when writing to shared accumulators. | Large population; parallelize over individuals and overlap DALY vs other stats; protect shared sums.                                                                        |
-| **Result writing** ([result_file_writer.cpp](src/HealthGPS.Console/result_file_writer.cpp))                                                                                                      | Income-category CSV writes: `tbb::parallel_for_each` over income categories; each stream has its own mutex.                                                                                                                                               | Different files; no shared stream.                                                                                                                                          |
-| **Event bus** ([event_bus.cpp](src/HealthGPS/event_bus.cpp))                                                                                                                                     | `publish_async`: subscribers notified via `core::run_async`.                                                                                                                                                                                              | Non-blocking publish; subscribers run in worker threads.                                                                                                                    |
-| **EventMonitor** ([event_monitor.cpp](src/HealthGPS.Console/event_monitor.cpp), [event_monitor.h](src/HealthGPS.Console/event_monitor.h))                                                        | Separate **queues and dispatch threads** for result vs individual-tracking messages (`tbb::concurrent_queue`, dedicated threads).                                                                                                                         | Main result writes and ID-tracking writes can proceed in parallel (see [parallelize_output_writes_and_is_active-plan.md](parallelize_output_writes_and_is_active-plan.md)). |
+| Location                                                                                                                                                                                         | Mechanism                                                                                                                     | Rationale                                                                                                                   |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| **Runner** ([runner.cpp](src/HealthGPS/runner.cpp))                                                                                                                                              | Baseline and intervention run in parallel (two `std::jthread`s per trial when intervention is configured)                     | Independent simulations; no shared mutable state between them                                                               |
+| **Program** ([program.cpp](src/HealthGPS.Console/program.cpp))                                                                                                                                   | Async datatable load via `core::run_async`; TBB parallelism cap via `-T`                                                      | Overlap I/O with startup; user-configurable thread count                                                                    |
+| **Simulation** ([simulation.cpp](src/HealthGPS/simulation.cpp))                                                                                                                                  | `tbb::parallel_for_each` for population counts; `core::run_async` for expected population and input summary                   | Per-person independence in aggregation                                                                                      |
+| **Demographic** ([demographic.cpp](src/HealthGPS/demographic.cpp))                                                                                                                               | `tbb::parallel_for_each` for region/ethnicity assignment; async residual mortality                                            | Independent per-person assignment                                                                                           |
+| **Risk factor adjustable** ([risk_factor_adjustable_model.cpp](src/HealthGPS/risk_factor_adjustable_model.cpp))                                                                                  | `tbb::parallel_for_each` over population during adjustment                                                                    | Independent per-person adjustment                                                                                           |
+| **Disease** ([default_disease_model.cpp](src/HealthGPS/default_disease_model.cpp), [default_cancer_model.cpp](src/HealthGPS/default_cancer_model.cpp), [disease.cpp](src/HealthGPS/disease.cpp)) | `tbb::parallel_for_each` for incidence/remission; mutex on shared counters                                                    | Parallel per-person updates; protected reduction                                                                            |
+| **Analysis** ([analysis_module.cpp](src/HealthGPS/analysis_module.cpp))                                                                                                                          | `core::parallel_for` over population; concurrent DALY and historical stats via `core::run_async`; `sum_mutex` on accumulators | Large-population performance                                                                                                |
+| **Result writing** ([result_file_writer.cpp](src/HealthGPS.Console/result_file_writer.cpp))                                                                                                      | `tbb::parallel_for_each` over income categories; per-stream mutex                                                             | Separate output files                                                                                                       |
+| **Event bus** ([event_bus.cpp](src/HealthGPS/event_bus.cpp))                                                                                                                                     | `publish_async` via `core::run_async`                                                                                         | Non-blocking subscriber notification                                                                                        |
+| **EventMonitor** ([event_monitor.cpp](src/HealthGPS.Console/event_monitor.cpp))                                                                                                                  | Separate queues and dispatch threads for result vs individual-tracking messages                                               | Parallel main-result and tracking writes (see [parallelize output writes plan](../plans/parallelize-output-writes-plan.md)) |
 
-### Where we do *not* parallelize (and why)
+### 4.2 Sequential components
 
-| Location                                                                                                                             | What                                                                                                                              | Why                                                                                                                                                                             |
-| ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Static linear model** ([static_linear_model.cpp](src/HealthGPS/static_linear_model.cpp))                                           | Initialisation and update loops over population are **sequential**.                                                               | Shared model state (e.g. linear model coefficients), possible ordering/reproducibility requirements, and dependency on demographic/SES already set per person in a fixed order. |
-| **Kevin Hall (dynamic) model** ([kevin_hall_model.cpp](src/HealthGPS/kevin_hall_model.cpp))                                          | Per-person weight/dynamic updates are **sequential**.                                                                             | Model uses shared parameters and possibly person-to-person or temporal dependencies; parallelization would require careful design to avoid races or non-determinism.            |
-| **Simulation module order** ([simulation.cpp](src/HealthGPS/simulation.cpp))                                                         | `initialise_population` and `update_population` call **Demographic → SES → Risk factor → Disease → Analysis** in strict sequence. | Data dependencies: each module expects the previous one to have run (e.g. risk factors need demographics and income).                                                           |
-| **Repository / data loading** ([repository.cpp](src/HealthGPS/repository.cpp), [model_parser](src/HealthGPS.Input/model_parser.cpp)) | Loads and caches protected by a **single mutex**; no parallel iteration over load steps.                                          | Consistency of cached data and simple correctness; parallel loads would require finer-grained locking or lock-free structures.                                                  |
-| **SyncChannel** (baseline ↔ intervention)                                                                                            | Sending net immigration (etc.) from baseline to intervention is **synchronous** (blocking send/receive).                          | Deterministic coupling between scenarios; parallelizing would complicate ordering and reproducibility.                                                                          |
+| Location                                                                                                                                 | Behaviour                                                   | Rationale                                        |
+| ---------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- | ------------------------------------------------ |
+| **Static linear model** ([static_linear_model.cpp](src/HealthGPS/static_linear_model.cpp))                                               | Sequential population loops                                 | Shared model state; ordering and reproducibility |
+| **Kevin Hall model** ([kevin_hall_model.cpp](src/HealthGPS/kevin_hall_model.cpp))                                                        | Sequential per-person updates                               | Shared parameters; temporal dependencies         |
+| **Simulation module order** ([simulation.cpp](src/HealthGPS/simulation.cpp))                                                             | Strict Demographic → SES → Risk factor → Disease → Analysis | Cross-module data dependencies                   |
+| **Repository / model parser** ([repository.cpp](src/HealthGPS/repository.cpp), [model_parser.cpp](src/HealthGPS.Input/model_parser.cpp)) | Single mutex on load/cache                                  | Cache consistency                                |
+| **SyncChannel** (baseline ↔ intervention)                                                                                                | Synchronous send/receive for net immigration etc.           | Deterministic scenario coupling                  |
 
-### Concurrency primitives and thread control
+### 4.3 Concurrency primitives
 
-- **TBB**: `tbb::parallel_for_each`, `tbb::global_control::max_allowed_parallelism`, `tbb::concurrent_queue`, `tbb::task_group` / `task_group_context` (EventMonitor).
-- **Core helpers** ([thread_util.h](src/HealthGPS.Core/thread_util.h)): `core::parallel_for` (index-based, implemented via TBB), `core::run_async` (wraps `std::async(std::launch::async, ...)`).
-- **Mutexes**: Used where parallel loops reduce into shared state (e.g. analysis `sum_mutex`, disease model counters, simulation `count_mutex`, demographic aggregation, result writer per-stream locks, repository cache lock, EventBus subscriber list).
-- **Document in final report**: List the above tables (or a short summary) so readers know where to expect parallelism and where to preserve ordering or avoid introducing races.
+- **TBB:** `tbb::parallel_for_each`, `tbb::global_control::max_allowed_parallelism`, `tbb::concurrent_queue`, `tbb::task_group` / `task_group_context`
+- **Core helpers** ([thread_util.h](src/HealthGPS.Core/thread_util.h)): `core::parallel_for`, `core::run_async`
+- **Mutexes:** Used where parallel loops reduce into shared state (analysis, disease, simulation counts, result writers, repository cache, EventBus subscribers)
+
+Further runtime notes: [Performance optimizations](performance-optimizations.md).
 
 ---
 
-## Document Structure and Content
+## 5. Demographic module
 
-### 1. Introduction and scope
+| Feature           | Description                                                           | Key code                                                                                                                                                        |
+| ----------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Region**        | Assignment via `region.csv` by age and gender (random probability)    | [demographic.cpp](src/HealthGPS/demographic.cpp) — `initialise_region`; [repository.cpp](src/HealthGPS/repository.cpp) — `get_region_prevalence`                |
+| **Ethnicity**     | Assignment via `ethnicity.csv` by age and gender (random probability) | `initialise_ethnicity`; `get_ethnicity_prevalence`                                                                                                              |
+| **Gender**        | Encoding: 1 = Female, 0 = Male                                        | Demographic module                                                                                                                                              |
+| **Individual ID** | Stable ID tracking across baseline and intervention runs              | See [individual ID tracking plan](../plans/individual-id-tracking-csv-plan.md) and [same person ID plan](../plans/same-person-id-baseline-intervention-plan.md) |
 
-- **Author**: The updates described in this document were made by **Mahima**; the report is written in first person where appropriate and is intended to be developer-friendly and in-depth.
-- Brief purpose: integrated codebase that supports India, ABD, and FINCH with the listed features along with new features to make the codebase more user friendly.
-- Note that the document describes updates relative to the main branch and is current as of the stated date (e.g. progress as of 20 Feb 2026). Will be pushed to MAIN branch on 20th Feb 2026 (tentative)
-- Link to existing [Quick Start](../../user/getstarted.md), [User Guide](../../user/userguide.md), [Architecture](../../developer/architecture.md). Link to design docs: [individual-id-tracking-csv-plan.md](../plans/individual-id-tracking-csv-plan.md), [same-person-id-baseline-intervention-plan.md](../plans/same-person-id-baseline-intervention-plan.md).
+---
 
-### 2. Supported projects and compatibility
+## 6. Socioeconomic module (income)
 
-- **Projects**: India, ABD, FINCH – integrated codebase works for all.
-- **Backward compatibility**: Old India config format still works; configs can be updated to the new format. Code supports both old and new/improved schemas.
-- **Important note** (from your summary): When uploading JSON to healthgps-examples, keep existing KevinHall folders; add a new folder for new JSON files rather than replacing or deleting old ones.
+- **Income categorical** (formerly `income`): Renamed to `income_categorical`; assignment via logits; category count is user-defined in config.
+- **Income (continuous) model:** Assigns `income_continuous` via linear regression on age, gender, region, ethnicity, and random noise; optional adjustment to factors mean; ranks values and assigns tertiles or quartiles per config.
+- **Configuration:** Factors-mean adjustment for income and final category count (e.g. 3 or 4) are specified in `config.json` / `project_requirements`.
 
-### 3. Demographic module
+Reference: [demographic.cpp](src/HealthGPS/demographic.cpp), [configuration.cpp](src/HealthGPS.Input/configuration.cpp), [model_parser.cpp](src/HealthGPS.Input/model_parser.cpp).
 
-- **Region**: Region model added; assignment via `region.csv` by age and gender using random probability. Key code: [demographic.cpp](src/HealthGPS/demographic.cpp) (e.g. `initialise_region`, repository `get_region_prevalence`), [repository.cpp](src/HealthGPS/repository.cpp).
-- **Ethnicity**: Ethnicity model added; assignment via `ethnicity.csv` by age and gender using random probability. Key code: `initialise_ethnicity`, repository `get_ethnicity_prevalence`.
-- **Gender**: Encoding clarified (1 = Female, 0 = Male).
-- **Individual ID**: Individual ID tracking enabled; same ID for each person across baseline and intervention (with intervention ID offset rule documented in Section 8). **Design docs**: detailed plan for ID tracking CSV output is in [individual_id_tracking_csv-plan.md](individual_id_tracking_csv-plan.md); ID assignment for same person across baseline and intervention is in [same_person_id_across_baseline_and_intervention-plan.md](same_person_id_across_baseline_and_intervention-plan.md).
+---
 
-### 4. Socioeconomic module (income)
+## 7. Risk factors — static linear model
 
-- **Income categorical (formerly “income”)**: Renamed to `income_categorical`; assignment via logits; flexible number of categories (user-defined in config).
-- **Income (continuous) model**: New Income model that:
-  - Assigns `income_continuous` using linear regression depending on age, gender, region, ethnicity, and random noise.
-  - Optionally adjusts income to factors mean (configurable in `config.json`).
-  - Sorts income values ascending and divides into quartiles or tertiles (user-configurable).
-- **Config**: User specifies whether income is adjusted to factors mean in `config.json`. Income category count (e.g. 3 or 4) specified in config.
+- **Physical activity naming:** `physical_activity` replaced by `simple_physical_activity` (random probability, constant mean, small standard deviation).
+- **Continuous physical activity:** Regression on age, gender, region, ethnicity, `income_continuous`, and noise; optional factors-mean adjustment.
+- **Two-stage modelling** (e.g. alcohol zero vs non-zero):
+  - **Initialisation:** Stage 1 — logistic regression for P(value = 0); Stage 2 — Box-Cox + linear regression for non-zero values. Logistic stage is optional; Box-Cox stage is required when two-stage is enabled.
+  - **Update:** Stage 1 probability adjusted by prior-year status (e.g. if previous year zero, P(0) = (P_stage1 + 1) / 2; else (P_stage1 + 0) / 2). Coefficients for two-stage factors are added to `logistic_regression.csv`.
+- **Policy CSV input:** Energy intake rows are normalised to **log** energy intake at load time.
+- **Static model config:** File names and columns are user-specifiable for region, ethnicity, income (continuous or categorical), physical activity (continuous or simple), logistic model, Box-Cox coefficients, and policy model.
 
-Reference: [demographic.cpp](src/HealthGPS/demographic.cpp), [configuration.cpp](src/HealthGPS.Input/configuration.cpp), [model_parser.cpp](src/HealthGPS.Input/model_parser.cpp) for loading and config.
+Reference: [static_linear_model.cpp](src/HealthGPS/static_linear_model.cpp), [risk_factor_adjustable_model.cpp](src/HealthGPS/risk_factor_adjustable_model.cpp). Modeller-facing detail: [FINCH linear models guide](finch-linear-models-and-income-adjustment.md).
 
-### 5. Risk factors – static linear model
+---
 
-- **Physical activity naming**: `physical_activity` replaced by `simple_physical_activity` (random probability, constant mean, small std).
-- **Physical activity model**: New model for continuous physical activity: regression on age, gender, region, ethnicity, `income_continuous`, and random noise; optional adjustment to factors mean (configurable in `config.json`).
-- **Two-stage modelling** (e.g. zero vs non-zero then level):
-  - **Initialisation**: Stage 1 – logistic regression for P(value=0); Stage 2 – for non-zero, Box-Cox + linear regression. **Update**: Stage 1 – probability of zero from logistic regression, then adjusted by previous year status (e.g. alcohol: if previous year zero, new P(0) = (P_stage1+1)/2; else (P_stage1+0)/2); Stage 2 – non-zero values via Box-Cox and linear regression. First stage (logistic) is optional; second stage (Box-Cox + linear) is compulsory. Two-stage factors are defined by adding coefficients to `logistic_regression.csv`.
-- **Policy/CSV input**: When using CSV for policy models, “energy intake” is stored as **log** energy intake.
-- **Static model config**: User can specify file names (and columns) for: region, ethnicity, income (continuous or categorical), physical activity (continuous or simple); and for risk factor models, logistic model, Box-Cox coefficients, and policy model. Changing behaviour requires updating both “name” and “columns” where applicable.
+## 8. Risk factors — Kevin Hall (dynamic) model
 
-Reference: [static_linear_model.cpp](src/HealthGPS/static_linear_model.cpp), [risk_factor_adjustable_model.cpp](src/HealthGPS/risk_factor_adjustable_model.cpp).
+- **Weight — `get_expected`:** Physical activity is read from factors-mean CSV data rather than hardcoded values when setting expected weight.
+- **Dynamic model JSON:** Kevin Hall parameters are specified in the dynamic model configuration.
 
-### 6. Risk factors – Kevin Hall (dynamic) model
+Reference: [kevin_hall_model.cpp](src/HealthGPS/kevin_hall_model.cpp).
 
-- **Weight – `get_expected`**: No longer uses hardcoded physical activity. It now reads PA values from the factors mean CSV and uses them to set `get_expected` for weight dynamically.
-- **Dynamic model JSON**: Kevin Hall parameters are specified in the dynamic model JSON.
+---
 
-Reference: [kevin_hall_model.cpp](src/HealthGPS/kevin_hall_model.cpp), dynamic model config and factors mean data loading.
+## 9. Analysis module and output
 
-### 7. Analysis module and output
-
-- **Simulated mean**: Contains only non-zero risk factors / factors that use Box-Cox and **not** only logistic regression (e.g. if a factor has both Box-Cox and logistic, include it; if only logistic, exclude from simulated mean). Implemented in [risk_factor_adjustable_model.cpp](src/HealthGPS/risk_factor_adjustable_model.cpp).
-- **Income-based CSV**: Results by income category are written based on `income_category`; logic fixed accordingly.
-- **Individual ID tracking**: All persons tracked by unique ID across years (same ID in baseline until death; after death a newborn can reuse that ID in baseline). In intervention, persons copied from baseline get new IDs = baseline ID + N (N = total population size). Example: baseline IDs 1..N, intervention IDs N+1..2N. See [individual_id_tracking_csv-plan.md](individual_id_tracking_csv-plan.md) for the CSV tracking feature and [same_person_id_across_baseline_and_intervention-plan.md](same_person_id_across_baseline_and_intervention-plan.md) for ID assignment rules.
-- **Optional income-based files**: User can enable/disable output of results files categorised by income in config.
-- **Output writes and is_active**: Parallelizing main result writes vs individual-tracking writes (two writer threads) and reducing redundant `is_active()` calls in analysis hot paths are described in [parallelize_output_writes_and_is_active-plan.md](parallelize_output_writes_and_is_active-plan.md).
+- **Simulated mean:** Includes non-zero risk factors and factors using Box-Cox; excludes factors modelled by logistic regression only. Implemented in [risk_factor_adjustable_model.cpp](src/HealthGPS/risk_factor_adjustable_model.cpp).
+- **Income-based CSV:** Results stratified by `income_category` with corrected assignment logic.
+- **Individual ID tracking:** Optional per-person CSV output with user-defined filters. Baseline IDs are stable until death; intervention copies receive offset IDs (baseline ID + N, where N is population size). See design plans linked in Section 5.
+- **Optional income-based files:** Enabled or disabled via config.
+- **Output parallelism:** Separate writer threads for main results vs individual tracking; reduced `is_active()` calls in analysis hot paths — see [parallelize output writes plan](../plans/parallelize-output-writes-plan.md).
 
 Reference: [analysis_module.cpp](src/HealthGPS/analysis_module.cpp), [result_file_writer.cpp](src/HealthGPS.Console/result_file_writer.cpp), [individual_id_tracking_writer.cpp](src/HealthGPS.Console/individual_id_tracking_writer.cpp).
 
-### 8. Disease module (incidence, remission, prevalence, YLD, YLL, DALY, mortality)
+---
 
-- **PIF (Population Impact Fraction)**: New option to compute disease probability as `incidence * (1 - PIF)`, with PIF depending on age, gender, years post intervention, and disease-specific PIF values. Can be switched on/off in config.
-- Reference: PIF-related code and tests under [default_disease_model.cpp](src/HealthGPS/default_disease_model.cpp), [pif_data.cpp](src/HealthGPS.Input/pif_data.cpp), [RepositoryPIF.Test.cpp](src/HealthGPS.Tests/RepositoryPIF.Test.cpp), [PIFIntegration.Test.cpp](src/HealthGPS.Tests/PIFIntegration.Test.cpp), etc.
+## 10. Disease module
 
-### 9. Policy
+- **Population Impact Fraction (PIF):** Optional mode computes disease probability as `incidence × (1 − PIF)`, with PIF depending on age, gender, years post intervention, and disease-specific values. Configurable on/off.
+- **Outputs:** Incidence, remission, prevalence, YLD, YLL, DALY, and mortality follow existing module structure with PIF integration where enabled.
 
-- **Policy start year**: Policy implementation can start from a user-specified year. For the ADB paper, implementation starts from the first year. Default in code is second year; config allows overriding.
+Reference: [default_disease_model.cpp](src/HealthGPS/default_disease_model.cpp), [pif_data.cpp](src/HealthGPS.Input/pif_data.cpp).
 
-Reference: Configuration and policy application in simulation flow (e.g. [configuration.cpp](src/HealthGPS.Input/configuration.cpp), [configuration_parsing.cpp](src/HealthGPS.Input/configuration_parsing.cpp)).
+---
 
-### 10. Configuration (JSON) and schema
+## 11. Policy
 
-- **Config**: Income category count for `income_categorical`; trend type (`null`, `UPF_trend`, `income_trend`); optional income-based result files; adjust-to-factors-mean (income, PA); trended adjustment to factors mean; year policy implementation starts; project-specific requirements (e.g. India: presence of region/ethnicity, income type, category count, adjustments, trended adjustments, trends).
-- **Static model**: File names (and columns) for region, ethnicity, income model, physical activity, risk factor models, logistic regression, Box-Cox, policy model.
-- **Dynamic model**: Kevin Hall parameters.
-- **Two-stage risk factors**: Configured by adding coefficients to `logistic_regression.csv`.
-- **Schemas**: Act as intermediary to CSV inputs in HealthGPS-examples; placeholders for file names only (no need to manually list all policy/risk factor/Box-Cox values). Old configs still valid; new format optional. Schema options: income categories (3 or 4), trend type, income-based output on/off, adjust to factors mean, trended adjustment, policy start year.
+Policy implementation may start from a user-specified year. For the ADB paper, implementation begins in the first simulation year. The code default is the second year; config overrides this behaviour.
 
-Reference: [configuration.cpp](src/HealthGPS.Input/configuration.cpp), [configuration_parsing.cpp](src/HealthGPS.Input/configuration_parsing.cpp), [schema.cpp](src/HealthGPS.Input/schema.cpp), [ConfigSchemaExpanded.Test.cpp](src/HealthGPS.Tests/ConfigSchemaExpanded.Test.cpp).
+Reference: [configuration.cpp](src/HealthGPS.Input/configuration.cpp), [configuration_parsing.cpp](src/HealthGPS.Input/configuration_parsing.cpp).
 
-### 11. Data loading and model parser
+---
 
-- **names_** vector: Risk factor correlation and covariance matrix data keep a consistent order. **names_** contains risk factor names (e.g. carb, sugar, protein) and **excludes** weight, height, BMI, income, physical activity, and energy intake – i.e. quantities used in [kevin_hall_model.cpp](src/HealthGPS/kevin_hall_model.cpp) and supplied via dynamic_model.json.
+## 12. Configuration and schema
+
+**Config extensions:**
+
+- Income category count for `income_categorical`
+- Trend type: `null`, `UPF_trend`, `income_trend`
+- Optional income-stratified result files
+- Adjust-to-factors-mean flags (income, physical activity)
+- Trended adjustment to factors mean
+- Policy start year
+- `project_requirements` (demographics, income layout, PA, trends, two-stage flags — see [project requirements plan](../plans/project-requirements-plan.md))
+
+**Static model:** User-specified file names and columns for region, ethnicity, income, physical activity, logistic regression, Box-Cox, and policy models.
+
+**Dynamic model:** Kevin Hall parameters in dynamic model JSON.
+
+**Schemas:** Act as intermediaries to CSV inputs in Health-GPS-examples (file-name placeholders rather than full coefficient listings). Legacy configs remain valid; extended schema options include income categories (3 or 4), trend type, income-based output, adjust-to-factors-mean, trended adjustment, and policy start year.
+
+Reference: [configuration.cpp](src/HealthGPS.Input/configuration.cpp), [configuration_parsing.cpp](src/HealthGPS.Input/configuration_parsing.cpp), [schema.cpp](src/HealthGPS.Input/schema.cpp).
+
+---
+
+## 13. Data loading and model parser
+
+The `names_` vector in the model parser preserves a consistent order for risk-factor correlation and covariance data. It contains risk-factor names (e.g. carbohydrate, sugar, protein) and **excludes** weight, height, BMI, income, physical activity, and energy intake — quantities supplied via dynamic model JSON and used in [kevin_hall_model.cpp](src/HealthGPS/kevin_hall_model.cpp).
 
 Reference: [model_parser.cpp](src/HealthGPS.Input/model_parser.cpp).
 
-### 12. Order of person initialization
+---
 
-Include the exact sequence (as a numbered list or flowchart description):
+## 14. Person initialization sequence
 
-**Written sequence:**
+Per-person initialization follows this order:
 
-Age → Gender → Region (if available) → Ethnicity (if available) → Sector (if available) → Income → [Categorical: direct assignment (e.g. India) OR Continuous: compute value, quartiles, assign categories (e.g. FINCH)] → **Risk factors** → [If two-stage (logistic): Stage 1 logistic regression, then Stage 2 Box-Cox; else Box-Cox only] → **Physical activity** → [Simple: random probability, constant mean, small std OR Continuous: regression on age, gender, region, ethnicity, income_continuous, noise] → **Adjust to factors mean (user choice: enabled or not in config, same as other adjustments)** → Policies (if enabled) → Trends (if enabled) → [UPF trends: multiplicative over time; Income trends: exponential decay] → Trended Risk Factor Adjustment → Disease Model.
-
-Flowchart (no internal function names):
+Age → Gender → Region (if configured) → Ethnicity (if configured) → Sector (if configured) → Income → [Categorical: direct assignment (e.g. India) **or** Continuous: compute value, rank, assign categories (e.g. FINCH)] → Risk factors → [Two-stage: logistic then Box-Cox **or** Box-Cox only] → Physical activity → [Simple PA **or** continuous PA regression] → Adjust to factors mean (if enabled) → Policies (if enabled) → Trends (if enabled) → Trended risk-factor adjustment → Disease model.
 
 ```mermaid
 flowchart TB
     A[Age] --> B[Gender]
-    B --> C["Region (if available)"]
-    C --> D["Ethnicity (if available)"]
-    D --> E["Sector (if available)"]
+    B --> C["Region (if configured)"]
+    C --> D["Ethnicity (if configured)"]
+    D --> E["Sector (if configured)"]
     E --> F[Income]
-    F --> G["Categorical: direct assignment (e.g. India)"]
-    F --> H["Continuous: compute value, quartiles, assign categories (e.g. FINCH)"]
-    G --> I[Risk Factors]
+
+    F --> G["Categorical assignment<br/>(e.g. India)"]
+    F --> H["Continuous value + categories<br/>(e.g. FINCH)"]
+
+    G --> I[Risk factors]
     H --> I
-    I --> I1["Two-stage: Stage 1 logistic"]
-    I1 --> I1b["Stage 2 Box-Cox"]
-    I --> I2["Box-Cox only"]
-    I1b --> RFA
+
+    I --> I1["Two-stage path<br/>logistic then Box-Cox"]
+    I --> I2["Single-stage path<br/>Box-Cox only"]
+
+    I1 --> RFA[Risk factors assigned]
     I2 --> RFA
-    RFA["Risk factors assigned"] --> J[Physical Activity]
+
+    RFA --> J[Physical activity]
     J --> J1[Simple PA]
     J --> J2[Continuous PA]
-    J1 --> PAD
+
+    J1 --> PAD[PA assigned]
     J2 --> PAD
-    PAD["PA assigned"] --> K["Adjust to factors mean (if enabled)"]
-    K --> L["Policies (if enabled)"]
-    L --> M["Trends (if enabled)"]
-    M --> N["UPF trends: multiplicative over time"]
-    M --> O["Income trends: exponential decay"]
-    N --> P[Trended Risk Factor Adjustment]
+
+    PAD --> K["Factors-mean adjustment<br/>(if enabled)"]
+    K --> L["Policies<br/>(if enabled)"]
+    L --> M["Trends<br/>(if enabled)"]
+    M --> N["UPF trend"]
+    M --> O["Income trend"]
+    N --> P[Trended RF adjustment]
     O --> P
-    P --> Q[Disease Model]
+    P --> Q[Disease model]
 ```
 
-### 13. Progress as of 20 February 2026
+---
 
-- State that the integrated codebase works for all projects (India, ABD, FINCH). The items previously listed under To-do (trended adjustment, schema validation, risk factors from config, dynamic age cap, dynamic schemas, income-based files, consistent data loading, age limits, log energy intake, FINCH age cap, trended factors mean) have been **completed**.
-- **Remaining To-do** (not yet done):
-  - **a)** Remove Food section (from config/schema or UI as applicable).
-  - **b)** Remove DataFile.csv from config.
-  - **c)** Remove SES model from config.
-  - **d)** Remove Level from schemas.
-- **Verify**: Note open question – “Is income adjusted to factors mean only for FINCH or also for India? Same for physical activity.” (No code changes in the doc; just flag for verification.)
+## 15. Progress and outstanding work
 
-### 14. Notes for developers and contributors
+### 15.1 Completed (as of 20 February 2026)
 
-- **Author and voice**: The document should state that these changes were made by **Mahima** (first person: “I made these changes…” where appropriate), so developers know who to attribute and contact.
-- **Where to find things**: In-depth pointers to key modules with one-line description and main file paths: demographic, socioeconomic, static/dynamic risk factor, analysis, disease, policy, config, schema. Include which source files to open for each area.
-- **Tests updated and written**: List or describe the tests that were **updated** and **added** as part of these changes (e.g. Population.Test.cpp for ID assignment, ConfigSchemaExpanded.Test.cpp, PIF-related tests such as RepositoryPIF.Test.cpp, PIFIntegration.Test.cpp, PIFData.Test.cpp, DiseaseModelPIF.Test.cpp, DataManagerPIF.Test.cpp, ConfigurationPIF.Test.cpp, Simulation.Test.cpp if touched, and any new tests for demographic, analysis, or ID tracking). This gives developers a clear map of test coverage for the new behaviour.
-- How to run examples (reference to getstarted and example configs).
-- Reminder: preserve backward compatibility with old config/schema where stated.
-- **Related design docs**: Link again to [individual_id_tracking_csv-plan.md](individual_id_tracking_csv-plan.md) and [same_person_id_across_baseline_and_intervention-plan.md](same_person_id_across_baseline_and_intervention-plan.md) for ID tracking design details.
+The integrated codebase supports India, ADB, and FINCH. The following items from the original work plan are **complete**:
 
-### 15. Optional: short appendix
+- Trended adjustment to factors mean
+- Schema validation extensions
+- Risk factors driven from config
+- Dynamic age cap
+- Dynamic schemas
+- Income-based output files
+- Consistent data loading
+- Age limits
+- Log energy intake normalisation for policy CSVs
+- FINCH age cap
+- Trended factors-mean pipeline
 
-- **Appendix A**: List of config keys relevant to the new behaviour (income categories, trend_type, adjust_to_factors_mean, policy_start_year, etc.) with brief meaning.
-- **Appendix B**: File naming conventions for input CSVs (region, ethnicity, income, PA, logistic_regression, Box-Cox, factors mean) if you want a single reference.
+### 15.2 Outstanding
+
+| Item           | Description                                |
+| -------------- | ------------------------------------------ |
+| Food section   | Remove from config/schema where applicable |
+| DataFile.csv   | Remove from config                         |
+| SES model      | Remove from config                         |
+| Level property | Remove from schemas                        |
+
+### 15.3 Open verification question
+
+Whether income and physical activity are adjusted to factors mean for **India** as well as **FINCH** should be confirmed against project configs and reference runs. Behaviour is config-driven; defaults may differ by project.
 
 ---
 
-## Implementation notes for the writer
+## 16. Verification and testing
 
-- **Developer**: **Mahima** (first person: “I added…”, “I changed…”) so the document is clearly attributed and developer-friendly. Prefer concrete “I did X” or “the code now does X” over passive or vague “we.”
-- **Developer-friendly and in-depth**: Include enough detail for a new developer to find the right files, understand what was changed, and see which tests were updated or written (list test file names and, where useful, test case names).
-- Use markdown headers (H2 for main sections, H3 for subsections), bullet lists, and optional tables for config options or file references.
-- Keep mermaid minimal and robust (no spaces in node IDs, quoted edge labels if needed) per project guidelines.
-- Do not duplicate long code blocks; reference file paths and function names. Short one-line snippets are acceptable.
-- Cross-link to existing docs (architecture, userguide, getstarted) and to the two ID-tracking plan docs (individual_id_tracking_csv-plan.md, same_person_id_across_baseline_and_intervention-plan.md) so the new doc complements rather than replaces them.
+The following test files were updated or added to cover the integrated behaviour:
+
+| Test file                                                                                | Coverage area                          |
+| ---------------------------------------------------------------------------------------- | -------------------------------------- |
+| [Population.Test.cpp](src/HealthGPS.Tests/Population.Test.cpp)                           | Person ID assignment                   |
+| [ConfigSchemaExpanded.Test.cpp](src/HealthGPS.Tests/ConfigSchemaExpanded.Test.cpp)       | Extended config/schema                 |
+| [RepositoryPIF.Test.cpp](src/HealthGPS.Tests/RepositoryPIF.Test.cpp)                     | PIF data loading                       |
+| [PIFIntegration.Test.cpp](src/HealthGPS.Tests/PIFIntegration.Test.cpp)                   | PIF integration                        |
+| [PIFData.Test.cpp](src/HealthGPS.Tests/PIFData.Test.cpp)                                 | PIF data structures                    |
+| [DiseaseModelPIF.Test.cpp](src/HealthGPS.Tests/DiseaseModelPIF.Test.cpp)                 | Disease + PIF                          |
+| [DataManagerPIF.Test.cpp](src/HealthGPS.Tests/DataManagerPIF.Test.cpp)                   | Data manager PIF                       |
+| [ConfigurationPIF.Test.cpp](src/HealthGPS.Tests/ConfigurationPIF.Test.cpp)               | Config PIF options                     |
+| [Simulation.Test.cpp](src/HealthGPS.Tests/Simulation.Test.cpp)                           | Simulation integration (where touched) |
+| [PredictorResolver.Test.cpp](src/HealthGPS.Tests/PredictorResolver.Test.cpp)             | Predictor naming and `gender2`         |
+| [IncomeStratumAdjustment.Test.cpp](src/HealthGPS.Tests/IncomeStratumAdjustment.Test.cpp) | Income-stratum factors-mean adjustment |
+
+Example runs and configuration: [quick start](../../user/getstarted.md).
 
 ---
 
-## Deliverable
+## 17. Related documentation
 
-- **Single file**: `documentation/technical/guides/healthgps-update-report-2026-02-20.md`.
-- **Length**: Proportional to the summary (roughly 3–6 pages when rendered, depending on appendices).
-- **Outcome**: A document to upload to the GitHub repo and point to from README or docs index so users and developers have one place for “what changed and how it works now.”
+| Document                                                                           | Purpose                                                 |
+| ---------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| [FINCH linear models guide](finch-linear-models-and-income-adjustment.md)          | Policy equations, predictors, income-stratum adjustment |
+| [Performance optimizations](performance-optimizations.md)                          | Parallel trial execution and runtime tuning             |
+| [Individual ID tracking plan](../plans/individual-id-tracking-csv-plan.md)         | Per-person CSV output design                            |
+| [Same person ID plan](../plans/same-person-id-baseline-intervention-plan.md)       | ID assignment across scenarios                          |
+| [Income quintile factor means plan](../plans/income-quintile-factor-means-plan.md) | Optional stratum-specific adjustment                    |
+| [Architecture guide](../../developer/architecture.md)                              | Core system design                                      |
+| [Technical index](../README.md)                                                    | Full technical documentation listing                    |
+
+---
+
+*February 2026 — integrated Health-GPS codebase (India, ADB, FINCH).*
+
+**Author:** Mahima Ghosh · [← Technical documentation index](../README.md) · [Documentation home](../../index.md)
