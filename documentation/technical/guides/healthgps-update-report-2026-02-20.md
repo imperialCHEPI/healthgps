@@ -1,7 +1,7 @@
 # HealthGPS Project Update Report
 
-**Author:** Mahima Ghosh  
-**Period:** September 2025 – February 2026  
+**Author:** Mahima Ghosh
+**Period:** September 2025 – February 2026
 **Last updated:** 20 February 2026
 
 **Related documentation:** [FINCH linear models guide](finch-linear-models-and-income-adjustment.md) · [Income quintile factor means plan](../plans/income-quintile-factor-means-plan.md) · [Individual ID tracking plan](../plans/individual-id-tracking-csv-plan.md) · [Same person ID plan](../plans/same-person-id-baseline-intervention-plan.md) · [Architecture guide](../../developer/architecture.md) · [Technical index](../README.md)
