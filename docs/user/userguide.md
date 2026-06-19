@@ -1,12 +1,12 @@
 ## Global Health Policy Simulation model
 
-| [Home](index) | [Quick Start](getstarted) | User Guide | [Software Architecture](architecture) | [Data Model](datamodel) | [Developer Guide](development) | [API](api/index.html) |
+| [Home](../index) | [Quick Start](getstarted) | User Guide | [Software Architecture](../developer/architecture) | [Data Model](../developer/datamodel) | [Developer Guide](../developer/development) | [Technical docs](../technical/) | [API](../api/index.html) |
 
 # User Guide
 
 The **Health-GPS** microsimulation is a *data driven* modelling framework, combining many disconnected data sources to support the various interacting modules during a typical simulation experiment run. The framework provides a pre-populated *backend data storage* to minimise the learning curve for simple use cases, however advance users are likely to need a more in-depth knowledge of the full modelling workflow. A high-level representation of the microsimulation user workflow is shown below, it is crucial for users to have a good appreciation for the general dataflows and processes to better design experiments, configure the tool, and quantify the results.
 
-| ![Health-GPS Workflow](images/workflow_diagram.svg) |
+| ![Health-GPS Workflow](../images/workflow_diagram.svg) |
 |:---------------------------------------------------:|
 |            *Health-GPS Workflow Diagram*            |
 
@@ -398,11 +398,11 @@ The values in the adjustment files are *added* to the *model values*, therefore 
 
 ## Backend Storage
 
-Health-GPS by default uses a *file-based backend storage*, which implements the [Data Model](datamodel) to provides a reusable, *reference dataset* using a [standardised](datamodel) format for improved usability, the dataset can easily be expanded with new data without code changes. The contents of the file-based storage is defined using the [index.json][datastore] file, which must live at the *root* of the storage's *folder structure* as shown below.
+Health-GPS by default uses a *file-based backend storage*, which implements the [Data Model](../developer/datamodel) to provides a reusable, *reference dataset* using a [standardised](../developer/datamodel) format for improved usability, the dataset can easily be expanded with new data without code changes. The contents of the file-based storage is defined using the [index.json][datastore] file, which must live at the *root* of the storage's *folder structure* as shown below.
 
 As mentioned previously, the data store can be provided as a URL to ensure reproducibility. Different versions of the reference data set are available in the [Health-GPS data repository](https://github.com/imperialCHEPI/healthgps-data).
 
-| ![File-based Datastore](images/file_based_storage.png) |
+| ![File-based Datastore](../images/file_based_storage.png) |
 |:------------------------------------------------------:|
 |         *File-based Backend Datastore example*         |
 
@@ -606,7 +606,7 @@ View(data)
 
 The above script reads the results data from file and makes the data variable available in R for analysis as shown below, it is equally easy to write a R structure to a JSON string or file.
 
-| ![Health-GPS Results](images/model_results.png) |
+| ![Health-GPS Results](../images/model_results.png) |
 |:-----------------------------------------------:|
 |  *Health-GPS results in R data frame example*   |
 
@@ -653,7 +653,7 @@ p <- ggplot(data=df, aes(x=time, y=bmi, group=interaction(scenario, gender))) +
 show(p)
 ```
 
-| ![Experiment BMI Projection](images/bmi_projection.svg) |
+| ![Experiment BMI Projection](../images/bmi_projection.svg) |
 |:-------------------------------------------------------:|
 |           *Experiment BMI projection example*           |
 
@@ -717,7 +717,7 @@ A job script using PBS comprises of three parts:
 2. *required software* - load required software modules to execute the application.
 3. *user command* - execute the user application with given arguments.
 
-The following job script (`healthgps.pbs`) executes Health-GPS version X.Y.Z.B on the *development example* and writes the console output to text file: `healthgps.pbs.txt`. The `-GCCcore-11.3.0` part of the *version name* refers to the *compiler toolset* used to build the Health-GPS software and install on the HPC as described in the [Developer Guide](development#hpc-build), this guide concerns only the use of installed modules.
+The following job script (`healthgps.pbs`) executes Health-GPS version X.Y.Z.B on the *development example* and writes the console output to text file: `healthgps.pbs.txt`. The `-GCCcore-11.3.0` part of the *version name* refers to the *compiler toolset* used to build the Health-GPS software and install on the HPC as described in the [Developer Guide](../developer/development#hpc-build), this guide concerns only the use of installed modules.
 
 ```bash
 #PBS -l walltime=00:30:00

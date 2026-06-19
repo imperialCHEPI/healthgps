@@ -13,6 +13,8 @@ Date started: 1st November 2025
 
 Date last updated: 20th February 2026
 
+**Related documentation:** [FINCH linear models guide](../guides/finch-linear-models-and-income-adjustment.md) · [Income quintile factor means plan](../plans/income-quintile-factor-means-plan.md) · [Individual ID tracking plan](../plans/individual-id-tracking-csv-plan.md) · [Same person ID plan](../plans/same-person-id-baseline-intervention-plan.md) · [Architecture guide](../../developer/architecture.md) · [Technical index](../README.md)
+
 ## Objective
 
 Produce one **detailed project report** (Markdown) that can be committed to the HealthGPS GitHub repo. It should serve as:
@@ -20,7 +22,7 @@ Produce one **detailed project report** (Markdown) that can be committed to the 
 - **User-facing**: What changed and how the project works now (India, ABD, FINCH).
 - **Developer-facing**: Where to look in code, config, and schema; how modules interact; what to verify or extend.
 
-The document will be structured into clear sections, with minimal duplication of the existing [docs/architecture.md](docs/architecture.md) and [README.md](README.md), and will focus on **changes and integrated behaviour** described in your summary.
+The document will be structured into clear sections, with minimal duplication of the existing [architecture guide](../developer/architecture.md) and [README.md](../../README.md), and will focus on **changes and integrated behaviour** described in your summary.
 
 ---
 
@@ -181,7 +183,7 @@ Add a **Parallelization** subsection to the final document (e.g. after the overa
 - **Author**: The updates described in this document were made by **Mahima**; the report is written in first person where appropriate and is intended to be developer-friendly and in-depth.
 - Brief purpose: integrated codebase that supports India, ABD, and FINCH with the listed features along with new features to make the codebase more user friendly.
 - Note that the document describes updates relative to the main branch and is current as of the stated date (e.g. progress as of 20 Feb 2026). Will be pushed to MAIN branch on 20th Feb 2026 (tentative)
-- Link to existing [Quick Start](docs/getstarted.md), [User Guide](docs/userguide.md), [Architecture](docs/architecture.md). Link to design docs: [individual_id_tracking_csv-plan.md](individual_id_tracking_csv-plan.md), [same_person_id_across_baseline_and_intervention-plan.md](same_person_id_across_baseline_and_intervention-plan.md).
+- Link to existing [Quick Start](../../user/getstarted.md), [User Guide](../../user/userguide.md), [Architecture](../../developer/architecture.md). Link to design docs: [individual-id-tracking-csv-plan.md](../plans/individual-id-tracking-csv-plan.md), [same-person-id-baseline-intervention-plan.md](../plans/same-person-id-baseline-intervention-plan.md).
 
 ### 2. Supported projects and compatibility
 

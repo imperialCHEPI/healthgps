@@ -12,9 +12,22 @@ I put this document together for economists and modellers working on **FINCH** (
 1. **Income-stratum factors-mean adjustment** — optional baseline adjustment by income quintile.
 2. **How CSV predictor names map to regression terms** — `log_income`, `log_income2`, energy intake, dummies, etc.
 3. **Questions colleagues have raised** about policy equations and coefficient consistency.
-4. `**gender2` encoding** — FINCH convention and the `project_requirements.demographics.gender2` setting.
+4. **`gender2` encoding** — FINCH convention and the `project_requirements.demographics.gender2` setting.
 
 If anything is unclear or you need a walkthrough of the code path, contact **Mahima** :).
+
+### Related documentation
+
+| Topic | Document |
+| ----- | -------- |
+| Income-stratum adjustment (implementation plan) | [Income quintile factor means plan](../plans/income-quintile-factor-means-plan.md) |
+| 3 / 4 / 5 income categories | [Dynamic income categories plan](../plans/dynamic-income-categories-plan.md) |
+| `project_requirements` schema | [Project requirements plan](../plans/project-requirements-plan.md) |
+| Feb 2026 integrated changes | [HealthGPS update report](../reports/healthgps-update-report-2026-02-20.md) |
+| Kevin Hall height by quintile | [Height CSV quintile plan](../plans/height-csv-quintile-plan.md) |
+| Kevin Hall weight by quintile | [Weight quintile plan](../plans/weight-quintile-plan.md) |
+| All technical docs | [Technical documentation index](../README.md) |
+| Documentation home | [docs/index.md](../../index.md) |
 
 ---
 
@@ -25,7 +38,7 @@ If anything is unclear or you need a walkthrough of the code path, contact **Mah
 3. [Linear models and policy equations](#3-linear-models-and-policy-equations)
 4. [Predictor naming reference](#4-predictor-naming-reference)
 5. [Colleague Q&A](#5-colleague-qa)
-6. `[gender2` encoding](#6-gender2-encoding)
+6. [`gender2` encoding](#6-gender2-encoding)
 7. [Configuration reference](#7-configuration-reference)
 8. [What we deliberately did not change](#8-what-we-deliberately-did-not-change)
 
@@ -160,6 +173,8 @@ Under `modelling.baseline_adjustments` in `new_config.json`:
 
 Schema: `schemas/v1/config/modelling.json` → `baseline_adjustments.income_stratum_factors_mean`.
 
+**See also:** [Income quintile factor means plan](../plans/income-quintile-factor-means-plan.md) (implementation phases) · [Dynamic income categories plan](../plans/dynamic-income-categories-plan.md) (final `person.income` buckets)
+
 ### 2.5 Adjustment flow — what happens, in order
 
 This path runs when **all** of the following are true:
@@ -191,7 +206,7 @@ Read this top to bottom. Each step finishes before the next one starts.
 
 Suppose after step 2 we have 1,000 people and continuous income is spread across the population.
 
-```
+```text
 Step 3 — split by income rank:
   Stratum 0 (Quintile1): lowest 200 people  → use Finch.FactorsMean.*.Quintile1.csv
   Stratum 1 (Quintile2): next 200 people    → use Finch.FactorsMean.*.Quintile2.csv
@@ -261,7 +276,7 @@ Each nutrient (e.g. FoodCarbohydrate) goes through **two stages**.
 
 Add up the intercept and every predictor × its coefficient from the Box–Cox CSV:
 
-```
+```text
 Z = intercept
   + (coef_gender2  × gender2)
   + (coef_age1     × age)
@@ -284,7 +299,7 @@ Each nutrient has a **lambda** value in the CSV (row named `lambda`). Then:
 
 Policy CSVs use the **same linear part** on the Box–Cox scale. For nutrient *i* (a column in the CSV):
 
-```
+```text
 Z_i = Intercept
     + β_gender2    × gender2
     + β_age1       × age
@@ -311,7 +326,7 @@ Coefficients are read **directly from the CSV**. The code does not re-estimate o
 
 In code, the linear score is:
 
-```
+```text
 linear = intercept
        + sum of (coefficient[j] × predictor_value[j])   for each row j in the CSV
 ```
@@ -495,7 +510,7 @@ Internally each person still has `male` / `female` as an enum — only the **dum
 
 Dummy form (FINCH, after fix with `"gender2": "female"`):
 
-```
+```text
 gender2 = 1  if person is female
 gender2 = 0  if person is male
 ```
@@ -519,9 +534,11 @@ Contribution to the linear sum: `coef_gender2 × gender2`
 
 Schema: `schemas/v1/config/project_requirements.json`.
 
+**See also:** [Project requirements plan](../plans/project-requirements-plan.md)
+
 ### 6.3 How gender2 is computed (plain logic)
 
-```
+```text
 1. Read config:  project_requirements.demographics.gender2  →  "female" or "male"
 2. That setting means: which sex gets the value 1 for the gender2 row
 3. For each person:
@@ -638,3 +655,5 @@ For implementation detail, debugging, or config help, please contact **Mahima** 
 ---
 
 *June 2026 — income-stratum adjustment and `demographics.gender2` on the Health-GPS development branch.*
+
+[← Technical documentation index](../README.md) · [Documentation home](../../index.md)

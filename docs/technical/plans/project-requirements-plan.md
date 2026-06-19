@@ -1,5 +1,7 @@
 # Project requirements: config-driven behaviour (no project hacks)
 
+**Related:** [FINCH linear models guide](../guides/finch-linear-models-and-income-adjustment.md) (`gender2`, income flags) · [Schema migration plan](schema-migration-plan.md) · [Technical index](../README.md)
+
 ## Goal
 
 Drive all project-specific behaviour from a single **`project_requirements`** section in the config. The code should never branch on "if India" / "if FINCH" / "if PIF"; it should branch on "if config says region=false" / "if config says income.adjust_to_factors_mean=true", etc.

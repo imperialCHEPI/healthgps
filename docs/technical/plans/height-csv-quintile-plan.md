@@ -22,6 +22,8 @@ isProject: false
 
 # Height CSV Quintile Integration Plan
 
+**Related:** [Weight quintile plan](weight-quintile-plan.md) · [Income quintile factor means plan](income-quintile-factor-means-plan.md) · [FINCH guide](../guides/finch-linear-models-and-income-adjustment.md) · [Technical index](../README.md)
+
 ## Goal
 
 Support new `height_female.csv` and `height_male.csv` inputs in KevinHall dynamic model config, with either:

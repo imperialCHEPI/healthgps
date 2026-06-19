@@ -16,6 +16,8 @@ isProject: false
 
 # Income-stratum factors-mean adjustment (optional feature)
 
+**Related:** [FINCH linear models guide (modeller-facing)](../guides/finch-linear-models-and-income-adjustment.md) · [Dynamic income categories plan](dynamic-income-categories-plan.md) · [Technical index](../README.md)
+
 ## Optional and backward compatible
 
 **Yes — this stays fully optional.** If the user does **not** turn on stratum-specific adjustment (or leaves the new `baseline_adjustments` fields absent / `enabled: false`), behaviour must match **today’s model**:

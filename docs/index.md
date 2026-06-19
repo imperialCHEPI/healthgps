@@ -1,6 +1,6 @@
 ## Global Health Policy Simulation model
 
-| Home | [Quick Start](getstarted) | [User Guide](userguide) | [Software Architecture](architecture) | [Data Model](datamodel) | [Developer Guide](development) | [API](api/index.html) |
+| Home | [Quick Start](user/getstarted) | [User Guide](user/userguide) | [Software Architecture](developer/architecture) | [Data Model](developer/datamodel) | [Developer Guide](developer/development) | [Technical docs](technical/) | [API](api/index.html) |
 
 # Introduction
 
@@ -111,3 +111,41 @@ demographics, socio-economic, behavioural, risk exposure, diseases, healthcare d
 |             *Health-GPS Data Reconciliation*             |
 
 The reconcile process can be extremely laborious with each dataset having to be processed individually to for general data cleansing, map country code, use consistent unit of measurement, filling gaps, and smoothing. Health-GPS assumes complete datasets, all data processing must take place out outside of the model.
+
+---
+
+## Documentation map
+
+All project documentation lives under `docs/` in three areas:
+
+```mermaid
+flowchart TB
+    HOME[docs/index.md — you are here]
+    HOME --> USER[user/ — run and configure simulations]
+    HOME --> DEV[developer/ — architecture and build]
+    HOME --> TECH[technical/ — FINCH guides, reports, plans]
+
+    USER --> GS[getstarted.md]
+    USER --> UG[userguide.md]
+
+    DEV --> ARCH[architecture.md]
+    DEV --> DM[datamodel.md]
+    DEV --> DV[development.md]
+
+    TECH --> GUIDE[guides/ — modeller reference]
+    TECH --> REP[reports/ — project updates]
+    TECH --> PLAN[plans/ — implementation design]
+```
+
+| Folder | Audience | Contents |
+|--------|----------|----------|
+| [user/](user/) | Modellers, policy analysts | Quick start, full user guide |
+| [developer/](developer/) | Software developers | Architecture, data model, build guide, GitHub flow |
+| [technical/](technical/) | Economists + developers | FINCH linear-model guide, Feb 2026 update report, feature plans |
+
+**Recommended starting points**
+
+- New to Health-GPS → [Quick Start](user/getstarted)
+- FINCH / Kevin Hall inputs → [FINCH linear models guide](technical/guides/finch-linear-models-and-income-adjustment.md)
+- What changed in 2026 → [Update report](technical/reports/healthgps-update-report-2026-02-20.md)
+- Implementation questions → contact **Mahima** (see [technical index](technical/))

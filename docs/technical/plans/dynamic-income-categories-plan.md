@@ -22,6 +22,8 @@ isProject: false
 
 # Dynamic Final Income Categories (3/4/5) + Stratum Adjustment
 
+**Related:** [FINCH linear models guide](../guides/finch-linear-models-and-income-adjustment.md) · [Income quintile factor means plan](income-quintile-factor-means-plan.md) · [Technical index](../README.md)
+
 **Engineer:** Mahima — building this feature and the primary contact for questions on dynamic final income categories, income stratum adjustment integration, and related `config.json` / `project_requirements` behaviour.
 
 ---
