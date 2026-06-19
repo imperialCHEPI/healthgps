@@ -1,9 +1,9 @@
 # FINCH linear models, predictor encoding, and income-stratum adjustment
 
-## **Author:** Mahima
+**Author:** Mahima Ghosh
 
 **Last updated:** June 2026
-**Engineering contact:** **Mahima** — please reach out for implementation questions, config issues, or anything not covered here
+**Engineering contact:** Mahima Ghosh — please reach out for implementation questions, config issues, or anything not covered here.
 
 ## About this note
 
@@ -23,11 +23,11 @@ If anything is unclear or you need a walkthrough of the code path, contact **Mah
 | Income-stratum adjustment (implementation plan) | [Income quintile factor means plan](../plans/income-quintile-factor-means-plan.md) |
 | 3 / 4 / 5 income categories | [Dynamic income categories plan](../plans/dynamic-income-categories-plan.md) |
 | `project_requirements` schema | [Project requirements plan](../plans/project-requirements-plan.md) |
-| Feb 2026 integrated changes | [HealthGPS update report](../reports/healthgps-update-report-2026-02-20.md) |
+| Feb 2026 integrated changes | [HealthGPS update report](healthgps-update-report-2026-02-20.md) |
 | Kevin Hall height by quintile | [Height CSV quintile plan](../plans/height-csv-quintile-plan.md) |
 | Kevin Hall weight by quintile | [Weight quintile plan](../plans/weight-quintile-plan.md) |
 | All technical docs | [Technical documentation index](../README.md) |
-| Documentation home | [docs/index.md](../../index.md) |
+| Documentation home | [documentation/index.md](../../index.md) |
 
 ---
 
@@ -638,7 +638,7 @@ India-style models using a `Gender` JSON key (not `gender2`) are unchanged.
 
 ## Questions?
 
-For implementation detail, debugging, or config help, please contact **Mahima** (engineer on the Health-GPS integration).
+For implementation detail, debugging, or config help, please contact **Mahima Ghosh**.
 
 **Useful source files:**
 

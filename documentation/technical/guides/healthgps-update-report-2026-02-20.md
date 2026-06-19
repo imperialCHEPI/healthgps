@@ -13,7 +13,7 @@ Date started: 1st November 2025
 
 Date last updated: 20th February 2026
 
-**Related documentation:** [FINCH linear models guide](../guides/finch-linear-models-and-income-adjustment.md) · [Income quintile factor means plan](../plans/income-quintile-factor-means-plan.md) · [Individual ID tracking plan](../plans/individual-id-tracking-csv-plan.md) · [Same person ID plan](../plans/same-person-id-baseline-intervention-plan.md) · [Architecture guide](../../developer/architecture.md) · [Technical index](../README.md)
+**Related documentation:** [FINCH linear models guide](finch-linear-models-and-income-adjustment.md) · [Income quintile factor means plan](../plans/income-quintile-factor-means-plan.md) · [Individual ID tracking plan](../plans/individual-id-tracking-csv-plan.md) · [Same person ID plan](../plans/same-person-id-baseline-intervention-plan.md) · [Architecture guide](../../developer/architecture.md) · [Technical index](../README.md)
 
 ## Objective
 
@@ -22,13 +22,13 @@ Produce one **detailed project report** (Markdown) that can be committed to the 
 - **User-facing**: What changed and how the project works now (India, ABD, FINCH).
 - **Developer-facing**: Where to look in code, config, and schema; how modules interact; what to verify or extend.
 
-The document will be structured into clear sections, with minimal duplication of the existing [architecture guide](../developer/architecture.md) and [README.md](../../README.md), and will focus on **changes and integrated behaviour** described in your summary.
+The document will be structured into clear sections, with minimal duplication of the existing [architecture guide](../../developer/architecture.md) and [README.md](../../../README.md), and will focus on **changes and integrated behaviour** described in your summary.
 
 ---
 
 ## Proposed Document Location and Name
 
-- **Path**: `docs/PROJECT_UPDATES_AND_CHANGES.md` (or root `PROJECT_UPDATES_AND_CHANGES.md` if you prefer it next to README).
+- **Path**: `documentation/technical/guides/healthgps-update-report-2026-02-20.md`.
 - **Format**: Markdown, with optional table of contents and cross-links to existing docs.
 
 ---
@@ -344,6 +344,6 @@ flowchart TB
 
 ## Deliverable
 
-- **Single file**: `docs/PROJECT_UPDATES_AND_CHANGES.md` (or root, per your preference).
+- **Single file**: `documentation/technical/guides/healthgps-update-report-2026-02-20.md`.
 - **Length**: Proportional to the summary (roughly 3–6 pages when rendered, depending on appendices).
 - **Outcome**: A document to upload to the GitHub repo and point to from README or docs index so users and developers have one place for “what changed and how it works now.”

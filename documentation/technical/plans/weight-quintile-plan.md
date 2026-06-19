@@ -25,7 +25,7 @@ isProject: false
 
 # Weight quantiles by income adjustment stratum
 
-**Related:** [Height CSV quintile plan](height-csv-quintile-plan.md) · [Income quintile factor means plan](income-quintile-factor-means-plan.md) · [FINCH guide](../guides/finch-linear-models-and-income-adjustment.md) · [Technical index](../README.md)
+**Author:** Mahima Ghosh · **Related:** [Height CSV quintile plan](height-csv-quintile-plan.md) · [Income quintile factor means plan](income-quintile-factor-means-plan.md) · [FINCH guide](../guides/finch-linear-models-and-income-adjustment.md) · [Technical index](../README.md)
 
 ## Goal
 
@@ -235,7 +235,7 @@ In [KevinHallHeight.Test.cpp](src/HealthGPS.Tests/KevinHallHeight.Test.cpp) and/
 
 ## Docs
 
-Short note in `docs/technical/plans/weight-quintile-plan.md` with config examples, both lifecycle diagrams, and table format—aligned with [height-csv-quintile-plan.md](height-csv-quintile-plan.md).
+Short note in `documentation/technical/plans/weight-quintile-plan.md` with config examples, both lifecycle diagrams, and table format—aligned with [height-csv-quintile-plan.md](height-csv-quintile-plan.md).
 
 ## Out of scope
 

@@ -1,6 +1,6 @@
 # Project requirements: config-driven behaviour (no project hacks)
 
-**Related:** [FINCH linear models guide](../guides/finch-linear-models-and-income-adjustment.md) (`gender2`, income flags) · [Schema migration plan](schema-migration-plan.md) · [Technical index](../README.md)
+**Author:** Mahima Ghosh · **Related:** [FINCH linear models guide](../guides/finch-linear-models-and-income-adjustment.md) (`gender2`, income flags) · [Schema migration plan](schema-migration-plan.md) · [Technical index](../README.md)
 
 ## Goal
 

@@ -2,6 +2,8 @@
 
 | Home | [Quick Start](user/getstarted) | [User Guide](user/userguide) | [Software Architecture](developer/architecture) | [Data Model](developer/datamodel) | [Developer Guide](developer/development) | [Technical docs](technical/) | [API](api/index.html) |
 
+**Documentation maintainer (technical):** Mahima Ghosh — see [technical documentation](technical/).
+
 # Introduction
 
 **Health-GPS** is a modular and flexible microsimulation framework developed in collaboration between the Centre for Health Economics & Policy Innovation ([CHEPI](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/)), Imperial College London; and [INRAE](https://www.inrae.fr), France; as part of the [STOP project](https://www.stopchildobesity.eu/). *Health-GPS* models the impacts of behavioural and metabolic risk factors on chronic diseases, and measure lifelong outcomes to allow researchers to test the effectiveness of a variety of health policies and interventions designed for tackling childhood obesity in European countries.
@@ -116,14 +118,14 @@ The reconcile process can be extremely laborious with each dataset having to be 
 
 ## Documentation map
 
-All project documentation lives under `docs/` in three areas:
+All project documentation lives under `documentation/` in three areas:
 
 ```mermaid
 flowchart TB
-    HOME[docs/index.md — you are here]
+    HOME[documentation/index.md — you are here]
     HOME --> USER[user/ — run and configure simulations]
     HOME --> DEV[developer/ — architecture and build]
-    HOME --> TECH[technical/ — FINCH guides, reports, plans]
+    HOME --> TECH[technical/ — guides and plans]
 
     USER --> GS[getstarted.md]
     USER --> UG[userguide.md]
@@ -132,8 +134,7 @@ flowchart TB
     DEV --> DM[datamodel.md]
     DEV --> DV[development.md]
 
-    TECH --> GUIDE[guides/ — modeller reference]
-    TECH --> REP[reports/ — project updates]
+    TECH --> GUIDE[guides/ — reference and reports]
     TECH --> PLAN[plans/ — implementation design]
 ```
 
@@ -141,11 +142,11 @@ flowchart TB
 |--------|----------|----------|
 | [user/](user/) | Modellers, policy analysts | Quick start, full user guide |
 | [developer/](developer/) | Software developers | Architecture, data model, build guide, GitHub flow |
-| [technical/](technical/) | Economists + developers | FINCH linear-model guide, Feb 2026 update report, feature plans |
+| [technical/](technical/) | Economists + developers | FINCH guide, update reports, feature plans |
 
-**Recommended starting points**
+### Recommended starting points
 
-- New to Health-GPS → [Quick Start](user/getstarted)
-- FINCH / Kevin Hall inputs → [FINCH linear models guide](technical/guides/finch-linear-models-and-income-adjustment.md)
-- What changed in 2026 → [Update report](technical/reports/healthgps-update-report-2026-02-20.md)
-- Implementation questions → contact **Mahima** (see [technical index](technical/))
+* New to Health-GPS → [Quick Start](user/getstarted)
+* FINCH / Kevin Hall inputs → [FINCH linear models guide](technical/guides/finch-linear-models-and-income-adjustment.md)
+* What changed in 2026 → [Update report](technical/guides/healthgps-update-report-2026-02-20.md)
+* Implementation questions → contact **Mahima Ghosh** (see [technical index](technical/))
