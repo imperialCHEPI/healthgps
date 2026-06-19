@@ -1,6 +1,8 @@
 #pragma once
 
+#include "HealthGPS.Core/income_category_layout.h"
 #include "interfaces.h"
+#include "linear_model_eval_options.h"
 #include "mapping.h"
 #include "risk_factor_adjustable_model.h"
 
@@ -82,7 +84,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// (FINCH approach)
     /// @param continuous_income_model The continuous income model parameters (if using FINCH
     /// approach)
-    /// @param income_categories The number of income categories (3 or 4)
+    /// @param income_category_layout Final income category buckets from project_requirements
     /// @throws HgpsException for invalid arguments
     StaticLinearModel(
         std::shared_ptr<RiskFactorSexAgeTable> expected,
@@ -114,7 +116,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
             nullptr,
         bool is_continuous_income_model = false,
         const LinearModelParams &continuous_income_model = LinearModelParams{},
-        std::string income_categories = "3",
+        core::IncomeCategoryLayout income_category_layout = {},
         /// @param physical_activity_models Physical activity models for both India (simple) and
         /// FINCH (continuous) approaches
         const std::unordered_map<core::Identifier, PhysicalActivityModel>
@@ -129,7 +131,8 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
         std::size_t adjustment_income_stratum_count = 0u, bool has_active_policies = true,
         /// @param logistic_models Logistic regression models for two-stage modeling (optional)
         /// Empty models indicate no logistic regression for that risk factor
-        const std::vector<LinearModelParams> &logistic_models = {});
+        const std::vector<LinearModelParams> &logistic_models = {},
+        core::Gender gender2_indicator = core::Gender::male);
 
     RiskFactorModelType type() const noexcept override;
 
@@ -215,7 +218,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     // Continuous income model support (FINCH approach)
     bool is_continuous_income_model_;
     LinearModelParams continuous_income_model_;
-    std::string income_categories_;
+    core::IncomeCategoryLayout income_category_layout_;
 
     /// @brief Calculate continuous income using FINCH approach
     /// @param person The person to calculate income for
@@ -250,6 +253,10 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @return Vector of tertile thresholds [T1 (33rd), T2 (67th)]
     static std::vector<double> calculate_income_tertiles(const Population &population);
 
+    /// @brief Calculate percentile thresholds for debug output (bucket_count - 1 cut points).
+    static std::vector<double> calculate_income_percentile_thresholds(const Population &population,
+                                                                      std::size_t bucket_count);
+
     /// @brief Initialise income using categorical approach (India method)
     /// @param person The person to initialise income for
     /// @param random Random number generator
@@ -280,14 +287,17 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
                                 const std::vector<core::DoubleInterval> &base_ranges,
                                 bool for_trended_adjustment = false) const;
 
+    /// @brief Base linear-model options from project_requirements (gender2 indicator, etc.).
+    LinearModelEvalOptions base_linear_eval_options() const noexcept;
+
     /// @brief Initialise physical activity using continuous model approach (FINCH method)
     /// @param context The runtime context
     /// @param person The person to initialise physical activity for
     /// @param random Random number generator
     /// @param model The physical activity model to use
-    static void initialise_continuous_physical_activity(RuntimeContext &context, Person &person,
-                                                        Random &random,
-                                                        const PhysicalActivityModel &model);
+    void initialise_continuous_physical_activity(RuntimeContext &context, Person &person,
+                                                 Random &random,
+                                                 const PhysicalActivityModel &model) const;
 
     /// @brief Initialise physical activity using simple model approach (India method)
     /// @param context The runtime context
@@ -344,6 +354,9 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     // Two-stage modeling: Logistic regression for zero probability (optional)
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-const-or-ref-data-members) reference to model data
     const std::vector<LinearModelParams> &logistic_models_;
+
+    /// @brief Sex that receives 1 for the gender2 CSV regression row (from project_requirements).
+    core::Gender gender2_indicator_{core::Gender::male};
 };
 
 /// @brief Defines the static linear model data type
@@ -382,7 +395,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     /// (FINCH approach)
     /// @param continuous_income_model The continuous income model parameters (if using FINCH
     /// approach)
-    /// @param income_categories The number of income categories (3 or 4)
+    /// @param income_category_layout Final income category buckets from project_requirements
     /// @throws HgpsException for invalid arguments
     StaticLinearModelDefinition(
         std::unique_ptr<RiskFactorSexAgeTable> expected,
@@ -413,14 +426,15 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
             nullptr,
         bool is_continuous_income_model = false,
         const LinearModelParams &continuous_income_model = LinearModelParams{},
-        std::string income_categories = "3",
+        core::IncomeCategoryLayout income_category_layout = {},
         const std::unordered_map<core::Identifier, PhysicalActivityModel>
             &physical_activity_models = {},
         const std::vector<IncomeStratumExpectedTableEntry> &income_stratum_expected_tables = {},
         bool income_stratum_adjustment_enabled = false,
         std::size_t adjustment_income_stratum_count = 0u, bool has_active_policies = true,
         /// @param logistic_models Logistic regression models for two-stage modeling (optional)
-        std::vector<LinearModelParams> logistic_models = {});
+        std::vector<LinearModelParams> logistic_models = {},
+        core::Gender gender2_indicator = core::Gender::male);
 
     /// @brief Construct a new StaticLinearModel from this definition
     /// @return A unique pointer to the new StaticLinearModel instance
@@ -474,9 +488,10 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     // Continuous income model support (FINCH approach)
     bool is_continuous_income_model_;
     LinearModelParams continuous_income_model_;
-    std::string income_categories_;
+    core::IncomeCategoryLayout income_category_layout_;
     // Policy optimization flag - Mahima
     bool has_active_policies_;
+    core::Gender gender2_indicator_{core::Gender::male};
 };
 
 } // namespace hgps

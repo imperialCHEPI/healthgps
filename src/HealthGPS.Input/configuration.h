@@ -79,14 +79,12 @@ struct Configuration {
     /// @brief Experiment model version
     const char *app_version = PROJECT_VERSION;
 
-    /// @brief Type of trend to apply to risk factors (null, trend, income_trend)
-    std::string trend_type = "null";
-
     /// @brief Per-project requirements (demographics, income, PA, risk factors, trend, two-stage).
-    /// Optional in config; if absent, default-constructed values are used for older configs.
+    /// Parsed from project_requirements; legacy root trend_type / income_categories map here when
+    /// project_requirements is absent.
     ProjectRequirements project_requirements{};
 
-    /// @brief Original config.json data for accessing additional fields like income_categories
+    /// @brief Original config.json data for additional fields not mapped into Configuration.
     nlohmann::json config_data;
     /// @brief Population Impact Fraction (PIF) configuration
     PIFInfo population_impact_fraction{};

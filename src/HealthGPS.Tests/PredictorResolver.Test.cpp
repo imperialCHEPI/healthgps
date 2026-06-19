@@ -1,5 +1,6 @@
 #include "pch.h"
 
+#include "HealthGPS.Core/exception.h"
 #include "HealthGPS/linear_model_evaluator.h"
 #include "HealthGPS/person.h"
 #include "HealthGPS/predictor_resolver.h"
@@ -153,10 +154,55 @@ TEST(TestHealthGPS_PredictorResolver, AgeEthnicityGenderSector) {
     EXPECT_DOUBLE_EQ(25.0, expect_resolved(person, "age2"));
     EXPECT_DOUBLE_EQ(1.0, expect_resolved(person, "ethnicity3"));
     EXPECT_DOUBLE_EQ(0.0, expect_resolved(person, "ethnicity2"));
-    EXPECT_DOUBLE_EQ(1.0, expect_resolved(person, "gender2"));
+    LinearModelEvalOptions gender2_options;
+    gender2_options.gender2_indicator = core::Gender::male;
+    EXPECT_DOUBLE_EQ(1.0, get_linear_predictor_value(person, "gender2"_id, gender2_options));
     EXPECT_DOUBLE_EQ(person.gender_to_value(), expect_resolved(person, "gender"));
     EXPECT_DOUBLE_EQ(person.sector_to_value(), expect_resolved(person, "sector"));
     EXPECT_DOUBLE_EQ(std::pow(person.sector_to_value(), 2), expect_resolved(person, "sector2"));
+}
+
+TEST(TestHealthGPS_PredictorResolver, Gender2RegressionIndicator) {
+    using namespace hgps;
+
+    Person male;
+    male.gender = core::Gender::male;
+    Person female;
+    female.gender = core::Gender::female;
+
+    LinearModelEvalOptions male_indicator;
+    male_indicator.gender2_indicator = core::Gender::male;
+    LinearModelEvalOptions female_indicator;
+    female_indicator.gender2_indicator = core::Gender::female;
+
+    EXPECT_DOUBLE_EQ(1.0, get_linear_predictor_value(male, "gender2"_id, male_indicator));
+    EXPECT_DOUBLE_EQ(0.0, get_linear_predictor_value(female, "gender2"_id, male_indicator));
+    EXPECT_DOUBLE_EQ(0.0, get_linear_predictor_value(male, "gender2"_id, female_indicator));
+    EXPECT_DOUBLE_EQ(1.0, get_linear_predictor_value(female, "gender2"_id, female_indicator));
+}
+
+TEST(TestHealthGPS_PredictorResolver, ParseGender2Indicator) {
+    using namespace hgps;
+
+    EXPECT_EQ(core::Gender::male, parse_gender2_indicator("male"));
+    EXPECT_EQ(core::Gender::female, parse_gender2_indicator("Female"));
+    EXPECT_THROW(parse_gender2_indicator("other"), core::HgpsException);
+}
+
+TEST(TestHealthGPS_LinearModelEvaluator, Gender2InRegressionModel) {
+    using namespace hgps;
+
+    Person female;
+    female.gender = core::Gender::female;
+
+    LinearModelParams model;
+    model.intercept = 10.0;
+    model.coefficients["gender2"_id] = 2.5;
+
+    LinearModelEvalOptions options;
+    options.gender2_indicator = core::Gender::female;
+
+    EXPECT_NEAR(12.5, evaluate_linear_model(female, model, options), 1e-9);
 }
 
 TEST(TestHealthGPS_PredictorResolver, IncomeFromContinuousWhenRiskFactorMissing) {

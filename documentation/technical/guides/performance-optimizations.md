@@ -1,5 +1,9 @@
 # HealthGPS Performance Optimizations For ADB Paper
 
+**Author:** Mahima Ghosh
+
+**Related:** [HealthGPS update report](healthgps-update-report-2026-02-20.md) · [Technical index](../README.md)
+
 This document describes the performance optimizations implemented to make HealthGPS simulations run faster.
 
 ## 🚀 Key Optimizations Implemented
@@ -160,3 +164,7 @@ parallel_config.progress_interval = 2.0;    // More frequent updates
 ---
 
 **Result**: 100-simulation jobs that previously took 30+ days should now complete in **~7-8 days** with much better resource utilization and queue efficiency! 🚀
+
+---
+
+**Author:** Mahima Ghosh · [← Technical documentation index](../README.md) · [Documentation home](../../index.md)

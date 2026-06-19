@@ -7,6 +7,8 @@ isProject: false
 
 # Parallelize output writes and reduce is_active() calls
 
+**Author:** Mahima Ghosh · **Related:** [Individual ID tracking plan](individual-id-tracking-csv-plan.md) · [Technical index](../README.md)
+
 ## Current behaviour
 
 - **Single result dispatch thread** ([event_monitor.cpp](src/HealthGPS.Console/event_monitor.cpp)): Both `EventType::result` and `EventType::individual_tracking` use `result_event_handler`, which pushes every message into one `results_queue`_. One thread (`result_dispatch_thread`) pops and calls `accept()` so that:
@@ -94,3 +96,7 @@ No changes to [result_file_writer.cpp](src/HealthGPS.Console/result_file_writer.
 
 1. Phase 1: EventMonitor two-queue, two-thread parallel writes.
 2. Phase 2: In analysis_module, add is_active cache (or active index list) in the heaviest multi-pass function and replace repeated `is_active()` checks with the cache.
+
+---
+
+**Author:** Mahima Ghosh · [Technical index](../README.md)

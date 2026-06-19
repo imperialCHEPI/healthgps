@@ -62,6 +62,8 @@ target_sources(
             "ConfigurationPIF.Test.cpp"
             "PIFIntegration.Test.cpp"
             "IncomeStratumAdjustment.Test.cpp"
+            "IncomeCategoryLayout.Test.cpp"
+            "ConfigLegacyFields.Test.cpp"
             "ResultFileWriter.Test.cpp")
 
 # Download and extract test data

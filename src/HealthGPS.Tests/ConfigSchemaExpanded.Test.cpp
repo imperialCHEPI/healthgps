@@ -311,6 +311,7 @@ TEST(ConfigSchemaExpanded, ProjectRequirementsDefaultDemographics) {
     EXPECT_FALSE(req.demographics.region);
     EXPECT_FALSE(req.demographics.ethnicity);
     EXPECT_FALSE(req.demographics.max_age_for_linear_models.has_value());
+    EXPECT_EQ("male", req.demographics.gender2);
 }
 
 TEST(ConfigSchemaExpanded, ProjectRequirementsDefaultTwoStage) {

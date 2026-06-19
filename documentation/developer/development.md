@@ -1,6 +1,6 @@
 ## Global Health Policy Simulation model
 
-| [Home](index) | [Quick Start](getstarted) | [User Guide](userguide) | [Software Architecture](architecture) | [Data Model](datamodel) | Developer Guide | [API](api/index.html) |
+| [Home](../index) | [Quick Start](../user/getstarted) | [User Guide](../user/userguide) | [Software Architecture](architecture) | [Data Model](datamodel) | Developer Guide | [Technical docs](../technical/) | [API](../api/index.html) |
 
 # Developer Guide
 
@@ -139,7 +139,7 @@ a pull request.
 
 ## HPC Build
 
-Although Health-GPS is compatible with most High Performance Computing (HPC) system, this section contents are specific for using *Health-GPS software* at the *Imperial College London* [HPC system](https://www.imperial.ac.uk/admin-services/ict/self-service/research-support/rcs/), which users need to register to *get access* and support. The HPC is **Linux** based, therefore users *must* be familiar with *Unix command line* and *shell script* to properly navigate the file system, build programs, run applications, and automate repetitive tasks. See the [User Guide](userguide#50-hpc-running) for a very brief introduction to Imperial HPC system.
+Although Health-GPS is compatible with most High Performance Computing (HPC) system, this section contents are specific for using *Health-GPS software* at the *Imperial College London* [HPC system](https://www.imperial.ac.uk/admin-services/ict/self-service/research-support/rcs/), which users need to register to *get access* and support. The HPC is **Linux** based, therefore users *must* be familiar with *Unix command line* and *shell script* to properly navigate the file system, build programs, run applications, and automate repetitive tasks. See the [User Guide](../user/userguide#50-hpc-running) for a very brief introduction to Imperial HPC system.
 
 This tutorial describes building Health-GPS using [EasyBuild](https://easybuild.io/), a framework specially designed to manage (scientific) software on HPC systems, adopted by the Imperial HPC to manage the installation of users' software on different stacks depending on maturity and quality.
 
@@ -230,7 +230,7 @@ module add healthgps/X.Y.Z.B-GCCcore-11.3.0
 HealthGPS.Console -f healthgps/example/France.Config.json -s ~/healthgps/data
 ```
 
-In general, you should avoid running you own applications on the shared HPC login nodes, the *etiquette* for working with HPC system is the create and submit jobs to be evaluated by the HPC nodes instead. See the [User Guide](userguide#50-hpc-running) for details on how to use the installed Health-GPS modules on the Imperial HPC system.
+In general, you should avoid running you own applications on the shared HPC login nodes, the *etiquette* for working with HPC system is the create and submit jobs to be evaluated by the HPC nodes instead. See the [User Guide](../user/userguide#50-hpc-running) for details on how to use the installed Health-GPS modules on the Imperial HPC system.
 
 ## Implementation
 
@@ -242,7 +242,7 @@ The software application provides a Command Line Interface (CLI) for the user to
 
 To run a microsimulation experiment, at least one simulation engine and one simulation executive must be created, the HealthGPS class implements the engine, and Runner class implements the executive respectively as shown below. To create a simulation engine instance, the user must provide a SimulationDefinition with the model configuration, the SimulationModuleFactory with builders for each module type registered, and one implementation of the EventAggregator interface for external communication.
 
-| ![Composing Health-GPS](images/compose_simulation.svg) |
+| ![Composing Health-GPS](../images/compose_simulation.svg) |
 |:------------------------------------------------------:|
 |        *Composing a Health-GPS Microsimulation*        |
 
@@ -396,11 +396,11 @@ The factory must provide builder functions for all the required *module types* t
 
 Simulation experiment results reproducibility is a fundamental requirement for a rigorous scientific approach. Health-GPS defines mechanisms to enable  reproducibility of experiment run continuous run and batch mode typical of HPC environments. The core mechanism requires traceable inputs, Health-GPS version, and a custom random number seed, the following algorithm is used to manage the master seed for all experiments.
 
-| ![Experiment reproducibility](images/batch_mode_seed.svg) |
+| ![Experiment reproducibility](../images/batch_mode_seed.svg) |
 |:---------------------------------------------------------:|
 | *Experiment reproducibility algorithm (seed management)*  |
 
-When running the simulation as a single experiment, the solution is trivial using the same seed, however in a cluster or HPC environment, reproducibility of parallel simulation is more challenging. See the [User Guide](userguide#50-hpc-running) for an worked example using *Health-GPS* on *HPC computer* arrays to evaluate the *same experiment* in parallel.
+When running the simulation as a single experiment, the solution is trivial using the same seed, however in a cluster or HPC environment, reproducibility of parallel simulation is more challenging. See the [User Guide](../user/userguide#50-hpc-running) for an worked example using *Health-GPS* on *HPC computer* arrays to evaluate the *same experiment* in parallel.
 
 ## GitHub flow
 

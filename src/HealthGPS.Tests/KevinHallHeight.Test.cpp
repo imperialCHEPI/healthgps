@@ -704,6 +704,42 @@ TEST(KevinHallHeight, UpdateNewbornsInitialisesHeight) {
     EXPECT_NE(output.find("[HEIGHT STRATUM ASSIGNMENT]"), std::string::npos);
 }
 
+TEST(KevinHallHeight, GeneratePrintsHeightTablesForFiveIncomeCategories) {
+    using hgps::test::capture_stdout;
+
+    const auto finch = finch_data_root();
+    if (!std::filesystem::exists(finch / "dynamic_model.json")) {
+        GTEST_SKIP() << "FINCH input data not available at " << finch.string();
+    }
+
+    constexpr int start_year = 2020;
+    auto json = hgps::input::load_json(finch / "dynamic_model.json");
+    auto config = make_quintile_height_finch_configuration();
+    auto runtime =
+        make_kevin_hall_height_runtime(json, config, 5, start_year, /*income_categories=*/"5");
+
+    const std::array<hgps::core::Income, 5> incomes = {
+        hgps::core::Income::low, hgps::core::Income::lowermiddle, hgps::core::Income::middle,
+        hgps::core::Income::uppermiddle, hgps::core::Income::high};
+    for (std::size_t i = 0; i < runtime.context.population().size(); ++i) {
+        auto &person = runtime.context.population()[i];
+        person.gender = hgps::core::Gender::female;
+        person.age = 10;
+        person.income = incomes[i % incomes.size()];
+        person.has_income_adjustment_stratum = true;
+        person.income_adjustment_stratum = i % 5u;
+        seed_finch_kevin_hall_food_factors(person);
+    }
+
+    const auto output =
+        capture_stdout([&] { runtime.model->generate_risk_factors(runtime.context); });
+
+    EXPECT_NE(output.find("[HEIGHT BY FINAL INCOME CATEGORY]"), std::string::npos);
+    EXPECT_NE(output.find("Middle"), std::string::npos);
+    EXPECT_NE(output.find("LowerMid"), std::string::npos);
+    EXPECT_NE(output.find("UpperMid"), std::string::npos);
+}
+
 TEST(KevinHallHeight, GeneratePrintsHeightTablesForThreeIncomeCategories) {
     using hgps::test::capture_stdout;
 

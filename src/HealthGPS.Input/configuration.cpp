@@ -1,5 +1,6 @@
 #include "configuration.h"
 #include "configuration_parsing.h"
+#include "configuration_parsing_helpers.h"
 #include "jsonparser.h"
 #include "schema.h"
 #include "validated_data_source.h"
@@ -100,61 +101,14 @@ Configuration get_configuration(const std::string &config_source,
     // Base dir for relative paths
     config.root_path = config_file.parent_path();
 
-    // project_requirements is optional; if absent, use default-constructed values for older configs
-    if (opt.contains("project_requirements")) {
-        const auto &pr = opt["project_requirements"];
-        auto &req = config.project_requirements;
-        const auto &d = pr["demographics"];
-        req.demographics.age = d["age"].get<bool>();
-        req.demographics.gender = d["gender"].get<bool>();
-        req.demographics.region = d["region"].get<bool>();
-        req.demographics.ethnicity = d["ethnicity"].get<bool>();
-        if (d.contains("max_age_for_linear_models") && !d["max_age_for_linear_models"].is_null()) {
-            req.demographics.max_age_for_linear_models = d["max_age_for_linear_models"].get<int>();
-        }
-        const auto &inc = pr["income"];
-        req.income.enabled = inc["enabled"].get<bool>();
-        req.income.type = inc["type"].get<std::string>();
-        req.income.categories = inc["categories"].get<std::string>();
-        req.income.adjust_to_factors_mean = inc["adjust_to_factors_mean"].get<bool>();
-        req.income.trended = inc["trended"].get<bool>();
-        if (inc.contains("income_based_csv_output")) {
-            req.income.income_based_csv_output = inc["income_based_csv_output"].get<bool>();
-        }
-        const auto &pa = pr["physical_activity"];
-        req.physical_activity.enabled = pa["enabled"].get<bool>();
-        req.physical_activity.type = pa["type"].get<std::string>();
-        req.physical_activity.adjust_to_factors_mean = pa["adjust_to_factors_mean"].get<bool>();
-        req.physical_activity.trended = pa["trended"].get<bool>();
-        const auto &rf = pr["risk_factors"];
-        req.risk_factors.adjust_to_factors_mean = rf["adjust_to_factors_mean"].get<bool>();
-        req.risk_factors.trended = rf["trended"].get<bool>();
-        const auto &tr = pr["trend"];
-        req.trend.enabled = tr["enabled"].get<bool>();
-        req.trend.type = tr["type"].get<std::string>();
-        const auto &ts = pr["two_stage"];
-        req.two_stage.use_logistic = ts["use_logistic"].get<bool>();
-        if (ts.contains("logistic_file") && !ts["logistic_file"].is_null()) {
-            req.two_stage.logistic_file = ts["logistic_file"].get<std::string>();
-        }
-    } else {
-        // Mahima: Legacy configs without project_requirements: use categorical income so static
-        // models that only define categorical IncomeModels (e.g. India) work without change.
-        config.project_requirements.income.type = "categorical";
-        config.project_requirements.income.type = "simple";
-    }
+    reject_deprecated_root_config_fields(opt);
 
-    // Read trend_type from JSON file (defaults to "null")
-    if (opt.contains("trend_type")) {
-        config.trend_type = opt["trend_type"].get<std::string>();
-        // Validate trend_type value
-        if (config.trend_type != "null" && config.trend_type != "trend" &&
-            config.trend_type != "upf_trend" && config.trend_type != "UPFTrend" &&
-            config.trend_type != "income_trend") {
-            throw ConfigurationError{fmt::format("Invalid trend_type: {}. Must be one of: null, "
-                                                 "trend, upf_trend, UPFTrend, income_trend",
-                                                 config.trend_type)};
-        }
+    if (opt.contains("project_requirements")) {
+        parse_project_requirements_block(opt["project_requirements"], config.project_requirements);
+    } else {
+        // Legacy configs without project_requirements: categorical income for India-style models.
+        config.project_requirements.income.type = "categorical";
+        apply_legacy_root_config_fields(opt, config.project_requirements);
     }
 
     // Store the original config.json data for accessing additional fields

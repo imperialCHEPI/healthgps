@@ -34,7 +34,7 @@ jobs:
       - name: Build with Jekyll
         uses: actions/jekyll-build-pages@v1
         with:
-          source: ./docs
+          source: ./documentation
           destination: ./_site
       - name: Install build dependencies
         run: |

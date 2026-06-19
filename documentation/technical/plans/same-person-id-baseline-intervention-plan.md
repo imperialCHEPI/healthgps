@@ -21,6 +21,8 @@ isProject: false
 
 # Same person ID across baseline and intervention
 
+**Author:** Mahima Ghosh · **Related:** [Individual ID tracking plan](individual-id-tracking-csv-plan.md) · [Technical index](../README.md)
+
 ## Goal
 
 Make the same logical person have the **same ID** in both baseline and intervention by deriving ID from **population index** (ID = index + 1) instead of a global counter. This enables tracking individuals across scenarios without breaking existing behaviour.
@@ -325,3 +327,7 @@ Notes:
 
 - Bar = normalized runtime (effectively unchanged at this resolution).
 - Line = normalized extra memory factor (tiny constant increase shown illustratively).
+
+---
+
+**Author:** Mahima Ghosh · [Technical index](../README.md)
