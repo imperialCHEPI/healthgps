@@ -1,9 +1,12 @@
 #include "predictor_resolver.h"
 
+#include "HealthGPS.Core/exception.h"
 #include "HealthGPS.Core/string_util.h"
+#include "converter.h"
 
 #include <cctype>
 #include <cmath>
+#include <fmt/format.h>
 #include <string>
 
 namespace hgps {
@@ -135,15 +138,12 @@ std::optional<double> resolve_income_predictor(const Person &person, const std::
 }
 
 std::optional<double> resolve_gender_predictor(const Person &person, const std::string &key) {
+    if (is_gender2_predictor(key)) {
+        return std::nullopt;
+    }
     int power = 0;
     if (parse_trailing_power(key, "gender", power)) {
-        if (power == 1 && key == "gender2") {
-            return gender_dummy(person);
-        }
         return std::pow(gender_dummy(person), power);
-    }
-    if (key == "gender2") {
-        return gender_dummy(person);
     }
     if (key == "gender") {
         return person.gender_to_value();
@@ -178,6 +178,25 @@ std::optional<double> resolve_energyintake_predictor(const Person &person, const
 }
 
 } // namespace
+
+bool is_gender2_predictor(const std::string &key) {
+    return core::case_insensitive::equals(key, "gender2");
+}
+
+double gender2_regression_value(const Person &person, core::Gender indicator_sex) {
+    return person.gender == indicator_sex ? 1.0 : 0.0;
+}
+
+core::Gender parse_gender2_indicator(const std::string &indicator_label) {
+    const auto gender = hgps::detail::StoreConverter::to_gender(indicator_label);
+    if (gender == core::Gender::unknown) {
+        throw core::HgpsException{
+            fmt::format("project_requirements.demographics.gender2 must be \"male\" or \"female\", "
+                        "got: {}",
+                        indicator_label)};
+    }
+    return gender;
+}
 
 bool is_metadata_predictor(const std::string &name) {
     return core::case_insensitive::equals(name, "stddev") ||

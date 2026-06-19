@@ -16,8 +16,8 @@ endif()
 if(BUILD_DOC)
     message(STATUS "Doxygen build folder: ${CMAKE_CURRENT_BINARY_DIR}")
     set(DOXYGEN_FILE_PATTERNS *.h *.cpp *.md)
-    set(DOXYGEN_EXCLUDE_PATTERNS "*/vcpkg_installed/*" "*/_deps/" "*/docs/*" "*/external/*"
-                                 "*/HealthGPS.Tests/*")
+    set(DOXYGEN_EXCLUDE_PATTERNS "*/vcpkg_installed/*" "*/_deps/" "*/documentation/*"
+                                 "*/external/*" "*/HealthGPS.Tests/*")
     enable_doxygen("awesome-sidebar")
 endif()
 

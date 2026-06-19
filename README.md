@@ -15,7 +15,7 @@ The *Health GPS microsimulation* is being developed in collaboration between the
 
 ## February 2026 updates
 
-The **[HealthGPS Update Report – 20th Feb 2026](https://github.com/imperialCHEPI/healthgps/blob/main/Technical%20Documentations/HealthGPS%20Update%20Report-%2020th%20Feb%202026.md)** summarises integrated changes (demographics, socioeconomic/income, static and dynamic risk factors, analysis/output, disease/PIF, policy, config/schema), parallelisation notes, and a developer file map. Snippets below are taken from that report.
+The **[HealthGPS Update Report – 20th Feb 2026](documentation/technical/guides/healthgps-update-report-2026-02-20.md)** summarises integrated changes (demographics, socioeconomic/income, static and dynamic risk factors, analysis/output, disease/PIF, policy, config/schema), parallelisation notes, and a developer file map. Snippets below are taken from that report.
 
 **Supported use cases:** India, ABD, and FINCH on a shared codebase; backward compatibility with older India-style configs is retained alongside newer schema options.
 
@@ -214,9 +214,9 @@ Adjust the two paths to match where you built Health-GPS and where your `config.
 C:\healthgps\...\HealthGPS.Console.exe -c C:\healthgps-examples\...
 ```
 
-For more information, see the [quick start guide] in the documentation.
+For more information, see the [documentation home](documentation/index.md) and [quick start guide].
 
-[quick start guide]: https://imperialchepi.github.io/healthgps/getstarted
+[quick start guide]: https://imperialchepi.github.io/healthgps/user/getstarted
 
 ## Development Tools
 
@@ -224,7 +224,7 @@ The *Health GPS* software is written in modern, standard ANSI C++, targeting the
 
 For more information, see the [developer guide].
 
-[developer guide]: https://imperialchepi.github.io/healthgps/development
+[developer guide]: https://imperialchepi.github.io/healthgps/developer/development
 
 ## License
 

@@ -1,6 +1,6 @@
 ## Global Health Policy Simulation model
 
-| [Home](index) | [Quick Start](getstarted) | [User Guide](userguide) | [Software Architecture](architecture) | Data Model | [Developer Guide](development) | [API](api/index.html) |
+| [Home](../index) | [Quick Start](../user/getstarted) | [User Guide](../user/userguide) | [Software Architecture](architecture) | Data Model | [Developer Guide](development) | [Technical docs](../technical/) | [API](../api/index.html) |
 
 # Data Model
 
@@ -8,13 +8,13 @@ The backend *data model* defines an abstract model to organises data entities an
 
 The data model is storage agnostic, the [Data API][dataapi] abstraction interface shown below, provides a contract for the minimum dataset, easy access, strong typing, and decoupling from the backend storage implementation.
 
-| ![Health-GPS Data API](images/data_api.png) |
+| ![Health-GPS Data API](../images/data_api.png) |
 |:-------------------------------------------:|
 |        *Backend Data API Interface*         |
 
 The data model defines the minimum dataset required by the model, the backend storage can hold more data to support external analysis for example. The backend dataset diagram is shown below, it identifies the required entities, relationships, and fields with respective data types. The dataset is indexed by country, *green*, entities representing demographics are *gray*, diseases are *red*, analysis are *blue*, and enumeration types are *yellow* respectively. Primary key (PK) fields are shown in **bold**, the ***ID*** fields are auto-generated row identifiers for internal use and data integrity enforcement.
 
-| ![Health-GPS Data Model](images/data_model.png) |
+| ![Health-GPS Data Model](../images/data_model.png) |
 |:-----------------------------------------------:|
 |    *Data Model Entity–Relationship Diagram*     |
 

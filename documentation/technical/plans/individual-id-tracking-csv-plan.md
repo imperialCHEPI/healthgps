@@ -7,6 +7,8 @@ isProject: false
 
 # Individual ID tracking CSV (user-configured filters)
 
+**Author:** Mahima Ghosh · **Related:** [Same person ID plan](same-person-id-baseline-intervention-plan.md) · [Technical index](../README.md)
+
 ## Goal
 
 Allow users to request a **second CSV output** that contains **per-person rows** for the same run, with columns: run, time, scenario, id, age, gender, region, ethnicity, and selected risk factors. Rows are **filtered** by user-specified constraints (age range, gender, region, ethnicity, which years, which scenario). The file is named like the main result file but with a distinguishable suffix (e.g. `HealthGPS_result_{timestamp}_IndividualIDTracking.csv`). All new code will include **MAHIMA** in comments where appropriate.
@@ -139,3 +141,7 @@ Empty arrays / "all" mean no filter for that dimension.
 7. Add MAHIMA comments in the above files.
 
 No changes to the existing `ResultEventMessage` or main JSON/CSV writing logic; the new feature is additive and gated by config.
+
+---
+
+**Author:** Mahima Ghosh · [Technical index](../README.md)
