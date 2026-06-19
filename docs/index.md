@@ -145,7 +145,7 @@ flowchart TB
 
 **Recommended starting points**
 
-- New to Health-GPS → [Quick Start](user/getstarted)
-- FINCH / Kevin Hall inputs → [FINCH linear models guide](technical/guides/finch-linear-models-and-income-adjustment.md)
-- What changed in 2026 → [Update report](technical/reports/healthgps-update-report-2026-02-20.md)
-- Implementation questions → contact **Mahima** (see [technical index](technical/))
+* New to Health-GPS → [Quick Start](user/getstarted)
+* FINCH / Kevin Hall inputs → [FINCH linear models guide](technical/guides/finch-linear-models-and-income-adjustment.md)
+* What changed in 2026 → [Update report](technical/reports/healthgps-update-report-2026-02-20.md)
+* Implementation questions → contact **Mahima** (see [technical index](technical/))
