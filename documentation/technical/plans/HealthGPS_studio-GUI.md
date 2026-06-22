@@ -489,7 +489,7 @@ cd healthgps-GUI\frontend
 npm run build
 ```
 
-Open **http://localhost:8000/** and hard-refresh (Ctrl+Shift+R) after rebuilds.
+Open **<http://localhost:8000/>** and hard-refresh (Ctrl+Shift+R) after rebuilds.
 
 ### Optional — Vite dev server (React UI iteration)
 
