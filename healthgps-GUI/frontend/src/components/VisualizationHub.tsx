@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, type VisualizationBundle } from "../api/client";
 import ChartExplorer from "./ChartExplorer";
-import FlexibleChart, { type ChartType } from "./FlexibleChart";
+import { type ChartType } from "./FlexibleChart";
 import BurdenDeltaChart from "./viz/BurdenDeltaChart";
 import ComorbidityMatrix from "./viz/ComorbidityMatrix";
 import HeadlineMetrics from "./viz/HeadlineMetrics";
@@ -44,8 +44,6 @@ export default function VisualizationHub({
   const hasResultData = Boolean(chartBuilder?.variables?.length);
   const showCharts = show || hasResultData;
   const scenario2 = data?.scenario2;
-  const autoCharts = scenario2?.charts ?? [];
-  const trajectories = scenario2?.trajectories ?? [];
 
   useEffect(() => {
     if (!workspaceId || (!show && !live && !generating)) return;
@@ -107,29 +105,6 @@ export default function VisualizationHub({
           {scenario2?.burden_bars && scenario2.burden_bars.length > 0 && (
             <div className="viz-panel-section">
               <BurdenDeltaChart bars={scenario2.burden_bars} />
-            </div>
-          )}
-
-          {(autoCharts.length > 0 || trajectories.length > 0) && (
-            <div className="viz-panel-section">
-              <h4 className="viz-section-title">Charts from result JSON</h4>
-              {scenario2?.uncertainty_note && (
-                <p className="muted viz-note">{scenario2.uncertainty_note}</p>
-              )}
-              <div className="chart-explorer-grid">
-                {[...autoCharts, ...trajectories].map((chart) => (
-                  <div key={chart.id} className="chart-explorer-card">
-                    <FlexibleChart
-                      title={chart.title}
-                      xLabel={chart.x_label}
-                      yLabel={chart.y_label}
-                      series={chart.series}
-                      chartType={(chart.chart_type as ChartType) ?? "line"}
-                      large
-                    />
-                  </div>
-                ))}
-              </div>
             </div>
           )}
 

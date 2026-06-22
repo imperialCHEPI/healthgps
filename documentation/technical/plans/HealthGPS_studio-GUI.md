@@ -4,6 +4,8 @@
 
 I'm building a local-first web GUI so researchers can configure HealthGPS runs without editing JSON by hand, validate configs before compute, watch simulations live, and explore results through interactive charts — all without touching the C++ engine.
 
+> **Viewing diagrams:** Open this file on **GitHub** (or VS Code with Mermaid preview) to see flowcharts render. Diagrams use [Mermaid](https://mermaid.js.org/) syntax.
+
 ---
 
 ## What I've built so far
@@ -15,7 +17,7 @@ I'm building a local-first web GUI so researchers can configure HealthGPS runs w
 | Two-stage validation (JSON Schema + terminal dry-run) | Done |
 | Visible terminal runs with consent modal | Done |
 | Live simulation dashboard (timelines, CPU/memory, pipeline graph) | Done |
-| Post-run plots from `HealthGPS_Result_*.json` (auto charts + chart builder) | Done |
+| Post-run plots from `HealthGPS_Result_*.json` (summary + chart builder) | Done |
 | Live chart preview (updates as type/axes change) | Done |
 | Engine source normalization (`baseline`/`intervention` → display names) | Done |
 | Backend tests (32+ passing) | Done |
@@ -39,48 +41,103 @@ The folder is currently **untracked** in git (`?? healthgps-GUI/`).
 
 ---
 
+## Three layers — frontend, backend, engine
+
+This is the high-level split for presentations: **what users see**, **what orchestrates the run**, and **what actually simulates**.
+
+```mermaid
+flowchart TB
+    subgraph frontend [Frontend - React in the browser]
+        UI[HealthGPS Studio UI at localhost:8000]
+        Cover[Cover page and onboarding]
+        Workspace[Studio workspace - config sidebar]
+        LiveDash[Live simulation dashboard]
+        Charts[Results and chart builder]
+        UI --> Cover
+        UI --> Workspace
+        UI --> LiveDash
+        UI --> Charts
+    end
+
+    subgraph backend [Backend - FastAPI Python]
+        API[REST API]
+        ConfigSvc[Config builder and workspace]
+        SchemaSvc[Schema validator]
+        TermSvc[Terminal runner]
+        VizSvc[Results and visualizations]
+        API --> ConfigSvc
+        API --> SchemaSvc
+        API --> TermSvc
+        API --> VizSvc
+    end
+
+    subgraph engine [C++ engine - unchanged]
+        Console[HealthGPS.Console]
+        Analysis[AnalysisModule]
+        Console --> Analysis
+    end
+
+    subgraph data [Data on disk]
+        Examples[healthgps-examples templates]
+        Schemas[schemas/v1]
+        ResultJSON[HealthGPS_Result_*.json]
+        RunLog[run.log]
+    end
+
+    frontend -->|"HTTP /api/*"| backend
+    backend --> Examples
+    backend --> Schemas
+    TermSvc -->|"spawns visible terminal"| Console
+    Analysis --> ResultJSON
+    Console --> RunLog
+    VizSvc -->|"reads and parses"| ResultJSON
+    frontend -->|"polls status and telemetry"| backend
+```
+
+| Layer | Technology | What it does |
+|-------|------------|--------------|
+| **Frontend** | React + Vite + TypeScript | Screens, toggles, live charts, consent modal, chart builder |
+| **Backend** | FastAPI + Python | API, config merge, schema check, terminal launch, JSON parsing |
+| **Engine** | HealthGPS.Console (C++) | Runs the microsimulation; unchanged by Studio |
+
+---
+
 ## How the system fits together
 
 ```mermaid
 flowchart TB
-    subgraph studio [HealthGPS Studio - healthgps-GUI]
-        UI[React UI]
-        API[FastAPI]
-        VAL[SchemaValidator]
-        VIZ[visualizations.py]
-        TR[TerminalRunner]
+    subgraph studio [healthgps-GUI folder]
+        ReactUI[React UI]
+        FastAPI[FastAPI backend]
+        ReactUI --> FastAPI
     end
-    subgraph external [Data sources]
-        REG[registry.json + catalog.json]
-        EX[healthgps-examples]
-        SCH[schemas/v1]
+
+    subgraph external [External repos and schemas]
+        Registry[registry.json + catalog.json]
+        ExamplesRoot[healthgps-examples]
+        SchemaDir[schemas/v1]
     end
-    subgraph engine [C++ engine - unchanged]
-        CON[HealthGPS.Console]
-        AM[AnalysisModule]
+
+    subgraph userMachine [User machine]
+        Workspaces[healthgps-workspaces metadata]
+        StudioConfig[HealthGPS_Studio_*.json]
+        Terminal[Visible PowerShell]
+        ResultFile[HealthGPS_Result_*.json]
     end
-    subgraph user [User machine]
-        WS_META[healthgps-workspaces studio-meta.json]
-        STUDIO_CFG[HealthGPS_Studio_*.json]
-        TERM[Visible terminal]
-        RESULTS[HealthGPS_Result_*.json]
-    end
-    UI --> API
-    API --> REG
-    API --> EX
-    API --> SCH
-    VAL --> SCH
-    API --> VAL
-    TR -->|"spawns"| TERM
-    TERM --> CON
-    CON --> AM
-    AM --> RESULTS
-    VIZ -->|"reads + parses"| RESULTS
-    API --> VIZ
-    UI -->|"poll log + telemetry"| API
+
+    FastAPI --> Registry
+    FastAPI --> ExamplesRoot
+    FastAPI --> SchemaDir
+    FastAPI --> Workspaces
+    FastAPI --> StudioConfig
+    FastAPI -->|"consent + run"| Terminal
+    Terminal --> ConsoleExe[HealthGPS.Console.exe]
+    ConsoleExe --> ResultFile
+    FastAPI -->|"read results"| ResultFile
+    ReactUI -->|"poll log and telemetry"| FastAPI
 ```
 
-**Integration rule:** `config.root_path` is the parent of the config file. I write merged configs as `HealthGPS_Studio_{id}.json` beside the example directory in `healthgps-examples`, and keep workspace metadata under `%USERPROFILE%/healthgps-workspaces/`.
+**Integration rule:** `config.root_path` is the parent of the config file. Merged configs are written as `HealthGPS_Studio_{id}.json` beside the example directory in `healthgps-examples`. Workspace metadata lives under `%USERPROFILE%/healthgps-workspaces/`.
 
 ---
 
@@ -97,14 +154,14 @@ flowchart LR
     WS --> Validate[Validate]
     WS --> Run[Run]
     Validate --> SchemaOK{Schema OK?}
-    SchemaOK -->|No| FixConfig[Fix toggles - banner shows errors]
+    SchemaOK -->|No| FixConfig[Fix toggles in UI]
     SchemaOK -->|Yes| DryRun[Terminal dry-run]
     Run --> Consent[Consent modal]
     Consent --> LiveDash[Live simulation dashboard]
-    LiveDash --> ResultJSON[HealthGPS_Result JSON written]
-    ResultJSON --> AutoCharts[Auto charts from JSON]
-    ResultJSON --> ChartBuilder[Chart builder - pick type and axes]
-    ChartBuilder --> Charts[Live preview + pinned charts]
+    LiveDash --> ResultJSON[HealthGPS_Result JSON]
+    ResultJSON --> Summary[Policy impact summary]
+    ResultJSON --> ChartBuilder[Chart builder]
+    ChartBuilder --> Preview[Live preview and pinned charts]
 ```
 
 ### Routes and screens
@@ -128,8 +185,6 @@ Three large buttons:
 
 ### Studio workspace — main working screen
 
-Split layout:
-
 | Left sidebar | Main panel |
 |--------------|------------|
 | Config variant (`config.json`, `new_config.json`, …) | **Live simulation** panel (phase badge, progress bars, timelines) |
@@ -143,49 +198,54 @@ Split layout:
 
 ## Workspace screen layout
 
-```mermaid
-flowchart TB
-    subgraph header [App header]
-        LOGO[HEALTH-GPS logo + STUDIO]
-        BACK[Back button]
-        TITLE[Project name + example path]
-        ACTIONS[Validate + Run]
-    end
-    subgraph body [Workspace body]
-        subgraph sidebar [Left sidebar - configuration]
-            SETUP[Config variant + intervention]
-            RUNPARAMS[Population %, threads, years, trials]
-            DEMO[Demographics toggles]
-            INCOME[Income toggles + dropdowns]
-            PA[Physical activity toggles]
-            RF[Risk factor chips + bulk select]
-            TREND[Trend + two-stage toggles]
-        end
-        subgraph main [Right panel - live + results]
-            SIM[SimulationDashboard]
-            RM[RunMonitor - log tail]
-            VIZ[VisualizationHub]
-        end
-    end
-    header --> body
-    sidebar --> main
-```
-
 ### Screenshot — FINCH (UK) after a successful run
 
-What I see at `http://localhost:8000/` (hard-refresh after `npm run build`):
+Open at `http://localhost:8000/` (hard-refresh after `npm run build`):
 
-![HealthGPS Studio — FINCH UK workspace, live simulation complete](images/healthgps-studio-workspace.png)
+![HealthGPS Studio workspace — FINCH (UK), live simulation complete](images/healthgps-studio-workspace.png)
 
 | Area | What's on screen |
 |------|------------------|
-| **Header** | HEALTH-GPS \| STUDIO logo, Back, project title **FINCH (UK)**, example path `C:\healthgps-examples\KevinHall_FINCH`, **Validate** / **Run** |
-| **Left sidebar** | Config (`new_config.json`), intervention (`simple`), run parameters (population %, threads, start/stop year, trials), demographics toggles (Age, Gender, …) |
-| **Live simulation** | Green **COMPLETE** badge, four phase progress bars at 100% (population → policies → simulation → results), **721 agents**, policy **simple** |
-| **Resources** | CPU / memory sparkline (top-right of live panel) |
-| **Timelines** | Dual **BASELINE** and **INTERVENTION** year tracks (2022 → 2032, 100%) |
-| **Inline charts** | Gender split (M 49% / F 51%) and age distribution histogram |
-| **Below fold** | **Results & charts** — headline metrics, burden bars, auto JSON charts, comorbidity matrix, custom chart builder with live preview |
+| **Header** | HEALTH-GPS \| STUDIO logo, Back, project title **FINCH (UK)**, example path, **Validate** / **Run** |
+| **Left sidebar** | Config (`new_config.json`), intervention, run parameters, demographics toggles |
+| **Live simulation** | COMPLETE badge, phase progress bars, **721 agents**, policy **simple** |
+| **Resources** | CPU / memory sparkline (top-right) |
+| **Timelines** | Dual BASELINE and INTERVENTION tracks (2022 → 2032) |
+| **Inline charts** | Gender split (M/F %) and age distribution |
+| **Below fold** | **Results & charts** — policy impact, burden bars, comorbidity matrix, custom chart builder |
+
+### Layout diagram (matches screenshot)
+
+```mermaid
+flowchart TB
+    subgraph header [App header]
+        Logo[HEALTH-GPS logo + STUDIO]
+        Back[Back button]
+        Title[Project name + example path]
+        Actions[Validate + Run]
+    end
+
+    subgraph body [Workspace body]
+        subgraph sidebar [Left sidebar - Frontend config]
+            Setup[Config variant + intervention]
+            RunParams[Population %, threads, years, trials]
+            Demo[Demographics toggles]
+            Income[Income toggles + dropdowns]
+            PA[Physical activity toggles]
+            RF[Risk factor chips]
+            Trend[Trend + two-stage toggles]
+        end
+
+        subgraph main [Right panel - Frontend live + results]
+            Sim[SimulationDashboard]
+            RM[RunMonitor - log tail]
+            Viz[VisualizationHub]
+        end
+    end
+
+    header --> body
+    sidebar --> main
+```
 
 ---
 
@@ -197,20 +257,22 @@ Users catch config mistakes **before** wasting compute time.
 flowchart TB
     subgraph inApp [In-app - no terminal]
         Edit[User edits toggles and run settings]
-        Save[PUT workspace - merge config.json]
+        Save[PUT workspace - merge config]
         SchemaBtn[Validate schema button]
-        SchemaAPI["POST /validate-schema"]
+        SchemaAPI[POST /validate-schema]
         Banner[SchemaValidationBanner]
         Edit --> Save --> SchemaBtn --> SchemaAPI --> Banner
     end
-    subgraph terminal [Terminal - after consent]
+
+    subgraph terminalFlow [Terminal - after consent]
         Consent[ConsentModal - exact command shown]
-        FullVal["POST /validate - schema + dry-run"]
+        FullVal[POST /validate - schema + dry-run]
         PS[PowerShell window]
-        Console["HealthGPS.Console --dry-run"]
+        Console[HealthGPS.Console --dry-run]
         Log[run.log tail in Run monitor]
         Consent --> FullVal --> PS --> Console --> Log
     end
+
     Banner -->|"user fixes fields"| Edit
     Banner -->|"schema clean"| FullVal
 ```
@@ -247,18 +309,29 @@ I split visualization into **live run graphs** (during simulation) and **post-ru
 
 ```mermaid
 flowchart LR
-    subgraph telemetry [Run telemetry - polled every 1s]
-        TL[Dual timelines - baseline vs intervention]
+    subgraph sources [Backend data sources]
+        Psutil[psutil CPU and memory]
+        LogParse[run.log parsing]
+    end
+
+    subgraph telemetry [GET /run/telemetry - polled every 1s]
+        TL[Dual timelines]
+        Phase[Phase progress bars]
+        KPI[Population and policy KPIs]
         CPU[CPU sparkline]
         MEM[Memory sparkline]
-        PG[Pipeline graph - active module highlighted]
-        PHASE[Phase progress bars]
-        AB[Age distribution bars]
-        GB[Gender split bars]
-        EV[Event feed]
+        Gender[Gender split bars]
+        Age[Age distribution]
+        Events[Event feed]
     end
-    PSUTIL[psutil + log parsing] --> telemetry
-    telemetry --> SimDash[SimulationDashboard]
+
+    subgraph ui [Frontend component]
+        SimDash[SimulationDashboard]
+    end
+
+    Psutil --> telemetry
+    LogParse --> telemetry
+    telemetry --> SimDash
 ```
 
 **Components:**
@@ -271,40 +344,39 @@ flowchart LR
 | [`PipelineGraph.tsx`](../../../healthgps-GUI/frontend/src/components/viz/PipelineGraph.tsx) | Demographics → SES → Risk factors → Diseases → Analysis |
 | [`RunMonitor.tsx`](../../../healthgps-GUI/frontend/src/pages/RunMonitor.tsx) | Log tail from `run.log` |
 
-**API:** `GET /api/workspaces/{id}/run/telemetry`
-
 ### Post-run graphs (from `HealthGPS_Result_*.json`)
 
-After the engine finishes, `AnalysisModule` writes aggregate JSON. Studio reads the **latest** file and builds plots.
+After the engine finishes, `AnalysisModule` writes aggregate JSON. The backend parses it; the frontend renders charts.
 
 ```mermaid
 flowchart TB
     JSON[HealthGPS_Result_*.json]
-    NORM[normalize_result_rows]
-    PARSE[parse_healthgps_result_charts]
-    VIZ[visualizations.py bundle]
-    VARS[extract_result_variables]
+    Norm[normalize_result_rows]
+    Parse[parse_healthgps_result_charts]
+    Vars[extract_result_variables]
     API["GET /visualizations + /results/chart"]
-    HUB[VisualizationHub]
-    EXPLORER[ChartExplorer]
-    FLEX[FlexibleChart SVG renderer]
-    JSON --> NORM --> PARSE
-    NORM --> VARS
-    PARSE --> VIZ --> API
-    VARS --> API
-    API --> HUB
-    HUB --> EXPLORER --> FLEX
+    Hub[VisualizationHub - Frontend]
+    Explorer[ChartExplorer - Frontend]
+    Flex[FlexibleChart SVG renderer]
+
+    JSON --> Norm
+    Norm --> Parse
+    Norm --> Vars
+    Parse --> API
+    Vars --> API
+    API --> Hub
+    Hub --> Explorer --> Flex
 ```
 
-#### Auto-generated views (shown prominently in Results & charts)
+#### Summary views (shown after run)
 
 | Chart / view | Purpose |
 |--------------|---------|
 | **Headline metrics** | Policy impact chips (delta % at target year — DALY, diabetes, BMI, …) |
 | **Burden delta bars** | Baseline vs intervention YLL, YLD, DALY |
-| **Time-series charts** | DALY, YLL, YLD, population alive, deaths, diabetes, BMI, avg age, physical activity |
 | **Comorbidity matrix** | Disease co-occurrence grid (final intervention year) |
-| **Trajectories** | Quick diabetes / BMI / DALY line charts |
+
+All time-series plots (DALY, BMI, population, etc.) are built through the **custom chart builder** — users pick type and axes.
 
 #### Custom chart builder
 
@@ -343,17 +415,17 @@ mindmap
 ```mermaid
 sequenceDiagram
     participant User
-    participant ChartExplorer
-    participant API
-    participant FlexibleChart
+    participant ChartExplorer as ChartExplorer Frontend
+    participant API as FastAPI Backend
+    participant FlexChart as FlexibleChart
+
     User->>ChartExplorer: Change chart type, X, Y, scenarios
     ChartExplorer->>API: GET /results/chart debounced
-    API->>ChartExplorer: series data + labels
-    ChartExplorer->>FlexibleChart: Live preview renders
-    FlexibleChart-->>User: Chart on screen
+    API->>ChartExplorer: series data and labels
+    ChartExplorer->>FlexChart: Live preview renders
+    FlexChart-->>User: Chart on screen
     User->>ChartExplorer: Click Add chart
     ChartExplorer-->>User: Chart pinned to grid
-    User->>FlexibleChart: Hover for exact x,y values
 ```
 
 **Backend:** [`results.py`](../../../healthgps-GUI/backend/app/services/results.py), [`result_explorer.py`](../../../healthgps-GUI/backend/app/services/result_explorer.py), [`visualizations.py`](../../../healthgps-GUI/backend/app/services/visualizations.py)
@@ -369,27 +441,28 @@ Runs do **not** use a hidden background subprocess. The backend opens the **user
 ```mermaid
 sequenceDiagram
     participant User
-    participant UI as Studio UI
-    participant API as FastAPI
-    participant PS as PowerShell
+    participant UI as Studio UI Frontend
+    participant API as FastAPI Backend
+    participant PS as PowerShell Terminal
     participant Engine as HealthGPS.Console
+
     User->>UI: Click Validate or Run
     UI->>User: ConsentModal - exact command + checkbox
     User->>UI: Confirm consent
     UI->>API: POST validate or run
     API->>PS: spawn visible window
     PS->>Engine: execute with config path
-    Engine-->>PS: stdout/stderr
+    Engine-->>PS: stdout and stderr
     PS-->>API: tee to run.log
-    UI->>API: poll run/status + telemetry
-    API-->>UI: log tail + phase updates
+    UI->>API: poll run/status and telemetry
+    API-->>UI: log tail and phase updates
 ```
 
 | What user sees | Where |
 |----------------|-------|
-| Toggle settings, Run/Validate buttons | HealthGPS Studio web UI |
-| HealthGPS.Console stdout, errors, progress | **Their terminal window** |
-| Summary status, log tail, result charts | Studio Run monitor + VisualizationHub |
+| Toggle settings, Run/Validate buttons | HealthGPS Studio web UI (frontend) |
+| HealthGPS.Console stdout, errors, progress | **Their terminal window** (engine) |
+| Summary status, log tail, result charts | Studio UI (frontend reads backend API) |
 
 ---
 
@@ -444,28 +517,27 @@ FastAPI also serves `frontend/dist` on port 8000 when built.
 
 ## Repository layout
 
-```
+```text
 healthgps-GUI/
   README.md
   projects/
     registry.json
     catalog.json
-  backend/
+  backend/                    ← FastAPI (Python)
     pyproject.toml
     scripts/run_healthgps.ps1
     app/
       main.py
-      api/              catalog, custom, projects, runs, workspaces
-      services/           config_builder, schema_validator, terminal_runner,
-                          results, visualizations, result_explorer, run_analytics
-    tests/              7 modules, 32+ tests
-  frontend/
+      api/                    catalog, custom, projects, runs, workspaces
+      services/               config_builder, schema_validator, terminal_runner,
+                              results, visualizations, result_explorer, run_analytics
+    tests/                    7 modules, 32+ tests
+  frontend/                   ← React (TypeScript)
     src/
-      pages/            CoverPage, NewUserWizard, ExpertUserWorkspace,
-                        ProjectPicker, StudioWorkspace, RunMonitor
-      components/       SimulationDashboard, VisualizationHub, ChartExplorer,
-                        FlexibleChart, ConsentModal, ProjectRequirementsPanel, …
-    dist/               production build (gitignored)
+      pages/                  CoverPage, NewUserWizard, ExpertUserWorkspace,
+                              ProjectPicker, StudioWorkspace, RunMonitor
+      components/             SimulationDashboard, VisualizationHub, ChartExplorer, …
+    dist/                     production build (gitignored)
 ```
 
 ---
