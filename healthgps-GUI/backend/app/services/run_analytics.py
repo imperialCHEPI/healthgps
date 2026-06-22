@@ -258,13 +258,15 @@ def _load_result_json(workspace_id: str) -> dict[str, Any] | None:
 
 
 def _load_result_rows(workspace_id: str) -> list[dict]:
+    from app.services.results import normalize_result_rows
+
     data = _load_result_json(workspace_id)
     if not isinstance(data, dict):
         return []
     rows = data.get("result")
     if not isinstance(rows, list):
         return []
-    return [r for r in rows if isinstance(r, dict)]
+    return normalize_result_rows(rows)
 
 
 def _population_from_result_json(workspace_id: str) -> dict[str, Any] | None:

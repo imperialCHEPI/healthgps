@@ -91,6 +91,7 @@ def result_chart(
     x: str = "__time__",
     y: str = "",
     chart_type: str = "line",
+    sources: str = "Baseline,Intervention",
 ) -> dict:
     try:
         from app.services.result_explorer import (

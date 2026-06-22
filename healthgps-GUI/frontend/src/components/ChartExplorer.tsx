@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { api, type ResultChartSeries } from "../api/client";
 import FlexibleChart, { type ChartType } from "./FlexibleChart";
 
@@ -84,7 +84,9 @@ export default function ChartExplorer({
   const [baselineOn, setBaselineOn] = useState(true);
   const [interventionOn, setInterventionOn] = useState(true);
   const [charts, setCharts] = useState<BuiltChart[]>([]);
+  const [preview, setPreview] = useState<BuiltChart | null>(null);
   const [loading, setLoading] = useState(false);
+  const [previewLoading, setPreviewLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const categories = useMemo(() => {
@@ -92,44 +94,86 @@ export default function ChartExplorer({
     return Array.from(set).sort();
   }, [variables]);
 
-  const addChart = async () => {
-    if (!yVar) return;
+  useEffect(() => {
+    if (!yVar && variables[0]?.id) {
+      setYVar(variables[0].id);
+    }
+  }, [variables, yVar]);
+
+  const selectedSources = useCallback(() => {
     const sources: string[] = [];
     if (baselineOn) sources.push("Baseline");
     if (interventionOn) sources.push("Intervention");
-    if (sources.length === 0) {
-      setError("Select at least one scenario (Baseline or Intervention).");
-      return;
-    }
-    if (xVar === yVar) {
-      setError("X and Y must be different variables.");
-      return;
-    }
-    setError(null);
-    setLoading(true);
-    try {
-      const res = await api.resultChart(workspaceId, {
-        x: xVar,
-        y: yVar,
-        chartType,
-        sources: sources.join(","),
-      });
-      setCharts((prev) => [
-        ...prev,
-        {
-          id: `${xVar}-${yVar}-${chartType}-${Date.now()}`,
+    return sources;
+  }, [baselineOn, interventionOn]);
+
+  const fetchChart = useCallback(
+    async (forPreview: boolean) => {
+      if (!yVar) return null;
+      const sources = selectedSources();
+      if (sources.length === 0) {
+        setError("Select at least one scenario (Baseline or Intervention).");
+        return null;
+      }
+      if (xVar === yVar) {
+        setError("X and Y must be different variables.");
+        return null;
+      }
+      setError(null);
+      if (forPreview) setPreviewLoading(true);
+      else setLoading(true);
+      try {
+        const res = await api.resultChart(workspaceId, {
+          x: xVar,
+          y: yVar,
+          chartType,
+          sources: sources.join(","),
+        });
+        return {
+          id: `preview-${xVar}-${yVar}-${chartType}`,
           title: res.title ?? `${res.y_label} vs ${res.x_label}`,
           x_label: res.x_label,
           y_label: res.y_label,
           chart_type: (res.chart_type as ChartType) ?? chartType,
           series: res.series,
-        },
-      ]);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
-    } finally {
-      setLoading(false);
+        };
+      } catch (e) {
+        if (forPreview) setPreview(null);
+        setError(e instanceof Error ? e.message : String(e));
+        return null;
+      } finally {
+        if (forPreview) setPreviewLoading(false);
+        else setLoading(false);
+      }
+    },
+    [workspaceId, xVar, yVar, chartType, selectedSources]
+  );
+
+  useEffect(() => {
+    if (!yVar || variables.length === 0) {
+      setPreview(null);
+      return;
     }
+    const sources = selectedSources();
+    if (sources.length === 0 || xVar === yVar) {
+      setPreview(null);
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      fetchChart(true).then((built) => {
+        if (built) setPreview(built);
+      });
+    }, 350);
+    return () => window.clearTimeout(timer);
+  }, [xVar, yVar, chartType, baselineOn, interventionOn, variables.length, fetchChart, selectedSources, yVar]);
+
+  const addChart = async () => {
+    const built = await fetchChart(false);
+    if (!built) return;
+    setCharts((prev) => [
+      ...prev,
+      { ...built, id: `${built.id}-${Date.now()}` },
+    ]);
   };
 
   if (variables.length === 0) {
@@ -146,8 +190,8 @@ export default function ChartExplorer({
       <div className="chart-builder-panel">
         <h4 className="chart-builder-title">Create your own chart</h4>
         <p className="muted chart-builder-hint">
-          Pick chart type, X axis, Y axis, and scenarios — nothing is pre-selected for you.
-          Hover over points to read exact values.
+          Pick chart type, X axis, Y axis, and scenarios — the preview updates live as you
+          change controls. Click Add chart to keep a view in the grid below.
         </p>
         <div className="chart-explorer-controls">
           <div className="field chart-axis-field">
@@ -209,6 +253,27 @@ export default function ChartExplorer({
 
       {error && <p className="alert alert-warning">{error}</p>}
 
+      {(preview || previewLoading) && (
+        <div className="viz-panel-section">
+          <h4 className="viz-section-title">Live preview</h4>
+          {previewLoading && !preview ? (
+            <p className="muted">Updating chart…</p>
+          ) : preview ? (
+            <div className="chart-explorer-card chart-explorer-card--preview">
+              <span className="chart-type-badge">{preview.chart_type.replace(/_/g, " ")}</span>
+              <FlexibleChart
+                title={preview.title}
+                xLabel={preview.x_label}
+                yLabel={preview.y_label}
+                series={preview.series}
+                chartType={preview.chart_type}
+                large
+              />
+            </div>
+          ) : null}
+        </div>
+      )}
+
       <details className="chart-explorer-vars">
         <summary>Browse all variables ({variables.length})</summary>
         <ul className="chart-var-list">
@@ -228,7 +293,7 @@ export default function ChartExplorer({
 
       {charts.length === 0 ? (
         <div className="chart-explorer-empty">
-          <p>No charts yet. Use the controls above to add your first visualisation.</p>
+          <p>No saved charts yet. Use Add chart to pin the live preview to this grid.</p>
         </div>
       ) : (
         <div className="chart-explorer-grid">

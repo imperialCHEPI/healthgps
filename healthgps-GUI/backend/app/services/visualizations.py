@@ -14,6 +14,7 @@ from app.services.results import (
     _chart,
     discover_results_dirs,
     latest_run_files,
+    normalize_result_rows,
     parse_healthgps_result_charts,
 )
 from app.services.result_explorer import (
@@ -343,7 +344,8 @@ def load_visualization_bundle(workspace_id: str) -> dict[str, Any]:
         if isinstance(result_data, dict)
         else {"charts": [], "experiment": {}, "years": []}
     )
-    rows = result_data.get("result", []) if isinstance(result_data, dict) else []
+    raw_rows = result_data.get("result", []) if isinstance(result_data, dict) else []
+    rows = normalize_result_rows(raw_rows) if isinstance(raw_rows, list) else []
     experiment = parsed.get("experiment", {})
     years = parsed.get("years", [])
     target_year = years[-1] if years else run_settings.get("stop_time")

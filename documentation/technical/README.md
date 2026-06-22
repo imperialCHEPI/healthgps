@@ -33,6 +33,7 @@ Design and phase plans — useful for developers; some items may already be impl
 | [Parallelize output writes](plans/parallelize-output-writes-plan.md) | Result dispatch threading |
 | [Project requirements plan](plans/project-requirements-plan.md) | `project_requirements` schema design |
 | [Schema migration plan](plans/schema-migration-plan.md) | Config v1 → v2 migration |
+| [HealthGPS Studio GUI](plans/HealthGPS_studio-GUI.md) | Local web GUI (`healthgps-GUI/`) — validation, runs, result JSON plots |
 
 ### Related clusters
 

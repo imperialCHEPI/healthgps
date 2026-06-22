@@ -2048,6 +2048,16 @@ input[type="text"] {
   opacity: 0.92;
 }
 
+.chart-explorer-card--preview {
+  border-style: dashed;
+  border-color: #d4a5b0;
+  min-height: 360px;
+}
+
+.chart-explorer-card--preview .flexible-chart-svg {
+  min-height: 300px;
+}
+
 .chart-explorer-card .flexible-chart-svg {
   width: 100%;
   height: auto;

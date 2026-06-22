@@ -281,6 +281,7 @@ export interface ResultChart {
   x_label: string;
   y_label: string;
   series: ResultChartSeries[];
+  chart_type?: string;
 }
 
 export interface ResultChartsResponse {

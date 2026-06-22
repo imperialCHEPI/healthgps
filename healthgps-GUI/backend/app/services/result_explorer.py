@@ -76,6 +76,16 @@ def extract_result_variables(rows: list[dict]) -> list[dict[str, str]]:
                     name,
                     "",
                 )
+        age = row.get("average_age")
+        if isinstance(age, dict):
+            for key in ("male", "female"):
+                if key in age:
+                    add_var(
+                        f"average_age.{key}",
+                        "Demographics",
+                        f"Average age ({key})",
+                        "years",
+                    )
 
     variables.sort(key=lambda v: (v["category"], v["label"]))
     return variables

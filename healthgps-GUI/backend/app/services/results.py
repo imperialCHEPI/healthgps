@@ -123,6 +123,29 @@ SOURCE_COLORS = {
 }
 
 
+def normalize_source_name(source: str) -> str:
+    """Map engine lowercase sources (baseline/intervention) to display names."""
+    key = str(source).strip().lower()
+    if key == "baseline":
+        return "Baseline"
+    if key == "intervention":
+        return "Intervention"
+    return str(source).strip().title() or "Unknown"
+
+
+def normalize_result_rows(rows: list) -> list[dict]:
+    """Normalize result row sources so charts work with engine JSON."""
+    out: list[dict] = []
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        copy = dict(row)
+        if "source" in copy:
+            copy["source"] = normalize_source_name(copy["source"])
+        out.append(copy)
+    return out
+
+
 def _avg_male_female(block: dict | None) -> float | None:
     if not isinstance(block, dict):
         return None
@@ -189,9 +212,10 @@ def _chart(
 
 def parse_healthgps_result_charts(data: dict) -> dict:
     """Build dashboard charts from HealthGPS aggregate result JSON."""
-    rows = data.get("result")
-    if not isinstance(rows, list) or not rows:
+    raw_rows = data.get("result")
+    if not isinstance(raw_rows, list) or not raw_rows:
         return {"charts": [], "experiment": {}, "years": []}
+    rows = normalize_result_rows(raw_rows)
 
     experiment = data.get("experiment") if isinstance(data.get("experiment"), dict) else {}
     years = sorted(
@@ -240,12 +264,16 @@ def parse_healthgps_result_charts(data: dict) -> dict:
             lambda r: _avg_male_female((r.get("risk_factors_average") or {}).get("BMI")),
         ),
         (
-            "physical_activity",
-            "Physical activity",
-            "Index",
-            lambda r: _avg_male_female(
-                (r.get("risk_factors_average") or {}).get("PhysicalActivity")
-            ),
+            "yld",
+            "Years lived with disability (YLD)",
+            "YLD",
+            lambda r: (r.get("indicators") or {}).get("YLD"),
+        ),
+        (
+            "avg_age",
+            "Average age",
+            "Years",
+            lambda r: _avg_male_female(r.get("average_age")),
         ),
     ]
 
