@@ -1826,7 +1826,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     }
 
     g_pending_static_linear_summary = std::move(load_summary);
-    
+
     const core::Gender gender2_indicator =
         parse_gender2_indicator(config.project_requirements.demographics.gender2);
     try {
