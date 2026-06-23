@@ -8,7 +8,6 @@ I'm building a local-first web GUI so researchers can configure HealthGPS runs w
 
 ## What I've built so far
 
-
 | Area                                                                    | Status      |
 | ----------------------------------------------------------------------- | ----------- |
 | Onboarding (cover page, wizard, expert upload, programme catalog)       | Done        |
@@ -21,7 +20,6 @@ I'm building a local-first web GUI so researchers can configure HealthGPS runs w
 | Engine source normalization (`baseline`/`intervention` → display names) | Done        |
 | Backend tests (32+ passing)                                             | Done        |
 | Repo integration (commit to git, root README link)                      | **Not yet** |
-
 
 The folder is currently updated in the hgps/gui branch on HealthGPS.
 
@@ -94,15 +92,11 @@ flowchart TB
     frontend -->|"polls status and telemetry"| backend
 ```
 
-
-
-
 | Layer        | Technology                | What it does                                                   |
 | ------------ | ------------------------- | -------------------------------------------------------------- |
 | **Frontend** | React + Vite + TypeScript | Screens, toggles, live charts, consent modal, chart builder    |
 | **Backend**  | FastAPI + Python          | API, config merge, schema check, terminal launch, JSON parsing |
 | **Engine**   | HealthGPS.Console (C++)   | Runs the microsimulation; unchanged by Studio                  |
-
 
 ---
 
@@ -141,8 +135,6 @@ flowchart TB
     ReactUI -->|"poll log and telemetry"| FastAPI
 ```
 
-
-
 **Integration rule:** `config.root_path` is the parent of the config file. Merged configs are written as `HealthGPS_Studio_{id}.json` beside the example directory in `healthgps-examples`. Workspace metadata lives under `%USERPROFILE%/healthgps-workspaces/`.
 
 ---
@@ -170,10 +162,7 @@ flowchart LR
     ChartBuilder --> Preview[Live preview and pinned charts]
 ```
 
-
-
 ### Routes and screens
-
 
 | Route                       | Screen                  | What the user does                                            |
 | --------------------------- | ----------------------- | ------------------------------------------------------------- |
@@ -183,7 +172,6 @@ flowchart LR
 | `/examples`                 | **ProjectPicker**       | Browses programme × country catalog (STOP, FINCH, India, …)   |
 | `/workspace/new/:projectId` | **StudioWorkspace**     | Configures and runs a new session                             |
 | `/workspace/:workspaceId`   | **StudioWorkspace**     | Resumes an existing session                                   |
-
 
 ### Cover page — first screen
 
@@ -195,7 +183,6 @@ Three large buttons:
 
 ### Studio workspace — main working screen
 
-
 | Left sidebar                                          | Main panel                                                        |
 | ----------------------------------------------------- | ----------------------------------------------------------------- |
 | Config variant (`config.json`, `new_config.json`, …)  | **Live simulation** panel (phase badge, progress bars, timelines) |
@@ -204,7 +191,6 @@ Three large buttons:
 | Demographics / income / PA / risk-factor toggles      | **Results & charts** (after run completes)                        |
 | Risk-factor chip selection                            | Run monitor (log tail, collapses when done)                       |
 | **Validate** and **Run** buttons                      |                                                                   |
-
 
 ---
 
@@ -216,7 +202,6 @@ Open at `http://localhost:8000/` (hard-refresh after `npm run build`):
 
 HealthGPS Studio workspace — FINCH (UK), live simulation complete
 
-
 | Area                | What's on screen                                                                                   |
 | ------------------- | -------------------------------------------------------------------------------------------------- |
 | **Header**          | HEALTH-GPS | STUDIO logo, Back, project title **FINCH (UK)**, example path, **Validate** / **Run** |
@@ -226,7 +211,6 @@ HealthGPS Studio workspace — FINCH (UK), live simulation complete
 | **Timelines**       | Dual BASELINE and INTERVENTION tracks (2022 → 2032)                                                |
 | **Inline charts**   | Gender split (M/F %) and age distribution                                                          |
 | **Below fold**      | **Results & charts** — policy impact, burden bars, comorbidity matrix, custom chart builder        |
-
 
 ### Layout diagram
 
@@ -261,8 +245,6 @@ flowchart TB
     sidebar --> main
 ```
 
-
-
 ---
 
 ## Validation — two-stage flow
@@ -293,8 +275,6 @@ flowchart TB
     Banner -->|"schema clean"| FullVal
 ```
 
-
-
 ### Layer 1 — JSON Schema (in-process)
 
 - **Service:** `[schema_validator.py](../../../healthgps-GUI/backend/app/services/schema_validator.py)`
@@ -310,14 +290,12 @@ flowchart TB
 
 ### What the user sees at each step
 
-
 | Step          | Where                              | Feedback                                |
 | ------------- | ---------------------------------- | --------------------------------------- |
 | Edit config   | Sidebar `ProjectRequirementsPanel` | Locked fields greyed with tooltip       |
 | Schema check  | Red banner above workspace         | Per-field expected/supplied             |
 | Full validate | Terminal + Run monitor             | Engine stdout, completion markers       |
 | Run           | Simulation dashboard               | Phase badge, dual timelines, event feed |
-
 
 ---
 
@@ -354,10 +332,7 @@ flowchart LR
     telemetry --> SimDash
 ```
 
-
-
 **Components:**
-
 
 | Component                                                                                             | Purpose                                                      |
 | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
@@ -366,7 +341,6 @@ flowchart LR
 | `[ResourceMonitorChart.tsx](../../../healthgps-GUI/frontend/src/components/ResourceMonitorChart.tsx)` | CPU/memory over time                                         |
 | `[PipelineGraph.tsx](../../../healthgps-GUI/frontend/src/components/viz/PipelineGraph.tsx)`           | Demographics → SES → Risk factors → Diseases → Analysis      |
 | `[RunMonitor.tsx](../../../healthgps-GUI/frontend/src/pages/RunMonitor.tsx)`                          | Log tail from `run.log`                                      |
-
 
 ### Post-run graphs (from `HealthGPS_Result_*.json`)
 
@@ -392,10 +366,7 @@ flowchart TB
     Hub --> Explorer --> Flex
 ```
 
-
-
 #### Summary views (shown after run)
-
 
 | Chart / view           | Purpose                                                               |
 | ---------------------- | --------------------------------------------------------------------- |
@@ -403,11 +374,9 @@ flowchart TB
 | **Burden delta bars**  | Baseline vs intervention YLL, YLD, DALY                               |
 | **Comorbidity matrix** | Disease co-occurrence grid (final intervention year)                  |
 
-
 All time-series plots (DALY, BMI, population, etc.) are built through the **custom chart builder** — users pick type and axes.
 
 #### Custom chart builder
-
 
 | Control    | What user picks                                                          |
 | ---------- | ------------------------------------------------------------------------ |
@@ -417,7 +386,6 @@ All time-series plots (DALY, BMI, population, etc.) are built through the **cust
 | Scenarios  | Baseline, Intervention, or both                                          |
 | Preview    | **Live** — updates as controls change (350ms debounce)                   |
 | Add chart  | Pins the current preview into the comparison grid                        |
-
 
 #### Supported chart types
 
@@ -440,8 +408,6 @@ mindmap
       scatter
 ```
 
-
-
 #### Chart builder sequence
 
 ```mermaid
@@ -459,8 +425,6 @@ sequenceDiagram
     User->>ChartExplorer: Click Add chart
     ChartExplorer-->>User: Chart pinned to grid
 ```
-
-
 
 **Backend:** `[results.py](../../../healthgps-GUI/backend/app/services/results.py)`, `[result_explorer.py](../../../healthgps-GUI/backend/app/services/result_explorer.py)`, `[visualizations.py](../../../healthgps-GUI/backend/app/services/visualizations.py)`
 
@@ -492,15 +456,11 @@ sequenceDiagram
     API-->>UI: log tail and phase updates
 ```
 
-
-
-
 | What user sees                             | Where                                  |
 | ------------------------------------------ | -------------------------------------- |
 | Toggle settings, Run/Validate buttons      | HealthGPS Studio web UI (frontend)     |
 | HealthGPS.Console stdout, errors, progress | **Their terminal window** (engine)     |
 | Summary status, log tail, result charts    | Studio UI (frontend reads backend API) |
-
 
 ---
 
@@ -510,7 +470,6 @@ Templates resolve from `**healthgps-examples`** (sibling repo), not `input-data/
 
 ### `[projects/registry.json](../../../healthgps-GUI/projects/registry.json)`
 
-
 | ID           | Example dir       | Notes                           |
 | ------------ | ----------------- | ------------------------------- |
 | `hlm_france` | `HLM_France`      | STOP France                     |
@@ -518,9 +477,7 @@ Templates resolve from `**healthgps-examples`** (sibling repo), not `input-data/
 | `india`      | `KevinHall_India` | Some fields locked per template |
 | `pif`        | `KevinHall_PIF`   | PIF toggle enabled              |
 
-
 ### `[projects/catalog.json](../../../healthgps-GUI/projects/catalog.json)`
-
 
 | Programme             | Status   | Countries                     |
 | --------------------- | -------- | ----------------------------- |
@@ -531,11 +488,9 @@ Templates resolve from `**healthgps-examples`** (sibling repo), not `input-data/
 | JA Prevent NCD        | Upcoming | Estonia, Belgium, Finland, …  |
 | JACARDI               | Upcoming | Romania, Slovenia, Belgium, … |
 
-
 ---
 
 ## API endpoints
-
 
 | Method  | Path                                   | Purpose                           |
 | ------- | -------------------------------------- | --------------------------------- |
@@ -553,7 +508,6 @@ Templates resolve from `**healthgps-examples`** (sibling repo), not `input-data/
 | GET     | `/api/workspaces/{id}/results`         | Output file list                  |
 | GET     | `/api/workspaces/{id}/visualizations`  | Full viz bundle from JSON         |
 | GET     | `/api/workspaces/{id}/results/chart`   | Custom chart series (type + axes) |
-
 
 FastAPI also serves `frontend/dist` on port 8000 when built.
 
@@ -624,7 +578,6 @@ Backend must still be running on :8000.
 cd healthgps-GUI\backend && pytest
 ```
 
-
 | Module                     | What I test                                              |
 | -------------------------- | -------------------------------------------------------- |
 | `test_schema_validator.py` | Config schema pass/fail                                  |
@@ -634,7 +587,6 @@ cd healthgps-GUI\backend && pytest
 | `test_visualizations.py`   | Pipeline graph, chart axes, headlines, lowercase sources |
 | `test_api.py`              | End-to-end workspace + custom flows                      |
 | `test_registry.py`         | All four projects resolve                                |
-
 
 ---
 
@@ -650,7 +602,6 @@ cd healthgps-GUI\backend && pytest
 
 ## Risks
 
-
 | Risk                                                              | Mitigation                                                |
 | ----------------------------------------------------------------- | --------------------------------------------------------- |
 | Engine uses lowercase `source` values (`baseline`/`intervention`) | `normalize_result_rows()` in results pipeline             |
@@ -659,5 +610,3 @@ cd healthgps-GUI\backend && pytest
 | Chart type vs data mismatch                                       | API 404 with message; scatter needs numeric X             |
 | Untracked folder                                                  | Repo integration — priority                               |
 | Windows-only terminal v1                                          | Documented; cross-platform adapter in backlog             |
-
-
