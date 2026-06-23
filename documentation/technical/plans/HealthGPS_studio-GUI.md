@@ -8,20 +8,26 @@ I'm building a local-first web GUI so researchers can configure HealthGPS runs w
 
 ## What I've built so far
 
-| Area                                                                    | Status      |
-| ----------------------------------------------------------------------- | ----------- |
-| Onboarding (cover page, wizard, expert upload, programme catalog)       | Done        |
-| Full `project_requirements` editor + risk-factor chips                  | Done        |
-| Two-stage validation (JSON Schema + terminal dry-run)                   | Done        |
-| Visible terminal runs with consent modal                                | Done        |
-| Live simulation dashboard (timelines, CPU/memory, pipeline graph)       | Done        |
-| Post-run plots from `HealthGPS_Result_*.json` (summary + chart builder) | Done        |
-| Live chart preview (updates as type/axes change)                        | Done        |
-| Engine source normalization (`baseline`/`intervention` → display names) | Done        |
-| Backend tests (32+ passing)                                             | Done        |
-| Repo integration (commit to git, root README link)                      | **Not yet** |
+Early prototype on branch `hgps/gui` — core flows work locally, but polish, coverage, and repo integration are still open.
 
-The folder is currently updated in the hgps/gui branch on HealthGPS.
+| Area                                                                    | Status        |
+| ----------------------------------------------------------------------- | ------------- |
+| Onboarding (cover page, wizard, expert upload, programme catalog)       | Working       |
+| `project_requirements` editor + risk-factor chips                       | Working       |
+| Two-stage validation (JSON Schema + terminal dry-run)                   | Working       |
+| Visible terminal runs with consent modal                                | Working       |
+| Live simulation dashboard (timelines, CPU/memory, pipeline graph)       | Working       |
+| Post-run plots from `HealthGPS_Result_*.json` (summary + chart builder) | Partial       |
+| Live chart preview (type/axes change)                                   | Partial       |
+| Engine source normalization (`baseline`/`intervention` → display names) | Partial       |
+| Backend tests (32+ passing)                                             | In progress   |
+| Cross-platform terminal launch (macOS / Linux)                          | Not started   |
+| CSV-based result plots (beyond JSON)                                      | Not started   |
+| Upcoming programmes (CoDiet, JA Prevent NCD, JACARDI)                   | Not started   |
+| Repo integration (merge to main, root README, release packaging)        | Not started   |
+| UX polish, accessibility, error messaging, docs for end users           | Not started   |
+
+The folder lives on `hgps/gui` today; nothing is merged to `main` yet.
 
 ---
 
@@ -204,7 +210,7 @@ HealthGPS Studio workspace — FINCH (UK), live simulation complete
 
 | Area                | What's on screen                                                                                   |
 | ------------------- | -------------------------------------------------------------------------------------------------- |
-| **Header**          | HEALTH-GPS | STUDIO logo, Back, project title **FINCH (UK)**, example path, **Validate** / **Run** |
+| **Header**          | HEALTH-GPS · STUDIO logo, Back, project title **FINCH (UK)**, example path, **Validate** / **Run** |
 | **Left sidebar**    | Config (`new_config.json`), intervention, run parameters, demographics toggles                     |
 | **Live simulation** | COMPLETE badge, phase progress bars, **721 agents**, policy **simple**                             |
 | **Resources**       | CPU / memory sparkline (top-right)                                                                 |
