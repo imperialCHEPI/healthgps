@@ -31,6 +31,34 @@ The folder lives on `hgps/gui` today; nothing is merged to `main` yet.
 
 ---
 
+## Timeline (for stakeholders)
+
+High-level calendar estimate — **part-time** alongside other HealthGPS work (~2–3 days/week on Studio). Long simulation runs add calendar slack; they do not block all development.
+
+**Summary:** ~**2 months** to team beta on Windows · ~**4–5 months** to something comfortable for wider research use.
+
+| Phase | When | What you get |
+| ----- | ---- | ------------ |
+| **1 — Internal beta** | ~6–8 weeks | Merged into repo; FINCH / STOP / India workflows; validate → run → charts; good enough for the team to dogfood |
+| **2 — Research-ready** | +8–12 weeks | Short user guide; more programmes (CoDiet, JA Prevent, …); chart and results polish; clearer errors |
+| **3 — Stretch (if needed)** | After phase 2 | macOS / Linux support; CSV-based plots; packaging for non-developers |
+
+### Steps (non-technical)
+
+1. **Finish what's half-done** — result charts and live preview (~few weeks).
+2. **Merge and stabilise** — into `main`, basic tests, fix issues on real projects (~2 weeks).
+3. **Pilot with the team** — one real project end-to-end; fix what researchers actually trip on (~2 weeks).
+4. **Expand catalogue and document** — new programmes, handover guide (~2–3 months, in parallel with other work).
+5. **Optional later** — other operating systems, extra plot types from CSV.
+
+### If asked "why not faster?"
+
+- Core UI already exists on a branch — not starting from zero.
+- Allocation is shared with other models and runs.
+- Scope is a **local researcher tool**, not a product launch (no HPC integration, no engine rewrite).
+
+---
+
 ## My goals
 
 1. Let users pick how they start — new user wizard, expert config upload, or curated examples.
