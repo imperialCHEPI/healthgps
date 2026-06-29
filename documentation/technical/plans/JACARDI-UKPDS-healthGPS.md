@@ -60,8 +60,8 @@ isProject: false
 
 # JACARDI-UKPDS-healthGPS — UKPDS integration into HealthGPS
 
-**Author:** Mahima Ghosh · **GitHub:** `jacardi` · **Branch prefix:** `jacardi/`  
-**Status:** Design / planning (written and maintained by Mahima)  
+**Author:** Mahima Ghosh · **GitHub:** `jacardi` · **Branch prefix:** `jacardi/`
+**Status:** Design / planning (written and maintained by Mahima)
 **Related:** [Technical index](../README.md)
 
 **Goal:** Integrate the UKPDS diabetes submodel into HealthGPS so that (1) diabetes diagnosis is assigned by HealthGPS, (2) diagnosed individuals enter UKPDS, (3) from Year 2 of diabetes onward UKPDS equations update clinical risk factors and complications based on **prior-year** values, and (4) overlap complications (stroke, IHD, etc.) retain history from before diabetes onset.
@@ -100,8 +100,6 @@ flowchart TD
 
     year2 --> year3
 ```
-
-
 
 **Coding rules from this diagram:**
 
@@ -161,10 +159,7 @@ flowchart TB
     disUp3 --> ukpdsComp3
 ```
 
-
-
 **Mapping to HealthGPS modules:**
-
 
 | Diagram step                        | HealthGPS module                                       | When                                                |
 | ----------------------------------- | ------------------------------------------------------ | --------------------------------------------------- |
@@ -174,7 +169,6 @@ flowchart TB
 | Disease status / diabetes diagnosis | `DiseaseModule` → `DefaultDiseaseModel` for `diabetes` | Init prevalence + annual incidence                  |
 | UKPDS complications                 | **New** `UkpdsComplicationModel`                       | After global RF + disease pass, diabetic only       |
 | UKPDS clinical RFs                  | **New** `UkpdsRiskFactorModel`                         | After complications or paired in one UKPDS pass     |
-
 
 ---
 
@@ -221,8 +215,6 @@ flowchart TB
     personState --> overlap
 ```
 
-
-
 ### 3.2 Annual sequence with UKPDS inserted
 
 ```mermaid
@@ -247,8 +239,6 @@ sequenceDiagram
     UKPDS->>UKPDS: update clinical RFs UKPDS equations
     UKPDS->>Person: overwrite clinical RF values for diabetics
 ```
-
-
 
 **Wiring choice:** UKPDS runs **after** `DiseaseModule` so new diagnoses in year t enter UKPDS in the same year (Year 1 of diabetes = diagnosis year). Complication/RF updates for that person use HealthGPS values from **before** the UKPDS pass as "prior year" inputs (or stored snapshot — see §5.3).
 
@@ -275,8 +265,6 @@ flowchart TD
     rfUpdate --> writeState[Write Person.risk_factors and Person.diseases]
     writeState --> nextYear[State becomes prior-year input for t plus 1]
 ```
-
-
 
 ### 3.4 Single person lifecycle — initialisation through Year 3
 
@@ -316,8 +304,6 @@ sequenceDiagram
     UKPDS->>P: Complications from prior-year UKPDS RFs
     UKPDS->>P: Clinical RFs from prior-year UKPDS RFs
 ```
-
-
 
 ### 3.5 Class diagram — new UKPDS types in HealthGPS
 
@@ -360,8 +346,6 @@ classDiagram
     UkpdssComplicationModel --> Person
 ```
 
-
-
 ---
 
 ## 4. Pre-existing complications and history (stroke example)
@@ -385,9 +369,6 @@ sequenceDiagram
     UKPDS->>UKPDS: do not re-incidence stroke if already active
 ```
 
-
-
-
 | Situation                                   | UKPDS behaviour                                                       |
 | ------------------------------------------- | --------------------------------------------------------------------- |
 | Complication already active before diabetes | Skip draw; use `start_time` in equations                              |
@@ -395,13 +376,11 @@ sequenceDiagram
 | Equation needs duration                     | `time_now - start_time`                                               |
 | Overlap disease codes                       | `stroke`, `ischemicheartdisease`, etc. — same `Person.diseases` entry |
 
-
 ---
 
 ## 5. Where I plan to add code and how much change is required (Mahima)
 
 ### 5.1 File change map
-
 
 | File / area                                                                               | Change type | Est. lines | Purpose                                                         |
 | ----------------------------------------------------------------------------------------- | ----------- | ---------- | --------------------------------------------------------------- |
@@ -423,9 +402,8 @@ sequenceDiagram
 | **NEW** `src/HealthGPS.Tests/Ukpds*.Test.cpp`                                             | New         | 300–500    | Handover, 3-year recursive, overlap history                     |
 | `[static_linear_model.cpp](../../../src/HealthGPS/static_linear_model.cpp)`           | Modify      | ~20–40     | Skip or partial update of clinical RFs for active diabetics     |
 
-
-**Estimated total new C++:** ~1,500–2,500 lines  
-**Estimated modified C++:** ~200–400 lines across existing files  
+**Estimated total new C++:** ~1,500–2,500 lines
+**Estimated modified C++:** ~200–400 lines across existing files
 **New data files:** ~20–40 CSV/JSON files for UKPDS coefficients
 
 ### 5.2 Wiring options (pick one during implementation)
@@ -443,8 +421,6 @@ flowchart TD
     optW3 --> w3pros[Complications tied to disease registry ordering issues]
 ```
 
-
-
 **My recommendation: W1** — add `UkpdsModule` called from `Simulation::update_population` immediately after `disease_->update_population`:
 
 ```cpp
@@ -459,13 +435,11 @@ analysis_->update_population(context_);
 
 UKPDS equations need **prior-year** RF values. Options:
 
-
 | Option                         | Mechanism                                                                   | Code cost                                       |
 | ------------------------------ | --------------------------------------------------------------------------- | ----------------------------------------------- |
 | **S1 — Snapshot buffer**       | `Person` extension or side map `prior_risk_factors` copied end of each year | Medium (~100 lines)                             |
 | **S2 — Read before overwrite** | UKPDS reads current values as prior before writing new                      | Low — but requires careful ordering within year |
 | **S3 — Delayed write**         | Global RF updates skip diabetics; UKPDS owns all diabetic clinical RFs      | Medium — touches Static/Dynamic models          |
-
 
 **Recommendation:** **S1** for clarity and to match diagram 1/2 semantics exactly.
 
@@ -490,7 +464,6 @@ Assumes one developer familiar with HealthGPS.
 - UKPDS RF + complication as `UkpdsModule` with CSV-driven equations
 - History via derived predictors only
 
-
 | Phase                            | Duration        |
 | -------------------------------- | --------------- |
 | Data + parser                    | 3–4 weeks       |
@@ -499,11 +472,9 @@ Assumes one developer familiar with HealthGPS.
 | Tests + docs                     | 2–3 weeks       |
 | **Total**                        | **10–14 weeks** |
 
-
 ### Option B — Full UKPDS module + history view + config schema (RECOMMENDED)
 
 Everything in A plus `UkpdsHistoryView`, overlap disease gating, config schema, skip global clinical RF for diabetics.
-
 
 | Phase                                | Duration        |
 | ------------------------------------ | --------------- |
@@ -512,7 +483,6 @@ Everything in A plus `UkpdsHistoryView`, overlap disease gating, config schema, 
 | Config schema + repository wiring    | 1 week          |
 | Performance profiling                | 1 week          |
 | **Total**                            | **12–14 weeks** |
-
 
 ### Option C — Option B + custom DiabetesModel + framework changes
 
@@ -528,8 +498,6 @@ flowchart TD
     q1 -->|Yes| optC[Option C 18 to 22 weeks]
     q1 -->|Fastest MVP| optA[Option A 10 to 14 weeks]
 ```
-
-
 
 ---
 
@@ -555,8 +523,6 @@ sequenceDiagram
     Sim->>Ana: publish results
 ```
 
-
-
 ---
 
 ## 8. Data pipeline
@@ -577,12 +543,9 @@ flowchart TB
     ukpdsMod --> personD
 ```
 
-
-
 ---
 
 ## 9. Validation scenarios
-
 
 | #      | Scenario                             | Expected                                                          |
 | ------ | ------------------------------------ | ----------------------------------------------------------------- |
@@ -594,7 +557,6 @@ flowchart TB
 | V6     | Performance                          | no major runtime regression                                       |
 | **V7** | **3-year handover**                  | Y1 diagnosis → Y2 UKPDS uses HealthGPS RFs → Y3 uses Y2 UKPDS RFs |
 | **V8** | **Non-diabetic control**             | UKPDS never runs; global RFs unchanged                            |
-
 
 ---
 
@@ -613,8 +575,6 @@ flowchart TD
     ukpdsComp --> done
 ```
 
-
-
 ---
 
 ## 11. Performance constraints
@@ -626,8 +586,6 @@ flowchart LR
     precompute --> noScan[No per-person CSV reads at runtime]
 ```
 
-
-
 - Single `UkpdsModule` pass; no separate loop per complication
 - Precompute all UKPDS tables in `Repository` at startup
 - Cache overlap disease `Identifier` handles
@@ -635,7 +593,6 @@ flowchart LR
 ---
 
 ## 12. Diagram index — all diagrams in Mahima's plan
-
 
 | #   | Diagram                                                     | Section |
 | --- | ----------------------------------------------------------- | ------- |
@@ -656,7 +613,6 @@ flowchart LR
 | 15  | GitHub branch flow gitGraph (fixed — no slashes in IDs)     | §14.1   |
 | 16  | Per-push PR workflow                                        | §14.3   |
 
-
 ---
 
 ## 13. Execution order — what I (Mahima) will do next
@@ -675,8 +631,8 @@ flowchart LR
 
 ## 14. GitHub workflow — branches, pushes, and PRs (Mahima / jacardi)
 
-**Convention:** all branches use prefix `jacardi/` (my GitHub handle)  
-**Base branch:** `main` (merge target for every PR)  
+**Convention:** all branches use prefix `jacardi/` (my GitHub handle)
+**Base branch:** `main` (merge target for every PR)
 **Strategy:** stacked feature branches — each branch is one logical push/PR, builds on the previous merge. I (Mahima) keep `main` green after every merge.
 
 ### 14.1 Branch flow overview
@@ -783,10 +739,7 @@ gitGraph
     merge ukpds_docs tag: "PR13"
 ```
 
-
-
 ### 14.2 Branch catalogue — what goes in each push
-
 
 | PR       | Branch                             | Push contains                                                                            | Files touched (main ones)                                                                                                         | Merge gate                                             |
 | -------- | ---------------------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
@@ -804,7 +757,6 @@ gitGraph
 | **PR12** | `jacardi/ukpds-tests`              | Full test suite V1–V8; 3-year handover; performance smoke test                           | `UkpdsHandover.Test.cpp`, `UkpdsIntegration.Test.cpp`                                                                             | All tests green                                        |
 | **PR13** | `jacardi/ukpds-docs`               | Economist note; CSV-to-equation map                                                      | `docs/ukpds/economist_note.md`, `docs/ukpds/csv_map.md`                                                                           | Economist review; no code change                       |
 
-
 ### 14.3 What each push should look like (my rules)
 
 ```mermaid
@@ -820,8 +772,6 @@ flowchart TD
     merge --> deleteBranch[Delete remote branch]
     deleteBranch --> start
 ```
-
-
 
 **Per-push checklist:**
 
@@ -853,13 +803,11 @@ Author: Mahima (@jacardi)
 
 ### 14.5 Optional parallel branches
 
-
 | Branch                             | Can start after | Depends on               |
 | ---------------------------------- | --------------- | ------------------------ |
 | `jacardi/ukpds-history`            | PR4 merged      | Parser only              |
 | `jacardi/ukpds-rf-model`           | PR5 merged      | Parser + person snapshot |
 | `jacardi/ukpds-complication-model` | PR6 merged      | Parser + history view    |
-
 
 Do **not** open PR10 until PR9 is merged.
 
@@ -876,7 +824,6 @@ gh pr create --title "jacardi/ukpds-scaffold: add UKPDS module stubs and CMake e
 
 ### 14.7 Timeline — branches to weeks
 
-
 | Weeks | Branches  | Capability after merge                    |
 | ----- | --------- | ----------------------------------------- |
 | 1–2   | PR1–PR3   | Scaffold, data layout, config parses      |
@@ -884,7 +831,6 @@ gh pr create --title "jacardi/ukpds-scaffold: add UKPDS module stubs and CMake e
 | 5–7   | PR7–PR9   | RF model, complications, full module      |
 | 8–9   | PR10–PR11 | Live in simulation; handover works        |
 | 10–11 | PR12–PR13 | Full validation + economist docs          |
-
 
 ---
 
