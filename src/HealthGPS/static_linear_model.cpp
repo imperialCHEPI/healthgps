@@ -420,8 +420,8 @@ std::size_t policy_debug_row_score(const PolicyApplyExampleRow &row) {
     score ^= static_cast<std::size_t>(row.age + 4099) * 3266489917u;
     score ^= static_cast<std::size_t>(row.factor.size()) * 668265263u;
     for (const char c : row.factor) {
-        score = (score * 131u) ^
-                static_cast<std::size_t>(std::tolower(static_cast<unsigned char>(c)));
+        score =
+            (score * 131u) ^ static_cast<std::size_t>(std::tolower(static_cast<unsigned char>(c)));
     }
     score ^= static_cast<std::size_t>(row.sex == "male" ? 17u : 31u);
     return score;
@@ -429,8 +429,8 @@ std::size_t policy_debug_row_score(const PolicyApplyExampleRow &row) {
 
 void collect_policy_apply_debug_rows(
     const Population &population, const std::vector<core::Identifier> &names,
-    const std::vector<IncomeStratumExpectedTableEntry> &stratum_tables, core::Gender gender2_indicator,
-    std::vector<PolicyApplyExampleRow> &rows_out) {
+    const std::vector<IncomeStratumExpectedTableEntry> &stratum_tables,
+    core::Gender gender2_indicator, std::vector<PolicyApplyExampleRow> &rows_out) {
     rows_out.clear();
     rows_out.reserve(80);
     std::vector<std::pair<std::size_t, PolicyApplyExampleRow>> scored_rows;
@@ -469,10 +469,9 @@ void collect_policy_apply_debug_rows(
             row.policy_pct = person.risk_factors.at(policy_name);
 
             const auto residual_name = core::Identifier{names[i].to_string() + "_policy_residual"};
-            row.residual =
-                person.risk_factors.contains(residual_name)
-                    ? person.risk_factors.at(residual_name)
-                    : 0.0;
+            row.residual = person.risk_factors.contains(residual_name)
+                               ? person.risk_factors.at(residual_name)
+                               : 0.0;
 
             row.current_value = person.risk_factors.at(names[i]);
             row.after_policy_value = row.current_value * (1.0 + row.policy_pct / 100.0);
@@ -506,11 +505,11 @@ void collect_policy_apply_debug_rows(
     }
 }
 
-std::vector<PolicyPredictorDetail> build_policy_predictor_details(
-    const Person &person, const LinearModelParams &model,
-    const LinearModelEvalOptions &options) {
-    const auto try_predictor_value = [&person, &options](
-                                         const core::Identifier &name) -> std::optional<double> {
+std::vector<PolicyPredictorDetail>
+build_policy_predictor_details(const Person &person, const LinearModelParams &model,
+                               const LinearModelEvalOptions &options) {
+    const auto try_predictor_value =
+        [&person, &options](const core::Identifier &name) -> std::optional<double> {
         try {
             return get_linear_predictor_value(person, name, options);
         } catch (const std::exception &) {
@@ -549,15 +548,16 @@ std::vector<PolicyPredictorDetail> build_policy_predictor_details(
             {fmt::format("log_{}", name.to_string()), log_value, coef, coef * log_value});
     }
 
-    std::ranges::sort(details, [](const PolicyPredictorDetail &lhs, const PolicyPredictorDetail &rhs) {
-        if (lhs.name == "Intercept") {
-            return true;
-        }
-        if (rhs.name == "Intercept") {
-            return false;
-        }
-        return lhs.name < rhs.name;
-    });
+    std::ranges::sort(details,
+                      [](const PolicyPredictorDetail &lhs, const PolicyPredictorDetail &rhs) {
+                          if (lhs.name == "Intercept") {
+                              return true;
+                          }
+                          if (rhs.name == "Intercept") {
+                              return false;
+                          }
+                          return lhs.name < rhs.name;
+                      });
     return details;
 }
 
@@ -578,9 +578,9 @@ void print_policy_sample_predictor_values(const std::vector<PolicyApplyExampleRo
             continue;
         }
         out << "PersonID=" << row.person_id << " Factor=" << row.factor << " Sex=" << row.sex
-            << " Age=" << row.age << " Stratum=" << row.stratum_id << " Linear="
-            << fmt::format("{:.5f}", row.linear) << " Residual="
-            << fmt::format("{:.5f}", row.residual) << '\n';
+            << " Age=" << row.age << " Stratum=" << row.stratum_id
+            << " Linear=" << fmt::format("{:.5f}", row.linear)
+            << " Residual=" << fmt::format("{:.5f}", row.residual) << '\n';
         out << std::setw(18) << std::left << "Predictor" << std::setw(14) << std::right << "Value"
             << std::setw(14) << "Coefficient" << std::setw(14) << "Contribution" << '\n';
         for (const auto &detail : row.predictor_details) {
@@ -594,8 +594,9 @@ void print_policy_sample_predictor_values(const std::vector<PolicyApplyExampleRo
     std::osyncstream(std::cout) << out.str();
 }
 
-std::vector<std::size_t> select_policy_debug_row_indices(const std::vector<PolicyApplyExampleRow> &rows,
-                                                         std::size_t max_rows_to_print) {
+std::vector<std::size_t>
+select_policy_debug_row_indices(const std::vector<PolicyApplyExampleRow> &rows,
+                                std::size_t max_rows_to_print) {
     std::vector<std::size_t> selected_indices;
     selected_indices.reserve(std::min(max_rows_to_print, rows.size()));
     if (rows.size() <= max_rows_to_print) {
