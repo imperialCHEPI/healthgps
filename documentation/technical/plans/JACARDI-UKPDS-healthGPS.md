@@ -402,8 +402,8 @@ sequenceDiagram
 | **NEW** `src/HealthGPS.Tests/Ukpds*.Test.cpp`                                             | New         | 300–500    | Handover, 3-year recursive, overlap history                     |
 | `[static_linear_model.cpp](../../../src/HealthGPS/static_linear_model.cpp)`           | Modify      | ~20–40     | Skip or partial update of clinical RFs for active diabetics     |
 
-**Estimated total new C++:** ~1,500–2,500 lines  
-**Estimated modified C++:** ~200–400 lines across existing files  
+**Estimated total new C++:** ~1,500–2,500 lines
+**Estimated modified C++:** ~200–400 lines across existing files
 **New data files:** ~20–40 CSV/JSON files for UKPDS coefficients
 
 ### 5.2 Wiring options (pick one during implementation)
