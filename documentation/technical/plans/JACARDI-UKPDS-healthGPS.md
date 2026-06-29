@@ -60,8 +60,8 @@ isProject: false
 
 # JACARDI-UKPDS-healthGPS — UKPDS integration into HealthGPS
 
-**Author:** Mahima Ghosh · **GitHub:** `jacardi` · **Branch prefix:** `jacardi/`  
-**Status:** Design / planning (written and maintained by Mahima)  
+**Author:** Mahima Ghosh · **GitHub:** `jacardi` · **Branch prefix:** `jacardi/`
+**Status:** Design / planning (written and maintained by Mahima)
 **Related:** [Technical index](../README.md)
 
 **Goal:** Integrate the UKPDS diabetes submodel into HealthGPS so that (1) diabetes diagnosis is assigned by HealthGPS, (2) diagnosed individuals enter UKPDS, (3) from Year 2 of diabetes onward UKPDS equations update clinical risk factors and complications based on **prior-year** values, and (4) overlap complications (stroke, IHD, etc.) retain history from before diabetes onset.
@@ -631,8 +631,8 @@ flowchart LR
 
 ## 14. GitHub workflow — branches, pushes, and PRs (Mahima / jacardi)
 
-**Convention:** all branches use prefix `jacardi/` (my GitHub handle)  
-**Base branch:** `main` (merge target for every PR)  
+**Convention:** all branches use prefix `jacardi/` (my GitHub handle)
+**Base branch:** `main` (merge target for every PR)
 **Strategy:** stacked feature branches — each branch is one logical push/PR, builds on the previous merge. I (Mahima) keep `main` green after every merge.
 
 ### 14.1 Branch flow overview
