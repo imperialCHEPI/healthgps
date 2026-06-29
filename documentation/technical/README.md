@@ -24,6 +24,7 @@ Design and phase plans — useful for developers; some items may already be impl
 
 | Document | Topic |
 | -------- | ----- |
+| [JACARDI-UKPDS-healthGPS](plans/JACARDI-UKPDS-healthGPS.md) | UKPDS diabetes submodel integration — architecture, diagrams, GitHub branches (`jacardi/*`), code map (Mahima) |
 | [Income quintile factor means](plans/income-quintile-factor-means-plan.md) | Income-stratum factors-mean adjustment (schema + C++ phases) |
 | [Dynamic income categories](plans/dynamic-income-categories-plan.md) | 3/4/5 income category layout |
 | [Weight quintile plan](plans/weight-quintile-plan.md) | Kevin Hall weight by income stratum |
@@ -43,6 +44,7 @@ Design and phase plans — useful for developers; some items may already be impl
 | Kevin Hall height/weight | [Height quintile plan](plans/height-csv-quintile-plan.md) | [Weight quintile plan](plans/weight-quintile-plan.md) |
 | Output / person IDs | [Individual ID tracking](plans/individual-id-tracking-csv-plan.md) | [Same person ID plan](plans/same-person-id-baseline-intervention-plan.md) |
 | What shipped in Feb 2026 | [Update report](guides/healthgps-update-report-2026-02-20.md) | [Performance notes](guides/performance-optimizations.md) |
+| UKPDS / diabetes submodel | [JACARDI-UKPDS-healthGPS](plans/JACARDI-UKPDS-healthGPS.md) | [Update report](guides/healthgps-update-report-2026-02-20.md) (module order) |
 
 ---
 
