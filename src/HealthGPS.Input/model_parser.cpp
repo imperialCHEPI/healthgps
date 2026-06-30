@@ -1829,7 +1829,6 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
     const core::Gender gender2_indicator =
         parse_gender2_indicator(config.project_requirements.demographics.gender2);
-
     try {
         auto result = std::make_unique<StaticLinearModelDefinition>(
             std::move(expected), std::move(expected_trend), std::move(trend_steps),

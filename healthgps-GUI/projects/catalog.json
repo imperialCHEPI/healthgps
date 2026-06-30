@@ -1,0 +1,130 @@
+{
+    "programs": [
+        {
+            "id": "stop",
+            "name": "STOP",
+            "subtitle": "Childhood obesity policy simulation",
+            "status": "active",
+            "countries": [
+                {
+                    "id": "fra",
+                    "name": "France",
+                    "example_dir": "HLM_France",
+                    "project_id": "hlm_france"
+                }
+            ]
+        },
+        {
+            "id": "resolve",
+            "name": "Resolve to Save Lives",
+            "subtitle": "India NCD policy modelling",
+            "status": "active",
+            "countries": [
+                {
+                    "id": "ind",
+                    "name": "India",
+                    "example_dir": "KevinHall_India",
+                    "project_id": "india"
+                }
+            ]
+        },
+        {
+            "id": "finch",
+            "name": "FINCH",
+            "subtitle": "UK food and health policy",
+            "status": "active",
+            "countries": [
+                {
+                    "id": "gbr",
+                    "name": "United Kingdom",
+                    "example_dir": "KevinHall_FINCH",
+                    "project_id": "finch"
+                }
+            ]
+        },
+        {
+            "id": "codiet",
+            "name": "CoDiet",
+            "subtitle": "Upcoming",
+            "status": "upcoming",
+            "countries": [
+                {
+                    "id": "gbr",
+                    "name": "United Kingdom"
+                }
+            ]
+        },
+        {
+            "id": "ja_prevent_ncd",
+            "name": "JA Prevent NCD",
+            "subtitle": "Upcoming",
+            "status": "upcoming",
+            "countries": [
+                {
+                    "id": "est",
+                    "name": "Estonia"
+                },
+                {
+                    "id": "bel",
+                    "name": "Belgium"
+                },
+                {
+                    "id": "fin",
+                    "name": "Finland"
+                },
+                {
+                    "id": "nor",
+                    "name": "Norway"
+                },
+                {
+                    "id": "itl",
+                    "name": "Italy"
+                },
+                {
+                    "id": "gbr",
+                    "name": "United Kingdom"
+                },
+                {
+                    "id": "fra",
+                    "name": "France"
+                }
+            ]
+        },
+        {
+            "id": "jacardi",
+            "name": "JACARDI",
+            "subtitle": "Upcoming",
+            "status": "upcoming",
+            "countries": [
+                {
+                    "id": "rou",
+                    "name": "Romania"
+                },
+                {
+                    "id": "svn",
+                    "name": "Slovenia"
+                },
+                {
+                    "id": "bel",
+                    "name": "Belgium"
+                },
+                {
+                    "id": "ita",
+                    "name": "Italy"
+                },
+                {
+                    "id": "esp",
+                    "name": "Spain"
+                },
+                {
+                    "id": "mlt",
+                    "name": "Malta"
+                },
+                {
+                    "id": "pol",
+                    "name": "Poland"
+                }
+            ]
+        }
+    ]
+}
