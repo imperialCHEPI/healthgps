@@ -1,6 +1,6 @@
 ## Global Health Policy Simulation model
 
-| [Home](../index) | [Quick Start](getstarted) | User Guide | [Software Architecture](../developer/architecture) | [Data Model](../developer/datamodel) | [Developer Guide](../developer/development) | [Technical docs](../technical/) | [API](../api/index.html) |
+| [Home](../index.md) | [Quick Start](getstarted.md) | User Guide | [Software Architecture](../developer/architecture.md) | [Data Model](../developer/datamodel.md) | [Developer Guide](../developer/development.md) | [Technical docs](../technical/README.md) | [API](../api/index.html) |
 
 # User Guide
 
@@ -953,3 +953,22 @@ rm *.pbs.[oet]*
 ```
 
 Finally, array jobs are not suitable to all workflows. Because array jobs are intended to run many copies (potentially thousands) of the same workflow, typical of Monte-Carlo simulations, workflows with high load on the filesystem, where each sub-job is going to be reading/writing to the same file, for example, can result in slowdown of access to all HPC users. ***Be especially careful during the holidays when the HPC system has minimum support***.
+
+---
+
+### Related documentation
+
+| Topic | Document |
+| ----- | -------- |
+| User docs index | [user/README.md](README.md) |
+| Quick start | [Quick Start](getstarted.md) |
+| Build from source | [Developer Guide](../developer/development.md) |
+| Architecture | [Software Architecture](../developer/architecture.md) |
+| FINCH / income / predictors | [FINCH linear models guide](../technical/guides/finch-linear-models-and-income-adjustment.md) |
+| Feb 2026 changes | [Update report](../technical/guides/healthgps-update-report-2026-02-20.md) |
+| Technical docs | [Technical documentation index](../technical/README.md) |
+| Documentation home | [documentation/index.md](../index.md) |
+
+---
+
+[← User documentation index](README.md) · [Documentation home](../index.md)

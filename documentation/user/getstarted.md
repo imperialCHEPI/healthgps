@@ -1,6 +1,6 @@
 ## Global Health Policy Simulation model
 
-| [Home](../index) | Quick Start | [User Guide](userguide) | [Software Architecture](../developer/architecture) | [Data Model](../developer/datamodel) | [Developer Guide](../developer/development) | [Technical docs](../technical/) | [API](../api/index.html) |
+| [Home](../index.md) | Quick Start | [User Guide](userguide.md) | [Software Architecture](../developer/architecture.md) | [Data Model](../developer/datamodel.md) | [Developer Guide](../developer/development.md) | [Technical docs](../technical/README.md) | [API](../api/index.html) |
 
 # Quick Start
 
@@ -98,5 +98,23 @@ show(p)
 |           *Experiment BMI projection example*           |
 
 In a similar manner, the resulting dataset `df`, can be re-created and expanded to summarise other variables of interest, create results tables and plots to better understand the experiment.
+
+---
+
+### Related documentation
+
+| Topic | Document |
+| ----- | -------- |
+| User docs index | [user/README.md](README.md) |
+| Full configuration & HPC | [User Guide](userguide.md) |
+| Build from source | [Developer Guide](../developer/development.md) |
+| Windows MSVC failures | [MSVC troubleshooting](../technical/developer/msvc-windows-build-troubleshooting.md) |
+| FINCH / Kevin Hall inputs | [FINCH linear models guide](../technical/guides/finch-linear-models-and-income-adjustment.md) |
+| Technical docs | [Technical documentation index](../technical/README.md) |
+| Documentation home | [documentation/index.md](../index.md) |
+
+---
+
+[← User documentation index](README.md) · [Documentation home](../index.md)
 
 [configjson]:https://github.com/imperialCHEPI/healthgps-examples/tree/main/HLM_France/config.json "Configuration file example"

@@ -428,7 +428,11 @@ Example runs and configuration: [quick start](../../user/getstarted.md).
 | [Same person ID plan](../plans/same-person-id-baseline-intervention-plan.md)       | ID assignment across scenarios                          |
 | [Income quintile factor means plan](../plans/income-quintile-factor-means-plan.md) | Optional stratum-specific adjustment                    |
 | [Architecture guide](../../developer/architecture.md)                              | Core system design                                      |
+| [Developer Guide](../../developer/development.md)                                  | Build, CMake, vcpkg                                     |
+| [MSVC troubleshooting](../developer/msvc-windows-build-troubleshooting.md)         | Windows toolset / Ninja environment failures            |
 | [Technical index](../README.md)                                                    | Full technical documentation listing                    |
+| [User Guide](../../user/userguide.md)                                              | Configuration and HPC usage                             |
+| [Documentation home](../../index.md)                                               | Documentation map                                       |
 
 ---
 

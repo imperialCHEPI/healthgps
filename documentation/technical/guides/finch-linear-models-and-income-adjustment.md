@@ -27,6 +27,10 @@ If anything is unclear or you need a walkthrough of the code path, contact **Mah
 | Kevin Hall height by quintile | [Height CSV quintile plan](../plans/height-csv-quintile-plan.md) |
 | Kevin Hall weight by quintile | [Weight quintile plan](../plans/weight-quintile-plan.md) |
 | All technical docs | [Technical documentation index](../README.md) |
+| Technical developer notes | [Technical developer index](../developer/README.md) |
+| Windows MSVC / Ninja build | [MSVC troubleshooting](../developer/msvc-windows-build-troubleshooting.md) |
+| Formal developer docs | [developer/](../../developer/) |
+| User docs | [user/](../../user/) |
 | Documentation home | [documentation/index.md](../../index.md) |
 
 ---

@@ -1,6 +1,6 @@
 # Schema Migration Plan: Unified Schema
 
-**Author:** Mahima Ghosh · **Related:** [Project requirements plan](project-requirements-plan.md) · [Technical index](../README.md)
+**Author:** Mahima Ghosh · **Related:** [Project requirements plan](project-requirements-plan.md) · [Technical index](../README.md) · [Documentation home](../../index.md)
 
 ## 🎯 **Goal**
 
@@ -107,4 +107,4 @@ file(COPY ${CMAKE_SOURCE_DIR}/schemas/config
 
 ---
 
-**Author:** Mahima Ghosh · [Technical index](../README.md)
+**Author:** Mahima Ghosh · [Technical index](../README.md) · [Documentation home](../../index.md)

@@ -18,6 +18,17 @@ Reference documents for modellers, economists, and developers — start here for
 
 ---
 
+## Developer notes (tooling)
+
+Practical Windows / MSVC / CMake notes that sit next to the formal [Developer Guide](../developer/development.md).
+
+| Document | Description |
+| -------- | ----------- |
+| [Technical developer notes index](developer/README.md) | Hub for tooling / environment docs |
+| [Windows MSVC / Ninja build troubleshooting](developer/msvc-windows-build-troubleshooting.md) | Missing `cstdint`, broken `MSVCRTD.lib`, toolset mismatch — diagnosis and recovery |
+
+---
+
 ## Plans (implementation design)
 
 Design and phase plans — useful for developers; some items may already be implemented.
@@ -43,6 +54,18 @@ Design and phase plans — useful for developers; some items may already be impl
 | Kevin Hall height/weight | [Height quintile plan](plans/height-csv-quintile-plan.md) | [Weight quintile plan](plans/weight-quintile-plan.md) |
 | Output / person IDs | [Individual ID tracking](plans/individual-id-tracking-csv-plan.md) | [Same person ID plan](plans/same-person-id-baseline-intervention-plan.md) |
 | What shipped in Feb 2026 | [Update report](guides/healthgps-update-report-2026-02-20.md) | [Performance notes](guides/performance-optimizations.md) |
+| Windows build / MSVC / Ninja | [MSVC troubleshooting](developer/msvc-windows-build-troubleshooting.md) | [Developer Guide](../developer/development.md) |
+
+---
+
+## Documentation map
+
+| Area | Index |
+| ---- | ----- |
+| Documentation home | [documentation/index.md](../index.md) |
+| User docs | [user/](../user/) |
+| Formal developer docs | [developer/](../developer/) |
+| Technical developer notes | [developer/](developer/) |
 
 ---
 

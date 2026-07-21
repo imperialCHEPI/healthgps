@@ -1,6 +1,6 @@
 ## Global Health Policy Simulation model
 
-| [Home](../index) | [Quick Start](../user/getstarted) | [User Guide](../user/userguide) | Software Architecture | [Data Model](datamodel) | [Developer Guide](development) | [Technical docs](../technical/) | [API](../api/index.html) |
+| [Home](../index.md) | [Quick Start](../user/getstarted.md) | [User Guide](../user/userguide.md) | Software Architecture | [Data Model](datamodel.md) | [Developer Guide](development.md) | [Technical docs](../technical/README.md) | [API](../api/index.html) |
 
 # Software Architecture
 
@@ -215,7 +215,25 @@ The various components of the Health-GPS ecosystem can be deployed to multiple c
 
 The version of the *libraries* required by the application at runtime depends on the compiler being used to build Health-GPS executable. The source code is portable for compilers supporting C++20 standard, however the resulting binaries are platform *dependent* and must be built, tested, and deployed accordingly for the model to work as expected.
 
-> See [Data Model](datamodel) and [Developer Guide](development) for detailed information on the backend data storage and the various *interfaces* implementation respectively.
+> See [Data Model](datamodel.md) and [Developer Guide](development.md) for detailed information on the backend data storage and the various *interfaces* implementation respectively.
+
+---
+
+### Related documentation
+
+| Topic | Document |
+| ----- | -------- |
+| Developer docs index | [developer/README.md](README.md) |
+| Data model | [Data Model](datamodel.md) |
+| Build guide | [Developer Guide](development.md) |
+| GitHub flow | [GitHub Flow](github-flow.md) |
+| Feb 2026 integrated changes | [Update report](../technical/guides/healthgps-update-report-2026-02-20.md) |
+| Technical docs | [Technical documentation index](../technical/README.md) |
+| Documentation home | [documentation/index.md](../index.md) |
+
+---
+
+[← Developer documentation index](README.md) · [Documentation home](../index.md)
 
 [cpp20]:https://en.cppreference.com/w/cpp/20 "C++ 20 standard features and compiler support"
 [kafka]:https://kafka.apache.org "Distributed event streaming platform"

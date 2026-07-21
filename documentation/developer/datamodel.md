@@ -1,6 +1,6 @@
 ## Global Health Policy Simulation model
 
-| [Home](../index) | [Quick Start](../user/getstarted) | [User Guide](../user/userguide) | [Software Architecture](architecture) | Data Model | [Developer Guide](development) | [Technical docs](../technical/) | [API](../api/index.html) |
+| [Home](../index.md) | [Quick Start](../user/getstarted.md) | [User Guide](../user/userguide.md) | [Software Architecture](architecture.md) | Data Model | [Developer Guide](development.md) | [Technical docs](../technical/README.md) | [API](../api/index.html) |
 
 # Data Model
 
@@ -262,7 +262,24 @@ The burden of diseases (BoD) measure is modelled using a two-dimensional entity,
 
 The ***data model*** definition is now *complete*. The design makes heavy use of relational-database notations; however, the backend data model is storage and implementation agnostic, the Health-GPS ecosystem seamlessly supports different [Data API][dataapi] implementations via instance injection during construction.
 
->See [Development Guide](development) for a *file-based* backend storage implementation detail.
+>See [Development Guide](development.md) for a *file-based* backend storage implementation detail.
+
+---
+
+### Related documentation
+
+| Topic | Document |
+| ----- | -------- |
+| Developer docs index | [developer/README.md](README.md) |
+| Architecture | [Software Architecture](architecture.md) |
+| Build guide | [Developer Guide](development.md) |
+| User guide | [User Guide](../user/userguide.md) |
+| Technical docs | [Technical documentation index](../technical/README.md) |
+| Documentation home | [documentation/index.md](../index.md) |
+
+---
+
+[← Developer documentation index](README.md) · [Documentation home](../index.md)
 
 [dataapi]: https://github.com/imperialCHEPI/healthgps/blob/main/source/HealthGPS.Core/datastore.h "Health-GPS Data API definition."
 

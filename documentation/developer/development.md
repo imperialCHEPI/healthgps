@@ -1,6 +1,6 @@
 ## Global Health Policy Simulation model
 
-| [Home](../index) | [Quick Start](../user/getstarted) | [User Guide](../user/userguide) | [Software Architecture](architecture) | [Data Model](datamodel) | Developer Guide | [Technical docs](../technical/) | [API](../api/index.html) |
+| [Home](../index.md) | [Quick Start](../user/getstarted.md) | [User Guide](../user/userguide.md) | [Software Architecture](architecture.md) | [Data Model](datamodel.md) | Developer Guide | [Technical docs](../technical/README.md) | [API](../api/index.html) |
 
 # Developer Guide
 
@@ -41,6 +41,8 @@ git checkout v1.2.2.0
 (for example).
 
 Finally, open the `healthgps` folder in Visual Studio and hit build. The first build takes considerably longer than normal due to the initial work required by CMake and the package manager.
+
+> **Windows / MSVC note:** If CMake reports missing headers such as `cstdint`, cannot find `CMAKE_CXX_COMPILER`, or fails linking with `MSVCRTD.lib`, that is a local Visual Studio toolset / environment issue — not a Health-GPS source bug. See [Windows MSVC / Ninja build troubleshooting](../technical/developer/msvc-windows-build-troubleshooting.md) (Mahima Ghosh).
 
 ### Building Health-GPS
 
@@ -405,4 +407,22 @@ When running the simulation as a single experiment, the solution is trivial usin
 ## GitHub flow
 
 Health-GPS uses the GitHub flow branching pattern for git. For more information, see the
-[GitHub flow guide](github-flow)
+[GitHub flow guide](github-flow.md).
+
+---
+
+### Related documentation
+
+| Topic | Document |
+| ----- | -------- |
+| Developer docs index | [developer/README.md](README.md) |
+| Windows MSVC / Ninja failures | [MSVC troubleshooting](../technical/developer/msvc-windows-build-troubleshooting.md) |
+| Architecture | [Software Architecture](architecture.md) |
+| Data model | [Data Model](datamodel.md) |
+| Technical guides & plans | [Technical documentation index](../technical/README.md) |
+| User guide / HPC | [User Guide](../user/userguide.md) |
+| Documentation home | [documentation/index.md](../index.md) |
+
+---
+
+[← Developer documentation index](README.md) · [Documentation home](../index.md)

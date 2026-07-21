@@ -1,5 +1,7 @@
 # Health-GPS Project Model Branching Policy
 
+| [Home](../index.md) | [Quick Start](../user/getstarted.md) | [User Guide](../user/userguide.md) | [Software Architecture](architecture.md) | [Data Model](datamodel.md) | [Developer Guide](development.md) | [Technical docs](../technical/README.md) | [API](../api/index.html) |
+
 Traditional Git-flow branching patterns are usually adopted by large software teams with
 complex release processes to support the deployment of multiple versions of the same
 application in production. Not all software projects benefit from the flexibility
@@ -51,3 +53,19 @@ The GitHub workflow described above aims at enabling collaboration and productiv
 - ***Name feature branches by convention*** - use a consistent naming convention for your feature branches to identify the work done in the branch, e.g., `hotfix/description` and `feature/feature-name`.
 
 Finally, GitHub extensions are available for workflow integration with many popular development tools, however the graphical interfaces are usually task-based and perform multiple commands to accomplish the required task. To learn and be confident with the Git source control system, the use of the Git command line is strongly recommended, see [GitHub Git Cheat Sheet](https://education.github.com/git-cheat-sheet-education.pdf) for a summary the Git commands associated with the GitHub flow branching policy.
+
+---
+
+### Related documentation
+
+| Topic | Document |
+| ----- | -------- |
+| Developer docs index | [developer/README.md](README.md) |
+| Build guide | [Developer Guide](development.md) |
+| Architecture | [Software Architecture](architecture.md) |
+| Technical docs | [Technical documentation index](../technical/README.md) |
+| Documentation home | [documentation/index.md](../index.md) |
+
+---
+
+[← Developer documentation index](README.md) · [Documentation home](../index.md)
