@@ -1,7 +1,7 @@
 # Windows MSVC / Ninja build troubleshooting
 
-**Author:** Mahima Ghosh  
-**Last updated:** July 2026  
+**Author:** Mahima Ghosh
+**Last updated:** July 2026
 **Engineering contact:** Mahima Ghosh — please reach out if you hit a related build failure or anything not covered here.
 
 ## About this note
