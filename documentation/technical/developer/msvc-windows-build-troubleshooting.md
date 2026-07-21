@@ -112,7 +112,7 @@ dir "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42
 dir "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\lib\x64\msvcrtd.lib"
 ```
 
-4. Forced the healthy toolset:
+1. Forced the healthy toolset:
 
 ```bat
 call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat" -vcvars_ver=14.44.35207
@@ -137,20 +137,20 @@ call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build
 cd /d C:\HealthGPS
 ```
 
-4. Delete the stale CMake cache for the preset (optional but safest after a broken configure):
+1. Delete the stale CMake cache for the preset (optional but safest after a broken configure):
 
 ```bat
 rmdir /s /q out\build\windows-release
 ```
 
-5. Reconfigure and build:
+1. Reconfigure and build:
 
 ```bat
 cmake --preset windows-release
 cmake --build out\build\windows-release
 ```
 
-6. To continue in the IDE with the same environment:
+1. To continue in the IDE with the same environment:
 
 ```bat
 devenv C:\HealthGPS
