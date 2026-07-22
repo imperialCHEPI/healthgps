@@ -34,7 +34,7 @@ Design notes for developers. Some items may already be in the tree.
 | [Project requirements plan](plans/project-requirements-plan.md) | `project_requirements` schema |
 | [Schema migration plan](plans/schema-migration-plan.md) | Config v1 to v2 |
 
-### If you are working on...
+### If you are working on
 
 | Topic | Start here | Then |
 | ----- | ---------- | ---- |

@@ -1,6 +1,6 @@
 # Windows MSVC / Ninja build troubleshooting
 
-**Author:** Mahima Ghosh  
+**Author:** Mahima Ghosh
 **Last updated:** July 2026
 
 ## Why I wrote this
@@ -11,7 +11,6 @@ This is not a bug in Health-GPS. The presets and code were fine. I am writing do
 
 ### Related documentation
 
-
 | Topic                      | Document                                      |
 | -------------------------- | --------------------------------------------- |
 | Normal build steps         | [Developer Guide](development.md)             |
@@ -20,10 +19,7 @@ This is not a bug in Health-GPS. The presets and code were fine. I am writing do
 | Documentation index        | [documentation/README.md](../README.md)       |
 | Quick start (binaries)     | [Quick Start](../user/getstarted.md)          |
 
-
 ---
-
-
 
 ## Table of contents
 
@@ -36,8 +32,6 @@ This is not a bug in Health-GPS. The presets and code were fine. I am writing do
 7. [What it was not](#7-what-it-was-not)
 
 ---
-
-
 
 ## 1. Symptoms
 
@@ -72,11 +66,7 @@ This one was the giveaway. `cl.exe` was on disk, but the x64 runtime libs for th
 
 ---
 
-
-
 ## 2. Root causes
-
-
 
 ### 2.1 Ninja needs the MSVC developer environment
 
@@ -94,12 +84,10 @@ I had more than one MSVC toolset under:
 
 `C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\`
 
-
 | Toolset         | x64 `MSVCRTD.lib`                           |
 | --------------- | ------------------------------------------- |
 | **14.42.34433** | **Missing** (`lib\x64` empty or incomplete) |
 | **14.44.35207** | Present                                     |
-
 
 Visual Studio / CMake preferred **14.42**, so linking failed even though **14.44** was fine. That fits a partial VS update leaving an older toolset half-installed.
 
@@ -107,14 +95,14 @@ vcpkg also found a compiler binary. That does not mean the active toolset's libs
 
 ---
 
-
-
 ## 3. How I diagnosed it
 
 1. Confirmed `#include <cstdint>` in our headers is normal and correct.
 2. Compared CMake environment dumps:
-  - First run: no `INCLUDE` / `LIB` -> Errors B / A.
-  - Later run (from Native Tools): `INCLUDE` present, but `LIB` pointed at the broken 14.42 tree -> Error C.
+
+- First run: no `INCLUDE` / `LIB` -> Errors B / A.
+- Later run (from Native Tools): `INCLUDE` present, but `LIB` pointed at the broken 14.42 tree -> Error C.
+
 3. Checked on disk:
 
 ```bat
@@ -131,8 +119,6 @@ call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build
 After that, `LIB` included `...\MSVC\14.44.35207\lib\x64`, CMake configured, and the release build completed.
 
 ---
-
-
 
 ## 4. What fixed it
 
@@ -185,10 +171,7 @@ Binary:
 
 ---
 
-
-
 ## 5. Checklist for next time
-
 
 | Step | Action                                                                                                                 |
 | ---- | ---------------------------------------------------------------------------------------------------------------------- |
@@ -200,9 +183,6 @@ Binary:
 | 6    | Delete `out\build\windows-release` (or your preset folder) and reconfigure.                                            |
 | 7    | If several toolsets look broken, run Visual Studio Installer -> Repair (section 6).                                    |
 | 8    | Only after the toolchain works should you dig into project CMake or source. Usually you will not need to.              |
-
-
-
 
 ### Handy commands
 
@@ -216,8 +196,6 @@ where /R "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC"
 
 ---
 
-
-
 ## 6. Repairing Visual Studio properly
 
 `-vcvars_ver=` is fine for a day. I still prefer a clean install so Visual Studio defaults to a healthy toolset.
@@ -225,9 +203,11 @@ where /R "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC"
 1. Open **Visual Studio Installer**.
 2. Select **Visual Studio Community 2022** -> **Repair**.
 3. If it still fails, **Modify** -> **Individual components**:
-  - Install **MSVC v143 - VS 2022 C++ x64/x86 build tools (Latest)**.
-  - Install a **Windows 10/11 SDK**.
-  - Optionally remove a clearly broken older 14.42 (or similar) component if Repair left it incomplete.
+
+- Install **MSVC v143 - VS 2022 C++ x64/x86 build tools (Latest)**.
+- Install a **Windows 10/11 SDK**.
+- Optionally remove a clearly broken older 14.42 (or similar) component if Repair left it incomplete.
+
 4. Reboot if prompted.
 5. Open a fresh **x64 Native Tools** prompt, confirm `LIB` points at a toolset with `lib\x64\msvcrtd.lib`, then reconfigure Health-GPS.
 
@@ -235,10 +215,7 @@ After a good Repair, opening the folder in Visual Studio normally should work ag
 
 ---
 
-
-
 ## 7. What it was not
-
 
 | Suspect                         | Why I ruled it out                                   |
 | ------------------------------- | ---------------------------------------------------- |
@@ -247,10 +224,7 @@ After a good Repair, opening the folder in Visual Studio normally should work ag
 | vcpkg registry warnings         | Noise; packages installed successfully.              |
 | Missing project code            | Full release build worked once 14.44 was active.     |
 
-
 ---
-
-
 
 ## Questions?
 
