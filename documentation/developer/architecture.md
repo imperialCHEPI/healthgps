@@ -4,6 +4,8 @@
 
 # Software Architecture
 
+**Author:** Mahima Ghosh
+
 The Health-GPS software architecture adopts a modular design approach to provide the building blocks necessary to compose the microsimulation, which is written in modern, standard ANSI [C++20][cpp20] and using object-oriented principles for software development. The software application is open source, cross-platform,  and comprises of four main components:
 
 | ![Health-GPS Components](../images/component_diagram.svg) |
@@ -23,17 +25,17 @@ The Health-GPS framework adopts a modular design to specify the building blocks 
 |:-----------------------------------------------------:|
 | *High-level Architecture of the Health-GPS Framework* |
 
-- ***Inputs*** – provides additional datasets, models hierarchy definition, fitted parameters, diseases selection, intervention scenario and simulation run-time settings.
-- ***Host Application*** – process the user’s inputs, initialise the required infrastructure, create the microsimulation instance, run the experiment, collect, and write results to the output file.
+- ***Inputs*** - provides additional datasets, models hierarchy definition, fitted parameters, diseases selection, intervention scenario and simulation run-time settings.
+- ***Host Application*** - process the user’s inputs, initialise the required infrastructure, create the microsimulation instance, run the experiment, collect, and write results to the output file.
 - ***Data Storage*** - contains the datasets in a consistent format as required by all simulation modules not externally fitted by the user. The data in storage comes from multiple sources and have already been externally processed, smoothly interpolated missing information to conform with the required data format. The datastore uses [ISO 3166](https://www.iso.org/iso-3166-country-codes.html)  country code to index the datasets by country and stores information on birth and death rates by age and gender, total population, relative risks for risk factors-diseases associations, epidemiological rates for most countries by age and gender, and disability weights. New datasets can be added without code change.
-- ***Risk Factors Module*** – represents the generic factors hierarchy as defined by the user to generate the dynamic equations with respective parameters fitted to a dataset, e.g., survey. Their values provide additional properties to individuals within the virtual population and are continuously updated throughout the simulation based on the derived equations. There are two types of hierarchical models: *static* used only during individual’s initialisation, and *dynamic* which includes a dynamic factor, time (year), and is used during subsequent individual’s risks updates.
-- ***SES Module*** – defines the virtual population individuals’ socio-economic status properties such as education and income to represent their relative importance as determinants of health by gender and age. These properties values can be updated throughout the simulation.
-- ***Demographics Module*** – defines the population of interest to be simulated, providing historic and projected indicators of a country’s population size, age, and gender. Their values are used to create the initial virtual population, the building blocks of the simulation holding vital information about virtual individuals such as age, gender, education, income, risk factors exposures and comorbidities. The module also provided indicators on a country’s population birth and death rates, which is used throughout the simulation to update the individuals’ life cycle.
-- ***Diseases Module*** – holds the collection of diseases sub-models selected by the user. The definition of diseases is data driven, the design provides a reusable generic interface to represent diseases epidemiological rates and relative risks for risk factors-diseases associations; and update individual’s disease status based on their risk factors exposures.
-- ***Burden of Diseases Module*** – collects statistical indicators about the simulated population, calculates diseases prevalence, risk factors exposure, and standardised metrics such as YLL, YLD, DALY, and publish the results to the outside world asynchronously via messaging.
-- ***Intervention Module*** – defines the alternative scenario used to update risk factors distributions based on the intervention’s population targets and parameters. Interventions are designed specifically to study a particular scenario and may require new data formats and additional module in code.
+- ***Risk Factors Module*** - represents the generic factors hierarchy as defined by the user to generate the dynamic equations with respective parameters fitted to a dataset, e.g., survey. Their values provide additional properties to individuals within the virtual population and are continuously updated throughout the simulation based on the derived equations. There are two types of hierarchical models: *static* used only during individual’s initialisation, and *dynamic* which includes a dynamic factor, time (year), and is used during subsequent individual’s risks updates.
+- ***SES Module*** - defines the virtual population individuals’ socio-economic status properties such as education and income to represent their relative importance as determinants of health by gender and age. These properties values can be updated throughout the simulation.
+- ***Demographics Module*** - defines the population of interest to be simulated, providing historic and projected indicators of a country’s population size, age, and gender. Their values are used to create the initial virtual population, the building blocks of the simulation holding vital information about virtual individuals such as age, gender, education, income, risk factors exposures and comorbidities. The module also provided indicators on a country’s population birth and death rates, which is used throughout the simulation to update the individuals’ life cycle.
+- ***Diseases Module*** - holds the collection of diseases sub-models selected by the user. The definition of diseases is data driven, the design provides a reusable generic interface to represent diseases epidemiological rates and relative risks for risk factors-diseases associations; and update individual’s disease status based on their risk factors exposures.
+- ***Burden of Diseases Module*** - collects statistical indicators about the simulated population, calculates diseases prevalence, risk factors exposure, and standardised metrics such as YLL, YLD, DALY, and publish the results to the outside world asynchronously via messaging.
+- ***Intervention Module*** - defines the alternative scenario used to update risk factors distributions based on the intervention’s population targets and parameters. Interventions are designed specifically to study a particular scenario and may require new data formats and additional module in code.
 - ***Health-GPS*** - the core of the microsimulation engine. It holds all the other modules instances and state machine to run a full simulation, dictating the calling order of each module during initialisation and multiple update steps to completion, and notify progress via messaging.
-- ***Output*** – the collection of results published by the simulation (Analysis Module) at the end of each time step and written to a file in disk, JSON format, by the Host Application to be analysed by the user externally to draw conclusions about the simulated experiment. An alternative to writing the results to a file in disk, is to use a message broker, e.g., [RabbitMQ][broker], or a distributed event streaming platform such as [Apache Kafka][kafka] to distribute the messages and enable parallel analysis of results while the simulation is running by an external application.
+- ***Output*** - the collection of results published by the simulation (Analysis Module) at the end of each time step and written to a file in disk, JSON format, by the Host Application to be analysed by the user externally to draw conclusions about the simulated experiment. An alternative to writing the results to a file in disk, is to use a message broker, e.g., [RabbitMQ][broker], or a distributed event streaming platform such as [Apache Kafka][kafka] to distribute the messages and enable parallel analysis of results while the simulation is running by an external application.
 
 The *simulation engine* clock and events scheduling is based on the *Discrete Event System Specification* ([DEVS][devs]) and provided by the [ADEVS][adevs] library. The simulation results are streamed asynchronous to the outside world via the *message bus* instance provided to the model by the *host application* during initialisation.
 
@@ -229,11 +231,11 @@ The version of the *libraries* required by the application at runtime depends on
 | GitHub flow | [GitHub Flow](github-flow.md) |
 | Feb 2026 integrated changes | [Update report](../technical/guides/healthgps-update-report-2026-02-20.md) |
 | Technical docs | [Technical documentation index](../technical/README.md) |
-| Documentation home | [documentation/index.md](../index.md) |
+| Documentation home | [documentation/README.md](../README.md) |
 
 ---
 
-[← Developer documentation index](README.md) · [Documentation home](../index.md)
+[← Developer documentation index](README.md) · [Documentation index](../README.md)
 
 [cpp20]:https://en.cppreference.com/w/cpp/20 "C++ 20 standard features and compiler support"
 [kafka]:https://kafka.apache.org "Distributed event streaming platform"

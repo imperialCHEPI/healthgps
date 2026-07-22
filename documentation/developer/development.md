@@ -4,6 +4,8 @@
 
 # Developer Guide
 
+**Author:** Mahima Ghosh
+
 The *Health GPS* software is written in modern, standard ANSI C++, targeting the [C++20 version](https://en.cppreference.com/w/cpp/20) and using the C++ Standard Library. The project is fully managed by [CMake](https://cmake.org/) and [Microsoft Visual Studio](https://visualstudio.microsoft.com), the code base is portable but requires a C++20 compatible compiler to build. The development toolset users [Ninja](https://ninja-build.org/) for build, [vcpkg](https://github.com/microsoft/vcpkg) package manager for dependencies, [googletest](https://github.com/google/googletest) for unit testing and [GitHub Actions](https://docs.github.com/en/actions) for continuous integration (CI) builds and testing.
 
 ## Building from source
@@ -42,7 +44,7 @@ git checkout v1.2.2.0
 
 Finally, open the `healthgps` folder in Visual Studio and hit build. The first build takes considerably longer than normal due to the initial work required by CMake and the package manager.
 
-> **Windows / MSVC note:** If CMake reports missing headers such as `cstdint`, cannot find `CMAKE_CXX_COMPILER`, or fails linking with `MSVCRTD.lib`, that is a local Visual Studio toolset / environment issue — not a Health-GPS source bug. See [Windows MSVC / Ninja build troubleshooting](../technical/developer/msvc-windows-build-troubleshooting.md) (Mahima Ghosh).
+> **Windows / MSVC note:** If CMake reports missing headers such as `cstdint`, cannot find `CMAKE_CXX_COMPILER`, or fails linking with `MSVCRTD.lib`, that is a local Visual Studio toolset / environment issue, not a Health-GPS source bug. See [Windows MSVC / Ninja build troubleshooting](msvc-windows-build-troubleshooting.md) (Mahima Ghosh).
 
 ### Building Health-GPS
 
@@ -416,13 +418,13 @@ Health-GPS uses the GitHub flow branching pattern for git. For more information,
 | Topic | Document |
 | ----- | -------- |
 | Developer docs index | [developer/README.md](README.md) |
-| Windows MSVC / Ninja failures | [MSVC troubleshooting](../technical/developer/msvc-windows-build-troubleshooting.md) |
+| Windows MSVC / Ninja failures | [MSVC troubleshooting](msvc-windows-build-troubleshooting.md) |
 | Architecture | [Software Architecture](architecture.md) |
 | Data model | [Data Model](datamodel.md) |
 | Technical guides & plans | [Technical documentation index](../technical/README.md) |
 | User guide / HPC | [User Guide](../user/userguide.md) |
-| Documentation home | [documentation/index.md](../index.md) |
+| Documentation home | [documentation/README.md](../README.md) |
 
 ---
 
-[← Developer documentation index](README.md) · [Documentation home](../index.md)
+**Author:** Mahima Ghosh | [Developer documentation index](README.md) | [Documentation index](../README.md)

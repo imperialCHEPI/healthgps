@@ -1,41 +1,33 @@
 # Developer documentation
 
-Formal software-engineering docs for building, extending, and contributing to Health-GPS.
+**Author / contact:** Mahima Ghosh
 
-**Engineering contact:** Mahima Ghosh — for Windows/MSVC build failures see [MSVC troubleshooting](../technical/developer/msvc-windows-build-troubleshooting.md); for FINCH/config behaviour see [technical guides](../technical/).
-
----
-
-## Documents
+Docs for building Health-GPS, reading the architecture, and contributing.
 
 | Document | Description |
 | -------- | ----------- |
 | [Software Architecture](architecture.md) | Components, modules, simulation engine |
 | [Data Model](datamodel.md) | Backend Data API and entity schema |
-| [Developer Guide](development.md) | C++20, CMake presets, vcpkg, tests, HPC EasyBuild |
-| [GitHub Flow](github-flow.md) | Branching and contribution policy |
+| [Developer Guide](development.md) | C++20, CMake presets, vcpkg, tests, HPC |
+| [Windows MSVC / Ninja troubleshooting](msvc-windows-build-troubleshooting.md) | `cstdint`, `MSVCRTD.lib`, broken toolsets |
+| [GitHub Flow](github-flow.md) | Branching and pull requests |
 
-### Related clusters
+### If you are working on...
 
-| If you are working on… | Start with… | Then see… |
-| ---------------------- | ----------- | --------- |
-| Build / CMake / vcpkg | [Developer Guide](development.md) | [MSVC troubleshooting](../technical/developer/msvc-windows-build-troubleshooting.md) |
-| Module design | [Software Architecture](architecture.md) | [Update report](../technical/guides/healthgps-update-report-2026-02-20.md) |
-| Datastore / countries | [Data Model](datamodel.md) | [User Guide](../user/userguide.md) |
+| Topic | Start here | Then |
+| ----- | ---------- | ---- |
+| Build / CMake / vcpkg | [Developer Guide](development.md) | [MSVC troubleshooting](msvc-windows-build-troubleshooting.md) |
+| Module design | [Architecture](architecture.md) | [Update report](../technical/guides/healthgps-update-report-2026-02-20.md) |
+| Datastore | [Data Model](datamodel.md) | [User Guide](../user/userguide.md) |
 | Pull requests | [GitHub Flow](github-flow.md) | [Developer Guide](development.md) |
-| FINCH / income / predictors | [FINCH guide](../technical/guides/finch-linear-models-and-income-adjustment.md) | [Technical index](../technical/README.md) |
+| FINCH / income / predictors | [FINCH guide](../technical/guides/finch-linear-models-and-income-adjustment.md) | [technical/README.md](../technical/README.md) |
 
 ---
 
-## Documentation map
-
-| Area | Index |
-| ---- | ----- |
-| Documentation home | [documentation/index.md](../index.md) |
+| Area | Link |
+| ---- | ---- |
+| Documentation root | [documentation/README.md](../README.md) |
 | User docs | [user/](../user/) |
-| Technical guides, plans, developer notes | [technical/](../technical/) |
-| Technical developer notes (tooling) | [technical/developer/](../technical/developer/) |
+| Technical guides and plans | [technical/](../technical/) |
 
----
-
-[← Back to documentation home](../index.md) · **Maintainer (technical):** Mahima Ghosh
+**Author:** Mahima Ghosh | [Documentation index](../README.md)

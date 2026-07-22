@@ -2,7 +2,7 @@
 
 **Author:** Mahima Ghosh
 
-**Related:** [HealthGPS update report](healthgps-update-report-2026-02-20.md) · [MSVC troubleshooting](../developer/msvc-windows-build-troubleshooting.md) · [Technical index](../README.md) · [Developer Guide](../../developer/development.md)
+**Related:** [HealthGPS update report](healthgps-update-report-2026-02-20.md) · [MSVC troubleshooting](../../developer/msvc-windows-build-troubleshooting.md) · [Technical index](../README.md) · [Developer Guide](../../developer/development.md)
 
 This document describes the performance optimizations implemented to make HealthGPS simulations run faster.
 
@@ -167,4 +167,4 @@ parallel_config.progress_interval = 2.0;    // More frequent updates
 
 ---
 
-**Author:** Mahima Ghosh · [← Technical documentation index](../README.md) · [Technical developer notes](../developer/README.md) · [Documentation home](../../index.md)
+**Author:** Mahima Ghosh · [← Technical documentation index](../README.md) · [Technical developer notes](../developer/README.md) · [Documentation index](../../README.md)

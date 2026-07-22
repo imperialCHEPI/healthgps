@@ -3,24 +3,24 @@ name: Income quintile factor means
 overview: "Optional income-stratum factors-mean adjustment: default keeps today’s two overall CSVs + single adjustment pass. When enabled (baseline_adjustments), load extra stratum pairs, split continuous income into N adjustment buckets, calibrate RF/PA to stratum tables, then assign final income categories from project_requirements. Three phases: schema, C++, tests."
 todos:
   - id: phase1-schema
-    content: "Phase 1: Schema + BaselineInfo/parsing—baseline_adjustments toggle, stratum file pairs, adjustment bucket count vs final income.categories; validate consistency"
+    content: "Phase 1: Schema + BaselineInfo/parsing-baseline_adjustments toggle, stratum file pairs, adjustment bucket count vs final income.categories; validate consistency"
     status: pending
   - id: phase2-cpp
-    content: "Phase 2: C++—load tables (verify OK); rank-split to N adjustment strata; income-overall + stratum adjustments; final person.income via project_requirements; integrate generate+update yearly; baseline/intervention sync for stratum payloads"
+    content: "Phase 2: C++-load tables (verify OK); rank-split to N adjustment strata; income-overall + stratum adjustments; final person.income via project_requirements; integrate generate+update yearly; baseline/intervention sync for stratum payloads"
     status: pending
   - id: phase3-tests
-    content: "Phase 3: Tests—config, load failures, regression off-path, on-path sanity, yearly paths"
+    content: "Phase 3: Tests-config, load failures, regression off-path, on-path sanity, yearly paths"
     status: pending
 isProject: false
 ---
 
 # Income-stratum factors-mean adjustment (optional feature)
 
-**Author:** Mahima Ghosh · **Related:** [FINCH linear models guide (modeller-facing)](../guides/finch-linear-models-and-income-adjustment.md) · [Dynamic income categories plan](dynamic-income-categories-plan.md) · [Technical index](../README.md) · [Documentation home](../../index.md)
+**Author:** Mahima Ghosh · **Related:** [FINCH linear models guide (modeller-facing)](../guides/finch-linear-models-and-income-adjustment.md) · [Dynamic income categories plan](dynamic-income-categories-plan.md) · [Technical index](../README.md) · [Documentation index](../../README.md)
 
 ## Optional and backward compatible
 
-**Yes — this stays fully optional.** If the user does **not** turn on stratum-specific adjustment (or leaves the new `baseline_adjustments` fields absent / `enabled: false`), behaviour must match **today’s model**:
+**Yes - this stays fully optional.** If the user does **not** turn on stratum-specific adjustment (or leaves the new `baseline_adjustments` fields absent / `enabled: false`), behaviour must match **today’s model**:
 
 - Only the **two overall** factors-mean files (`factorsmean_male`, `factorsmean_female`) are used.
 - **One** combined factors-mean adjustment path as now (subject to existing `project_requirements`: `adjust_to_factors_mean`, income/PA flags, etc.).
@@ -34,14 +34,14 @@ No extra stratum CSVs, no second “adjustment bucket count,” and no change to
 
 - Raw simulation can misalign **physical activity** and risk factors with **income** in ways external data do not support (e.g. PAL vs income in reference data).
 - **Approach:** Keep the current machinery, but allow **factors-mean adjustment** to use **income-stratum reference tables** (e.g. quintiles from data) for **risk factors and PA**, while **continuous income** is still first calibrated to **overall** marginal factors means (the existing two files).
-- **Final reporting / Kevin Hall** may still use **fewer** categories (e.g. quartiles): so the model may need **two different notions of “income buckets”**—one for **which adjustment table** applies, and one for `**core::Income`** after all adjustments. This plan encodes that split in config (see below).
+- **Final reporting / Kevin Hall** may still use **fewer** categories (e.g. quartiles): so the model may need **two different notions of “income buckets”**-one for **which adjustment table** applies, and one for `**core::Income`** after all adjustments. This plan encodes that split in config (see below).
 
 ---
 
 ## Two config knobs for “how many income buckets?”
 
-- **Final categories** — `project_requirements.income.categories` (`"3"` or `"4"`): `**person.income`** for output, Kevin Hall, reporting—**after** the full pipeline; unchanged semantic from today.
-- **Adjustment strata** — `modelling.baseline_adjustments` (new): how many **rank buckets** from **continuous income** *before* stratum-specific factors-mean adjustment; must line up with loaded **stratum CSV pairs** (e.g. five quintiles ⇒ five pairs and five buckets; six strata with six table pairs ⇒ six buckets, then still final `"4"` for `person.income` if desired).
+- **Final categories** - `project_requirements.income.categories` (`"3"` or `"4"`): `**person.income`** for output, Kevin Hall, reporting-**after** the full pipeline; unchanged semantic from today.
+- **Adjustment strata** - `modelling.baseline_adjustments` (new): how many **rank buckets** from **continuous income** *before* stratum-specific factors-mean adjustment; must line up with loaded **stratum CSV pairs** (e.g. five quintiles ⇒ five pairs and five buckets; six strata with six table pairs ⇒ six buckets, then still final `"4"` for `person.income` if desired).
 
 Example: `**"4"`** final categories but **six** adjustment strata → six rank buckets → six male/female table pairs for RF/PA calibration → then equal-split into **four** final `core::Income` groups using continuous income.
 
@@ -53,7 +53,7 @@ Example: `**"4"`** final categories but **six** adjustment strata → six rank b
 
 **Overall (always, today):**
 
-- `factorsmean_male`, `factorsmean_female` — e.g. `Finch.FactorsMean.Male.csv`, `Finch.FactorsMean.Female.csv`.
+- `factorsmean_male`, `factorsmean_female` - e.g. `Finch.FactorsMean.Male.csv`, `Finch.FactorsMean.Female.csv`.
 
 **When stratum adjustment is enabled:** optional list of stratum pairs, e.g. `Finch.FactorsMean.Male.Quintile1.csv` / `Finch.FactorsMean.Female.Quintile1.csv`, … (`Quintile5` for five strata). Length is flexible (not hardcoded to five).
 
@@ -61,7 +61,7 @@ Example: `**"4"`** final categories but **six** adjustment strata → six rank b
 
 ---
 
-## Diagram — default path vs optional stratum path
+## Diagram - default path vs optional stratum path
 
 These are **continuous-income** flows at a high level (categorical-income projects follow existing India-style logic without this feature unless extended later).
 
@@ -97,29 +97,29 @@ When the feature is **off**, the simulator keeps the **existing** implementation
 
 ---
 
-## Phase 1 — Schema and config only
+## Phase 1 - Schema and config only
 
 **Scope:** [`schemas/v1/config/modelling.json`](c:/healthgps/schemas/v1/config/modelling.json), [`schemas/config/modelling.json`](c:/healthgps/schemas/config/modelling.json) if applicable, [`BaselineInfo`](c:/healthgps/src/HealthGPS.Input/poco.h), [`get_baseline_info`](c:/healthgps/src/HealthGPS.Input/configuration_parsing.cpp). **No simulation behaviour change** until Phase 2.
 
 **Under `baseline_adjustments`, include:**
 
-1. **Toggle** — stratum factors-mean adjustment enabled (default **false** / absent).
-2. `**file_names`** — existing `factorsmean_male` / `factorsmean_female` (**required**).
-3. **Stratum list** — array of `{ id, factorsmean_male, factorsmean_female }` (0..N entries when disabled; when enabled, length matches **N**).
-4. **Adjustment bucket count** — integer **N** (≥ 2): how many equal-rank buckets from continuous income for **adjustment**. Must be **consistent** with `strata.length` (pick one authoritative rule in implementation and validate).
+1. **Toggle** - stratum factors-mean adjustment enabled (default **false** / absent).
+2. `**file_names`** - existing `factorsmean_male` / `factorsmean_female` (**required**).
+3. **Stratum list** - array of `{ id, factorsmean_male, factorsmean_female }` (0..N entries when disabled; when enabled, length matches **N**).
+4. **Adjustment bucket count** - integer **N** (≥ 2): how many equal-rank buckets from continuous income for **adjustment**. Must be **consistent** with `strata.length` (pick one authoritative rule in implementation and validate).
 
 **Validation when enabled:** paths exist after rebase; **N** matches stratum file list length; optional consistency checks with `enabled` flag.
 
 ---
 
-## Phase 2 — C++ (ordered)
+## Phase 2 - C++ (ordered)
 
 Applies only when stratum adjustment is **enabled** and **continuous income** mode applies; otherwise execute **default path** only.
 
 1. **Load** overall + each stratum table; **abort or error** clearly on failure.
-2. **Assign N adjustment strata** — after **income-only** adjustment to the **overall** two files (when `project_requirements` say to adjust income), rank-split continuous income into **N** buckets (same *idea* as `[assign_income_categories_equal_split](c:/healthgps/src/HealthGPS/static_linear_model.cpp)`, extended to **N**). Persist stratum on `[Person](c:/healthgps/src/HealthGPS/person.h)` (or equivalent).
-3. **Stratum adjustments** — adjust **risk factors** then **PA** using **per-stratum** expected tables; **income** is **not** re-adjusted against stratum tables in the default design (only overall two files for income).
-4. **Final `person.income`** — **only** via `**project_requirements.income.categories`** (`"3"` / `"4"`), **after** the above, using continuous income (current equal-split style).
+2. **Assign N adjustment strata** - after **income-only** adjustment to the **overall** two files (when `project_requirements` say to adjust income), rank-split continuous income into **N** buckets (same *idea* as `[assign_income_categories_equal_split](c:/healthgps/src/HealthGPS/static_linear_model.cpp)`, extended to **N**). Persist stratum on `[Person](c:/healthgps/src/HealthGPS/person.h)` (or equivalent).
+3. **Stratum adjustments** - adjust **risk factors** then **PA** using **per-stratum** expected tables; **income** is **not** re-adjusted against stratum tables in the default design (only overall two files for income).
+4. **Final `person.income`** - **only** via `**project_requirements.income.categories`** (`"3"` / `"4"`), **after** the above, using continuous income (current equal-split style).
 
 **Integration:** End-to-end consistency (N, files, buckets, final categories). **Baseline ↔ intervention:** extend sync payloads so stratified deltas (per stratum × sex × age × factor) replicate today’s baseline-driven calibration for dual-scenario runs (see earlier plan notes on message shape).
 
@@ -137,7 +137,7 @@ Continues to use the **overall** `expected_` table for **initialisation** / blen
 
 ---
 
-## Phase 3 — Testing
+## Phase 3 - Testing
 
 - Config errors (bad paths, **N** vs list mismatch).
 - **Feature off:** regression vs pre-feature behaviour.

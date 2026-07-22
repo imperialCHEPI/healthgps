@@ -2,7 +2,7 @@
 
 | Home | [Quick Start](user/getstarted.md) | [User Guide](user/userguide.md) | [Software Architecture](developer/architecture.md) | [Data Model](developer/datamodel.md) | [Developer Guide](developer/development.md) | [Technical docs](technical/README.md) | [API](api/index.html) |
 
-**Documentation maintainer (technical):** Mahima Ghosh — see [technical documentation](technical/README.md) and [technical developer notes](technical/developer/README.md).
+**Documentation maintainer:** Mahima Ghosh - see [documentation/README.md](README.md).
 
 # Introduction
 
@@ -118,51 +118,47 @@ The reconcile process can be extremely laborious with each dataset having to be 
 
 ## Documentation map
 
-All project documentation lives under `documentation/` in four linked areas:
+All project docs live under `documentation/`. Start at [README.md](README.md).
+
+**Maintainer:** Mahima Ghosh
 
 ```mermaid
 flowchart TB
-    HOME[documentation/index.md — you are here]
-    HOME --> USER[user/ — run and configure]
-    HOME --> DEV[developer/ — architecture and build]
-    HOME --> TECH[technical/ — guides and plans]
-
+    ROOT[documentation/README.md]
+    ROOT --> USER[user/]
+    ROOT --> DEV[developer/]
+    ROOT --> TECH[technical/]
     USER --> GS[getstarted.md]
     USER --> UG[userguide.md]
-    USER --> UIDX[user/README.md]
-
     DEV --> ARCH[architecture.md]
     DEV --> DM[datamodel.md]
     DEV --> DV[development.md]
+    DEV --> MSVC[msvc-windows-build-troubleshooting.md]
     DEV --> GH[github-flow.md]
-    DEV --> DIDX[developer/README.md]
-
-    TECH --> GUIDE[guides/]
-    TECH --> PLAN[plans/]
-    TECH --> TDEV[developer/ — tooling notes]
-    TDEV --> MSVC[msvc-windows-build-troubleshooting.md]
+    TECH --> GUIDES[guides/]
+    TECH --> PLANS[plans/]
 ```
 
 | Folder | Audience | Contents |
 |--------|----------|----------|
-| [user/](user/) | Modellers, policy analysts | [Quick Start](user/getstarted.md), [User Guide](user/userguide.md) — see [user index](user/README.md) |
-| [developer/](developer/) | Software developers | Architecture, data model, build guide, GitHub flow — see [developer index](developer/README.md) |
-| [technical/](technical/) | Economists + developers | FINCH guide, update reports, feature plans — see [technical index](technical/README.md) |
-| [technical/developer/](technical/developer/) | Developers (tooling) | Windows MSVC / Ninja troubleshooting — see [technical developer index](technical/developer/README.md) |
+| [user/](user/) | Modellers, policy analysts | [Quick Start](user/getstarted.md), [User Guide](user/userguide.md) - see [user index](user/README.md) |
+| [developer/](developer/) | Software developers | Architecture, data model, build guide, MSVC troubleshooting, GitHub flow - see [developer index](developer/README.md) |
+| [technical/](technical/) | Economists and developers | FINCH guide, update reports, feature plans - see [technical index](technical/README.md) |
 
 ### Recommended starting points
 
-* New to Health-GPS → [Quick Start](user/getstarted.md)
-* FINCH / Kevin Hall inputs → [FINCH linear models guide](technical/guides/finch-linear-models-and-income-adjustment.md)
-* What changed in 2026 → [Update report](technical/guides/healthgps-update-report-2026-02-20.md)
-* Building from source → [Developer Guide](developer/development.md)
-* Windows build fails (`cstdint` / `MSVCRTD.lib`) → [MSVC troubleshooting](technical/developer/msvc-windows-build-troubleshooting.md)
-* Implementation questions → contact **Mahima Ghosh** (see [technical index](technical/README.md))
+* New to Health-GPS -> [Quick Start](user/getstarted.md)
+* FINCH / Kevin Hall inputs -> [FINCH linear models guide](technical/guides/finch-linear-models-and-income-adjustment.md)
+* What changed in 2026 -> [Update report](technical/guides/healthgps-update-report-2026-02-20.md)
+* Building from source -> [Developer Guide](developer/development.md)
+* Windows build fails (`cstdint` / `MSVCRTD.lib`) -> [MSVC troubleshooting](developer/msvc-windows-build-troubleshooting.md)
+* Questions -> **Mahima Ghosh** (see [documentation/README.md](README.md))
 
 ### Cross-area navigation
 
-| From… | To… |
-| ----- | --- |
-| [User index](user/README.md) | [Developer index](developer/README.md) · [Technical index](technical/README.md) |
-| [Developer index](developer/README.md) | [User index](user/README.md) · [Technical developer notes](technical/developer/README.md) |
-| [Technical index](technical/README.md) | [Developer Guide](developer/development.md) · [User Guide](user/userguide.md) |
+| From | To |
+| ---- | -- |
+| [Documentation root](README.md) | [User](user/README.md) / [Developer](developer/README.md) / [Technical](technical/README.md) |
+| [User index](user/README.md) | [Developer index](developer/README.md) / [Technical index](technical/README.md) |
+| [Developer index](developer/README.md) | [User index](user/README.md) / [MSVC note](developer/msvc-windows-build-troubleshooting.md) |
+| [Technical index](technical/README.md) | [Developer Guide](developer/development.md) / [User Guide](user/userguide.md) |

@@ -7,7 +7,7 @@ isProject: false
 
 # Parallelize output writes and reduce is_active() calls
 
-**Author:** Mahima Ghosh · **Related:** [Individual ID tracking plan](individual-id-tracking-csv-plan.md) · [Technical index](../README.md) · [Documentation home](../../index.md)
+**Author:** Mahima Ghosh · **Related:** [Individual ID tracking plan](individual-id-tracking-csv-plan.md) · [Technical index](../README.md) · [Documentation index](../../README.md)
 
 ## Current behaviour
 
@@ -99,4 +99,4 @@ No changes to [result_file_writer.cpp](src/HealthGPS.Console/result_file_writer.
 
 ---
 
-**Author:** Mahima Ghosh · [Technical index](../README.md) · [Documentation home](../../index.md)
+**Author:** Mahima Ghosh · [Technical index](../README.md) · [Documentation index](../../README.md)

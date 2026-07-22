@@ -1,7 +1,7 @@
 # HealthGPS Project Update Report
 
 **Author:** Mahima Ghosh
-**Period:** September 2025 – February 2026
+**Period:** September 2025 - February 2026
 **Last updated:** 20 February 2026
 
 **Related documentation:** [FINCH linear models guide](finch-linear-models-and-income-adjustment.md) · [Income quintile factor means plan](../plans/income-quintile-factor-means-plan.md) · [Individual ID tracking plan](../plans/individual-id-tracking-csv-plan.md) · [Same person ID plan](../plans/same-person-id-baseline-intervention-plan.md) · [Architecture guide](../../developer/architecture.md) · [Technical index](../README.md)
@@ -24,8 +24,8 @@ The report is intended for modellers, economists, and developers who need a sing
 4. [Parallelization](#4-parallelization)
 5. [Demographic module](#5-demographic-module)
 6. [Socioeconomic module (income)](#6-socioeconomic-module-income)
-7. [Risk factors — static linear model](#7-risk-factors--static-linear-model)
-8. [Risk factors — Kevin Hall (dynamic) model](#8-risk-factors--kevin-hall-dynamic-model)
+7. [Risk factors - static linear model](#7-risk-factors--static-linear-model)
+8. [Risk factors - Kevin Hall (dynamic) model](#8-risk-factors--kevin-hall-dynamic-model)
 9. [Analysis module and output](#9-analysis-module-and-output)
 10. [Disease module](#10-disease-module)
 11. [Policy](#11-policy)
@@ -71,7 +71,7 @@ Behaviour is documented relative to the main branch as of **20 February 2026**.
 
 ## 3. Application workflow
 
-The diagrams below describe the overall Health-GPS execution path — from program entry through simulation and output — rather than the per-person initialization sequence (see Section 14).
+The diagrams below describe the overall Health-GPS execution path - from program entry through simulation and output - rather than the per-person initialization sequence (see Section 14).
 
 ### 3.1 Module pipeline
 
@@ -219,7 +219,7 @@ Further runtime notes: [Performance optimizations](performance-optimizations.md)
 
 | Feature           | Description                                                           | Key code                                                                                                                                                        |
 | ----------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Region**        | Assignment via `region.csv` by age and gender (random probability)    | [demographic.cpp](src/HealthGPS/demographic.cpp) — `initialise_region`; [repository.cpp](src/HealthGPS/repository.cpp) — `get_region_prevalence`                |
+| **Region**        | Assignment via `region.csv` by age and gender (random probability)    | [demographic.cpp](src/HealthGPS/demographic.cpp) - `initialise_region`; [repository.cpp](src/HealthGPS/repository.cpp) - `get_region_prevalence`                |
 | **Ethnicity**     | Assignment via `ethnicity.csv` by age and gender (random probability) | `initialise_ethnicity`; `get_ethnicity_prevalence`                                                                                                              |
 | **Gender**        | Encoding: 1 = Female, 0 = Male                                        | Demographic module                                                                                                                                              |
 | **Individual ID** | Stable ID tracking across baseline and intervention runs              | See [individual ID tracking plan](../plans/individual-id-tracking-csv-plan.md) and [same person ID plan](../plans/same-person-id-baseline-intervention-plan.md) |
@@ -236,12 +236,12 @@ Reference: [demographic.cpp](src/HealthGPS/demographic.cpp), [configuration.cpp]
 
 ---
 
-## 7. Risk factors — static linear model
+## 7. Risk factors - static linear model
 
 - **Physical activity naming:** `physical_activity` replaced by `simple_physical_activity` (random probability, constant mean, small standard deviation).
 - **Continuous physical activity:** Regression on age, gender, region, ethnicity, `income_continuous`, and noise; optional factors-mean adjustment.
 - **Two-stage modelling** (e.g. alcohol zero vs non-zero):
-  - **Initialisation:** Stage 1 — logistic regression for P(value = 0); Stage 2 — Box-Cox + linear regression for non-zero values. Logistic stage is optional; Box-Cox stage is required when two-stage is enabled.
+  - **Initialisation:** Stage 1 - logistic regression for P(value = 0); Stage 2 - Box-Cox + linear regression for non-zero values. Logistic stage is optional; Box-Cox stage is required when two-stage is enabled.
   - **Update:** Stage 1 probability adjusted by prior-year status (e.g. if previous year zero, P(0) = (P_stage1 + 1) / 2; else (P_stage1 + 0) / 2). Coefficients for two-stage factors are added to `logistic_regression.csv`.
 - **Policy CSV input:** Energy intake rows are normalised to **log** energy intake at load time.
 - **Static model config:** File names and columns are user-specifiable for region, ethnicity, income (continuous or categorical), physical activity (continuous or simple), logistic model, Box-Cox coefficients, and policy model.
@@ -250,9 +250,9 @@ Reference: [static_linear_model.cpp](src/HealthGPS/static_linear_model.cpp), [ri
 
 ---
 
-## 8. Risk factors — Kevin Hall (dynamic) model
+## 8. Risk factors - Kevin Hall (dynamic) model
 
-- **Weight — `get_expected`:** Physical activity is read from factors-mean CSV data rather than hardcoded values when setting expected weight.
+- **Weight - `get_expected`:** Physical activity is read from factors-mean CSV data rather than hardcoded values when setting expected weight.
 - **Dynamic model JSON:** Kevin Hall parameters are specified in the dynamic model configuration.
 
 Reference: [kevin_hall_model.cpp](src/HealthGPS/kevin_hall_model.cpp).
@@ -265,7 +265,7 @@ Reference: [kevin_hall_model.cpp](src/HealthGPS/kevin_hall_model.cpp).
 - **Income-based CSV:** Results stratified by `income_category` with corrected assignment logic.
 - **Individual ID tracking:** Optional per-person CSV output with user-defined filters. Baseline IDs are stable until death; intervention copies receive offset IDs (baseline ID + N, where N is population size). See design plans linked in Section 5.
 - **Optional income-based files:** Enabled or disabled via config.
-- **Output parallelism:** Separate writer threads for main results vs individual tracking; reduced `is_active()` calls in analysis hot paths — see [parallelize output writes plan](../plans/parallelize-output-writes-plan.md).
+- **Output parallelism:** Separate writer threads for main results vs individual tracking; reduced `is_active()` calls in analysis hot paths - see [parallelize output writes plan](../plans/parallelize-output-writes-plan.md).
 
 Reference: [analysis_module.cpp](src/HealthGPS/analysis_module.cpp), [result_file_writer.cpp](src/HealthGPS.Console/result_file_writer.cpp), [individual_id_tracking_writer.cpp](src/HealthGPS.Console/individual_id_tracking_writer.cpp).
 
@@ -298,7 +298,7 @@ Reference: [configuration.cpp](src/HealthGPS.Input/configuration.cpp), [configur
 - Adjust-to-factors-mean flags (income, physical activity)
 - Trended adjustment to factors mean
 - Policy start year
-- `project_requirements` (demographics, income layout, PA, trends, two-stage flags — see [project requirements plan](../plans/project-requirements-plan.md))
+- `project_requirements` (demographics, income layout, PA, trends, two-stage flags - see [project requirements plan](../plans/project-requirements-plan.md))
 
 **Static model:** User-specified file names and columns for region, ethnicity, income, physical activity, logistic regression, Box-Cox, and policy models.
 
@@ -312,7 +312,7 @@ Reference: [configuration.cpp](src/HealthGPS.Input/configuration.cpp), [configur
 
 ## 13. Data loading and model parser
 
-The `names_` vector in the model parser preserves a consistent order for risk-factor correlation and covariance data. It contains risk-factor names (e.g. carbohydrate, sugar, protein) and **excludes** weight, height, BMI, income, physical activity, and energy intake — quantities supplied via dynamic model JSON and used in [kevin_hall_model.cpp](src/HealthGPS/kevin_hall_model.cpp).
+The `names_` vector in the model parser preserves a consistent order for risk-factor correlation and covariance data. It contains risk-factor names (e.g. carbohydrate, sugar, protein) and **excludes** weight, height, BMI, income, physical activity, and energy intake - quantities supplied via dynamic model JSON and used in [kevin_hall_model.cpp](src/HealthGPS/kevin_hall_model.cpp).
 
 Reference: [model_parser.cpp](src/HealthGPS.Input/model_parser.cpp).
 
@@ -429,13 +429,13 @@ Example runs and configuration: [quick start](../../user/getstarted.md).
 | [Income quintile factor means plan](../plans/income-quintile-factor-means-plan.md) | Optional stratum-specific adjustment                    |
 | [Architecture guide](../../developer/architecture.md)                              | Core system design                                      |
 | [Developer Guide](../../developer/development.md)                                  | Build, CMake, vcpkg                                     |
-| [MSVC troubleshooting](../developer/msvc-windows-build-troubleshooting.md)         | Windows toolset / Ninja environment failures            |
+| [MSVC troubleshooting](../../developer/msvc-windows-build-troubleshooting.md)         | Windows toolset / Ninja environment failures            |
 | [Technical index](../README.md)                                                    | Full technical documentation listing                    |
 | [User Guide](../../user/userguide.md)                                              | Configuration and HPC usage                             |
-| [Documentation home](../../index.md)                                               | Documentation map                                       |
+| [Documentation index](../../README.md)                                               | Documentation map                                       |
 
 ---
 
-*February 2026 — integrated Health-GPS codebase (India, ADB, FINCH).*
+*February 2026 - integrated Health-GPS codebase (India, ADB, FINCH).*
 
-**Author:** Mahima Ghosh · [← Technical documentation index](../README.md) · [Documentation home](../../index.md)
+**Author:** Mahima Ghosh · [← Technical documentation index](../README.md) · [Documentation index](../../README.md)

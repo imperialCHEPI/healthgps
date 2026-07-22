@@ -4,6 +4,8 @@
 
 # Quick Start
 
+**Author:** Mahima Ghosh
+
 The *Health GPS* application provides a *Command Line Interface* (CLI) and runs on *Windows 10 (and newer)* and *Linux* devices. All supported options are provided to the model via a [configuration][configjson] file (JSON format), including population size, intervention scenarios and number of runs. Users are encouraged to start exploring the model by using the included example dataset, changing the provided configuration file, and running the model.
 
 Pre-compiled binaries for `Windows` and `Linux` are available on the [releases page](https://github.com/imperialCHEPI/healthgps/) for generic x86-64 CPUs. If you want a version of the program tailored to your specific CPU (e.g. for HPC) or you wish to develop *Health GPS*, follow the instructions to build from source in the [developer guide](../developer/development). To use the binaries, you will need to unzip the downloaded file to a directory of your choice.
@@ -108,13 +110,13 @@ In a similar manner, the resulting dataset `df`, can be re-created and expanded 
 | User docs index | [user/README.md](README.md) |
 | Full configuration & HPC | [User Guide](userguide.md) |
 | Build from source | [Developer Guide](../developer/development.md) |
-| Windows MSVC failures | [MSVC troubleshooting](../technical/developer/msvc-windows-build-troubleshooting.md) |
+| Windows MSVC failures | [MSVC troubleshooting](../developer/msvc-windows-build-troubleshooting.md) |
 | FINCH / Kevin Hall inputs | [FINCH linear models guide](../technical/guides/finch-linear-models-and-income-adjustment.md) |
 | Technical docs | [Technical documentation index](../technical/README.md) |
-| Documentation home | [documentation/index.md](../index.md) |
+| Documentation home | [documentation/README.md](../README.md) |
 
 ---
 
-[← User documentation index](README.md) · [Documentation home](../index.md)
+[← User documentation index](README.md) · [Documentation index](../README.md)
 
 [configjson]:https://github.com/imperialCHEPI/healthgps-examples/tree/main/HLM_France/config.json "Configuration file example"

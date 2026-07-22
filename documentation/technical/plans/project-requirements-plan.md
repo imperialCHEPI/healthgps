@@ -1,6 +1,6 @@
 # Project requirements: config-driven behaviour (no project hacks)
 
-**Author:** Mahima Ghosh · **Related:** [FINCH linear models guide](../guides/finch-linear-models-and-income-adjustment.md) (`gender2`, income flags) · [Schema migration plan](schema-migration-plan.md) · [Technical index](../README.md) · [Documentation home](../../index.md)
+**Author:** Mahima Ghosh · **Related:** [FINCH linear models guide](../guides/finch-linear-models-and-income-adjustment.md) (`gender2`, income flags) · [Schema migration plan](schema-migration-plan.md) · [Technical index](../README.md) · [Documentation index](../../README.md)
 
 ## Goal
 
@@ -221,8 +221,8 @@ After Phase 3, no code path should branch on “India” / “FINCH” / “PIF�
 
 - [ ] `schemas/v1/config/project_requirements.json` (new)
 - [ ] `schemas/v1/config.json` (add optional `project_requirements` ref)
-- [ ] `input-data/data/KevinHall_FINCH/config.json` (or new_config.json) – add `project_requirements`
-- [ ] `input-data/data/KevinHall_India/config.json` – add `project_requirements`
-- [ ] `input-data/data/KevinHall_PIF/config.json` – add `project_requirements`
+- [ ] `input-data/data/KevinHall_FINCH/config.json` (or new_config.json) - add `project_requirements`
+- [ ] `input-data/data/KevinHall_India/config.json` - add `project_requirements`
+- [ ] `input-data/data/KevinHall_PIF/config.json` - add `project_requirements`
 - [ ] C++: config parsing and struct for `project_requirements` (Phase 2)
 - [ ] C++: demographic / income / PA / trend / two-stage logic use flags (Phase 3)

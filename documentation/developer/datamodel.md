@@ -4,6 +4,8 @@
 
 # Data Model
 
+**Author:** Mahima Ghosh
+
 The backend *data model* defines an abstract model to organises data entities and how they relate to one another in a standardised schema and format to be used within the Health-GPS systems. The backend storage provides a reference dataset that reconcile various disparate data sources required by the model, fill gaps, adjust units, etc, for easy use. The standardised format allows the reference dataset to be easily expanded to accommodate new and non-traditional data sources.
 
 The data model is storage agnostic, the [Data API][dataapi] abstraction interface shown below, provides a contract for the minimum dataset, easy access, strong typing, and decoupling from the backend storage implementation.
@@ -16,7 +18,7 @@ The data model defines the minimum dataset required by the model, the backend st
 
 | ![Health-GPS Data Model](../images/data_model.png) |
 |:-----------------------------------------------:|
-|    *Data Model Entity–Relationship Diagram*     |
+|    *Data Model Entity-Relationship Diagram*     |
 
 The *country* index entity is based on the [ISO 3166-1][iso3166] standard. All external data sources must provide some kind of *location identifier*, most likely with different values, but must enable mapping with the data storage index definition to be reconcile.
 
@@ -275,11 +277,11 @@ The ***data model*** definition is now *complete*. The design makes heavy use of
 | Build guide | [Developer Guide](development.md) |
 | User guide | [User Guide](../user/userguide.md) |
 | Technical docs | [Technical documentation index](../technical/README.md) |
-| Documentation home | [documentation/index.md](../index.md) |
+| Documentation home | [documentation/README.md](../README.md) |
 
 ---
 
-[← Developer documentation index](README.md) · [Documentation home](../index.md)
+[← Developer documentation index](README.md) · [Documentation index](../README.md)
 
 [dataapi]: https://github.com/imperialCHEPI/healthgps/blob/main/source/HealthGPS.Core/datastore.h "Health-GPS Data API definition."
 

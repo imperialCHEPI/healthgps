@@ -4,6 +4,8 @@
 
 # User Guide
 
+**Author:** Mahima Ghosh
+
 The **Health-GPS** microsimulation is a *data driven* modelling framework, combining many disconnected data sources to support the various interacting modules during a typical simulation experiment run. The framework provides a pre-populated *backend data storage* to minimise the learning curve for simple use cases, however advance users are likely to need a more in-depth knowledge of the full modelling workflow. A high-level representation of the microsimulation user workflow is shown below, it is crucial for users to have a good appreciation for the general dataflows and processes to better design experiments, configure the tool, and quantify the results.
 
 | ![Health-GPS Workflow](../images/workflow_diagram.svg) |
@@ -967,8 +969,8 @@ Finally, array jobs are not suitable to all workflows. Because array jobs are in
 | FINCH / income / predictors | [FINCH linear models guide](../technical/guides/finch-linear-models-and-income-adjustment.md) |
 | Feb 2026 changes | [Update report](../technical/guides/healthgps-update-report-2026-02-20.md) |
 | Technical docs | [Technical documentation index](../technical/README.md) |
-| Documentation home | [documentation/index.md](../index.md) |
+| Documentation home | [documentation/README.md](../README.md) |
 
 ---
 
-[← User documentation index](README.md) · [Documentation home](../index.md)
+[← User documentation index](README.md) · [Documentation index](../README.md)
