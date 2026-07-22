@@ -99,10 +99,8 @@ vcpkg also found a compiler binary. That does not mean the active toolset's libs
 
 1. Confirmed `#include <cstdint>` in our headers is normal and correct.
 2. Compared CMake environment dumps:
-
-- First run: no `INCLUDE` / `LIB` -> Errors B / A.
-- Later run (from Native Tools): `INCLUDE` present, but `LIB` pointed at the broken 14.42 tree -> Error C.
-
+   - First run: no `INCLUDE` / `LIB` -> Errors B / A.
+   - Later run (from Native Tools): `INCLUDE` present, but `LIB` pointed at the broken 14.42 tree -> Error C.
 3. Checked on disk:
 
 ```bat
@@ -203,11 +201,9 @@ where /R "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC"
 1. Open **Visual Studio Installer**.
 2. Select **Visual Studio Community 2022** -> **Repair**.
 3. If it still fails, **Modify** -> **Individual components**:
-
-- Install **MSVC v143 - VS 2022 C++ x64/x86 build tools (Latest)**.
-- Install a **Windows 10/11 SDK**.
-- Optionally remove a clearly broken older 14.42 (or similar) component if Repair left it incomplete.
-
+   - Install **MSVC v143 - VS 2022 C++ x64/x86 build tools (Latest)**.
+   - Install a **Windows 10/11 SDK**.
+   - Optionally remove a clearly broken older 14.42 (or similar) component if Repair left it incomplete.
 4. Reboot if prompted.
 5. Open a fresh **x64 Native Tools** prompt, confirm `LIB` points at a toolset with `lib\x64\msvcrtd.lib`, then reconfigure Health-GPS.
 

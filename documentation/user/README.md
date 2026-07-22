@@ -9,7 +9,7 @@ Guides for running Health-GPS (binaries or a local build).
 | [Quick Start](getstarted.md) | Download binaries, first run, Windows console colours |
 | [User Guide](userguide.md) | Config, modules, scenarios, outputs, HPC |
 
-### If you are working on
+## If you are working on
 
 | Topic | Start here | Then |
 | ----- | ---------- | ---- |

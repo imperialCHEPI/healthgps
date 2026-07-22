@@ -12,7 +12,7 @@ Docs for building Health-GPS, reading the architecture, and contributing.
 | [Windows MSVC / Ninja troubleshooting](msvc-windows-build-troubleshooting.md) | `cstdint`, `MSVCRTD.lib`, broken toolsets |
 | [GitHub Flow](github-flow.md) | Branching and pull requests |
 
-### If you are working on
+## If you are working on
 
 | Topic | Start here | Then |
 | ----- | ---------- | ---- |
