@@ -262,7 +262,7 @@ The code in this repository is licensed under the [BSD 3-Clause](LICENSE.txt) li
 
 ---
 
-**Author:** Mahima Ghosh  
+**Author:** Mahima Ghosh
 **Engineering contact:** Mahima Ghosh
 
 ## Third-party components
@@ -294,5 +294,5 @@ The code in this repository is licensed under the [BSD 3-Clause](LICENSE.txt) li
 
 ---
 
-**Author:** Mahima Ghosh  
+**Author:** Mahima Ghosh
 **Engineering contact:** Mahima Ghosh
