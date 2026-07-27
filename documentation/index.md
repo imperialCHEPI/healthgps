@@ -1,6 +1,6 @@
 ## Global Health Policy Simulation model
 
-| Home | [Quick Start](user/getstarted.md) | [User Guide](user/userguide.md) | [Software Architecture](developer/architecture.md) | [Data Model](developer/datamodel.md) | [Developer Guide](developer/development.md) | [Technical docs](technical/README.md) | [API](api/index.html) |
+| Home | [Quick Start](user/getstarted.md) | [User Guide](user/userguide.md) | [Software Architecture](developer/architecture.md) | [Data Model](developer/datamodel.md) | [Developer Guide](developer/development.md) | [Technical docs](technical/README.md) | [API (Pages)](https://imperialchepi.github.io/healthgps/api/) |
 
 **Documentation maintainer:** Mahima Ghosh - see [documentation/README.md](README.md).
 
@@ -20,7 +20,7 @@ The Health-GPS workflow is summarised below, datasets from many disconnected sou
 |:---------------------------------------------------:|
 |        *Health-GPS General Workflow Diagram*        |
 
-The simulation creates the virtual population, simulates the synthetic individuals over time, collects population statistics and publish to the outside world at the end of each simulated time step. It is the user's responsibility to analyse and quantify the model results, which are saved to a chosen output folder in JSON format.
+The simulation creates the virtual population, simulates the synthetic individuals over time, collects population statistics and publish to the outside world at the end of each simulated time step. It is the user's responsibility to analyse and quantify the model results, which are saved to a chosen output folder as **JSON and CSV**, and optionally **income-stratum CSVs** or **individual ID tracking** files depending on configuration. See the [User Guide](user/userguide.md#results).
 
 Health-GPS is a flexible and modular framework, written in modern C++, designed using object-oriented principles to provide the building blocks necessary to compose the overall microsimulation, several data sources, modules, and sub-model are required as shown below.
 
@@ -51,7 +51,7 @@ Births, deaths, and immigration are the only drivers of changes in demographics 
 
 ### Socio-Economic Status (SES)
 
-SES plays an important role in the levels of risk factors observed within the population. The levels of income and education can influence the nature of diet, and physical activity. Health-GPS models SES as a proxy value, combining education, income, and other factors to represent specific groups within the population. Each individual SES value is attributed at birth by sampling from a *standard normal distribution* and stays constant over time.
+SES plays an important role in the levels of risk factors observed within the population. The levels of income and education can influence the nature of diet, and physical activity. In simple France-style configs, Health-GPS models SES as a continuous noise draw (`ses`) assigned at birth and held fixed. **Income categories**, quintile adjustment, and FINCH-style predictors are configured separately via `project_requirements` and modelling CSVs; see the [FINCH guide](technical/guides/finch-linear-models-and-income-adjustment.md) and [Software Architecture](developer/architecture.md).
 
 ## Risk Factors
 
@@ -150,6 +150,7 @@ flowchart TB
 * New to Health-GPS -> [Quick Start](user/getstarted.md)
 * FINCH / Kevin Hall inputs -> [FINCH linear models guide](technical/guides/finch-linear-models-and-income-adjustment.md)
 * What changed in 2026 -> [Update report](technical/guides/healthgps-update-report-2026-02-20.md)
+* Threading and HPC sizing -> [Performance guide](technical/guides/performance-optimizations.md)
 * Building from source -> [Developer Guide](developer/development.md)
 * Windows build fails (`cstdint` / `MSVCRTD.lib`) -> [MSVC troubleshooting](developer/msvc-windows-build-troubleshooting.md)
 * Questions -> **Mahima Ghosh** (see [documentation/README.md](README.md))

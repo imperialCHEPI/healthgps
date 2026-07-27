@@ -1,6 +1,6 @@
 ## Global Health Policy Simulation model
 
-| [Home](../index.md) | Quick Start | [User Guide](userguide.md) | [Software Architecture](../developer/architecture.md) | [Data Model](../developer/datamodel.md) | [Developer Guide](../developer/development.md) | [Technical docs](../technical/README.md) | [API](../api/index.html) |
+| [Home](../index.md) | Quick Start | [User Guide](userguide.md) | [Software Architecture](../developer/architecture.md) | [Data Model](../developer/datamodel.md) | [Developer Guide](../developer/development.md) | [Technical docs](../technical/README.md) | [API (Pages)](https://imperialchepi.github.io/healthgps/api/) |
 
 # Quick Start
 
@@ -14,7 +14,7 @@ Pre-compiled binaries for `Windows` and `Linux` are available on the [releases p
 
 ## Example usage
 
-*Health GPS* requires model configuration files in order to be able to run. These files can either be in a local directory or as a zip file on the local machine or on the web. Here, we will use a model available from the [Health-GPS examples repository]. (We are assuming that you have changed directories to wherever you have built or extracted the Health-GPS binaries.)
+*Health GPS* requires model configuration files in order to be able to run. These files can either be in a local directory or as a zip file on the local machine or on the web. Here, we will use a model available from the [Health-GPS examples repository][examplesrepo]. (We are assuming that you have changed directories to wherever you have built or extracted the Health-GPS binaries.)
 
 For Windows:
 
@@ -30,11 +30,13 @@ For Linux:
 
 Output data will be written to a subfolder of your home directory, `healthgps/results/france`.
 
+Optional: validate a config without running trials: `HealthGPS.Console -c path/to/config.json --dry-run`. Limit CPU threads with `-T` (see [performance guide](../technical/guides/performance-optimizations.md)).
+
 ## Results
 
 NB: For analysis and visualisation of *Health GPS* output data, we recommend the [`healthgpsrvis` R package](https://imperialchepi.github.io/healthgpsrvis/), but here we show how to do some analysis manually.
 
-Health-GPS produces output data simultaneously in two file formats: CSV and JSON. The one mostly used by the developers is CSV, so you should prefer it, but the JSON format is also included for legacy reasons (for now).
+Health-GPS produces output data simultaneously in **CSV and JSON** (same run; prefer CSV for analysis). Large or FINCH-style configs may also write **per-income-stratum CSVs** and an optional **`_IndividualIDTracking.csv`**. See the [User Guide](userguide.md#results) for details.
 
 ### Analysing the JSON output data
 
@@ -120,3 +122,4 @@ In a similar manner, the resulting dataset `df`, can be re-created and expanded 
 [← User documentation index](README.md) · [Documentation index](../README.md)
 
 [configjson]:https://github.com/imperialCHEPI/healthgps-examples/tree/main/HLM_France/config.json "Configuration file example"
+[examplesrepo]:https://github.com/imperialCHEPI/healthgps-examples "Health-GPS examples repository"

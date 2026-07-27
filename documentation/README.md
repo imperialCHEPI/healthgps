@@ -12,6 +12,8 @@ This folder is the project documentation. Start here, then pick the section that
 
 There is also a longer site-style intro in [index.md](index.md) (diagrams and model overview).
 
+**API reference:** Page headers link to **[API (Pages)](https://imperialchepi.github.io/healthgps/api/)**. That Doxygen site is **not** checked into `documentation/`; the [docs workflow](../.github/workflows/docs.yml) builds it on deploy and publishes it under `/api` on GitHub Pages. Local clones will not have `documentation/api/`.
+
 ---
 
 ## Quick links
