@@ -22,7 +22,10 @@ isProject: false
 
 # Height CSV Quintile Integration Plan
 
-**Author:** Mahima Ghosh · **Related:** [Weight quintile plan](weight-quintile-plan.md) · [Income quintile factor means plan](income-quintile-factor-means-plan.md) · [FINCH guide](../guides/finch-linear-models-and-income-adjustment.md) · [Technical index](../README.md) · [Documentation index](../../README.md)
+**Author:** Mahima Ghosh
+**Engineering contact:** Mahima Ghosh
+
+**Related:** [Weight quintile plan](weight-quintile-plan.md) · [Income quintile factor means plan](income-quintile-factor-means-plan.md) · [FINCH guide](../guides/finch-linear-models-and-income-adjustment.md) · [Technical index](../README.md) · [Documentation index](../../README.md)
 
 ## Goal
 
@@ -150,3 +153,8 @@ flowchart TD
 - Build and run targeted KevinHall tests.
 - Run any config/schema validation tests that exercise KevinHall dynamic model parsing.
 - Spot-check one end-to-end run where adjustment strata count differs from final income categories (e.g., 5 -> 4) to confirm height uses stratum values during assignment while outputs remain in configured final categories.
+
+---
+
+**Author:** Mahima Ghosh
+**Engineering contact:** Mahima Ghosh

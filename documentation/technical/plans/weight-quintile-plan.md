@@ -25,7 +25,10 @@ isProject: false
 
 # Weight quantiles by income adjustment stratum
 
-**Author:** Mahima Ghosh · **Related:** [Height CSV quintile plan](height-csv-quintile-plan.md) · [Income quintile factor means plan](income-quintile-factor-means-plan.md) · [FINCH guide](../guides/finch-linear-models-and-income-adjustment.md) · [Technical index](../README.md) · [Documentation index](../../README.md)
+**Author:** Mahima Ghosh
+**Engineering contact:** Mahima Ghosh
+
+**Related:** [Height CSV quintile plan](height-csv-quintile-plan.md) · [Income quintile factor means plan](income-quintile-factor-means-plan.md) · [FINCH guide](../guides/finch-linear-models-and-income-adjustment.md) · [Technical index](../README.md) · [Documentation index](../../README.md)
 
 ## Goal
 
@@ -242,3 +245,8 @@ Short note in `documentation/technical/plans/weight-quintile-plan.md` with confi
 - Changing static income rebucketing
 - Multi-row single CSV per gender (nested quintile files only)
 - Generating production quintile CSVs (tests use small fixtures)
+
+---
+
+**Author:** Mahima Ghosh
+**Engineering contact:** Mahima Ghosh

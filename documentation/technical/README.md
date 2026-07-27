@@ -1,6 +1,7 @@
 # Technical documentation
 
-**Author / contact:** Mahima Ghosh
+**Author:** Mahima Ghosh
+**Engineering contact:** Mahima Ghosh
 
 Implementation notes, project reports, and modeller guides (FINCH, India, shared codebase).
 
@@ -53,4 +54,7 @@ Design notes for developers. Some items may already be in the tree.
 | User docs | [user/](../user/) |
 | Developer docs (build, MSVC) | [developer/](../developer/) |
 
-**Author:** Mahima Ghosh | [Documentation index](../README.md)
+---
+
+**Author:** Mahima Ghosh
+**Engineering contact:** Mahima Ghosh

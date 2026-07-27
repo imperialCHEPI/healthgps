@@ -1,6 +1,7 @@
 # Health-GPS documentation
 
-**Maintainer:** Mahima Ghosh
+**Author:** Mahima Ghosh
+**Engineering contact:** Mahima Ghosh
 
 This folder is the project documentation. Start here, then pick the section that matches what you need.
 
@@ -57,4 +58,7 @@ Questions on code paths, config, or Windows builds: **Mahima Ghosh**.
 
 ---
 
-**Author:** Mahima Ghosh | [Site intro](index.md) | [User](user/README.md) | [Developer](developer/README.md) | [Technical](technical/README.md)
+---
+
+**Author:** Mahima Ghosh
+**Engineering contact:** Mahima Ghosh

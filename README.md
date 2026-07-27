@@ -5,19 +5,43 @@
 ![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/imperialCHEPI/healthgps?include_prereleases)
 ![GitHub](https://img.shields.io/github/license/imperialCHEPI/healthgps)
 
-| [Quick Start](#quick-start) | [February 2026 updates](#february-2026-updates) | [Development Tools](#development-tools) | [License](#license) | [Third-party Components](#third-party-components) |
+| [Quick Start](#quick-start) | [Documentation](#documentation) | [February 2026 updates](#february-2026-updates) | [Development Tools](#development-tools) | [License](#license) | [Third-party Components](#third-party-components) |
 
-Health-GPS microsimulation is part of the [STOP project](https://www.stopchildobesity.eu/), and support researchers and policy makers in the analysis of the health and economic impacts of alternative measures to tackle *chronic diseases* and *obesity in children*. The model reproduces the characteristics of a population and simulates key individual event histories associated with key components of relevant behaviours, such as physical activity, and diseases such as diabetes or cancer.
+**Author / engineering contact:** Mahima Ghosh
 
-HealthGPS has now been adpated to run for projects such as [FINCH](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/finch/), [JACARDI](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/jacardi/) and [JA PreventNCD](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/ja-prevent-ncd/). It can run for multiple projects using the inputs available at [HealthGPS-examples](https://github.com/imperialCHEPI/healthgps-examples) for each of the projects. Example- to run for STOP, use the [HLM_France](https://github.com/imperialCHEPI/healthgps-examples/tree/main/HLM_France) folder, for India the [KevinHall_India](https://github.com/imperialCHEPI/healthgps-examples/tree/main/KevinHall_India) folder must be used and for FINCH the [KevinHall_FINCH](https://github.com/imperialCHEPI/healthgps-examples/tree/main/KevinHall_FINCH).
+Health-GPS microsimulation is part of the [STOP project](https://www.stopchildobesity.eu/), and supports researchers and policy makers in the analysis of the health and economic impacts of alternative measures to tackle *chronic diseases* and *obesity in children*. The model reproduces the characteristics of a population and simulates key individual event histories associated with key components of relevant behaviours, such as physical activity, and diseases such as diabetes or cancer.
+
+Health-GPS has now been adapted to run for projects such as [FINCH](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/finch/), [JACARDI](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/jacardi/) and [JA PreventNCD](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/ja-prevent-ncd/). It can run for multiple projects using the inputs available at [HealthGPS-examples](https://github.com/imperialCHEPI/healthgps-examples) for each of the projects. Example: to run for STOP, use the [HLM_France](https://github.com/imperialCHEPI/healthgps-examples/tree/main/HLM_France) folder; for India the [KevinHall_India](https://github.com/imperialCHEPI/healthgps-examples/tree/main/KevinHall_India) folder; for FINCH the [KevinHall_FINCH](https://github.com/imperialCHEPI/healthgps-examples/tree/main/KevinHall_FINCH) folder.
 
 The *Health GPS microsimulation* is being developed in collaboration between the [Centre for Health Economics & Policy Innovation (CHEPI)](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/), Imperial College London; and [INRAE](https://www.inrae.fr), France; as part of the [STOP project](https://www.stopchildobesity.eu/). The software architecture uses a modular design approach to provide the building blocks of the *Health GPS application*, which is implemented using object-oriented principles in *Modern C++* programming language targeting the [C++20 standard](https://en.cppreference.com/w/cpp/20).
+
+## Documentation
+
+Full docs live under [`documentation/`](documentation/README.md). Start there for indexes by audience.
+
+| Need | Document |
+| ---- | -------- |
+| Documentation home | [documentation/README.md](documentation/README.md) |
+| Site-style intro (diagrams) | [documentation/index.md](documentation/index.md) |
+| First run / binaries | [Quick Start](documentation/user/getstarted.md) |
+| Config, outputs, HPC | [User Guide](documentation/user/userguide.md) |
+| Build from source / CMake | [Developer Guide](documentation/developer/development.md) |
+| Architecture | [Software Architecture](documentation/developer/architecture.md) |
+| Data model / Datastore | [Data Model](documentation/developer/datamodel.md) |
+| Windows MSVC / Ninja (`cstdint`, `MSVCRTD.lib`) | [MSVC troubleshooting](documentation/developer/msvc-windows-build-troubleshooting.md) |
+| FINCH / income / predictors | [FINCH guide](documentation/technical/guides/finch-linear-models-and-income-adjustment.md) |
+| Feb 2026 integrated changes | [Update report](documentation/technical/guides/healthgps-update-report-2026-02-20.md) |
+| Threading / HPC sizing | [Performance guide](documentation/technical/guides/performance-optimizations.md) |
+| Feature plans | [technical/README.md](documentation/technical/README.md) |
+| Doxygen API (GitHub Pages) | [API](https://imperialchepi.github.io/healthgps/api/) |
+
+Published website: [https://imperialchepi.github.io/healthgps/](https://imperialchepi.github.io/healthgps/). It is rebuilt from `documentation/` by the [docs workflow](.github/workflows/docs.yml) on **release** or **manual dispatch**, not on every push. Until that workflow runs against the current tree, the live site may lag the repo (older flat page layout).
 
 ## February 2026 updates
 
 The **[HealthGPS Update Report – 20th Feb 2026](documentation/technical/guides/healthgps-update-report-2026-02-20.md)** summarises integrated changes (demographics, socioeconomic/income, static and dynamic risk factors, analysis/output, disease/PIF, policy, config/schema), parallelisation notes, and a developer file map. Snippets below are taken from that report.
 
-**Supported use cases:** India, ABD, and FINCH on a shared codebase; backward compatibility with older India-style configs is retained alongside newer schema options.
+**Supported use cases:** India, ADB, and FINCH on a shared codebase; backward compatibility with older India-style configs is retained alongside newer schema options.
 
 **Module pipeline (simplified):**
 
@@ -162,24 +186,32 @@ Detailed tables describing:
 - **Where parallelisation is applied**
 - **Population Impact Fraction (PIF) handling**
 - **Income and individual ID tracking mechanisms**
-are available in the full update report: [here](https://github.com/imperialCHEPI/healthgps/blob/main/Technical%20Documentations/HealthGPS%20Update%20Report-%2020th%20Feb%202026.md)
 
-Relevant design documents:
+are in the full [update report](documentation/technical/guides/healthgps-update-report-2026-02-20.md).
 
-- [individual ID tracking](https://github.com/imperialCHEPI/healthgps/blob/main/Technical%20Documentations/individual_id_tracking_csv-plan.md)
-- [consistent person IDs across scenarios](https://github.com/imperialCHEPI/healthgps/blob/main/Technical%20Documentations/same_person_id_across_baseline_and_intervention-plan.md)
+Relevant design documents (under `documentation/technical/plans/`):
+
+- [Individual ID tracking](documentation/technical/plans/individual-id-tracking-csv-plan.md)
+- [Consistent person IDs across scenarios](documentation/technical/plans/same-person-id-baseline-intervention-plan.md)
+- [Income quintile factor means](documentation/technical/plans/income-quintile-factor-means-plan.md)
+- [Project requirements](documentation/technical/plans/project-requirements-plan.md)
+- [Performance / parallelization notes](documentation/technical/guides/performance-optimizations.md)
 
 ---
 
 ## Project Specific Requirements
 
-Currently HealthGPS allows user flexibility in the following areas. View [Project Requirements](https://github.com/imperialCHEPI/healthgps/blob/main/Technical%20Documentations/PROJECT_REQUIREMENTS_PLAN.md) for more details.
+Health-GPS is driven by config flags (not hard-coded project names). Optional `project_requirements` in `config.json` controls demographics (region, ethnicity, `gender2`), income type and final category count (`3` / `4` / `5`), physical activity, trends, and two-stage logistic behaviour. See:
+
+- [Project requirements plan](documentation/technical/plans/project-requirements-plan.md)
+- [User Guide: project requirements](documentation/user/userguide.md#project-requirements)
+- Schema: `schemas/v1/config/project_requirements.json`
 
 ---
 
 ## FINCH: Age/Gender/Income-Based Model Validation
 
-As part of the **FINCH** project, a new validation feature is currently under development. This work adjusts model outputs to better reflect real-world population distributions using:
+As part of the **FINCH** project, income-stratum and quintile-based calibration adjust model outputs to better reflect observed distributions by:
 
 - Age
 - Gender
@@ -187,11 +219,13 @@ As part of the **FINCH** project, a new validation feature is currently under de
 
 This enables income-stratified calibration and improves external validity when comparing model outputs against observed data.
 
-The design and implementation plan for this feature is available [here](https://github.com/imperialCHEPI/healthgps/blob/main/Technical%20Documentations/income_quintile_factor_means-plan.md)
+See the modeller-facing [FINCH guide](documentation/technical/guides/finch-linear-models-and-income-adjustment.md) and the [income quintile factor means plan](documentation/technical/plans/income-quintile-factor-means-plan.md).
 
 ## Quick Start
 
 The **Health GPS** application provides a command line interface (CLI) and runs on *Windows 10 (and newer)* and *Linux* devices. All supported options are provided to the model via a *configuration file* (JSON format), including intervention scenarios and multiple runs. Users are encouraged to start exploring the model by changing the provided example configuration file and running the model again.
+
+Prefer `-c` / `--config` for the config path (file, folder, or zip URL). Put the backend datastore in `data.source` inside the config. Optional flags include `-T` / `--threads` (TBB cap) and `--dry-run`. Deprecated: `-f` / `--file` and `-s` / `--storage`.
 
 From a Git Bash-style shell, run the console app with a config file and optional thread count:
 
@@ -214,21 +248,22 @@ Adjust the two paths to match where you built Health-GPS and where your `config.
 C:\healthgps\...\HealthGPS.Console.exe -c C:\healthgps-examples\...
 ```
 
-For more information, see the [documentation home](documentation/index.md) and [quick start guide].
-
-[quick start guide]: https://imperialchepi.github.io/healthgps/user/getstarted
+For more information, see the [documentation home](documentation/README.md), [Quick Start](documentation/user/getstarted.md), and the [User Guide](documentation/user/userguide.md).
 
 ## Development Tools
 
-The *Health GPS* software is written in modern, standard ANSI C++, targeting the [C++20 version](https://en.cppreference.com/w/cpp/20) and using the C++ Standard Library. The project is fully managed by [CMake](https://cmake.org/) and [Microsoft Visual Studio](https://visualstudio.microsoft.com), the code base is portable but requires a C++20 compatible compiler to build. The development toolset users [Ninja](https://ninja-build.org/) for build, [vcpkg](https://github.com/microsoft/vcpkg) package manager for dependencies, [googletest](https://github.com/google/googletest) for unit testing and [GitHub Actions](https://docs.github.com/en/actions) for automated builds.
+The *Health GPS* software is written in modern, standard ANSI C++, targeting the [C++20 version](https://en.cppreference.com/w/cpp/20) and using the C++ Standard Library. The project is fully managed by [CMake](https://cmake.org/) and [Microsoft Visual Studio](https://visualstudio.microsoft.com), the code base is portable but requires a C++20 compatible compiler to build. The development toolset uses [Ninja](https://ninja-build.org/) for build, [vcpkg](https://github.com/microsoft/vcpkg) package manager for dependencies, [googletest](https://github.com/google/googletest) for unit testing and [GitHub Actions](https://docs.github.com/en/actions) for automated builds.
 
-For more information, see the [developer guide].
-
-[developer guide]: https://imperialchepi.github.io/healthgps/developer/development
+For more information, see the [Developer Guide](documentation/developer/development.md). On Windows, if CMake cannot find headers such as `cstdint` or linking fails on `MSVCRTD.lib`, see [MSVC / Ninja troubleshooting](documentation/developer/msvc-windows-build-troubleshooting.md).
 
 ## License
 
 The code in this repository is licensed under the [BSD 3-Clause](LICENSE.txt) license.
+
+---
+
+**Author:** Mahima Ghosh  
+**Engineering contact:** Mahima Ghosh
 
 ## Third-party components
 
@@ -256,3 +291,8 @@ The code in this repository is licensed under the [BSD 3-Clause](LICENSE.txt) li
 |:---------------------------------------------------|:-------------|
 | [vcpkg](https://github.com/microsoft/vcpkg)        | MIT          |
 | [googletest](https://github.com/google/googletest) | BSD 3-Clause |
+
+---
+
+**Author:** Mahima Ghosh  
+**Engineering contact:** Mahima Ghosh

@@ -21,7 +21,10 @@ isProject: false
 
 # Same person ID across baseline and intervention
 
-**Author:** Mahima Ghosh · **Related:** [Individual ID tracking plan](individual-id-tracking-csv-plan.md) · [Technical index](../README.md) · [Documentation index](../../README.md)
+**Author:** Mahima Ghosh
+**Engineering contact:** Mahima Ghosh
+
+**Related:** [Individual ID tracking plan](individual-id-tracking-csv-plan.md) · [Technical index](../README.md) · [Documentation index](../../README.md)
 
 ## Goal
 
@@ -330,4 +333,7 @@ Notes:
 
 ---
 
-**Author:** Mahima Ghosh · [Technical index](../README.md) · [Documentation index](../../README.md)
+---
+
+**Author:** Mahima Ghosh
+**Engineering contact:** Mahima Ghosh

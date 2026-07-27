@@ -1,6 +1,7 @@
 # User documentation
 
-**Author / contact:** Mahima Ghosh
+**Author:** Mahima Ghosh
+**Engineering contact:** Mahima Ghosh
 
 Guides for running Health-GPS (binaries or a local build).
 
@@ -25,4 +26,7 @@ Guides for running Health-GPS (binaries or a local build).
 | Developer docs | [developer/](../developer/) |
 | Technical guides and plans | [technical/](../technical/) |
 
-**Author:** Mahima Ghosh | [Documentation index](../README.md)
+---
+
+**Author:** Mahima Ghosh
+**Engineering contact:** Mahima Ghosh

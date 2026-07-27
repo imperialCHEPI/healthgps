@@ -1,9 +1,9 @@
 # FINCH linear models, predictor encoding, and income-stratum adjustment
 
 **Author:** Mahima Ghosh
+**Engineering contact:** Mahima Ghosh
 
 **Last updated:** June 2026
-**Engineering contact:** Mahima Ghosh - please reach out for implementation questions, config issues, or anything not covered here.
 
 ## About this note
 
@@ -660,3 +660,8 @@ For implementation detail, debugging, or config help, please contact **Mahima Gh
 *June 2026 - income-stratum adjustment and `demographics.gender2` on the Health-GPS development branch.*
 
 [← Technical documentation index](../README.md) · [Documentation index](../../README.md)
+
+---
+
+**Author:** Mahima Ghosh
+**Engineering contact:** Mahima Ghosh

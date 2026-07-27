@@ -22,7 +22,10 @@ isProject: false
 
 # Dynamic Final Income Categories (3/4/5) + Stratum Adjustment
 
-**Author:** Mahima Ghosh · **Related:** [FINCH linear models guide](../guides/finch-linear-models-and-income-adjustment.md) · [Income quintile factor means plan](income-quintile-factor-means-plan.md) · [Technical index](../README.md) · [Documentation index](../../README.md)
+**Author:** Mahima Ghosh
+**Engineering contact:** Mahima Ghosh
+
+**Related:** [FINCH linear models guide](../guides/finch-linear-models-and-income-adjustment.md) · [Income quintile factor means plan](income-quintile-factor-means-plan.md) · [Technical index](../README.md) · [Documentation index](../../README.md)
 
 **Engineer:** Mahima - building this feature and the primary contact for questions on dynamic final income categories, income stratum adjustment integration, and related `config.json` / `project_requirements` behaviour.
 
@@ -194,3 +197,8 @@ Register new test file in `[src/HealthGPS.Tests/CMakeLists.txt](src/HealthGPS.Te
 1. Build + run `HealthGPS.Tests` (especially new layout test, ResultFileWriter, IncomeStratumAdjustment, KevinHallHeight).
 1. Manual smoke: config with `categories: "5"` and `income_stratum_factors_mean.enabled: true`, `adjustment_income_stratum_count: 5` - Kevin Hall uses quintile strata; final output has five income CSVs.
 1. Regression: existing `"3"` and `"4"` tests pass unchanged behavior.
+
+---
+
+**Author:** Mahima Ghosh
+**Engineering contact:** Mahima Ghosh

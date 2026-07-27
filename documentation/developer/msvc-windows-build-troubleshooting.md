@@ -1,6 +1,8 @@
 # Windows MSVC / Ninja build troubleshooting
 
 **Author:** Mahima Ghosh
+**Engineering contact:** Mahima Ghosh
+
 **Last updated:** July 2026
 
 ## Why I wrote this
@@ -230,4 +232,7 @@ If you see `cstdint`, `CMAKE_CXX_COMPILER`, or `MSVCRTD.lib` errors on Windows, 
 
 *July 2026. Windows MSVC / Ninja environment failure on my Health-GPS machine; fixed by switching to a complete MSVC 14.44 toolset and repairing Visual Studio.*
 
-**Author:** Mahima Ghosh | [Developer docs](README.md) | [Documentation index](../README.md)
+---
+
+**Author:** Mahima Ghosh
+**Engineering contact:** Mahima Ghosh

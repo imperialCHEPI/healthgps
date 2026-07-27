@@ -2,9 +2,10 @@
 
 | Home | [Quick Start](user/getstarted.md) | [User Guide](user/userguide.md) | [Software Architecture](developer/architecture.md) | [Data Model](developer/datamodel.md) | [Developer Guide](developer/development.md) | [Technical docs](technical/README.md) | [API (Pages)](https://imperialchepi.github.io/healthgps/api/) |
 
-**Documentation maintainer:** Mahima Ghosh - see [documentation/README.md](README.md).
-
 # Introduction
+
+**Author:** Mahima Ghosh
+**Engineering contact:** Mahima Ghosh
 
 **Health-GPS** is a modular and flexible microsimulation framework developed in collaboration between the Centre for Health Economics & Policy Innovation ([CHEPI](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/)), Imperial College London; and [INRAE](https://www.inrae.fr), France; as part of the [STOP project](https://www.stopchildobesity.eu/). *Health-GPS* models the impacts of behavioural and metabolic risk factors on chronic diseases, and measure lifelong outcomes to allow researchers to test the effectiveness of a variety of health policies and interventions designed for tackling childhood obesity in European countries.
 
@@ -120,8 +121,6 @@ The reconcile process can be extremely laborious with each dataset having to be 
 
 All project docs live under `documentation/`. Start at [README.md](README.md).
 
-**Maintainer:** Mahima Ghosh
-
 ```mermaid
 flowchart TB
     ROOT[documentation/README.md]
@@ -163,3 +162,8 @@ flowchart TB
 | [User index](user/README.md) | [Developer index](developer/README.md) / [Technical index](technical/README.md) |
 | [Developer index](developer/README.md) | [User index](user/README.md) / [MSVC note](developer/msvc-windows-build-troubleshooting.md) |
 | [Technical index](technical/README.md) | [Developer Guide](developer/development.md) / [User Guide](user/userguide.md) |
+
+---
+
+**Author:** Mahima Ghosh
+**Engineering contact:** Mahima Ghosh

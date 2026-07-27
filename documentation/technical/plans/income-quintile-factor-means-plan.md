@@ -16,7 +16,10 @@ isProject: false
 
 # Income-stratum factors-mean adjustment (optional feature)
 
-**Author:** Mahima Ghosh · **Related:** [FINCH linear models guide (modeller-facing)](../guides/finch-linear-models-and-income-adjustment.md) · [Dynamic income categories plan](dynamic-income-categories-plan.md) · [Technical index](../README.md) · [Documentation index](../../README.md)
+**Author:** Mahima Ghosh
+**Engineering contact:** Mahima Ghosh
+
+**Related:** [FINCH linear models guide (modeller-facing)](../guides/finch-linear-models-and-income-adjustment.md) · [Dynamic income categories plan](dynamic-income-categories-plan.md) · [Technical index](../README.md) · [Documentation index](../../README.md)
 
 ## Optional and backward compatible
 
@@ -167,3 +170,8 @@ Continues to use the **overall** `expected_` table for **initialisation** / blen
 - Logistic simulated-mean exclusion **unchanged**; stratum = extra filter only.
 - Baseline/intervention sync extended for stratified deltas.
 - Diagrams: default path vs stratum path.
+
+---
+
+**Author:** Mahima Ghosh
+**Engineering contact:** Mahima Ghosh
