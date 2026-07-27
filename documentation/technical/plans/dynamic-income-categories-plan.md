@@ -1,33 +1,27 @@
----
-name: Dynamic Income Categories
-overview: Introduce a shared `IncomeCategoryLayout` as the single source of truth for final income bucket count (3/4/5), replace scattered string branching across the simulation pipeline, and verify it composes cleanly with the already-dynamic income stratum adjustment (independent N vs M). Engineer contact - Mahima.
-todos:
-  - id: core-layout
-    content: Add IncomeCategoryLayout module in HealthGPS.Core (parse, strata, index, numeric helpers) + CMake
-    status: completed
-  - id: config-parser
-    content: Update model_parser, map_income_category, schemas, poco comments for categories 3/4/5
-    status: in_progress
-  - id: static-model
-    content: "Refactor static_linear_model: layout member, unified rank buckets, percentile thresholds, fixed 5-way tables"
-    status: pending
-  - id: downstream
-    content: Update analysis_module, result_file_writer, program.cpp, kevin_hall_model to use layout
-    status: pending
-  - id: tests
-    content: Add IncomeCategoryLayout.Test.cpp; extend ResultFileWriter, IncomeStratumAdjustment, KevinHallHeight tests
-    status: pending
-isProject: false
----
-
 # Dynamic Final Income Categories (3/4/5) + Stratum Adjustment
 
 **Author:** Mahima Ghosh
 **Engineering contact:** Mahima Ghosh
 
-**Related:** [FINCH linear models guide](../guides/finch-linear-models-and-income-adjustment.md) · [Income quintile factor means plan](income-quintile-factor-means-plan.md) · [Technical index](../README.md) · [Documentation index](../../README.md)
+**Related:** [FINCH linear models guide](../guides/finch-linear-models-and-income-adjustment.md) | [Income quintile factor means plan](income-quintile-factor-means-plan.md) | [Technical index](../README.md) | [Documentation index](../../README.md)
 
 **Engineer:** Mahima - building this feature and the primary contact for questions on dynamic final income categories, income stratum adjustment integration, and related `config.json` / `project_requirements` behaviour.
+
+## Plan summary
+
+**Title:** Dynamic Income Categories
+
+**Overview:** Introduce a shared `IncomeCategoryLayout` as the single source of truth for final income bucket count (3/4/5), replace scattered string branching across the simulation pipeline, and verify it composes cleanly with the already-dynamic income stratum adjustment (independent N vs M). Engineer contact - Mahima.
+
+### Work items
+
+| Status | Item |
+| ------ | ---- |
+| Done | Add IncomeCategoryLayout module in HealthGPS.Core (parse, strata, index, numeric helpers) + CMake |
+| In progress | Update model_parser, map_income_category, schemas, poco comments for categories 3/4/5 |
+| Planned | Refactor static_linear_model: layout member, unified rank buckets, percentile thresholds, fixed 5-way tables |
+| Planned | Update analysis_module, result_file_writer, program.cpp, kevin_hall_model to use layout |
+| Planned | Add IncomeCategoryLayout.Test.cpp; extend ResultFileWriter, IncomeStratumAdjustment, KevinHallHeight tests |
 
 ---
 
@@ -38,15 +32,15 @@ Enable `project_requirements.income.categories: "5"` while keeping **adjustment 
 ```mermaid
 flowchart TD
     subgraph config [Config]
-        PR["project_requirements.income.categories → M"]
-        SA["income_stratum_factors_mean → N"]
+        PR["project_requirements.income.categories -> M"]
+        SA["income_stratum_factors_mean -> N"]
     end
     subgraph static [StaticLinearModel]
         CI[Continuous income regression]
         FM[Optional factors-mean]
-        AS["assign_equal_rank_buckets → income_adjustment_stratum (N)"]
+        AS["assign_equal_rank_buckets -> income_adjustment_stratum (N)"]
         PSF[Per-stratum factors-mean]
-        FC["assign_equal_rank_buckets → person.income (M)"]
+        FC["assign_equal_rank_buckets -> person.income (M)"]
     end
     subgraph downstream [Downstream]
         KH["KevinHall: height/weight by adjustment stratum (N)"]
@@ -90,9 +84,9 @@ double income_category_numeric(core::Income income, const IncomeCategoryLayout &
 
 **Numeric encoding** (`income_category_numeric`):
 
-- count 3 → legacy 1, 2, 4 (unchanged)
-- count 4 → legacy 1, 2, 3, 4 (unchanged)
-- count 5 → 1, 2, 3, 4, 5 (one-to-one)
+- count 3 -> legacy 1, 2, 4 (unchanged)
+- count 4 -> legacy 1, 2, 3, 4 (unchanged)
+- count 5 -> 1, 2, 3, 4, 5 (one-to-one)
 
 `Person::income_to_value()` in `[src/HealthGPS/person.cpp](src/HealthGPS/person.cpp)` stays unchanged for backward compatibility.
 
@@ -135,8 +129,8 @@ void assign_equal_rank_buckets(Population &pop, std::size_t bucket_count, SetBuc
 
 1. **Refactor existing functions** to call it:
 
-- `assign_income_adjustment_strata_equal_split` → sets `income_adjustment_stratum` (unchanged behavior, N from config).
-- `assign_income_categories_equal_split` → uses `layout.count` + `income_from_equal_split_bucket`.
+- `assign_income_adjustment_strata_equal_split` -> sets `income_adjustment_stratum` (unchanged behavior, N from config).
+- `assign_income_categories_equal_split` -> uses `layout.count` + `income_from_equal_split_bucket`.
 
 1. **Replace all `income_categories_ == "4"` branches** with `income_category_layout_.count`:
 

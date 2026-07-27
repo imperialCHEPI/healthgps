@@ -1,39 +1,31 @@
----
-name: Weight Quintile Quantiles
-overview: Add per-stratum weight quantile CSVs under WeightQuantiles (nested Quintile1..N), keep the legacy single-file shape, pick curves by income_adjustment_stratum when assigning weight, and print stratum/final-income summary tables on generate and update-same pattern as height.
-todos:
-  - id: schema-weight-quintiles
-    content: "Extend v1/v2 kevinhall.json WeightQuantiles Female/Male oneOf: legacy csv_file | Quintile1..N object"
-    status: completed
-  - id: parser-load-strata
-    content: Implement load_weight_quantiles_by_gender in model_parser.cpp with broadcast, count validation vs adjustment_income_stratum_count, sorted Quintile keys
-    status: in_progress
-  - id: runtime-stratum-select
-    content: Change KevinHallModel/Definition to vector<vector<double>> + resolve_weight_quantiles_for_person + update initialise_weight/get_weight_quantile
-    status: pending
-  - id: console-weight-tables
-    content: Add print_weight_stratum_assignment_table, print_weight_by_final_income_category_table, print_weight_summary_tables; call from generate and update paths (mirror height gating)
-    status: pending
-  - id: tests-weight-strata
-    content: Add parser/runtime tests for legacy, N files, broadcast, mismatch errors, and console table output where applicable
-    status: pending
-  - id: fixture-docs
-    content: Update FINCH dynamic_model.json when quintile CSVs exist; add weight_quantiles_quintile_plan.md
-    status: pending
-isProject: false
----
-
 # Weight quantiles by income adjustment stratum
 
 **Author:** Mahima Ghosh
 **Engineering contact:** Mahima Ghosh
 
-**Related:** [Height CSV quintile plan](height-csv-quintile-plan.md) · [Income quintile factor means plan](income-quintile-factor-means-plan.md) · [FINCH guide](../guides/finch-linear-models-and-income-adjustment.md) · [Technical index](../README.md) · [Documentation index](../../README.md)
+**Related:** [Height CSV quintile plan](height-csv-quintile-plan.md) | [Income quintile factor means plan](income-quintile-factor-means-plan.md) | [FINCH guide](../guides/finch-linear-models-and-income-adjustment.md) | [Technical index](../README.md) | [Documentation index](../../README.md)
+
+## Plan summary
+
+**Title:** Weight Quintile Quantiles
+
+**Overview:** Add per-stratum weight quantile CSVs under WeightQuantiles (nested Quintile1..N), keep the legacy single-file shape, pick curves by income_adjustment_stratum when assigning weight, and print stratum/final-income summary tables on generate and update-same pattern as height.
+
+### Work items
+
+| Status | Item |
+| ------ | ---- |
+| Done | Extend v1/v2 kevinhall.json WeightQuantiles Female/Male oneOf: legacy csv_file \| Quintile1..N object |
+| In progress | Implement load_weight_quantiles_by_gender in model_parser.cpp with broadcast, count validation vs adjustment_income_stratum_count, sorted Quintile keys |
+| Planned | Change KevinHallModel/Definition to per-stratum quantile vectors + resolve_weight_quantiles_for_person + update initialise_weight/get_weight_quantile |
+| Planned | Add print_weight_stratum_assignment_table, print_weight_by_final_income_category_table, print_weight_summary_tables; call from generate and update paths (mirror height gating) |
+| Planned | Add parser/runtime tests for legacy, N files, broadcast, mismatch errors, and console table output where applicable |
+| Planned | Update FINCH dynamic_model.json when quintile CSVs exist; add weight_quantiles_quintile_plan.md |
 
 ## Goal
 
 - Keep **legacy** `WeightQuantiles.Female` / `Male` as a single `csv_file` (e.g. `weight_quantiles_NCDRisk_female.csv`).
-- Add **stratum files**: `Female.Quintile1` → `weight_quantiles_NCDRisk_female_quintile1.csv`, and the same for Male.
+- Add **stratum files**: `Female.Quintile1` -> `weight_quantiles_NCDRisk_female_quintile1.csv`, and the same for Male.
 - At **weight assignment**, use `person.income_adjustment_stratum` (from `adjustment_income_stratum_count` rank buckets) to choose which quantile curve to use-the same idea as height via `resolve_height_params_for_person` in [kevin_hall_model.cpp](src/HealthGPS/kevin_hall_model.cpp).
 - **Final reporting income** stays on `project_requirements.income.categories` (`"3"` or `"4"`) on `person.income`; that does not change.
 
@@ -68,7 +60,7 @@ flowchart TD
     staticGen --> dynGen
 ```
 
-**Weight-specific step:** `initialise_weight` resolves the quantile vector for `(gender, income_adjustment_stratum)` (or index 0 if no stratum flag), then applies the existing E/PA → weight quantile logic (~873-908).
+**Weight-specific step:** `initialise_weight` resolves the quantile vector for `(gender, income_adjustment_stratum)` (or index 0 if no stratum flag), then applies the existing E/PA -> weight quantile logic (~873-908).
 
 ## Lifecycle - update (`update_risk_factors`)
 
@@ -176,7 +168,7 @@ std::unordered_map<core::Gender, std::vector<std::vector<double>>> weight_quanti
 
 1. `resolve_weight_quantiles_for_person` - same rules as height (~69-85): stratum index when `has_income_adjustment_stratum`, else index 0.
 2. `get_weight_quantile(epa_quantile, const std::vector<double>& quantiles)` - no per-person allocation; quantiles already sorted at load.
-3. `initialise_weight` - resolve stratum vector, then existing EPA percentile → weight quantile math (~1027-1038).
+3. `initialise_weight` - resolve stratum vector, then existing EPA percentile -> weight quantile math (~1027-1038).
 
 **Performance:** I/O and sorting only at load; per person stays O(log n) on `epa_quantiles_` plus O(1) index into the stratum vector.
 
@@ -233,7 +225,7 @@ In [KevinHallHeight.Test.cpp](src/HealthGPS.Tests/KevinHallHeight.Test.cpp) and/
 - Five quintile files with `adjustment_income_stratum_count = 5`
 - Single file broadcast when N = 5
 - File count mismatch throws a clear error
-- Two people, same EPA quantile, different strata → different weights
+- Two people, same EPA quantile, different strata -> different weights
 - Console output contains `[WEIGHT STRATUM ASSIGNMENT]` and `Quintile1` when tables are enabled (capture stdout like height tests ~542)
 
 ## Docs

@@ -3,7 +3,7 @@
 **Author:** Mahima Ghosh
 **Engineering contact:** Mahima Ghosh
 
-**Related:** [Project requirements plan](project-requirements-plan.md) · [Technical index](../README.md) · [Documentation index](../../README.md)
+**Related:** [Project requirements plan](project-requirements-plan.md) | [Technical index](../README.md) | [Documentation index](../../README.md)
 
 ## 🎯 **Goal**
 

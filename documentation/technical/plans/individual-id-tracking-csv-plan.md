@@ -1,16 +1,15 @@
----
-name: Individual ID tracking CSV
-overview: Add user-configurable individual ID tracking that writes a CSV of filtered persons (by age, gender, region, ethnicity, risk factors, years, scenario) with filename derived from the main HealthGPS result file (e.g. ..._IndividualIDTracking.csv), using a new event type and writer, with MAHIMA comments throughout.
-todos: []
-isProject: false
----
-
 # Individual ID tracking CSV (user-configured filters)
 
 **Author:** Mahima Ghosh
 **Engineering contact:** Mahima Ghosh
 
-**Related:** [Same person ID plan](same-person-id-baseline-intervention-plan.md) · [Technical index](../README.md) · [Documentation index](../../README.md)
+**Related:** [Same person ID plan](same-person-id-baseline-intervention-plan.md) | [Technical index](../README.md) | [Documentation index](../../README.md)
+
+## Plan summary
+
+**Title:** Individual ID tracking CSV
+
+**Overview:** Add user-configurable individual ID tracking that writes a CSV of filtered persons (by age, gender, region, ethnicity, risk factors, years, scenario) with filename derived from the main HealthGPS result file (e.g. ..._IndividualIDTracking.csv), using a new event type and writer, with MAHIMA comments throughout.
 
 ## Goal
 
@@ -95,7 +94,7 @@ sequenceDiagram
 
 ## 7. File naming summary
 
-- Main result: `create_output_file_name(config.output, config.job_id)` → e.g. `"C:/out/HealthGPS_result_2026-02-19_10-34-52.json"`.
+- Main result: `create_output_file_name(config.output, config.job_id)` -> e.g. `"C:/out/HealthGPS_result_2026-02-19_10-34-52.json"`.
 - Individual tracking CSV: same path with extension replaced and suffix before extension: e.g. `"C:/out/HealthGPS_result_2026-02-19_10-34-52_IndividualIDTracking.csv"` (mirror [generate_income_filename](src/HealthGPS.Console/result_file_writer.cpp) pattern: `base_stem + "_IndividualIDTracking.csv"`).
 
 ## 8. Example config (for users)

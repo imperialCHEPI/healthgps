@@ -3,7 +3,7 @@
 **Author:** Mahima Ghosh
 **Engineering contact:** Mahima Ghosh
 
-**Related:** [FINCH linear models guide](../guides/finch-linear-models-and-income-adjustment.md) (`gender2`, income flags) · [Schema migration plan](schema-migration-plan.md) · [Technical index](../README.md) · [Documentation index](../../README.md)
+**Related:** [FINCH linear models guide](../guides/finch-linear-models-and-income-adjustment.md) | [Schema migration plan](schema-migration-plan.md) | [Technical index](../README.md) | [Documentation index](../../README.md)
 
 ## Goal
 

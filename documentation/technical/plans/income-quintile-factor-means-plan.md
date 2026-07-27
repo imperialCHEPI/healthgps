@@ -1,25 +1,23 @@
----
-name: Income quintile factor means
-overview: "Optional income-stratum factors-mean adjustment: default keeps today’s two overall CSVs + single adjustment pass. When enabled (baseline_adjustments), load extra stratum pairs, split continuous income into N adjustment buckets, calibrate RF/PA to stratum tables, then assign final income categories from project_requirements. Three phases: schema, C++, tests."
-todos:
-  - id: phase1-schema
-    content: "Phase 1: Schema + BaselineInfo/parsing-baseline_adjustments toggle, stratum file pairs, adjustment bucket count vs final income.categories; validate consistency"
-    status: pending
-  - id: phase2-cpp
-    content: "Phase 2: C++-load tables (verify OK); rank-split to N adjustment strata; income-overall + stratum adjustments; final person.income via project_requirements; integrate generate+update yearly; baseline/intervention sync for stratum payloads"
-    status: pending
-  - id: phase3-tests
-    content: "Phase 3: Tests-config, load failures, regression off-path, on-path sanity, yearly paths"
-    status: pending
-isProject: false
----
-
 # Income-stratum factors-mean adjustment (optional feature)
 
 **Author:** Mahima Ghosh
 **Engineering contact:** Mahima Ghosh
 
-**Related:** [FINCH linear models guide (modeller-facing)](../guides/finch-linear-models-and-income-adjustment.md) · [Dynamic income categories plan](dynamic-income-categories-plan.md) · [Technical index](../README.md) · [Documentation index](../../README.md)
+**Related:** [FINCH linear models guide (modeller-facing)](../guides/finch-linear-models-and-income-adjustment.md) | [Dynamic income categories plan](dynamic-income-categories-plan.md) | [Technical index](../README.md) | [Documentation index](../../README.md)
+
+## Plan summary
+
+**Title:** Income quintile factor means
+
+**Overview:** Optional income-stratum factors-mean adjustment: default keeps today’s two overall CSVs + single adjustment pass. When enabled (baseline_adjustments), load extra stratum pairs, split continuous income into N adjustment buckets, calibrate RF/PA to stratum tables, then assign final income categories from project_requirements. Three phases: schema, C++, tests.
+
+### Work items
+
+| Status | Item |
+| ------ | ---- |
+| Planned | Phase 1: Schema + BaselineInfo/parsing-baseline_adjustments toggle, stratum file pairs, adjustment bucket count vs final income.categories; validate consistency |
+| Planned | Phase 2: C++-load tables (verify OK); rank-split to N adjustment strata; income-overall + stratum adjustments; final person.income via project_requirements; integrate generate+update yearly; baseline/intervention sync for stratum payloads |
+| Planned | Phase 3: Tests-config, load failures, regression off-path, on-path sanity, yearly paths |
 
 ## Optional and backward compatible
 
@@ -46,7 +44,7 @@ No extra stratum CSVs, no second “adjustment bucket count,” and no change to
 - **Final categories** - `project_requirements.income.categories` (`"3"` or `"4"`): `**person.income`** for output, Kevin Hall, reporting-**after** the full pipeline; unchanged semantic from today.
 - **Adjustment strata** - `modelling.baseline_adjustments` (new): how many **rank buckets** from **continuous income** *before* stratum-specific factors-mean adjustment; must line up with loaded **stratum CSV pairs** (e.g. five quintiles ⇒ five pairs and five buckets; six strata with six table pairs ⇒ six buckets, then still final `"4"` for `person.income` if desired).
 
-Example: `**"4"`** final categories but **six** adjustment strata → six rank buckets → six male/female table pairs for RF/PA calibration → then equal-split into **four** final `core::Income` groups using continuous income.
+Example: `**"4"`** final categories but **six** adjustment strata -> six rank buckets -> six male/female table pairs for RF/PA calibration -> then equal-split into **four** final `core::Income` groups using continuous income.
 
 ---
 
@@ -165,7 +163,7 @@ Continues to use the **overall** `expected_` table for **initialisation** / blen
 - Economics: overall income calibration; stratum tables for **RF + PA** misalignment fix.
 - **baseline_adjustments** for toggle + paths + **N** adjustment buckets; **project_requirements** only for **final** `"3"`/`"4"`.
 - **Flexible** number of strata (not only quintiles); FINCH naming as example.
-- Phases: schema → C++ (load → strata → adjust → final categories) → tests.
+- Phases: schema -> C++ (load -> strata -> adjust -> final categories) -> tests.
 - **Yearly** generate + update.
 - Logistic simulated-mean exclusion **unchanged**; stratum = extra filter only.
 - Baseline/intervention sync extended for stratified deltas.

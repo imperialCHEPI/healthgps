@@ -19,9 +19,9 @@ Reach out if you need a code path, config walkthrough, or help debugging.
 
 ---
 
-## Plans
+## Software plans
 
-Design notes for developers. Some items may already be in the tree.
+Engineering design notes for developers. Written as ordinary markdown plans (summary, goals, work items). Some items may already be in the tree.
 
 | Document | Topic |
 | -------- | ----- |

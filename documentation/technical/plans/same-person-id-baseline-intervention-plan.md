@@ -1,30 +1,27 @@
----
-name: Same person ID across baseline and intervention
-overview: Assign Person IDs from population index (id = index + 1) so the same logical person has the same ID in both baseline and intervention runs. Changes are limited to Person and Population with MAHIMA comments; no change to scenario logic or event bus.
-todos:
-  - id: confirm-baseline-sync-contract
-    content: Confirm and document baseline -> intervention sync contract (aggregate tables only, one-way) in the plan and implementation notes.
-  - id: add-population-next-id-counter
-    content: Add Population monotonic next_person_id_ state initialised to initial_size + 1 after initial population construction.
-  - id: switch-post-initial-id-assignment
-    content: Update Population add and add_newborn_babies so all post-initial entrants get ID from next_person_id_++ on both recycled-slot and append paths.
-  - id: preserve-initial-id-alignment
-    content: Keep initial ID assignment as i + 1 to preserve baseline/intervention initial cohort comparability.
-  - id: refresh-tests-lifetime-unique
-    content: Replace slot-reuse ID assertions with lifetime-unique assertions in Population tests, including recycled-slot replacement cases.
-  - id: validate-individual-tracking-behavior
-    content: Validate tracking output expectations (no demographic identity swapping under one ID due to slot reuse) with targeted run/test checks.
-  - id: performance-memory-check
-    content: Record runtime and memory impact checks for large runs (including 14M-population assumptions and observed deltas).
-isProject: false
----
-
 # Same person ID across baseline and intervention
 
 **Author:** Mahima Ghosh
 **Engineering contact:** Mahima Ghosh
 
-**Related:** [Individual ID tracking plan](individual-id-tracking-csv-plan.md) · [Technical index](../README.md) · [Documentation index](../../README.md)
+**Related:** [Individual ID tracking plan](individual-id-tracking-csv-plan.md) | [Technical index](../README.md) | [Documentation index](../../README.md)
+
+## Plan summary
+
+**Title:** Same person ID across baseline and intervention
+
+**Overview:** Assign Person IDs from population index (id = index + 1) so the same logical person has the same ID in both baseline and intervention runs. Changes are limited to Person and Population with MAHIMA comments; no change to scenario logic or event bus.
+
+### Work items
+
+| Status | Item |
+| ------ | ---- |
+| Planned | Confirm and document baseline -> intervention sync contract (aggregate tables only, one-way) in the plan and implementation notes. |
+| Planned | Add Population monotonic `next_person_id_` state initialised to initial_size + 1 after initial population construction. |
+| Planned | Update Population add and add_newborn_babies so all post-initial entrants get ID from `next_person_id_`++ on both recycled-slot and append paths. |
+| Planned | Keep initial ID assignment as i + 1 to preserve baseline/intervention initial cohort comparability. |
+| Planned | Replace slot-reuse ID assertions with lifetime-unique assertions in Population tests, including recycled-slot replacement cases. |
+| Planned | Validate tracking output expectations (no demographic identity swapping under one ID due to slot reuse) with targeted run/test checks. |
+| Planned | Record runtime and memory impact checks for large runs (including 14M-population assumptions and observed deltas). |
 
 ## Goal
 
