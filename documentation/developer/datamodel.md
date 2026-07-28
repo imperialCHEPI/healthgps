@@ -1,12 +1,16 @@
 ## Global Health Policy Simulation model
 
-| [Home](../index) | [Quick Start](../user/getstarted) | [User Guide](../user/userguide) | [Software Architecture](architecture) | Data Model | [Developer Guide](development) | [Technical docs](../technical/) | [API](../api/index.html) |
+| [Home](../index.md) | [Quick Start](../user/getstarted.md) | [User Guide](../user/userguide.md) | [Software Architecture](architecture.md) | [Data Model](datamodel.md) | [Developer Guide](development.md) | [Technical docs](../technical/README.md) | [API (Pages)](https://imperialchepi.github.io/healthgps/api/) |
 
 # Data Model
 
-The backend *data model* defines an abstract model to organises data entities and how they relate to one another in a standardised schema and format to be used within the Health-GPS systems. The backend storage provides a reference dataset that reconcile various disparate data sources required by the model, fill gaps, adjust units, etc, for easy use. The standardised format allows the reference dataset to be easily expanded to accommodate new and non-traditional data sources.
+**Author:** Mahima Ghosh
 
-The data model is storage agnostic, the [Data API][dataapi] abstraction interface shown below, provides a contract for the minimum dataset, easy access, strong typing, and decoupling from the backend storage implementation.
+**Interfaces:** `hgps::core::Datastore` in `src/HealthGPS.Core/datastore.h`. File-backed implementation: `hgps::input::DataManager` in `src/HealthGPS.Input/datamanager.h`.
+
+The backend *data model* is an abstract description of the country-indexed reference datasets Health-GPS modules read through the Datastore API. The physical store reconciles disparate sources (units, gaps, country codes) so the engine can stay storage-agnostic.
+
+The diagram below is a **conceptual** entity-relationship view. In C++, many of these tables map to POCOs in `src/HealthGPS.Core` (for example `BirthItem`, `PopulationItem`, `DiseaseEntity`). Field names on the diagram are not always 1:1 with member names in code.
 
 | ![Health-GPS Data API](../images/data_api.png) |
 |:-------------------------------------------:|
@@ -16,7 +20,7 @@ The data model defines the minimum dataset required by the model, the backend st
 
 | ![Health-GPS Data Model](../images/data_model.png) |
 |:-----------------------------------------------:|
-|    *Data Model Entity–Relationship Diagram*     |
+|    *Data Model Entity-Relationship Diagram*     |
 
 The *country* index entity is based on the [ISO 3166-1][iso3166] standard. All external data sources must provide some kind of *location identifier*, most likely with different values, but must enable mapping with the data storage index definition to be reconcile.
 
@@ -141,20 +145,18 @@ Stores the number for *male* and *female* deaths for a location at each *time* a
 | DeathMale   | Real      |            | Number of males deaths in population  |
 | DeathFemale | Real      |            | Number of female deaths in population |
 
-### Indicators
+### Indicators (births)
 
-Stores general population indicators number for a location at each *time* entry.
+Loaded via `Datastore::get_birth_indicators` into `BirthItem` (`src/HealthGPS.Core/indicator.h`). The file-backed CSV columns are typically `Time`, `Births`, and `SRB`.
 
-| Field name | Data Type | Constraint | Description                                               |
-|:-----------|:----------|:-----------|:----------------------------------------------------------|
-| **ID**     | Integer   | PK         | Model unique identifier                                   |
-| LocationID | Integer   | UQ         | Location unique identifier                                |
-| AtTime     | Integer   | UQ         | Time reference of the indicator values                    |
-| Births     | Real      |            | Number of births, both sexes combined                     |
-| SRB        | Real      |            | Sex ratio at birth (male births per female births)        |
-| LEx        | Real      |            | Life expectancy at birth for both sexes combined in years |
-| LExMale    | Real      |            | Male life expectancy at birth (years)                     |
-| LExFemale  | Real      |            | Female life expectancy at birth (years)                   |
+| Field name | Data Type | Constraint | Maps to (`BirthItem`) | Description |
+|:-----------|:----------|:-----------|:----------------------|:------------|
+| LocationID | Integer   | UQ         | (via `Country`)       | Location unique identifier |
+| AtTime     | Integer   | UQ         | `at_time`             | Time reference of the indicator values |
+| Births     | Real      |            | `number`              | Number of births, both sexes combined |
+| SRB        | Real      |            | `sex_ratio`           | Sex ratio at birth (males per 100 female births) |
+
+Life expectancy (`LEx`, `LExMale`, `LExFemale`) is **not** part of `BirthItem`. It is loaded with disease analysis into `LifeExpectancyItem` inside `DiseaseAnalysisEntity` (`get_disease_analysis`).
 
 ## Diseases
 
@@ -222,48 +224,72 @@ The risk factors relative risk to diseases is modelled as a two-dimensional enti
 
 ## Analysis
 
-Defines the data model to support the analysis modules, which calculates among other things calculates the *Burden of Diseases* (BoD) indicators, describing death and loss of health due to diseases, injuries, and risk factors for the simulated population.
+Defines reference data used by analysis modules when computing burden-of-disease style indicators (death and health loss due to diseases, injuries, and risk factors) for the simulated population.
+
+In C++, analysis datasets for a country are returned together as `DiseaseAnalysisEntity` from `Datastore::get_disease_analysis` (`src/HealthGPS.Core/analysis.h`): disability weights, life expectancy, and cost of disease tables.
 
 ### Disability Weight
 
-Stores disease specific disability weight estimates, which representing the magnitude of health loss associated with specific health outcomes, used to calculate years lived with disability (YLD) for these outcomes in a given population.
+Stores disease-specific disability weight estimates (magnitude of health loss), used when calculating years lived with disability (YLD). In code this is `DiseaseAnalysisEntity::disability_weights` (`std::map<std::string, float>` keyed by disease code).
 
 | Field name | Data Type | Constraint | Description                    |
 |:-----------|:----------|:-----------|:-------------------------------|
-| DiseaseID  | Integer   | PK         | Disease type unique identifier |
+| Disease code | Text     | PK         | Disease identifier (map key)   |
 | Weight     | Real      |            | The disease weight value       |
+
+### Life expectancy
+
+Part of `DiseaseAnalysisEntity::life_expectancy` (`LifeExpectancyItem`). Typical CSV columns: `Time`, `LEx`, `LExMale`, `LExFemale`.
+
+| Field name | Data Type | Maps to | Description |
+|:-----------|:----------|:--------|:------------|
+| AtTime     | Integer   | `at_time` | Reference year |
+| LEx        | Real      | `both`    | Life expectancy at birth, both sexes (years) |
+| LExMale    | Real      | `male`    | Male life expectancy at birth (years) |
+| LExFemale  | Real      | `female`  | Female life expectancy at birth (years) |
 
 ### LMS Parameters
 
-Stores the Lambda-Mu-Sigma (LMS) model parameters, which is used to convert BMI risk factor values to z-scores for children.
+Lambda-Mu-Sigma (LMS) parameters for converting childhood BMI risk-factor values to z-scores. Loaded via `Datastore::get_lms_parameters` into `LmsDataRow` (CSV columns typically `age`, `gender_id`, `lambda`, `mu`, `sigma`).
 
-| Field name | Data Type | Constraint | Description                    |
-|:-----------|:----------|:-----------|:-------------------------------|
-| **ID**     | Integer   | PK         | Parameter unique identifier    |
-| GenderID   | Integer   | UQ         | Gender type unique             |
-| WithAge    | Integer   | UQ         | Age reference of the parameter |
-| Lambda     | Real      |            | The lambda parameter value     |
-| Mu         | Real      |            | The mu parameter value         |
-| Sigma      | Real      |            | The sigma parameter value      |
+| Field name | Data Type | Constraint | Maps to (`LmsDataRow`) | Description |
+|:-----------|:----------|:-----------|:-----------------------|:------------|
+| GenderID   | Integer   | UQ         | `gender`               | Gender enumeration |
+| WithAge / age | Integer | UQ         | `age`                  | Age reference of the parameter |
+| Lambda     | Real      |            | `lambda`               | Lambda parameter |
+| Mu         | Real      |            | `mu`                   | Mu parameter |
+| Sigma      | Real      |            | `sigma`                | Sigma parameter |
 
-### Burden of Disease
+### Cost of disease / BoD tables
 
-The burden of diseases (BoD) measure is modelled using a two-dimensional entity, *time* x *age*, to represent the measure values for each *gender* enumeration entry.
+Cost-of-disease lookup data sits in `DiseaseAnalysisEntity::cost_of_diseases` (age × gender). The older ERD also showed a separate Burden of Disease measure table (*time* × *age* × *gender* × *measure*). Treat that diagram as conceptual; the live `Datastore` contract is the methods and POCOs in `datastore.h` / `analysis.h`.
 
-| Field name | Data Type | Constraint | Description                          |
-|:-----------|:----------|:-----------|:-------------------------------------|
-| **ID**     | Integer   | PK         | Model unique identifier              |
-| LocationID | Integer   | UQ         | Location unique identifier           |
-| MeasureID  | Integer   | UQ         | BoD measure type unique identifier   |
-| GenderID   | Integer   | UQ         | Gender type unique identifier        |
-| AtTime     | Integer   | UQ         | Time reference of the measure values |
-| WithAge    | Integer   | UQ         | Age reference of the measure values  |
-| Mean       | Real      |            | The measure mean value               |
+---
 
-The ***data model*** definition is now *complete*. The design makes heavy use of relational-database notations; however, the backend data model is storage and implementation agnostic, the Health-GPS ecosystem seamlessly supports different [Data API][dataapi] implementations via instance injection during construction.
+This document describes the **country reference Datastore** surface. It is not a claim that every Health-GPS input lives here. Experiment JSON, risk-factor model packs, FINCH policy equations, income stratum tables, height/weight curves, PIF CSVs, and similar project inputs are loaded through configuration and `HealthGPS.Input`, then held on the `Repository` / `ModelInput` path. See the [FINCH guide](../technical/guides/finch-linear-models-and-income-adjustment.md) and [Developer Guide](development.md).
 
->See [Development Guide](development) for a *file-based* backend storage implementation detail.
+Different [Data API][dataapi] implementations can be injected at construction; the file-backed one is `input::DataManager`.
 
-[dataapi]: https://github.com/imperialCHEPI/healthgps/blob/main/source/HealthGPS.Core/datastore.h "Health-GPS Data API definition."
+---
+
+### Related documentation
+
+| Topic | Document |
+| ----- | -------- |
+| Developer docs index | [developer/README.md](README.md) |
+| Architecture | [Software Architecture](architecture.md) |
+| Build guide | [Developer Guide](development.md) |
+| FINCH / income inputs | [FINCH guide](../technical/guides/finch-linear-models-and-income-adjustment.md) |
+| User guide | [User Guide](../user/userguide.md) |
+| Technical docs | [Technical documentation index](../technical/README.md) |
+| Documentation home | [documentation/README.md](../README.md) |
+
+---
+
+---
+
+**Author:** Mahima Ghosh
+
+[dataapi]: ../../src/HealthGPS.Core/datastore.h "Health-GPS Data API definition (Datastore)."
 
 [iso3166]: https://www.iso.org/iso-3166-country-codes.html "ISO 3166 Country Codes"

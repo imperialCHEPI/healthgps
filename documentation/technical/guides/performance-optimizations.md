@@ -1,170 +1,88 @@
-# HealthGPS Performance Optimizations For ADB Paper
+# Health-GPS performance and parallelization
 
 **Author:** Mahima Ghosh
 
-**Related:** [HealthGPS update report](healthgps-update-report-2026-02-20.md) · [Technical index](../README.md)
+**Related:** [HealthGPS update report](healthgps-update-report-2026-02-20.md) (section 4) · [Developer Guide](../../developer/development.md) · [MSVC troubleshooting](../../developer/msvc-windows-build-troubleshooting.md) · [Technical index](../README.md)
 
-This document describes the performance optimizations implemented to make HealthGPS simulations run faster.
-
-## 🚀 Key Optimizations Implemented
-
-### 1. **Parallel Trial Execution**
-
-**Before**: Trials ran sequentially (one after another)
-**After**: Multiple trials run simultaneously
-
-- **ParallelRunner Class**: New optimized runner that executes multiple trials concurrently
-- **Configurable Concurrency**: Adjustable number of concurrent trials (default: 4)
-- **Smart Thread Allocation**: Distributes available cores between trials intelligently
-
-```cpp
-// Example configuration
-ParallelRunnerConfig config;
-config.concurrent_trials = 4;           // Run 4 trials simultaneously
-config.threads_per_trial = 16;          // 16 threads per trial
-config.enable_monitoring = true;        // Real-time progress monitoring
-```
-
-### 2. **Real-Time Performance Monitoring**
-
-**New Feature**: Live progress tracking and performance analytics
-
-- **Progress Updates**: Shows completion percentage, ETA, and throughput
-- **Performance Metrics**: Tracks average trial time and identifies bottlenecks
-- **Color-Coded Output**: Easy-to-read progress indicators
-
-```text
-🚀 Progress: 45/100 trials (45.0%) | Avg: 2341.2ms/trial | ETA: 128.7s | Elapsed: 105.3s
-```
-
-### 3. **Optimized Threading Strategy**
-
-**Before**: Using all 256 cores for each trial (thread overhead)
-**After**: Smart core allocation across multiple trials
-
-- **Thread Distribution**: Cores shared intelligently between concurrent trials
-- **Reduced Overhead**: Less thread coordination overhead per trial
-- **Better Resource Utilization**: More efficient use of available CPU cores
-
-### 4. **Performance Profiling Integration**
-
-**New Feature**: Detailed timing of simulation components
-
-- **Component Timing**: Track time spent in each simulation module
-- **Bottleneck Identification**: Identify which operations take the most time
-- **Performance Summary**: Detailed breakdown at the end of simulation
-
-## 📊 Expected Performance Improvements
-
-### **Trial Execution Speed**
-
-- **Sequential**: 100 trials × 3 minutes = 300 minutes (5 hours)
-- **Parallel (4x)**: 100 trials ÷ 4 × 3 minutes = 75 minutes (1.25 hours)
-- **Speedup**: **~4x faster** for trial execution
-
-### **HPC Scaling Benefits**
-
-- **Better Core Utilization**: No longer requires 256 cores per job
-- **More Jobs**: Can run multiple simulations simultaneously with fewer cores each
-- **Queue Efficiency**: Shorter queue times with more reasonable resource requests
-
-### **Memory Efficiency**
-
-- **Reduced Memory Per Core**: Lower memory requirements per core
-- **Better Cache Utilization**: Improved memory access patterns within trials
-
-## 🔧 Usage Instructions
-
-### **Command Line Usage**
-
-The optimizations are automatically enabled. The system will:
-
-1. **Auto-configure** concurrent trials based on total trial count
-2. **Distribute threads** intelligently across trials
-3. **Monitor progress** in real-time
-4. **Report performance** metrics at completion
-
-### **HPC Job Script Optimization**
-
-**Old approach** (slow, requires many cores):
-
-```bash
-#PBS -l select=1:ncpus=256:mem=512gb
-HealthGPS.Console -c config.json -T 256
-```
-
-**New approach** (faster, fewer cores needed):
-
-```bash
-#PBS -l select=1:ncpus=64:mem=128gb
-HealthGPS.Console -c config.json -T 64
-```
-
-### **Expected HPC Benefits**
-
-- **Fewer Cores Needed**: 64 cores instead of 256
-- **Less Memory**: 128GB instead of 512GB
-- **Shorter Queue Times**: More reasonable resource requests
-- **Same or Better Performance**: Due to parallel trial execution
-
-## 📈 Performance Monitoring Output
-
-### **Real-Time Progress**
-
-```text
-🚀 Optimized execution: 4 concurrent trials, 16 threads per trial
-🚀 Progress: 25/100 trials (25.0%) | Avg: 2156.3ms/trial | ETA: 161.2s | Elapsed: 53.9s
-🚀 Progress: 50/100 trials (50.0%) | Avg: 2203.1ms/trial | ETA: 110.2s | Elapsed: 110.2s
-✅ COMPLETED: 100 trials in 220.4s | Avg: 2204.0ms/trial | Throughput: 0.45 trials/sec
-```
-
-### **Detailed Performance Breakdown**
-
-```text
-📊 Performance Summary:
-Operation                      Count      Total(ms)    Avg(ms)      Max(ms)
---------------------------------------------------------------------------------
-Total_Population_Update        3000       145632.50    48.54        89.23
-RiskFactor_Update             3000        67891.20     22.63        45.12
-Demographic_Update            3000        34567.80     11.52        23.45
-Disease_Update                3000        28934.60     9.64         18.76
-Analysis_Update               3000        14238.90     4.75         12.34
-Net_Immigration_Update        3000         3456.70     1.15         3.21
-```
-
-## 🎯 Optimization Impact Summary
-
-| **Metric** | **Before** | **After** | **Improvement** |
-|------------|------------|-----------|-----------------|
-| Trial Execution | Sequential | 4x Parallel | **4x faster** |
-| Core Requirements | 256 cores | 64 cores | **75% reduction** |
-| Memory Requirements | 512GB | 128GB | **75% reduction** |
-| Queue Time | Hours | Minutes | **Significantly faster** |
-| Progress Visibility | None | Real-time | **Full monitoring** |
-| Performance Insights | None | Detailed | **Complete profiling** |
-
-## 🔧 Advanced Configuration
-
-For power users who want to fine-tune performance:
-
-```cpp
-// In program.cpp, you can adjust:
-parallel_config.concurrent_trials = 8;      // More concurrent trials
-parallel_config.threads_per_trial = 8;      // Fewer threads per trial
-parallel_config.progress_interval = 2.0;    // More frequent updates
-```
-
-## 🚨 Important Notes
-
-1. **Memory Scaling**: More concurrent trials = more memory usage
-2. **Optimal Configuration**: Usually 4-8 concurrent trials work best
-3. **HPC Resources**: Request reasonable resources (64-128 cores) for better queue times
-4. **Monitoring Overhead**: Performance monitoring adds ~1-2% overhead but provides valuable insights
+This note describes **where Health-GPS uses parallelism today** and how to tune runtime on a laptop or HPC node. It replaces an older draft that described a non-existent `ParallelRunner` API.
 
 ---
 
-**Result**: 100-simulation jobs that previously took 30+ days should now complete in **~7-8 days** with much better resource utilization and queue efficiency! 🚀
+## What is parallel today
+
+Trials (replications) still run **one after another** inside `hgps::Runner` (`src/HealthGPS/runner.cpp`). There is **no** built-in “run four trials at once” mode in the Console.
+
+Parallelism instead comes from:
+
+| Area | Mechanism | Purpose |
+| ---- | --------- | ------- |
+| **Baseline + intervention** | Two `std::jthread` workers per trial when an intervention is configured | Both scenarios advance in the same replication |
+| **In-process hot paths** | Intel [oneTBB](https://github.com/oneapi-src/oneTBB) and `core::parallel_for` / `core::run_async` | Population updates, disease incidence, analysis aggregation, income CSV writes |
+| **Startup** | Async load of large datatables in `program.cpp` | Overlap I/O with setup |
+| **Result I/O** | Separate dispatch threads in `EventMonitor` for main results vs individual ID tracking | Main JSON/CSV and `_IndividualIDTracking.csv` can be written concurrently |
+| **Income-stratum CSVs** | `tbb::parallel_for_each` over income categories in `result_file_writer.cpp` | One file per stratum without serializing all writes on one lock |
+
+For a module-by-module table and source links, see [Parallelization in the update report](healthgps-update-report-2026-02-20.md#4-parallelization).
 
 ---
 
-**Author:** Mahima Ghosh · [← Technical documentation index](../README.md) · [Documentation home](../../index.md)
+## Thread limit (`--threads` / `-T`)
+
+Health-GPS caps TBB worker threads from the Console CLI:
+
+```bash
+HealthGPS.Console -c path/to/config.json -T 64
+```
+
+- **`0`** (default): no explicit cap; TBB may use all visible CPU cores on the node.
+- **Positive value**: sets `tbb::global_control::max_allowed_parallelism` in `src/HealthGPS.Console/program.cpp`.
+
+On HPC, request **`ncpus`** in PBS (or your scheduler) to match what you pass to `-T`. Requesting 256 cores but limiting to 64 wastes queue priority; requesting 8 cores and omitting `-T` can oversubscribe the allocation.
+
+See also the HPC thread note in the [Developer Guide](../../developer/development.md#hpc-build).
+
+---
+
+## HPC job sizing (practical)
+
+There is no automatic “optimal core count.” Start from:
+
+1. **Population size and trial count** in `config.json` (`running.trial_runs`, `inputs.settings.size_fraction`).
+2. **One process per array task** when using PBS array jobs (parallelism across jobs, not inside one Console process).
+3. **`-T`** set to the cores you reserved on that node (often 8–64 for France-scale examples).
+
+Example job fragment (config holds `data.source`; prefer `-c` over deprecated `-f` / `-s`):
+
+```bash
+#PBS -l select=1:ncpus=8:mem=64gb
+module add Health-GPS/X.Y.Z.B-GCCcore-11.3.0
+HealthGPS.Console -c ${PBS_O_WORKDIR}/HLM_France/config.json -T 8 -j ${PBS_ARRAY_INDEX}
+```
+
+Use **array jobs** to scale replications across nodes; see [User Guide: HPC running](../../user/userguide.md#hpc-running).
+
+---
+
+## What stays sequential (on purpose)
+
+- **Trial loop** in `Runner::run` (each replication finishes before the next starts).
+- **Shared mutable state** protected by mutexes (analysis accumulators, disease counters, repository cache, event bus subscribers).
+- **Random number streams** tied to run seeds for reproducibility.
+
+Do not expect near-linear speedup by raising `-T` beyond the work available per simulated year; diminishing returns are normal once per-person loops are saturated.
+
+---
+
+## Further reading
+
+| Topic | Document |
+| ----- | -------- |
+| Output threading design | [Parallelize output writes plan](../plans/parallelize-output-writes-plan.md) |
+| Architecture / modules | [Software Architecture](../../developer/architecture.md) |
+| FINCH / large configs | [FINCH guide](finch-linear-models-and-income-adjustment.md) |
+
+---
+
+---
+
+**Author:** Mahima Ghosh

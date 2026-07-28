@@ -1,13 +1,14 @@
----
-name: Individual ID tracking CSV
-overview: Add user-configurable individual ID tracking that writes a CSV of filtered persons (by age, gender, region, ethnicity, risk factors, years, scenario) with filename derived from the main HealthGPS result file (e.g. ..._IndividualIDTracking.csv), using a new event type and writer, with MAHIMA comments throughout.
-todos: []
-isProject: false
----
-
 # Individual ID tracking CSV (user-configured filters)
 
-**Author:** Mahima Ghosh · **Related:** [Same person ID plan](same-person-id-baseline-intervention-plan.md) · [Technical index](../README.md)
+**Author:** Mahima Ghosh
+
+**Related:** [Same person ID plan](same-person-id-baseline-intervention-plan.md) | [Technical index](../README.md) | [Documentation index](../../README.md)
+
+## Plan summary
+
+**Title:** Individual ID tracking CSV
+
+**Overview:** Add user-configurable individual ID tracking that writes a CSV of filtered persons (by age, gender, region, ethnicity, risk factors, years, scenario) with filename derived from the main HealthGPS result file (e.g. ..._IndividualIDTracking.csv), using a new event type and writer, with MAHIMA comments throughout.
 
 ## Goal
 
@@ -43,8 +44,8 @@ sequenceDiagram
   - `gender`: string enum "male" | "female" | "all" (default "all")
   - `regions`: array of strings (empty = all)
   - `ethnicities`: array of strings (empty = all)
-  - `risk_factors`: array of strings – which risk factors to output as columns (empty = all from mapping)
-  - `years`: array of integers – which simulation years to include (empty = all)
+  - `risk_factors`: array of strings - which risk factors to output as columns (empty = all from mapping)
+  - `years`: array of integers - which simulation years to include (empty = all)
   - `scenarios`: "baseline" | "intervention" | "both" (default "both")
 - **POCO**: Add struct `IndividualIdTrackingConfig` in [src/HealthGPS.Input/poco.h](src/HealthGPS.Input/poco.h) with the same fields (sensible defaults: enabled false, age_min/max optional, gender "all", empty vectors, scenarios "both"). Add optional `std::optional<IndividualIdTrackingConfig> individual_id_tracking` to `OutputInfo` in the same header.
 - **Parsing**: In [src/HealthGPS.Input/configuration_parsing.cpp](src/HealthGPS.Input/configuration_parsing.cpp) (or wherever output is loaded), when `output` object contains `individual_id_tracking`, parse it into `config.output.individual_id_tracking`. If the key is absent, leave it as `std::nullopt`.
@@ -92,7 +93,7 @@ sequenceDiagram
 
 ## 7. File naming summary
 
-- Main result: `create_output_file_name(config.output, config.job_id)` → e.g. `"C:/out/HealthGPS_result_2026-02-19_10-34-52.json"`.
+- Main result: `create_output_file_name(config.output, config.job_id)` -> e.g. `"C:/out/HealthGPS_result_2026-02-19_10-34-52.json"`.
 - Individual tracking CSV: same path with extension replaced and suffix before extension: e.g. `"C:/out/HealthGPS_result_2026-02-19_10-34-52_IndividualIDTracking.csv"` (mirror [generate_income_filename](src/HealthGPS.Console/result_file_writer.cpp) pattern: `base_stem + "_IndividualIDTracking.csv"`).
 
 ## 8. Example config (for users)
@@ -144,4 +145,6 @@ No changes to the existing `ResultEventMessage` or main JSON/CSV writing logic; 
 
 ---
 
-**Author:** Mahima Ghosh · [Technical index](../README.md)
+---
+
+**Author:** Mahima Ghosh

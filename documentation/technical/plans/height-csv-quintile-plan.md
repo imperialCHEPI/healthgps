@@ -1,28 +1,24 @@
----
-name: Height CSV Quintile Integration
-overview: Add new male/female height CSV inputs to KevinHall dynamic model parsing while preserving legacy HeightSlope/HeightStdDev fields, then apply height slope/std by adjustment income stratum and keep final output income categories unchanged.
-todos:
-  - id: schema-extend-height-csv
-    content: Add optional KevinHall height CSV fields to v1/v2 schemas while preserving legacy HeightSlope/HeightStdDev support.
-    status: pending
-  - id: parser-height-csv-loading
-    content: Implement KevinHall parser logic to read slope/std CSVs, validate row counts, and fallback to legacy scalar fields.
-    status: pending
-  - id: kevinhall-runtime-stratum-height
-    content: Update KevinHall runtime/model definition to select height slope/std by income adjustment stratum before final category remap.
-    status: pending
-  - id: tests-backcompat-and-strata
-    content: Add tests for scalar backward compatibility, single-row broadcast, multi-row strata mapping, and invalid row-count errors.
-    status: pending
-  - id: fixtures-and-example-update
-    content: Update KevinHall sample dynamic model fixture(s) to show new CSV input format.
-    status: pending
-isProject: false
----
-
 # Height CSV Quintile Integration Plan
 
-**Author:** Mahima Ghosh · **Related:** [Weight quintile plan](weight-quintile-plan.md) · [Income quintile factor means plan](income-quintile-factor-means-plan.md) · [FINCH guide](../guides/finch-linear-models-and-income-adjustment.md) · [Technical index](../README.md)
+**Author:** Mahima Ghosh
+
+**Related:** [Weight quintile plan](weight-quintile-plan.md) | [Income quintile factor means plan](income-quintile-factor-means-plan.md) | [FINCH guide](../guides/finch-linear-models-and-income-adjustment.md) | [Technical index](../README.md) | [Documentation index](../../README.md)
+
+## Plan summary
+
+**Title:** Height CSV Quintile Integration
+
+**Overview:** Add new male/female height CSV inputs to KevinHall dynamic model parsing while preserving legacy HeightSlope/HeightStdDev fields, then apply height slope/std by adjustment income stratum and keep final output income categories unchanged.
+
+### Work items
+
+| Status | Item |
+| ------ | ---- |
+| Planned | Add optional KevinHall height CSV fields to v1/v2 schemas while preserving legacy HeightSlope/HeightStdDev support. |
+| Planned | Implement KevinHall parser logic to read slope/std CSVs, validate row counts, and fallback to legacy scalar fields. |
+| Planned | Update KevinHall runtime/model definition to select height slope/std by income adjustment stratum before final category remap. |
+| Planned | Add tests for scalar backward compatibility, single-row broadcast, multi-row strata mapping, and invalid row-count errors. |
+| Planned | Update KevinHall sample dynamic model fixture(s) to show new CSV input format. |
 
 ## Goal
 
@@ -150,3 +146,7 @@ flowchart TD
 - Build and run targeted KevinHall tests.
 - Run any config/schema validation tests that exercise KevinHall dynamic model parsing.
 - Spot-check one end-to-end run where adjustment strata count differs from final income categories (e.g., 5 -> 4) to confirm height uses stratum values during assignment while outputs remain in configured final categories.
+
+---
+
+**Author:** Mahima Ghosh

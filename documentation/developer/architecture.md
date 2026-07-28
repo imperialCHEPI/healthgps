@@ -1,19 +1,23 @@
 ## Global Health Policy Simulation model
 
-| [Home](../index) | [Quick Start](../user/getstarted) | [User Guide](../user/userguide) | Software Architecture | [Data Model](datamodel) | [Developer Guide](development) | [Technical docs](../technical/) | [API](../api/index.html) |
+| [Home](../index.md) | [Quick Start](../user/getstarted.md) | [User Guide](../user/userguide.md) | [Software Architecture](architecture.md) | [Data Model](datamodel.md) | [Developer Guide](development.md) | [Technical docs](../technical/README.md) | [API (Pages)](https://imperialchepi.github.io/healthgps/api/) |
 
 # Software Architecture
 
-The Health-GPS software architecture adopts a modular design approach to provide the building blocks necessary to compose the microsimulation, which is written in modern, standard ANSI [C++20][cpp20] and using object-oriented principles for software development. The software application is open source, cross-platform,  and comprises of four main components:
+**Author:** Mahima Ghosh
+
+**Source layout:** `src/HealthGPS` (engine), `src/HealthGPS.Core` (Data API / POCOs), `src/HealthGPS.Input` (file datastore + config), `src/HealthGPS.Console` (host), `src/HealthGPS.Tests`. ADEVS is vendored under `src/external/adevs`.
+
+The Health-GPS software architecture uses a modular design. It is written in modern [C++20][cpp20]. The deployable stack has four main pieces:
 
 | ![Health-GPS Components](../images/component_diagram.svg) |
 |:------------------------------------------------------:|
 |        *Health-GPS Microsimulation Components*         |
 
-- ***Host Application*** - responsible for parsing the user’s inputs via a configuration file, initialise the supporting infrastructure, compose the Health-GPS instance by assembling the required modules, running the experiment, and collect the results. This component is provided as a console terminal application, but can equality be a graphical user interface (GUI) or web page.
-- ***Health-GPS Model*** - defines the microsimulation engine, executive, core modules and algorithms used to create the virtual population, simulate over time, and produce results.
-- ***Backend Data Storage*** - provides an interface (`Data API`) and persistence-agnostic data types (plain old class object - POCO) as required to initialise the internal modules. This component is a contract for all concrete implementations that manage the storage and access of datasets.
-- ***File-base Data Storage*** - implements the `Data API` interface using a *file-based* storage to provide the modules’ required data. This component can be replaced by a different storage type, e.g., database, without affecting the Health-GPS model ecosystem.
+- ***Host Application*** - parses the configuration, sets up infrastructure, builds `Simulation` instance(s), runs the experiment via `Runner`, and writes results. Today that host is `HealthGPS.Console` (`src/HealthGPS.Console`). A GUI or other host can use the same libraries.
+- ***Health-GPS Model*** - the microsimulation engine (`Simulation`), executive (`Runner`), modules, and algorithms that create the virtual population, step through time, and publish results.
+- ***Backend Data Storage*** - the `Datastore` interface (`src/HealthGPS.Core/datastore.h`) and persistence-agnostic POCOs used to initialise modules.
+- ***File-based Data Storage*** - `hgps::input::DataManager` in `src/HealthGPS.Input`, which implements `Datastore` from files. Another storage backend can replace it without changing the engine.
 
 These components along with the physical data storage are the *minimum package* to deploy and use the Health-GPS microsimulation. All input data processing, model parameters fitting, and results analysis procedures are carried out *outside* the microsimulation using tools such R, Julia and Python which are very efficient in data wrangling, statistical analysis, and machine learning algorithms.
 
@@ -23,17 +27,17 @@ The Health-GPS framework adopts a modular design to specify the building blocks 
 |:-----------------------------------------------------:|
 | *High-level Architecture of the Health-GPS Framework* |
 
-- ***Inputs*** – provides additional datasets, models hierarchy definition, fitted parameters, diseases selection, intervention scenario and simulation run-time settings.
-- ***Host Application*** – process the user’s inputs, initialise the required infrastructure, create the microsimulation instance, run the experiment, collect, and write results to the output file.
-- ***Data Storage*** - contains the datasets in a consistent format as required by all simulation modules not externally fitted by the user. The data in storage comes from multiple sources and have already been externally processed, smoothly interpolated missing information to conform with the required data format. The datastore uses [ISO 3166](https://www.iso.org/iso-3166-country-codes.html)  country code to index the datasets by country and stores information on birth and death rates by age and gender, total population, relative risks for risk factors-diseases associations, epidemiological rates for most countries by age and gender, and disability weights. New datasets can be added without code change.
-- ***Risk Factors Module*** – represents the generic factors hierarchy as defined by the user to generate the dynamic equations with respective parameters fitted to a dataset, e.g., survey. Their values provide additional properties to individuals within the virtual population and are continuously updated throughout the simulation based on the derived equations. There are two types of hierarchical models: *static* used only during individual’s initialisation, and *dynamic* which includes a dynamic factor, time (year), and is used during subsequent individual’s risks updates.
-- ***SES Module*** – defines the virtual population individuals’ socio-economic status properties such as education and income to represent their relative importance as determinants of health by gender and age. These properties values can be updated throughout the simulation.
-- ***Demographics Module*** – defines the population of interest to be simulated, providing historic and projected indicators of a country’s population size, age, and gender. Their values are used to create the initial virtual population, the building blocks of the simulation holding vital information about virtual individuals such as age, gender, education, income, risk factors exposures and comorbidities. The module also provided indicators on a country’s population birth and death rates, which is used throughout the simulation to update the individuals’ life cycle.
-- ***Diseases Module*** – holds the collection of diseases sub-models selected by the user. The definition of diseases is data driven, the design provides a reusable generic interface to represent diseases epidemiological rates and relative risks for risk factors-diseases associations; and update individual’s disease status based on their risk factors exposures.
-- ***Burden of Diseases Module*** – collects statistical indicators about the simulated population, calculates diseases prevalence, risk factors exposure, and standardised metrics such as YLL, YLD, DALY, and publish the results to the outside world asynchronously via messaging.
-- ***Intervention Module*** – defines the alternative scenario used to update risk factors distributions based on the intervention’s population targets and parameters. Interventions are designed specifically to study a particular scenario and may require new data formats and additional module in code.
-- ***Health-GPS*** - the core of the microsimulation engine. It holds all the other modules instances and state machine to run a full simulation, dictating the calling order of each module during initialisation and multiple update steps to completion, and notify progress via messaging.
-- ***Output*** – the collection of results published by the simulation (Analysis Module) at the end of each time step and written to a file in disk, JSON format, by the Host Application to be analysed by the user externally to draw conclusions about the simulated experiment. An alternative to writing the results to a file in disk, is to use a message broker, e.g., [RabbitMQ][broker], or a distributed event streaming platform such as [Apache Kafka][kafka] to distribute the messages and enable parallel analysis of results while the simulation is running by an external application.
+- ***Inputs*** - configuration JSON (validated against schemas), model hierarchy and fitted parameters, disease selection, intervention scenario, and run-time settings. Project-specific CSVs (FINCH policy equations, income stratum tables, height/weight curves, PIF, and so on) are loaded through Input / modelling config, not only through the country Datastore.
+- ***Host Application*** - processes inputs, creates simulations, runs the experiment, and writes outputs.
+- ***Data Storage*** - country-indexed reference datasets (births, deaths, population, relative risks, epidemiology, disability weights, LMS, and related). Indexed by [ISO 3166](https://www.iso.org/iso-3166-country-codes.html) country code. New country files can be added without engine changes.
+- ***Risk Factors Module*** - hosts risk-factor models registered as static and/or dynamic. Implementations include hierarchical linear models (`StaticHierarchicalLinearModel`, `DynamicHierarchicalLinearModel`), static linear models used for FINCH-style pipelines (`StaticLinearModel`), and the Kevin Hall energy-balance model (`KevinHallModel`). Static models run at initialisation; dynamic models run on later yearly updates.
+- ***SES Module*** - assigns socio-economic status noise (`ses`) used as a continuous proxy. Income is modelled separately on `Person` (category, continuous value, optional adjustment stratum). See the [FINCH guide](../technical/guides/finch-linear-models-and-income-adjustment.md) and [update report](../technical/guides/healthgps-update-report-2026-02-20.md).
+- ***Demographics Module*** - population size, age, gender, births, deaths, and residual mortality; also drives net immigration. Person demographics can include sector, region, and ethnicity when configured.
+- ***Diseases Module*** - hosts disease sub-models (`others` and `cancers` groups). Optional population impact fraction (PIF) adjustment can modify incidence when configured.
+- ***Analysis Module*** (Burden of Diseases) - collects indicators (prevalence, exposure, YLL/YLD/DALY, income strata, and related channels) and publishes `ResultEventMessage`s on the message bus.
+- ***Policy scenarios*** - not a `SimulationModuleType`. Baseline and intervention behaviour is a `Scenario` object passed into each `Simulation` (for example `BaselineScenario`, fiscal, marketing, food labelling, physical activity). Interventions may need extra data and code.
+- ***Simulation engine*** - class `hgps::Simulation` (`src/HealthGPS/simulation.h`). Owns module instances, `RuntimeContext`, clock, and call order for initialise / update. Progress and results go out through the event bus.
+- ***Output*** - the Console host writes results from analysis messages: JSON, a main CSV, optional income-stratum CSVs (`ResultFileWriter`), and optionally a per-person tracking CSV (`IndividualIDTrackingWriter`). Results can also be consumed live over the bus (for example toward a broker such as [RabbitMQ][broker] or [Kafka][kafka] in a custom host).
 
 The *simulation engine* clock and events scheduling is based on the *Discrete Event System Specification* ([DEVS][devs]) and provided by the [ADEVS][adevs] library. The simulation results are streamed asynchronous to the outside world via the *message bus* instance provided to the model by the *host application* during initialisation.
 
@@ -43,27 +47,27 @@ The software architecture defines interfaces for modules, sub-models, and extern
 |:------------------------------------------------------------------:|
 |                *Simulation Module Common Interface*                |
 
-The *simulation module type* enumeration is used by the microsimulation engine to request the correct simulation module type implementation from the Module Factory, which uses the same enumeration for registration of the module builder functions required to be defined by each concrete implementation of a simulation module interface as shown below. The *RuntimeContext* data structure, used as parameter, is created by the simulation engine to store the virtual population, share the policy scenario, run-time information, e.g., current run number and time, and common infrastructure such as random number generator, message bus and model settings with all modules during calls via the public interface.
+The *simulation module type* enumeration (`SimulationModuleType` in `src/HealthGPS/interfaces.h`) is: `RiskFactor`, `SES`, `Demographic`, `Disease`, `Analysis`. The engine asks the module factory for each type. `RuntimeContext` holds the virtual population, scenario, run number, time, RNG, bus, and settings for module calls.
 
 |        ![Health-GPS Module Factory](../images/module_factory.png)        |
 |:---------------------------------------------------------------------:|
 | *Module Factory Class Diagram with Concrete Builder Function example* |
 
-The *module builder* functions have access to both the model inputs and backend data storage (Repository) when requested to create the respective simulation module instance. The *Repository* interface shown below, provides read-only access to external datasets loaded via configuration to parameterise the risk factor module, and exposes the `Datastore` interface implementation instance. The factory registered module builders can retrieve the required raw data, reshape, and combine to create the respective module parameters definition and instance.
+The *module builder* functions have access to both the model inputs and backend data storage (Repository) when requested to create the respective simulation module instance. The *Repository* interface shown below provides read-only access to external datasets loaded via configuration to parameterise the risk factor module, and exposes the `Datastore` interface implementation. The factory registered module builders can retrieve the required raw data, reshape, and combine to create the respective module parameters definition and instance.
 
 | ![Health-GPS Repository](../images/repository_interface.png) |
 |:---------------------------------------------------------:|
 |            *Data Repository Interface Diagram*            |
 
-This minimalistic design exposes the available datasets to the factory module builder functions, ultimately responsible for creating fully working module instances when requested. The requirement to evaluate *baseline* and *intervention* scenarios together as discussed later, provides an opportunity to extend the design to support caching of read-only modules parametrisation to share between the two scenarios. This optimisation would minimise backend I/O and memory usage, at the expense of introduced coupling between the repository and modules parameter.
+This design exposes datasets to factory builders. In the current Console host, a `CachedRepository` wraps the datastore and registered risk-factor model definitions so baseline and intervention simulations can share loaded data.
 
-The *backend data storage* interface shown below, defines the contract, the *Data API* abstraction providing Health-GPS a uniform data easy access layer to the physical backend storage, with strong typing, and fully agnostic of implementation.
+The *backend data storage* interface shown below defines the `Datastore` contract: a typed, storage-agnostic access layer.
 
 | ![Health-GPS Data API](../images/data_api.png) |
 |:-------------------------------------------:|
 |        *Backend Data API Interface*         |
 
-> See [Data Model](datamodel) for the backend *data model*.definition.
+> See [Data Model](datamodel.md) for the backend data model.
 
 To take the ***virtual population*** through time, the simulation modules have different requirements, and consequently the simulation module interface has been extended with new properties and operations to satisfy the different modules as shown below.
 
@@ -75,7 +79,7 @@ All modules must initialise the virtual population at the beginning of the simul
 
 The two *host modules*, risk factor and disease respectively, are special containers for similar *sub-models* and likewise are responsible for managing the creation, ownership and execution order when requested by the simulation engine or other modules.
 
-The *risk factor* module hosts hierarchical linear models defined and fitted to data by the user; and provided to the host application in the configuration file. The *hierarchical linear model* interface below defines the two types of models as previously described: *Static* and *Dynamic*, the first is used to initialise the population, and the second to update the population’s dynamics respectively.
+The *risk factor* module hosts models supplied through configuration. Models implement `RiskFactorModel` with type `Static` or `Dynamic` (`src/HealthGPS/risk_factor_model.h`). Concrete types include hierarchical linear models, static linear models (FINCH-style), and Kevin Hall. Static models initialise the population; dynamic models update it each year.
 
 | ![Health-GPS Hierarchical Models](../images/hierarchical_model_interface.png) |
 |:--------------------------------------------------------------------------:|
@@ -99,93 +103,94 @@ Below are the class diagrams for the thin *Population* wrapper, the virtual *Per
 |:---------------------------------------------------------------:|
 |            *Virtual Population’s Entity definition*             |
 
-Individual are given a unique identifier number at creation, contains trivial properties
-and flags, and dynamic properties for representing diseases and risk factors values as
-follows:
+Individuals get a lifetime-unique `id` within one `Population` (not reused after death or emigration; default-constructed persons stay unassigned until placed). Main fields on `Person` (`src/HealthGPS/person.h`):
 
-- ***id*** - autogenerated unique identifier number, population only, not globally unique.
-- ***age*** - current age of the individual, zero for new-borns, and updated at each time step.
-- ***gender*** - enumeration of the individual gender given at initialisation and never changes.
-- ***is_alive*** - flag indicating whether the individual’s alive status in the population, default true.
-- ***time_of_death*** - holders the time (simulation time) when the individual died, is_alive = false.
-- ***has_emigrated*** - flag indicating whether the individual has emigrated the population, default false.
-- ***ses*** - the individual’s socio-economic status (SES), a proxy value combining education and income, assigned at initialisation or birth, and stays constant over time.
-- ***risk_factors*** - hold a dynamic the list of risk factor values, key/value pairs, associated with the individual. The list is populated with all risk factors during initialisation and values are updated continuously during the simulation.
-- ***diseases*** - hold a dynamic list of diseases, key/value pairs, that at least once affected the individual. Absent from the list means that the individual never had the disease.
+- ***id*** - lifetime-unique within one population / simulation run.
+- ***age*** - years; newborns start at zero; updated each step.
+- ***gender*** - `core::Gender` (including `unknown` until set).
+- ***sector***, ***region***, ***ethnicity*** - optional demographics from config / CSV.
+- ***income***, ***income_continuous***, ***income_adjustment_stratum*** - final income category for reporting, continuous income, and optional stratum index for factors-mean adjustment.
+- ***physical_activity*** - continuous activity level where used.
+- ***is_alive*** / ***time_of_death*** - mortality status.
+- ***has_emigrated*** / migration time - emigration status.
+- ***ses*** - continuous SES noise assigned by the SES module (separate from income categories).
+- ***risk_factors*** - map of identifier to value; filled at init and updated by risk-factor models.
+- ***diseases*** - map of disease history (`DiseaseStatus` active/free, start time, time since onset for cancers).
 
-The *Disease* type stores the diseases' value, status: *Active*, indicates that the individual current has the disease; *Free*, the individual had the disease, but is now free (remission). The *start_time* value holds the time (simulation time) when the individual was diagnosed with the disease, and the *time_since_onset* holds the onset time of the disease at diagnose, used for cancers only.
-
-Helper methods are provided for easy access, for instance the `is_active` method checks all the *status flags* to indicate whether an individual is current in the simulation; and the `get_risk_factor_value` method handle the complex access to the dynamic properties.
+Helpers such as `is_active()`, `get_risk_factor_value()`, and gender/sector/income converters live on `Person`.
 
 ## Simulation Engine
 
-The *simulation engine* is responsible for managing the simulation clock, events scheduling and simulation execution order. The Health-GPS engine is based on the *Discrete Event System Specification* ([DEVS][devs]) and provided by the [ADEVS][adevs] library. DEVS formalism is a system-theoretic concept that represents inputs, states, and outputs, like a *state machine*, but with the critical addition of a time-advance function. This combination enables DEVS models to represent discrete event systems, agent-based systems as well as hybrids with continuous components in a straightforward manner. Health-GPS describes a discrete event dynamic system, which can be advantageously represented as DEVS models for greater generality, clarity, and flexibility.
+The *simulation engine* manages the clock, DEVS scheduling, and module call order. Health-GPS uses a slim ADEVS-based model (`adevs::Model<int>`), vendored under `src/external/adevs`.
 
-The DEVS model has been abstracted behind the `Simulation` base class, which defines the Health-GPS simulation engine shown below, it adds extensions to support this specific workflow, and stores the `SimulationDefinition` data structure containing the minimum information required to create a simulation. The pseudorandom number generator functionality required by the model is defined by the `RandomBitGenerator` interface, algorithms for generating sequence of numbers can be implemented and easily used by the simulation engine at runtime.
+The concrete engine is class **`hgps::Simulation`** (`src/HealthGPS/simulation.h`). There is no separate `HealthGPS` engine class and no `SimulationDefinition` type in the current tree.
 
-| ![Health-GPS Engine Interface](../images/simulation_engine_interface.png) |
-|:----------------------------------------------------------------------:|
-|                *Health-GPS Simulation Engine Interface*                |
+Construction (as used by the Console host):
 
-The default implementation of the `Simulation` interface, the *simulation engine*, is provided by the `HealthGPS` class shown below. The *simulation engine* requests the module factory to create all the required modules type instances during construction. The engine owns the module instances created by the factory and has full control over the duration of each run and time step advancements during its lifespan. The `RuntimeContext` data structure is created by the *Health-GPS engine* during construction to store the virtual population, and share common infrastructure, runtime information, and model settings with modules via calls to the public interface.
+```text
+Simulation(SimulationModuleFactory& factory,
+           shared_ptr<const EventAggregator> bus,
+           shared_ptr<const ModelInput> inputs,
+           unique_ptr<Scenario> scenario)
+```
+
+During construction the engine asks the factory for each `SimulationModuleType`, owns those modules, and builds a `RuntimeContext` (population, scenario, settings, RNG, bus). Randomness goes through the RNG held on the context (seeded per run via `setup_run`).
 
 | ![Health-GPS Engine](../images/healthgps_engine.png) |
 |:-------------------------------------------------:|
 |          *Health-GPS Simulation Engine*           |
 
-The engine enables communication with the outside world to update on progress, report errors, and publish simulation results via messaging, the `EventAggregator` and `EventSubscriber` interfaces define the required functionality that a concrete Message Bus implementation must provide as shown below. Four types of messages are current defined, however new messages can easily be added by extending the `EventMessage` interface, a single message is broadcasted to one or more subscribers.
+Outside communication uses `EventAggregator` / subscribers. Message kinds include errors, info, runner progress, analysis results, and optional individual-tracking events.
 
 | ![Health-GPS Engine](../images/message_bus_interface.png) |
 |:------------------------------------------------------:|
 |           *Health-GPS Message Bus Interface*           |
 
-A concrete *message bus* instance is provided to the *Health-GPS engine* during construction and exposed by the `RuntimeContext` via the *publish* method to streamline usage. Messages can be sent *synchronous* or *asynchronous*, depending on specific requirements, for example, *error* messages need immediate attention before continuing, usually synchronous; while notification messages are typically queued before processing, may be asynchronous.
+The host supplies the bus when constructing `Simulation`. Analysis publishes result messages; Console writers subscribe and write files.
 
-The *simulation engine* internal workflow shown below, highlights the main algorithms executed during the Health-GPS engine instance lifecycle, experiment scenario evaluation, and a single simulation run respectively. The number of simulation replications or runs required by an experiment is controlled externally by the *simulation executive*, which uses the same engine instance to complete multiple runs of the same scenario.
+The engine workflow covers lifecycle, scenario evaluation, and a single run. The **`Runner`** executive decides how many replications to execute and whether baseline alone or baseline+intervention pairs run.
 
 | ![Health-GPS Engine Workflow](../images/simulation_engine.svg) |
 |:-----------------------------------------------------------:|
 |           *Health-GPS Simulation Engine Workflow*           |
 
-The order of execution of each module and provision of parameters for each call is the responsibility of the simulation engine algorithm. The same random number generator instance is used throughout the simulation, the generator is initialised during the *Initialise* step, users can optionally provide a fixed seed to initialise the generator for reproducibility. This initialisation is sufficient for experiment with only *baseline* scenario, however experiments with *baseline* and *intervention* scenarios being evaluated together, the random number generator is reset before each run by the simulation executive to ensure reproducibility. The simulation engine consists of two main algorithms to *initialise* and *update* the virtual population over time respectively.
+Call order is fixed in `Simulation::initialise_population` / `update_population` (`src/HealthGPS/simulation.cpp`).
 
 ### Initialise Population
-
-Creating and initialising the virtual population is the first step of a simulation run, below is the sequence diagram showing the events and order of activation of the different modules by the Health-GPS algorithm.
 
 | ![Health-GPS Initialise Population](../images/initialise_sequence.svg) |
 |:-------------------------------------------------------------------:|
 |       *Initialise Population Algorithm (Sequence Diagram #1)*       |
 
-The algorithm sets the simulation world clock, in years, to the user’s defined start time, and uses the simulation module interface to request each module to initialise the relevant properties of the virtual population individuals.
+Order: Demographic -> SES -> RiskFactor -> Disease -> Analysis.
 
 ### Update Population
-
-The update population algorithm is the heart of the Health-GPS microsimulation, the sequence of events and order of activation for different modules during each time step update of the simulation is shown below. The algorithm moves the simulation clock, in years, forwards until the user’s defined end time is reached, at which point the algorithm terminates, finishing the run.
 
 | ![Health-GPS Update Population](../images/update_sequence.svg) |
 |:-----------------------------------------------------------:|
 |     *Update Population Algorithm (Sequence Diagram #2)*     |
 
-The empty squares in the Scenario timeline highlight data synchronisation points between the baseline and intervention scenarios, see next section for details.
+Order: Demographic (with disease for mortality) -> net immigration -> SES -> RiskFactor -> Disease -> Analysis.
+
+Empty squares on the scenario timeline mark synchronisation between baseline and intervention (see Policy Scenarios).
 
 ## Policy Scenarios
 
-Each simulation instance must have a single policy scenario associated as part of the experiment, the scenarios common interface definition is shown below. There are wwo types of scenarios are supported: ***Baseline*** to define the trends in the observed population to measure outcomes against; and ***Intervention*** for policies designed to change the observed trends during a specific time frame.
+Each `Simulation` takes one `Scenario`. Two kinds are used: ***Baseline*** (status-quo trends) and ***Intervention*** (policy that changes risk-factor paths for a target window). Scenario is not a `SimulationModuleType`.
 
 | ![Health-GPS Policy Scenarios Interface](../images/scenarios_interface.png) |
 |:------------------------------------------------------------------------:|
 |                    *Policy Scenario Common Interface*                    |
 
-Policy scenario is not a typical module, their implementation consists of a single function that is invoked with the information required for it to act: the individual, current time, the risk factor key, and risk factor value. The baseline scenario implementation simply loopback the *risk factor value* without making any change, independent of arguments, while the intervention scenarios definition might consist of external data, complex rules, and specific time frame to act upon invocation.
+Baseline usually passes risk-factor values through unchanged. Intervention scenarios apply policy rules (and often external data) when invoked.
 
-The current modelling of intervention scenario requires data synchronisation between the *baseline* and *intervention* scenarios at multiple points, resulting on pairs of simulations being evaluated at a time, instead of independently. The figure below illustrates the present solution, based on shared memory to work on a single machine, it creates a unidirectional channel to send messages, asynchronous, from baseline to intervention scenarios. At the receiving end, the channel is synchronous, blocking until the message arrives or a pre-defined time expires, forcing the experiment to terminate.
+Baseline and intervention runs can be paired with shared-memory synchronisation (`SyncChannel`) so the intervention side waits for baseline messages at agreed points.
 
 | ![Health-GPS Policy Scenarios Sync](../images/scenarios_sync.svg) |
 |:--------------------------------------------------------------:|
 |       *Policy Scenario’s Data Synchronisation Mechanism*       |
 
-An alternative to this design is to use a message broker, e.g., [RabbitMQ][broker], or a distributed event streaming platform such as [Apache Kafka][kafka] to distribute random generator seeds and messages over a network of computers running in pairs to scale-up the model’s virtual population size and throughput. This solution would allow for a single baseline scenario data to be shared by multiple intervention scenarios, marked reducing the requirement for simulation pair coupling.
+Scaling across machines with a broker (RabbitMQ, Kafka, and so on) is a possible future host design; the current Console path uses in-process pairing.
 
 ## Simulation Executive
 
@@ -215,11 +220,33 @@ The various components of the Health-GPS ecosystem can be deployed to multiple c
 
 The version of the *libraries* required by the application at runtime depends on the compiler being used to build Health-GPS executable. The source code is portable for compilers supporting C++20 standard, however the resulting binaries are platform *dependent* and must be built, tested, and deployed accordingly for the model to work as expected.
 
-> See [Data Model](datamodel) and [Developer Guide](development) for detailed information on the backend data storage and the various *interfaces* implementation respectively.
+> See [Data Model](datamodel.md) and [Developer Guide](development.md) for detailed information on the backend data storage and the various *interfaces* implementation respectively.
+
+---
+
+### Related documentation
+
+| Topic | Document |
+| ----- | -------- |
+| Developer docs index | [developer/README.md](README.md) |
+| Data model | [Data Model](datamodel.md) |
+| Build guide | [Developer Guide](development.md) |
+| GitHub flow | [GitHub Flow](github-flow.md) |
+| FINCH / income / predictors | [FINCH guide](../technical/guides/finch-linear-models-and-income-adjustment.md) |
+| Feb 2026 integrated changes | [Update report](../technical/guides/healthgps-update-report-2026-02-20.md) |
+| Windows MSVC builds | [MSVC troubleshooting](msvc-windows-build-troubleshooting.md) |
+| Technical docs | [Technical documentation index](../technical/README.md) |
+| Documentation home | [documentation/README.md](../README.md) |
+
+---
+
+---
+
+**Author:** Mahima Ghosh
 
 [cpp20]:https://en.cppreference.com/w/cpp/20 "C++ 20 standard features and compiler support"
 [kafka]:https://kafka.apache.org "Distributed event streaming platform"
 [broker]:https://www.rabbitmq.com "Message-broker with Advanced Message Queuing Protocol"
 [adevs]:https://web.ornl.gov/~nutarojj/adevs "A Discrete EVent System simulator library"
 [devs]:https://doi.org/10.1016/j.ifacol.2017.08.672 "From Discrete Event Simulation to Discrete Event Specified Systems (DEVS)"
-[adevsim]:https://github.com/imperialCHEPI/healthgps/blob/main/source/external/adevs/adevs_base.h#L193 "healthgps/blob/main/source/external/adevs/adevs_base.h"
+[adevsim]:https://github.com/imperialCHEPI/healthgps/blob/main/src/external/adevs/adevs_base.h "Vendored ADEVS headers under src/external/adevs"
