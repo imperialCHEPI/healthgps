@@ -4,7 +4,6 @@
 
 # Data Model
 
-**Author:** Mahima Ghosh
 
 **Interfaces:** `hgps::core::Datastore` in `src/HealthGPS.Core/datastore.h`. File-backed implementation: `hgps::input::DataManager` in `src/HealthGPS.Input/datamanager.h`.
 
@@ -286,10 +285,10 @@ Different [Data API][dataapi] implementations can be injected at construction; t
 
 ---
 
----
-
-**Author:** Mahima Ghosh
-
 [dataapi]: ../../src/HealthGPS.Core/datastore.h "Health-GPS Data API definition (Datastore)."
 
 [iso3166]: https://www.iso.org/iso-3166-country-codes.html "ISO 3166 Country Codes"
+
+---
+
+**Author:** Mahima Ghosh

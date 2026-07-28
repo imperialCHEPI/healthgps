@@ -1,7 +1,5 @@
 # GitHub Pages docs deploy troubleshooting
 
-**Author:** Mahima Ghosh
-
 **Last updated:** July 2026
 
 ## Why this exists

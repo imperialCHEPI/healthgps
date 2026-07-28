@@ -4,8 +4,6 @@
 
 # Quick Start
 
-**Author:** Mahima Ghosh
-
 The *Health GPS* application provides a *Command Line Interface* (CLI) and runs on *Windows 10 (and newer)* and *Linux* devices. All supported options are provided to the model via a [configuration][configjson] file (JSON format), including population size, intervention scenarios and number of runs. Users are encouraged to start exploring the model by using the included example dataset, changing the provided configuration file, and running the model.
 
 Pre-compiled binaries for `Windows` and `Linux` are available on the [releases page](https://github.com/imperialCHEPI/healthgps/) for generic x86-64 CPUs. If you want a version of the program tailored to your specific CPU (e.g. for HPC) or you wish to develop *Health GPS*, follow the instructions to build from source in the [developer guide](../developer/development.md). To use the binaries, you will need to unzip the downloaded file to a directory of your choice.
@@ -121,9 +119,9 @@ In a similar manner, the resulting dataset `df`, can be re-created and expanded 
 
 [← User documentation index](README.md) · [Documentation index](../README.md)
 
+[configjson]:https://github.com/imperialCHEPI/healthgps-examples/tree/main/HLM_France/config.json "Configuration file example"
+[examplesrepo]:https://github.com/imperialCHEPI/healthgps-examples "Health-GPS examples repository"
+
 ---
 
 **Author:** Mahima Ghosh
-
-[configjson]:https://github.com/imperialCHEPI/healthgps-examples/tree/main/HLM_France/config.json "Configuration file example"
-[examplesrepo]:https://github.com/imperialCHEPI/healthgps-examples "Health-GPS examples repository"

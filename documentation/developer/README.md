@@ -1,7 +1,5 @@
 # Developer documentation
 
-**Author:** Mahima Ghosh
-
 Docs for building Health-GPS, reading the architecture, and contributing.
 
 | Document | Description |

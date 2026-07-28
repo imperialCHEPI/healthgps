@@ -1,7 +1,5 @@
 # Individual ID tracking CSV (user-configured filters)
 
-**Author:** Mahima Ghosh
-
 **Related:** [Same person ID plan](same-person-id-baseline-intervention-plan.md) | [Technical index](../README.md) | [Documentation index](../../README.md)
 
 ## Plan summary
@@ -142,8 +140,6 @@ Empty arrays / "all" mean no filter for that dimension.
 7. Add MAHIMA comments in the above files.
 
 No changes to the existing `ResultEventMessage` or main JSON/CSV writing logic; the new feature is additive and gated by config.
-
----
 
 ---
 

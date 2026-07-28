@@ -1,7 +1,5 @@
 # Parallelize output writes and reduce is_active() calls
 
-**Author:** Mahima Ghosh
-
 **Related:** [Individual ID tracking plan](individual-id-tracking-csv-plan.md) | [Technical index](../README.md) | [Documentation index](../../README.md)
 
 ## Plan summary
@@ -97,8 +95,6 @@ No changes to [result_file_writer.cpp](src/HealthGPS.Console/result_file_writer.
 
 1. Phase 1: EventMonitor two-queue, two-thread parallel writes.
 2. Phase 2: In analysis_module, add is_active cache (or active index list) in the heaviest multi-pass function and replace repeated `is_active()` checks with the cache.
-
----
 
 ---
 

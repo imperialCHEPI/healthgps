@@ -1,7 +1,5 @@
 # Health-GPS performance and parallelization
 
-**Author:** Mahima Ghosh
-
 **Related:** [HealthGPS update report](healthgps-update-report-2026-02-20.md) (section 4) · [Developer Guide](../../developer/development.md) · [MSVC troubleshooting](../../developer/msvc-windows-build-troubleshooting.md) · [Technical index](../README.md)
 
 This note describes **where Health-GPS uses parallelism today** and how to tune runtime on a laptop or HPC node. It replaces an older draft that described a non-existent `ParallelRunner` API.
@@ -80,8 +78,6 @@ Do not expect near-linear speedup by raising `-T` beyond the work available per 
 | Output threading design | [Parallelize output writes plan](../plans/parallelize-output-writes-plan.md) |
 | Architecture / modules | [Software Architecture](../../developer/architecture.md) |
 | FINCH / large configs | [FINCH guide](finch-linear-models-and-income-adjustment.md) |
-
----
 
 ---
 

@@ -1,7 +1,5 @@
 # Income-stratum factors-mean adjustment (optional feature)
 
-**Author:** Mahima Ghosh
-
 **Related:** [FINCH linear models guide (modeller-facing)](../guides/finch-linear-models-and-income-adjustment.md) | [Dynamic income categories plan](dynamic-income-categories-plan.md) | [Technical index](../README.md) | [Documentation index](../../README.md)
 
 ## Plan summary

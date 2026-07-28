@@ -1,7 +1,5 @@
 # Health-GPS documentation
 
-**Author:** Mahima Ghosh
-
 This folder is the project documentation. Start here, then pick the section that matches what you need.
 
 | Section | Who it is for | Index |
@@ -14,6 +12,8 @@ There is also a longer site-style intro in [index.md](index.md) (diagrams and mo
 
 **API reference:** Page headers link to **[API (Pages)](https://imperialchepi.github.io/healthgps/api/)**. That Doxygen site is **not** checked into `documentation/`; the [docs workflow](../.github/workflows/docs.yml) builds it on deploy and publishes it under `/api` on GitHub Pages. Local clones will not have `documentation/api/`.
 
+**Diagrams:** Existing figures are SVG under `documentation/images/`. Markdown **Mermaid** blocks (`` ```mermaid ``) are rendered on GitHub.com natively but need [`_includes/head-custom.html`](_includes/head-custom.html) for the Jekyll GitHub Pages build.
+
 ---
 
 ## Quick links
@@ -22,6 +22,8 @@ There is also a longer site-style intro in [index.md](index.md) (diagrams and mo
 | ---- | ----- |
 | First run / binaries | [Quick Start](user/getstarted.md) |
 | Full user guide | [User Guide](user/userguide.md) |
+| Config JSON schemas (diagrams) | [Configuration schemas](user/schemas.md) |
+| Models and module I/O (overview) | [Models overview](user/models-overview.md) |
 | Build from source | [Developer Guide](developer/development.md) |
 | Windows build broken (`cstdint`, `MSVCRTD.lib`) | [MSVC troubleshooting](developer/msvc-windows-build-troubleshooting.md) |
 | Pages deploy failed (Configure HealthGPS) | [Docs deploy troubleshooting](developer/docs-deploy-troubleshooting.md) |
@@ -55,9 +57,7 @@ flowchart TB
 
 Build and tooling notes live under **developer/** next to the normal build guide. FINCH and feature work live under **technical/**.
 
-Questions on code paths, config, or Windows builds: **Mahima Ghosh**.
-
----
+For documentation questions, use the **Author** line at the bottom of each page.
 
 ---
 

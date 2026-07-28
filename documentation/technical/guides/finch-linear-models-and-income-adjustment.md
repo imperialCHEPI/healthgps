@@ -1,7 +1,5 @@
 # FINCH linear models, predictor encoding, and income-stratum adjustment
 
-**Author:** Mahima Ghosh
-
 **Last updated:** June 2026
 
 ## About this note

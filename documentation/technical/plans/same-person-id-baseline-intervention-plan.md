@@ -1,7 +1,5 @@
 # Same person ID across baseline and intervention
 
-**Author:** Mahima Ghosh
-
 **Related:** [Individual ID tracking plan](individual-id-tracking-csv-plan.md) | [Technical index](../README.md) | [Documentation index](../../README.md)
 
 ## Plan summary
@@ -326,8 +324,6 @@ Notes:
 
 - Bar = normalized runtime (effectively unchanged at this resolution).
 - Line = normalized extra memory factor (tiny constant increase shown illustratively).
-
----
 
 ---
 

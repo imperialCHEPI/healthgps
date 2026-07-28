@@ -1,7 +1,5 @@
 # Project requirements: config-driven behaviour (no project hacks)
 
-**Author:** Mahima Ghosh
-
 **Related:** [FINCH linear models guide](../guides/finch-linear-models-and-income-adjustment.md) | [Schema migration plan](schema-migration-plan.md) | [Technical index](../README.md) | [Documentation index](../../README.md)
 
 ## Goal

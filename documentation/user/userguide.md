@@ -4,8 +4,6 @@
 
 # User Guide
 
-**Author:** Mahima Ghosh
-
 The **Health-GPS** microsimulation is a *data driven* modelling framework, combining many disconnected data sources to support the various interacting modules during a typical simulation experiment run. The framework provides a pre-populated *backend data storage* to minimise the learning curve for simple use cases, however advance users are likely to need a more in-depth knowledge of the full modelling workflow. A high-level representation of the microsimulation user workflow is shown below, it is crucial for users to have a good appreciation for the general dataflows and processes to better design experiments, configure the tool, and quantify the results.
 
 | ![Health-GPS Workflow](../images/workflow_diagram.svg) |
@@ -100,7 +98,7 @@ The optional `project_requirements` block is shown above so FINCH / Kevin Hall /
 
 ### Schema
 
-The `$schema` property indicates the [JSON schema](https://json-schema.org/) which should be used for this model. *Health GPS* uses JSON schemas to validate various JSON input files. Where backwards compatibility is broken in the file format (i.e. for new versions of *Health GPS*), new versions of JSON schemas will be produced.
+The `$schema` property indicates the [JSON schema](https://json-schema.org/) which should be used for this model. *Health GPS* uses JSON schemas to validate various JSON input files. Where backwards compatibility is broken in the file format (i.e. for new versions of *Health GPS*), new versions of JSON schemas will be produced. For an overview with diagrams, see [Configuration schemas](schemas.md).
 
 ### Data
 

@@ -1,7 +1,5 @@
 # Schema Migration Plan: Unified Schema
 
-**Author:** Mahima Ghosh
-
 **Related:** [Project requirements plan](project-requirements-plan.md) | [Technical index](../README.md) | [Documentation index](../../README.md)
 
 ## 🎯 **Goal**
@@ -106,8 +104,6 @@ file(COPY ${CMAKE_SOURCE_DIR}/schemas/config
 - Add new properties as optional
 - Maintain backward compatibility
 - Single schema for all projects
-
----
 
 ---
 

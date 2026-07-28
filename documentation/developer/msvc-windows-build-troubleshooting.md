@@ -1,7 +1,5 @@
 # Windows MSVC / Ninja build troubleshooting
 
-**Author:** Mahima Ghosh
-
 **Last updated:** July 2026
 
 ## Why I wrote this
