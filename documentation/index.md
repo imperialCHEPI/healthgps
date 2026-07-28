@@ -1,4 +1,4 @@
-﻿## Global Health Policy Simulation model
+## Global Health Policy Simulation model
 
 {% include nav-root.md %}
 
