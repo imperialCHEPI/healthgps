@@ -1,4 +1,9 @@
-# Health-GPS documentation
+﻿# Health-GPS documentation
+
+
+## Global Health Policy Simulation model
+
+{% include nav-root.md %}
 
 This folder is the project documentation. Start here, then pick the section that matches what you need.
 
@@ -14,6 +19,8 @@ There is also a longer site-style intro in [index.md](index.md) (diagrams and mo
 
 **Diagrams:** Existing figures are SVG under `documentation/images/`. Markdown **Mermaid** blocks (`` ```mermaid ``) are rendered on GitHub.com natively but need [`_includes/head-custom.html`](_includes/head-custom.html) for the Jekyll GitHub Pages build.
 
+**Site navigation:** Most pages use `{% include nav-*.md %}` from [`_includes/`](_includes/) (paths differ for `user/`, `developer/`, `technical/`). Edit one include file to update the top link row across the site.
+
 ---
 
 ## Quick links
@@ -24,6 +31,7 @@ There is also a longer site-style intro in [index.md](index.md) (diagrams and mo
 | Full user guide | [User Guide](user/userguide.md) |
 | Config JSON schemas (diagrams) | [Configuration schemas](user/schemas.md) |
 | Models and module I/O (overview) | [Models overview](user/models-overview.md) |
+| Simulation models (detail) | [Simulation models reference](technical/guides/simulation-models-reference.md) |
 | Build from source | [Developer Guide](developer/development.md) |
 | Windows build broken (`cstdint`, `MSVCRTD.lib`) | [MSVC troubleshooting](developer/msvc-windows-build-troubleshooting.md) |
 | Pages deploy failed (Configure HealthGPS) | [Docs deploy troubleshooting](developer/docs-deploy-troubleshooting.md) |
@@ -45,6 +53,8 @@ flowchart TB
     ROOT --> TECH[technical/]
     USER --> GS[getstarted.md]
     USER --> UG[userguide.md]
+    USER --> SCH[schemas.md]
+    USER --> MOD[models-overview.md]
     DEV --> ARCH[architecture.md]
     DEV --> DM[datamodel.md]
     DEV --> DV[development.md]
@@ -52,6 +62,7 @@ flowchart TB
     DEV --> DOCSDEP[docs-deploy-troubleshooting.md]
     DEV --> GH[github-flow.md]
     TECH --> GUIDES[guides/]
+    TECH --> MODELREF[simulation-models-reference.md]
     TECH --> PLANS[plans/]
 ```
 

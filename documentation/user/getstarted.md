@@ -1,6 +1,6 @@
-## Global Health Policy Simulation model
+﻿## Global Health Policy Simulation model
 
-| [Home](../index.md) | [Quick Start](getstarted.md) | [User Guide](userguide.md) | [Software Architecture](../developer/architecture.md) | [Data Model](../developer/datamodel.md) | [Developer Guide](../developer/development.md) | [Technical docs](../technical/README.md) | [API (Pages)](https://imperialchepi.github.io/healthgps/api/) |
+{% include nav-user.md %}
 
 # Quick Start
 
@@ -117,7 +117,7 @@ In a similar manner, the resulting dataset `df`, can be re-created and expanded 
 
 ---
 
-[← User documentation index](README.md) · [Documentation index](../README.md)
+[â† User documentation index](README.md) Â· [Documentation index](../README.md)
 
 [configjson]:https://github.com/imperialCHEPI/healthgps-examples/tree/main/HLM_France/config.json "Configuration file example"
 [examplesrepo]:https://github.com/imperialCHEPI/healthgps-examples "Health-GPS examples repository"

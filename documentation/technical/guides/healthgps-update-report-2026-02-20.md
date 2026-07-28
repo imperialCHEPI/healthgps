@@ -1,9 +1,14 @@
-# HealthGPS Project Update Report
+﻿# HealthGPS Project Update Report
+
+
+## Global Health Policy Simulation model
+
+{% include nav-technical-subdir.md %}
 
 **Period:** September 2025 - February 2026
 **Last updated:** 20 February 2026
 
-**Related documentation:** [FINCH linear models guide](finch-linear-models-and-income-adjustment.md) · [Income quintile factor means plan](../plans/income-quintile-factor-means-plan.md) · [Individual ID tracking plan](../plans/individual-id-tracking-csv-plan.md) · [Same person ID plan](../plans/same-person-id-baseline-intervention-plan.md) · [Architecture guide](../../developer/architecture.md) · [Technical index](../README.md)
+**Related documentation:** [FINCH linear models guide](finch-linear-models-and-income-adjustment.md) Â· [Income quintile factor means plan](../plans/income-quintile-factor-means-plan.md) Â· [Individual ID tracking plan](../plans/individual-id-tracking-csv-plan.md) Â· [Same person ID plan](../plans/same-person-id-baseline-intervention-plan.md) Â· [Architecture guide](../../developer/architecture.md) Â· [Technical index](../README.md)
 
 ---
 
@@ -200,9 +205,9 @@ Health-GPS uses Intel TBB and core threading helpers in selected hot paths. The 
 | ---------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- | ------------------------------------------------ |
 | **Static linear model** ([static_linear_model.cpp](src/HealthGPS/static_linear_model.cpp))                                               | Sequential population loops                                 | Shared model state; ordering and reproducibility |
 | **Kevin Hall model** ([kevin_hall_model.cpp](src/HealthGPS/kevin_hall_model.cpp))                                                        | Sequential per-person updates                               | Shared parameters; temporal dependencies         |
-| **Simulation module order** ([simulation.cpp](src/HealthGPS/simulation.cpp))                                                             | Strict Demographic → SES → Risk factor → Disease → Analysis | Cross-module data dependencies                   |
+| **Simulation module order** ([simulation.cpp](src/HealthGPS/simulation.cpp))                                                             | Strict Demographic â†’ SES â†’ Risk factor â†’ Disease â†’ Analysis | Cross-module data dependencies                   |
 | **Repository / model parser** ([repository.cpp](src/HealthGPS/repository.cpp), [model_parser.cpp](src/HealthGPS.Input/model_parser.cpp)) | Single mutex on load/cache                                  | Cache consistency                                |
-| **SyncChannel** (baseline ↔ intervention)                                                                                                | Synchronous send/receive for net immigration etc.           | Deterministic scenario coupling                  |
+| **SyncChannel** (baseline â†” intervention)                                                                                                | Synchronous send/receive for net immigration etc.           | Deterministic scenario coupling                  |
 
 ### 4.3 Concurrency primitives
 
@@ -272,7 +277,7 @@ Reference: [analysis_module.cpp](src/HealthGPS/analysis_module.cpp), [result_fil
 
 ## 10. Disease module
 
-- **Population Impact Fraction (PIF):** Optional mode computes disease probability as `incidence × (1 − PIF)`, with PIF depending on age, gender, years post intervention, and disease-specific values. Configurable on/off.
+- **Population Impact Fraction (PIF):** Optional mode computes disease probability as `incidence Ã— (1 âˆ’ PIF)`, with PIF depending on age, gender, years post intervention, and disease-specific values. Configurable on/off.
 - **Outputs:** Incidence, remission, prevalence, YLD, YLL, DALY, and mortality follow existing module structure with PIF integration where enabled.
 
 Reference: [default_disease_model.cpp](src/HealthGPS/default_disease_model.cpp), [pif_data.cpp](src/HealthGPS.Input/pif_data.cpp).
@@ -321,7 +326,7 @@ Reference: [model_parser.cpp](src/HealthGPS.Input/model_parser.cpp).
 
 Per-person initialization follows this order:
 
-Age → Gender → Region (if configured) → Ethnicity (if configured) → Sector (if configured) → Income → [Categorical: direct assignment (e.g. India) **or** Continuous: compute value, rank, assign categories (e.g. FINCH)] → Risk factors → [Two-stage: logistic then Box-Cox **or** Box-Cox only] → Physical activity → [Simple PA **or** continuous PA regression] → Adjust to factors mean (if enabled) → Policies (if enabled) → Trends (if enabled) → Trended risk-factor adjustment → Disease model.
+Age â†’ Gender â†’ Region (if configured) â†’ Ethnicity (if configured) â†’ Sector (if configured) â†’ Income â†’ [Categorical: direct assignment (e.g. India) **or** Continuous: compute value, rank, assign categories (e.g. FINCH)] â†’ Risk factors â†’ [Two-stage: logistic then Box-Cox **or** Box-Cox only] â†’ Physical activity â†’ [Simple PA **or** continuous PA regression] â†’ Adjust to factors mean (if enabled) â†’ Policies (if enabled) â†’ Trends (if enabled) â†’ Trended risk-factor adjustment â†’ Disease model.
 
 ```mermaid
 flowchart TB

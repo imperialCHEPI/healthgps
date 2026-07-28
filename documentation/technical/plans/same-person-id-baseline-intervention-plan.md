@@ -1,4 +1,9 @@
-# Same person ID across baseline and intervention
+﻿# Same person ID across baseline and intervention
+
+
+## Global Health Policy Simulation model
+
+{% include nav-technical-subdir.md %}
 
 **Related:** [Individual ID tracking plan](individual-id-tracking-csv-plan.md) | [Technical index](../README.md) | [Documentation index](../../README.md)
 
@@ -81,7 +86,7 @@ flowchart LR
   - e.g. `people_.reserve(size);` then `for (size_t i = 0; i < size; ++i) people_.emplace_back(i + 1);`
   - Use the new `Person(std::size_t id)` constructor.
 - **add_newborn_babies** (MAHIMA):
-  - When **replacing** a recycled slot at index `recycle.at(index)`: create `Person(gender, recycle.at(index) + 1)` so the newborn gets that slot’s ID.
+  - When **replacing** a recycled slot at index `recycle.at(index)`: create `Person(gender, recycle.at(index) + 1)` so the newborn gets that slotâ€™s ID.
   - When **emplace_back** (no recycle): create `Person(gender, people_.size() + 1)` so the new slot gets ID = new index + 1.
 - **add** (MAHIMA):
   - After `people_.at(recycle.at(0)) = std::move(person)`: call `people_.at(recycle.at(0)).set_id(recycle.at(0) + 1)`.

@@ -1,24 +1,29 @@
-# Schema Migration Plan: Unified Schema
+﻿# Schema Migration Plan: Unified Schema
+
+
+## Global Health Policy Simulation model
+
+{% include nav-technical-subdir.md %}
 
 **Related:** [Project requirements plan](project-requirements-plan.md) | [Technical index](../README.md) | [Documentation index](../../README.md)
 
-## 🎯 **Goal**
+## ðŸŽ¯ **Goal**
 
 Consolidate v1 and v2 schemas into a single unified schema that works for all use cases.
 
-## 📋 **Current State**
+## ðŸ“‹ **Current State**
 
 - **v1 schemas**: Basic features, used by India project
 - **v2 schemas**: Extended features (PhysicalActivityModels, Trend properties), used by FINCH project
 - **Problem**: Version management complexity, maintenance overhead
 
-## ✅ **New Unified Schema**
+## âœ… **New Unified Schema**
 
 - **Location**: `schemas/config/models/staticlinear.json`
 - **Features**: Combines all v1 and v2 features
 - **Backward Compatibility**: Works with both old and new configurations
 
-## 🔄 **Migration Steps**
+## ðŸ”„ **Migration Steps**
 
 ### **Step 1: Update CMake Configuration**
 
@@ -37,16 +42,16 @@ file(COPY ${CMAKE_SOURCE_DIR}/schemas/config
 
 ### **Step 3: Test Both Projects**
 
-- ✅ India project (v1 features)
-- ✅ FINCH project (v2 features)
-- ✅ Future projects (all features)
+- âœ… India project (v1 features)
+- âœ… FINCH project (v2 features)
+- âœ… Future projects (all features)
 
 ### **Step 4: Clean Up (Optional)**
 
 - Remove v1 and v2 schema directories
 - Update documentation
 
-## 🚀 **Benefits**
+## ðŸš€ **Benefits**
 
 ### **For Developers:**
 
@@ -61,21 +66,21 @@ file(COPY ${CMAKE_SOURCE_DIR}/schemas/config
 - **FINCH**: Works with continuous income, PhysicalActivityModels
 - **Future**: Can use any combination of features
 
-## 📊 **Schema Features Matrix**
+## ðŸ“Š **Schema Features Matrix**
 
 | Feature | v1 | v2 | Unified | Status |
 |---------|----|----|---------|--------|
-| Basic IncomeModels | ✅ | ✅ | ✅ | ✅ |
-| Flexible Income Categories | ✅ | ✅ | ✅ | ✅ |
-| Region Definitions | ✅ | ✅ | ✅ | ✅ |
-| Ethnicity Definitions | ✅ | ✅ | ✅ | ✅ |
-| PhysicalActivityModels | ❌ | ✅ | ✅ | ✅ |
-| Trend Properties | ❌ | ✅ | ✅ | ✅ |
-| Required Fields | ❌ | ✅ | ✅ | ✅ |
-| project_requirements (optional) | N/A | ✅ | ✅ | Optional in v1 config; legacy configs work without it |
-| output.individual_id_tracking | ❌ | ❌ | ✅ | Optional; per-person CSV tracking (MAHIMA) |
+| Basic IncomeModels | âœ… | âœ… | âœ… | âœ… |
+| Flexible Income Categories | âœ… | âœ… | âœ… | âœ… |
+| Region Definitions | âœ… | âœ… | âœ… | âœ… |
+| Ethnicity Definitions | âœ… | âœ… | âœ… | âœ… |
+| PhysicalActivityModels | âŒ | âœ… | âœ… | âœ… |
+| Trend Properties | âŒ | âœ… | âœ… | âœ… |
+| Required Fields | âŒ | âœ… | âœ… | âœ… |
+| project_requirements (optional) | N/A | âœ… | âœ… | Optional in v1 config; legacy configs work without it |
+| output.individual_id_tracking | âŒ | âŒ | âœ… | Optional; per-person CSV tracking (MAHIMA) |
 
-## 🔧 **Implementation Notes**
+## ðŸ”§ **Implementation Notes**
 
 ### **Backward Compatibility:**
 

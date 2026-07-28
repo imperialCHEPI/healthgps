@@ -1,4 +1,9 @@
-# Technical documentation
+﻿# Technical documentation
+
+
+## Global Health Policy Simulation model
+
+{% include nav-technical.md %}
 
 Implementation notes, project reports, and modeller guides (FINCH, India, shared codebase).
 

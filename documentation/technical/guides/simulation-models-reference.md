@@ -1,4 +1,9 @@
-# Simulation models reference
+﻿# Simulation models reference
+
+
+## Global Health Policy Simulation model
+
+{% include nav-technical-subdir.md %}
 
 **Related:** [Models overview (site summary)](../user/models-overview.md) | [User Guide](../user/userguide.md) | [Architecture](../developer/architecture.md) | [FINCH guide](finch-linear-models-and-income-adjustment.md) | [Configuration schemas](../user/schemas.md)
 
@@ -32,7 +37,7 @@ On **`Simulation.init`** (initialise population):
 
 1. Demographic
 2. SES
-3. Risk factor — **static** models only
+3. Risk factor â€” **static** models only
 4. Disease
 5. Analysis (initial statistics)
 
@@ -41,7 +46,7 @@ On each **`Simulation.update`** (one simulated year):
 1. Demographic update
 2. Net immigration
 3. SES update
-4. Risk factor — **dynamic** models
+4. Risk factor â€” **dynamic** models
 5. Disease update
 6. Analysis update (publish results)
 
@@ -72,7 +77,7 @@ See [Update report](healthgps-update-report-2026-02-20.md) for diagrams aligned 
 | **Purpose** | Assign continuous socio-economic noise used as a predictor in hierarchical models. |
 | **Config** | `modelling.ses_model` (`function_name`, `function_parameters`). |
 | **Person fields** | `ses` (fixed after assignment in simple setups). |
-| **Note** | **Income** (categories, continuous value, quintiles) is configured via `project_requirements` and FINCH/India pipelines — not the same as `ses`. See [FINCH guide](finch-linear-models-and-income-adjustment.md). |
+| **Note** | **Income** (categories, continuous value, quintiles) is configured via `project_requirements` and FINCH/India pipelines â€” not the same as `ses`. See [FINCH guide](finch-linear-models-and-income-adjustment.md). |
 
 ---
 
@@ -81,8 +86,8 @@ See [Update report](healthgps-update-report-2026-02-20.md) for diagrams aligned 
 | | |
 | --- | --- |
 | **Purpose** | Load and run registered **static** and **dynamic** model definitions on each person. |
-| **Config** | `modelling.risk_factor_models` map (`"static"` / `"dynamic"` → file path), `modelling.risk_factors` hierarchy, `dynamic_risk_factor` name, `baseline_adjustments`. |
-| **Registration** | `register_risk_factor_model_definitions()` in `model_parser.cpp` reads each file’s **`ModelName`**. |
+| **Config** | `modelling.risk_factor_models` map (`"static"` / `"dynamic"` â†’ file path), `modelling.risk_factors` hierarchy, `dynamic_risk_factor` name, `baseline_adjustments`. |
+| **Registration** | `register_risk_factor_model_definitions()` in `model_parser.cpp` reads each fileâ€™s **`ModelName`**. |
 | **Person fields** | `risk_factors` map (and model-specific fields such as `physical_activity`, height/weight where implemented). |
 | **Outputs** | Risk-factor distributions feed disease incidence; analysis aggregates RF exposure. |
 
@@ -94,13 +99,13 @@ Supported **`ModelName`** values are listed in `schemas/v1/config/models/static.
 
 | | |
 | --- | --- |
-| **Typical use** | STOP / HLM France — hierarchical ICA-based initialisation. |
+| **Typical use** | STOP / HLM France â€” hierarchical ICA-based initialisation. |
 | **Schema** | [`schemas/v1/config/models/hlm.json`](https://github.com/imperialCHEPI/healthgps/blob/main/schemas/v1/config/models/hlm.json) |
 | **Input file** | JSON: per-RF regressions (`models`), `levels` with ICA matrices (`m`, `w`, `s`, variances), large residual arrays. |
 | **When it runs** | Population initialisation only (`RiskFactorModelType::Static`). |
 | **Outputs** | Initial values in `Person.risk_factors` preserving cross-sectional correlation structure. |
 | **Example pack** | [HLM_France](https://github.com/imperialCHEPI/healthgps-examples/tree/main/HLM_France) |
-| **User doc** | [User Guide — Static](user/userguide.md#static) |
+| **User doc** | [User Guide â€” Static](user/userguide.md#static) |
 
 **Memory note:** Residual arrays scale with fitting sample size *N*; prefer `staticlinear` / lite dynamic stacks for large fitting datasets.
 
@@ -110,7 +115,7 @@ Supported **`ModelName`** values are listed in `schemas/v1/config/models/static.
 
 | | |
 | --- | --- |
-| **Typical use** | FINCH, India-style configs — CSV-driven linear predictors, optional region/ethnicity files. |
+| **Typical use** | FINCH, India-style configs â€” CSV-driven linear predictors, optional region/ethnicity files. |
 | **Schema** | [`schemas/v1/config/models/staticlinear.json`](https://github.com/imperialCHEPI/healthgps/blob/main/schemas/v1/config/models/staticlinear.json) |
 | **Input files** | JSON wrapper pointing at CSVs (coefficients, factors means, ethnicity, region, etc.); structure in schema and [FINCH guide](finch-linear-models-and-income-adjustment.md). |
 | **When it runs** | Initialisation; may also supply data loaded for region/ethnicity tables. |
@@ -128,7 +133,7 @@ Supported **`ModelName`** values are listed in `schemas/v1/config/models/static.
 | **Input file** | JSON: country metadata, `RiskFactors` hierarchy with levels/ranges, regression coefficients, residual SDs (compact vs static HLM). |
 | **When it runs** | Each simulated year after demographics/SES. |
 | **Outputs** | Updated `Person.risk_factors` within configured bounds. |
-| **User doc** | [User Guide — Dynamic](user/userguide.md#dynamic) |
+| **User doc** | [User Guide â€” Dynamic](user/userguide.md#dynamic) |
 
 ---
 
@@ -163,7 +168,7 @@ Supported **`ModelName`** values are listed in `schemas/v1/config/models/static.
 | **Config** | Disease selection under `running`, relative risks from datastore, optional `population_impact_fraction`. |
 | **Person fields** | `diseases` map (`DiseaseStatus`, onset times). |
 | **Outputs** | Disease counts and BoD inputs to analysis. |
-| **User doc** | [User Guide — Diseases](user/userguide.md#diseases) |
+| **User doc** | [User Guide â€” Diseases](user/userguide.md#diseases) |
 
 ---
 
@@ -174,9 +179,9 @@ Supported **`ModelName`** values are listed in `schemas/v1/config/models/static.
 | **Purpose** | Aggregate population statistics each time step; optional individual tracking events. |
 | **Inputs** | Full population, scenario id (baseline/intervention), run number, clock. |
 | **Bus messages** | `ResultEventMessage`; optional `IndividualTrackingEventMessage` when tracking enabled. |
-| **Host writers** | `ResultFileWriter` → JSON + main CSV + optional income-stratum CSVs; `IndividualIDTrackingWriter` → filtered per-person CSV. |
+| **Host writers** | `ResultFileWriter` â†’ JSON + main CSV + optional income-stratum CSVs; `IndividualIDTrackingWriter` â†’ filtered per-person CSV. |
 | **Config** | `output.folder`, `output.file_name`, `output.individual_id_tracking`, `project_requirements.income.income_based_csv_output`. |
-| **User doc** | [User Guide — Analysis](user/userguide.md#analysis), [Results](user/userguide.md#results) |
+| **User doc** | [User Guide â€” Analysis](user/userguide.md#analysis), [Results](user/userguide.md#results) |
 
 Same **person ID** in baseline and intervention for the initial cohort enables joining tracking rows across scenarios; see [same-person ID plan](../plans/same-person-id-baseline-intervention-plan.md).
 
@@ -188,7 +193,7 @@ Same **person ID** in baseline and intervention for the initial cohort enables j
 | --- | --- |
 | **Purpose** | Baseline vs intervention: same module stack, different `Scenario` implementation (fiscal, marketing, food labelling, physical activity, etc.). |
 | **Config** | `running` intervention blocks, `modelling.policy_start_year`, policy CSVs in FINCH packs. |
-| **Sync** | Aggregate tables (e.g. net migration, residual mortality) can flow baseline → intervention; not person-level clones. |
+| **Sync** | Aggregate tables (e.g. net migration, residual mortality) can flow baseline â†’ intervention; not person-level clones. |
 | **Outputs** | Result rows tagged by **source** (baseline/intervention) in JSON/CSV. |
 
 ---
@@ -197,7 +202,7 @@ Same **person ID** in baseline and intervention for the initial cohort enables j
 
 | Item | Location |
 | ---- | -------- |
-| Model name → loader | `src/HealthGPS.Input/model_parser.cpp` (`load_risk_model_definition`, `get_model_schema_version`) |
+| Model name â†’ loader | `src/HealthGPS.Input/model_parser.cpp` (`load_risk_model_definition`, `get_model_schema_version`) |
 | Module interfaces | `src/HealthGPS/interfaces.h`, `risk_factor_model.h` |
 | Simulation order | `src/HealthGPS/simulation.cpp` |
 | Console registration | `src/HealthGPS.Console/program.cpp` |

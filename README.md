@@ -1,13 +1,11 @@
 # Global Health Policy Simulation model (Health-GPS)
 
-[![CI](https://github.com/imperialCHEPI/healthgps/actions/workflows/ci.yml/badge.svg)](https://github.com/imperialCHEPI/healthgps/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/github/imperialCHEPI/healthgps/graph/badge.svg?token=745WKKE6X0)](https://codecov.io/github/imperialCHEPI/healthgps)
-![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/imperialCHEPI/healthgps?include_prereleases)
-![GitHub](https://img.shields.io/github/license/imperialCHEPI/healthgps)
+[CI](https://github.com/imperialCHEPI/healthgps/actions/workflows/ci.yml)
+[codecov](https://codecov.io/github/imperialCHEPI/healthgps)
+GitHub release (latest by date including pre-releases)
+GitHub
 
 | [Quick Start](#quick-start) | [Documentation](#documentation) | [February 2026 updates](#february-2026-updates) | [Development Tools](#development-tools) | [License](#license) | [Third-party Components](#third-party-components) |
-
-**Author:** Mahima Ghosh
 
 Health-GPS microsimulation is part of the [STOP project](https://www.stopchildobesity.eu/), and supports researchers and policy makers in the analysis of the health and economic impacts of alternative measures to tackle *chronic diseases* and *obesity in children*. The model reproduces the characteristics of a population and simulates key individual event histories associated with key components of relevant behaviours, such as physical activity, and diseases such as diabetes or cancer.
 
@@ -17,23 +15,28 @@ The *Health GPS microsimulation* is being developed in collaboration between the
 
 ## Documentation
 
-Full docs live under [`documentation/`](documentation/README.md). Start there for indexes by audience.
+Full docs live under `[documentation/](documentation/README.md)`. Start there for indexes by audience.
 
-| Need | Document |
-| ---- | -------- |
-| Documentation home | [documentation/README.md](documentation/README.md) |
-| Site-style intro (diagrams) | [documentation/index.md](documentation/index.md) |
-| First run / binaries | [Quick Start](documentation/user/getstarted.md) |
-| Config, outputs, HPC | [User Guide](documentation/user/userguide.md) |
-| Build from source / CMake | [Developer Guide](documentation/developer/development.md) |
-| Architecture | [Software Architecture](documentation/developer/architecture.md) |
-| Data model / Datastore | [Data Model](documentation/developer/datamodel.md) |
-| Windows MSVC / Ninja (`cstdint`, `MSVCRTD.lib`) | [MSVC troubleshooting](documentation/developer/msvc-windows-build-troubleshooting.md) |
-| FINCH / income / predictors | [FINCH guide](documentation/technical/guides/finch-linear-models-and-income-adjustment.md) |
-| Feb 2026 integrated changes | [Update report](documentation/technical/guides/healthgps-update-report-2026-02-20.md) |
-| Threading / HPC sizing | [Performance guide](documentation/technical/guides/performance-optimizations.md) |
-| Feature plans | [technical/README.md](documentation/technical/README.md) |
-| Doxygen API (GitHub Pages) | [API](https://imperialchepi.github.io/healthgps/api/) |
+
+| Need                                            | Document                                                                                   |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Documentation home                              | [documentation/README.md](documentation/README.md)                                         |
+| Site-style intro (diagrams)                     | [documentation/index.md](documentation/index.md)                                           |
+| First run / binaries                            | [Quick Start](documentation/user/getstarted.md)                                            |
+| Config, outputs, HPC                            | [User Guide](documentation/user/userguide.md)                                              |
+| JSON schemas (diagrams)                         | [Configuration schemas](documentation/user/schemas.md)                                     |
+| Models and module I/O                           | [Models overview](documentation/user/models-overview.md) · [Simulation models reference](documentation/technical/guides/simulation-models-reference.md) |
+| Build from source / CMake                       | [Developer Guide](documentation/developer/development.md)                                  |
+| Architecture                                    | [Software Architecture](documentation/developer/architecture.md)                           |
+| Data model / Datastore                          | [Data Model](documentation/developer/datamodel.md)                                         |
+| Windows MSVC / Ninja (`cstdint`, `MSVCRTD.lib`) | [MSVC troubleshooting](documentation/developer/msvc-windows-build-troubleshooting.md)      |
+| GitHub Pages deploy failed                      | [Docs deploy troubleshooting](documentation/developer/docs-deploy-troubleshooting.md)    |
+| FINCH / income / predictors                     | [FINCH guide](documentation/technical/guides/finch-linear-models-and-income-adjustment.md) |
+| Feb 2026 integrated changes                     | [Update report](documentation/technical/guides/healthgps-update-report-2026-02-20.md)      |
+| Threading / HPC sizing                          | [Performance guide](documentation/technical/guides/performance-optimizations.md)           |
+| Feature plans                                   | [technical/README.md](documentation/technical/README.md)                                   |
+| Doxygen API (GitHub Pages)                      | [API](https://imperialchepi.github.io/healthgps/api/)                                      |
+
 
 Published website: [https://imperialchepi.github.io/healthgps/](https://imperialchepi.github.io/healthgps/). It is rebuilt from `documentation/` by the [docs workflow](.github/workflows/docs.yml) on **release** or **manual dispatch**, not on every push. Until that workflow runs against the current tree, the live site may lag the repo (older flat page layout).
 
@@ -52,6 +55,8 @@ flowchart LR
     RF --> DIS[Disease Module]
     DIS --> IO[Read/write to files]
 ```
+
+
 
 **Host application, run loop, module order, and output:**
 
@@ -127,6 +132,8 @@ flowchart TB
     A_UPD --> PUB
 ```
 
+
+
 **Person initialisation sequence (overview):**
 
 ```mermaid
@@ -160,6 +167,10 @@ flowchart TB
     P --> Q[Kevin Hall Model]
     Q --> R[Disease Model]
 ```
+
+
+
+
 
 ## Project Status and Recent Progress
 
@@ -199,6 +210,8 @@ Relevant design documents (under `documentation/technical/plans/`):
 
 ---
 
+
+
 ## Project Specific Requirements
 
 Health-GPS is driven by config flags (not hard-coded project names). Optional `project_requirements` in `config.json` controls demographics (region, ethnicity, `gender2`), income type and final category count (`3` / `4` / `5`), physical activity, trends, and two-stage logistic behaviour. See:
@@ -208,6 +221,8 @@ Health-GPS is driven by config flags (not hard-coded project names). Optional `p
 - Schema: `schemas/v1/config/project_requirements.json`
 
 ---
+
+
 
 ## FINCH: Age/Gender/Income-Based Model Validation
 
@@ -252,7 +267,7 @@ For more information, see the [documentation home](documentation/README.md), [Qu
 
 ## Development Tools
 
-The *Health GPS* software is written in modern, standard ANSI C++, targeting the [C++20 version](https://en.cppreference.com/w/cpp/20) and using the C++ Standard Library. The project is fully managed by [CMake](https://cmake.org/) and [Microsoft Visual Studio](https://visualstudio.microsoft.com), the code base is portable but requires a C++20 compatible compiler to build. The development toolset uses [Ninja](https://ninja-build.org/) for build, [vcpkg](https://github.com/microsoft/vcpkg) package manager for dependencies, [googletest](https://github.com/google/googletest) for unit testing and [GitHub Actions](https://docs.github.com/en/actions) for automated builds.
+The *Health GPS* software is written in modern, standard ANSI C++, targeting the [C++20 version]([https://en.cppreference.com/w/cpp/20](https://en.cppreference.com/w/cpp/20)) and using the C++Standard Library. The project is fully managed by [CMake](https://cmake.org/) and [Microsoft Visual Studio](https://visualstudio.microsoft.com), the code base is portable but requires a C++20 compatible compiler to build. The development toolset uses [Ninja](https://ninja-build.org/) for build, [vcpkg](https://github.com/microsoft/vcpkg) package manager for dependencies, [googletest](https://github.com/google/googletest) for unit testing and [GitHub Actions](https://docs.github.com/en/actions) for automated builds.
 
 For more information, see the [Developer Guide](documentation/developer/development.md). On Windows, if CMake cannot find headers such as `cstdint` or linking fails on `MSVCRTD.lib`, see [MSVC / Ninja troubleshooting](documentation/developer/msvc-windows-build-troubleshooting.md).
 
@@ -262,12 +277,17 @@ The code in this repository is licensed under the [BSD 3-Clause](LICENSE.txt) li
 
 ---
 
+
+
 ## Third-party components
+
+
 
 ### Libraries
 
+
 | Name                                                          | License      |
-|:--------------------------------------------------------------|:-------------|
+| ------------------------------------------------------------- | ------------ |
 | [Adevs](https://sourceforge.net/projects/adevs)               | BSD 3-Clause |
 | [crossguid](https://github.com/graeme-hill/crossguid)         | MIT          |
 | [cxxopts](https://github.com/jarro2783/cxxopts)               | MIT          |
@@ -282,12 +302,17 @@ The code in this repository is licensed under the [BSD 3-Clause](LICENSE.txt) li
 | [PlatformFolders](https://github.com/sago007/PlatformFolders) | MIT          |
 | [curlpp](http://www.curlpp.org)                               | MIT          |
 
+
+
+
 ### Tools and Frameworks
 
+
 | Name                                               | License      |
-|:---------------------------------------------------|:-------------|
+| -------------------------------------------------- | ------------ |
 | [vcpkg](https://github.com/microsoft/vcpkg)        | MIT          |
 | [googletest](https://github.com/google/googletest) | BSD 3-Clause |
+
 
 ---
 

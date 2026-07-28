@@ -1,4 +1,9 @@
-# Health-GPS performance and parallelization
+﻿# Health-GPS performance and parallelization
+
+
+## Global Health Policy Simulation model
+
+{% include nav-technical-subdir.md %}
 
 **Related:** [HealthGPS update report](healthgps-update-report-2026-02-20.md) (section 4) · [Developer Guide](../../developer/development.md) · [MSVC troubleshooting](../../developer/msvc-windows-build-troubleshooting.md) · [Technical index](../README.md)
 
@@ -8,7 +13,7 @@ This note describes **where Health-GPS uses parallelism today** and how to tune 
 
 ## What is parallel today
 
-Trials (replications) still run **one after another** inside `hgps::Runner` (`src/HealthGPS/runner.cpp`). There is **no** built-in “run four trials at once” mode in the Console.
+Trials (replications) still run **one after another** inside `hgps::Runner` (`src/HealthGPS/runner.cpp`). There is **no** built-in â€œrun four trials at onceâ€ mode in the Console.
 
 Parallelism instead comes from:
 
@@ -43,11 +48,11 @@ See also the HPC thread note in the [Developer Guide](../../developer/developmen
 
 ## HPC job sizing (practical)
 
-There is no automatic “optimal core count.” Start from:
+There is no automatic â€œoptimal core count.â€ Start from:
 
 1. **Population size and trial count** in `config.json` (`running.trial_runs`, `inputs.settings.size_fraction`).
 2. **One process per array task** when using PBS array jobs (parallelism across jobs, not inside one Console process).
-3. **`-T`** set to the cores you reserved on that node (often 8–64 for France-scale examples).
+3. **`-T`** set to the cores you reserved on that node (often 8â€“64 for France-scale examples).
 
 Example job fragment (config holds `data.source`; prefer `-c` over deprecated `-f` / `-s`):
 

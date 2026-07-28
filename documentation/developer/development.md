@@ -1,6 +1,6 @@
-## Global Health Policy Simulation model
+﻿## Global Health Policy Simulation model
 
-| [Home](../index.md) | [Quick Start](../user/getstarted.md) | [User Guide](../user/userguide.md) | [Software Architecture](architecture.md) | [Data Model](datamodel.md) | [Developer Guide](development.md) | [Technical docs](../technical/README.md) | [API (Pages)](https://imperialchepi.github.io/healthgps/api/) |
+{% include nav-developer.md %}
 
 # Developer Guide
 

@@ -1,4 +1,9 @@
-# Windows MSVC / Ninja build troubleshooting
+﻿# Windows MSVC / Ninja build troubleshooting
+
+
+## Global Health Policy Simulation model
+
+{% include nav-developer.md %}
 
 **Last updated:** July 2026
 

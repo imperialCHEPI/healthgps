@@ -1,4 +1,9 @@
-# GitHub Pages docs deploy troubleshooting
+﻿# GitHub Pages docs deploy troubleshooting
+
+
+## Global Health Policy Simulation model
+
+{% include nav-developer.md %}
 
 **Last updated:** July 2026
 
@@ -9,7 +14,7 @@ The public site ([imperialchepi.github.io/healthgps](https://imperialchepi.githu
 - a published **release**, or
 - a manual **workflow_dispatch** from the Actions tab
 
-Markdown/Jekyll and the Doxygen API are built in the same job. If CMake configure fails, the whole deploy fails — including the markdown site — even when Jekyll itself succeeded.
+Markdown/Jekyll and the Doxygen API are built in the same job. If CMake configure fails, the whole deploy fails â€” including the markdown site â€” even when Jekyll itself succeeded.
 
 ### Related documentation
 
@@ -33,7 +38,7 @@ Markdown/Jekyll and the Doxygen API are built in the same job. If CMake configur
 
 ## 1. Symptoms
 
-On GitHub → **Actions** → **Deploy Jekyll and Doxygen**:
+On GitHub â†’ **Actions** â†’ **Deploy Jekyll and Doxygen**:
 
 | Step | Typical result when this issue hits |
 | ---- | ----------------------------------- |
@@ -43,7 +48,7 @@ On GitHub → **Actions** → **Deploy Jekyll and Doxygen**:
 | Build with doxygen | Skipped |
 | Upload artifact / deploy | Skipped |
 
-The annotation often only says `Process completed with exit code 1` on the Configure step. Open that step’s log for the real CMake/vcpkg error.
+The annotation often only says `Process completed with exit code 1` on the Configure step. Open that stepâ€™s log for the real CMake/vcpkg error.
 
 The live Pages site keeps the **previous** successful deploy until a new run succeeds.
 
@@ -91,7 +96,7 @@ In `.github/workflows/docs.yml`, keep vcpkg caching in sync with `.github/workfl
 - `VCPKG_BINARY_SOURCES: clear;x-gha,readwrite`
 - A step that exports `ACTIONS_CACHE_URL` and `ACTIONS_RUNTIME_TOKEN` before Install VCPKG / Configure
 
-Commit, push to `main`, then re-run **Deploy Jekyll and Doxygen** (Actions → workflow → **Run workflow**).
+Commit, push to `main`, then re-run **Deploy Jekyll and Doxygen** (Actions â†’ workflow â†’ **Run workflow**).
 
 ### 3.3 If Configure still fails
 
@@ -121,7 +126,7 @@ Remember nested paths under `user/`, `developer/`, and `technical/` may differ f
 - [ ] Failed step is **Configure HealthGPS**, not Jekyll
 - [ ] Read the Configure log (not only the annotation)
 - [ ] `docs.yml` vcpkg cache matches `ci.yml` (`x-gha` + cache env export)
-- [ ] Same commit’s CI configure is green (or understand why it isn’t)
+- [ ] Same commitâ€™s CI configure is green (or understand why it isnâ€™t)
 - [ ] Re-run **Deploy Jekyll and Doxygen** after the fix
 - [ ] Confirm `/` and `/api/` on Pages
 

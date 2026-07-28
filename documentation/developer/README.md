@@ -1,4 +1,9 @@
-# Developer documentation
+﻿# Developer documentation
+
+
+## Global Health Policy Simulation model
+
+{% include nav-developer.md %}
 
 Docs for building Health-GPS, reading the architecture, and contributing.
 

@@ -1,4 +1,9 @@
-# Dynamic Final Income Categories (3/4/5) + Stratum Adjustment
+﻿# Dynamic Final Income Categories (3/4/5) + Stratum Adjustment
+
+
+## Global Health Policy Simulation model
+
+{% include nav-technical-subdir.md %}
 
 **Related:** [FINCH linear models guide](../guides/finch-linear-models-and-income-adjustment.md) | [Income quintile factor means plan](income-quintile-factor-means-plan.md) | [Technical index](../README.md) | [Documentation index](../../README.md)
 
