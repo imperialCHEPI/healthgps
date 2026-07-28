@@ -24,6 +24,7 @@ There is also a longer site-style intro in [index.md](index.md) (diagrams and mo
 | Full user guide | [User Guide](user/userguide.md) |
 | Build from source | [Developer Guide](developer/development.md) |
 | Windows build broken (`cstdint`, `MSVCRTD.lib`) | [MSVC troubleshooting](developer/msvc-windows-build-troubleshooting.md) |
+| Pages deploy failed (Configure HealthGPS) | [Docs deploy troubleshooting](developer/docs-deploy-troubleshooting.md) |
 | Architecture | [Software Architecture](developer/architecture.md) |
 | Data model | [Data Model](developer/datamodel.md) |
 | FINCH / Kevin Hall inputs | [FINCH guide](technical/guides/finch-linear-models-and-income-adjustment.md) |
@@ -46,6 +47,7 @@ flowchart TB
     DEV --> DM[datamodel.md]
     DEV --> DV[development.md]
     DEV --> MSVC[msvc-windows-build-troubleshooting.md]
+    DEV --> DOCSDEP[docs-deploy-troubleshooting.md]
     DEV --> GH[github-flow.md]
     TECH --> GUIDES[guides/]
     TECH --> PLANS[plans/]
