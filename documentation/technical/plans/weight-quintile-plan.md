@@ -1,5 +1,4 @@
-﻿# Weight quantiles by income adjustment stratum
-
+# Weight quantiles by income adjustment stratum
 
 ## Global Health Policy Simulation model
 

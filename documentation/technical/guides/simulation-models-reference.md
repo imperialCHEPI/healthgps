@@ -1,5 +1,4 @@
-﻿# Simulation models reference
-
+# Simulation models reference
 
 ## Global Health Policy Simulation model
 

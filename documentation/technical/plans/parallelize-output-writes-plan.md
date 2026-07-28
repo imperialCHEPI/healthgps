@@ -1,5 +1,4 @@
-﻿# Parallelize output writes and reduce is_active() calls
-
+# Parallelize output writes and reduce is_active() calls
 
 ## Global Health Policy Simulation model
 

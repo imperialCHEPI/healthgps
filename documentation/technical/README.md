@@ -1,5 +1,4 @@
-﻿# Technical documentation
-
+# Technical documentation
 
 ## Global Health Policy Simulation model
 

@@ -1,5 +1,4 @@
-﻿# Same person ID across baseline and intervention
-
+# Same person ID across baseline and intervention
 
 ## Global Health Policy Simulation model
 

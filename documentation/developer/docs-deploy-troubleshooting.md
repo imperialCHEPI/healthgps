@@ -1,5 +1,4 @@
-﻿# GitHub Pages docs deploy troubleshooting
-
+# GitHub Pages docs deploy troubleshooting
 
 ## Global Health Policy Simulation model
 

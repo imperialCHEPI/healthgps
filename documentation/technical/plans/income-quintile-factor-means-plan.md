@@ -1,5 +1,4 @@
-﻿# Income-stratum factors-mean adjustment (optional feature)
-
+# Income-stratum factors-mean adjustment (optional feature)
 
 ## Global Health Policy Simulation model
 

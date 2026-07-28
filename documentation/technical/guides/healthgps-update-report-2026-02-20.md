@@ -1,5 +1,4 @@
-﻿# HealthGPS Project Update Report
-
+# HealthGPS Project Update Report
 
 ## Global Health Policy Simulation model
 

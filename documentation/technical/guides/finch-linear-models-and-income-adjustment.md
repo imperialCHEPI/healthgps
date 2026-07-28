@@ -1,5 +1,4 @@
-﻿# FINCH linear models, predictor encoding, and income-stratum adjustment
-
+# FINCH linear models, predictor encoding, and income-stratum adjustment
 
 ## Global Health Policy Simulation model
 

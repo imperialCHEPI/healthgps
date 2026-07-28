@@ -4,6 +4,6 @@ description: Global Health Policy Simulation model
 logo: images/logo.png
 show_downloads: true
 # Project site: https://imperialchepi.github.io/healthgps/
-baseurl: "/healthgps"
-url: "https://imperialchepi.github.io"
+baseurl: /healthgps
+url: https://imperialchepi.github.io
 markdown: kramdown

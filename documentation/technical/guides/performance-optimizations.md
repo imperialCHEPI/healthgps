@@ -1,5 +1,4 @@
-﻿# Health-GPS performance and parallelization
-
+# Health-GPS performance and parallelization
 
 ## Global Health Policy Simulation model
 

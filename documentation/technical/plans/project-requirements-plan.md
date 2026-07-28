@@ -1,5 +1,4 @@
-﻿# Project requirements: config-driven behaviour (no project hacks)
-
+# Project requirements: config-driven behaviour (no project hacks)
 
 ## Global Health Policy Simulation model
 

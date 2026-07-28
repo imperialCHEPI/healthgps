@@ -1,5 +1,4 @@
-﻿# Windows MSVC / Ninja build troubleshooting
-
+# Windows MSVC / Ninja build troubleshooting
 
 ## Global Health Policy Simulation model
 

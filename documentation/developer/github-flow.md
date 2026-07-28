@@ -1,5 +1,4 @@
-﻿# Health-GPS Project Model Branching Policy
-
+# Health-GPS Project Model Branching Policy
 
 ## Global Health Policy Simulation model
 

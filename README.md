@@ -17,7 +17,6 @@ The *Health GPS microsimulation* is being developed in collaboration between the
 
 Full docs live under `[documentation/](documentation/README.md)`. Start there for indexes by audience.
 
-
 | Need                                            | Document                                                                                   |
 | ----------------------------------------------- | ------------------------------------------------------------------------------------------ |
 | Documentation home                              | [documentation/README.md](documentation/README.md)                                         |
@@ -37,7 +36,6 @@ Full docs live under `[documentation/](documentation/README.md)`. Start there fo
 | Feature plans                                   | [technical/README.md](documentation/technical/README.md)                                   |
 | Doxygen API (GitHub Pages)                      | [API](https://imperialchepi.github.io/healthgps/api/)                                      |
 
-
 Published website: [https://imperialchepi.github.io/healthgps/](https://imperialchepi.github.io/healthgps/). It is rebuilt from `documentation/` by the [docs workflow](.github/workflows/docs.yml) on **release** or **manual dispatch**, not on every push. Until that workflow runs against the current tree, the live site may lag the repo (older flat page layout).
 
 ## February 2026 updates
@@ -55,8 +53,6 @@ flowchart LR
     RF --> DIS[Disease Module]
     DIS --> IO[Read/write to files]
 ```
-
-
 
 **Host application, run loop, module order, and output:**
 
@@ -132,8 +128,6 @@ flowchart TB
     A_UPD --> PUB
 ```
 
-
-
 **Person initialisation sequence (overview):**
 
 ```mermaid
@@ -167,10 +161,6 @@ flowchart TB
     P --> Q[Kevin Hall Model]
     Q --> R[Disease Model]
 ```
-
-
-
-
 
 ## Project Status and Recent Progress
 
@@ -210,8 +200,6 @@ Relevant design documents (under `documentation/technical/plans/`):
 
 ---
 
-
-
 ## Project Specific Requirements
 
 Health-GPS is driven by config flags (not hard-coded project names). Optional `project_requirements` in `config.json` controls demographics (region, ethnicity, `gender2`), income type and final category count (`3` / `4` / `5`), physical activity, trends, and two-stage logistic behaviour. See:
@@ -221,8 +209,6 @@ Health-GPS is driven by config flags (not hard-coded project names). Optional `p
 - Schema: `schemas/v1/config/project_requirements.json`
 
 ---
-
-
 
 ## FINCH: Age/Gender/Income-Based Model Validation
 
@@ -277,14 +263,9 @@ The code in this repository is licensed under the [BSD 3-Clause](LICENSE.txt) li
 
 ---
 
-
-
 ## Third-party components
 
-
-
 ### Libraries
-
 
 | Name                                                          | License      |
 | ------------------------------------------------------------- | ------------ |
@@ -302,17 +283,12 @@ The code in this repository is licensed under the [BSD 3-Clause](LICENSE.txt) li
 | [PlatformFolders](https://github.com/sago007/PlatformFolders) | MIT          |
 | [curlpp](http://www.curlpp.org)                               | MIT          |
 
-
-
-
 ### Tools and Frameworks
-
 
 | Name                                               | License      |
 | -------------------------------------------------- | ------------ |
 | [vcpkg](https://github.com/microsoft/vcpkg)        | MIT          |
 | [googletest](https://github.com/google/googletest) | BSD 3-Clause |
-
 
 ---
 

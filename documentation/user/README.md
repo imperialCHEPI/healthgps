@@ -1,5 +1,4 @@
-﻿# User documentation
-
+# User documentation
 
 ## Global Health Policy Simulation model
 

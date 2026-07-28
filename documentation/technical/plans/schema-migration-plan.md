@@ -1,5 +1,4 @@
-﻿# Schema Migration Plan: Unified Schema
-
+# Schema Migration Plan: Unified Schema
 
 ## Global Health Policy Simulation model
 

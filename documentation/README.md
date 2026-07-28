@@ -1,5 +1,4 @@
-﻿# Health-GPS documentation
-
+# Health-GPS documentation
 
 ## Global Health Policy Simulation model
 

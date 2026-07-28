@@ -1,5 +1,4 @@
-﻿# Individual ID tracking CSV (user-configured filters)
-
+# Individual ID tracking CSV (user-configured filters)
 
 ## Global Health Policy Simulation model
 

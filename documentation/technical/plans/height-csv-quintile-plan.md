@@ -1,5 +1,4 @@
-﻿# Height CSV Quintile Integration Plan
-
+# Height CSV Quintile Integration Plan
 
 ## Global Health Policy Simulation model
 

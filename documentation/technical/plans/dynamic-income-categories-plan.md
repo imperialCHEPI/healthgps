@@ -1,5 +1,4 @@
-﻿# Dynamic Final Income Categories (3/4/5) + Stratum Adjustment
-
+# Dynamic Final Income Categories (3/4/5) + Stratum Adjustment
 
 ## Global Health Policy Simulation model
 
