@@ -1,8 +1,11 @@
 ## Global Health Policy Simulation model
 
-| [Home](../index) | [Quick Start](getstarted) | User Guide | [Software Architecture](../developer/architecture) | [Data Model](../developer/datamodel) | [Developer Guide](../developer/development) | [Technical docs](../technical/) | [API](../api/index.html) |
+| [Home](../index.md) | [Quick Start](getstarted.md) | [User Guide](userguide.md) | [Software Architecture](../developer/architecture.md) | [Data Model](../developer/datamodel.md) | [Developer Guide](../developer/development.md) | [Technical docs](../technical/README.md) | [API (Pages)](https://imperialchepi.github.io/healthgps/api/) |
 
 # User Guide
+
+**Author:** Mahima Ghosh
+**Engineering contact:** Mahima Ghosh
 
 The **Health-GPS** microsimulation is a *data driven* modelling framework, combining many disconnected data sources to support the various interacting modules during a typical simulation experiment run. The framework provides a pre-populated *backend data storage* to minimise the learning curve for simple use cases, however advance users are likely to need a more in-depth knowledge of the full modelling workflow. A high-level representation of the microsimulation user workflow is shown below, it is crucial for users to have a good appreciation for the general dataflows and processes to better design experiments, configure the tool, and quantify the results.
 
@@ -12,7 +15,7 @@ The **Health-GPS** microsimulation is a *data driven* modelling framework, combi
 
 As with any simulation model, the workflow starts with data, it is the user's responsibility to process and analyse the input data, define the model’s hierarchy, fit parameters to data, and design intervention. A *configuration* file is used to provide the user's datasets, model parameters, and control the simulation experiment runtime. The model is invoked via a *Command Line Interface* (CLI), which validates the configuration contents, loads associated files to create the model inputs, assembles the microsimulation with the required modules, evaluates the experiment, and writes the results to a chosen output *file* and *folder*. Likewise, it is the user's responsibility to analyse and quantify the model results and draw conclusions on the cost-effectiveness of the intervention.
 
-> See [Quick Start](getstarted) to get started using the microsimulation with a working example.
+> See [Quick Start](getstarted.md) to get started using the microsimulation with a working example.
 
 ## Configuration
 
@@ -22,6 +25,39 @@ The high-level structure of the [configuration][configjson] file used to create 
 {
     "$schema": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/config.json",
     "version": 2,
+    "project_requirements": {
+        "demographics": {
+            "age": true,
+            "gender": true,
+            "region": false,
+            "ethnicity": false
+        },
+        "income": {
+            "enabled": true,
+            "type": "continuous",
+            "categories": "4",
+            "adjust_to_factors_mean": true,
+            "trended": false,
+            "income_based_csv_output": true
+        },
+        "physical_activity": {
+            "enabled": true,
+            "type": "continuous",
+            "adjust_to_factors_mean": true,
+            "trended": false
+        },
+        "risk_factors": {
+            "adjust_to_factors_mean": true,
+            "trended": true
+        },
+        "trend": {
+            "enabled": true,
+            "type": "income_trend"
+        },
+        "two_stage": {
+            "use_logistic": false
+        }
+    },
     "data": {
         "source": "https://github.com/imperialCHEPI/healthgps-data/releases/download/20240624/data_20240624.zip",
         "checksum": "b68abc8d40b937d377aa7357bff66a1f4f5196da5b867f7ca88d02b37d2ebb5c"
@@ -60,6 +96,8 @@ The high-level structure of the [configuration][configjson] file used to create 
     }
 }
 ```
+
+The optional `project_requirements` block is shown above so FINCH / Kevin Hall / India-style configs have a place in the skeleton. Legacy France packs may omit it and still validate. See [Project requirements](#project-requirements) below for field meaning, and `schemas/v1/config/project_requirements.json` for the full schema.
 
 ### Schema
 
@@ -216,7 +254,42 @@ Finally, ***output*** section repeated below, defines  the maximum number of *co
 ...
 ```
 
-The file name can have a *job_id*, passed as a CLI parameter, added to the end when running the simulation in batch mode, e.g., HPC cluster array. This feature enables the batch output files to be collated together to produce the complete results dataset for analysis.
+The file name can have a *job_id*, passed as a CLI parameter (`-j` / `--jobid`), added to the end when running the simulation in batch mode, e.g., HPC cluster array. This feature enables the batch output files to be collated together to produce the complete results dataset for analysis.
+
+Optional **per-person tracking** CSV (same person IDs across baseline and intervention) is configured under `output.individual_id_tracking`. When `enabled` is true, the Console writes an additional file alongside the main results, typically `HealthGPS_Result_{TIMESTAMP}_IndividualIDTracking.csv`, with filters for age, gender, region, ethnicity, risk factors, years, and scenarios. Schema: `schemas/v1/config/output.json`. Example: `input-data/data/KevinHall_FINCH/config.json`.
+
+```json
+"output": {
+    "comorbidities": 5,
+    "folder": "${HOME}/healthgps/results/france",
+    "file_name": "HealthGPS_Result_{TIMESTAMP}.json",
+    "individual_id_tracking": {
+        "enabled": true,
+        "gender": "all",
+        "scenarios": "both",
+        "risk_factors": ["BMI", "Energy"]
+    }
+}
+```
+
+When income-stratum breakdown is active in the analysis output, the Console may also write **extra CSV files** per final income category (suffixes such as `_low`, `_middle`, `_high`, depending on `project_requirements.income.categories`). These mirror the main detailed CSV layout for that stratum only.
+
+### Project requirements
+
+Advanced projects (FINCH, Kevin Hall, India-style configs) should set optional **`project_requirements`** in `config.json` (see the top-level skeleton above). The engine reads these flags instead of hard-coded project names:
+
+| Sub-block | Typical use |
+| --------- | ----------- |
+| `demographics` | Whether region / ethnicity apply; optional `gender2` predictor encoding and age caps for linear models |
+| `income` | Enabled, continuous vs categorical, **final** category count `"3"` / `"4"` / `"5"`, factors-mean / trended flags, optional income-based CSV output |
+| `physical_activity` | Simple vs continuous PA, adjustment / trend flags |
+| `risk_factors` | Whether nutrient / base RFs enter factors-mean and trended adjustment |
+| `trend` | `null`, UPF-style, or `income_trend` |
+| `two_stage` | Logistic stage for zero vs non-zero (when used) |
+
+The block is optional; legacy France-style configs without it still validate. Full schema: `schemas/v1/config/project_requirements.json`. Worked examples: `examples/config_skeleton.json`, FINCH packs under `input-data/data/`. Modeller walkthrough: [FINCH linear models guide](../technical/guides/finch-linear-models-and-income-adjustment.md) and [project requirements plan](../technical/plans/project-requirements-plan.md).
+
+Income-quintile **baseline adjustment** (separate adjustment strata from final reporting categories) is toggled under `modelling.baseline_adjustments` / `income_stratum_factors_mean`, not under `project_requirements`. See the FINCH guide for CSV layout and `adjustment_income_stratum_count`.
 
 ### Risk Factor Models
 
@@ -398,7 +471,7 @@ The values in the adjustment files are *added* to the *model values*, therefore 
 
 ## Backend Storage
 
-Health-GPS by default uses a *file-based backend storage*, which implements the [Data Model](../developer/datamodel) to provides a reusable, *reference dataset* using a [standardised](../developer/datamodel) format for improved usability, the dataset can easily be expanded with new data without code changes. The contents of the file-based storage is defined using the [index.json][datastore] file, which must live at the *root* of the storage's *folder structure* as shown below.
+Health-GPS by default uses a *file-based backend storage*, which implements the [Data Model](../developer/datamodel.md) to provides a reusable, *reference dataset* using a [standardised](../developer/datamodel.md) format for improved usability, the dataset can easily be expanded with new data without code changes. The contents of the file-based storage is defined using the [index.json][datastore] file, which must live at the *root* of the storage's *folder structure* as shown below.
 
 As mentioned previously, the data store can be provided as a URL to ensure reproducibility. Different versions of the reference data set are available in the [Health-GPS data repository](https://github.com/imperialCHEPI/healthgps-data).
 
@@ -559,11 +632,40 @@ Defines the file storage for disease cost analysis for country specific data con
 
 ## Running Health-GPS
 
-For instructions on how to install and run *Health GPS*, see [getting started](getstarted).
+For instructions on how to install and run *Health GPS*, see [Quick Start](getstarted.md).
+
+### Command-line interface
+
+`HealthGPS.Console` reads a JSON **config** path (file, directory, or URL to a zip). Backend reference data should be declared in the config **`data.source`** block (URL with checksum, or local path). That is the supported way to point at the country datastore.
+
+| Option | Short | Description |
+| ------ | ----- | ----------- |
+| `--config` | `-c` | Path to configuration file, folder, or URL (**preferred**) |
+| `--file` | `-f` | Deprecated alias for `-c` (Console prints a warning) |
+| `--storage` | `-s` | Deprecated override for datastore root; use `data.source` in config instead |
+| `--output` | `-o` | Override output folder from config |
+| `--jobid` | `-j` | Batch / array job index appended to output file names |
+| `--threads` | `-T` | Cap TBB threads (`0` = no cap). See [performance guide](../technical/guides/performance-optimizations.md) |
+| `--dry-run` | | Validate inputs and exit without running trials |
+| `--verbose` | | Extra logging |
+
+Example (France example pack; datastore URL is inside `config.json`):
+
+```bash
+HealthGPS.Console -c path/to/HLM_France/config.json -T 8
+```
+
+Zip download in one step (as in [Quick Start](getstarted.md)):
+
+```bash
+HealthGPS.Console -c https://github.com/imperialCHEPI/healthgps-examples/releases/download/20240907/HLM_France.zip
+```
 
 ### Results
 
-The model results file structure is composed of two parts: *experiment metadata* and *result array* respectively, each entry in the *result* array contains the *results* of a complete simulation run for a *scenario* as shown below. The simulation results are unique identified the source scenario, run number and time for each result row, the *id* property identifies the *message type* within the message bus implementation. The model also output a detailed results file in Comma Separated Values (.csv), this associated output file name is included in the global summary file as shown below.
+Health-GPS writes **JSON and CSV** for each run (same basename; JSON uses the name from config, CSV replaces the extension). Optionally it writes **per-income-stratum CSVs** and an **`_IndividualIDTracking.csv`** when configured (see [Output](#output) above).
+
+The JSON summary is composed of *experiment metadata* and a *result* array. Each entry is one simulated time step for a scenario. Rows are uniquely identified by **source** (baseline or intervention), **run**, and **time**. The model also writes a **detailed CSV**; the JSON `experiment.output_filename` field names the paired CSV path as shown below.
 
 ```json
 {
@@ -717,7 +819,9 @@ A job script using PBS comprises of three parts:
 2. *required software* - load required software modules to execute the application.
 3. *user command* - execute the user application with given arguments.
 
-The following job script (`healthgps.pbs`) executes Health-GPS version X.Y.Z.B on the *development example* and writes the console output to text file: `healthgps.pbs.txt`. The `-GCCcore-11.3.0` part of the *version name* refers to the *compiler toolset* used to build the Health-GPS software and install on the HPC as described in the [Developer Guide](../developer/development#hpc-build), this guide concerns only the use of installed modules.
+The following job script (`healthgps.pbs`) executes Health-GPS version X.Y.Z.B on the [HLM_France example](https://github.com/imperialCHEPI/healthgps-examples/tree/main/HLM_France) and writes the console output to text file: `healthgps.pbs.txt`. The `-GCCcore-11.3.0` part of the *version name* refers to the *compiler toolset* used to build the Health-GPS software and install on the HPC as described in the [Developer Guide](../developer/development.md#hpc-build), this guide concerns only the use of installed modules.
+
+Assume `config.json` (and modelling files next to it) live in `$PBS_O_WORKDIR/HLM_France/` and already define `data.source` for the backend datastore.
 
 ```bash
 #PBS -l walltime=00:30:00
@@ -728,7 +832,7 @@ cd $PBS_O_WORKDIR
 module add tools/dev
 module add Health-GPS/X.Y.Z.B-GCCcore-11.3.0
 
-HealthGPS.Console -f healthgps/example/France.Config.json -s healthgps/data > healthgps.pbs.txt
+HealthGPS.Console -c HLM_France/config.json -T 8 > healthgps.pbs.txt
 ```
 
 To submit the above job script, check its status, and view the console output, the following PBS commands can be used:
@@ -767,7 +871,7 @@ cd $PBS_O_WORKDIR
 module add tools/dev
 module add Health-GPS/X.Y.Z.B-GCCcore-11.3.0
 
-HealthGPS.Console -f healthgps/example/France.Config.json -s healthgps/data -j $PBS_ARRAY_INDEX > healthgps.pbs.$PBS_ARRAY_INDEX.txt
+HealthGPS.Console -c HLM_France/config.json -T 8 -j $PBS_ARRAY_INDEX > healthgps.pbs.$PBS_ARRAY_INDEX.txt
 ```
 
 Environment variable `$PBS_ARRAY_INDEX` takes the values from 1 to 5. The *custom seed* in the configuration file is used to create predictable master seeds for each batch in the array job, a total of `5 x number of runs in each batch` repeatable simulations run are evaluated in parallel. It is very important that the number of simulations run within *each batch* do not exceed the configured job duration (`walltime`) and complete in less than 1 hour, in this example.
@@ -856,7 +960,7 @@ The project RDS storage contains three top folders:
 
 The development dataset: *example* and backend *data* folders, is distributed as part of the Health-GPS source code. In this example, the development dataset has been copied into the `demo` folder, inside the STOP project RDS storage `live` sub-folder, and the remaining of this example will be using this dataset to illustrate the process. The STOP project's production *inputs* and *backend storage* can be found in folder: `${RDS_PROJECT}/stop/live/healthgps_v2`.
 
-First change the configuration file (`example/France.Config.json`) as shown below:
+First change the configuration file (`HLM_France/config.json` or your copy under RDS) as shown below. Keep the existing `data` section so the backend datastore is still loaded from config.
 
 ```json
 {
@@ -892,7 +996,7 @@ cd $PBS_O_WORKDIR
 module add tools/dev
 module add Health-GPS/X.Y.Z.B-GCCcore-11.3.0
 
-HealthGPS.Console -f ${RDS_PROJECT}stop/live/demo/example/France.Config.json -s ${RDS_PROJECT}stop/live/demo/data -j $PBS_ARRAY_INDEX > healthgps_demo.pbs.$PBS_ARRAY_INDEX.txt
+HealthGPS.Console -c ${RDS_PROJECT}stop/live/demo/HLM_France/config.json -T 8 -j $PBS_ARRAY_INDEX > healthgps_demo.pbs.$PBS_ARRAY_INDEX.txt
 
 ```
 
@@ -917,10 +1021,12 @@ qstat XXX[]
 qstat -t XXX[]
 ```
 
-You can also monitor your job status and other HPC resources information via the [self service portal](https://selfservice.rcs.imperial.ac.uk), subject to being connected to Imperial network on campus or via VPN. Finally, this experiment will generate two simulation result files per batch in the output folder: `.../demo/results/france`:
+You can also monitor your job status and other HPC resources information via the [self service portal](https://selfservice.rcs.imperial.ac.uk), subject to being connected to Imperial network on campus or via VPN. Finally, this experiment will generate at least two simulation result files per batch in the output folder: `.../demo/results/france`:
 
 1. `HealthGPS_Result_{TIMESTAMP}_X.json` - global average summary of the simulation batch results.
 2. `HealthGPS_Result_{TIMESTAMP}_X.csv`  - detailed simulation results associated with batch X.
+
+If `output.individual_id_tracking` is enabled, or income-stratum CSV output applies to your config, additional files with the same timestamp prefix may appear (see [Results](#results)).
 
 where `X = $PBS_ARRAY_INDEX` value appended to the fine name to allow the reconstruction of the overall experiment for analysis. The simulation results file can be large, and grow with the size of the experiment, users should create results processing scripts or tools to be executed on the HPC to tabulate the results, create plots dataset, etc to minimise the coping of large files over the network.
 
@@ -953,3 +1059,28 @@ rm *.pbs.[oet]*
 ```
 
 Finally, array jobs are not suitable to all workflows. Because array jobs are intended to run many copies (potentially thousands) of the same workflow, typical of Monte-Carlo simulations, workflows with high load on the filesystem, where each sub-job is going to be reading/writing to the same file, for example, can result in slowdown of access to all HPC users. ***Be especially careful during the holidays when the HPC system has minimum support***.
+
+---
+
+### Related documentation
+
+| Topic | Document |
+| ----- | -------- |
+| User docs index | [user/README.md](README.md) |
+| Quick start | [Quick Start](getstarted.md) |
+| Build from source | [Developer Guide](../developer/development.md) |
+| Architecture | [Software Architecture](../developer/architecture.md) |
+| FINCH / income / predictors | [FINCH linear models guide](../technical/guides/finch-linear-models-and-income-adjustment.md) |
+| Performance / threading | [Performance guide](../technical/guides/performance-optimizations.md) |
+| Feb 2026 changes | [Update report](../technical/guides/healthgps-update-report-2026-02-20.md) |
+| Technical docs | [Technical documentation index](../technical/README.md) |
+| Documentation home | [documentation/README.md](../README.md) |
+
+---
+
+[← User documentation index](README.md) · [Documentation index](../README.md)
+
+---
+
+**Author:** Mahima Ghosh
+**Engineering contact:** Mahima Ghosh

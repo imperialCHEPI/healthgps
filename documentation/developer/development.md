@@ -1,8 +1,11 @@
 ## Global Health Policy Simulation model
 
-| [Home](../index) | [Quick Start](../user/getstarted) | [User Guide](../user/userguide) | [Software Architecture](architecture) | [Data Model](datamodel) | Developer Guide | [Technical docs](../technical/) | [API](../api/index.html) |
+| [Home](../index.md) | [Quick Start](../user/getstarted.md) | [User Guide](../user/userguide.md) | [Software Architecture](architecture.md) | [Data Model](datamodel.md) | [Developer Guide](development.md) | [Technical docs](../technical/README.md) | [API (Pages)](https://imperialchepi.github.io/healthgps/api/) |
 
 # Developer Guide
+
+**Author:** Mahima Ghosh
+**Engineering contact:** Mahima Ghosh
 
 The *Health GPS* software is written in modern, standard ANSI C++, targeting the [C++20 version](https://en.cppreference.com/w/cpp/20) and using the C++ Standard Library. The project is fully managed by [CMake](https://cmake.org/) and [Microsoft Visual Studio](https://visualstudio.microsoft.com), the code base is portable but requires a C++20 compatible compiler to build. The development toolset users [Ninja](https://ninja-build.org/) for build, [vcpkg](https://github.com/microsoft/vcpkg) package manager for dependencies, [googletest](https://github.com/google/googletest) for unit testing and [GitHub Actions](https://docs.github.com/en/actions) for continuous integration (CI) builds and testing.
 
@@ -20,7 +23,7 @@ In addition, you will also need:
 
 ### Installing vcpkg
 
-We use vcpkg for building and bundling this project's dependencies so you will need to install it. Follow [the instructions on the vcpkg website] to get started.
+We use vcpkg for building and bundling this project's dependencies so you will need to install it. Follow [the instructions on the vcpkg website](https://vcpkg.io/en/getting-started) to get started.
 
 Once you have installed vcpkg, you will also need to ensure that the `VCPKG_ROOT` environment variable is set to the installation directory.
 
@@ -41,6 +44,8 @@ git checkout v1.2.2.0
 (for example).
 
 Finally, open the `healthgps` folder in Visual Studio and hit build. The first build takes considerably longer than normal due to the initial work required by CMake and the package manager.
+
+> **Windows / MSVC note:** If CMake reports missing headers such as `cstdint`, cannot find `CMAKE_CXX_COMPILER`, or fails linking with `MSVCRTD.lib`, that is a local Visual Studio toolset / environment issue, not a Health-GPS source bug. See [Windows MSVC / Ninja build troubleshooting](msvc-windows-build-troubleshooting.md) (Mahima Ghosh).
 
 ### Building Health-GPS
 
@@ -102,7 +107,7 @@ cmake --preset=linux-debug -DBUILD_DOC=ON
 ## Running `pre-commit` hooks
 
 It is recommended that developers install [`pre-commit`](https://pre-commit.com/) to
-make use of [the hooks](./.pre-commit-config.yaml) we have installed for this
+make use of [the hooks](../../.pre-commit-config.yaml) we have installed for this
 repository. (Note that this step is only for Health-GPS developers, not end users!)
 
 Once you have [installed `pre-commit`](https://pre-commit.com/#installation), you should
@@ -139,7 +144,7 @@ a pull request.
 
 ## HPC Build
 
-Although Health-GPS is compatible with most High Performance Computing (HPC) system, this section contents are specific for using *Health-GPS software* at the *Imperial College London* [HPC system](https://www.imperial.ac.uk/admin-services/ict/self-service/research-support/rcs/), which users need to register to *get access* and support. The HPC is **Linux** based, therefore users *must* be familiar with *Unix command line* and *shell script* to properly navigate the file system, build programs, run applications, and automate repetitive tasks. See the [User Guide](../user/userguide#50-hpc-running) for a very brief introduction to Imperial HPC system.
+Although Health-GPS is compatible with most High Performance Computing (HPC) system, this section contents are specific for using *Health-GPS software* at the *Imperial College London* [HPC system](https://www.imperial.ac.uk/admin-services/ict/self-service/research-support/rcs/), which users need to register to *get access* and support. The HPC is **Linux** based, therefore users *must* be familiar with *Unix command line* and *shell script* to properly navigate the file system, build programs, run applications, and automate repetitive tasks. See the [User Guide](../user/userguide.md#hpc-running) for a very brief introduction to Imperial HPC system.
 
 This tutorial describes building Health-GPS using [EasyBuild](https://easybuild.io/), a framework specially designed to manage (scientific) software on HPC systems, adopted by the Imperial HPC to manage the installation of users' software on different stacks depending on maturity and quality.
 
@@ -200,7 +205,7 @@ HealthGPS.Console --version
 
 The Health-GPS build and installation on the HPC is now complete using EasyBuild software management tool. The resulting *configuration* file should now be checked-in to the [easybuild-easyconfigs](https://github.com/easybuilders/easybuild-easyconfigs) repository via pull request to create a *reproducible* build of the application, see the EasyBuild [documentation](https://docs.easybuild.io/en/latest/Integration_with_GitHub.html) for details.
 
-When using HPC job scheduling software, such as PBS, some thought must be given to how many CPU threads to request, since resource allocation is strictly enforced. Jobs with lower thread counts may have higher priority than large resource hungry jobs, but choose too few and you risk job termination due to using in excess of the original request. Whilst this trade-off is left for you to decide, Health-GPS provides a means of hard-limiting the number of threads its simulations use. Health-GPS uses ([oneTBB](https://github.com/oneapi-src/oneTBB)) for it's multi-threading, and uses the maximum visible CPU cores by default. However, users may limit the number of threads a simulation uses by setting the `OMP_THREAD_LIMIT` environment variable in their terminal to a given limit before executing the Health-GPS command. For instance, on the Imperial HPC, type `export OMP_THREAD_LIMIT=64` in your PBS script before running your main Health-GPS command.
+When using HPC job scheduling software, such as PBS, some thought must be given to how many CPU threads to request, since resource allocation is strictly enforced. Jobs with lower thread counts may have higher priority than large resource hungry jobs, but choose too few and you risk job termination due to using in excess of the original request. Whilst this trade-off is left for you to decide, Health-GPS provides a means of hard-limiting the number of threads its simulations use. Health-GPS uses ([oneTBB](https://github.com/oneapi-src/oneTBB)) for multi-threading, and uses the maximum visible CPU cores by default. Limit threads with the Console CLI flag `--threads` / `-T` (0 means no limit). That sets `tbb::global_control::max_allowed_parallelism` in `src/HealthGPS.Console/program.cpp`. Example: `HealthGPS.Console ... --threads 64`.
 
 > **Note**
 > The decision to use [oneTBB](https://github.com/oneapi-src/oneTBB) for multi-threading was taken since the parallel algorithms of the `C++20` stanard library offer no means for the software engineer, thus the user, to impose limits on thread usage.
@@ -226,183 +231,160 @@ module av healthgps
 # Load the desirable Health-GPS module version
 module add healthgps/X.Y.Z.B-GCCcore-11.3.0
 
-# Use the Health-GPS application. e.g. using development example and dataset
-HealthGPS.Console -f healthgps/example/France.Config.json -s ~/healthgps/data
+# Use the Health-GPS application, e.g. HLM_France example (data.source is in config.json)
+HealthGPS.Console -c ~/HLM_France/config.json -T 8
 ```
 
-In general, you should avoid running you own applications on the shared HPC login nodes, the *etiquette* for working with HPC system is the create and submit jobs to be evaluated by the HPC nodes instead. See the [User Guide](../user/userguide#50-hpc-running) for details on how to use the installed Health-GPS modules on the Imperial HPC system.
+In general, you should avoid running you own applications on the shared HPC login nodes, the *etiquette* for working with HPC system is the create and submit jobs to be evaluated by the HPC nodes instead. See the [User Guide](../user/userguide.md#hpc-running) for details on how to use the installed Health-GPS modules on the Imperial HPC system.
 
 ## Implementation
 
-The software application provides a Command Line Interface (CLI) for the user to inform the configuration to run and backend storage location. The experiment options are provided to the model via a configuration file (JSON format), including population size, intervention scenarios and number of runs.
+The Console host (`HealthGPS.Console`) is a CLI. Experiment options come from a JSON configuration file (validated against schemas under `schemas/`), including population size, intervention scenarios, and number of runs. Optional flags include `--threads` / `-T` and `--dry-run` (validate inputs without running trials). See `src/HealthGPS.Console/command_options.*` and `program.cpp`.
 
- The console terminal application aims to provide the users of with a wider range of cross-platform options to run the microsimulation, including hardware ranging from desktops to high performance computers. However, the microsimulation software program can equality be a graphical user interface (GUI) or web page program.
+The same libraries can back a GUI or other host; `healthgps-GUI/` in the repo is a separate package and is not required to build the Console.
 
 ## Composing a Microsimulation
 
-To run a microsimulation experiment, at least one simulation engine and one simulation executive must be created, the HealthGPS class implements the engine, and Runner class implements the executive respectively as shown below. To create a simulation engine instance, the user must provide a SimulationDefinition with the model configuration, the SimulationModuleFactory with builders for each module type registered, and one implementation of the EventAggregator interface for external communication.
+To run an experiment you need:
+
+1. A **`SimulationModuleFactory`** with builders for every `SimulationModuleType` (use `get_default_simulation_module_factory` from `src/HealthGPS/simulation_module.cpp`).
+2. One or more **`Simulation`** engines (`src/HealthGPS/simulation.h`), each with a `Scenario`.
+3. A **`Runner`** executive to drive trials and seeds.
+4. An **`EventAggregator`** (typically `DefaultEventBus`) plus monitors/writers.
+
+There is no `SimulationDefinition` or `HealthGPS` engine class in the current tree. Construction looks like:
+
+```text
+Simulation(factory, shared_ptr<EventAggregator>, shared_ptr<ModelInput>, unique_ptr<Scenario>)
+```
 
 | ![Composing Health-GPS](../images/compose_simulation.svg) |
 |:------------------------------------------------------:|
 |        *Composing a Health-GPS Microsimulation*        |
 
-The simulation executive requires a RandomBitGenerator interface implementation for master seed generation and an implementation of the EventAggregator interface, in this example the DefaultEventBus class, which should be shared by the engines and executive to provide a centralised source of communication. The simulation engine must have its own random number generator instance as part of the simulation definition, the Mersenne Twister pseudorandom number generator algorithms is the default implementation, however other algorithms can easily be used.
+The Console host (`program.cpp`) does roughly the following:
 
-EventMonitor class has been created to receive all messages from the microsimulation, notifications and error messages are displayed on the application terminal, and result messages are queued to be processed by an implementation of the ResultWriter interface, ResultFileWriter class in this example, which writes the results to a file in JSON format.
+1. Parse CLI and load / validate JSON config.
+2. Open `input::DataManager` on the data directory; wrap it in `CachedRepository`.
+3. Register risk-factor model definitions from config onto the repository.
+4. Build `factory = get_default_simulation_module_factory(repository)`.
+5. Build `shared_ptr<ModelInput>` via `create_model_input(...)`.
+6. Optionally stop after `--dry-run`.
+7. Create `DefaultEventBus`, `ResultFileWriter` (JSON + CSV + optional income CSVs), optional `IndividualIDTrackingWriter`, and `EventMonitor`.
+8. Create `Runner` with an `MTRandom32` master seed generator.
+9. Create `SyncChannel`, baseline `Simulation`, and optionally an intervention `Simulation`.
+10. Call `runner.run(...)` for the configured trial count; then stop the monitor.
 
-The following code snippet shows how to compose a microsimulation using the classes discussed above. The modules factory holds the backend datastore instance and allows dynamic registration of implementations for the required module types, the default module factory function registers the current production implementations. The contents of the input configuration file is loaded and processed to create the model input, a read-only data structure shared with all the simulation engines. An implementation of *scenario* interface must be provided for each simulation definition, the *BaselineScenario* class is a generic type, while the intervention scenarios are defined to test specific policies.
+Illustrative composition (simplified from the host; see `program.cpp` for the full path):
 
 ```cpp
-// Parse configuration file from command line arguments
-auto config = load_configuration(cmd_args);
+auto data_api = input::DataManager(data_directory, verbosity);
+auto data_repository = hgps::CachedRepository{data_api};
+register_risk_factor_model_definitions(data_repository, config);
 
-try {
-    // Create factory with backend data store and modules implementation
-    auto factory = get_default_simulation_module_factory(...);
+auto factory = get_default_simulation_module_factory(data_repository);
+auto model_input = std::make_shared<ModelInput>(create_model_input(...));
 
-    // Create the complete model input from configuration
-    auto model_input = create_model_input(...);
+auto event_bus = std::make_shared<DefaultEventBus>();
+auto results_writer = create_results_file_logger(config, *model_input);
+auto event_monitor = EventMonitor{*event_bus, results_writer, /*optional tracking*/ nullptr};
 
-    // Create event bus and monitor
-    auto event_bus = DefaultEventBus();
-    auto json_file_logger = create_results_file_logger(config, model_input);
-    auto event_monitor = EventMonitor{ event_bus, json_file_logger };
-
-    // Create simulation executive
-    auto seed_generator = std::make_unique<hgps::MTRandom32>();
-    if (model_input.seed().has_value()) {
-        seed_generator->seed(model_input.seed().value());
-    }
-    auto executive = Runner(event_bus, std::move(seed_generator));
-
-    // Create baseline scenario with data sync channel
-    auto channel = SyncChannel{};
-    auto baseline_scenario = std::make_unique<BaselineScenario>(channel);
-
-    // Create simulation engine for baseline scenario
-    auto baseline_rnd = std::make_unique<hgps::MTRandom32>();
-    auto baseline = HealthGPS{
-        SimulationDefinition{ model_input,
-            std::move(baseline_scenario),
-            std::move(baseline_rnd)},
-        factory, event_bus };
-
-    std::atomic<bool> done(false);
-    auto runtime = 0.0;
-    if (config.has_active_intervention) {
-        // Create intervention scenario
-        auto policy_scenario = create_intervention_scenario(channel, config.intervention);
-
-        // Create simulation engine for intervention scenario
-        auto policy_rnd = std::make_unique<hgps::MTRandom32>();
-        auto intervention = HealthGPS{
-            SimulationDefinition{ model_input,
-                std::move(policy_scenario),
-                std::move(policy_rnd)},
-            factory, event_bus };
-
-        // Create worker thread to run the two scenarios side by side
-        auto worker = std::jthread{ [&runtime, &executive, &baseline, &intervention, &config, &done] {
-            runtime = executive.run(baseline, intervention, config.trial_runs);
-            done.store(true);
-        } };
-
-        // Waits for it to finish, cancellation can be enabled here
-        while (!done.load()) {
-            std::this_thread::sleep_for(std::chrono::microseconds(100));
-        }
-        worker.join();
-    }
-    else {
-        // Create worker thread to run only the baseline scenario
-        channel.close(); // Will not store any message
-        auto worker = std::jthread{[&runtime, &executive, &baseline, &config, &done] {
-            runtime = executive.run(baseline, config.trial_runs);
-            done.store(true);
-        } };
-
-        // Waits for it to finish, cancellation can be enabled here
-        while (!done.load()) {
-            std::this_thread::sleep_for(std::chrono::microseconds(100));
-        }
-        worker.join();
-    }
+auto seed_generator = std::make_unique<hgps::MTRandom32>();
+if (const auto seed = model_input->seed()) {
+    seed_generator->seed(seed.value());
 }
-catch (const std::exception& ex) {
-    fmt::print(fg(fmt::color::red), "\n\nFailed with message - {}.\n", ex.what());
+auto runner = Runner(event_bus, std::move(seed_generator));
+
+auto channel = SyncChannel{};
+auto baseline = create_baseline_simulation(channel, factory, event_bus, model_input);
+
+if (config.active_intervention.has_value()) {
+    auto intervention = create_intervention_simulation(
+        channel, factory, event_bus, model_input, config.active_intervention.value());
+    runner.run(baseline, intervention, config.trial_runs);
+} else {
+    channel.close();
+    runner.run(baseline, config.trial_runs);
 }
 
-// Stop listening for new messages.
 event_monitor.stop();
 ```
 
-The simulation executive can run experiments for baseline scenario only, or baseline and intervention scenarios combination as shown above. The results message is a polymorphic type carrying a customisable data payload, table below shows the default implementation outputs.
+`ResultFileWriter` writes JSON, a main CSV, and optionally income-stratum CSVs. When individual ID tracking is enabled in config, `IndividualIDTrackingWriter` writes a separate tracking CSV.
 
-| Property           | Overall | Male | Female | Description                                   |
-|:-------------------|:-------:|:----:|:------:|:----------------------------------------------|
-| Id                 |    ✓    |  -   |   -    | The message type identifier (results type)    |
-| Source             |    ✓    |  -   |   -    | The results experiment identification         |
-| Run number         |    ✓    |  -   |   -    | The results rum number identification         |
-| Model time         |    ✓    |  -   |   -    | The results model time identification         |
-| Average Age        |    -    |  ✓   |   ✓    | Average age of the population alive           |
-| Prevalence         |    -    |  ✓   |   ✓    | Prevalence for each disease in the population |
-| Risk factors       |    -    |  ✓   |   ✓    | Average risk factor values in the population  |
-| Indicators (DALYs) |    ✓    |  -   |   -    | YLL, YLD and DALY values per 100'000 people   |
-| Population Counts  |    ✓    |  -   |   -    | Total size, number alive, dead and emigrants  |
-| Comorbidities      |    -    |  ✓   |   ✓    | Percentage of people with 0 to N+ diseases    |
-| Metrics            |    ✓    |  -   |   -    | Custom key/value metrics for algorithms       |
-| Series             |    -    |  ✓   |   ✓    | Detailed time series by time, age, and gender |
+Default result payload fields (from analysis messages) include identifiers (source, run, time), average age, prevalence, risk factors, DALY indicators, population counts, comorbidities, metrics, and series. The combination of source, run number, and model time uniquely identifies a result message.
 
-These measures are calculated and published by the analysis module at the end of each simulation time step, the combination of *source*, *run number* and *model time* is unique.
-
-The following code snippet illustrates the dynamic registration of module builder functions with the simulation module factory by using the default module factory function used above. A similar mechanism can be used to register dummy or mock module versions, with deterministic behaviour for testing purpose.
+Module builders are registered like this (matches `get_default_simulation_module_factory`):
 
 ```cpp
 SimulationModuleFactory get_default_simulation_module_factory(Repository& manager)
 {
     auto factory = SimulationModuleFactory(manager);
     factory.register_builder(SimulationModuleType::SES,
-        [](Repository& repository, const ModelInput& config) ->
-        SimulationModuleFactory::ModuleType {
+        [](Repository& repository, const ModelInput& config)
+            -> SimulationModuleFactory::ModuleType {
             return build_ses_noise_module(repository, config); });
 
     factory.register_builder(SimulationModuleType::Demographic,
-        [](Repository& repository, const ModelInput& config) ->
-        SimulationModuleFactory::ModuleType {
+        [](Repository& repository, const ModelInput& config)
+            -> SimulationModuleFactory::ModuleType {
             return build_population_module(repository, config); });
 
     factory.register_builder(SimulationModuleType::RiskFactor,
-        [](Repository& repository, const ModelInput& config) ->
-        SimulationModuleFactory::ModuleType {
+        [](Repository& repository, const ModelInput& config)
+            -> SimulationModuleFactory::ModuleType {
             return build_risk_factor_module(repository, config); });
 
     factory.register_builder(SimulationModuleType::Disease,
-        [](Repository& repository, const ModelInput& config) ->
-        SimulationModuleFactory::ModuleType {
+        [](Repository& repository, const ModelInput& config)
+            -> SimulationModuleFactory::ModuleType {
             return build_disease_module(repository, config); });
 
     factory.register_builder(SimulationModuleType::Analysis,
-        [](Repository& repository, const ModelInput& config) ->
-        SimulationModuleFactory::ModuleType {
+        [](Repository& repository, const ModelInput& config)
+            -> SimulationModuleFactory::ModuleType {
             return build_analysis_module(repository, config); });
 
     return factory;
 }
 ```
 
-The factory must provide builder functions for all the required *module types* to successfully create an instance of the *HealthGPS* simulation engine, however, the user can disable a particular module behaviour by registering an implementation that makes no change to the virtual population properties when invoked by the simulation engine at runtime.
+The factory must provide builders for all required module types before a `Simulation` can be constructed. For tests you can register stub modules that leave the population unchanged.
 
 ## Reproducibility
 
-Simulation experiment results reproducibility is a fundamental requirement for a rigorous scientific approach. Health-GPS defines mechanisms to enable  reproducibility of experiment run continuous run and batch mode typical of HPC environments. The core mechanism requires traceable inputs, Health-GPS version, and a custom random number seed, the following algorithm is used to manage the master seed for all experiments.
+Simulation experiment results reproducibility is a fundamental requirement for a rigorous scientific approach. Health-GPS defines mechanisms to enable reproducibility of continuous runs and batch mode typical of HPC environments. The core mechanism requires traceable inputs, Health-GPS version, and a custom random number seed. The following algorithm is used to manage the master seed for all experiments.
 
 | ![Experiment reproducibility](../images/batch_mode_seed.svg) |
 |:---------------------------------------------------------:|
 | *Experiment reproducibility algorithm (seed management)*  |
 
-When running the simulation as a single experiment, the solution is trivial using the same seed, however in a cluster or HPC environment, reproducibility of parallel simulation is more challenging. See the [User Guide](../user/userguide#50-hpc-running) for an worked example using *Health-GPS* on *HPC computer* arrays to evaluate the *same experiment* in parallel.
+When running the simulation as a single experiment, the solution is trivial using the same seed. In a cluster or HPC environment, reproducibility of parallel simulation is more challenging. See the [User Guide](../user/userguide.md#hpc-running) for a worked example using *Health-GPS* on *HPC computer* arrays to evaluate the *same experiment* in parallel.
 
 ## GitHub flow
 
 Health-GPS uses the GitHub flow branching pattern for git. For more information, see the
-[GitHub flow guide](github-flow)
+[GitHub flow guide](github-flow.md).
+
+---
+
+### Related documentation
+
+| Topic | Document |
+| ----- | -------- |
+| Developer docs index | [developer/README.md](README.md) |
+| Windows MSVC / Ninja failures | [MSVC troubleshooting](msvc-windows-build-troubleshooting.md) |
+| Architecture | [Software Architecture](architecture.md) |
+| Data model | [Data Model](datamodel.md) |
+| Technical guides & plans | [Technical documentation index](../technical/README.md) |
+| FINCH / income / predictors | [FINCH guide](../technical/guides/finch-linear-models-and-income-adjustment.md) |
+| Feb 2026 changes | [Update report](../technical/guides/healthgps-update-report-2026-02-20.md) |
+| User guide / HPC | [User Guide](../user/userguide.md) |
+| Documentation home | [documentation/README.md](../README.md) |
+
+---
+
+---
+
+**Author:** Mahima Ghosh
+**Engineering contact:** Mahima Ghosh

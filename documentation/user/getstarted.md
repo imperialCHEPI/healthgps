@@ -1,18 +1,21 @@
 ## Global Health Policy Simulation model
 
-| [Home](../index) | Quick Start | [User Guide](userguide) | [Software Architecture](../developer/architecture) | [Data Model](../developer/datamodel) | [Developer Guide](../developer/development) | [Technical docs](../technical/) | [API](../api/index.html) |
+| [Home](../index.md) | [Quick Start](getstarted.md) | [User Guide](userguide.md) | [Software Architecture](../developer/architecture.md) | [Data Model](../developer/datamodel.md) | [Developer Guide](../developer/development.md) | [Technical docs](../technical/README.md) | [API (Pages)](https://imperialchepi.github.io/healthgps/api/) |
 
 # Quick Start
 
+**Author:** Mahima Ghosh
+**Engineering contact:** Mahima Ghosh
+
 The *Health GPS* application provides a *Command Line Interface* (CLI) and runs on *Windows 10 (and newer)* and *Linux* devices. All supported options are provided to the model via a [configuration][configjson] file (JSON format), including population size, intervention scenarios and number of runs. Users are encouraged to start exploring the model by using the included example dataset, changing the provided configuration file, and running the model.
 
-Pre-compiled binaries for `Windows` and `Linux` are available on the [releases page](https://github.com/imperialCHEPI/healthgps/) for generic x86-64 CPUs. If you want a version of the program tailored to your specific CPU (e.g. for HPC) or you wish to develop *Health GPS*, follow the instructions to build from source in the [developer guide](../developer/development). To use the binaries, you will need to unzip the downloaded file to a directory of your choice.
+Pre-compiled binaries for `Windows` and `Linux` are available on the [releases page](https://github.com/imperialCHEPI/healthgps/) for generic x86-64 CPUs. If you want a version of the program tailored to your specific CPU (e.g. for HPC) or you wish to develop *Health GPS*, follow the instructions to build from source in the [developer guide](../developer/development.md). To use the binaries, you will need to unzip the downloaded file to a directory of your choice.
 
 ***Known Issue:*** `Windows 10` support for VT (Virtual Terminal) / ANSI escape sequences is turned OFF by default, this is required to display colours on console / shell terminals. You can enable this feature manually by editing windows [registry keys](https://superuser.com/questions/413073/windows-console-with-ansi-colors-handling/1300251#1300251), however we recommend the use of [Windows Terminal](https://www.microsoft.com/en-gb/p/windows-terminal/9n0dx20hk701?rtc=1&activetab=pivot:overviewtab), which is a modern terminal application for command-line tools, has no such limitation, and is now distributed as part of the `Windows 11` installation.
 
 ## Example usage
 
-*Health GPS* requires model configuration files in order to be able to run. These files can either be in a local directory or as a zip file on the local machine or on the web. Here, we will use a model available from the [Health-GPS examples repository]. (We are assuming that you have changed directories to wherever you have built or extracted the Health-GPS binaries.)
+*Health GPS* requires model configuration files in order to be able to run. These files can either be in a local directory or as a zip file on the local machine or on the web. Here, we will use a model available from the [Health-GPS examples repository][examplesrepo]. (We are assuming that you have changed directories to wherever you have built or extracted the Health-GPS binaries.)
 
 For Windows:
 
@@ -28,11 +31,13 @@ For Linux:
 
 Output data will be written to a subfolder of your home directory, `healthgps/results/france`.
 
+Optional: validate a config without running trials: `HealthGPS.Console -c path/to/config.json --dry-run`. Limit CPU threads with `-T` (see [performance guide](../technical/guides/performance-optimizations.md)).
+
 ## Results
 
 NB: For analysis and visualisation of *Health GPS* output data, we recommend the [`healthgpsrvis` R package](https://imperialchepi.github.io/healthgpsrvis/), but here we show how to do some analysis manually.
 
-Health-GPS produces output data simultaneously in two file formats: CSV and JSON. The one mostly used by the developers is CSV, so you should prefer it, but the JSON format is also included for legacy reasons (for now).
+Health-GPS produces output data simultaneously in **CSV and JSON** (same run; prefer CSV for analysis). Large or FINCH-style configs may also write **per-income-stratum CSVs** and an optional **`_IndividualIDTracking.csv`**. See the [User Guide](userguide.md#results) for details.
 
 ### Analysing the JSON output data
 
@@ -99,4 +104,28 @@ show(p)
 
 In a similar manner, the resulting dataset `df`, can be re-created and expanded to summarise other variables of interest, create results tables and plots to better understand the experiment.
 
+---
+
+### Related documentation
+
+| Topic | Document |
+| ----- | -------- |
+| User docs index | [user/README.md](README.md) |
+| Full configuration & HPC | [User Guide](userguide.md) |
+| Build from source | [Developer Guide](../developer/development.md) |
+| Windows MSVC failures | [MSVC troubleshooting](../developer/msvc-windows-build-troubleshooting.md) |
+| FINCH / Kevin Hall inputs | [FINCH linear models guide](../technical/guides/finch-linear-models-and-income-adjustment.md) |
+| Technical docs | [Technical documentation index](../technical/README.md) |
+| Documentation home | [documentation/README.md](../README.md) |
+
+---
+
+[← User documentation index](README.md) · [Documentation index](../README.md)
+
+---
+
+**Author:** Mahima Ghosh
+**Engineering contact:** Mahima Ghosh
+
 [configjson]:https://github.com/imperialCHEPI/healthgps-examples/tree/main/HLM_France/config.json "Configuration file example"
+[examplesrepo]:https://github.com/imperialCHEPI/healthgps-examples "Health-GPS examples repository"
