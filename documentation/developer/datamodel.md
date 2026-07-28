@@ -4,7 +4,6 @@
 
 # Data Model
 
-
 **Interfaces:** `hgps::core::Datastore` in `src/HealthGPS.Core/datastore.h`. File-backed implementation: `hgps::input::DataManager` in `src/HealthGPS.Input/datamanager.h`.
 
 The backend *data model* is an abstract description of the country-indexed reference datasets Health-GPS modules read through the Datastore API. The physical store reconciles disparate sources (units, gaps, country codes) so the engine can stay storage-agnostic.

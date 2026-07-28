@@ -30,19 +30,19 @@ For a shorter pipeline diagram and comparison table, start at [Models overview](
 
 On **`Simulation.init`** (initialise population):
 
-1. Demographic  
-2. SES  
-3. Risk factor — **static** models only  
-4. Disease  
+1. Demographic
+2. SES
+3. Risk factor — **static** models only
+4. Disease
 5. Analysis (initial statistics)
 
 On each **`Simulation.update`** (one simulated year):
 
-1. Demographic update  
-2. Net immigration  
-3. SES update  
-4. Risk factor — **dynamic** models  
-5. Disease update  
+1. Demographic update
+2. Net immigration
+3. SES update
+4. Risk factor — **dynamic** models
+5. Disease update
 6. Analysis update (publish results)
 
 See [Update report](healthgps-update-report-2026-02-20.md) for diagrams aligned with `program.cpp` / `Simulation`.

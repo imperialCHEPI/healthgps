@@ -4,7 +4,6 @@
 
 # Software Architecture
 
-
 **Source layout:** `src/HealthGPS` (engine), `src/HealthGPS.Core` (Data API / POCOs), `src/HealthGPS.Input` (file datastore + config), `src/HealthGPS.Console` (host), `src/HealthGPS.Tests`. ADEVS is vendored under `src/external/adevs`.
 
 The Health-GPS software architecture uses a modular design. It is written in modern [C++20][cpp20]. The deployable stack has four main pieces:
