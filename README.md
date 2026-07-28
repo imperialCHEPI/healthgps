@@ -7,6 +7,7 @@
 
 | [Quick Start](#quick-start) | [Documentation](#documentation) | [February 2026 updates](#february-2026-updates) | [Development Tools](#development-tools) | [License](#license) | [Third-party Components](#third-party-components) |
 
+**Author / engineering contact:** Mahima Ghosh
 
 Health-GPS microsimulation is part of the [STOP project](https://www.stopchildobesity.eu/), and supports researchers and policy makers in the analysis of the health and economic impacts of alternative measures to tackle *chronic diseases* and *obesity in children*. The model reproduces the characteristics of a population and simulates key individual event histories associated with key components of relevant behaviours, such as physical activity, and diseases such as diabetes or cancer.
 
@@ -290,4 +291,5 @@ The code in this repository is licensed under the [BSD 3-Clause](LICENSE.txt) li
 
 ---
 
-**Author:** Mahima Ghosh
+**Author:** Mahima Ghosh  
+**Engineering contact:** Mahima Ghosh
