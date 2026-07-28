@@ -57,18 +57,18 @@
 
 ## Phase 2: Reduce number of is_active() calls
 
-**Goal:** Avoid calling `is_active()` repeatedly on the same person in the same logical â€œiterationâ€ (e.g. same year, same module).
+**Goal:** Avoid calling `is_active()` repeatedly on the same person in the same logical “iteration” (e.g. same year, same module).
 
-**Where itâ€™s used (examples):**
+**Where it’s used (examples):**
 
 - [analysis_module.cpp](src/HealthGPS/analysis_module.cpp): many loops over `context.population()` that do `if (!entity.is_active()) continue;` or similar (e.g. lines 100, 224, 312, 418, 625, 685, 746, 1002, 1171, 1452, 1553, 1760, 1979).
 - Other modules (demographic, default_disease_model, static_linear_model, kevin_hall_model, etc.) also iterate population and call `is_active()`.
 
 **Options:**
 
-1. **Cache per iteration in analysis module:** For a single â€œyearâ€ or â€œpublishâ€ pass, build once a compact structure (e.g. `std::vector<bool>` or bit set) of â€œactiveâ€ by index, then in subsequent loops over the same population snapshot use that cache instead of calling `entity.is_active()`. Downside: population can change during a year (deaths, births); so the cache is only valid if all uses in that pass see the same snapshot. In `publish_result_message` and the various `calculate_`* paths, the population is not modified during the same call, so a cache per function scope is valid.
-2. **Filter once into an â€œactiveâ€ index list:** One loop over the population that builds `std::vector<std::size_t> active_indices`, then later loops iterate `for (auto i : active_indices) { auto& entity = population[i]; ... }`. This replaces many `is_active()` checks with one pass and then direct iteration. Same caveat: use within a single logical pass where population is not changing.
-3. **Leave hot loops in disease/risk-factor modules as-is initially:** Focus on analysis_module where a single â€œresultâ€ computation does multiple full-population passes; there caching or a single â€œactiveâ€ index list gives the biggest benefit.
+1. **Cache per iteration in analysis module:** For a single “year” or “publish” pass, build once a compact structure (e.g. `std::vector<bool>` or bit set) of “active” by index, then in subsequent loops over the same population snapshot use that cache instead of calling `entity.is_active()`. Downside: population can change during a year (deaths, births); so the cache is only valid if all uses in that pass see the same snapshot. In `publish_result_message` and the various `calculate_`* paths, the population is not modified during the same call, so a cache per function scope is valid.
+2. **Filter once into an “active” index list:** One loop over the population that builds `std::vector<std::size_t> active_indices`, then later loops iterate `for (auto i : active_indices) { auto& entity = population[i]; ... }`. This replaces many `is_active()` checks with one pass and then direct iteration. Same caveat: use within a single logical pass where population is not changing.
+3. **Leave hot loops in disease/risk-factor modules as-is initially:** Focus on analysis_module where a single “result” computation does multiple full-population passes; there caching or a single “active” index list gives the biggest benefit.
 
 **Recommendation:** Start with analysis_module only. In functions that do multiple passes over `context.population()` in one go (e.g. `calculate_historical_statistics`, or the block that does DALYs + risk-factor sums + comorbidity + prevalence), add one initial pass that fills `std::vector<bool> is_active(pop.size())` (or an index list), then use that in subsequent loops instead of calling `entity.is_active()`. Measure before/after if needed.
 

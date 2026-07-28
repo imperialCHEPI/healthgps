@@ -65,7 +65,7 @@ Place at the **start** of each project config for clarity. All fields are explic
 | `adjust_to_factors_mean`  | boolean | Include PA in factors-mean adjustment (initial). |
 | `trended`                 | boolean | Include PA in trended adjustment. |
 
-- **FINCH:** enabled=true, type=continuous, adjust_to_factors_mean=true, trended=false (per your â€œdo not include in trendedâ€ rule).
+- **FINCH:** enabled=true, type=continuous, adjust_to_factors_mean=true, trended=false (per your “do not include in trended” rule).
 - **India:** enabled=true, type=simple, adjust_to_factors_mean=true, trended=false.
 
 - Code: include PA in extended factors (initial/trended) only when these flags say so; no `has_physical_activity_models_`-only logic.
@@ -77,7 +77,7 @@ Place at the **start** of each project config for clarity. All fields are explic
 | `adjust_to_factors_mean`  | boolean | Apply factors-mean adjustment to base risk factors. |
 | `trended`                 | boolean | Apply trended adjustment to base risk factors. |
 
-- â€œBaseâ€ = the list from the static model (e.g. food nutrients). Income/PA are governed by their own sections.
+- “Base” = the list from the static model (e.g. food nutrients). Income/PA are governed by their own sections.
 
 ### 5. `trend`
 
@@ -95,7 +95,7 @@ Place at the **start** of each project config for clarity. All fields are explic
 | `use_logistic` | boolean | Use logistic (Stage 1) for zero vs non-zero. |
 | `logistic_file`| string  | Optional; CSV name when use_logistic=true. |
 
-- Code: â€œSet 0 logistic factorsâ€ vs â€œSet N logistic factorsâ€ and simulated-mean exclusion of zeros come from here; no inferring from file presence only.
+- Code: “Set 0 logistic factors” vs “Set N logistic factors” and simulated-mean exclusion of zeros come from here; no inferring from file presence only.
 
 ---
 
@@ -211,13 +211,13 @@ No code behaviour change yet; configs and schema are in place and validated.
 
 ### Phase 3: Replace hacks with requirement flags
 
-1. **Demographics:** In `DemographicModule::initialise_region` / `initialise_ethnicity`, skip or require based on `project_requirements.demographics.region` / `ethnicity` (no throw for â€œnewborn needs regionâ€ when region=false).
+1. **Demographics:** In `DemographicModule::initialise_region` / `initialise_ethnicity`, skip or require based on `project_requirements.demographics.region` / `ethnicity` (no throw for “newborn needs region” when region=false).
 2. **Income:** In `build_extended_factors_list` and trended path, use `project_requirements.income.adjust_to_factors_mean` and `project_requirements.income.trended` instead of only `is_continuous_income_model_` and `for_trended_adjustment`.
 3. **Physical activity:** Same: use `project_requirements.physical_activity.adjust_to_factors_mean` and `.trended` instead of only `has_physical_activity_models_`.
 4. **Trend:** Use `project_requirements.trend.enabled` and `.type` where `trend_type_` is used (or map from existing `trend_type` when requirements are missing).
 5. **Two-stage:** Use `project_requirements.two_stage.use_logistic` to decide whether to load logistic CSV and to exclude zeros in simulated mean.
 
-After Phase 3, no code path should branch on â€œIndiaâ€ / â€œFINCHâ€ / â€œPIFâ€; only on the flags in `project_requirements`.
+After Phase 3, no code path should branch on “India” / “FINCH” / “PIF”; only on the flags in `project_requirements`.
 
 ---
 

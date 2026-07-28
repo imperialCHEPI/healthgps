@@ -13,7 +13,7 @@ The public site ([imperialchepi.github.io/healthgps](https://imperialchepi.githu
 - a published **release**, or
 - a manual **workflow_dispatch** from the Actions tab
 
-Markdown/Jekyll and the Doxygen API are built in the same job. If CMake configure fails, the whole deploy fails â€” including the markdown site â€” even when Jekyll itself succeeded.
+Markdown/Jekyll and the Doxygen API are built in the same job. If CMake configure fails, the whole deploy fails — including the markdown site — even when Jekyll itself succeeded.
 
 ### Related documentation
 
@@ -47,7 +47,7 @@ On GitHub â†’ **Actions** â†’ **Deploy Jekyll and Doxygen**:
 | Build with doxygen | Skipped |
 | Upload artifact / deploy | Skipped |
 
-The annotation often only says `Process completed with exit code 1` on the Configure step. Open that stepâ€™s log for the real CMake/vcpkg error.
+The annotation often only says `Process completed with exit code 1` on the Configure step. Open that step’s log for the real CMake/vcpkg error.
 
 The live Pages site keeps the **previous** successful deploy until a new run succeeds.
 
@@ -125,7 +125,7 @@ Remember nested paths under `user/`, `developer/`, and `technical/` may differ f
 - [ ] Failed step is **Configure HealthGPS**, not Jekyll
 - [ ] Read the Configure log (not only the annotation)
 - [ ] `docs.yml` vcpkg cache matches `ci.yml` (`x-gha` + cache env export)
-- [ ] Same commitâ€™s CI configure is green (or understand why it isnâ€™t)
+- [ ] Same commit’s CI configure is green (or understand why it isn’t)
 - [ ] Re-run **Deploy Jekyll and Doxygen** after the fix
 - [ ] Confirm `/` and `/api/` on Pages
 

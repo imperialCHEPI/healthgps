@@ -69,7 +69,7 @@ flowchart TB
     subgraph sim [Simulation]
         INIT[Initialise RF from<br/>Box-Cox + logistic]
         ADJ[Factors-mean adjustment<br/>overall income then per-stratum RF/PA]
-        EVAL[evaluate_linear_model<br/>intercept + Î£ Î²Â·x]
+        EVAL[evaluate_linear_model<br/>intercept + Î£ Î²·x]
         POL[Apply policy effects]
     end
 
@@ -104,12 +104,12 @@ Previously we only had one overall pair of tables:
 
 This way the virtual population can match nutrient and activity patterns **conditional on income rank**, not only sex and age.
 
-### 2.2 Two different â€œincome bucketâ€ concepts - do not mix them up
+### 2.2 Two different “income bucket” concepts - do not mix them up
 
 | Concept                     | Where in config                                                | What it does                                                                                                                                               |
 | --------------------------- | -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Final income categories** | `project_requirements.income.categories` (`"3"`, `"4"`, `"5"`) | Sets discrete `person.income` for reporting and other model logic. Assigned by equal rank split after continuous income is set.                            |
-| **Adjustment strata**       | `modelling.baseline_adjustments.income_stratum_factors_mean`   | Rank buckets used **only** for factors-mean adjustment. Each bucket has its own expected CSV pair. Stored as `person.income_adjustment_stratum` (0 â€¦ Nâˆ’1). |
+| **Adjustment strata**       | `modelling.baseline_adjustments.income_stratum_factors_mean`   | Rank buckets used **only** for factors-mean adjustment. Each bucket has its own expected CSV pair. Stored as `person.income_adjustment_stratum` (0 … Nâˆ’1). |
 
 **FINCH example:** we use `income.categories = "5"` and `adjustment_income_stratum_count = 5` with quintile-specific factors-mean files - five final categories **and** five adjustment strata, but they serve different purposes.
 
@@ -163,7 +163,7 @@ Under `modelling.baseline_adjustments` in `new_config.json`:
 }
 ```
 
-(Full FINCH config lists Quintile1 â€¦ Quintile5.)
+(Full FINCH config lists Quintile1 … Quintile5.)
 
 ### 2.4 Validation rules (enforced at load)
 
@@ -177,7 +177,7 @@ Under `modelling.baseline_adjustments` in `new_config.json`:
 
 Schema: `schemas/v1/config/modelling.json` â†’ `baseline_adjustments.income_stratum_factors_mean`.
 
-**See also:** [Income quintile factor means plan](../plans/income-quintile-factor-means-plan.md) (implementation phases) Â· [Dynamic income categories plan](../plans/dynamic-income-categories-plan.md) (final `person.income` buckets)
+**See also:** [Income quintile factor means plan](../plans/income-quintile-factor-means-plan.md) (implementation phases) · [Dynamic income categories plan](../plans/dynamic-income-categories-plan.md) (final `person.income` buckets)
 
 ### 2.5 Adjustment flow - what happens, in order
 
@@ -196,15 +196,15 @@ Read this top to bottom. Each step finishes before the next one starts.
 | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- | ------------------------ |
 | **1**    | Generate starting risk factors (nutrients, etc.) from Box-Cox / logistic / regression models                                                               | - (model CSVs only)                                 | Whole population         |
 | **2**    | Adjust **income only**                                                                                                                                     | Overall `Finch.FactorsMean.Male.csv` / `Female.csv` | Whole population         |
-| **3**    | Sort everyone by continuous income and split into **N equal rank buckets** (e.g. 5 quintiles). Each person gets `income_adjustment_stratum` = 0, 1, â€¦, Nâˆ’1 | -                                                   | Whole population         |
+| **3**    | Sort everyone by continuous income and split into **N equal rank buckets** (e.g. 5 quintiles). Each person gets `income_adjustment_stratum` = 0, 1, …, Nâˆ’1 | -                                                   | Whole population         |
 | **4a**   | Adjust **risk factors** (all nutrients - **not** income, **not** physical activity)                                                                        | Quintile **1** male/female tables                   | Only people in stratum 0 |
 | **4b**   | Adjust **physical activity** (if enabled in config)                                                                                                        | Quintile **1** male/female tables                   | Only people in stratum 0 |
 | **5a**   | Same as 4a                                                                                                                                                 | Quintile **2** tables                               | Only people in stratum 1 |
 | **5b**   | Same as 4b                                                                                                                                                 | Quintile **2** tables                               | Only people in stratum 1 |
-| â€¦        | Repeat for quintiles 3, 4, 5 (or however many strata you configured)                                                                                       | Per-quintile tables                                 | One stratum at a time    |
+| …        | Repeat for quintiles 3, 4, 5 (or however many strata you configured)                                                                                       | Per-quintile tables                                 | One stratum at a time    |
 | **Last** | Assign **final income categories** (3, 4, or 5 groups per `income.categories`)                                                                             | -                                                   | Whole population         |
 
-**In plain terms:** income is calibrated to the **national** expected table first; then nutrients and PA are calibrated **separately within each income quintile**, using that quintileâ€™s own factors-mean files.
+**In plain terms:** income is calibrated to the **national** expected table first; then nutrients and PA are calibrated **separately within each income quintile**, using that quintile’s own factors-mean files.
 
 #### Small example (N = 5 quintiles)
 
@@ -219,11 +219,11 @@ Step 3 - split by income rank:
   Stratum 4 (Quintile5): highest 200        â†’ use Finch.FactorsMean.*.Quintile5.csv
 
 Step 4-5 - for Quintile1 only:
-  Adjust FoodCarbohydrate, FoodFat, â€¦ (not income, not PA) to match Quintile1 expected means by sex/age
+  Adjust FoodCarbohydrate, FoodFat, … (not income, not PA) to match Quintile1 expected means by sex/age
 
 Step 4-5 - for Quintile2 only:
   Same nutrients, but now using Quintile2 expected means
-  â€¦ and so on for Quintile3, 4, 5
+  … and so on for Quintile3, 4, 5
 ```
 
 ```mermaid
@@ -278,15 +278,15 @@ Each nutrient (e.g. FoodCarbohydrate) goes through **two stages**.
 
 **Stage A - build a linear score `Z`**
 
-Add up the intercept and every predictor Ã— its coefficient from the Box-Cox CSV:
+Add up the intercept and every predictor × its coefficient from the Box-Cox CSV:
 
 ```text
 Z = intercept
-  + (coef_gender2  Ã— gender2)
-  + (coef_age1     Ã— age)
-  + (coef_age2     Ã— ageÂ²)
-  + (coef_log_income Ã— log(income))
-  + â€¦ other predictors â€¦
+  + (coef_gender2  × gender2)
+  + (coef_age1     × age)
+  + (coef_age2     × ageÂ²)
+  + (coef_log_income × log(income))
+  + … other predictors …
 ```
 
 **Stage B - transform `Z` back to the nutrient scale `Y`**
@@ -305,15 +305,15 @@ Policy CSVs use the **same linear part** on the Box-Cox scale. For nutrient *i* 
 
 ```text
 Z_i = Intercept
-    + Î²_gender2    Ã— gender2
-    + Î²_age1       Ã— age
-    + Î²_age2       Ã— ageÂ²
-    + Î²_log_income Ã— log(income)
-    + Î²_log_income2 Ã— (log(income))Â²
-    + Î²_region2    Ã— (1 if region 2, else 0)
-    + Î²_region3    Ã— (1 if region 3, else 0)
-    + â€¦ etc â€¦
-    + Î²_log_energy Ã— log(EnergyIntake)
+    + Î²_gender2    × gender2
+    + Î²_age1       × age
+    + Î²_age2       × ageÂ²
+    + Î²_log_income × log(income)
+    + Î²_log_income2 × (log(income))Â²
+    + Î²_region2    × (1 if region 2, else 0)
+    + Î²_region3    × (1 if region 3, else 0)
+    + … etc …
+    + Î²_log_energy × log(EnergyIntake)
 ```
 
 **How the CSV maps to this:**
@@ -322,7 +322,7 @@ Z_i = Intercept
 | -------------------------------------- | ---------------------------------------------------- |
 | **Column** (e.g. `FoodCarbohydrate`)   | The nutrient *i* - one equation per column           |
 | **Row** (e.g. `gender2`, `log_income`) | A predictor - one term in the sum                    |
-| **Cell** at (row, column)              | The coefficient Î² for that predictor Ã— that nutrient |
+| **Cell** at (row, column)              | The coefficient Î² for that predictor × that nutrient |
 
 Coefficients are read **directly from the CSV**. The code does not re-estimate or rescale them. They only work correctly if predictor values match how the regression was coded (Sections 4 and 6).
 
@@ -332,7 +332,7 @@ In code, the linear score is:
 
 ```text
 linear = intercept
-       + sum of (coefficient[j] Ã— predictor_value[j])   for each row j in the CSV
+       + sum of (coefficient[j] × predictor_value[j])   for each row j in the CSV
 ```
 
 Special cases:
@@ -346,8 +346,8 @@ Special cases:
 | ------------- | ---------------------- | ------------------ | ------------------------- |
 | Intercept     | 17.99                  | 1 (implicit)       | 17.99                     |
 | gender2       | 0.062                  | 0 (male)           | 0                         |
-| log_income    | âˆ’8.36                  | log(25000) â‰ˆ 10.13 | âˆ’8.36 Ã— 10.13 â‰ˆ âˆ’84.7     |
-| â€¦             | â€¦                      | â€¦                  | â€¦                         |
+| log_income    | âˆ’8.36                  | log(25000) â‰ˆ 10.13 | âˆ’8.36 × 10.13 â‰ˆ âˆ’84.7     |
+| …             | …                      | …                  | …                         |
 | **Sum**       |                        |                    | **â†’ Z for that nutrient** |
 
 ```mermaid
@@ -355,7 +355,7 @@ flowchart LR
     CSV[CSV row: log_income] --> LOAD[Coefficient stored under name log_income]
     LOAD --> EVAL[Look up person income]
     EVAL --> LOG[Compute log income]
-    LOG --> SUM[Add beta Ã— log income to linear sum]
+    LOG --> SUM[Add beta × log income to linear sum]
 ```
 
 ### 3.4 Code locations (for Mahima / developers)
@@ -384,16 +384,16 @@ flowchart LR
 
 | Name          | Means                     | Does **not** mean    |
 | ------------- | ------------------------- | -------------------- |
-| `income2`     | income Ã— income           | -                    |
-| `log_income2` | log(income) Ã— log(income) | log(income Ã— income) |
+| `income2`     | income × income           | -                    |
+| `log_income2` | log(income) × log(income) | log(income × income) |
 
 ### 4.2 Age
 
 | CSV row              | What the code plugs in                                 |
 | -------------------- | ------------------------------------------------------ |
 | `age`, `age1`, `Age` | age (optionally capped by `max_age_for_linear_models`) |
-| `age2`, `Age2`       | age Ã— age                                              |
-| `age3`, â€¦            | age raised to that power                               |
+| `age2`, `Age2`       | age × age                                              |
+| `age3`, …            | age raised to that power                               |
 
 ### 4.3 Region and ethnicity dummies
 
@@ -432,7 +432,7 @@ Questions economists on the project have asked, with the answers we agreed on.
 
 ---
 
-### Q1: Why doesnâ€™t `normalize_policy_coefficient_row()` mention `log_income`?
+### Q1: Why doesn’t `normalize_policy_coefficient_row()` mention `log_income`?
 
 **Answer:** `log_income` is **not** created by normalization. It is a **literal row name** in the policy CSV. The loader stores the coefficient; at evaluation the code computes `log(income)` when the row name starts with `log_`.
 
@@ -446,7 +446,7 @@ Normalization is **only** for energy-intake naming (Section 4.4).
 
 ---
 
-### Q3: Is the policy model â€œBoxCox(Y) = Î²â‚€ + Î²â‚ Xâ‚ + â€¦â€ consistent with the code?
+### Q3: Is the policy model “BoxCox(Y) = Î²â‚€ + Î²â‚ Xâ‚ + …” consistent with the code?
 
 **Answer:** **Yes.**
 
@@ -461,15 +461,15 @@ Coefficients are not altered at load (except energy-intake **renaming**, not sig
 
 ---
 
-### Q4: Should `log_income` be log(income) and `log_income2` be log(income) Ã— log(income)?
+### Q4: Should `log_income` be log(income) and `log_income2` be log(income) × log(income)?
 
 **Answer:** **Yes.**
 
 | CSV name      | Code plugs in                |
 | ------------- | ---------------------------- |
 | `log_income`  | log(income)                  |
-| `log_income2` | log(income) Ã— log(income)    |
-| `income2`     | income Ã— income (not logged) |
+| `log_income2` | log(income) × log(income)    |
+| `income2`     | income × income (not logged) |
 
 ---
 
@@ -519,7 +519,7 @@ gender2 = 1  if person is female
 gender2 = 0  if person is male
 ```
 
-Contribution to the linear sum: `coef_gender2 Ã— gender2`
+Contribution to the linear sum: `coef_gender2 × gender2`
 
 ### 6.2 Configuration
 
@@ -548,7 +548,7 @@ Schema: `schemas/v1/config/project_requirements.json`.
 3. For each person:
      if person.sex matches the configured indicator  â†’  gender2 = 1
      else                                            â†’  gender2 = 0
-4. Add to linear sum:  coef_gender2 Ã— gender2
+4. Add to linear sum:  coef_gender2 × gender2
 ```
 
 | Config `gender2`   | Female person | Male person |
@@ -561,7 +561,7 @@ Schema: `schemas/v1/config/project_requirements.json`.
 | File                                                     | Contains `gender2` row |
 | -------------------------------------------------------- | ---------------------- |
 | `boxcox_coefficients.csv`                                | Yes                    |
-| `policyeffect_model.csv` / `S1_policyeffect_model.csv` â€¦ | Yes                    |
+| `policyeffect_model.csv` / `S1_policyeffect_model.csv` … | Yes                    |
 | `logistic_regression.csv`                                | Yes                    |
 | `income_model.csv`                                       | Yes                    |
 | `physicalactivity_model.csv`                             | Yes                    |
@@ -660,7 +660,7 @@ For implementation detail, debugging, or config help, please contact **Mahima Gh
 
 *June 2026 - income-stratum adjustment and `demographics.gender2` on the Health-GPS development branch.*
 
-[â† Technical documentation index](../README.md) Â· [Documentation index](../../README.md)
+[â† Technical documentation index](../README.md) · [Documentation index](../../README.md)
 
 ---
 

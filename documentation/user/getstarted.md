@@ -117,7 +117,7 @@ In a similar manner, the resulting dataset `df`, can be re-created and expanded 
 
 ---
 
-[â† User documentation index](README.md) Â· [Documentation index](../README.md)
+[â† User documentation index](README.md) · [Documentation index](../README.md)
 
 [configjson]:https://github.com/imperialCHEPI/healthgps-examples/tree/main/HLM_France/config.json "Configuration file example"
 [examplesrepo]:https://github.com/imperialCHEPI/healthgps-examples "Health-GPS examples repository"

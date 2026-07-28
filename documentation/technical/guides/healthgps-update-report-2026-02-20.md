@@ -7,7 +7,7 @@
 **Period:** September 2025 - February 2026
 **Last updated:** 20 February 2026
 
-**Related documentation:** [FINCH linear models guide](finch-linear-models-and-income-adjustment.md) Â· [Income quintile factor means plan](../plans/income-quintile-factor-means-plan.md) Â· [Individual ID tracking plan](../plans/individual-id-tracking-csv-plan.md) Â· [Same person ID plan](../plans/same-person-id-baseline-intervention-plan.md) Â· [Architecture guide](../../developer/architecture.md) Â· [Technical index](../README.md)
+**Related documentation:** [FINCH linear models guide](finch-linear-models-and-income-adjustment.md) · [Income quintile factor means plan](../plans/income-quintile-factor-means-plan.md) · [Individual ID tracking plan](../plans/individual-id-tracking-csv-plan.md) · [Same person ID plan](../plans/same-person-id-baseline-intervention-plan.md) · [Architecture guide](../../developer/architecture.md) · [Technical index](../README.md)
 
 ---
 
@@ -276,7 +276,7 @@ Reference: [analysis_module.cpp](src/HealthGPS/analysis_module.cpp), [result_fil
 
 ## 10. Disease module
 
-- **Population Impact Fraction (PIF):** Optional mode computes disease probability as `incidence Ã— (1 âˆ’ PIF)`, with PIF depending on age, gender, years post intervention, and disease-specific values. Configurable on/off.
+- **Population Impact Fraction (PIF):** Optional mode computes disease probability as `incidence × (1 âˆ’ PIF)`, with PIF depending on age, gender, years post intervention, and disease-specific values. Configurable on/off.
 - **Outputs:** Incidence, remission, prevalence, YLD, YLL, DALY, and mortality follow existing module structure with PIF integration where enabled.
 
 Reference: [default_disease_model.cpp](src/HealthGPS/default_disease_model.cpp), [pif_data.cpp](src/HealthGPS.Input/pif_data.cpp).

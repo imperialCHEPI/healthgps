@@ -260,7 +260,7 @@ Lambda-Mu-Sigma (LMS) parameters for converting childhood BMI risk-factor values
 
 ### Cost of disease / BoD tables
 
-Cost-of-disease lookup data sits in `DiseaseAnalysisEntity::cost_of_diseases` (age Ã— gender). The older ERD also showed a separate Burden of Disease measure table (*time* Ã— *age* Ã— *gender* Ã— *measure*). Treat that diagram as conceptual; the live `Datastore` contract is the methods and POCOs in `datastore.h` / `analysis.h`.
+Cost-of-disease lookup data sits in `DiseaseAnalysisEntity::cost_of_diseases` (age × gender). The older ERD also showed a separate Burden of Disease measure table (*time* × *age* × *gender* × *measure*). Treat that diagram as conceptual; the live `Datastore` contract is the methods and POCOs in `datastore.h` / `analysis.h`.
 
 ---
 

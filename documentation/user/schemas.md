@@ -6,7 +6,7 @@
 
 Health-GPS validates experiment inputs with [JSON Schema](https://json-schema.org/). Schemas live in the repository under [`schemas/`](https://github.com/imperialCHEPI/healthgps/tree/main/schemas); the Console loads them from the copy next to the built binary. Your `config.json` should declare which root schema it follows via the **`$schema`** URL.
 
-This page explains **how schemas fit together** and where to look when validation fails. For field-by-field config guidance and examples, use the [User Guide â€” Configuration](userguide.md#configuration). For machine-readable definitions, open the JSON files on GitHub or in your clone.
+This page explains **how schemas fit together** and where to look when validation fails. For field-by-field config guidance and examples, use the [User Guide — Configuration](userguide.md#configuration). For machine-readable definitions, open the JSON files on GitHub or in your clone.
 
 ---
 
@@ -16,7 +16,7 @@ This page explains **how schemas fit together** and where to look when validatio
 | ----- | ------------ | --------------------- |
 | Experiment configuration | `config.json` | [`schemas/v1/config.json`](https://github.com/imperialCHEPI/healthgps/blob/main/schemas/v1/config.json) |
 | Backend data catalogue | `data_index.json` (in downloaded data) | [`schemas/v1/data_index.json`](https://github.com/imperialCHEPI/healthgps/blob/main/schemas/v1/data_index.json) |
-| Risk-factor / model JSON | Paths under `modelling` | e.g. [`config/models/kevinhall.json`](https://github.com/imperialCHEPI/healthgps/blob/main/schemas/v1/config/models/kevinhall.json), `hlm.json`, `dynamic.json`, â€¦ |
+| Risk-factor / model JSON | Paths under `modelling` | e.g. [`config/models/kevinhall.json`](https://github.com/imperialCHEPI/healthgps/blob/main/schemas/v1/config/models/kevinhall.json), `hlm.json`, `dynamic.json`, … |
 
 At startup the CLI parses JSON, resolves **`$ref`** links to sub-schemas (data, inputs, modelling, running, output, model-specific files), and reports validation errors before a long run. Use **`--dry-run`** to validate without executing trials (see [Developer Guide](../developer/development.md)).
 
@@ -41,7 +41,7 @@ flowchart TB
     DATA --> DATAref["config/data.json<br/>URL or local datastore"]
     IN --> INref["config/inputs.json<br/>country, dataset CSV"]
     MOD --> MODref["config/modelling.json"]
-    MODref --> MODELS["config/models/*.json<br/>HLM, Kevin Hall, dynamic, â€¦"]
+    MODref --> MODELS["config/models/*.json<br/>HLM, Kevin Hall, dynamic, …"]
     RUN --> RUNref["config/running.json<br/>seed, trials, interventions"]
     OUT --> OUTref["config/output.json<br/>paths, comorbidities, ID tracking"]
 ```
@@ -76,7 +76,7 @@ flowchart LR
     IDX --> PIFidx[population_impact_fraction]
 ```
 
-See [User Guide â€” Backend storage](userguide.md#backend-storage) for how this connects to `config.json` â†’ `data`.
+See [User Guide — Backend storage](userguide.md#backend-storage) for how this connects to `config.json` â†’ `data`.
 
 ---
 
@@ -90,7 +90,7 @@ The repository may contain more than one schema tree while projects migrate:
 | **`schemas/v2/`** | Extended FINCH-style model definitions | Extra properties on some model schemas |
 | **`schemas/config/`** | Target unified layout | Described in the [schema migration plan](../technical/plans/schema-migration-plan.md) |
 
-Your **`$schema`** URL must match the tree the Console expects for that release. If validation fails after upgrading Health-GPS, compare your configâ€™s `$schema` with the example pack for your project and read the [update report](../technical/guides/healthgps-update-report-2026-02-20.md) (config/schema section).
+Your **`$schema`** URL must match the tree the Console expects for that release. If validation fails after upgrading Health-GPS, compare your config’s `$schema` with the example pack for your project and read the [update report](../technical/guides/healthgps-update-report-2026-02-20.md) (config/schema section).
 
 Legacy fields (for example top-level `income_categories` or `trend_type`) may still parse when **`project_requirements`** is omitted; the root schema marks many of these as **deprecated** in favour of `project_requirements`.
 
@@ -108,7 +108,7 @@ sequenceDiagram
     User->>Console: -c config.json
     Console->>Console: Read config $schema URL
     Console->>Local: Load vN/config.json + resolve_uri
-    Local->>Ref: config/data.json, modelling.json, â€¦
+    Local->>Ref: config/data.json, modelling.json, …
     Console->>Console: validate_json
     alt invalid
         Console-->>User: Schema error (path, message)
@@ -117,7 +117,7 @@ sequenceDiagram
     end
 ```
 
-Schema URLs use the prefix `https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/`; the Console maps that prefix to **`{program_dir}/schemas/`** (see `src/HealthGPS.Input/schema.cpp`). Editing `$schema` in config without updating the matching files under `schemas/` in your build causes â€œUnable to load URLâ€ or validation mismatches.
+Schema URLs use the prefix `https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/`; the Console maps that prefix to **`{program_dir}/schemas/`** (see `src/HealthGPS.Input/schema.cpp`). Editing `$schema` in config without updating the matching files under `schemas/` in your build causes “Unable to load URL” or validation mismatches.
 
 ---
 
@@ -135,9 +135,9 @@ Schema URLs use the prefix `https://raw.githubusercontent.com/imperialCHEPI/heal
 
 | Topic | Document |
 | ----- | -------- |
-| Config sections and examples | [User Guide â€” Configuration](userguide.md#configuration) |
-| `project_requirements` | [User Guide â€” Project requirements](userguide.md#project-requirements) |
-| Output / ID tracking schema | [User Guide â€” Output](userguide.md#output) |
+| Config sections and examples | [User Guide — Configuration](userguide.md#configuration) |
+| `project_requirements` | [User Guide — Project requirements](userguide.md#project-requirements) |
+| Output / ID tracking schema | [User Guide — Output](userguide.md#output) |
 | v1 â†’ unified migration | [Schema migration plan](../technical/plans/schema-migration-plan.md) |
 | Architecture / inputs | [Software Architecture](../developer/architecture.md) |
 

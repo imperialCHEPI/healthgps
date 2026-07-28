@@ -130,7 +130,7 @@ flowchart TD
   - Update types in [`C:/healthgps/src/HealthGPS/kevinhall_model.h`](C:/healthgps/src/HealthGPS/kevinhall_model.h) and relevant constructor/definition wiring in [`C:/healthgps/src/HealthGPS.Input/model_parser.cpp`](C:/healthgps/src/HealthGPS.Input/model_parser.cpp).
 - Apply height assignment using `income_adjustment_stratum` before final income category remap.
   - Reuse existing stratum assignment pattern (already used by other factor adjustments) from static model flow in [`C:/healthgps/src/HealthGPS/static_linear_model.cpp`](C:/healthgps/src/HealthGPS/static_linear_model.cpp) as behavioral reference.
-  - In KevinHall height logic (`generate`/`update` paths), select `slope`/`std` by personâ€™s adjustment stratum when available; otherwise use broadcast/scalar defaults.
+  - In KevinHall height logic (`generate`/`update` paths), select `slope`/`std` by person’s adjustment stratum when available; otherwise use broadcast/scalar defaults.
   - Preserve downstream final income category behavior (`project_requirements.income.categories`) unchanged.
 - Add/adjust tests for both backward compatibility and quintile behavior.
   - Update/add tests near [`C:/healthgps/src/HealthGPS.Tests/KevinHallWeightValidation.Test.cpp`](C:/healthgps/src/HealthGPS.Tests/KevinHallWeightValidation.Test.cpp) and related KevinHall input tests.

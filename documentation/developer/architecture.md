@@ -89,7 +89,7 @@ The *disease* module hosts multiple instances of disease models from known group
 |:----------------------------------------------------------------:|
 |                 *Disease Model Common Interface*                 |
 
-The main difference between the two groups of diseases is on internal modelling, both groupsâ€™ definition is country-based and include rates for disease: prevalence, incidence, mortality and remission by age and gender; and relative risks for diseases and risk factors. However, cancers detection, mortality and remission are modelled differently from the othersâ€™ group and require an additional set of parameters data to be provided as part of the definition.
+The main difference between the two groups of diseases is on internal modelling, both groups’ definition is country-based and include rates for disease: prevalence, incidence, mortality and remission by age and gender; and relative risks for diseases and risk factors. However, cancers detection, mortality and remission are modelled differently from the others’ group and require an additional set of parameters data to be provided as part of the definition.
 
 ## Virtual Population
 
@@ -99,7 +99,7 @@ Below are the class diagrams for the thin *Population* wrapper, the virtual *Per
 
 | ![Health-GPS Virtual Population](../images/virtual_population.png) |
 |:---------------------------------------------------------------:|
-|            *Virtual Populationâ€™s Entity definition*             |
+|            *Virtual Population’s Entity definition*             |
 
 Individuals get a lifetime-unique `id` within one `Population` (not reused after death or emigration; default-constructed persons stay unassigned until placed). Main fields on `Person` (`src/HealthGPS/person.h`):
 
@@ -186,7 +186,7 @@ Baseline and intervention runs can be paired with shared-memory synchronisation 
 
 | ![Health-GPS Policy Scenarios Sync](../images/scenarios_sync.svg) |
 |:--------------------------------------------------------------:|
-|       *Policy Scenarioâ€™s Data Synchronisation Mechanism*       |
+|       *Policy Scenario’s Data Synchronisation Mechanism*       |
 
 Scaling across machines with a broker (RabbitMQ, Kafka, and so on) is a possible future host design; the current Console path uses in-process pairing.
 

@@ -70,7 +70,7 @@ Finally, GitHub extensions are available for workflow integration with many popu
 
 ---
 
-[â† Developer documentation index](README.md) Â· [Documentation index](../README.md)
+[â† Developer documentation index](README.md) · [Documentation index](../README.md)
 
 ---
 

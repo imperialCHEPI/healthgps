@@ -81,7 +81,7 @@ flowchart LR
 
 ---
 
-## Other configured â€œmodelsâ€
+## Other configured “models”
 
 These are not `ModelName` types but belong in the same mental model:
 
@@ -101,7 +101,7 @@ These are not `ModelName` types but belong in the same mental model:
 | ---- | -------- |
 | Full inputs/outputs per model | [Simulation models reference](../technical/guides/simulation-models-reference.md) |
 | FINCH linear models & income | [FINCH guide](../technical/guides/finch-linear-models-and-income-adjustment.md) |
-| Static/dynamic JSON examples | [User Guide â€” Risk factor models](userguide.md#risk-factor-models) |
+| Static/dynamic JSON examples | [User Guide — Risk factor models](userguide.md#risk-factor-models) |
 | Config layout | [Configuration schemas](schemas.md) |
 | Example packs | [HealthGPS-examples](https://github.com/imperialCHEPI/healthgps-examples) |
 

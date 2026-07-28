@@ -10,7 +10,7 @@ The **Health-GPS** microsimulation is a *data driven* modelling framework, combi
 |:---------------------------------------------------:|
 |            *Health-GPS Workflow Diagram*            |
 
-As with any simulation model, the workflow starts with data, it is the user's responsibility to process and analyse the input data, define the modelâ€™s hierarchy, fit parameters to data, and design intervention. A *configuration* file is used to provide the user's datasets, model parameters, and control the simulation experiment runtime. The model is invoked via a *Command Line Interface* (CLI), which validates the configuration contents, loads associated files to create the model inputs, assembles the microsimulation with the required modules, evaluates the experiment, and writes the results to a chosen output *file* and *folder*. Likewise, it is the user's responsibility to analyse and quantify the model results and draw conclusions on the cost-effectiveness of the intervention.
+As with any simulation model, the workflow starts with data, it is the user's responsibility to process and analyse the input data, define the model’s hierarchy, fit parameters to data, and design intervention. A *configuration* file is used to provide the user's datasets, model parameters, and control the simulation experiment runtime. The model is invoked via a *Command Line Interface* (CLI), which validates the configuration contents, loads associated files to create the model inputs, assembles the microsimulation with the required modules, evaluates the experiment, and writes the results to a chosen output *file* and *folder*. Likewise, it is the user's responsibility to analyse and quantify the model results and draw conclusions on the cost-effectiveness of the intervention.
 
 > See [Quick Start](getstarted.md) to get started using the microsimulation with a working example.
 
@@ -1075,7 +1075,7 @@ Finally, array jobs are not suitable to all workflows. Because array jobs are in
 
 ---
 
-[â† User documentation index](README.md) Â· [Documentation index](../README.md)
+[â† User documentation index](README.md) · [Documentation index](../README.md)
 
 ---
 

@@ -105,7 +105,7 @@ flowchart TD
 For `WeightQuantiles.Female` and `.Male`, use **`oneOf`**:
 
 1. Legacy - `$ref` to `csv_file.json`
-2. Stratum - object with `Quintile1`, `Quintile2`, â€¦ each a `csv_file` block
+2. Stratum - object with `Quintile1`, `Quintile2`, … each a `csv_file` block
 
 **New format example:**
 
@@ -131,12 +131,12 @@ This is the approach to use unless requirements change later.
 
 | Approach | Config effort | Tradeoff |
 |----------|---------------|----------|
-| **Explicit `Quintile1`â€¦`N` (chosen)** | Repeat `format` / `delimiter` / `columns` per file (or copy-paste blocks) | Same pattern as factors-mean strata in [examples/config_skeleton.json](examples/config_skeleton.json); schema can validate each file; wrong or missing file fails at load with a clear path |
-| **Name pattern** e.g. `â€¦_quintile{n}.csv`, N from `adjustment_income_stratum_count` | One block per gender, fewer lines | Assumes rigid filenames; harder to mix non-standard names or skip a stratum |
+| **Explicit `Quintile1`…`N` (chosen)** | Repeat `format` / `delimiter` / `columns` per file (or copy-paste blocks) | Same pattern as factors-mean strata in [examples/config_skeleton.json](examples/config_skeleton.json); schema can validate each file; wrong or missing file fails at load with a clear path |
+| **Name pattern** e.g. `…_quintile{n}.csv`, N from `adjustment_income_stratum_count` | One block per gender, fewer lines | Assumes rigid filenames; harder to mix non-standard names or skip a stratum |
 | **Ordered `files` array** | List filenames once, shared format on parent | Slightly shorter JSON, but still N filenames; new schema shape |
 | **Directory glob** | Almost nothing in JSON | Fragile ordering, accidental extra CSVs, weak validation |
 
-**Practical tip:** For FINCH, duplicate the existing `Female` / `Male` csv block five times, change `name` to `_quintile1` â€¦ `_quintile5`, and nest under `Quintile1` â€¦ `Quintile5`. No magic paths-the filenames in JSON are exactly what get loaded.
+**Practical tip:** For FINCH, duplicate the existing `Female` / `Male` csv block five times, change `name` to `_quintile1` … `_quintile5`, and nest under `Quintile1` … `Quintile5`. No magic paths-the filenames in JSON are exactly what get loaded.
 
 Factors-mean quintiles stay in **config.json** (`baseline_adjustments.income_stratum_factors_mean.strata`); weight quantiles stay in **dynamic_model.json** because Kevin Hall already owns `WeightQuantiles` there today.
 
@@ -149,11 +149,11 @@ Replace the flat load at ~1864-1883 with a helper similar to Height (~1901-1937)
 | Config input | `adjustment_income_stratum_count` | Loaded shape per gender |
 |--------------|-----------------------------------|-------------------------|
 | Single `csv_file` | any | One vector; broadcast to N if stratum mode on and N > 1 |
-| `Quintile1`â€¦`QuintileN` | N | N vectors; error if file count â‰  N |
+| `Quintile1`…`QuintileN` | N | N vectors; error if file count â‰  N |
 | Wrong count | - | Parse error with file count vs expected N |
 
 - Load each file: `load_datatable_from_csv`, first column `double`, sort once at load.
-- Order quintile keys numerically (`Quintile1`, `Quintile2`, â€¦).
+- Order quintile keys numerically (`Quintile1`, `Quintile2`, …).
 - Read `config.modelling.baseline_adjustment.income_stratum_factors_mean` for `enabled` and `adjustment_income_stratum_count` (same as height ~1897-1899).
 - If multiple quintile files are configured but stratum adjustment is disabled, fail at parse time.
 
@@ -189,7 +189,7 @@ Modeled on `print_height_stratum_assignment_table`:
 | Column | Content |
 |--------|---------|
 | Bucket | `person.income_adjustment_stratum` (0..N-1) |
-| Stratum ID | `Quintile1` â€¦ `QuintileN` |
+| Stratum ID | `Quintile1` … `QuintileN` |
 | Count | Active people in bucket |
 | Quantile size | Number of values loaded for that stratum (sanity check) |
 | Weight Min / Max / Mean | From `person.risk_factors["Weight"]` after assignment in that step |
