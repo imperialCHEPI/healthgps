@@ -1,7 +1,6 @@
 # Project requirements: config-driven behaviour (no project hacks)
 
 **Author:** Mahima Ghosh
-**Engineering contact:** Mahima Ghosh
 
 **Related:** [FINCH linear models guide](../guides/finch-linear-models-and-income-adjustment.md) | [Schema migration plan](schema-migration-plan.md) | [Technical index](../README.md) | [Documentation index](../../README.md)
 
@@ -233,4 +232,3 @@ After Phase 3, no code path should branch on “India” / “FINCH” / “PIF�
 ---
 
 **Author:** Mahima Ghosh
-**Engineering contact:** Mahima Ghosh

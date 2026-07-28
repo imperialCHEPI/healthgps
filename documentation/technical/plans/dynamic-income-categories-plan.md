@@ -1,7 +1,6 @@
 # Dynamic Final Income Categories (3/4/5) + Stratum Adjustment
 
 **Author:** Mahima Ghosh
-**Engineering contact:** Mahima Ghosh
 
 **Related:** [FINCH linear models guide](../guides/finch-linear-models-and-income-adjustment.md) | [Income quintile factor means plan](income-quintile-factor-means-plan.md) | [Technical index](../README.md) | [Documentation index](../../README.md)
 
@@ -195,4 +194,3 @@ Register new test file in `[src/HealthGPS.Tests/CMakeLists.txt](src/HealthGPS.Te
 ---
 
 **Author:** Mahima Ghosh
-**Engineering contact:** Mahima Ghosh

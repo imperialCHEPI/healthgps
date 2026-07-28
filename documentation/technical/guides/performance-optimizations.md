@@ -1,7 +1,6 @@
 # Health-GPS performance and parallelization
 
 **Author:** Mahima Ghosh
-**Engineering contact:** Mahima Ghosh
 
 **Related:** [HealthGPS update report](healthgps-update-report-2026-02-20.md) (section 4) · [Developer Guide](../../developer/development.md) · [MSVC troubleshooting](../../developer/msvc-windows-build-troubleshooting.md) · [Technical index](../README.md)
 
@@ -87,4 +86,3 @@ Do not expect near-linear speedup by raising `-T` beyond the work available per 
 ---
 
 **Author:** Mahima Ghosh
-**Engineering contact:** Mahima Ghosh

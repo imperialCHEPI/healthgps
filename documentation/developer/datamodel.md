@@ -5,7 +5,6 @@
 # Data Model
 
 **Author:** Mahima Ghosh
-**Engineering contact:** Mahima Ghosh
 
 **Interfaces:** `hgps::core::Datastore` in `src/HealthGPS.Core/datastore.h`. File-backed implementation: `hgps::input::DataManager` in `src/HealthGPS.Input/datamanager.h`.
 
@@ -290,7 +289,6 @@ Different [Data API][dataapi] implementations can be injected at construction; t
 ---
 
 **Author:** Mahima Ghosh
-**Engineering contact:** Mahima Ghosh
 
 [dataapi]: ../../src/HealthGPS.Core/datastore.h "Health-GPS Data API definition (Datastore)."
 

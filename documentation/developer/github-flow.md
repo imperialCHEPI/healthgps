@@ -1,7 +1,6 @@
 # Health-GPS Project Model Branching Policy
 
 **Author:** Mahima Ghosh
-**Engineering contact:** Mahima Ghosh
 
 | [Home](../index.md) | [Quick Start](../user/getstarted.md) | [User Guide](../user/userguide.md) | [Software Architecture](architecture.md) | [Data Model](datamodel.md) | [Developer Guide](development.md) | [Technical docs](../technical/README.md) | [API (Pages)](https://imperialchepi.github.io/healthgps/api/) |
 
@@ -76,4 +75,3 @@ Finally, GitHub extensions are available for workflow integration with many popu
 ---
 
 **Author:** Mahima Ghosh
-**Engineering contact:** Mahima Ghosh

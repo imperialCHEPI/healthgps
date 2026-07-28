@@ -5,7 +5,6 @@
 # Developer Guide
 
 **Author:** Mahima Ghosh
-**Engineering contact:** Mahima Ghosh
 
 The *Health GPS* software is written in modern, standard ANSI C++, targeting the [C++20 version](https://en.cppreference.com/w/cpp/20) and using the C++ Standard Library. The project is fully managed by [CMake](https://cmake.org/) and [Microsoft Visual Studio](https://visualstudio.microsoft.com), the code base is portable but requires a C++20 compatible compiler to build. The development toolset users [Ninja](https://ninja-build.org/) for build, [vcpkg](https://github.com/microsoft/vcpkg) package manager for dependencies, [googletest](https://github.com/google/googletest) for unit testing and [GitHub Actions](https://docs.github.com/en/actions) for continuous integration (CI) builds and testing.
 
@@ -387,4 +386,3 @@ Health-GPS uses the GitHub flow branching pattern for git. For more information,
 ---
 
 **Author:** Mahima Ghosh
-**Engineering contact:** Mahima Ghosh

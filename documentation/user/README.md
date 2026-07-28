@@ -1,7 +1,6 @@
 # User documentation
 
 **Author:** Mahima Ghosh
-**Engineering contact:** Mahima Ghosh
 
 Guides for running Health-GPS (binaries or a local build).
 
@@ -29,4 +28,3 @@ Guides for running Health-GPS (binaries or a local build).
 ---
 
 **Author:** Mahima Ghosh
-**Engineering contact:** Mahima Ghosh

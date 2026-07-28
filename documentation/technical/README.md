@@ -1,7 +1,6 @@
 # Technical documentation
 
 **Author:** Mahima Ghosh
-**Engineering contact:** Mahima Ghosh
 
 Implementation notes, project reports, and modeller guides (FINCH, India, shared codebase).
 
@@ -57,4 +56,3 @@ Engineering design notes for developers. Written as ordinary markdown plans (sum
 ---
 
 **Author:** Mahima Ghosh
-**Engineering contact:** Mahima Ghosh

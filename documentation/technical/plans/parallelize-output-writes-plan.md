@@ -1,7 +1,6 @@
 # Parallelize output writes and reduce is_active() calls
 
 **Author:** Mahima Ghosh
-**Engineering contact:** Mahima Ghosh
 
 **Related:** [Individual ID tracking plan](individual-id-tracking-csv-plan.md) | [Technical index](../README.md) | [Documentation index](../../README.md)
 
@@ -104,4 +103,3 @@ No changes to [result_file_writer.cpp](src/HealthGPS.Console/result_file_writer.
 ---
 
 **Author:** Mahima Ghosh
-**Engineering contact:** Mahima Ghosh

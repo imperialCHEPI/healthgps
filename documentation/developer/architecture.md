@@ -5,7 +5,6 @@
 # Software Architecture
 
 **Author:** Mahima Ghosh
-**Engineering contact:** Mahima Ghosh
 
 **Source layout:** `src/HealthGPS` (engine), `src/HealthGPS.Core` (Data API / POCOs), `src/HealthGPS.Input` (file datastore + config), `src/HealthGPS.Console` (host), `src/HealthGPS.Tests`. ADEVS is vendored under `src/external/adevs`.
 
@@ -244,7 +243,6 @@ The version of the *libraries* required by the application at runtime depends on
 ---
 
 **Author:** Mahima Ghosh
-**Engineering contact:** Mahima Ghosh
 
 [cpp20]:https://en.cppreference.com/w/cpp/20 "C++ 20 standard features and compiler support"
 [kafka]:https://kafka.apache.org "Distributed event streaming platform"

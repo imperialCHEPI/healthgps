@@ -5,7 +5,6 @@
 # User Guide
 
 **Author:** Mahima Ghosh
-**Engineering contact:** Mahima Ghosh
 
 The **Health-GPS** microsimulation is a *data driven* modelling framework, combining many disconnected data sources to support the various interacting modules during a typical simulation experiment run. The framework provides a pre-populated *backend data storage* to minimise the learning curve for simple use cases, however advance users are likely to need a more in-depth knowledge of the full modelling workflow. A high-level representation of the microsimulation user workflow is shown below, it is crucial for users to have a good appreciation for the general dataflows and processes to better design experiments, configure the tool, and quantify the results.
 
@@ -1083,4 +1082,3 @@ Finally, array jobs are not suitable to all workflows. Because array jobs are in
 ---
 
 **Author:** Mahima Ghosh
-**Engineering contact:** Mahima Ghosh

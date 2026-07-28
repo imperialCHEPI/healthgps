@@ -1,7 +1,6 @@
 # FINCH linear models, predictor encoding, and income-stratum adjustment
 
 **Author:** Mahima Ghosh
-**Engineering contact:** Mahima Ghosh
 
 **Last updated:** June 2026
 
@@ -664,4 +663,3 @@ For implementation detail, debugging, or config help, please contact **Mahima Gh
 ---
 
 **Author:** Mahima Ghosh
-**Engineering contact:** Mahima Ghosh

@@ -1,7 +1,6 @@
 # Windows MSVC / Ninja build troubleshooting
 
 **Author:** Mahima Ghosh
-**Engineering contact:** Mahima Ghosh
 
 **Last updated:** July 2026
 
@@ -235,4 +234,3 @@ If you see `cstdint`, `CMAKE_CXX_COMPILER`, or `MSVCRTD.lib` errors on Windows, 
 ---
 
 **Author:** Mahima Ghosh
-**Engineering contact:** Mahima Ghosh

@@ -1,7 +1,6 @@
 # HealthGPS Project Update Report
 
 **Author:** Mahima Ghosh
-**Engineering contact:** Mahima Ghosh
 
 **Period:** September 2025 - February 2026
 **Last updated:** 20 February 2026
@@ -443,4 +442,3 @@ Example runs and configuration: [quick start](../../user/getstarted.md).
 ---
 
 **Author:** Mahima Ghosh
-**Engineering contact:** Mahima Ghosh

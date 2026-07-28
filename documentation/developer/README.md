@@ -1,7 +1,6 @@
 # Developer documentation
 
 **Author:** Mahima Ghosh
-**Engineering contact:** Mahima Ghosh
 
 Docs for building Health-GPS, reading the architecture, and contributing.
 
@@ -34,4 +33,3 @@ Docs for building Health-GPS, reading the architecture, and contributing.
 ---
 
 **Author:** Mahima Ghosh
-**Engineering contact:** Mahima Ghosh
