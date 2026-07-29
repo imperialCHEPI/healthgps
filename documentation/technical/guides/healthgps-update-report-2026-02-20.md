@@ -11,8 +11,6 @@
 
 ---
 
-
-
 ## Executive summary
 
 This report documents the integrated Health-GPS codebase changes delivered between November 2025 and February 2026. The work unifies support for **India**, **ADB**, and **FINCH** within a single branch, extends demographic and socioeconomic modelling, refines static and dynamic risk-factor pipelines, and adds analysis, disease, policy, and configuration capabilities described below.
@@ -20,8 +18,6 @@ This report documents the integrated Health-GPS codebase changes delivered betwe
 The report is intended for modellers, economists, and developers who need a single reference for **what changed**, **how modules interact**, and **where to look in the source tree**. It complements the existing [architecture guide](../../developer/architecture.md), [user guide](../../user/userguide.md), and [quick start](../../user/getstarted.md) rather than replacing them.
 
 ---
-
-
 
 ## Table of contents
 
@@ -45,8 +41,6 @@ The report is intended for modellers, economists, and developers who need a sing
 
 ---
 
-
-
 ## 1. Introduction and scope
 
 The updates described in this report extend Health-GPS from a project-specific codebase into an integrated platform that supports multiple country and study configurations through shared modules, schemas, and input conventions.
@@ -64,10 +58,7 @@ Behaviour is documented relative to the main branch as of **20 February 2026**.
 
 ---
 
-
-
 ## 2. Supported projects and compatibility
-
 
 | Project | Status                             |
 | ------- | ---------------------------------- |
@@ -75,14 +66,11 @@ Behaviour is documented relative to the main branch as of **20 February 2026**.
 | ADB     | Supported on the integrated branch |
 | FINCH   | Supported on the integrated branch |
 
-
 **Backward compatibility:** Legacy India configuration formats continue to work. Configurations may be migrated to the new format incrementally; the code accepts both old and revised schemas where stated in Section 12.
 
 **Repository note:** When uploading JSON to `healthgps-examples`, existing Kevin Hall folders should be preserved. New JSON files should be added in a separate folder rather than replacing or deleting legacy examples.
 
 ---
-
-
 
 ## 3. Application workflow
 
@@ -97,10 +85,6 @@ flowchart LR
     RF --> DIS[Disease Module]
     DIS --> IO[Read/write to files]
 ```
-
-
-
-
 
 ### 3.2 Host application and run loop
 
@@ -178,12 +162,7 @@ flowchart TB
     A_UPD --> PUB
 ```
 
-
-
-
-
 ### 3.3 Developer file map
-
 
 | Area                                           | Entry / main files                                                                                                                                                                                                                 |
 | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -198,17 +177,13 @@ flowchart TB
 | Result and ID-tracking output                  | [result_file_writer.cpp](../../../src/HealthGPS.Console/result_file_writer.cpp), [individual_id_tracking_writer.cpp](../../../src/HealthGPS.Console/individual_id_tracking_writer.cpp), [event_monitor.cpp](../../../src/HealthGPS.Console/event_monitor.cpp) |
 | Config and schema                              | [configuration.cpp](../../../src/HealthGPS.Input/configuration.cpp), [configuration_parsing.cpp](../../../src/HealthGPS.Input/configuration_parsing.cpp), [schema.cpp](../../../src/HealthGPS.Input/schema.cpp)                                               |
 
-
 ---
-
-
 
 ## 4. Parallelization
 
 Health-GPS uses Intel TBB and core threading helpers in selected hot paths. The tables below summarise where concurrency is applied and where sequential execution is retained for correctness or reproducibility.
 
 ### 4.1 Parallelized components
-
 
 | Location                                                                                                                                                                                         | Mechanism                                                                                                                     | Rationale                                                                                                                   |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
@@ -223,11 +198,7 @@ Health-GPS uses Intel TBB and core threading helpers in selected hot paths. The 
 | **Event bus** ([event_bus.cpp](../../../src/HealthGPS/event_bus.cpp))                                                                                                                                     | `publish_async` via `core::run_async`                                                                                         | Non-blocking subscriber notification                                                                                        |
 | **EventMonitor** ([event_monitor.cpp](../../../src/HealthGPS.Console/event_monitor.cpp))                                                                                                                  | Separate queues and dispatch threads for result vs individual-tracking messages                                               | Parallel main-result and tracking writes (see [parallelize output writes plan](../plans/parallelize-output-writes-plan.md)) |
 
-
-
-
 ### 4.2 Sequential components
-
 
 | Location                                                                                                                                 | Behaviour                                                           | Rationale                                        |
 | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------ |
@@ -236,9 +207,6 @@ Health-GPS uses Intel TBB and core threading helpers in selected hot paths. The 
 | **Simulation module order** ([simulation.cpp](../../../src/HealthGPS/simulation.cpp))                                                             | Strict Demographic â†’ SES â†’ Risk factor â†’ Disease â†’ Analysis | Cross-module data dependencies                   |
 | **Repository / model parser** ([repository.cpp](../../../src/HealthGPS/repository.cpp), [model_parser.cpp](../../../src/HealthGPS.Input/model_parser.cpp)) | Single mutex on load/cache                                          | Cache consistency                                |
 | **SyncChannel** (baseline â†” intervention)                                                                                              | Synchronous send/receive for net immigration etc.                   | Deterministic scenario coupling                  |
-
-
-
 
 ### 4.3 Concurrency primitives
 
@@ -250,10 +218,7 @@ Further runtime notes: [Performance optimizations](performance-optimizations.md)
 
 ---
 
-
-
 ## 5. Demographic module
-
 
 | Feature           | Description                                                           | Key code                                                                                                                                                        |
 | ----------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -262,10 +227,7 @@ Further runtime notes: [Performance optimizations](performance-optimizations.md)
 | **Gender**        | Encoding: 1 = Female, 0 = Male                                        | Demographic module                                                                                                                                              |
 | **Individual ID** | Stable ID tracking across baseline and intervention runs              | See [individual ID tracking plan](../plans/individual-id-tracking-csv-plan.md) and [same person ID plan](../plans/same-person-id-baseline-intervention-plan.md) |
 
-
 ---
-
-
 
 ## 6. Socioeconomic module (income)
 
@@ -276,8 +238,6 @@ Further runtime notes: [Performance optimizations](performance-optimizations.md)
 Reference: [demographic.cpp](../../../src/HealthGPS/demographic.cpp), [configuration.cpp](../../../src/HealthGPS.Input/configuration.cpp), [model_parser.cpp](../../../src/HealthGPS.Input/model_parser.cpp).
 
 ---
-
-
 
 ## 7. Risk factors - static linear model
 
@@ -293,8 +253,6 @@ Reference: [static_linear_model.cpp](../../../src/HealthGPS/static_linear_model.
 
 ---
 
-
-
 ## 8. Risk factors - Kevin Hall (dynamic) model
 
 - **Weight -** `get_expected`**:** Physical activity is read from factors-mean CSV data rather than hardcoded values when setting expected weight.
@@ -303,8 +261,6 @@ Reference: [static_linear_model.cpp](../../../src/HealthGPS/static_linear_model.
 Reference: [kevin_hall_model.cpp](../../../src/HealthGPS/kevin_hall_model.cpp).
 
 ---
-
-
 
 ## 9. Analysis module and output
 
@@ -318,8 +274,6 @@ Reference: [analysis_module.cpp](../../../src/HealthGPS/analysis_module.cpp), [r
 
 ---
 
-
-
 ## 10. Disease module
 
 - **Population Impact Fraction (PIF):** Optional mode computes disease probability as `incidence × (1 - PIF)`, with PIF depending on age, gender, years post intervention, and disease-specific values. Configurable on/off.
@@ -329,8 +283,6 @@ Reference: [default_disease_model.cpp](../../../src/HealthGPS/default_disease_mo
 
 ---
 
-
-
 ## 11. Policy
 
 Policy implementation may start from a user-specified year. For the ADB paper, implementation begins in the first simulation year. The code default is the second year; config overrides this behaviour.
@@ -338,8 +290,6 @@ Policy implementation may start from a user-specified year. For the ADB paper, i
 Reference: [configuration.cpp](../../../src/HealthGPS.Input/configuration.cpp), [configuration_parsing.cpp](../../../src/HealthGPS.Input/configuration_parsing.cpp).
 
 ---
-
-
 
 ## 12. Configuration and schema
 
@@ -363,8 +313,6 @@ Reference: [configuration.cpp](../../../src/HealthGPS.Input/configuration.cpp), 
 
 ---
 
-
-
 ## 13. Data loading and model parser
 
 The `names_` vector in the model parser preserves a consistent order for risk-factor correlation and covariance data. It contains risk-factor names (e.g. carbohydrate, sugar, protein) and **excludes** weight, height, BMI, income, physical activity, and energy intake - quantities supplied via dynamic model JSON and used in [kevin_hall_model.cpp](../../../src/HealthGPS/kevin_hall_model.cpp).
@@ -372,8 +320,6 @@ The `names_` vector in the model parser preserves a consistent order for risk-fa
 Reference: [model_parser.cpp](../../../src/HealthGPS.Input/model_parser.cpp).
 
 ---
-
-
 
 ## 14. Person initialization sequence
 
@@ -418,15 +364,9 @@ flowchart TB
     P --> Q[Disease model]
 ```
 
-
-
 ---
 
-
-
 ## 15. Progress and outstanding work
-
-
 
 ### 15.1 Completed (as of 20 February 2026)
 
@@ -444,10 +384,7 @@ The integrated codebase supports India, ADB, and FINCH. The following items from
 - FINCH age cap
 - Trended factors-mean pipeline
 
-
-
 ### 15.2 Outstanding
-
 
 | Item           | Description                                |
 | -------------- | ------------------------------------------ |
@@ -456,21 +393,15 @@ The integrated codebase supports India, ADB, and FINCH. The following items from
 | SES model      | Remove from config                         |
 | Level property | Remove from schemas                        |
 
-
-
-
 ### 15.3 Open verification question
 
 Whether income and physical activity are adjusted to factors mean for **India** as well as **FINCH** should be confirmed against project configs and reference runs. Behaviour is config-driven; defaults may differ by project.
 
 ---
 
-
-
 ## 16. Verification and testing
 
 The following test files were updated or added to cover the integrated behaviour:
-
 
 | Test file                                                                                | Coverage area                          |
 | ---------------------------------------------------------------------------------------- | -------------------------------------- |
@@ -486,15 +417,11 @@ The following test files were updated or added to cover the integrated behaviour
 | [PredictorResolver.Test.cpp](../../../src/HealthGPS.Tests/PredictorResolver.Test.cpp)             | Predictor naming and `gender2`         |
 | [IncomeStratumAdjustment.Test.cpp](../../../src/HealthGPS.Tests/IncomeStratumAdjustment.Test.cpp) | Income-stratum factors-mean adjustment |
 
-
 Example runs and configuration: [quick start](../../user/getstarted.md).
 
 ---
 
-
-
 ## 17. Related documentation
-
 
 | Document                                                                           | Purpose                                                 |
 | ---------------------------------------------------------------------------------- | ------------------------------------------------------- |
@@ -509,7 +436,6 @@ Example runs and configuration: [quick start](../../user/getstarted.md).
 | [Technical index](../README.md)                                                    | Full technical documentation listing                    |
 | [User Guide](../../user/userguide.md)                                              | Configuration and HPC usage                             |
 | [Documentation index](../../README.md)                                             | Documentation map                                       |
-
 
 ---
 

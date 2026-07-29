@@ -19,7 +19,6 @@ If anything is unclear or you need a walkthrough of the code path, contact **Mah
 
 ### Related documentation
 
-
 | Topic                                           | Document                                                                           |
 | ----------------------------------------------- | ---------------------------------------------------------------------------------- |
 | Income-stratum adjustment (implementation plan) | [Income quintile factor means plan](../plans/income-quintile-factor-means-plan.md) |
@@ -34,10 +33,7 @@ If anything is unclear or you need a walkthrough of the code path, contact **Mah
 | User docs                                       | [user/](../../user/)                                                               |
 | Documentation home                              | [documentation/README.md](../../README.md)                                         |
 
-
 ---
-
-
 
 ## Table of contents
 
@@ -51,8 +47,6 @@ If anything is unclear or you need a walkthrough of the code path, contact **Mah
 8. [What we deliberately did not change](#8-what-we-deliberately-did-not-change)
 
 ---
-
-
 
 ## 1. Overview diagram
 
@@ -91,15 +85,9 @@ flowchart TB
     EVAL --> POL
 ```
 
-
-
 ---
 
-
-
 ## 2. Income-stratum factors-mean adjustment
-
-
 
 ### 2.1 Why we added this
 
@@ -107,12 +95,10 @@ For FINCH projects with **continuous income**, we initialise risk factors from r
 
 Previously we only had one overall pair of tables:
 
-
 | File                           | Role                     |
 | ------------------------------ | ------------------------ |
 | `Finch.FactorsMean.Male.csv`   | Expected means - males   |
 | `Finch.FactorsMean.Female.csv` | Expected means - females |
-
 
 **Income-stratum adjustment** lets us load **one male/female pair per income quintile** (or other rank bucket). Risk factors and physical activity are then adjusted **within each stratum**, using that stratum's expected table. Income itself is still adjusted against the **overall** table first.
 
@@ -120,12 +106,10 @@ This way the virtual population can match nutrient and activity patterns **condi
 
 ### 2.2 Two different “income bucket” concepts - do not mix them up
 
-
 | Concept                     | Where in config                                                | What it does                                                                                                                                                 |
 | --------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Final income categories** | `project_requirements.income.categories` (`"3"`, `"4"`, `"5"`) | Sets discrete `person.income` for reporting and other model logic. Assigned by equal rank split after continuous income is set.                              |
 | **Adjustment strata**       | `modelling.baseline_adjustments.income_stratum_factors_mean`   | Rank buckets used **only** for factors-mean adjustment. Each bucket has its own expected CSV pair. Stored as `person.income_adjustment_stratum` (0 … Nâˆ’1). |
-
 
 **FINCH example:** we use `income.categories = "5"` and `adjustment_income_stratum_count = 5` with quintile-specific factors-mean files - five final categories **and** five adjustment strata, but they serve different purposes.
 
@@ -151,10 +135,6 @@ flowchart LR
     Q2 -.->|adjust RF + PA only| pop
     Q5 -.->|adjust RF + PA only| pop
 ```
-
-
-
-
 
 ### 2.3 Configuration example
 
@@ -187,7 +167,6 @@ Under `modelling.baseline_adjustments` in `new_config.json`:
 
 ### 2.4 Validation rules (enforced at load)
 
-
 | Rule              | Detail                                                                   |
 | ----------------- | ------------------------------------------------------------------------ |
 | `enabled = true`  | `adjustment_income_stratum_count` must be **â‰¥ 2**                      |
@@ -195,7 +174,6 @@ Under `modelling.baseline_adjustments` in `new_config.json`:
 | Each stratum      | Non-empty `id`, `factorsmean_male`, `factorsmean_female`                 |
 | Missing data      | Missing files or risk factors â†’ fail fast with stratum-specific errors |
 | `enabled = false` | Legacy behaviour - overall male/female tables only                       |
-
 
 Schema: `schemas/v1/config/modelling.json` â†’ `baseline_adjustments.income_stratum_factors_mean`.
 
@@ -210,12 +188,9 @@ This path runs when **all** of the following are true:
 - `income_stratum_factors_mean.enabled = true`
 - At least one stratum expected table loaded successfully
 
-
-
 #### Step-by-step (initial generation)
 
 Read this top to bottom. Each step finishes before the next one starts.
-
 
 | Step     | What happens                                                                                                                                                 | Which expected table?                               | Who is affected?         |
 | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------- | ------------------------ |
@@ -228,7 +203,6 @@ Read this top to bottom. Each step finishes before the next one starts.
 | **5b**   | Same as 4b                                                                                                                                                   | Quintile **2** tables                               | Only people in stratum 1 |
 | …        | Repeat for quintiles 3, 4, 5 (or however many strata you configured)                                                                                         | Per-quintile tables                                 | One stratum at a time    |
 | **Last** | Assign **final income categories** (3, 4, or 5 groups per `income.categories`)                                                                               | -                                                   | Whole population         |
-
 
 **In plain terms:** income is calibrated to the **national** expected table first; then nutrients and PA are calibrated **separately within each income quintile**, using that quintile’s own factors-mean files.
 
@@ -264,12 +238,9 @@ flowchart TD
     S8[Final step: Assign income categories 3/4/5 for reporting]
 ```
 
-
-
 **Yearly updates** follow the same ordering for non-trended adjustment; trended paths mirror this with the relevant `trended` flags.
 
 **Design choices we locked in:**
-
 
 | Choice                                | Rationale                                                              |
 | ------------------------------------- | ---------------------------------------------------------------------- |
@@ -278,11 +249,7 @@ flowchart TD
 | Recompute strata each step            | Newborns and income changes stay in the correct bucket                 |
 | Filter by `income_adjustment_stratum` | Only people in stratum *k* are adjusted in pass *k*                    |
 
-
-
-
 ### 2.6 Related `project_requirements` flags
-
 
 | Field                                      | Effect                                           |
 | ------------------------------------------ | ------------------------------------------------ |
@@ -293,9 +260,6 @@ flowchart TD
 | `physical_activity.adjust_to_factors_mean` | Per-stratum PA adjustment                        |
 | `physical_activity.trended`                | Trended PA adjustment                            |
 
-
-
-
 ### 2.7 Debug output
 
 When verbosity allows, the simulation prints an income-stratum assignment table at start year and start year + 1 (count, min/max/mean income per bucket, stratum id). Search logs for:
@@ -304,17 +268,13 @@ When verbosity allows, the simulation prints an income-stratum assignment table 
 
 Example console output (assignment table plus sampled delta/apply rows):
 
-
 | Income-stratum assignment and delta/apply debug                                        |
 | -------------------------------------------------------------------------------------- |
 | *Income-stratum assignment buckets and sampled factor delta/apply rows (initial year)* |
 
-
 Related lines may also include `[MAHIMA][INCOME-STRATUM DELTA/APPLY EXAMPLES]` and post-adjustment `[INCOME]` stats.
 
 ---
-
-
 
 ## 3. Linear models and policy equations
 
@@ -324,13 +284,9 @@ At startup the Console also prints a **two-stage modelling summary**: which risk
 
 `=== TWO-STAGE MODELING SUMMARY ===`
 
-
 | Two-stage modelling summary                                     |
 | --------------------------------------------------------------- |
 | *Two-stage vs BoxCox-only factors and Stage 1 / Stage 2 counts* |
-
-
-
 
 ### 3.1 Box-Cox risk-factor model (how a nutrient is generated)
 
@@ -353,11 +309,9 @@ Z = intercept
 
 Each nutrient has a **lambda** value in the CSV (row named `lambda`). Then:
 
-
 | If lambda!= 0                 | If lambda = 0 |
 | ----------------------------- | ------------- |
 | `Y = (Z^lambda - 1) / lambda` | `Y = exp(Z)`  |
-
 
 **Worked intuition:** the regression was fit on a transformed scale; the code computes `Z` exactly like the regression linear part, then reverses the Box-Cox transform to get the actual nutrient value stored on the person.
 
@@ -380,13 +334,11 @@ Z_i = Intercept
 
 **How the CSV maps to this:**
 
-
 | In the CSV file                        | Meaning                                              |
 | -------------------------------------- | ---------------------------------------------------- |
 | **Column** (e.g. `FoodCarbohydrate`)   | The nutrient *i* - one equation per column           |
 | **Row** (e.g. `gender2`, `log_income`) | A predictor - one term in the sum                    |
 | **Cell** at (row, column)              | The coefficient β for that predictor × that nutrient |
-
 
 Coefficients are read **directly from the CSV**. The code does not re-estimate or rescale them. They only work correctly if predictor values match how the regression was coded (Sections 4 and 6).
 
@@ -406,7 +358,6 @@ Special cases:
 
 **Example for one person and one nutrient:**
 
-
 | Predictor row | Coefficient (from CSV) | Person value        | Term added              |
 | ------------- | ---------------------- | ------------------- | ----------------------- |
 | Intercept     | 17.99                  | 1 (implicit)        | 17.99                   |
@@ -414,7 +365,6 @@ Special cases:
 | log_income    | 8.36                   | log e(25083) =10.13 | 8.36 × 10.13 =84.7      |
 | …             | …                      | …                   | …                       |
 | **Sum**       |                        |                     | **Z for that nutrient** |
-
 
 ```mermaid
 flowchart LR
@@ -424,12 +374,7 @@ flowchart LR
     LOG --> SUM[Add beta × log income to linear sum]
 ```
 
-
-
-
-
 ### 3.4 Code locations (for Mahima / developers)
-
 
 | Step                            | File                         |
 | ------------------------------- | ---------------------------- |
@@ -438,17 +383,11 @@ flowchart LR
 | Resolve predictors              | `predictor_resolver.cpp`     |
 | Box-Cox + adjustment + policies | `static_linear_model.cpp`    |
 
-
 ---
-
-
 
 ## 4. Predictor naming reference
 
-
-
 ### 4.1 Income and log-income
-
 
 | CSV row name  | What the code plugs in                | Example (income = 20,000) |
 | ------------- | ------------------------------------- | ------------------------- |
@@ -457,20 +396,14 @@ flowchart LR
 | `log_income`  | log(income)                           | 9.90                      |
 | `log_income2` | (log(income))² - **not** log(income²) | 98.0                      |
 
-
 **Critical rule - read the prefix:**
-
 
 | Name          | Means                     | Does **not** mean    |
 | ------------- | ------------------------- | -------------------- |
 | `income2`     | income × income           | -                    |
 | `log_income2` | log(income) × log(income) | log(income × income) |
 
-
-
-
 ### 4.2 Age
-
 
 | CSV row              | What the code plugs in                                 |
 | -------------------- | ------------------------------------------------------ |
@@ -478,17 +411,12 @@ flowchart LR
 | `age2`, `Age2`       | age × age                                              |
 | `age3`, …            | age raised to that power                               |
 
-
-
-
 ### 4.3 Region and ethnicity dummies
-
 
 | CSV row                                  | Value                                       |
 | ---------------------------------------- | ------------------------------------------- |
 | `region2`, `region3`, `region4`          | 1 if person in that region category, else 0 |
 | `ethnicity2`, `ethnicity3`, `ethnicity4` | Same for ethnicity                          |
-
 
 Reference category = omitted level (typically region1 / ethnicity1).
 
@@ -496,13 +424,11 @@ Reference category = omitted level (typically region1 / ethnicity1).
 
 `normalize_policy_coefficient_row()` **only** renames energy-intake rows:
 
-
 | CSV row name        | After load          | What gets plugged in |
 | ------------------- | ------------------- | -------------------- |
 | `EnergyIntake`      | `log_energy_intake` | log(EnergyIntake)    |
 | `log_EnergyIntake`  | `log_energy_intake` | log(EnergyIntake)    |
 | `log_energy_intake` | `log_energy_intake` | log(EnergyIntake)    |
-
 
 Switching from legacy `EnergyIntake` to `log_EnergyIntake` in scenario files (e.g. `S1_policyeffect_model.csv`) should **not** cause errors - both are equivalent after normalization.
 
@@ -510,15 +436,11 @@ This function does **not** create or rename `log_income`; that name comes straig
 
 ### 4.5 Metadata rows (not predictors)
 
-
 | Row names                        | Role                                                               |
 | -------------------------------- | ------------------------------------------------------------------ |
 | `min`, `max`, `stddev`, `lambda` | Model bounds / dispersion - **not** summed in the linear predictor |
 
-
 ---
-
-
 
 ## 5. Colleague Q&A
 
@@ -532,20 +454,15 @@ Normalization is **only** for energy-intake naming (Section 4.4).
 
 ---
 
-
-
 ### Q2: New policy files use `log_EnergyIntake` instead of `EnergyIntake` - will that error?
 
 **Answer:** **No.** Both map to `log_energy_intake` and the code plugs in `log(EnergyIntake)`. The newer name is clearer; we are fine using it in new scenario files.
 
 ---
 
-
-
 ### Q3: Is the policy model “BoxCox(Y) = β₀ + β₁ Xâ‚ + …” consistent with the code?
 
 **Answer:** **Yes.**
-
 
 | Your notation       | Code                                        |
 | ------------------- | ------------------------------------------- |
@@ -554,17 +471,13 @@ Normalization is **only** for energy-intake naming (Section 4.4).
 | β in each cell      | `coefficients[predictor]` for that nutrient |
 | Box-Cox transform   | Applied after the linear sum Z is computed  |
 
-
 Coefficients are not altered at load (except energy-intake **renaming**, not sign/magnitude changes).
 
 ---
 
-
-
 ### Q4: Should `log_income` be log(income) and `log_income2` be log(income) × log(income)?
 
 **Answer:** **Yes.**
-
 
 | CSV name      | Code plugs in                |
 | ------------- | ---------------------------- |
@@ -572,10 +485,7 @@ Coefficients are not altered at load (except energy-intake **renaming**, not sig
 | `log_income2` | log(income) × log(income)    |
 | `income2`     | income × income (not logged) |
 
-
 ---
-
-
 
 ### Q5: Should `gender2` be male = 0 and female = 1?
 
@@ -593,8 +503,6 @@ so female = 1 and male = 0 for the `gender2` row. If omitted, default is `"male"
 
 ---
 
-
-
 ### Q6: Was it correct before the integrated codebase? Are main-branch FINCH runs wrong?
 
 **Answer:** FINCH **data** convention (female = 1) did not change. The **regression evaluation** for the `gender2` row was wrong on main until `project_requirements.demographics.gender2` was wired through. FINCH simulations on main **before that fix** should be treated as **incorrect for the sex term** unless they ran on a branch with the fix.
@@ -603,28 +511,20 @@ Internally each person still has `male` / `female` as an enum - only the **dummy
 
 ---
 
-
-
 ### Q7: Can we use `gender_to_value()` to get female = 1 for FINCH?
 
 **Answer:** **Not for the** `gender2` **row.** `gender_to_value()` still returns male = 1, female = 0 (used for legacy `Gender` predictors, e.g. India). The `gender2` row uses `gender2_regression_value()` and the `gender2` config (Section 6).
 
 ---
 
-
-
 ## 6. `gender2` encoding
 
-
-
 ### 6.1 FINCH convention
-
 
 | Sex    | `gender2` in regression | `Gender` in factors-mean CSV |
 | ------ | ----------------------- | ---------------------------- |
 | Male   | 0                       | 0                            |
 | Female | 1                       | 1                            |
-
 
 Dummy form (FINCH, after fix with `"gender2": "female"`):
 
@@ -645,12 +545,10 @@ Contribution to the linear sum: `coef_gender2 × gender2`
 }
 ```
 
-
 | Config value | Meaning                                                     |
 | ------------ | ----------------------------------------------------------- |
 | `"female"`   | `gender2` = 1 for females, 0 for males (**FINCH**)          |
 | `"male"`     | `gender2` = 1 for males, 0 for females (default if omitted) |
-
 
 Schema: `schemas/v1/config/project_requirements.json`.
 
@@ -667,17 +565,12 @@ Schema: `schemas/v1/config/project_requirements.json`.
 4. Add to linear sum:  coef_gender2 × gender2
 ```
 
-
 | Config `gender2`   | Female person | Male person |
 | ------------------ | ------------- | ----------- |
 | `"female"` (FINCH) | gender2 = 1   | gender2 = 0 |
 | `"male"` (default) | gender2 = 0   | gender2 = 1 |
 
-
-
-
 ### 6.4 Which FINCH files use `gender2`
-
 
 | File                                                     | Contains `gender2` row |
 | -------------------------------------------------------- | ---------------------- |
@@ -687,16 +580,11 @@ Schema: `schemas/v1/config/project_requirements.json`.
 | `income_model.csv`                                       | Yes                    |
 | `physicalactivity_model.csv`                             | Yes                    |
 
-
 India-style models using a `Gender` JSON key (not `gender2`) are unchanged.
 
 ---
 
-
-
 ## 7. Configuration reference
-
-
 
 ### 7.1 FINCH `new_config.json` (key excerpt)
 
@@ -740,10 +628,7 @@ India-style models using a `Gender` JSON key (not `gender2`) are unchanged.
 }
 ```
 
-
-
 ### 7.2 Checklist before running FINCH with new features
-
 
 | Check                                                        |     |
 | ------------------------------------------------------------ | --- |
@@ -754,13 +639,9 @@ India-style models using a `Gender` JSON key (not `gender2`) are unchanged.
 | Quintile CSV pairs exist for each stratum id                 |     |
 | Policy CSV predictor names match Section 4                   |     |
 
-
 ---
 
-
-
 ## 8. What we deliberately did not change
-
 
 | Item                                                           | Status                                         |
 | -------------------------------------------------------------- | ---------------------------------------------- |
@@ -771,17 +652,13 @@ India-style models using a `Gender` JSON key (not `gender2`) are unchanged.
 | Legacy path when `income_stratum_factors_mean.enabled = false` | Same as before                                 |
 | Default when `gender2` omitted                                 | `"male"` (male = 1) for backward compatibility |
 
-
 ---
-
-
 
 ## Questions?
 
 For implementation detail, debugging, or config help, please contact **Mahima Ghosh**.
 
 **Useful source files:**
-
 
 | Topic                     | Location                                                                    |
 | ------------------------- | --------------------------------------------------------------------------- |
@@ -792,7 +669,6 @@ For implementation detail, debugging, or config help, please contact **Mahima Gh
 | Schema                    | `schemas/v1/config/modelling.json`, `project_requirements.json`             |
 | FINCH example             | `input-data/data/KevinHall_FINCH/new_config.json`                           |
 | Tests                     | `IncomeStratumAdjustment.Test.cpp`, `PredictorResolver.Test.cpp`            |
-
 
 ---
 
