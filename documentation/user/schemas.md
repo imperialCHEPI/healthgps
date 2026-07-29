@@ -6,7 +6,7 @@
 
 Health-GPS validates experiment inputs with [JSON Schema](https://json-schema.org/). Schemas live in the repository under [`schemas/`](https://github.com/imperialCHEPI/healthgps/tree/main/schemas); the Console loads them from the copy next to the built binary. Your `config.json` should declare which root schema it follows via the **`$schema`** URL.
 
-This page explains **how schemas fit together** and where to look when validation fails. For field-by-field config guidance and examples, use the [User Guide — Configuration](userguide.md#configuration). For machine-readable definitions, open the JSON files on GitHub or in your clone.
+This page explains **how schemas fit together** and where to look when validation fails. For field-by-field config guidance and examples, use the [User Guide - Configuration](userguide.md#configuration). For machine-readable definitions, open the JSON files on GitHub or in your clone.
 
 ---
 
@@ -76,7 +76,7 @@ flowchart LR
     IDX --> PIFidx[population_impact_fraction]
 ```
 
-See [User Guide — Backend storage](userguide.md#backend-storage) for how this connects to `config.json` â†’ `data`.
+See [User Guide - Backend storage](userguide.md#backend-storage) for how this connects to `config.json` â†’ `data`.
 
 ---
 

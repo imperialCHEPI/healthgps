@@ -40,7 +40,7 @@ sequenceDiagram
 
 ## 1. Config schema and POCO
 
-- **Schema**: Extend [schemas/v1/config/output.json](schemas/v1/config/output.json) with an optional `individual_id_tracking` object (all properties optional for backward compatibility):
+- **Schema**: Extend [schemas/v1/config/output.json](../../../schemas/v1/config/output.json) with an optional `individual_id_tracking` object (all properties optional for backward compatibility):
   - `enabled`: boolean (default false)
   - `age_min`, `age_max`: integer or null (omit = no age filter)
   - `gender`: string enum "male" | "female" | "all" (default "all")
@@ -49,20 +49,20 @@ sequenceDiagram
   - `risk_factors`: array of strings - which risk factors to output as columns (empty = all from mapping)
   - `years`: array of integers - which simulation years to include (empty = all)
   - `scenarios`: "baseline" | "intervention" | "both" (default "both")
-- **POCO**: Add struct `IndividualIdTrackingConfig` in [src/HealthGPS.Input/poco.h](src/HealthGPS.Input/poco.h) with the same fields (sensible defaults: enabled false, age_min/max optional, gender "all", empty vectors, scenarios "both"). Add optional `std::optional<IndividualIdTrackingConfig> individual_id_tracking` to `OutputInfo` in the same header.
-- **Parsing**: In [src/HealthGPS.Input/configuration_parsing.cpp](src/HealthGPS.Input/configuration_parsing.cpp) (or wherever output is loaded), when `output` object contains `individual_id_tracking`, parse it into `config.output.individual_id_tracking`. If the key is absent, leave it as `std::nullopt`.
-- **Top-level schema**: In [schemas/v1/config.json](schemas/v1/config.json), ensure `output` can have additional properties or add `individual_id_tracking` to the output schema reference if needed.
+- **POCO**: Add struct `IndividualIdTrackingConfig` in [src/HealthGPS.Input/poco.h](../../../src/HealthGPS.Input/poco.h) with the same fields (sensible defaults: enabled false, age_min/max optional, gender "all", empty vectors, scenarios "both"). Add optional `std::optional<IndividualIdTrackingConfig> individual_id_tracking` to `OutputInfo` in the same header.
+- **Parsing**: In [src/HealthGPS.Input/configuration_parsing.cpp](../../../src/HealthGPS.Input/configuration_parsing.cpp) (or wherever output is loaded), when `output` object contains `individual_id_tracking`, parse it into `config.output.individual_id_tracking`. If the key is absent, leave it as `std::nullopt`.
+- **Top-level schema**: In [schemas/v1/config.json](../../../schemas/v1/config.json), ensure `output` can have additional properties or add `individual_id_tracking` to the output schema reference if needed.
 
 ## 2. Passing config into the simulation
 
-- **ModelInput**: Add optional tracking config to [src/HealthGPS/modelinput.h](src/HealthGPS/modelinput.h) and [src/HealthGPS/modelinput.cpp](src/HealthGPS/modelinput.cpp): e.g. `std::optional<hgps::input::IndividualIdTrackingConfig> individual_id_tracking_config`_ and accessor `individual_id_tracking_config() const`.
-- **create_model_input**: In [src/HealthGPS.Input/configuration.cpp](src/HealthGPS.Input/configuration.cpp), when building `ModelInput`, pass `config.output.individual_id_tracking` into the new ModelInput field (signature of `create_model_input` and `ModelInput` ctor need an extra optional parameter).
+- **ModelInput**: Add optional tracking config to [src/HealthGPS/modelinput.h](../../../src/HealthGPS/modelinput.h) and [src/HealthGPS/modelinput.cpp](../../../src/HealthGPS/modelinput.cpp): e.g. `std::optional<hgps::input::IndividualIdTrackingConfig> individual_id_tracking_config`_ and accessor `individual_id_tracking_config() const`.
+- **create_model_input**: In [src/HealthGPS.Input/configuration.cpp](../../../src/HealthGPS.Input/configuration.cpp), when building `ModelInput`, pass `config.output.individual_id_tracking` into the new ModelInput field (signature of `create_model_input` and `ModelInput` ctor need an extra optional parameter).
 
 ## 3. New event and payload
 
-- **Event type**: In [src/HealthGPS/event_message.h](src/HealthGPS/event_message.h), add to the enum: `individual_tracking` (or similar).
+- **Event type**: In [src/HealthGPS/event_message.h](../../../src/HealthGPS/event_message.h), add to the enum: `individual_tracking` (or similar).
 - **Payload**: Define a small struct for one row, e.g. `IndividualTrackingRow`: id, age, gender, region, ethnicity, plus a map or vector of risk factor name -> value. Then define `IndividualTrackingEventMessage` (extends `EventMessage`) with: sender, run_number, time, scenario name, and `std::vector<IndividualTrackingRow> rows`. Implement in new files (e.g. `individual_tracking_message.h/cpp`) with `id()` returning the new `EventType`, `to_string()`, and `accept(EventMessageVisitor&)`.
-- **Visitor**: In [src/HealthGPS/event_visitor.h](src/HealthGPS/event_visitor.h), add `virtual void visit(const IndividualTrackingEventMessage &message) = 0;` (and forward declare the new type). Existing visitor implementations (e.g. EventMonitor) will need a default implementation that does nothing, and the new writer’s visitor will implement it.
+- **Visitor**: In [src/HealthGPS/event_visitor.h](../../../src/HealthGPS/event_visitor.h), add `virtual void visit(const IndividualTrackingEventMessage &message) = 0;` (and forward declare the new type). Existing visitor implementations (e.g. EventMonitor) will need a default implementation that does nothing, and the new writer’s visitor will implement it.
 
 ## 4. Producing the event (Analysis module)
 
@@ -83,20 +83,20 @@ sequenceDiagram
 
 ## 5. Writing the CSV
 
-- **Filename**: Same convention as income CSVs in [src/HealthGPS.Console/result_file_writer.cpp](src/HealthGPS.Console/result_file_writer.cpp): from the main result path (e.g. `HealthGPS_result_{timestamp}.json`), take the path and replace extension / stem to get `..._IndividualIDTracking.csv` (e.g. `base_path.substr(0, dot_pos) + "_IndividualIDTracking.csv"`). Reuse the same base path that `create_output_file_name` returns (the JSON path); the new writer receives this base path.
+- **Filename**: Same convention as income CSVs in [src/HealthGPS.Console/result_file_writer.cpp](../../../src/HealthGPS.Console/result_file_writer.cpp): from the main result path (e.g. `HealthGPS_result_{timestamp}.json`), take the path and replace extension / stem to get `..._IndividualIDTracking.csv` (e.g. `base_path.substr(0, dot_pos) + "_IndividualIDTracking.csv"`). Reuse the same base path that `create_output_file_name` returns (the JSON path); the new writer receives this base path.
 - **New writer class**: e.g. `IndividualIDTrackingWriter` in the Console project: implements an interface that has `write(const IndividualTrackingEventMessage &)` (or extend a small writer interface). Opens one CSV file (same base + `_IndividualIDTracking.csv`), writes header once (run, time, scenario, id, age, gender, region, ethnicity, risk_f1, risk_f2, ...), then on each `write()` appends one row per item in `message.rows`. Thread-safe (e.g. mutex) if the event is dispatched from the same result queue. MAHIMA comments: explain that this file supports tracking the same person (by id) across baseline and intervention.
-- **EventMonitor**: [src/HealthGPS.Console/event_monitor.cpp](src/HealthGPS.Console/event_monitor.cpp) and [event_monitor.h](src/HealthGPS.Console/event_monitor.h): Subscribe to the new event type (`EventType::individual_tracking`). When the handler receives the message, push it to the same `results_queue`_ (or a dedicated queue). In the visitor, add `visit(const IndividualTrackingEventMessage &message)` which calls the new writer’s `write(message)`. The monitor must hold an optional second writer: e.g. `std::optional<IndividualIDTrackingWriter> individual_tracking_writer_` or a pointer, created only when `config.output.individual_id_tracking` is present and enabled.
+- **EventMonitor**: [src/HealthGPS.Console/event_monitor.cpp](../../../src/HealthGPS.Console/event_monitor.cpp) and [event_monitor.h](../../../src/HealthGPS.Console/event_monitor.h): Subscribe to the new event type (`EventType::individual_tracking`). When the handler receives the message, push it to the same `results_queue`_ (or a dedicated queue). In the visitor, add `visit(const IndividualTrackingEventMessage &message)` which calls the new writer’s `write(message)`. The monitor must hold an optional second writer: e.g. `std::optional<IndividualIDTrackingWriter> individual_tracking_writer_` or a pointer, created only when `config.output.individual_id_tracking` is present and enabled.
 - **program.cpp**: When creating the event monitor, if `config.output.individual_id_tracking` has value and `enabled`, create the `IndividualIDTrackingWriter` with the same base path used for the main result file, and pass it to the monitor (e.g. two writers: main + optional tracking). If not enabled, pass a no-op or null and the visitor’s `visit(IndividualTrackingEventMessage)` does nothing or is not called.
 - file structure- columns similar to existing HealthGPS_result_{timestamp}.csv with the user specific constarints. Example- if user says 50 year old males from year 2022-2025 for both baseline and intervention for BMI, FoodFat, FoodProtein, FoodRedMeat and FoodLegume in all income categories and ethnicity white- the columns of the output file must include all of that along with the person ID (now that both baseline and intervention use the same ID)
 
 ## 6. Event aggregator subscription
 
-- **EventAggregator / EventBus**: Ensure the new event type can be subscribed to. In [src/HealthGPS/event_aggregator.h](src/HealthGPS/event_aggregator.h) (or equivalent), handlers are typically keyed by `EventType`. Add subscription for `EventType::individual_tracking` in EventMonitor and dispatch to the same result queue so the visitor is invoked with the new message type.
+- **EventAggregator / EventBus**: Ensure the new event type can be subscribed to. In [src/HealthGPS/event_aggregator.h](../../../src/HealthGPS/event_aggregator.h) (or equivalent), handlers are typically keyed by `EventType`. Add subscription for `EventType::individual_tracking` in EventMonitor and dispatch to the same result queue so the visitor is invoked with the new message type.
 
 ## 7. File naming summary
 
 - Main result: `create_output_file_name(config.output, config.job_id)` -> e.g. `"C:/out/HealthGPS_result_2026-02-19_10-34-52.json"`.
-- Individual tracking CSV: same path with extension replaced and suffix before extension: e.g. `"C:/out/HealthGPS_result_2026-02-19_10-34-52_IndividualIDTracking.csv"` (mirror [generate_income_filename](src/HealthGPS.Console/result_file_writer.cpp) pattern: `base_stem + "_IndividualIDTracking.csv"`).
+- Individual tracking CSV: same path with extension replaced and suffix before extension: e.g. `"C:/out/HealthGPS_result_2026-02-19_10-34-52_IndividualIDTracking.csv"` (mirror [generate_income_filename](../../../src/HealthGPS.Console/result_file_writer.cpp) pattern: `base_stem + "_IndividualIDTracking.csv"`).
 
 ## 8. Example config (for users)
 
@@ -123,10 +123,10 @@ Empty arrays / "all" mean no filter for that dimension.
 
 ## 9. MAHIMA comment placement
 
-- [src/HealthGPS.Input/poco.h](src/HealthGPS.Input/poco.h): Comment on `IndividualIdTrackingConfig` that it drives per-person CSV output for same-person tracking (MAHIMA).
-- [src/HealthGPS/analysis_module.cpp](src/HealthGPS/analysis_module.cpp): Where filtering and publishing of `IndividualTrackingEventMessage` is implemented (MAHIMA: same-person ID tracking output).
+- [src/HealthGPS.Input/poco.h](../../../src/HealthGPS.Input/poco.h): Comment on `IndividualIdTrackingConfig` that it drives per-person CSV output for same-person tracking (MAHIMA).
+- [src/HealthGPS/analysis_module.cpp](../../../src/HealthGPS/analysis_module.cpp): Where filtering and publishing of `IndividualTrackingEventMessage` is implemented (MAHIMA: same-person ID tracking output).
 - New message type file: Brief comment that this event carries filtered individual rows for the IndividualIDTracking CSV (MAHIMA).
-- [src/HealthGPS.Console](src/HealthGPS.Console) writer: Comment that the CSV allows users to verify same person (by id) across baseline and intervention (MAHIMA).
+- [src/HealthGPS.Console](../../../src/HealthGPS.Console) writer: Comment that the CSV allows users to verify same person (by id) across baseline and intervention (MAHIMA).
 
 ## 10. Testing (optional in plan)
 

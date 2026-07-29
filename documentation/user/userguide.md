@@ -137,47 +137,133 @@ The ***inputs*** section sets the target country information, the *file* sub-sec
 
 ### Modelling
 
-The ***modelling*** section, defines the *SES* model, and the *risk factor* model with factors identifiers, hierarchy level, data range and mapping with the model's virtual individual properties (proxy). The *risk_factor_models* sub-section provides the fitted parameters file, `JSON` format, for each hierarchical *model type*, the *dynamic risk factor*, if exists, can be identified by the respective property. Finally, the *baseline adjustments* sub-section provides the *adjustment files* for each hierarchical *model type* and *gender*.
+The ***modelling*** section wires socio-economic noise, the risk-factor hierarchy, the **static** and **dynamic** model files, and optional baseline (factors-mean) adjustments.
+
+| Field | Role |
+| ----- | ---- |
+| `ses_model` | Continuous SES noise (`normal` with mean/sd is typical) |
+| `risk_factors` | Hierarchy: name, level, optional `proxy`, and `range` for each variable |
+| `risk_factor_models` | Paths to the static and dynamic model JSON files |
+| `dynamic_risk_factor` | Optional; rarely needed when the dynamic file’s `ModelName` is clear |
+| `baseline_adjustments` | Overall factors-mean CSV files (male/female); optional income-stratum tables |
+
+The Console loads each file under `risk_factor_models` and selects the implementation from its **`ModelName`** (validated against the `$schema` URL in that file). Common pairs today:
+
+| Style | Static `ModelName` | Dynamic `ModelName` | Example pack |
+| ----- | ------------------ | ------------------- | ------------ |
+| STOP / HLM France | `HLM` | `EBHLM` | [HLM_France](https://github.com/imperialCHEPI/healthgps-examples/tree/main/HLM_France) |
+| FINCH / Kevin Hall | `StaticLinear` | `KevinHall` | [KevinHall_FINCH](https://github.com/imperialCHEPI/healthgps-examples/tree/main/KevinHall_FINCH) (`new_static_model.json`, `dynamic_model.json`) |
+
+#### Config skeleton (shared shape)
+
+Both styles use the same `modelling` keys in `config.json`. France keeps a short nutrient/BMI hierarchy; FINCH lists many foods, nutrients, region, ethnicity, income, PA, height, weight, and BMI.
+
+**HLM France–style** (`risk_factor_models` → HLM + EBHLM files):
 
 ```json
-...
 "modelling": {
     "ses_model": {
-        "function_name":"normal",
-        "function_parameters":[0.0, 1.0]
+        "function_name": "normal",
+        "function_parameters": [0.0, 1.0]
     },
     "risk_factors": [
-        {"name":"Gender",   "level":0, "proxy":"gender", "range":[0,1]},
-        {"name":"Age",      "level":0, "proxy":"age",    "range":[1,87]},
-        {"name":"Age2",     "level":0, "proxy":"",       "range":[1,7569]},
-        {"name":"Age3",     "level":0, "proxy":"",       "range":[1,658503]},
-        {"name":"SES",      "level":0, "proxy":"ses",    "range":[-2.316299,2.296689]},
-        {"name":"Sodium",   "level":1, "proxy":"",       "range":[1.127384,8.656519]},
-        {"name":"Protein",  "level":1, "proxy":"",       "range":[43.50682,238.4145]},
-        {"name":"Fat",      "level":1, "proxy":"",       "range":[45.04756,382.664]},
-        {"name":"PA",       "level":2, "proxy":"",       "range":[22.22314,9765.512]},
-        {"name":"Energy",   "level":2, "proxy":"",       "range":[1326.14051,7522.496]},
-        {"name":"BMI",      "level":3, "proxy":"",       "range":[13.88,39.48983]}
+        {"name": "Gender", "level": 0, "range": [0, 1]},
+        {"name": "Age", "level": 0, "range": [1, 87]},
+        {"name": "SES", "level": 0, "range": [-2.3, 2.3]},
+        {"name": "Sodium", "level": 1, "range": [1.1, 8.7]},
+        {"name": "PA", "level": 2, "range": [22.0, 9765.0]},
+        {"name": "BMI", "level": 3, "range": [13.9, 39.5]}
     ],
-    "dynamic_risk_factor": "",
     "risk_factor_models": {
-        "static": "France_HLM.json",
-        "dynamic": "France_EBHLM.json"
+        "static": "static_model.json",
+        "dynamic": "dynamic_model.json"
     },
     "baseline_adjustments": {
         "format": "csv",
         "delimiter": ",",
-        "encoding": "UTF8",
+        "encoding": "ASCII",
         "file_names": {
-            "factors_mean_male":"France.FactorsMean.Male.csv",
-            "factors_mean_female":"France.FactorsMean.Female.csv"
+            "factorsmean_male": "France.FactorsMean.Male.csv",
+            "factorsmean_female": "France.FactorsMean.Female.csv"
         }
     }
 }
-...
 ```
 
-The *risk factor model* and *baseline adjustment* files have their own schemas and formats requirements, these files structure are defined separately below, after all the *configuration file* sections.
+**FINCH-style** (same block shape; longer `risk_factors` list and Kevin Hall files — truncated):
+
+```json
+"modelling": {
+    "ses_model": {
+        "function_name": "normal",
+        "function_parameters": [0.0, 1.0]
+    },
+    "risk_factors": [
+        {"name": "Gender", "level": 0, "range": [0, 1]},
+        {"name": "Age", "level": 0, "range": [0, 110]},
+        {"name": "Region", "level": 0, "range": [1, 4]},
+        {"name": "Ethnicity", "level": 0, "range": [1, 5]},
+        {"name": "Income", "level": 0, "range": [0, 5000]},
+        {"name": "Carbohydrate", "level": 1, "range": [0, 800]},
+        {"name": "PhysicalActivity", "level": 2, "range": [0, 20]},
+        {"name": "BMI", "level": 3, "range": [10, 60]}
+    ],
+    "risk_factor_models": {
+        "static": "new_static_model.json",
+        "dynamic": "dynamic_model.json"
+    },
+    "baseline_adjustments": {
+        "format": "csv",
+        "delimiter": ",",
+        "encoding": "ASCII",
+        "file_names": {
+            "factorsmean_male": "Finch.FactorsMean.Male.csv",
+            "factorsmean_female": "Finch.FactorsMean.Female.csv"
+        }
+    }
+}
+```
+
+Optional **income-stratum** factors-mean (quintile CSVs under `baseline_adjustments.income_stratum_factors_mean`) and **`project_requirements`** (income categories, PA type, trends) sit alongside this for FINCH-style runs. See [Project requirements](#project-requirements) and the [FINCH guide](../technical/guides/finch-linear-models-and-income-adjustment.md).
+
+#### What goes inside the model JSON files
+
+**HLM France static (`ModelName`: `HLM`)** — large embedded regressions and ICA `levels` matrices (`models` + `levels`). **Dynamic (`EBHLM`)** — lite hierarchy with `Variables` / `Equations` for yearly deltas. Full examples: [static_model.json](https://github.com/imperialCHEPI/healthgps-examples/blob/main/HLM_France/static_model.json), [dynamic_model.json](https://github.com/imperialCHEPI/healthgps-examples/blob/main/HLM_France/dynamic_model.json).
+
+**FINCH static (`ModelName`: `StaticLinear`)** — points at CSVs instead of embedding huge arrays: `IncomeModels`, `PhysicalActivityModels`, `RiskFactorModels` (boxcox / policy / logistic coefficient files), region/ethnicity files, correlation and policy covariance. **Dynamic (`KevinHall`)** — energy-balance inputs: nutrients/foods, height curves, weight and energy–PA quantiles. Full examples: [new_static_model.json](https://github.com/imperialCHEPI/healthgps-examples/blob/main/KevinHall_FINCH/new_static_model.json), [dynamic_model.json](https://github.com/imperialCHEPI/healthgps-examples/blob/main/KevinHall_FINCH/dynamic_model.json).
+
+Compact shape of a FINCH static file (paths only):
+
+```json
+{
+    "$schema": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v2/config/models/staticlinear.json",
+    "ModelName": "StaticLinear",
+    "IncomeModels": { "continuous": { "csv_file": "income_model.csv", "format": "csv", "...": "..." } },
+    "PhysicalActivityModels": { "continuous": { "csv_file": "physicalactivity_model.csv", "...": "..." } },
+    "RiskFactorModels": {
+        "boxcox_coefficients": { "name": "boxcox_coefficients.csv", "...": "..." },
+        "policy_coefficients": { "name": "policyeffect_model.csv", "...": "..." },
+        "logistic_regression": { "name": "logistic_regression.csv", "...": "..." }
+    },
+    "RiskFactorCorrelationFile": { "name": "Finch_residual_risk_factor_correlation.csv" },
+    "PolicyCovarianceFile": { "name": "Finch_residual_policy_covariance.csv" }
+}
+```
+
+Compact shape of a FINCH Kevin Hall dynamic file:
+
+```json
+{
+    "$schema": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v2/config/models/kevinhall.json",
+    "ModelName": "KevinHall",
+    "Nutrients": ["FoodCarbohydrate", "FoodFat", "..."],
+    "WeightQuantiles": { "Female": { "name": "..." }, "Male": { "name": "..." } },
+    "Height": { "Female": { "name": "height_female.csv" }, "Male": { "name": "height_male.csv" } },
+    "EnergyPhysicalActivityQuantiles": { "name": "energy_physicalactivity_quantiles.csv" }
+}
+```
+
+Risk-factor model file layouts (HLM residual matrices, Kevin Hall maths, baseline adjustments) are expanded in [Risk Factor Models](#risk-factor-models) below and in the [models overview](models-overview.md) / [FINCH guide](../technical/guides/finch-linear-models-and-income-adjustment.md). Schema map: [Configuration schemas](schemas.md).
 
 ### Running
 
@@ -1075,7 +1161,7 @@ Finally, array jobs are not suitable to all workflows. Because array jobs are in
 
 ---
 
-[â† User documentation index](README.md) · [Documentation index](../README.md)
+[User documentation index](README.md) · [Documentation index](../README.md)
 
 ---
 

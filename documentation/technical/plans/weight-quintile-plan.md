@@ -27,14 +27,14 @@
 
 - Keep **legacy** `WeightQuantiles.Female` / `Male` as a single `csv_file` (e.g. `weight_quantiles_NCDRisk_female.csv`).
 - Add **stratum files**: `Female.Quintile1` -> `weight_quantiles_NCDRisk_female_quintile1.csv`, and the same for Male.
-- At **weight assignment**, use `person.income_adjustment_stratum` (from `adjustment_income_stratum_count` rank buckets) to choose which quantile curve to use-the same idea as height via `resolve_height_params_for_person` in [kevin_hall_model.cpp](src/HealthGPS/kevin_hall_model.cpp).
+- At **weight assignment**, use `person.income_adjustment_stratum` (from `adjustment_income_stratum_count` rank buckets) to choose which quantile curve to use-the same idea as height via `resolve_height_params_for_person` in [kevin_hall_model.cpp](../../../src/HealthGPS/kevin_hall_model.cpp).
 - **Final reporting income** stays on `project_requirements.income.categories` (`"3"` or `"4"`) on `person.income`; that does not change.
 
 Example: 5 adjustment strata for factors-mean / weight curves, 4 categories in ProjectRequirements for output.
 
 ## Pipeline order (static before dynamic)
 
-[RiskFactorModule](src/HealthGPS/riskfactor.cpp) always runs **static** then **Kevin Hall**. So when `initialise_weight` runs, the static model has already assigned `income_adjustment_stratum` and remapped `person.income` to 3 or 4 categories ([static_linear_model.cpp](src/HealthGPS/static_linear_model.cpp) ~786-905).
+[RiskFactorModule](../../../src/HealthGPS/riskfactor.cpp) always runs **static** then **Kevin Hall**. So when `initialise_weight` runs, the static model has already assigned `income_adjustment_stratum` and remapped `person.income` to 3 or 4 categories ([static_linear_model.cpp](../../../src/HealthGPS/static_linear_model.cpp) ~786-905).
 
 ## Lifecycle - initialize (`generate_risk_factors`)
 
@@ -100,7 +100,7 @@ flowchart TD
 
 ## Config and schema
 
-**Files:** [schemas/v2/config/models/kevinhall.json](schemas/v2/config/models/kevinhall.json), [schemas/v1/config/models/kevinhall.json](schemas/v1/config/models/kevinhall.json)
+**Files:** [schemas/v2/config/models/kevinhall.json](../../../schemas/v2/config/models/kevinhall.json), [schemas/v1/config/models/kevinhall.json](../../../schemas/v1/config/models/kevinhall.json)
 
 For `WeightQuantiles.Female` and `.Male`, use **`oneOf`**:
 
@@ -142,7 +142,7 @@ Factors-mean quintiles stay in **config.json** (`baseline_adjustments.income_str
 
 Update [dynamic_model.json](input-data/data/KevinHall_FINCH/dynamic_model.json) when quintile CSVs are in the data folder.
 
-## Parser ([model_parser.cpp](src/HealthGPS.Input/model_parser.cpp))
+## Parser ([model_parser.cpp](../../../src/HealthGPS.Input/model_parser.cpp))
 
 Replace the flat load at ~1864-1883 with a helper similar to Height (~1901-1937):
 
@@ -157,7 +157,7 @@ Replace the flat load at ~1864-1883 with a helper similar to Height (~1901-1937)
 - Read `config.modelling.baseline_adjustment.income_stratum_factors_mean` for `enabled` and `adjustment_income_stratum_count` (same as height ~1897-1899).
 - If multiple quintile files are configured but stratum adjustment is disabled, fail at parse time.
 
-## Runtime ([kevin_hall_model.h](src/HealthGPS/kevin_hall_model.h) / [kevin_hall_model.cpp](src/HealthGPS/kevin_hall_model.cpp))
+## Runtime ([kevin_hall_model.h](../../../src/HealthGPS/kevin_hall_model.h) / [kevin_hall_model.cpp](../../../src/HealthGPS/kevin_hall_model.cpp))
 
 **Storage** (mirror `height_params_`):
 
@@ -175,7 +175,7 @@ std::unordered_map<core::Gender, std::vector<std::vector<double>>> weight_quanti
 
 ## Console output tables (required)
 
-Mirror the height helpers in [kevin_hall_model.cpp](src/HealthGPS/kevin_hall_model.cpp) (~87-225, ~1176-1194). Not optional-needed to verify stratum weight assignment in the log.
+Mirror the height helpers in [kevin_hall_model.cpp](../../../src/HealthGPS/kevin_hall_model.cpp) (~87-225, ~1176-1194). Not optional-needed to verify stratum weight assignment in the log.
 
 **Gating** - reuse the same policy as `should_print_height_summary_tables` (~49-58):
 
@@ -220,7 +220,7 @@ Header note: `person.income` from ProjectRequirements categories after static re
 
 ## Tests
 
-In [KevinHallHeight.Test.cpp](src/HealthGPS.Tests/KevinHallHeight.Test.cpp) and/or [KevinHallWeightValidation.Test.cpp](src/HealthGPS.Tests/KevinHallWeightValidation.Test.cpp):
+In [KevinHallHeight.Test.cpp](../../../src/HealthGPS.Tests/KevinHallHeight.Test.cpp) and/or [KevinHallWeightValidation.Test.cpp](../../../src/HealthGPS.Tests/KevinHallWeightValidation.Test.cpp):
 
 - Legacy single-file config still parses and runs
 - Five quintile files with `adjustment_income_stratum_count = 5`

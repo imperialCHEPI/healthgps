@@ -14,15 +14,19 @@
 
 ### Work items
 
-| Status | Item |
-| ------ | ---- |
-| Planned | Confirm and document baseline -> intervention sync contract (aggregate tables only, one-way) in the plan and implementation notes. |
-| Planned | Add Population monotonic `next_person_id_` state initialised to initial_size + 1 after initial population construction. |
-| Planned | Update Population add and add_newborn_babies so all post-initial entrants get ID from `next_person_id_`++ on both recycled-slot and append paths. |
-| Planned | Keep initial ID assignment as i + 1 to preserve baseline/intervention initial cohort comparability. |
-| Planned | Replace slot-reuse ID assertions with lifetime-unique assertions in Population tests, including recycled-slot replacement cases. |
-| Planned | Validate tracking output expectations (no demographic identity swapping under one ID due to slot reuse) with targeted run/test checks. |
-| Planned | Record runtime and memory impact checks for large runs (including 14M-population assumptions and observed deltas). |
+
+| Status | Item                                                                                                                                              |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Done   | Confirm and document baseline -> intervention sync contract (aggregate tables only, one-way) in the plan and implementation notes.                |
+| Done   | Add Population monotonic `next_person_id_` state initialised to initial_size + 1 after initial population construction.                           |
+| Done   | Update Population add and add_newborn_babies so all post-initial entrants get ID from `next_person_id`_++ on both recycled-slot and append paths. |
+| Done   | Keep initial ID assignment as i + 1 to preserve baseline/intervention initial cohort comparability.                                               |
+| Done   | Replace slot-reuse ID assertions with lifetime-unique assertions in Population tests, including recycled-slot replacement cases.                  |
+| Done   | Validate tracking output expectations (no demographic identity swapping under one ID due to slot reuse) with targeted run/test checks.            |
+| Done   | Record runtime and memory impact checks for large runs (including 14M-population assumptions and observed deltas).                                |
+
+
+
 
 ## Goal
 
@@ -34,6 +38,8 @@ Make the same logical person have the **same ID** in both baseline and intervent
 - **No global ID key**: No code keys data globally by Person ID across runs; IDs are only used within one population.
 - **result_file_writer.cpp** `message.id()` is `ResultEventMessage::id()` (event type enum), not Person ID - no change.
 
+
+
 ## What data is transferred
 
 Only aggregate tables, not person-level records:
@@ -44,12 +50,14 @@ No person object, no ID, no region/ethnicity individual records are transferred 
 
 ## Design: ID assignment rules
 
+
 | Context                                      | ID assigned                           |
 | -------------------------------------------- | ------------------------------------- |
 | Initial population slot `i`                  | `i + 1`                               |
 | Newborn replacing slot `i`                   | `i + 1` (slot keeps its ID)           |
 | Newborn added via `emplace_back` (new slot)  | `people_.size()` (new index + 1)      |
 | Person added via `add()` (immigration clone) | Set to slot index + 1 after placement |
+
 
 ```mermaid
 flowchart LR
@@ -68,9 +76,15 @@ flowchart LR
   Bi -.same logical person.-> Ii
 ```
 
+
+
+
+
 ## Implementation plan
 
-### 1. Person ([person.h](src/HealthGPS/person.h), [person.cpp](src/HealthGPS/person.cpp))
+
+
+### 1. Person ([person.h](../../../src/HealthGPS/person.h), [person.cpp](../../../src/HealthGPS/person.cpp))
 
 - **Add constructors** (MAHIMA):
   - `Person(std::size_t id)` - sets `id_ = id` (for initial population construction).
@@ -79,7 +93,9 @@ flowchart LR
 - **Person()** / **Person(gender)** leave `id_` at `Person::unassigned_id` (0) until `Population` assigns a lifetime-unique ID via `set_id` or explicit-ID constructors. Removed global `Person::newUID` to avoid duplicate-ID space separate from `Population::next_person_id_`.
 - **Comments**: Add a short MAHIMA block at the top of the ID-related section explaining index-based ID for same-person tracking across baseline and intervention.
 
-### 2. Population ([population.h](src/HealthGPS/population.h), [population.cpp](src/HealthGPS/population.cpp))
+
+
+### 2. Population ([population.h](../../../src/HealthGPS/population.h), [population.cpp](../../../src/HealthGPS/population.cpp))
 
 - **Constructor** (MAHIMA): Replace `people_(size)` (default-constructed Persons) with a loop that creates each person with ID = index + 1:
   - e.g. `people_.reserve(size);` then `for (size_t i = 0; i < size; ++i) people_.emplace_back(i + 1);`
@@ -92,7 +108,9 @@ flowchart LR
   - After `people_.emplace_back(std::move(person))`: call `people_.back().set_id(people_.size())`.
 - **Comments**: Add a MAHIMA block above the constructor and above add/add_newborn_babies explaining that IDs are index-based for cross-scenario tracking.
 
-### 3. Tests ([Population.Test.cpp](src/HealthGPS.Tests/Population.Test.cpp))
+
+
+### 3. Tests ([Population.Test.cpp](../../../src/HealthGPS.Tests/Population.Test.cpp))
 
 - **CreateUniquePerson**: Asserts unassigned default IDs and explicit `set_id` ordering.
 - **CreateDefaultPerson**: Asserts `unassigned_id` until Population placement.
@@ -101,26 +119,36 @@ flowchart LR
   - Added persons will get IDs set by Population (recycled slot ID or new size). No change to test logic required; only IDs may differ from current (still positive and stable per slot).
 - Add a **new test** (MAHIMA): e.g. "PersonIdEqualsSlotIndexPlusOne" - create a Population(10), assert `population[i].id() == i + 1` for several indices; add newborns (replace and emplace), assert the replaced slot keeps ID = slot_index + 1 and the new tail has ID = size.
 
+
+
 ### 4. No changes to
 
 - **Simulation::partial_clone_entity**: Returns `Person{}` (unassigned ID). `population().add()` assigns the next lifetime-unique ID via `set_id`.
 - **DemographicModule**: Only assigns age, gender, region, ethnicity to existing `context.population()[index]`; does not create Person objects.
 - **Scenario classes**: They only use `entity.id()` as key within their own map; same ID in baseline and intervention is desired and safe.
-- **reset_id()** / **newUID**: Removed; all simulation IDs come from `Population::next_person_id_` (and initial `1..N`).
+- **reset_id()** / **newUID**: Removed; all simulation IDs come from `Population::next_person_id`_ (and initial `1..N`).
+
+
 
 ### 5. Commenting convention (MAHIMA)
 
 - At each changed site, add a short comment prefixed with `// MAHIMA:` explaining the change.
 - In Person and Population, add a small block comment (e.g. before the new constructors and set_id, and above the Population constructor and add/add_newborn_babies) describing that IDs are index-based so that the same logical person has the same ID in baseline and intervention.
 
+
+
 ## File change summary
 
-| File                                                           | Changes                                                                                                                                         |
-| -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| [person.h](src/HealthGPS/person.h)                             | Add `Person(std::size_t id)`, `Person(core::Gender, std::size_t id)`, `void set_id(std::size_t id)`; MAHIMA block for index-based ID.           |
-| [person.cpp](src/HealthGPS/person.cpp)                         | Implement new constructors and `set_id`; MAHIMA comments.                                                                                       |
-| [population.cpp](src/HealthGPS/population.cpp)                 | Constructor: build vector with `Person(i+1)`; add_newborn_babies: use ID = slot+1 or size+1; add: call set_id after placement; MAHIMA comments. |
-| [Population.Test.cpp](src/HealthGPS.Tests/Population.Test.cpp) | Add test verifying ID == index + 1 for initial and after add/newborns; MAHIMA comment.                                                          |
+
+| File                                                                    | Changes                                                                                                                                         |
+| ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| [person.h](../../../src/HealthGPS/person.h)                             | Add `Person(std::size_t id)`, `Person(core::Gender, std::size_t id)`, `void set_id(std::size_t id)`; MAHIMA block for index-based ID.           |
+| [person.cpp](../../../src/HealthGPS/person.cpp)                         | Implement new constructors and `set_id`; MAHIMA comments.                                                                                       |
+| [population.cpp](../../../src/HealthGPS/population.cpp)                 | Constructor: build vector with `Person(i+1)`; add_newborn_babies: use ID = slot+1 or size+1; add: call set_id after placement; MAHIMA comments. |
+| [Population.Test.cpp](../../../src/HealthGPS.Tests/Population.Test.cpp) | Add test verifying ID == index + 1 for initial and after add/newborns; MAHIMA comment.                                                          |
+
+
+
 
 ## Order of implementation
 
@@ -131,7 +159,11 @@ flowchart LR
 
 ---
 
+
+
 ## Update: Lifetime-unique ID strategy (no ID reuse after death/emigration)
+
+
 
 ### Why this update is needed
 
@@ -147,17 +179,21 @@ tracking), which breaks lifetime person identity.
 - Never reuse a dead/emigrated person ID.
 - Preserve runtime and memory efficiency.
 
+
+
 ### Updated design (minimal changes)
 
 1. Keep initial population IDs deterministic and aligned across scenarios:
-   - Initial slot `i` still gets ID `i + 1`.
+  - Initial slot `i` still gets ID `i + 1`.
 2. Add a Population-owned monotonic counter:
-   - `next_person_id_` in `Population` private state.
-   - Initialise to `initial_size + 1` after population construction.
+  - `next_person_id_` in `Population` private state.
+  - Initialise to `initial_size + 1` after population construction.
 3. For all post-initial entrants (newborns and `add()` entities):
-   - Assign `ID = next_person_id_++` regardless of recycled or appended slot.
+  - Assign `ID = next_person_id_++` regardless of recycled or appended slot.
 4. Continue slot recycling for memory efficiency:
-   - Reuse memory slots, not person IDs.
+  - Reuse memory slots, not person IDs.
+
+
 
 ### Why this preserves performance
 
@@ -165,51 +201,64 @@ tracking), which breaks lifetime person identity.
 - **Memory:** one extra `std::size_t` per `Population` object (negligible).
 - **No extra maps/sets/lookups**, so no added per-entity search or hash overhead.
 
+
+
 ### Baseline/intervention compatibility after update
 
 - Initial individuals still align by ID across baseline and intervention (`1..N`).
 - IDs for births/immigration remain unique and non-reused within each scenario run.
 - Existing scenario event logic remains valid since it already treats `entity.id()` as opaque key.
 
+
+
 ### Delta to implementation steps
+
+
 
 #### 1) Population only (primary behavior change)
 
-- **[population.h](src/HealthGPS/population.h)**
+- **[population.h](../../../src/HealthGPS/population.h)**
   - Add `std::size_t next_person_id_{1};` private member.
-
-- **[population.cpp](src/HealthGPS/population.cpp)**
+- **[population.cpp](../../../src/HealthGPS/population.cpp)**
   - Constructor:
     - Keep initial construction with `Person(i + 1)`.
     - Set `next_person_id_ = size + 1`.
   - `add(Person, time)`:
     - After placing person in recycled slot or push-back slot, call
-      `set_id(next_person_id_++)` (not slot index based).
+    `set_id(next_person_id_++)` (not slot index based).
   - `add_newborn_babies(number, gender, time)`:
     - On both recycled-slot and append paths, assign IDs from `next_person_id_++`.
+
+
 
 #### 2) Person
 
 - No new API required beyond existing `set_id` and constructors.
 - Keep current `Person{}` and `Person(gender)` behavior unchanged.
 
+
+
 #### 3) Tests update
 
-- **[Population.Test.cpp](src/HealthGPS.Tests/Population.Test.cpp)**
+- **[Population.Test.cpp](../../../src/HealthGPS.Tests/Population.Test.cpp)**
   - Replace/extend slot-based ID assertions to lifetime-unique assertions:
     - Initial IDs are deterministic (`1..init_size`).
     - Recycled-slot replacement gets a fresh new ID (not old slot ID).
     - IDs are never duplicated in the exercised sequence.
+
+
 
 ### Validation checklist (updated)
 
 1. Run `Population.Test` and ensure lifetime-unique assertions pass.
 2. Run targeted simulation/analysis tests covering individual tracking output.
 3. Smoke-check individual tracking CSV:
-   - Same ID should not switch to a different person profile due to slot recycling.
+  - Same ID should not switch to a different person profile due to slot recycling.
 4. Confirm no changes to scenario sync behavior between baseline/intervention.
 5. Debug builds: `Population::allocate_next_person_id()` asserts each new ID equals `next_person_id_`
-   before increment (MAHIMA; no hash set; zero release cost).
+  before increment (MAHIMA; no hash set; zero release cost).
+
+
 
 ### Summary of why this is better than current implemented version
 
@@ -218,7 +267,11 @@ tracking), which breaks lifetime person identity.
 - Keeps memory reuse and near-identical runtime characteristics.
 - Achieves the intended semantics: **slot reuse allowed, ID reuse forbidden**.
 
+
+
 ## Additional clarifications from review Q&A
+
+
 
 ### 1) What if a person is alive in intervention but dead in baseline?
 
@@ -242,6 +295,8 @@ No person object, no person ID, no region/ethnicity per-person payload is transf
 
 ## Before vs updated behavior flowcharts
 
+
+
 ### Before (implemented slot-based ID reuse)
 
 ```mermaid
@@ -252,6 +307,10 @@ flowchart TD
   newbornA --> sameIdA[AssignedID_iPlus1_Again]
   sameIdA --> mixedA[SameIDMapsToDifferentPeopleOverTime]
 ```
+
+
+
+
 
 ### Updated (lifetime-unique IDs with slot reuse only)
 
@@ -264,6 +323,10 @@ flowchart TD
   newPersonB --> assignB[AssignID_next_person_id_ThenIncrement]
   assignB --> uniqueB[IDNeverReused_LifetimeUnique]
 ```
+
+
+
+
 
 ### Baseline/intervention sync and divergence model
 
@@ -283,7 +346,13 @@ flowchart LR
   interPolicy --> outcomeDiverge[SameStartID_CanHaveDifferentDeathYear]
 ```
 
+
+
+
+
 ## Runtime and memory impact at large scale (14 million people)
+
+
 
 ### Assumptions for this estimate
 
@@ -291,11 +360,15 @@ flowchart LR
 - Both designs keep slot recycling, same person object size, same module order.
 - Only extra state in updated design: one `std::size_t next_person_id_` per `Population`.
 
+
+
 ### Complexity impact
 
 - Old assignment: O(1) write per new person.
 - Updated assignment: O(1) increment + write per new person.
 - Asymptotic runtime and memory are unchanged.
+
+
 
 ### Memory delta for 14M population
 
@@ -306,12 +379,16 @@ flowchart LR
   - Intervention run population object: +8 bytes.
   - Combined additional working memory: about **16 bytes** total (typical 64-bit build).
 
+
+
 ### Runtime effect estimate (relative)
 
 - Additional operation per newly added entity: one integer increment.
 - Expected wall-time impact is negligible versus existing demographic/risk/disease updates.
 - Practical expectation at 14M scale: near-0% change in overall runtime, while fixing identity
-  correctness.
+correctness.
+
+
 
 ### Relative impact plot (normalized)
 
@@ -323,6 +400,8 @@ xychart-beta
   bar [1.00,1.00]
   line [1.00,1.000001]
 ```
+
+
 
 Notes:
 
