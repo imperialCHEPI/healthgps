@@ -14,13 +14,13 @@
 
 ### Work items
 
-| Status | Item |
-| ------ | ---- |
-| Planned | Add optional KevinHall height CSV fields to v1/v2 schemas while preserving legacy HeightSlope/HeightStdDev support. |
-| Planned | Implement KevinHall parser logic to read slope/std CSVs, validate row counts, and fallback to legacy scalar fields. |
-| Planned | Update KevinHall runtime/model definition to select height slope/std by income adjustment stratum before final category remap. |
-| Planned | Add tests for scalar backward compatibility, single-row broadcast, multi-row strata mapping, and invalid row-count errors. |
-| Planned | Update KevinHall sample dynamic model fixture(s) to show new CSV input format. |
+| Status | Item                                                                                                                           |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| Done   | Add optional KevinHall height CSV fields to v1/v2 schemas while preserving legacy HeightSlope/HeightStdDev support.            |
+| Done   | Implement KevinHall parser logic to read slope/std CSVs, validate row counts, and fallback to legacy scalar fields.            |
+| Done   | Update KevinHall runtime/model definition to select height slope/std by income adjustment stratum before final category remap. |
+| Done   | Add tests for scalar backward compatibility, single-row broadcast, multi-row strata mapping, and invalid row-count errors.     |
+| Done   | Update KevinHall sample dynamic model fixture(s) to show new CSV input format.                                                 |
 
 ## Goal
 
@@ -53,17 +53,17 @@ Keep existing `HeightSlope` / `HeightStdDev` JSON fields working for backward co
 
 ### 2) Yearly update (`update_risk_factors`) split by age
 
-- **Newborns (`age == 0`)**
+- **Newborns (**`age == 0`**)**
   - Reinitialize nutrient/energy/weight.
   - Apply newborn weight adjustment.
   - Initialize height and KevinHall state.
   - New logic: height params selected by quintile/broadcast fallback before setting height.
-- **Children/adolescents (`0 < age < 19`)**
+- **Children/adolescents (**`0 < age < 19`**)**
   - Update nutrient/energy/weight with pre-19 branch.
   - Apply scenario adjustment to weight/state.
   - Recompute height (`update_height`) each step.
   - New logic: `update_height` selects stratum-based slope/std before computing height.
-- **Adults (`age >= 19`)**
+- **Adults (**`age >= 19`**)**
   - Weight evolves through the full Kevin Hall run and scenario adjustment.
   - Height is not in the under-19 update branch.
   - No new height update behavior unless future requirements explicitly extend adult height updates.
@@ -99,7 +99,7 @@ flowchart TD
     newbornHeight --> newbornIncome[AssignFinalIncomeCategories3Or4]
     newbornIncome --> newbornBmi[ComputeBMI]
 
-    nonNewbornPath --> ageGate{AgeLT19}
+    nonNewbornPath --> ageGate{AgeL<9}
     ageGate -->|Yes| childWeight[UpdateWeightPre19]
     ageGate -->|No| adultWeight[RunKevinHallAdultWeight]
     childWeight --> childStrata[AssignIncomeAdjustmentStrataN]
@@ -114,10 +114,10 @@ flowchart TD
 ## Implementation Steps
 
 - Extend KevinHall dynamic model schema to allow optional CSV file blocks for male/female height parameters in addition to legacy scalar fields.
-  - Update [`C:/healthgps/schemas/v2/config/models/kevinhall.json`](C:/healthgps/schemas/v2/config/models/kevinhall.json)
-  - Update [`C:/healthgps/schemas/v1/config/models/kevinhall.json`](C:/healthgps/schemas/v1/config/models/kevinhall.json)
+  - Update `[C:/healthgps/schemas/v2/config/models/kevinhall.json](C:/healthgps/schemas/v2/config/models/kevinhall.json)`
+  - Update `[C:/healthgps/schemas/v1/config/models/kevinhall.json](C:/healthgps/schemas/v1/config/models/kevinhall.json)`
 - Add parser support for new CSV inputs in KevinHall model loading.
-  - Read `HeightCsv.Female` / `HeightCsv.Male` (or final agreed field names) as CSV metadata blocks via existing CSV helpers in [`C:/healthgps/src/HealthGPS.Input/model_parser.cpp`](C:/healthgps/src/HealthGPS.Input/model_parser.cpp).
+  - Read `HeightCsv.Female` / `HeightCsv.Male` (or final agreed field names) as CSV metadata blocks via existing CSV helpers in `[C:/healthgps/src/HealthGPS.Input/model_parser.cpp](C:/healthgps/src/HealthGPS.Input/model_parser.cpp)`.
   - Parse columns `slope` and `std` (row-order mapping).
   - Validate row count:
     - `1` row => broadcast to all adjustment strata.
@@ -127,13 +127,13 @@ flowchart TD
     1. New CSV input if present.
     2. Legacy `HeightSlope`/`HeightStdDev` scalar values if CSV absent.
 - Extend KevinHall model definition/runtime data structures to carry either scalar or per-stratum height parameters.
-  - Update types in [`C:/healthgps/src/HealthGPS/kevinhall_model.h`](C:/healthgps/src/HealthGPS/kevinhall_model.h) and relevant constructor/definition wiring in [`C:/healthgps/src/HealthGPS.Input/model_parser.cpp`](C:/healthgps/src/HealthGPS.Input/model_parser.cpp).
+  - Update types in `[C:/healthgps/src/HealthGPS/kevinhall_model.h](C:/healthgps/src/HealthGPS/kevinhall_model.h)` and relevant constructor/definition wiring in `[C:/healthgps/src/HealthGPS.Input/model_parser.cpp](C:/healthgps/src/HealthGPS.Input/model_parser.cpp)`.
 - Apply height assignment using `income_adjustment_stratum` before final income category remap.
-  - Reuse existing stratum assignment pattern (already used by other factor adjustments) from static model flow in [`C:/healthgps/src/HealthGPS/static_linear_model.cpp`](C:/healthgps/src/HealthGPS/static_linear_model.cpp) as behavioral reference.
+  - Reuse existing stratum assignment pattern (already used by other factor adjustments) from static model flow in `[C:/healthgps/src/HealthGPS/static_linear_model.cpp](C:/healthgps/src/HealthGPS/static_linear_model.cpp)` as behavioral reference.
   - In KevinHall height logic (`generate`/`update` paths), select `slope`/`std` by person’s adjustment stratum when available; otherwise use broadcast/scalar defaults.
   - Preserve downstream final income category behavior (`project_requirements.income.categories`) unchanged.
 - Add/adjust tests for both backward compatibility and quintile behavior.
-  - Update/add tests near [`C:/healthgps/src/HealthGPS.Tests/KevinHallWeightValidation.Test.cpp`](C:/healthgps/src/HealthGPS.Tests/KevinHallWeightValidation.Test.cpp) and related KevinHall input tests.
+  - Update/add tests near `[C:/healthgps/src/HealthGPS.Tests/KevinHallWeightValidation.Test.cpp](C:/healthgps/src/HealthGPS.Tests/KevinHallWeightValidation.Test.cpp)` and related KevinHall input tests.
   - Cover scenarios:
     - Legacy scalar-only config still produces prior behavior.
     - CSV single-row broadcast works.
@@ -141,7 +141,19 @@ flowchart TD
     - Invalid row count throws clear error.
     - Mixed male/female CSV content handled independently.
 - Update sample config/input-data docs fixture(s) to demonstrate new format while keeping legacy fields in examples for compatibility.
-  - Start with KevinHall fixture under [`C:/healthgps/input-data/data/KevinHall_FINCH/dynamic_model.json`](C:/healthgps/input-data/data/KevinHall_FINCH/dynamic_model.json).
+  - Start with KevinHall fixture under `[C:/healthgps/input-data/data/KevinHall_FINCH/dynamic_model.json](C:/healthgps/input-data/data/KevinHall_FINCH/dynamic_model.json)`.
+
+## Example console output
+
+Income-stratum assignment (static model) feeds which height CSV row/params are used. Height then prints stratum and final-income summary tables on generate (same gating as weight).
+
+| ![Income-stratum assignment and delta/apply](../../images/finch/income-stratum-delta-apply-example.png) |
+| :----------------------------------------------------------------------------------------------------: |
+| *Income-stratum assignment buckets and sampled factor delta/apply rows (initial year)* |
+
+| ![Height and weight stratum assignment](../../images/finch/height-weight-stratum-assignment.png) |
+| :----------------------------------------------------------------------------------------------: |
+| *Height stratum assignment and height by final income category (year 2022, phase=generate); weight tables appear in the same log* |
 
 ## Validation Strategy
 

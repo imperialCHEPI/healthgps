@@ -150,21 +150,14 @@ tracking), which breaks lifetime person identity.
 ### Updated design (minimal changes)
 
 1. Keep initial population IDs deterministic and aligned across scenarios:
-
-- Initial slot `i` still gets ID `i + 1`.
-
-2. Add a Population-owned monotonic counter:
-
-- `next_person_id_` in `Population` private state.
-- Initialise to `initial_size + 1` after population construction.
-
-3. For all post-initial entrants (newborns and `add()` entities):
-
-- Assign `ID = next_person_id_++` regardless of recycled or appended slot.
-
-4. Continue slot recycling for memory efficiency:
-
-- Reuse memory slots, not person IDs.
+   - Initial slot `i` still gets ID `i + 1`.
+1. Add a Population-owned monotonic counter:
+   - `next_person_id_` in `Population` private state.
+   - Initialise to `initial_size + 1` after population construction.
+1. For all post-initial entrants (newborns and `add()` entities):
+   - Assign `ID = next_person_id_++` regardless of recycled or appended slot.
+1. Continue slot recycling for memory efficiency:
+   - Reuse memory slots, not person IDs.
 
 ### Why this preserves performance
 
@@ -211,13 +204,10 @@ tracking), which breaks lifetime person identity.
 
 1. Run `Population.Test` and ensure lifetime-unique assertions pass.
 2. Run targeted simulation/analysis tests covering individual tracking output.
-3. Smoke-check individual tracking CSV:
-
-- Same ID should not switch to a different person profile due to slot recycling.
-
+3. Smoke-check individual tracking CSV: same ID should not switch to a different person profile due to slot recycling.
 4. Confirm no changes to scenario sync behavior between baseline/intervention.
 5. Debug builds: `Population::allocate_next_person_id()` asserts each new ID equals `next_person_id_`
-  before increment (MAHIMA; no hash set; zero release cost).
+   before increment (MAHIMA; no hash set; zero release cost).
 
 ### Summary of why this is better than current implemented version
 

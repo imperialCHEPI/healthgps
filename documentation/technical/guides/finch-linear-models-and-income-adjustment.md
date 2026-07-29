@@ -268,8 +268,8 @@ When verbosity allows, the simulation prints an income-stratum assignment table 
 
 Example console output (assignment table plus sampled delta/apply rows):
 
-| Income-stratum assignment and delta/apply debug                                        |
-| -------------------------------------------------------------------------------------- |
+| ![Income-stratum assignment and delta/apply](../../images/finch/income-stratum-assignment-debug.png) |
+| :-------------------------------------------------------------------------------------------------: |
 | *Income-stratum assignment buckets and sampled factor delta/apply rows (initial year)* |
 
 Related lines may also include `[MAHIMA][INCOME-STRATUM DELTA/APPLY EXAMPLES]` and post-adjustment `[INCOME]` stats.
@@ -284,8 +284,8 @@ At startup the Console also prints a **two-stage modelling summary**: which risk
 
 `=== TWO-STAGE MODELING SUMMARY ===`
 
-| Two-stage modelling summary                                     |
-| --------------------------------------------------------------- |
+| ![Two-stage modelling summary](../../images/finch/two-stage-modeling-summary.png) |
+| :-------------------------------------------------------------------------------: |
 | *Two-stage vs BoxCox-only factors and Stage 1 / Stage 2 counts* |
 
 ### 3.1 Box-Cox risk-factor model (how a nutrient is generated)
