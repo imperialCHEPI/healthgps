@@ -10,12 +10,9 @@ There is also a longer site-style intro in [index.md](index.md) (diagrams and mo
 
 ---
 
-
-
 ## Documentation key (how folders differ)
 
 Docs are split by **audience and job**, not by topic alone. The same subject (e.g. models or income strata) can appear in more than one place at different depths.
-
 
 | Folder                       | Audience                                                         | What belongs here                                                                                                       | What does *not*                                                                                |
 | ---------------------------- | ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
@@ -23,22 +20,18 @@ Docs are split by **audience and job**, not by topic alone. The same subject (e.
 | **[developer/](developer/)** | Engineers building or changing the codebase                      | CMake/vcpkg/tests, architecture, data API, contribution flow, Windows/MSVC and Pages deploy troubleshooting             | End-user “how do I set `config.json`?” walkthroughs; FINCH equation detail; open feature plans |
 | **[technical/](technical/)** | Engineers *and* advanced modellers who need implementation truth | Domain/project deep-dives (FINCH, update reports, model I/O reference) plus engineering **plans** for specific features | Generic “first run” material; repo-wide build instructions (those stay in `developer/`)        |
 
-
 **Why three top-level folders?** `user/` stays runnable and short. `developer/` stays about the product as software. `technical/` holds longer domain notes and design work that would clutter either of the other two, without forcing every modeller through CMake, or every contributor through FINCH nutrient equations.
 
 ### Inside `technical/`: guides vs plans
-
 
 | Subfolder                        | Role                            | Tone                                                       | Lifecycle                                                                       |
 | -------------------------------- | ------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------- |
 | **[guides/](technical/guides/)** | Stable reference and explainers | “How it works / how to interpret inputs and logs”          | Kept current; cite from user and developer pages                                |
 | **[plans/](technical/plans/)**   | Feature design notes            | “What we intend to change, where in code, how to validate” | Living design docs; status may be Done/Planned; useful after merge as rationale |
 
-
 **Rule of thumb:** if you are *using* the model → start in `user/`, jump to a `technical/guides/` page only when you need equations or FINCH-specific detail. If you are *building* or fixing the tree → start in `developer/`. If you are *implementing or reviewing a feature* → read the matching `technical/plans/` page, then the related guide.
 
 ### Supporting folders (not “content hubs”)
-
 
 | Path                  | Purpose                                                                                                              |
 | --------------------- | -------------------------------------------------------------------------------------------------------------------- |
@@ -47,7 +40,6 @@ Docs are split by **audience and job**, not by topic alone. The same subject (e.
 | `_includes/`          | Jekyll/Pages helpers (e.g. Mermaid on the deployed site)                                                             |
 | `assets/`             | Site/theme assets if present                                                                                         |
 | API on Pages (`/api`) | Doxygen C++ API - **not** stored under `documentation/`; built by the [docs workflow](../.github/workflows/docs.yml) |
-
 
 **API reference:** Page headers link to **[API (Pages)](https://imperialchepi.github.io/healthgps/api/)**. Local clones will not have `documentation/api/`.
 
@@ -59,10 +51,7 @@ Section indexes: [user/README.md](user/README.md) · [developer/README.md](devel
 
 ---
 
-
-
 ## Quick links
-
 
 | Need                                            | Go to                                                                          |
 | ----------------------------------------------- | ------------------------------------------------------------------------------ |
@@ -80,10 +69,7 @@ Section indexes: [user/README.md](user/README.md) · [developer/README.md](devel
 | What changed in Feb 2026                        | [Update report](technical/guides/healthgps-update-report-2026-02-20.md)        |
 | All technical plans                             | [technical/README.md](technical/README.md)                                     |
 
-
 ---
-
-
 
 ## Folder map
 
@@ -99,8 +85,6 @@ flowchart TB
     TECH --> GUIDES[guides/ — reference and explainers]
     TECH --> PLANS[plans/ — feature design notes]
 ```
-
-
 
 For documentation questions, use the **Author** line at the bottom of each page.
 
