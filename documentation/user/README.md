@@ -2,7 +2,7 @@
 
 ## Global Health Policy Simulation model
 
-{% include nav-user.md %}
+| [Home](../index.md) | [Quick Start](getstarted.md) | [User Guide](userguide.md) | [Schemas](schemas.md) | [Models](models-overview.md) | [Architecture](../developer/architecture.md) | [Data Model](../developer/datamodel.md) | [Developer Guide](../developer/development.md) | [Technical docs](../technical/README.md) | [API](https://imperialchepi.github.io/healthgps/api/) |
 
 Guides for running Health-GPS (binaries or a local build).
 

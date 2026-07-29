@@ -2,7 +2,7 @@
 
 ## Global Health Policy Simulation model
 
-{% include nav-root.md %}
+| [Home](index.md) | [Quick Start](user/getstarted.md) | [User Guide](user/userguide.md) | [Schemas](user/schemas.md) | [Models](user/models-overview.md) | [Architecture](developer/architecture.md) | [Data Model](developer/datamodel.md) | [Developer Guide](developer/development.md) | [Technical docs](technical/README.md) | [API](https://imperialchepi.github.io/healthgps/api/) |
 
 This folder is the project documentation. Start here, then pick the section that matches what you need.
 
@@ -16,9 +16,9 @@ There is also a longer site-style intro in [index.md](index.md) (diagrams and mo
 
 **API reference:** Page headers link to **[API (Pages)](https://imperialchepi.github.io/healthgps/api/)**. That Doxygen site is **not** checked into `documentation/`; the [docs workflow](../.github/workflows/docs.yml) builds it on deploy and publishes it under `/api` on GitHub Pages. Local clones will not have `documentation/api/`.
 
-**Diagrams:** Existing figures are SVG under `documentation/images/`. Markdown **Mermaid** blocks (`` ```mermaid ``) are rendered on GitHub.com natively but need [`_includes/head-custom.html`](_includes/head-custom.html) for the Jekyll GitHub Pages build.
+**Diagrams:** SVG figures live under `documentation/images/`. **Mermaid** (`` ```mermaid `` blocks) renders on the **built GitHub Pages site** via [`_includes/head-custom.html`](_includes/head-custom.html) (loads Mermaid from a CDN in the browser). On **github.com** when viewing `.md` source, Mermaid blocks appear as code unless GitHub’s native renderer supports that file context—use the deployed site to review diagrams.
 
-**Site navigation:** Most pages use `{% include nav-*.md %}` from [`_includes/`](_includes/) (paths differ for `user/`, `developer/`, `technical/`). Edit one include file to update the top link row across the site.
+**Site navigation:** The top link row (Home, Schemas, Models, …) is plain markdown in each page so it reads correctly on GitHub; if you add a new doc hub link, update the nav line on each section’s pages (or the copies under `user/`, `developer/`, `technical/`).
 
 ---
 

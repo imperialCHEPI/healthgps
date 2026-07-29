@@ -2,7 +2,7 @@
 
 ## Global Health Policy Simulation model
 
-{% include nav-technical-subdir.md %}
+| [Home](../../index.md) | [Quick Start](../../user/getstarted.md) | [User Guide](../../user/userguide.md) | [Schemas](../../user/schemas.md) | [Models](../../user/models-overview.md) | [Architecture](../../developer/architecture.md) | [Data Model](../../developer/datamodel.md) | [Developer Guide](../../developer/development.md) | [Technical docs](../README.md) | [API](https://imperialchepi.github.io/healthgps/api/) |
 
 **Related:** [Weight quintile plan](weight-quintile-plan.md) | [Income quintile factor means plan](income-quintile-factor-means-plan.md) | [FINCH guide](../guides/finch-linear-models-and-income-adjustment.md) | [Technical index](../README.md) | [Documentation index](../../README.md)
 

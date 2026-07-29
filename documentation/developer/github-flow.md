@@ -2,7 +2,7 @@
 
 ## Global Health Policy Simulation model
 
-{% include nav-developer.md %}
+| [Home](../index.md) | [Quick Start](../user/getstarted.md) | [User Guide](../user/userguide.md) | [Schemas](../user/schemas.md) | [Models](../user/models-overview.md) | [Architecture](architecture.md) | [Data Model](datamodel.md) | [Developer Guide](development.md) | [Technical docs](../technical/README.md) | [API](https://imperialchepi.github.io/healthgps/api/) |
 
 Traditional Git-flow branching patterns are usually adopted by large software teams with
 complex release processes to support the deployment of multiple versions of the same
