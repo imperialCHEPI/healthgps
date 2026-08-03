@@ -69,6 +69,7 @@ flowchart TB
     PERSON --> BOTLEFT
     PERSON --> BOTRIGHT
 ```
+
 |:---------------------------------------------------:|
 | *How Health-GPS models a person. Person sits in the centre; demographics and socio-economic status feed in from above, behaviour/risk factors and body/disease/status update below. Each card shows the core assignment equation. Full maths: [How Health-GPS models a person](technical/guides/how-healthgps-models-a-person.md).*|
 
