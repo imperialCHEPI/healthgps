@@ -34,18 +34,19 @@ I wrote it for modellers and engineers who need a clear map without reading the 
 ## Table of contents
 
 1. [What a person is](#1-what-a-person-is)
-2. [When attributes are set](#2-when-attributes-are-set)
-3. [Person ID](#3-person-id)
-4. [Age and gender](#4-age-and-gender)
-5. [Region, sector, and ethnicity](#5-region-sector-and-ethnicity)
-6. [SES and income](#6-ses-and-income)
-7. [Physical activity](#7-physical-activity)
-8. [Height, weight, and BMI](#8-height-weight-and-bmi)
-9. [Other risk factors](#9-other-risk-factors)
-10. [Diseases](#10-diseases)
-11. [Alive, death, and migration](#11-alive-death-and-migration)
-12. [HLM France vs FINCH](#12-hlm-france-vs-finch)
-13. [Where to look in code and config](#13-where-to-look-in-code-and-config)
+2. [Assignment equations](#2-assignment-equations)
+3. [When attributes are set](#3-when-attributes-are-set)
+4. [Person ID](#4-person-id)
+5. [Age and gender](#5-age-and-gender)
+6. [Region, sector, and ethnicity](#6-region-sector-and-ethnicity)
+7. [SES and income](#7-ses-and-income)
+8. [Physical activity](#8-physical-activity)
+9. [Height, weight, and BMI](#9-height-weight-and-bmi)
+10. [Other risk factors](#10-other-risk-factors)
+11. [Diseases](#11-diseases)
+12. [Alive, death, and migration](#12-alive-death-and-migration)
+13. [HLM France vs FINCH](#13-hlm-france-vs-finch)
+14. [Where to look in code and config](#14-where-to-look-in-code-and-config)
 
 ---
 
@@ -53,45 +54,55 @@ I wrote it for modellers and engineers who need a clear map without reading the 
 
 Every simulated individual is a `Person` (`src/HealthGPS/person.h`). Think of it as the full state vector for one life course inside one scenario run.
 
-The figure below is the self-contained map: each panel names the attribute group, the module that owns it, and the assignment rule (initialisation and, where relevant, yearly update). Use it as the overview; the numbered sections after it unpack each group.
-
-| ![How Health-GPS models a person](../../images/how_healthgps_models_a_person.svg) |
-|:---------------------------------------------------------------------------------:|
-| *How Health-GPS models a person: attribute groups on Person, mathematical assignment rules, and the init/yearly module order* |
+The Mermaid diagram below is the overview used on the documentation home page as well. Each box names an attribute group and the core assignment equation. Section 2 writes those equations out in full, matching the C++ implementation.
 
 ```mermaid
 flowchart TB
-    subgraph identity [Identity and status]
-        ID[id]
-        ALIVE[is_alive / has_emigrated]
-        TOD[time_of_death / time_of_migration]
+    subgraph TOPLEFT ["1. Demographics"]
+        direction TB
+        AGE["Age<br/><br/>n from population shares year, age, sex<br/>yearly: survivors age := age + 1<br/>newborns start at age 0"]
+        GEN["Gender<br/><br/>init from age-sex table<br/>births from SRB<br/>encoding: male = 1, female = 0"]
+        REG["Region / ethnicity optional<br/><br/>CDF sample from prevalence<br/>ethnicity depends on region"]
+        SEC["Sector optional<br/><br/>Bernoulli rural prevalence<br/>age-18 rural to urban transition"]
+        AGE --- GEN
+        GEN --- REG
+        REG --- SEC
     end
 
-    subgraph demo [Demographics]
-        AGE[age]
-        GEN[gender]
-        REG[region]
-        ETH[ethnicity]
-        SEC[sector]
+    subgraph TOPRIGHT ["2. Socio-economic"]
+        direction TB
+        SES["SES<br/><br/>ses ~ Normal mu, sigma<br/>redraw newborns only"]
+        INC["Income continuous FINCH<br/><br/>I = Z + eps<br/>clamp to min / max<br/>equal-rank strata and categories"]
+        CAT["Income categorical path<br/><br/>softmax logits to category<br/>India-style packs"]
+        SES --- INC
+        INC --- CAT
     end
 
-    subgraph socio [Socio-economic]
-        SES[ses]
-        INC_C[income_continuous]
-        INC[income category]
-        STRAT[income_adjustment_stratum]
+    PERSON(["PERSON<br/>virtual individual state<br/>src/HealthGPS/person.h"])
+
+    subgraph BOTLEFT ["3. Behaviour and risk factors"]
+        direction TB
+        PA["Physical activity<br/><br/>simple: mu * exp eps - 0.5 sigma^2<br/>or continuous: clamp Z + eps"]
+        FOOD["Foods / nutrients<br/><br/>Stage 1: logistic P zero<br/>Stage 2: mu * BoxCox^-1 Z, lambda<br/>then clamp to range"]
+        PA --- FOOD
     end
 
-    subgraph behaviour [Behaviour and body]
-        PA[physical_activity]
-        RF[risk_factors map<br/>foods, nutrients, Height, Weight, BMI, ...]
-        DIS[diseases map]
+    subgraph BOTRIGHT ["4. Body, disease, and status"]
+        direction TB
+        WHB["Weight / Height / BMI<br/><br/>W = W_exp * q EI/PA<br/>H = H_exp * W^slope / mean * e^eps<br/>BMI = W / h_m^2"]
+        DIS["Diseases<br/><br/>P = rate * RR / mean RR<br/>remission then incidence<br/>optional PIF on intervention"]
+        DEATH["Death / migration<br/><br/>P_death = 1 - survival product<br/>net migration clones or emigrates"]
+        WHB --- DIS
+        DIS --- DEATH
     end
 
-    identity --- demo
-    demo --- socio
-    socio --- behaviour
+    TOPLEFT --> PERSON
+    TOPRIGHT --> PERSON
+    PERSON --> BOTLEFT
+    PERSON --> BOTRIGHT
 ```
+
+*How Health-GPS models a person. Person sits in the centre; demographics and socio-economic status feed in from above, behaviour/risk factors and body/disease/status update below. Each card shows the core assignment equation. Section 2 writes the equations in full.*
 
 | Group | Fields on `Person` | Typical owner |
 | ----- | ------------------ | ------------- |
@@ -110,7 +121,214 @@ Many nutrients and behaviours exist only inside `risk_factors`. Dedicated member
 
 ---
 
-## 2. When attributes are set
+## 2. Assignment equations
+
+These are the equations Health-GPS actually evaluates when assigning person characteristics. Notation matches the code (`evaluate_linear_model`, `inverse_box_cox`, `update_age_and_death_events`, Kevin Hall helpers, and the default disease model).
+
+### Shared linear predictor
+
+Used for continuous income, continuous PA, Box-Cox risk factors, and logistic Stage 1 scores:
+
+```text
+Z = intercept + sum_k (beta_k * x_k) + sum_m (beta_m * log(x_m))
+```
+
+`evaluate_linear_model` skips metadata coefficients such as `stddev`, `min`, `max`, and `lambda`. Predictors `x_k` come from person fields and `risk_factors` (age, gender encodings, region/ethnicity dummies, income, nutrients, and so on). See the [FINCH guide](finch-linear-models-and-income-adjustment.md) for predictor name mapping.
+
+### Person ID
+
+```text
+initial cohort:   id(i) = i + 1          for slot index i = 0 .. N-1
+new entrants:     id = next_person_id++  (newborns and immigrants)
+```
+
+IDs are never reused after death or emigration.
+
+### Age and gender
+
+```text
+n_age,sex = round( population_share(year, age, sex) * virtual_population_size )
+```
+
+Yearly for survivors:
+
+```text
+age := age + 1
+```
+
+Birth sex uses the life-table sex ratio at birth (SRB). Encoding used elsewhere:
+
+```text
+gender_value(male) = 1
+gender_value(female) = 0
+```
+
+### Region and ethnicity (optional)
+
+With prevalence tables enabled:
+
+```text
+U ~ Uniform(0, 1)
+region = first category whose cumulative prevalence(age, gender) >= U
+
+U ~ Uniform(0, 1)
+ethnicity = first category whose cumulative prevalence(age_group, gender, region) >= U
+```
+
+Age group is Under18 if `age < 18`, else Over18. Newborns require an exact `age_0` region row.
+
+### Sector (StaticLinear, optional)
+
+```text
+U ~ Uniform(0, 1)
+sector = rural  if U < rural_prevalence(age_group, gender)
+       = urban  otherwise
+```
+
+At age 18, if currently rural:
+
+```text
+p_urban = 1 - rural_prevalence(Over18, gender) / rural_prevalence(Under18, gender)
+U ~ Uniform(0, 1);  become urban if U < p_urban
+```
+
+### SES equation
+
+```text
+ses ~ Normal(mu, sigma)
+```
+
+from `modelling.ses_model` (`function_name = "normal"`, parameters `[mu, sigma]`). Redrawn only for newborns on yearly update.
+
+### Continuous income (FINCH)
+
+```text
+I0 = Z_income
+eps  ~ Normal(0, sigma_income)     if stddev coefficient present
+I  = clamp(I0 + eps, min, max) if min/max coefficients present
+```
+
+Store `income_continuous = I` and `risk_factors["income"] = I`.
+
+Equal-rank reporting categories with `C` categories (`project_requirements.income.categories`):
+
+```text
+sort active incomes I_(1) <= ... <= I_(n)
+threshold_j = I_( round((n-1) * j/C) )     for j = 1 .. C-1
+category(I) = strata[j] if I <= threshold_j, else highest stratum
+```
+
+Adjustment strata (`0 .. N-1`) use the same equal-rank idea with `N = adjustment_income_stratum_count`.
+
+### Categorical income (India-style)
+
+```text
+logit_c = intercept_c + Sum beta_{c,k} * x_k
+p_c = exp(logit_c) / Sum_j exp(logit_j)
+category ~ Categorical(p)
+```
+
+### Physical activity
+
+Simple type:
+
+```text
+mu = expected PhysicalActivity(gender, age)
+eps ~ Normal(0, sigma)
+PA = clamp( mu * exp(eps - 1/2 sigma^2) )
+```
+
+Continuous type:
+
+```text
+PA = clamp( Z_PA + eps ),   eps ~ Normal(0, sigma)
+```
+
+Both write `physical_activity` and `risk_factors["PhysicalActivity"]`.
+
+### Foods and other StaticLinear risk factors
+
+Correlated residuals first (`r` from Cholesky of the residual correlation), then optional two-stage path.
+
+Stage 1 (if a logistic model exists for factor `f`):
+
+```text
+p_zero = logistic(Z_logistic)
+U ~ Uniform(0, 1)
+if U < p_zero:  risk_factors[f] = 0
+```
+
+Stage 2 (non-zero path, or Box-Cox-only factors):
+
+```text
+Z = Z_linear + r * sigma
+if |lambda| ~= 0:   BoxCox^{-1}(Z, lambda) = exp(Z)
+else:         BoxCox^{-1}(Z, lambda) = (lambda Z + 1)^(1/lambda)     (0 if base <= 0)
+risk_factors[f] = clamp( mu_f * BoxCox^{-1}(Z, lambda) )
+```
+
+`mu_f` is the expected factors-mean value for that person (gender, age, and optional income stratum).
+
+### Weight, height, BMI (Kevin Hall)
+
+```text
+(EI/PA)_expected = EnergyIntake_expected / PhysicalActivity_expected
+(EI/PA)_actual   = EnergyIntake / PhysicalActivity
+q = quantile( (EI/PA)_actual / (EI/PA)_expected ; weight quantile curve )
+Weight = Weight_expected * q
+```
+
+Height (slope and sigma may depend on income adjustment stratum):
+
+```text
+eps_H = Height_residual ~ Normal(0, sigma)   drawn once
+Height = Height_expected * (Weight^slope / mean(Weight^slope)) * (exp(eps_H) / exp(1/2 sigma^2))
+```
+
+```text
+h_m = Height / 100
+BMI = Weight / h_m^2
+```
+
+### Diseases
+
+Prevalence initialisation and yearly incidence share the same shape:
+
+```text
+RR = product over risk-factor RRs * product over comorbid-disease RRs
+P  = rate(age, sex) * RR / mean_RR(age, sex)
+U ~ Uniform(0, 1);  disease becomes active if U < P
+```
+
+`rate` is prevalence at init and incidence on yearly update. Intervention runs may apply PIF:
+
+```text
+P := P * (1 - PIF(age, sex, years_since_start))
+```
+
+Remission (if modelled):
+
+```text
+U ~ Uniform(0, 1);  status := free if U < remission(age, sex)
+```
+
+### Death
+
+Residual (non-modelled) mortality is calibrated from life-table death rates and mean excess-mortality products. For an active person each year:
+
+```text
+survival = (1 - residual_death(age, sex))
+for each active disease d:
+    survival = survival * (1 - excess_mortality_d)
+P_death = 1 - survival
+U ~ Uniform(0, 1);  die if age >= max_age or U < P_death
+```
+
+Survivors then take `age := age + 1`.
+
+---
+
+## 3. When attributes are set
 
 Attributes are not all drawn once. Health-GPS uses a fixed module order at initialisation and again each year.
 
@@ -156,7 +374,7 @@ For the module-level I/O view, see [Simulation models reference](simulation-mode
 
 ---
 
-## 3. Person ID
+## 4. Person ID
 
 | | |
 | --- | --- |
@@ -178,7 +396,7 @@ Detail: [Same person ID plan](../plans/same-person-id-baseline-intervention-plan
 
 ---
 
-## 4. Age and gender
+## 5. Age and gender
 
 ### Age
 
@@ -212,7 +430,7 @@ Code: `src/HealthGPS/demographic.cpp` (`initialise_population`, `update_age_and_
 
 ---
 
-## 5. Region, sector, and ethnicity
+## 6. Region, sector, and ethnicity
 
 These are optional demographics extras. France-style HLM packs often leave them unused. FINCH-style packs usually enable region and ethnicity through `project_requirements.demographics`.
 
@@ -259,11 +477,11 @@ Code: `demographic.cpp` for region/ethnicity; `static_linear_model.cpp` for sect
 
 ---
 
-## 6. SES and income
+## 7. SES and income
 
 SES noise and income are **different**. Mixing them up is a common source of confusion when reading France vs FINCH configs.
 
-### SES
+### SES field
 
 | | |
 | --- | --- |
@@ -310,13 +528,13 @@ Deep dives: [FINCH guide](finch-linear-models-and-income-adjustment.md), [Dynami
 
 ---
 
-## 7. Physical activity
+## 8. Physical activity
 
 | | |
 | --- | --- |
 | **Fields** | `physical_activity` and usually `risk_factors["PhysicalActivity"]` (kept in sync on the StaticLinear path). |
 | **Gate** | `project_requirements.physical_activity.enabled` |
-| **Simple type** | Expected mean by age/sex × lognormal-style noise. |
+| **Simple type** | Expected mean by age/sex * lognormal-style noise. |
 | **Continuous type** | Linear model + noise + clamp to configured bounds. |
 | **When** | Init for the population; yearly re-init for **newborns**. Adults are not randomly re-drawn each year on this path. |
 | **Kevin Hall** | Reads PA when forming energy / PA ratios for weight; it does not own the PA assignment. |
@@ -336,7 +554,7 @@ flowchart LR
 
 ---
 
-## 8. Height, weight, and BMI
+## 9. Height, weight, and BMI
 
 On FINCH / Kevin Hall packs these are explicit anthropometrics. On HLM France, BMI (and related factors) usually come from the hierarchical model instead.
 
@@ -378,7 +596,7 @@ Detail and console tables: [Height CSV quintile plan](../plans/height-csv-quinti
 
 ---
 
-## 9. Other risk factors
+## 10. Other risk factors
 
 Everything else in `Person.risk_factors` (foods, nutrients, residuals, policy/trend copies, Kevin Hall internal state, and so on) is owned by the registered static and dynamic models.
 
@@ -410,7 +628,7 @@ Predictor naming, Box-Cox, and policy equations for FINCH: [FINCH guide](finch-l
 
 ---
 
-## 10. Diseases
+## 11. Diseases
 
 | | |
 | --- | --- |
@@ -435,7 +653,7 @@ Code: `disease.cpp`, `default_disease_model.cpp`, `default_cancer_model.cpp`.
 
 ---
 
-## 11. Alive, death, and migration
+## 12. Alive, death, and migration
 
 | Field / accessor | Meaning |
 | ---------------- | ------- |
@@ -462,7 +680,7 @@ flowchart TD
 
 ---
 
-## 12. HLM France vs FINCH
+## 13. HLM France vs FINCH
 
 Same `Person` type. Different models fill different fields.
 
@@ -495,7 +713,7 @@ Example packs: [HLM_France](https://github.com/imperialCHEPI/healthgps-examples/
 
 ---
 
-## 13. Where to look in code and config
+## 14. Where to look in code and config
 
 | Concern | Primary code | Primary config / data |
 | ------- | ------------ | --------------------- |
