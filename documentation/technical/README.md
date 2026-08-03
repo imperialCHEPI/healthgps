@@ -1,6 +1,8 @@
 # Technical documentation
 
-**Author:** Mahima Ghosh
+## Global Health Policy Simulation model
+
+| [Home](../index.md) | [Quick Start](../user/getstarted.md) | [User Guide](../user/userguide.md) | [Schemas](../user/schemas.md) | [Models](../user/models-overview.md) | [Architecture](../developer/architecture.md) | [Data Model](../developer/datamodel.md) | [Developer Guide](../developer/development.md) | [Technical docs](README.md) | [API](https://imperialchepi.github.io/healthgps/api/) |
 
 Implementation notes, project reports, and modeller guides (FINCH, India, shared codebase).
 
@@ -14,6 +16,7 @@ Reach out if you need a code path, config walkthrough, or help debugging.
 | -------- | ----------- |
 | [FINCH linear models and income-stratum adjustment](guides/finch-linear-models-and-income-adjustment.md) | Policy equations, predictor names (`log_income`, `gender2`), income-quintile factors-mean, Q&A |
 | [HealthGPS update report (20 Feb 2026)](guides/healthgps-update-report-2026-02-20.md) | Integrated changes, module order, config/schema, verification |
+| [Simulation models reference](guides/simulation-models-reference.md) | Per-module and per-ModelName inputs, outputs, schemas, code pointers |
 | [Performance optimizations](guides/performance-optimizations.md) | Parallelisation and runtime notes |
 
 ---

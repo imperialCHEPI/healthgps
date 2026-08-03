@@ -1,10 +1,8 @@
 ## Global Health Policy Simulation model
 
-| [Home](../index.md) | [Quick Start](../user/getstarted.md) | [User Guide](../user/userguide.md) | [Software Architecture](architecture.md) | [Data Model](datamodel.md) | [Developer Guide](development.md) | [Technical docs](../technical/README.md) | [API (Pages)](https://imperialchepi.github.io/healthgps/api/) |
+| [Home](../index.md) | [Quick Start](../user/getstarted.md) | [User Guide](../user/userguide.md) | [Schemas](../user/schemas.md) | [Models](../user/models-overview.md) | [Architecture](architecture.md) | [Data Model](datamodel.md) | [Developer Guide](development.md) | [Technical docs](../technical/README.md) | [API](https://imperialchepi.github.io/healthgps/api/) |
 
 # Developer Guide
-
-**Author:** Mahima Ghosh
 
 The *Health GPS* software is written in modern, standard ANSI C++, targeting the [C++20 version](https://en.cppreference.com/w/cpp/20) and using the C++ Standard Library. The project is fully managed by [CMake](https://cmake.org/) and [Microsoft Visual Studio](https://visualstudio.microsoft.com), the code base is portable but requires a C++20 compatible compiler to build. The development toolset users [Ninja](https://ninja-build.org/) for build, [vcpkg](https://github.com/microsoft/vcpkg) package manager for dependencies, [googletest](https://github.com/google/googletest) for unit testing and [GitHub Actions](https://docs.github.com/en/actions) for continuous integration (CI) builds and testing.
 
@@ -94,6 +92,10 @@ ctest --preset='core-test-linux'
 
 API documentation for the latest version of Health-GPS [is available on the
 GitHub Pages site](https://imperialchepi.github.io/healthgps/).
+
+The public site is published by **Deploy Jekyll and Doxygen** (release or manual
+workflow run), not on every push. If that workflow fails at **Configure HealthGPS**,
+see [Docs deploy troubleshooting](docs-deploy-troubleshooting.md).
 
 If you wish to build documentation locally, you need [Doxygen](https://www.doxygen.nl/) installed.
 
@@ -380,8 +382,6 @@ Health-GPS uses the GitHub flow branching pattern for git. For more information,
 | Feb 2026 changes | [Update report](../technical/guides/healthgps-update-report-2026-02-20.md) |
 | User guide / HPC | [User Guide](../user/userguide.md) |
 | Documentation home | [documentation/README.md](../README.md) |
-
----
 
 ---
 

@@ -1,10 +1,8 @@
 ## Global Health Policy Simulation model
 
-| [Home](../index.md) | [Quick Start](../user/getstarted.md) | [User Guide](../user/userguide.md) | [Software Architecture](architecture.md) | [Data Model](datamodel.md) | [Developer Guide](development.md) | [Technical docs](../technical/README.md) | [API (Pages)](https://imperialchepi.github.io/healthgps/api/) |
+| [Home](../index.md) | [Quick Start](../user/getstarted.md) | [User Guide](../user/userguide.md) | [Schemas](../user/schemas.md) | [Models](../user/models-overview.md) | [Architecture](architecture.md) | [Data Model](datamodel.md) | [Developer Guide](development.md) | [Technical docs](../technical/README.md) | [API](https://imperialchepi.github.io/healthgps/api/) |
 
 # Data Model
-
-**Author:** Mahima Ghosh
 
 **Interfaces:** `hgps::core::Datastore` in `src/HealthGPS.Core/datastore.h`. File-backed implementation: `hgps::input::DataManager` in `src/HealthGPS.Input/datamanager.h`.
 
@@ -286,10 +284,10 @@ Different [Data API][dataapi] implementations can be injected at construction; t
 
 ---
 
----
-
-**Author:** Mahima Ghosh
-
 [dataapi]: ../../src/HealthGPS.Core/datastore.h "Health-GPS Data API definition (Datastore)."
 
 [iso3166]: https://www.iso.org/iso-3166-country-codes.html "ISO 3166 Country Codes"
+
+---
+
+**Author:** Mahima Ghosh

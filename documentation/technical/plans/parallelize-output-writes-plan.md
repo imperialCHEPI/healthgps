@@ -1,6 +1,8 @@
 # Parallelize output writes and reduce is_active() calls
 
-**Author:** Mahima Ghosh
+## Global Health Policy Simulation model
+
+| [Home](../../index.md) | [Quick Start](../../user/getstarted.md) | [User Guide](../../user/userguide.md) | [Schemas](../../user/schemas.md) | [Models](../../user/models-overview.md) | [Architecture](../../developer/architecture.md) | [Data Model](../../developer/datamodel.md) | [Developer Guide](../../developer/development.md) | [Technical docs](../README.md) | [API](https://imperialchepi.github.io/healthgps/api/) |
 
 **Related:** [Individual ID tracking plan](individual-id-tracking-csv-plan.md) | [Technical index](../README.md) | [Documentation index](../../README.md)
 
@@ -12,14 +14,14 @@
 
 ## Current behaviour
 
-- **Single result dispatch thread** ([event_monitor.cpp](src/HealthGPS.Console/event_monitor.cpp)): Both `EventType::result` and `EventType::individual_tracking` use `result_event_handler`, which pushes every message into one `results_queue`_. One thread (`result_dispatch_thread`) pops and calls `accept()` so that:
+- **Single result dispatch thread** ([event_monitor.cpp](../../../src/HealthGPS.Console/event_monitor.cpp)): Both `EventType::result` and `EventType::individual_tracking` use `result_event_handler`, which pushes every message into one `results_queue`_. One thread (`result_dispatch_thread`) pops and calls `accept()` so that:
   - `ResultEventMessage` -> `result_writer_.write()` (JSON + main CSV + income CSVs)
   - `IndividualTrackingEventMessage` -> `individual_tracking_writer_->write()`
   All writes are therefore serialized on one thread.
 - **Writers**:
-  - [result_file_writer.cpp](src/HealthGPS.Console/result_file_writer.cpp): `ResultFileWriter::write()` holds a single mutex, then writes JSON fragment, main CSV rows, and (if enabled) income CSV rows. Different files (`stream_`, `csvstream_`, `income_csvstreams_`) but same lock.
-  - [individual_id_tracking_writer.cpp](src/HealthGPS.Console/individual_id_tracking_writer.cpp): `IndividualIDTrackingWriter::write()` has its own mutex and writes only to the tracking CSV.
-- **is_active()**: Called many times across the codebase (e.g. 13+ in [analysis_module.cpp](src/HealthGPS/analysis_module.cpp), plus demographic, disease, risk-factor modules). Each call is a simple member read (`is_alive_ && !has_emigrated_`), but in tight loops over the full population it can add up.
+  - [result_file_writer.cpp](../../../src/HealthGPS.Console/result_file_writer.cpp): `ResultFileWriter::write()` holds a single mutex, then writes JSON fragment, main CSV rows, and (if enabled) income CSV rows. Different files (`stream_`, `csvstream_`, `income_csvstreams_`) but same lock.
+  - [individual_id_tracking_writer.cpp](../../../src/HealthGPS.Console/individual_id_tracking_writer.cpp): `IndividualIDTrackingWriter::write()` has its own mutex and writes only to the tracking CSV.
+- **is_active()**: Called many times across the codebase (e.g. 13+ in [analysis_module.cpp](../../../src/HealthGPS/analysis_module.cpp), plus demographic, disease, risk-factor modules). Each call is a simple member read (`is_alive_ && !has_emigrated_`), but in tight loops over the full population it can add up.
 
 ---
 
@@ -29,7 +31,7 @@
 
 **Approach: two queues, two dispatch threads.**
 
-1. **Add a second queue and thread in EventMonitor** ([event_monitor.h](src/HealthGPS.Console/event_monitor.h), [event_monitor.cpp](src/HealthGPS.Console/event_monitor.cpp)):
+1. **Add a second queue and thread in EventMonitor** ([event_monitor.h](../../../src/HealthGPS.Console/event_monitor.h), [event_monitor.cpp](../../../src/HealthGPS.Console/event_monitor.cpp)):
 
 - Add `tbb::concurrent_queue<std::shared_ptr<hgps::EventMessage>> tracking_results_queue_` and a `tracking_dispatch_thread()` that loops popping from this queue and calling `m->accept(*this)` (same visitor; only `IndividualTrackingEventMessage` will be pushed here).
 - Keep `results_queue_` and `result_dispatch_thread()` for `ResultEventMessage` only.
@@ -59,7 +61,7 @@
 
 **Where it’s used (examples):**
 
-- [analysis_module.cpp](src/HealthGPS/analysis_module.cpp): many loops over `context.population()` that do `if (!entity.is_active()) continue;` or similar (e.g. lines 100, 224, 312, 418, 625, 685, 746, 1002, 1171, 1452, 1553, 1760, 1979).
+- [analysis_module.cpp](../../../src/HealthGPS/analysis_module.cpp): many loops over `context.population()` that do `if (!entity.is_active()) continue;` or similar (e.g. lines 100, 224, 312, 418, 625, 685, 746, 1002, 1171, 1452, 1553, 1760, 1979).
 - Other modules (demographic, default_disease_model, static_linear_model, kevin_hall_model, etc.) also iterate population and call `is_active()`.
 
 **Options:**
@@ -78,10 +80,10 @@
 
 | File                                                         | Change                                                                                                                                                                                                       |
 | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [event_monitor.h](src/HealthGPS.Console/event_monitor.h)     | Add `tracking_results_queue`_, declare `tracking_dispatch_thread()`, and second `tg_.run()` for it.                                                                                                          |
-| [event_monitor.cpp](src/HealthGPS.Console/event_monitor.cpp) | individual_tracking subscriber pushes to `tracking_results_queue`_; implement `tracking_dispatch_thread()` (same loop as result_dispatch_thread but pop from tracking queue); start tracking thread in ctor. |
+| [event_monitor.h](../../../src/HealthGPS.Console/event_monitor.h)     | Add `tracking_results_queue`_, declare `tracking_dispatch_thread()`, and second `tg_.run()` for it.                                                                                                          |
+| [event_monitor.cpp](../../../src/HealthGPS.Console/event_monitor.cpp) | individual_tracking subscriber pushes to `tracking_results_queue`_; implement `tracking_dispatch_thread()` (same loop as result_dispatch_thread but pop from tracking queue); start tracking thread in ctor. |
 
-No changes to [result_file_writer.cpp](src/HealthGPS.Console/result_file_writer.cpp) or [individual_id_tracking_writer.cpp](src/HealthGPS.Console/individual_id_tracking_writer.cpp) for Phase 1; each writer stays single-threaded from its own dispatch thread.
+No changes to [result_file_writer.cpp](../../../src/HealthGPS.Console/result_file_writer.cpp) or [individual_id_tracking_writer.cpp](../../../src/HealthGPS.Console/individual_id_tracking_writer.cpp) for Phase 1; each writer stays single-threaded from its own dispatch thread.
 
 ---
 
@@ -89,7 +91,7 @@ No changes to [result_file_writer.cpp](src/HealthGPS.Console/result_file_writer.
 
 | File                                                     | Change                                                                                                                                                                                                                                                                  |
 | -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [analysis_module.cpp](src/HealthGPS/analysis_module.cpp) | In one or two hot functions that do multiple population passes (e.g. `calculate_historical_statistics`), add a single initial pass that builds a cache of active flags (or active indices), then use that cache in later loops instead of calling `person.is_active()`. |
+| [analysis_module.cpp](../../../src/HealthGPS/analysis_module.cpp) | In one or two hot functions that do multiple population passes (e.g. `calculate_historical_statistics`), add a single initial pass that builds a cache of active flags (or active indices), then use that cache in later loops instead of calling `person.is_active()`. |
 
 ---
 
@@ -97,8 +99,6 @@ No changes to [result_file_writer.cpp](src/HealthGPS.Console/result_file_writer.
 
 1. Phase 1: EventMonitor two-queue, two-thread parallel writes.
 2. Phase 2: In analysis_module, add is_active cache (or active index list) in the heaviest multi-pass function and replace repeated `is_active()` checks with the cache.
-
----
 
 ---
 
