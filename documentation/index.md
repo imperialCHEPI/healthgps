@@ -69,7 +69,7 @@ flowchart TB
     PERSON --> BOTLEFT
     PERSON --> BOTRIGHT
 ```
-
+|:---------------------------------------------------:|
 | *How Health-GPS models a person. Person sits in the centre; demographics and socio-economic status feed in from above, behaviour/risk factors and body/disease/status update below. Each card shows the core assignment equation. Full maths: [How Health-GPS models a person](technical/guides/how-healthgps-models-a-person.md).*|
 
 The model uses proprietary equations to account for a variety of complex interactions such as risk factor-disease interactions and disease-disease interactions. Modellers are then able to evaluate health-related policies by changing some of the parameters and comparing the outputs with a *baseline* simulation. The model produces detailed quantitative outputs covering demographics, risk factors, diseases, mortality, global health estimates and health care expenditure, which could then be used to complement qualitative policy evaluation tools.
