@@ -4,7 +4,7 @@
 
 | [Home](../../index.md) | [Quick Start](../../user/getstarted.md) | [User Guide](../../user/userguide.md) | [Schemas](../../user/schemas.md) | [Models](../../user/models-overview.md) | [Architecture](../../developer/architecture.md) | [Data Model](../../developer/datamodel.md) | [Developer Guide](../../developer/development.md) | [Technical docs](../README.md) | [API](https://imperialchepi.github.io/healthgps/api/) |
 
-**Related:** [Models overview (site summary)](../user/models-overview.md) | [User Guide](../user/userguide.md) | [Architecture](../developer/architecture.md) | [FINCH guide](finch-linear-models-and-income-adjustment.md) | [Configuration schemas](../user/schemas.md)
+**Related:** [How Health-GPS models a person](how-healthgps-models-a-person.md) | [Models overview (site summary)](../../user/models-overview.md) | [User Guide](../../user/userguide.md) | [Architecture](../../developer/architecture.md) | [FINCH guide](finch-linear-models-and-income-adjustment.md) | [Configuration schemas](../../user/schemas.md)
 
 Detailed reference for **simulation modules** and **risk-factor model implementations** in Health-GPS: configuration keys, typical input files, what is updated on `Person`, and what reaches experiment output.
 

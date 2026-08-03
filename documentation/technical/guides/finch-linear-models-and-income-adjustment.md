@@ -21,6 +21,7 @@ If anything is unclear or you need a walkthrough of the code path, contact **Mah
 
 | Topic                                           | Document                                                                           |
 | ----------------------------------------------- | ---------------------------------------------------------------------------------- |
+| How a virtual person is modelled                | [How Health-GPS models a person](how-healthgps-models-a-person.md)                 |
 | Income-stratum adjustment (implementation plan) | [Income quintile factor means plan](../plans/income-quintile-factor-means-plan.md) |
 | 3 / 4 / 5 income categories                     | [Dynamic income categories plan](../plans/dynamic-income-categories-plan.md)       |
 | `project_requirements` schema                   | [Project requirements plan](../plans/project-requirements-plan.md)                 |

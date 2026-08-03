@@ -99,6 +99,7 @@ These are not `ModelName` types but belong in the same mental model:
 
 | Need | Document |
 | ---- | -------- |
+| How a person is built and updated | [How Health-GPS models a person](../technical/guides/how-healthgps-models-a-person.md) |
 | Full inputs/outputs per model | [Simulation models reference](../technical/guides/simulation-models-reference.md) |
 | FINCH linear models & income | [FINCH guide](../technical/guides/finch-linear-models-and-income-adjustment.md) |
 | Static/dynamic JSON examples | [User Guide — Risk factor models](userguide.md#risk-factor-models) |

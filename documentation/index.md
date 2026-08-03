@@ -16,9 +16,15 @@ Health-GPS models the impacts of behavioural and metabolic risk factors on chron
 | JACARDI                 | [JACARDI (CHEPI)](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/jacardi/)              | Use inputs published under [HealthGPS-examples](https://github.com/imperialCHEPI/healthgps-examples) for your study |
 | JA PreventNCD           | [JA PreventNCD (CHEPI)](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/ja-prevent-ncd/) | Use inputs published under [HealthGPS-examples](https://github.com/imperialCHEPI/healthgps-examples) for your study |
 
-For FINCH-specific modelling (income, Kevin Hall, predictors), see the [FINCH guide](technical/guides/finch-linear-models-and-income-adjustment.md).
+For FINCH-specific modelling (income, Kevin Hall, predictors), see the [FINCH guide](technical/guides/finch-linear-models-and-income-adjustment.md). For a full map of how every person attribute is assigned and updated, see [How Health-GPS models a person](technical/guides/how-healthgps-models-a-person.md).
 
 Health-GPS creates a *virtual population* representative of a distinct country's population and simulates close to reality life histories from birth to death of each member of the population including key characteristics such as gender, age, socio-economic status, risk factors, and disease profiles. These characteristics evolve over time and are updated in discrete time *annually* using statistical and probabilistic models which are calibrated to reproduce key demographic and epidemiological statistics from the specific country.
+
+The diagram below summarises how those characteristics are assigned mathematically on each `Person`. Full walkthrough: [How Health-GPS models a person](technical/guides/how-healthgps-models-a-person.md).
+
+| ![How Health-GPS models a person](images/how_healthgps_models_a_person.svg) |
+|:---------------------------------------------------------------------------:|
+| *How Health-GPS models a person: demographics, socio-economic status, risk factors, anthropometrics, diseases, and yearly module order, with the assignment rules used at initialisation and update* |
 
 The model uses proprietary equations to account for a variety of complex interactions such as risk factor-disease interactions and disease-disease interactions. Modellers are then able to evaluate health-related policies by changing some of the parameters and comparing the outputs with a *baseline* simulation. The model produces detailed quantitative outputs covering demographics, risk factors, diseases, mortality, global health estimates and health care expenditure, which could then be used to complement qualitative policy evaluation tools.
 
@@ -30,7 +36,7 @@ The Health-GPS workflow is summarised below, datasets from many disconnected sou
 |:---------------------------------------------------:|
 | *Health-GPS General Workflow Diagram* |
 
-The simulation creates the virtual population, simulates the synthetic individuals over time, collects population statistics and publish to the outside world at the end of each simulated time step. It is the user's responsibility to analyse and quantify the model results, which are saved to a chosen output folder as **JSON and CSV**, and optionally **income-stratum CSVs** or **individual ID tracking** CSVs (same person IDs in baseline and intervention when tracking is enabled). See the [User Guide — Results](user/userguide.md#results) and [Policy Evaluation](#policy-evaluation) below.
+The simulation creates the virtual population, simulates the synthetic individuals over time, collects population statistics and publish to the outside world at the end of each simulated time step. It is the user's responsibility to analyse and quantify the model results, which are saved to a chosen output folder as **JSON and CSV**, and optionally **income-stratum CSVs** or **individual ID tracking** CSVs (same person IDs in baseline and intervention when tracking is enabled). See the [User Guide - Results](user/userguide.md#results) and [Policy Evaluation](#policy-evaluation) below.
 
 Health-GPS is a flexible and modular framework, written in modern C++, designed using object-oriented principles to provide the building blocks necessary to compose the overall microsimulation, several data sources, modules, and sub-model are required as shown below.
 
@@ -102,9 +108,9 @@ The first run evaluates the no-intervention, *“baseline scenario”* where dem
 
 ### Same person ID across baseline and intervention
 
-For the **initial cohort**, Health-GPS assigns each synthetic person a stable **person ID** (derived from their slot in the population) so the **same logical individual** shares the same ID in both baseline and intervention runs. That makes it possible to compare scenarios at the person level—for example in optional tracking output—not only from aggregate JSON and CSV summaries. Life paths can still **diverge** after the intervention is applied; matching IDs mean “same starting person for comparison”, not guaranteed identical outcomes.
+For the **initial cohort**, Health-GPS assigns each synthetic person a stable **person ID** (derived from their slot in the population) so the **same logical individual** shares the same ID in both baseline and intervention runs. That makes it possible to compare scenarios at the person level - for example in optional tracking output - not only from aggregate JSON and CSV summaries. Life paths can still **diverge** after the intervention is applied; matching IDs mean “same starting person for comparison”, not guaranteed identical outcomes.
 
-When you need filtered per-person time series (run, year, scenario, demographics, selected risk factors), enable **`output.individual_id_tracking`** in config. The model then writes an additional `*_IndividualIDTracking.csv` alongside the main results. Configuration, filters, and an example are in the [User Guide — Output](user/userguide.md#output) (FINCH example: `KevinHall_FINCH/config.json` in [HealthGPS-examples](https://github.com/imperialCHEPI/healthgps-examples/tree/main/KevinHall_FINCH)). Design notes: [same-person ID plan](technical/plans/same-person-id-baseline-intervention-plan.md), [individual ID tracking plan](technical/plans/individual-id-tracking-csv-plan.md).
+When you need filtered per-person time series (run, year, scenario, demographics, selected risk factors), enable **`output.individual_id_tracking`** in config. The model then writes an additional `*_IndividualIDTracking.csv` alongside the main results. Configuration, filters, and an example are in the [User Guide - Output](user/userguide.md#output) (FINCH example: `KevinHall_FINCH/config.json` in [HealthGPS-examples](https://github.com/imperialCHEPI/healthgps-examples/tree/main/KevinHall_FINCH)). Design notes: [same-person ID plan](technical/plans/same-person-id-baseline-intervention-plan.md), [individual ID tracking plan](technical/plans/individual-id-tracking-csv-plan.md).
 
 Finally, detailed analysis can be carried out, externally, to compare the two simulated scenarios results in terms of population demographics and burden of diseases to estimate the cost-effectiveness and impacts of the targeted intervention in tackling childhood obesity.
 
@@ -158,9 +164,9 @@ flowchart TB
 
 | Folder | Audience | Contents |
 | ------ | -------- | -------- |
-| [user/](user/) | Modellers, policy analysts | [Quick Start](user/getstarted.md), [User Guide](user/userguide.md), [Schemas](user/schemas.md), [Models overview](user/models-overview.md) — [user index](user/README.md) |
-| [developer/](developer/) | Software developers | Architecture, data model, build guide, [Pages deploy troubleshooting](developer/docs-deploy-troubleshooting.md), MSVC note, GitHub flow — [developer index](developer/README.md) |
-| [technical/](technical/) | Economists and developers | FINCH guide, [simulation models reference](technical/guides/simulation-models-reference.md), update reports, feature plans — [technical index](technical/README.md) |
+| [user/](user/) | Modellers, policy analysts | [Quick Start](user/getstarted.md), [User Guide](user/userguide.md), [Schemas](user/schemas.md), [Models overview](user/models-overview.md) - [user index](user/README.md) |
+| [developer/](developer/) | Software developers | Architecture, data model, build guide, [Pages deploy troubleshooting](developer/docs-deploy-troubleshooting.md), MSVC note, GitHub flow - [developer index](developer/README.md) |
+| [technical/](technical/) | Economists and developers | FINCH guide, [simulation models reference](technical/guides/simulation-models-reference.md), update reports, feature plans - [technical index](technical/README.md) |
 
 ### Recommended starting points
 
@@ -169,7 +175,7 @@ flowchart TB
 - What changed in 2026 -> [Update report](technical/guides/healthgps-update-report-2026-02-20.md)
 - Threading and HPC sizing -> [Performance guide](technical/guides/performance-optimizations.md)
 - Building from source -> [Developer Guide](developer/development.md)
-- Per-person baseline vs intervention output -> [User Guide — Output](user/userguide.md#output)
+- Per-person baseline vs intervention output -> [User Guide - Output](user/userguide.md#output)
 - Config validation / `$schema` / v1 vs v2 -> [Configuration schemas](user/schemas.md)
 - Which model does what (HLM, Kevin Hall, …) -> [Models overview](user/models-overview.md)
 - Windows build fails (`cstdint` / `MSVCRTD.lib`) -> [MSVC troubleshooting](developer/msvc-windows-build-troubleshooting.md)
