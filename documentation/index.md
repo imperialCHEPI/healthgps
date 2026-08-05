@@ -21,57 +21,6 @@ Health-GPS models the impacts of behavioural and metabolic risk factors on chron
 For FINCH-specific modelling (income, Kevin Hall, predictors), see the [FINCH guide](technical/guides/finch-linear-models-and-income-adjustment.md). For a full map of how every person attribute is assigned and updated, see [How Health-GPS models a person](technical/guides/how-healthgps-models-a-person.md).
 
 Health-GPS creates a *virtual population* representative of a distinct country's population and simulates close to reality life histories from birth to death of each member of the population including key characteristics such as gender, age, socio-economic status, risk factors, and disease profiles. These characteristics evolve over time and are updated in discrete time *annually* using statistical and probabilistic models which are calibrated to reproduce key demographic and epidemiological statistics from the specific country.
-
-The diagram below is the person-centric view of Health-GPS: what sits on each `Person`, and the assignment equations used at initialisation and update. Full derivation and code pointers: [How Health-GPS models a person](technical/guides/how-healthgps-models-a-person.md).
-
-```mermaid
-%%{init: {"flowchart": {"nodeSpacing": 36, "rankSpacing": 48, "padding": 16}}}%%
-flowchart TB
-    subgraph ROW1 [" "]
-        direction LR
-
-        subgraph DEMO ["1. Demographics"]
-            direction LR
-            AGE["Age<br/>n from population shares<br/>yearly: age := age + 1"]
-            GEN["Gender<br/>age-sex table / SRB<br/>male = 1, female = 0"]
-            REG["Region / ethnicity<br/>CDF from prevalence"]
-            SEC["Sector<br/>Bernoulli rural prevalence"]
-        end
-
-        subgraph SOCIO ["2. Socio-economic"]
-            direction LR
-            SES["SES<br/>ses ~ Normal(mu, sigma)<br/>newborns only on update"]
-            INC["Continuous income<br/>I = Z + eps, then clamp<br/>equal-rank categories"]
-            CAT["Categorical income<br/>softmax logits to category"]
-        end
-    end
-
-    PERSON(["PERSON<br/>virtual individual state<br/>src/HealthGPS/person.h"])
-
-    subgraph ROW2 [" "]
-        direction LR
-
-        subgraph RF ["3. Behaviour and risk factors"]
-            direction LR
-            PA["Physical activity<br/>simple: mu * exp(eps - 0.5 sigma^2)<br/>or continuous: clamp(Z + eps)"]
-            FOOD["Foods / nutrients<br/>Stage 1: logistic P(zero)<br/>Stage 2: mu * BoxCox^-1(Z, lambda)"]
-        end
-
-        subgraph BODY ["4. Body, disease, and status"]
-            direction LR
-            WHB["Weight / Height / BMI<br/>W = W_exp * q(EI/PA)<br/>BMI = W / h_m^2"]
-            DIS["Diseases and death<br/>P = rate * RR / mean RR<br/>P_death = 1 - survival"]
-        end
-    end
-
-    DEMO --> PERSON
-    SOCIO --> PERSON
-    PERSON --> RF
-    PERSON --> BODY
-```
-
-*How Health-GPS models a person. Top row: demographics and socio-economic status side by side. Centre: Person. Bottom row: behaviour/risk factors and body/disease/status side by side. Full maths: [How Health-GPS models a person](technical/guides/how-healthgps-models-a-person.md).*
-
 The model uses proprietary equations to account for a variety of complex interactions such as risk factor-disease interactions and disease-disease interactions. Modellers are then able to evaluate health-related policies by changing some of the parameters and comparing the outputs with a *baseline* simulation. The model produces detailed quantitative outputs covering demographics, risk factors, diseases, mortality, global health estimates and health care expenditure, which could then be used to complement qualitative policy evaluation tools.
 
 ## General Workflow
