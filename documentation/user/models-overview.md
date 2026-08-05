@@ -10,8 +10,6 @@ This page is the **website summary**: what each piece needs and what it produces
 
 ---
 
-
-
 ## Simulation pipeline
 
 Modules run in a fixed order each year. Policy **scenarios** (baseline vs intervention) change parameters and interventions but use the same module stack.
@@ -45,9 +43,6 @@ flowchart TB
     OUT --> ID[Optional ID tracking CSV]
 ```
 
-
-
-
 | Stage            | Primary inputs                                                                   | Primary outputs                                                           |
 | ---------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
 | **Demographics** | Country datastore (population, births, deaths), `inputs.settings`                | Ages, births, deaths, immigration; alive / emigrated flags                |
@@ -57,17 +52,13 @@ flowchart TB
 | **Analysis**     | Population state, scenario label                                                 | `ResultEventMessage` aggregates (and optional individual tracking events) |
 | **Host output**  | Analysis messages                                                                | Files under `output.folder` (see [Results](userguide.md#results))         |
 
-
 Architecture diagrams (SVG): [modules](../images/modules_diagram.svg), [simulation engine](../images/simulation_engine.svg). Code-oriented detail: [Software Architecture](../developer/architecture.md).
 
 ---
 
-
-
 ## Risk-factor model implementations
 
 Configured in `config.json` `modelling.risk_factor_models`, for example `"static": "static_model.json"` and `"dynamic": "dynamic_model.json"`. The JSON `ModelName` field selects the implementation (validated against `[schemas/v1/config/models/static.json](https://github.com/imperialCHEPI/healthgps/blob/main/schemas/v1/config/models/static.json)` or `dynamic.json`).
-
 
 | Model name     | Role                                | Typical projects         | One-line inputs outputs                                                                    |
 | -------------- | ----------------------------------- | ------------------------ | ------------------------------------------------------------------------------------------ |
@@ -77,21 +68,15 @@ Configured in `config.json` `modelling.risk_factor_models`, for example `"static
 | `kevinhall`    | Dynamic energy-balance (Kevin Hall) | FINCH, Kevin Hall India  | Energy/PA equations, height/weight curves, boxcox/policy CSVs BMI, intake, PA trajectories |
 | `dummy`        | Placeholder / tests                 | Development              | Minimal JSON no-op or test values                                                          |
 
-
-
 | config.json file path             |
 | --------------------------------- |
 | *Health-GPS config.json filepath* |
 
-
 ---
-
-
 
 ## Other configured “models”
 
 These are not `ModelName` types but belong in the same mental model:
-
 
 | Area                      | Config / data                                  | Role                                                    |
 | ------------------------- | ---------------------------------------------- | ------------------------------------------------------- |
@@ -101,13 +86,9 @@ These are not `ModelName` types but belong in the same mental model:
 | **PIF**                   | `population_impact_fraction`                   | Optional population impact fraction on incidence        |
 | **Datastore diseases**    | Backend `data_index` + `running` disease list  | Country-specific rates and relative risks               |
 
-
 ---
 
-
-
 ## Where to go next
-
 
 | Need                              | Document                                                                               |
 | --------------------------------- | -------------------------------------------------------------------------------------- |
@@ -117,7 +98,6 @@ These are not `ModelName` types but belong in the same mental model:
 | Static/dynamic JSON examples      | [User Guide - Risk factor models](userguide.md#risk-factor-models)                     |
 | Config layout                     | [Configuration schemas](schemas.md)                                                    |
 | Example packs                     | [HealthGPS-examples](https://github.com/imperialCHEPI/healthgps-examples)              |
-
 
 ---
 
