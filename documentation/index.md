@@ -86,7 +86,7 @@ The simulation creates the virtual population, simulates the synthetic individua
 
 Health-GPS is a flexible and modular framework, written in modern C++, designed using object-oriented principles to provide the building blocks necessary to compose the overall microsimulation, several data sources, modules, and sub-model are required as shown below.
 
-| ![Health-GPS Concept](images/model_concept_diagram.svg) |
+| ![Health-GPS Concept](images/model_concept_diagram.png) |
 |:-------------------------------------------------------:|
 | *Health-GPS Concept Diagram* |
 
