@@ -58,7 +58,7 @@ Architecture diagrams (SVG): [modules](../images/modules_diagram.svg), [simulati
 
 ## Risk-factor model implementations
 
-Configured in `config.json` â†’ `modelling.risk_factor_models`, for example `"static": "static_model.json"` and `"dynamic": "dynamic_model.json"`. The JSON **`ModelName`** field selects the implementation (validated against [`schemas/v1/config/models/static.json`](https://github.com/imperialCHEPI/healthgps/blob/main/schemas/v1/config/models/static.json) or `dynamic.json`).
+Configured in `config.json` `modelling.risk_factor_models`, for example `"static": "static_model.json"` and `"dynamic": "dynamic_model.json"`. The JSON **`ModelName`** field selects the implementation (validated against [`schemas/v1/config/models/static.json`](https://github.com/imperialCHEPI/healthgps/blob/main/schemas/v1/config/models/static.json) or `dynamic.json`).
 
 | Model name | Role | Typical projects | One-line inputs â†’ outputs |
 | ---------- | ---- | ---------------- | ------------------------- |
@@ -68,16 +68,9 @@ Configured in `config.json` â†’ `modelling.risk_factor_models`, for example
 | **`kevinhall`** | Dynamic energy-balance (Kevin Hall) | FINCH, Kevin Hall India | Energy/PA equations, height/weight curves, boxcox/policy CSVs â†’ BMI, intake, PA trajectories |
 | **`dummy`** | Placeholder / tests | Development | Minimal JSON â†’ no-op or test values |
 
-```mermaid
-flowchart LR
-    CFG[config.json modelling]
-    CFG --> ST[static file]
-    CFG --> DY[dynamic file]
-    ST --> HLM[hlm / staticlinear]
-    DY --> EB[ebhlm / kevinhall]
-    HLM --> POP[Person.risk_factors at t0]
-    EB --> POP2[Person.risk_factors each year]
-```
+| ![config.json file path](images/config_filepath.png) |
+|:--------------------------------------------------------:|
+| *Health-GPS config.json filepath* |
 
 ---
 
