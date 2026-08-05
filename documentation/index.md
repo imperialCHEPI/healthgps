@@ -187,26 +187,9 @@ The reconcile process can be extremely laborious with each dataset having to be 
 
 All project docs live under `documentation/`. Start at [README.md](README.md).
 
-```mermaid
-flowchart TB
-    ROOT[documentation/README.md]
-    ROOT --> USER[user/]
-    ROOT --> DEV[developer/]
-    ROOT --> TECH[technical/]
-    USER --> GS[getstarted.md]
-    USER --> UG[userguide.md]
-    USER --> SCH[schemas.md]
-    USER --> MOD[models-overview.md]
-    DEV --> ARCH[architecture.md]
-    DEV --> DM[datamodel.md]
-    DEV --> DV[development.md]
-    DEV --> MSVC[msvc-windows-build-troubleshooting.md]
-    DEV --> DOCSDEP[docs-deploy-troubleshooting.md]
-    DEV --> GH[github-flow.md]
-    TECH --> GUIDES[guides/]
-    TECH --> MODELREF[simulation-models-reference.md]
-    TECH --> PLANS[plans/]
-```
+| ![Health-GPS Documentation Guide](images/documentation_guide.png) |
+|:--------------------------------------------------------:|
+| *Health-GPS Documentation Guide* |
 
 | Folder                   | Audience                   | Contents                                                                                                                                                                         |
 | ------------------------ | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
