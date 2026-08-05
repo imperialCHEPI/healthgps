@@ -25,52 +25,52 @@ Health-GPS creates a *virtual population* representative of a distinct country's
 The diagram below is the person-centric view of Health-GPS: what sits on each `Person`, and the assignment equations used at initialisation and update. Full derivation and code pointers: [How Health-GPS models a person](technical/guides/how-healthgps-models-a-person.md).
 
 ```mermaid
+%%{init: {"flowchart": {"nodeSpacing": 36, "rankSpacing": 48, "padding": 16}}}%%
 flowchart TB
-    subgraph TOPLEFT ["1. Demographics"]
-        direction TB
-        AGE["Age<br/><br/>n from population shares year, age, sex<br/>yearly: survivors age := age + 1<br/>newborns start at age 0"]
-        GEN["Gender<br/><br/>init from age-sex table<br/>births from SRB<br/>encoding: male = 1, female = 0"]
-        REG["Region / ethnicity optional<br/><br/>CDF sample from prevalence<br/>ethnicity depends on region"]
-        SEC["Sector optional<br/><br/>Bernoulli rural prevalence<br/>age-18 rural to urban transition"]
-        AGE --- GEN
-        GEN --- REG
-        REG --- SEC
-    end
+    subgraph ROW1 [" "]
+        direction LR
 
-    subgraph TOPRIGHT ["2. Socio-economic"]
-        direction TB
-        SES["SES<br/><br/>ses ~ Normal mu, sigma<br/>redraw newborns only"]
-        INC["Income continuous FINCH<br/><br/>I = Z + eps<br/>clamp to min / max<br/>equal-rank strata and categories"]
-        CAT["Income categorical path<br/><br/>softmax logits to category<br/>India-style packs"]
-        SES --- INC
-        INC --- CAT
+        subgraph DEMO ["1. Demographics"]
+            direction LR
+            AGE["Age<br/>n from population shares<br/>yearly: age := age + 1"]
+            GEN["Gender<br/>age-sex table / SRB<br/>male = 1, female = 0"]
+            REG["Region / ethnicity<br/>CDF from prevalence"]
+            SEC["Sector<br/>Bernoulli rural prevalence"]
+        end
+
+        subgraph SOCIO ["2. Socio-economic"]
+            direction LR
+            SES["SES<br/>ses ~ Normal(mu, sigma)<br/>newborns only on update"]
+            INC["Continuous income<br/>I = Z + eps, then clamp<br/>equal-rank categories"]
+            CAT["Categorical income<br/>softmax logits to category"]
+        end
     end
 
     PERSON(["PERSON<br/>virtual individual state<br/>src/HealthGPS/person.h"])
 
-    subgraph BOTLEFT ["3. Behaviour and risk factors"]
-        direction TB
-        PA["Physical activity<br/><br/>simple: mu * exp eps - 0.5 sigma^2<br/>or continuous: clamp Z + eps"]
-        FOOD["Foods / nutrients<br/><br/>Stage 1: logistic P zero<br/>Stage 2: mu * BoxCox^-1 Z, lambda<br/>then clamp to range"]
-        PA --- FOOD
+    subgraph ROW2 [" "]
+        direction LR
+
+        subgraph RF ["3. Behaviour and risk factors"]
+            direction LR
+            PA["Physical activity<br/>simple: mu * exp(eps - 0.5 sigma^2)<br/>or continuous: clamp(Z + eps)"]
+            FOOD["Foods / nutrients<br/>Stage 1: logistic P(zero)<br/>Stage 2: mu * BoxCox^-1(Z, lambda)"]
+        end
+
+        subgraph BODY ["4. Body, disease, and status"]
+            direction LR
+            WHB["Weight / Height / BMI<br/>W = W_exp * q(EI/PA)<br/>BMI = W / h_m^2"]
+            DIS["Diseases and death<br/>P = rate * RR / mean RR<br/>P_death = 1 - survival"]
+        end
     end
 
-    subgraph BOTRIGHT ["4. Body, disease, and status"]
-        direction TB
-        WHB["Weight / Height / BMI<br/><br/>W = W_exp * q EI/PA<br/>H = H_exp * W^slope / mean * e^eps<br/>BMI = W / h_m^2"]
-        DIS["Diseases<br/><br/>P = rate * RR / mean RR<br/>remission then incidence<br/>optional PIF on intervention"]
-        DEATH["Death / migration<br/><br/>P_death = 1 - survival product<br/>net migration clones or emigrates"]
-        WHB --- DIS
-        DIS --- DEATH
-    end
-
-    TOPLEFT --> PERSON
-    TOPRIGHT --> PERSON
-    PERSON --> BOTLEFT
-    PERSON --> BOTRIGHT
+    DEMO --> PERSON
+    SOCIO --> PERSON
+    PERSON --> RF
+    PERSON --> BODY
 ```
 
-*How Health-GPS models a person. Person sits in the centre; demographics and socio-economic status feed in from above, behaviour/risk factors and body/disease/status update below. Each card shows the core assignment equation. Full maths: [How Health-GPS models a person](technical/guides/how-healthgps-models-a-person.md).*
+*How Health-GPS models a person. Top row: demographics and socio-economic status side by side. Centre: Person. Bottom row: behaviour/risk factors and body/disease/status side by side. Full maths: [How Health-GPS models a person](technical/guides/how-healthgps-models-a-person.md).*
 
 The model uses proprietary equations to account for a variety of complex interactions such as risk factor-disease interactions and disease-disease interactions. Modellers are then able to evaluate health-related policies by changing some of the parameters and comparing the outputs with a *baseline* simulation. The model produces detailed quantitative outputs covering demographics, risk factors, diseases, mortality, global health estimates and health care expenditure, which could then be used to complement qualitative policy evaluation tools.
 
@@ -78,7 +78,7 @@ The model uses proprietary equations to account for a variety of complex interac
 
 The Health-GPS workflow is summarised below, datasets from many disconnected sources are used to define the various modules and components of the framework. Commonly used datasets are processed, aggregated, indexed by country, and stored in the backend *datastore*, while research specific datasets are analysed externally to build the *risk factors* and *socio-economic status* modules, design and parameterise *intervention* to be tested.
 
-| ![Health-GPS Workflow](images/general_workflow.svg) |
+| ![Health-GPS Workflow](images/general_workflow.png) |
 |:---------------------------------------------------:|
 | *Health-GPS General Workflow Diagram* |
 

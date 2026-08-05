@@ -76,7 +76,7 @@ flowchart LR
     IDX --> PIFidx[population_impact_fraction]
 ```
 
-See [User Guide - Backend storage](userguide.md#backend-storage) for how this connects to `config.json` â†’ `data`.
+See [User Guide - Backend storage](userguide.md#backend-storage) for how this connects to `config.json` `data`.
 
 ---
 
@@ -135,10 +135,10 @@ Schema URLs use the prefix `https://raw.githubusercontent.com/imperialCHEPI/heal
 
 | Topic | Document |
 | ----- | -------- |
-| Config sections and examples | [User Guide — Configuration](userguide.md#configuration) |
-| `project_requirements` | [User Guide — Project requirements](userguide.md#project-requirements) |
-| Output / ID tracking schema | [User Guide — Output](userguide.md#output) |
-| v1 â†’ unified migration | [Schema migration plan](../technical/plans/schema-migration-plan.md) |
+| Config sections and examples | [User Guide - Configuration](userguide.md#configuration) |
+| `project_requirements` | [User Guide - Project requirements](userguide.md#project-requirements) |
+| Output / ID tracking schema | [User Guide - Output](userguide.md#output) |
+| v1 unified migration | [Schema migration plan](../technical/plans/schema-migration-plan.md) |
 | Architecture / inputs | [Software Architecture](../developer/architecture.md) |
 
 ---
