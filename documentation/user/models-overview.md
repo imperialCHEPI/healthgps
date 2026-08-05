@@ -68,9 +68,9 @@ Configured in `config.json` `modelling.risk_factor_models`, for example `"static
 | `kevinhall`    | Dynamic energy-balance (Kevin Hall) | FINCH, Kevin Hall India  | Energy/PA equations, height/weight curves, boxcox/policy CSVs BMI, intake, PA trajectories |
 | `dummy`        | Placeholder / tests                 | Development              | Minimal JSON no-op or test values                                                          |
 
-| config.json file path             |
-| --------------------------------- |
-| *Health-GPS config.json filepath* |
+| ![config.json modelling](../images/config_filepath.png) |
+|:--------------------------------------------------------:|
+| *Health-GPS config.json modelling* |
 
 ---
 
