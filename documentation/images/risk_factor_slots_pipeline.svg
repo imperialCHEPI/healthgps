@@ -1,64 +1,65 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="720" height="520" viewBox="0 0 720 520" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="680" viewBox="0 0 780 680" role="img" aria-labelledby="title desc">
   <title id="title">Risk-factor model slots in the simulation pipeline</title>
-  <desc id="desc">Initialisation runs both risk-factor model slots (generate). Each simulated year runs both slots again (update). Static and dynamic are config roles, not properties of individual risk factors.</desc>
+  <desc id="desc">At initialisation both config slots run generate (static then dynamic). Each year both run update (static then dynamic).</desc>
   <defs>
     <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
       <path d="M0,0 L6,3 L0,6 Z" fill="#4672c4"/>
     </marker>
   </defs>
 
-  <!-- Init box -->
-  <rect x="40" y="20" width="640" height="150" rx="6" fill="#f7f9fc" stroke="#9aa7b8"/>
-  <text x="56" y="44" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="14" font-weight="bold">Initialisation (once per run)</text>
+  <rect x="24" y="16" width="732" height="200" rx="8" fill="#f7f9fc" stroke="#9aa7b8"/>
+  <text x="40" y="42" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="15" font-weight="bold">Initialisation (once per run)</text>
 
-  <rect x="60" y="60" width="100" height="40" rx="3" fill="#dae2f3" stroke="#41719c"/>
-  <text x="110" y="85" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="12">Demographics</text>
-  <path d="M160 80 H180" stroke="#4672c4" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="48" y="64" width="118" height="44" rx="4" fill="#dae2f3" stroke="#41719c"/>
+  <text x="107" y="91" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="13">Demographics</text>
+  <path d="M166 86 H186" stroke="#4672c4" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
 
-  <rect x="180" y="60" width="70" height="40" rx="3" fill="#dae2f3" stroke="#41719c"/>
-  <text x="215" y="85" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="12">SES</text>
-  <path d="M250 80 H270" stroke="#4672c4" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="186" y="64" width="70" height="44" rx="4" fill="#dae2f3" stroke="#41719c"/>
+  <text x="221" y="91" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="13">SES</text>
+  <path d="M256 86 H276" stroke="#4672c4" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
 
-  <rect x="270" y="52" width="250" height="88" rx="4" fill="#fff2cc" stroke="#bf8f00"/>
-  <text x="395" y="72" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="12" font-weight="bold">Risk factors</text>
-  <text x="395" y="92" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="11">1) initialisation-slot generate</text>
-  <text x="395" y="110" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="11">2) update-slot generate</text>
-  <text x="395" y="128" text-anchor="middle" fill="#666666" font-family="Calibri, Arial, sans-serif" font-size="10">(config keys: static then dynamic)</text>
-  <path d="M520 80 H540" stroke="#4672c4" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="276" y="56" width="268" height="112" rx="6" fill="#fff2cc" stroke="#bf8f00" stroke-width="1.5"/>
+  <text x="410" y="78" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="13" font-weight="bold">Risk factors</text>
+  <text x="410" y="100" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="12">1) static slot: generate</text>
+  <text x="410" y="120" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="12">2) dynamic slot: generate</text>
+  <text x="410" y="146" text-anchor="middle" fill="#666666" font-family="Calibri, Arial, sans-serif" font-size="11">both packs, in that order</text>
+  <path d="M544 86 H564" stroke="#4672c4" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
 
-  <rect x="540" y="60" width="60" height="40" rx="3" fill="#dae2f3" stroke="#41719c"/>
-  <text x="570" y="85" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="12">Diseases</text>
-  <path d="M600 80 H620" stroke="#4672c4" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="564" y="64" width="80" height="44" rx="4" fill="#dae2f3" stroke="#41719c"/>
+  <text x="604" y="91" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="13">Diseases</text>
+  <path d="M644 86 H664" stroke="#4672c4" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
 
-  <rect x="620" y="60" width="45" height="40" rx="3" fill="#dae2f3" stroke="#41719c"/>
-  <text x="642" y="85" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="11">Anal.</text>
+  <rect x="664" y="64" width="72" height="44" rx="4" fill="#dae2f3" stroke="#41719c"/>
+  <text x="700" y="91" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="13">Analysis</text>
 
-  <!-- Arrow down -->
-  <path d="M360 170 V210" stroke="#4672c4" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <path d="M390 216 V248" stroke="#4672c4" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
 
-  <!-- Yearly box -->
-  <rect x="180" y="210" width="360" height="290" rx="6" fill="#f7f9fc" stroke="#9aa7b8"/>
-  <text x="360" y="234" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="14" font-weight="bold">Each simulated year</text>
+  <rect x="200" y="248" width="380" height="412" rx="8" fill="#f7f9fc" stroke="#9aa7b8"/>
+  <text x="390" y="276" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="15" font-weight="bold">Each simulated year</text>
 
-  <rect x="250" y="250" width="220" height="32" rx="3" fill="#dae2f3" stroke="#41719c"/>
-  <text x="360" y="271" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="12">Demographics update</text>
-  <path d="M360 282 V298" stroke="#4672c4" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="260" y="292" width="240" height="34" rx="4" fill="#dae2f3" stroke="#41719c"/>
+  <text x="390" y="314" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="13">Demographics update</text>
+  <path d="M390 326 V344" stroke="#4672c4" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
 
-  <rect x="250" y="298" width="220" height="32" rx="3" fill="#dae2f3" stroke="#41719c"/>
-  <text x="360" y="319" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="12">Net immigration</text>
-  <path d="M360 330 V346" stroke="#4672c4" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="260" y="344" width="240" height="34" rx="4" fill="#dae2f3" stroke="#41719c"/>
+  <text x="390" y="366" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="13">Net immigration</text>
+  <path d="M390 378 V396" stroke="#4672c4" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
 
-  <rect x="250" y="346" width="220" height="32" rx="3" fill="#dae2f3" stroke="#41719c"/>
-  <text x="360" y="367" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="12">SES (mainly newborns)</text>
-  <path d="M360 378 V394" stroke="#4672c4" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="260" y="396" width="240" height="34" rx="4" fill="#dae2f3" stroke="#41719c"/>
+  <text x="390" y="418" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="13">SES (mainly newborns)</text>
+  <path d="M390 430 V448" stroke="#4672c4" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
 
-  <rect x="230" y="394" width="260" height="56" rx="4" fill="#fff2cc" stroke="#bf8f00"/>
-  <text x="360" y="414" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="12" font-weight="bold">Risk factors</text>
-  <text x="360" y="432" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="11">1) initialisation-slot update</text>
-  <text x="360" y="446" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="11">2) update-slot update</text>
-  <path d="M360 450 V466" stroke="#4672c4" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="240" y="448" width="280" height="84" rx="6" fill="#fff2cc" stroke="#bf8f00" stroke-width="1.5"/>
+  <text x="390" y="472" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="13" font-weight="bold">Risk factors</text>
+  <text x="390" y="494" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="12">1) static slot: update</text>
+  <text x="390" y="514" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="12">2) dynamic slot: update</text>
+  <path d="M390 532 V550" stroke="#4672c4" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
 
-  <rect x="250" y="466" width="220" height="28" rx="3" fill="#dae2f3" stroke="#41719c"/>
-  <text x="360" y="485" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="12">Diseases update ’ Analysis</text>
+  <rect x="260" y="550" width="240" height="34" rx="4" fill="#dae2f3" stroke="#41719c"/>
+  <text x="390" y="572" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="13">Diseases update</text>
+  <path d="M390 584 V602" stroke="#4672c4" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+
+  <rect x="260" y="602" width="240" height="34" rx="4" fill="#dae2f3" stroke="#41719c"/>
+  <text x="390" y="624" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="13">Analysis publish</text>
 </svg>

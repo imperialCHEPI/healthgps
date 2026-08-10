@@ -70,7 +70,7 @@ So if the update-slot is Kevin Hall, **both packs still run each year**; Kevin H
 
 | ![Risk-factor slots in the pipeline](../images/risk_factor_slots_pipeline.svg) |
 |:------------------------------------------------------------------------------:|
-| *Both config slots run at init (generate) and each year (update). Yellow = risk-factor host.* |
+| *Both config slots run at init (`generate`) and each year (`update`): static then dynamic* |
 
 ### FINCH-style example (answers the protein question)
 

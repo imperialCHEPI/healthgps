@@ -26,25 +26,9 @@ At startup the CLI parses JSON, resolves **`$ref`** links to sub-schemas (data, 
 
 The root schema composes several sections. Optional blocks (such as **`project_requirements`**, **`population_impact_fraction`**, or **`output.individual_id_tracking`**) extend behaviour for FINCH, India, PIF, and per-person tracking without replacing the core layout.
 
-```mermaid
-flowchart TB
-    ROOT["config.json<br/>$schema → v1/config.json"]
-    ROOT --> PR[project_requirements]
-    ROOT --> DATA[data]
-    ROOT --> IN[inputs]
-    ROOT --> MOD[modelling]
-    ROOT --> RUN[running]
-    ROOT --> OUT[output]
-    ROOT --> PIF[population_impact_fraction]
-
-    PR --> PRsub["demographics, income, PA,<br/>risk_factors, trend, two_stage"]
-    DATA --> DATAref["config/data.json<br/>URL or local datastore"]
-    IN --> INref["config/inputs.json<br/>country, dataset CSV"]
-    MOD --> MODref["config/modelling.json"]
-    MODref --> MODELS["config/models/*.json<br/>HLM, Kevin Hall, dynamic, …"]
-    RUN --> RUNref["config/running.json<br/>seed, trials, interventions"]
-    OUT --> OUTref["config/output.json<br/>paths, comorbidities, ID tracking"]
-```
+| ![Top-level config.json schema structure](../images/schemas_overview.svg) |
+|:-------------------------------------------------------------------------:|
+| *Root `config.json` sections and linked sub-schemas* |
 
 | Section | Role |
 | ------- | ---- |
