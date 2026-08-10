@@ -26,9 +26,11 @@ At startup the CLI parses JSON, resolves **`$ref`** links to sub-schemas (data, 
 
 The root schema composes several sections. Optional blocks (such as **`project_requirements`**, **`population_impact_fraction`**, or **`output.individual_id_tracking`**) extend behaviour for FINCH, India, PIF, and per-person tracking without replacing the core layout.
 
-| ![Top-level config.json schema structure](../images/schemas_overview.svg) |
-|:-------------------------------------------------------------------------:|
-| *Root `config.json` sections and linked sub-schemas* |
+<div style="overflow-x: auto; max-width: 100%;">
+  <img src="../images/schemas_overview.svg" alt="Top-level config.json schema structure" width="1918" height="478" />
+</div>
+
+*Root `config.json` sections and linked sub-schemas. Scroll horizontally if the diagram is wider than the page.*
 
 | Section | Role |
 | ------- | ---- |
