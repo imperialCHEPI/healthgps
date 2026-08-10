@@ -53,38 +53,9 @@ If anything is unclear or you need a walkthrough of the code path, contact **Mah
 
 High-level picture of how FINCH static linear models, factors-mean adjustment, and predictor evaluation fit together:
 
-```mermaid
-flowchart TB
-    subgraph inputs [Inputs]
-        CSV[Model CSVs<br/>boxcox, policy, income, PA, logistic]
-        FM[Factors-mean tables<br/>overall + optional per-quintile]
-        CFG[config.json<br/>project_requirements + modelling]
-    end
-
-    subgraph load [Load time]
-        PARSER[model_parser.cpp<br/>load coefficients]
-        NORM[normalize_policy_coefficient_row<br/>energy intake names only]
-        STRATUM[Load income-stratum<br/>expected tables if enabled]
-    end
-
-    subgraph sim [Simulation]
-        INIT[Initialise RF from<br/>Box-Cox + logistic]
-        ADJ[Factors-mean adjustment<br/>overall income then per-stratum RF/PA]
-        EVAL[evaluate_linear_model<br/>intercept + Σ β·x]
-        POL[Apply policy effects]
-    end
-
-    CSV --> PARSER
-    CFG --> PARSER
-    CFG --> STRATUM
-    FM --> STRATUM
-    PARSER --> NORM
-    NORM --> INIT
-    STRATUM --> ADJ
-    INIT --> ADJ
-    ADJ --> EVAL
-    EVAL --> POL
-```
+| ![Modelling inputs, load time, and simulation](../../images/modelling_inputs_load_simulation.png) |
+|:-------------------------------------------------------------------------------------------------:|
+| *Static linear modelling flow: inputs → load-time parsing → simulation steps* |
 
 ---
 
@@ -114,7 +85,7 @@ This way the virtual population can match nutrient and activity patterns **condi
 
 **FINCH example:** we use `income.categories = "5"` and `adjustment_income_stratum_count = 5` with quintile-specific factors-mean files - five final categories **and** five adjustment strata, but they serve different purposes.
 
-| ![Income adjustment strata vs final categories](../../images/finch/income_strata_5.png) |
+| ![Income adjustment strata vs final categories](../../images/income_strata_5.png) |
 |:--------------------------------------------------------------------------------------:|
 | *Adjustment strata (N=5) calibrate RF + PA; equal-rank split also sets final `person.income` categories* |
 
@@ -208,17 +179,9 @@ Step 4-5 - for Quintile2 only:
   … and so on for Quintile3, 4, 5
 ```
 
-```mermaid
-flowchart TD
-    S1[Step 1: Generate risk factors from regression] --> S2
-    S2[Step 2: Adjust income using OVERALL factors-mean tables] --> S3
-    S3[Step 3: Rank-split population into N income strata] --> S4
-    S4[Step 4: For Quintile 1 - adjust nutrients using Quintile1 tables] --> S5
-    S5[Step 5: For Quintile 1 - adjust PA using Quintile1 tables] --> S6
-    S6[Step 6: For Quintile 2 - adjust nutrients + PA using Quintile2 tables] --> S7
-    S7[... repeat for remaining quintiles ...] --> S8
-    S8[Final step: Assign income categories 3/4/5 for reporting]
-```
+| ![Income-stratum adjustment steps](../../images/income_stratum_steps.png) |
+|:-------------------------------------------------------------------------------:|
+| *FINCH income-stratum adjustment order: overall income, then per-stratum RF/PA* |
 
 **Yearly updates** follow the same ordering for non-trended adjustment; trended paths mirror this with the relevant `trended` flags.
 
@@ -348,13 +311,13 @@ Special cases:
 | …             | …                      | …                   | …                       |
 | **Sum**       |                        |                     | **Z for that nutrient** |
 
-```mermaid
-flowchart LR
-    CSV[CSV row: log_income] --> LOAD[Coefficient stored under name log_income]
-    LOAD --> EVAL[Look up person income]
-    EVAL --> LOG[Compute log income]
-    LOG --> SUM[Add beta × log income to linear sum]
-```
+| ![log_income coefficient pipeline](../../images/log_income_pipeline.png) |
+|:------------------------------------------------------------------------------:|
+| *How a `log_income` CSV row becomes a term in the linear sum* |
+
+| ![log_income load time vs evaluation](../../images/log_income_load_vs_eval.png) |
+|:-------------------------------------------------------------------------------------:|
+| *Load time stores the coefficient; evaluation looks up income, applies `ln`, and accumulates β·x* |
 
 ### 3.4 Code locations (for Mahima / developers)
 

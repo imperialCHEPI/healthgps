@@ -14,34 +14,9 @@ This page summarises modules, model names, inputs, behaviour, and outputs. For f
 
 Modules run in a fixed order. Policy **scenarios** (baseline vs intervention) change parameters and interventions but use the same module stack.
 
-```mermaid
-flowchart TB
-    subgraph init [Initialisation once per run]
-        D0[Demographics]
-        SES0[SES]
-        RFS[Static risk-factor model]
-        DIS0[Diseases]
-        A0[Analysis]
-        D0 --> SES0 --> RFS --> DIS0 --> A0
-    end
-
-    subgraph yearly [Each simulated year]
-        D1[Demographics update]
-        MIG[Net immigration]
-        SES1[SES]
-        RFD[Dynamic risk-factor model]
-        DIS1[Diseases update]
-        A1[Analysis publish]
-        D1 --> MIG --> SES1 --> RFD --> DIS1 --> A1
-    end
-
-    init --> yearly
-    A1 --> OUT[Host output writers]
-    OUT --> JSON[JSON summary]
-    OUT --> CSV[Main CSV]
-    OUT --> INC[Optional income CSVs]
-    OUT --> ID[Optional ID tracking CSV]
-```
+| ![Top-level simulation modules](../images/simulation_modules.png) |
+|:----------------------------------------------------------------:|
+| *Health-GPS top-level modules: demographics → SES → risk factors → diseases → outputs* |
 
 | Stage | Primary inputs | Primary outputs |
 | ----- | -------------- | --------------- |
