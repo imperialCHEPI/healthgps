@@ -1,64 +1,9 @@
----
-name: JACARDI-UKPDS-healthGPS
-author: Mahima
-github: jacardi
-overview: Mahima's plan to integrate the UKPDS diabetes submodel into HealthGPS — diagrams, code change map, GitHub branch strategy (jacardi/*), implementation todos, and time estimates.
-todos:
-  - id: ukpds-data-layer
-    content: Add UKPDS coefficient CSVs and complication mapping under input-data/; map 8 complications to existing HealthGPS disease codes where they overlap (stroke, IHD, etc.)
-    status: pending
-  - id: ukpds-parser
-    content: Create ukpds_model_parser.cpp/h (or extend model_parser) to load UKPDS equation coefficients at startup via Repository
-    status: pending
-  - id: ukpds-rf-model
-    content: "Implement UkpdsRiskFactorModel : RiskFactorModel — updates clinical RFs (HbA1c, GFR, BP, etc.) for diabetic persons using prior-year values + UKPDS equations"
-    status: pending
-  - id: ukpds-complication-model
-    content: Implement UkpdsComplicationModel (inside UkpdsModule or UkpdsDiseaseModel) — draws/updates 8 complications from prior-year RFs; respects overlap disease history in Person.diseases
-    status: pending
-  - id: ukpds-history-view
-    content: Add UkpdsHistoryView / derived predictors in predictor_resolver for pre-diabetes complication history (stroke duration, has_stroke, etc.)
-    status: pending
-  - id: wire-riskfactor-module
-    content: Extend RiskFactorModelType enum; wire UkpdsRiskFactorModel in build_risk_factor_module + riskfactor.cpp after Static/Dynamic update
-    status: pending
-  - id: wire-disease-module
-    content: Register UkpdsDiseaseModel for diabetes code in disease_registry.h OR call Ukpds complication update from RiskFactorModule after RF pass (see wiring options)
-    status: pending
-  - id: person-init-handover
-    content: Implement diabetes diagnosis handover — on first year diabetic, seed UKPDS state from HealthGPS RFs; track ukpds_active flag or use Person.diseases diabetes start_time
-    status: pending
-  - id: config-schema
-    content: Extend config.json schema (configuration_parsing.cpp) with ukpds.enabled, equation file paths, complication list
-    status: pending
-  - id: integration-tests
-    content: Add tests V1–V6 plus 3-year handover test (Year1 diagnosis → Year2 UKPDS RF+complications → Year3 recursive update)
-    status: pending
-  - id: performance-profile
-    content: Profile single-pass UKPDS loop; confirm no extra top-level Simulation module unless needed
-    status: pending
-  - id: economist-docs
-    content: Write economist note mapping UKPDS CSVs to equations and describing Year1 handover vs Year2+ recursive logic
-    status: pending
-  - id: github-branch-scaffold
-    content: Branch jacardi/ukpds-scaffold — empty UKPDS class stubs + CMake; PR 1, must compile
-    status: pending
-  - id: github-branch-data-config
-    content: Branches jacardi/ukpds-data + jacardi/ukpds-config — CSV layout, complication map, config.json schema
-    status: pending
-  - id: github-branch-core-models
-    content: Branches jacardi/ukpds-parser through jacardi/ukpds-module — parser, history, RF, complications, module
-    status: pending
-  - id: github-branch-integration
-    content: Branches jacardi/ukpds-simulation-wire + jacardi/ukpds-person-handover — Simulation wiring, prior-year snapshot, handover
-    status: pending
-  - id: github-branch-tests-docs
-    content: Branches jacardi/ukpds-tests + jacardi/ukpds-docs — V1–V8 tests, economist note; final PR into main
-    status: pending
-isProject: false
----
+## Global Health Policy Simulation model
 
-# JACARDI-UKPDS-healthGPS — UKPDS integration into HealthGPS
+| [Home](../../index.md) | [Quick Start](../../user/getstarted.md) | [User Guide](../../user/userguide.md) | [Schemas](../../user/schemas.md) | [Models](../../user/models-overview.md) | [Architecture](../../developer/architecture.md) | [Data Model](../../developer/datamodel.md) | [Developer Guide](../../developer/development.md) | [Technical docs](../README.md) | [API](https://imperialchepi.github.io/healthgps/api/) |
+
+
+# JACARDI-UKPDS-HealthGPS - UKPDS integration into HealthGPS
 
 **Author:** Mahima Ghosh · **GitHub:** `jacardi` · **Branch prefix:** `jacardi/`
 **Status:** Design / planning (written and maintained by Mahima)
