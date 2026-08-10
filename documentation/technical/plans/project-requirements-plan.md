@@ -31,9 +31,9 @@ Place at the **start** of each project config for clarity. All fields are explic
 
 ### 1. `demographics`
 
-| Field     | Type    | Description |
-|----------|---------|-------------|
-| `age`    | boolean | Use age (always true in practice). |
+| Field | Type | Description |
+| ---------- | --------- | ------------- |
+| `age` | boolean | Use age (always true in practice). |
 | `gender` | boolean | Use gender (always true). |
 | `region` | boolean | Use region (FINCH/PIF: true, India: false). |
 | `ethnicity` | boolean | Use ethnicity (FINCH/PIF: true, India: false). |
@@ -42,13 +42,13 @@ Place at the **start** of each project config for clarity. All fields are explic
 
 ### 2. `income`
 
-| Field                      | Type   | Description |
-|---------------------------|--------|-------------|
-| `enabled`                 | boolean | Use income in the model. |
-| `type`                    | string | `"continuous"` \| `"categorical"`. |
-| `categories`              | string | `"3"` \| `"4"` (only when type is categorical, or for continuous→category mapping). |
-| `adjust_to_factors_mean`  | boolean | Include income in factors-mean adjustment (initial). |
-| `trended`                 | boolean | Include income in trended adjustment. |
+| Field | Type | Description |
+| --------------------------- | -------- | ------------- |
+| `enabled` | boolean | Use income in the model. |
+| `type` | string | `"continuous"` \| `"categorical"`. |
+| `categories` | string | `"3"` \| `"4"` (only when type is categorical, or for continuous→category mapping). |
+| `adjust_to_factors_mean` | boolean | Include income in factors-mean adjustment (initial). |
+| `trended` | boolean | Include income in trended adjustment. |
 
 - **FINCH:** type=continuous, adjust_to_factors_mean=true, trended=true (if trend enabled).
 - **India:** type=categorical, adjust_to_factors_mean=false, trended=false.
@@ -58,12 +58,12 @@ Place at the **start** of each project config for clarity. All fields are explic
 
 ### 3. `physical_activity`
 
-| Field                      | Type    | Description |
-|---------------------------|---------|-------------|
-| `enabled`                 | boolean | Use physical activity (have PA models). |
-| `type`                    | string  | `"simple"` \| `"continuous"` (which PA model). |
-| `adjust_to_factors_mean`  | boolean | Include PA in factors-mean adjustment (initial). |
-| `trended`                 | boolean | Include PA in trended adjustment. |
+| Field | Type | Description |
+| --------------------------- | --------- | ------------- |
+| `enabled` | boolean | Use physical activity (have PA models). |
+| `type` | string | `"simple"` \| `"continuous"` (which PA model). |
+| `adjust_to_factors_mean` | boolean | Include PA in factors-mean adjustment (initial). |
+| `trended` | boolean | Include PA in trended adjustment. |
 
 - **FINCH:** enabled=true, type=continuous, adjust_to_factors_mean=true, trended=false (per your “do not include in trended” rule).
 - **India:** enabled=true, type=simple, adjust_to_factors_mean=true, trended=false.

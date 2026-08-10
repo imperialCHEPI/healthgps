@@ -2393,18 +2393,14 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     bool has_active_policies, std::vector<LinearModelParams> logistic_models,
     core::Gender gender2_indicator)
     // NOLINTNEXTLINE(readability-function-cognitive-complexity)
-    : RiskFactorAdjustableModelDefinition{std::move(expected),
-                                          expected_trend
-                                              ? std::make_unique<
-                                                    std::unordered_map<core::Identifier, double>>(
-                                                    *expected_trend)
-                                              : nullptr,
-                                          trend_steps
-                                              ? std::make_unique<
-                                                    std::unordered_map<core::Identifier, int>>(
-                                                    *trend_steps)
-                                              : nullptr,
-                                          trend_type},
+    : RiskFactorAdjustableModelDefinition{
+          std::move(expected),
+          expected_trend
+              ? std::make_unique<std::unordered_map<core::Identifier, double>>(*expected_trend)
+              : nullptr,
+          trend_steps ? std::make_unique<std::unordered_map<core::Identifier, int>>(*trend_steps)
+                      : nullptr,
+          trend_type},
       expected_trend_{
           expected_trend
               ? std::make_shared<std::unordered_map<core::Identifier, double>>(*expected_trend)
