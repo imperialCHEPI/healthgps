@@ -36,7 +36,7 @@ On **`Simulation.init`** (initialise population):
 
 1. Demographic
 2. SES
-3. Risk factor — **static** models only
+3. Risk factor — **both** configured packs: initialisation-slot `generate`, then update-slot `generate` (config keys `static` / `dynamic`)
 4. Disease
 5. Analysis (initial statistics)
 
@@ -45,9 +45,11 @@ On each **`Simulation.update`** (one simulated year):
 1. Demographic update
 2. Net immigration
 3. SES update
-4. Risk factor — **dynamic** models
+4. Risk factor — **both** packs again: initialisation-slot `update`, then update-slot `update`
 5. Disease update
 6. Analysis update (publish results)
+
+The words `static` / `dynamic` are slot names, not “protein becomes dynamic in year 2”. See [Models overview](../../user/models-overview.md#the-confusing-words-static-and-dynamic).
 
 See [Update report](healthgps-update-report-2026-02-20.md) for diagrams aligned with `program.cpp` / `Simulation`.
 

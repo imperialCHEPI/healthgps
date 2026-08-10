@@ -53,7 +53,7 @@ If anything is unclear or you need a walkthrough of the code path, contact **Mah
 
 High-level picture of how FINCH static linear models, factors-mean adjustment, and predictor evaluation fit together:
 
-| ![Modelling inputs, load time, and simulation](../../images/modelling_inputs_load_simulation.png) |
+| ![Modelling inputs, load time, and simulation](../../images/modelling_inputs_load_simulation.svg) |
 |:-------------------------------------------------------------------------------------------------:|
 | *Static linear modelling flow: inputs → load-time parsing → simulation steps* |
 

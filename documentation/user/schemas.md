@@ -65,16 +65,9 @@ Worked JSON skeleton: [`examples/config_skeleton.json`](https://github.com/imper
 
 Downloaded or local datastore bundles describe countries, demographics, diseases, and analysis metadata in a separate index file. It uses its own root schema and is validated when the Console loads data.
 
-```mermaid
-flowchart LR
-    ZIP["data release .zip"]
-    ZIP --> IDX[data_index.json]
-    IDX --> C[country]
-    IDX --> D[demographic]
-    IDX --> DIS[diseases / disease]
-    IDX --> AN[analysis]
-    IDX --> PIFidx[population_impact_fraction]
-```
+| ![Data release zip and data_index.json](../images/data_release_zip.png) |
+|:----------------------------------------------------------------------:|
+| *Datastore bundle: `data_index.json` points at country, demographic, disease, analysis, and PIF tables* |
 
 See [User Guide - Backend storage](userguide.md#backend-storage) for how this connects to `config.json` `data`.
 

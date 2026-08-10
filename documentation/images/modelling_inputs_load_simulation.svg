@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 883.6859999999999 931.7" width="883.6859999999999" height="931.7" style="--bg: #FFFFFF; --fg: #27272A; background: var(--bg); width: 883.686px; height: 931.7px;">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
+  text { font-family: 'Inter', system-ui, sans-serif; }
+  svg {
+    /* Derived from --bg and --fg (overridable via --line, --accent, etc.) */
+    --_text:          var(--fg);
+    --_text-sec:      var(--muted, color-mix(in srgb, var(--fg) 60%, var(--bg)));
+    --_text-muted:    var(--muted, color-mix(in srgb, var(--fg) 40%, var(--bg)));
+    --_text-faint:    color-mix(in srgb, var(--fg) 25%, var(--bg));
+    --_line:          var(--line, color-mix(in srgb, var(--fg) 50%, var(--bg)));
+    --_arrow:         var(--accent, color-mix(in srgb, var(--fg) 85%, var(--bg)));
+    --_node-fill:     var(--surface, color-mix(in srgb, var(--fg) 3%, var(--bg)));
+    --_node-stroke:   var(--border, color-mix(in srgb, var(--fg) 20%, var(--bg)));
+    --_group-fill:    var(--bg);
+    --_group-hdr:     color-mix(in srgb, var(--fg) 5%, var(--bg));
+    --_inner-stroke:  color-mix(in srgb, var(--fg) 12%, var(--bg));
+    --_key-badge:     color-mix(in srgb, var(--fg) 10%, var(--bg));
+  }
+</style>
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="5" refX="7" refY="2.5" orient="auto">
+    <polygon points="0 0, 8 2.5, 0 5" fill="var(--_arrow)" stroke="var(--_arrow)" stroke-width="0.75" stroke-linejoin="round"/>
+  </marker>
+  <marker id="arrowhead-start" markerWidth="8" markerHeight="5" refX="1" refY="2.5" orient="auto-start-reverse">
+    <polygon points="8 0, 0 2.5, 8 5" fill="var(--_arrow)" stroke="var(--_arrow)" stroke-width="0.75" stroke-linejoin="round"/>
+  </marker>
+</defs>
+<g class="subgraph" data-id="inputs" data-label="📄 Inputs">
+  <rect x="40" y="40" width="803.6859999999999" height="113.80000000000001" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1"/>
+  <rect x="40" y="40" width="803.6859999999999" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1"/>
+  <text x="52" y="54" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">📄 Inputs</text>
+</g>
+<g class="subgraph" data-id="load" data-label="⚙️ Load time">
+  <rect x="225.1270833333333" y="213.8" width="449.933" height="215.60000000000002" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1"/>
+  <rect x="225.1270833333333" y="213.8" width="449.933" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1"/>
+  <text x="237.1270833333333" y="227.8" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">⚙️ Load time</text>
+</g>
+<g class="subgraph" data-id="sim" data-label="🔁 Simulation">
+  <rect x="310.67533333333336" y="489.40000000000003" width="300.6959999999999" height="402.30000000000007" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1"/>
+  <rect x="310.67533333333336" y="489.40000000000003" width="300.6959999999999" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1"/>
+  <text x="322.67533333333336" y="503.40000000000003" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">🔁 Simulation</text>
+</g>
+<polyline class="edge" data-from="CSV" data-to="PARSER" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="455.181,137.8 455.181,197.8 360.65508333333327,197.8 360.65508333333327,257.8" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)"/>
+<polyline class="edge" data-from="CFG" data-to="PARSER" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="174.046,137.8 174.046,197.8 360.65508333333327,197.8 360.65508333333327,257.8" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)"/>
+<polyline class="edge" data-from="FM" data-to="STRATUM" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="722.978,137.8 722.978,195.8 561.3915833333333,195.8 561.3915833333333,257.8" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)"/>
+<polyline class="edge" data-from="NORM" data-to="INIT" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="360.6550833333333,413.40000000000003 360.65508333333327,471.40000000000003 416.24066666666664,471.40000000000003 416.24066666666664,533.4000000000001" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)"/>
+<polyline class="edge" data-from="STRATUM" data-to="ADJ" data-style="dotted" data-arrow-start="false" data-arrow-end="true" points="561.3915833333333,311.6 561.3915833333333,471.40000000000003 505.8059999999999,471.40000000000003 505.8059999999999,635.2" fill="none" stroke="var(--_line)" stroke-width="1" stroke-dasharray="4 4" marker-end="url(#arrowhead)"/>
+<polyline class="edge" data-from="PARSER" data-to="NORM" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="360.65508333333327,311.6 360.65508333333327,359.6" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)"/>
+<polyline class="edge" data-from="INIT" data-to="ADJ" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="416.24066666666664,587.2 416.24066666666664,635.2" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)"/>
+<polyline class="edge" data-from="ADJ" data-to="EVAL" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="461.0233333333333,689 461.0233333333333,737" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)"/>
+<polyline class="edge" data-from="EVAL" data-to="POL" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="461.0233333333333,790.8000000000001 461.0233333333333,838.8000000000001" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)"/>
+<g class="node" data-id="CSV" data-label="Model CSVs&#10;boxcox · policy · income · PA · logistic" data-shape="rectangle">
+  <rect x="320.092" y="84" width="270.178" height="53.800000000000004" rx="0" ry="0" fill="#3261A3" stroke="#0f172a" stroke-width="0.75"/>
+  <text x="455.181" y="110.9" text-anchor="middle" font-size="13" font-weight="500" fill="#f8fafc"><tspan x="455.181" dy="-3.9000000000000012">Model CSVs</tspan><tspan x="455.181" dy="16.900000000000002">boxcox · policy · income · PA · logistic</tspan></text>
+</g>
+<g class="node" data-id="FM" data-label="Factors-mean tables&#10;overall + optional per-quintile" data-shape="rectangle">
+  <rect x="618.27" y="84" width="209.41599999999994" height="53.800000000000004" rx="0" ry="0" fill="#3261A3" stroke="#0f172a" stroke-width="0.75"/>
+  <text x="722.978" y="110.9" text-anchor="middle" font-size="13" font-weight="500" fill="#f8fafc"><tspan x="722.978" dy="-3.9000000000000012">Factors-mean tables</tspan><tspan x="722.978" dy="16.900000000000002">overall + optional per-quintile</tspan></text>
+</g>
+<g class="node" data-id="CFG" data-label="config.json&#10;project_requirements + modelling" data-shape="rectangle">
+  <rect x="56" y="84" width="236.09199999999996" height="53.800000000000004" rx="0" ry="0" fill="#3261A3" stroke="#0f172a" stroke-width="0.75"/>
+  <text x="174.046" y="110.9" text-anchor="middle" font-size="13" font-weight="500" fill="#f8fafc"><tspan x="174.046" dy="-3.9000000000000012">config.json</tspan><tspan x="174.046" dy="16.900000000000002">project_requirements + modelling</tspan></text>
+</g>
+<g class="node" data-id="PARSER" data-label="model_parser.cpp&#10;load coefficients" data-shape="rectangle">
+  <rect x="285.5870833333333" y="257.8" width="150.136" height="53.800000000000004" rx="0" ry="0" fill="#DEE7F1" stroke="#94a3b8" stroke-width="0.75"/>
+  <text x="360.65508333333327" y="284.7" text-anchor="middle" font-size="13" font-weight="500" fill="#334155"><tspan x="360.65508333333327" dy="-3.9000000000000012">model_parser.cpp</tspan><tspan x="360.65508333333327" dy="16.900000000000002">load coefficients</tspan></text>
+</g>
+<g class="node" data-id="NORM" data-label="normalize_policy_coefficient_row&#10;energy-intake names only" data-shape="rectangle">
+  <rect x="241.1270833333333" y="359.6" width="239.05599999999995" height="53.800000000000004" rx="0" ry="0" fill="#DEE7F1" stroke="#94a3b8" stroke-width="0.75"/>
+  <text x="360.65508333333327" y="386.5" text-anchor="middle" font-size="13" font-weight="500" fill="#334155"><tspan x="360.65508333333327" dy="-3.9000000000000012">normalize_policy_coefficient_row</tspan><tspan x="360.65508333333327" dy="16.900000000000002">energy-intake names only</tspan></text>
+</g>
+<g class="node" data-id="STRATUM" data-label="Load income-stratum&#10;expected tables, if enabled" data-shape="rectangle">
+  <rect x="463.7230833333333" y="257.8" width="195.337" height="53.800000000000004" rx="0" ry="0" fill="#DEE7F1" stroke="#94a3b8" stroke-width="0.75"/>
+  <text x="561.3915833333333" y="284.7" text-anchor="middle" font-size="13" font-weight="500" fill="#334155"><tspan x="561.3915833333333" dy="-3.9000000000000012">Load income-stratum</tspan><tspan x="561.3915833333333" dy="16.900000000000002">expected tables, if enabled</tspan></text>
+</g>
+<g class="node" data-id="INIT" data-label="Initialise RF from&#10;Box-Cox + logistic" data-shape="rectangle">
+  <rect x="343.0251666666667" y="533.4000000000001" width="146.43099999999998" height="53.800000000000004" rx="0" ry="0" fill="#0f172a" stroke="#0f172a" stroke-width="0.75"/>
+  <text x="416.2406666666667" y="560.3000000000001" text-anchor="middle" font-size="13" font-weight="500" fill="#f8fafc"><tspan x="416.2406666666667" dy="-3.9000000000000012">Initialise RF from</tspan><tspan x="416.2406666666667" dy="16.900000000000002">Box-Cox + logistic</tspan></text>
+</g>
+<g class="node" data-id="ADJ" data-label="Factors-mean adjustment&#10;overall income, then per-stratum RF/PA" data-shape="rectangle">
+  <rect x="326.67533333333336" y="635.2" width="268.6959999999999" height="53.800000000000004" rx="0" ry="0" fill="#0f172a" stroke="#0f172a" stroke-width="0.75"/>
+  <text x="461.0233333333333" y="662.1" text-anchor="middle" font-size="13" font-weight="500" fill="#f8fafc"><tspan x="461.0233333333333" dy="-3.9000000000000012">Factors-mean adjustment</tspan><tspan x="461.0233333333333" dy="16.900000000000002">overall income, then per-stratum RF/PA</tspan></text>
+</g>
+<g class="node" data-id="EVAL" data-label="evaluate_linear_model&#10;intercept + Σ β·x" data-shape="rectangle">
+  <rect x="373.35833333333335" y="737" width="175.32999999999998" height="53.800000000000004" rx="0" ry="0" fill="#0f172a" stroke="#0f172a" stroke-width="0.75"/>
+  <text x="461.0233333333333" y="763.9" text-anchor="middle" font-size="13" font-weight="500" fill="#f8fafc"><tspan x="461.0233333333333" dy="-3.9000000000000012">evaluate_linear_model</tspan><tspan x="461.0233333333333" dy="16.900000000000002">intercept + Σ β·x</tspan></text>
+</g>
+<g class="node" data-id="POL" data-label="Apply policy effects" data-shape="rectangle">
+  <rect x="383.7323333333333" y="838.8000000000001" width="154.582" height="36.900000000000006" rx="0" ry="0" fill="#0f172a" stroke="#0f172a" stroke-width="0.75"/>
+  <text x="461.0233333333333" y="857.2500000000001" text-anchor="middle" font-size="13" font-weight="500" fill="#f8fafc" dy="4.55">Apply policy effects</text>
+</g>
+</svg>
