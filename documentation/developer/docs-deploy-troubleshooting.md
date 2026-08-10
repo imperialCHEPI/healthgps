@@ -37,7 +37,7 @@ Markdown/Jekyll and the Doxygen API are built in the same job. If CMake configur
 
 ## 1. Symptoms
 
-On GitHub â†’ **Actions** â†’ **Deploy Jekyll and Doxygen**:
+On GitHub → **Actions** → **Deploy Jekyll and Doxygen**:
 
 | Step | Typical result when this issue hits |
 | ---- | ----------------------------------- |
@@ -95,7 +95,7 @@ In `.github/workflows/docs.yml`, keep vcpkg caching in sync with `.github/workfl
 - `VCPKG_BINARY_SOURCES: clear;x-gha,readwrite`
 - A step that exports `ACTIONS_CACHE_URL` and `ACTIONS_RUNTIME_TOKEN` before Install VCPKG / Configure
 
-Commit, push to `main`, then re-run **Deploy Jekyll and Doxygen** (Actions â†’ workflow â†’ **Run workflow**).
+Commit, push to `main`, then re-run **Deploy Jekyll and Doxygen** (Actions → workflow → **Run workflow**).
 
 ### 3.3 If Configure still fails
 

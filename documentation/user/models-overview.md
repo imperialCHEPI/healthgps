@@ -2,96 +2,125 @@
 
 | [Home](../index.md) | [Quick Start](getstarted.md) | [User Guide](userguide.md) | [Schemas](schemas.md) | [Models](models-overview.md) | [Architecture](../developer/architecture.md) | [Data Model](../developer/datamodel.md) | [Developer Guide](../developer/development.md) | [Technical docs](../technical/README.md) | [API](https://imperialchepi.github.io/healthgps/api/) |
 
-# Models overview
+# Models in Health-GPS
 
-Health-GPS is built from **simulation modules** (demographics, SES, risk factors, diseases, analysis) that act on each **person** every simulated year. **Risk-factor model implementations** are separate JSON/CSV packs registered under `modelling.risk_factor_models` as **static** (initialise the population) and **dynamic** (update risk factors over time).
+Health-GPS runs a fixed stack of **simulation modules** on each person. Inside the risk-factor module, config registers **two model packs** (two JSON files). The config keys are historically called `static` and `dynamic`; those words name **roles in the pipeline**, not kinds of risk factor and not “protein is static then becomes dynamic”.
 
-This page is the **website summary**: what each piece needs and what it produces. For file formats, coefficients, and FINCH-specific pipelines, see the **[Simulation models reference](../technical/guides/simulation-models-reference.md)** and the [User Guide](userguide.md).
+For file formats and FINCH maths, see the **[Simulation models reference](../technical/guides/simulation-models-reference.md)** and the [User Guide](userguide.md).
 
 ---
 
-## Simulation pipeline
+## Top-level simulation modules
 
-Modules run in a fixed order each year. Policy **scenarios** (baseline vs intervention) change parameters and interventions but use the same module stack.
+| ![Top-level simulation modules](../images/simulation_modules.png) |
+|:----------------------------------------------------------------:|
+| *Demographics → SES → risk factors → diseases → outputs* |
 
-```mermaid
-flowchart TB
-    subgraph init [Initialisation once per run]
-        D0[Demographics]
-        SES0[SES]
-        RFS[Static risk-factor model]
-        DIS0[Diseases]
-        A0[Analysis]
-        D0 --> SES0 --> RFS --> DIS0 --> A0
-    end
+| Stage | Role |
+| ----- | ---- |
+| **Demographics** | Age, births, deaths, migration |
+| **SES** | Continuous `ses` noise (not the same as income categories) |
+| **Risk factors** | Runs the two configured model packs (see below) |
+| **Diseases** | Incidence / prevalence from risk factors + datastore |
+| **Analysis / output** | Aggregates and files under `output.folder` |
 
-    subgraph yearly [Each simulated year]
-        D1[Demographics update]
-        MIG[Net immigration]
-        SES1[SES]
-        RFD[Dynamic risk-factor model]
-        DIS1[Diseases update]
-        A1[Analysis publish]
-        D1 --> MIG --> SES1 --> RFD --> DIS1 --> A1
-    end
+Architecture: [modules](../images/modules_diagram.svg), [simulation engine](../images/simulation_engine.svg), [Software Architecture](../developer/architecture.md).
 
-    init --> yearly
-    A1 --> OUT[Host output writers]
-    OUT --> JSON[JSON summary]
-    OUT --> CSV[Main CSV]
-    OUT --> INC[Optional income CSVs]
-    OUT --> ID[Optional ID tracking CSV]
+---
+
+## The confusing words: `static` and `dynamic`
+
+In Health-GPS these are **config slot names**, not scientific labels for a nutrient.
+
+| Config key | Better way to read it | What you put there | Example `ModelName` |
+| ---------- | --------------------- | ------------------ | ------------------- |
+| `modelling.risk_factor_models.static` | **Initialisation-oriented pack** | Model that mainly creates / adjusts baseline person profiles (and still participates on yearly update for newborns and some adjustments) | `hlm`, `staticlinear`, `dummy` |
+| `modelling.risk_factor_models.dynamic` | **Time-update-oriented pack** | Model that mainly advances physiology / risk factors through years (and also runs a generate step at init) | `ebhlm`, `kevinhall`, `dummy` |
+
+```json
+"modelling": {
+  "risk_factor_models": {
+    "static": "new_static_model.json",
+    "dynamic": "dynamic_model.json"
+  }
+}
 ```
 
-| Stage | Primary inputs | Primary outputs |
-| ----- | ---------------- | ---------------- |
-| **Demographics** | Country datastore (population, births, deaths), `inputs.settings` | Ages, births, deaths, immigration; alive / emigrated flags |
-| **SES** | `modelling.ses_model`, RNG | `Person.ses` (continuous noise; separate from income categories) |
-| **Risk factors** | Static + dynamic model files, optional factors-mean CSVs, `project_requirements` | `Person.risk_factors` map; optional PA, height, weight, nutrients |
-| **Diseases** | Disease definitions from datastore + selection in config | `Person.diseases`; incidence/prevalence drivers |
-| **Analysis** | Population state, scenario label | `ResultEventMessage` aggregates (and optional individual tracking events) |
-| **Host output** | Analysis messages | Files under `output.folder` (see [Results](userguide.md#results)) |
+Each file’s **`ModelName`** selects the real implementation (`staticlinear`, `kevinhall`, …). That name matters more than the slot word.
 
-Architecture diagrams (SVG): [modules](../images/modules_diagram.svg), [simulation engine](../images/simulation_engine.svg). Code-oriented detail: [Software Architecture](../developer/architecture.md).
+### What is *not* true
+
+- A factor such as protein is **not** “a static risk factor in year 1 and a dynamic risk factor from year 2”.
+- Protein (and income, PA, weight, …) are **fields on the person**. Different packs may write them at different times.
+- “Static” does **not** mean “the model never changes anything later”. The initialisation-slot model still has an `update_risk_factors` path (e.g. newborns, age-18 income, factors-mean adjustment in FINCH).
+
+### What *is* true (from the host module)
+
+On **initialisation**, Health-GPS calls:
+
+1. initialisation-slot → `generate_risk_factors`
+2. update-slot → `generate_risk_factors`
+
+On **each simulated year**, it calls:
+
+1. initialisation-slot → `update_risk_factors`
+2. update-slot → `update_risk_factors`
+
+So if the update-slot is Kevin Hall, **both packs still run each year**; Kevin Hall is not the only code in the yellow risk-factor step. Older diagrams that show only “Static risk-factor model” at init and only “Dynamic risk-factor model” each year are **oversimplified**.
+
+| ![Risk-factor slots in the pipeline](../images/risk_factor_slots_pipeline.svg) |
+|:------------------------------------------------------------------------------:|
+| *Both config slots run at init (`generate`) and each year (`update`): static then dynamic* |
+
+### FINCH-style example (answers the protein question)
+
+Typical pair: **`staticlinear`** in the `static` slot + **`kevinhall`** in the `dynamic` slot.
+
+| Moment | What usually happens to nutrients / weight |
+| ------ | ------------------------------------------ |
+| Start of run | `staticlinear` builds correlated baseline foods/nutrients, income, PA, etc.; then `kevinhall` initialises nutrient/energy intakes, weight, height, BMI |
+| Later years | `staticlinear` mainly re-initialises **newborns** (and related adjustments); `kevinhall` updates intakes/weight/BMI for the continuing population |
+
+So protein is not re-labelled “dynamic”. It is a person value that may be **set** by one pack and **updated** by another, depending on age and year.
+
+| ![config.json modelling](../images/config_modelling.png) |
+|:--------------------------------------------------------:|
+| *Two files, two slots; `ModelName` inside each file picks the implementation* |
 
 ---
 
-## Risk-factor model implementations
+## Model names (what to remember)
 
-Configured in `config.json` â†’ `modelling.risk_factor_models`, for example `"static": "static_model.json"` and `"dynamic": "dynamic_model.json"`. The JSON **`ModelName`** field selects the implementation (validated against [`schemas/v1/config/models/static.json`](https://github.com/imperialCHEPI/healthgps/blob/main/schemas/v1/config/models/static.json) or `dynamic.json`).
+Prefer these **implementation names** when talking about science. The slot (`static` / `dynamic`) only says where the file is plugged in.
 
-| Model name | Role | Typical projects | One-line inputs â†’ outputs |
-| ---------- | ---- | ---------------- | ------------------------- |
-| **`hlm`** | Static hierarchical linear model | STOP / HLM France | Fitted regressions + ICA levels â†’ initial risk-factor draws on each person |
-| **`staticlinear`** | Static linear (CSV/matrix) | FINCH, India-style packs | Coefficient CSVs, optional region/ethnicity files â†’ initial RF (+ demographics helpers) |
-| **`ebhlm`** | Dynamic hierarchical linear model | Legacy dynamic HLM | Lite dynamic JSON (deltas, hierarchy) â†’ yearly RF updates |
-| **`kevinhall`** | Dynamic energy-balance (Kevin Hall) | FINCH, Kevin Hall India | Energy/PA equations, height/weight curves, boxcox/policy CSVs â†’ BMI, intake, PA trajectories |
-| **`dummy`** | Placeholder / tests | Development | Minimal JSON â†’ no-op or test values |
+| `ModelName` | Usual slot | One-line description |
+| ----------- | ---------- | -------------------- |
+| **`hlm`** | `static` | Hierarchical linear initialisation (STOP / France-style HLM packs). |
+| **`staticlinear`** | `static` | CSV / Box-Cox baseline initialiser (FINCH, India-style); income, PA, nutrients, optional stratum mean adjustment. |
+| **`ebhlm`** | `dynamic` | Yearly equation-based factor updates with mean alignment (legacy dynamic HLM). |
+| **`kevinhall`** | `dynamic` | Energy-balance updates: intakes, weight, height, BMI (FINCH / Kevin Hall India). |
+| **`dummy`** | either | Test stub with fixed values / simple policy; not a scientific model. |
 
-```mermaid
-flowchart LR
-    CFG[config.json modelling]
-    CFG --> ST[static file]
-    CFG --> DY[dynamic file]
-    ST --> HLM[hlm / staticlinear]
-    DY --> EB[ebhlm / kevinhall]
-    HLM --> POP[Person.risk_factors at t0]
-    EB --> POP2[Person.risk_factors each year]
-```
+Common pairs:
+
+| Project style | `static` slot | `dynamic` slot |
+| ------------- | ------------- | -------------- |
+| STOP / HLM France | `hlm` | `ebhlm` |
+| FINCH / Kevin Hall India | `staticlinear` | `kevinhall` |
+
+Schemas: [`static.json`](https://github.com/imperialCHEPI/healthgps/blob/main/schemas/v1/config/models/static.json), [`dynamic.json`](https://github.com/imperialCHEPI/healthgps/blob/main/schemas/v1/config/models/dynamic.json). Worked inputs/outputs: [Simulation models reference](../technical/guides/simulation-models-reference.md).
 
 ---
 
-## Other configured “models”
-
-These are not `ModelName` types but belong in the same mental model:
+## Other configured pieces (not `ModelName`s)
 
 | Area | Config / data | Role |
 | ---- | ------------- | ---- |
 | **Income & demographics** | `project_requirements`, CSVs under `modelling` | Region, ethnicity, income category, quintile adjustment |
-| **Baseline adjustments** | `modelling.baseline_adjustments` | Factors-mean calibration to stratum tables (FINCH) |
-| **Interventions** | `running` scenarios + policy CSVs | Changes RF or policy levers in intervention run only |
-| **PIF** | `population_impact_fraction` | Optional population impact fraction on incidence |
-| **Datastore diseases** | Backend `data_index` + `running` disease list | Country-specific rates and relative risks |
+| **Baseline adjustments** | `modelling.baseline_adjustments` | Factors-mean calibration (optional income strata) |
+| **Interventions** | `running` scenarios + policy CSVs | Policy levers in the intervention run |
+| **PIF** | `population_impact_fraction` | Optional incidence scaling |
+| **Datastore diseases** | Backend `data_index` + `running` disease list | Country rates and relative risks |
 
 ---
 
@@ -99,10 +128,10 @@ These are not `ModelName` types but belong in the same mental model:
 
 | Need | Document |
 | ---- | -------- |
-| Full inputs/outputs per model | [Simulation models reference](../technical/guides/simulation-models-reference.md) |
+| How a person is built and updated | [How Health-GPS models a person](../technical/guides/how-healthgps-models-a-person.md) |
+| Full inputs/outputs per `ModelName` | [Simulation models reference](../technical/guides/simulation-models-reference.md) |
 | FINCH linear models & income | [FINCH guide](../technical/guides/finch-linear-models-and-income-adjustment.md) |
-| Static/dynamic JSON examples | [User Guide — Risk factor models](userguide.md#risk-factor-models) |
-| Config layout | [Configuration schemas](schemas.md) |
+| JSON examples | [User Guide — Risk factor models](userguide.md#risk-factor-models) |
 | Example packs | [HealthGPS-examples](https://github.com/imperialCHEPI/healthgps-examples) |
 
 ---

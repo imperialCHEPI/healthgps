@@ -43,7 +43,7 @@ No extra stratum CSVs, no second “adjustment bucket count,” and no change to
 ## Two config knobs for “how many income buckets?”
 
 - **Final categories** - `project_requirements.income.categories` (`"3"` or `"4"`): `**person.income`** for output, Kevin Hall, reporting-**after** the full pipeline; unchanged semantic from today.
-- **Adjustment strata** - `modelling.baseline_adjustments` (new): how many **rank buckets** from **continuous income** *before* stratum-specific factors-mean adjustment; must line up with loaded **stratum CSV pairs** (e.g. five quintiles â‡’ five pairs and five buckets; six strata with six table pairs â‡’ six buckets, then still final `"4"` for `person.income` if desired).
+- **Adjustment strata** - `modelling.baseline_adjustments` (new): how many **rank buckets** from **continuous income** *before* stratum-specific factors-mean adjustment; must line up with loaded **stratum CSV pairs** (e.g. five quintiles ⇒ five pairs and five buckets; six strata with six table pairs ⇒ six buckets, then still final `"4"` for `person.income` if desired).
 
 Example: `**"4"`** final categories but **six** adjustment strata -> six rank buckets -> six male/female table pairs for RF/PA calibration -> then equal-split into **four** final `core::Income` groups using continuous income.
 
@@ -108,7 +108,7 @@ When the feature is **off**, the simulator keeps the **existing** implementation
 1. **Toggle** - stratum factors-mean adjustment enabled (default **false** / absent).
 2. `**file_names`** - existing `factorsmean_male` / `factorsmean_female` (**required**).
 3. **Stratum list** - array of `{ id, factorsmean_male, factorsmean_female }` (0..N entries when disabled; when enabled, length matches **N**).
-4. **Adjustment bucket count** - integer **N** (â‰¥ 2): how many equal-rank buckets from continuous income for **adjustment**. Must be **consistent** with `strata.length` (pick one authoritative rule in implementation and validate).
+4. **Adjustment bucket count** - integer **N** (≥ 2): how many equal-rank buckets from continuous income for **adjustment**. Must be **consistent** with `strata.length` (pick one authoritative rule in implementation and validate).
 
 **Validation when enabled:** paths exist after rebase; **N** matches stratum file list length; optional consistency checks with `enabled` flag.
 
@@ -123,7 +123,7 @@ Applies only when stratum adjustment is **enabled** and **continuous income** mo
 3. **Stratum adjustments** - adjust **risk factors** then **PA** using **per-stratum** expected tables; **income** is **not** re-adjusted against stratum tables in the default design (only overall two files for income).
 4. **Final `person.income`** - **only** via `**project_requirements.income.categories`** (`"3"` / `"4"`), **after** the above, using continuous income (current equal-split style).
 
-**Integration:** End-to-end consistency (N, files, buckets, final categories). **Baseline â†” intervention:** extend sync payloads so stratified deltas (per stratum × sex × age × factor) replicate today’s baseline-driven calibration for dual-scenario runs (see earlier plan notes on message shape).
+**Integration:** End-to-end consistency (N, files, buckets, final categories). **Baseline ↔ intervention:** extend sync payloads so stratified deltas (per stratum × sex × age × factor) replicate today’s baseline-driven calibration for dual-scenario runs (see earlier plan notes on message shape).
 
 ---
 

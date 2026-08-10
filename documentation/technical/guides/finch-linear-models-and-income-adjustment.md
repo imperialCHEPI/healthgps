@@ -21,6 +21,7 @@ If anything is unclear or you need a walkthrough of the code path, contact **Mah
 
 | Topic                                           | Document                                                                           |
 | ----------------------------------------------- | ---------------------------------------------------------------------------------- |
+| How a virtual person is modelled                | [How Health-GPS models a person](how-healthgps-models-a-person.md)                 |
 | Income-stratum adjustment (implementation plan) | [Income quintile factor means plan](../plans/income-quintile-factor-means-plan.md) |
 | 3 / 4 / 5 income categories                     | [Dynamic income categories plan](../plans/dynamic-income-categories-plan.md)       |
 | `project_requirements` schema                   | [Project requirements plan](../plans/project-requirements-plan.md)                 |
@@ -52,38 +53,9 @@ If anything is unclear or you need a walkthrough of the code path, contact **Mah
 
 High-level picture of how FINCH static linear models, factors-mean adjustment, and predictor evaluation fit together:
 
-```mermaid
-flowchart TB
-    subgraph inputs [Inputs]
-        CSV[Model CSVs<br/>boxcox, policy, income, PA, logistic]
-        FM[Factors-mean tables<br/>overall + optional per-quintile]
-        CFG[config.json<br/>project_requirements + modelling]
-    end
-
-    subgraph load [Load time]
-        PARSER[model_parser.cpp<br/>load coefficients]
-        NORM[normalize_policy_coefficient_row<br/>energy intake names only]
-        STRATUM[Load income-stratum<br/>expected tables if enabled]
-    end
-
-    subgraph sim [Simulation]
-        INIT[Initialise RF from<br/>Box-Cox + logistic]
-        ADJ[Factors-mean adjustment<br/>overall income then per-stratum RF/PA]
-        EVAL[evaluate_linear_model<br/>intercept + Σ β·x]
-        POL[Apply policy effects]
-    end
-
-    CSV --> PARSER
-    CFG --> PARSER
-    CFG --> STRATUM
-    FM --> STRATUM
-    PARSER --> NORM
-    NORM --> INIT
-    STRATUM --> ADJ
-    INIT --> ADJ
-    ADJ --> EVAL
-    EVAL --> POL
-```
+| ![Modelling inputs, load time, and simulation](../../images/modelling_inputs_load_simulation.svg) |
+|:-------------------------------------------------------------------------------------------------:|
+| *Static linear modelling flow: inputs → load-time parsing → simulation steps* |
 
 ---
 
@@ -109,32 +81,13 @@ This way the virtual population can match nutrient and activity patterns **condi
 | Concept                     | Where in config                                                | What it does                                                                                                                                                 |
 | --------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Final income categories** | `project_requirements.income.categories` (`"3"`, `"4"`, `"5"`) | Sets discrete `person.income` for reporting and other model logic. Assigned by equal rank split after continuous income is set.                              |
-| **Adjustment strata**       | `modelling.baseline_adjustments.income_stratum_factors_mean`   | Rank buckets used **only** for factors-mean adjustment. Each bucket has its own expected CSV pair. Stored as `person.income_adjustment_stratum` (0 … Nâˆ’1). |
+| **Adjustment strata**       | `modelling.baseline_adjustments.income_stratum_factors_mean`   | Rank buckets used **only** for factors-mean adjustment. Each bucket has its own expected CSV pair. Stored as `person.income_adjustment_stratum` (0 … N−1). |
 
 **FINCH example:** we use `income.categories = "5"` and `adjustment_income_stratum_count = 5` with quintile-specific factors-mean files - five final categories **and** five adjustment strata, but they serve different purposes.
 
-```mermaid
-flowchart LR
-    subgraph pop [Virtual population]
-        INC[Continuous income<br/>risk_factors income]
-    end
-
-    subgraph adj [Adjustment strata N=5]
-        Q1[Quintile1 expected tables]
-        Q2[Quintile2 expected tables]
-        Q5[Quintile5 expected tables]
-    end
-
-    subgraph final [Final categories]
-        CAT[person.income<br/>3/4/5 categories]
-    end
-
-    INC -->|equal rank split| adj
-    INC -->|equal rank split| CAT
-    Q1 -.->|adjust RF + PA only| pop
-    Q2 -.->|adjust RF + PA only| pop
-    Q5 -.->|adjust RF + PA only| pop
-```
+| ![Income adjustment strata vs final categories](../../images/income_strata_5.png) |
+|:--------------------------------------------------------------------------------------:|
+| *Adjustment strata (N=5) calibrate RF + PA; equal-rank split also sets final `person.income` categories* |
 
 ### 2.3 Configuration example
 
@@ -169,13 +122,13 @@ Under `modelling.baseline_adjustments` in `new_config.json`:
 
 | Rule              | Detail                                                                   |
 | ----------------- | ------------------------------------------------------------------------ |
-| `enabled = true`  | `adjustment_income_stratum_count` must be **â‰¥ 2**                      |
+| `enabled = true`  | `adjustment_income_stratum_count` must be **≥ 2**                      |
 | Strata count      | `strata.length` must **equal** `adjustment_income_stratum_count`         |
 | Each stratum      | Non-empty `id`, `factorsmean_male`, `factorsmean_female`                 |
-| Missing data      | Missing files or risk factors â†’ fail fast with stratum-specific errors |
+| Missing data      | Missing files or risk factors → fail fast with stratum-specific errors |
 | `enabled = false` | Legacy behaviour - overall male/female tables only                       |
 
-Schema: `schemas/v1/config/modelling.json` â†’ `baseline_adjustments.income_stratum_factors_mean`.
+Schema: `schemas/v1/config/modelling.json` → `baseline_adjustments.income_stratum_factors_mean`.
 
 **See also:** [Income quintile factor means plan](../plans/income-quintile-factor-means-plan.md) (implementation phases) · [Dynamic income categories plan](../plans/dynamic-income-categories-plan.md) (final `person.income` buckets)
 
@@ -196,7 +149,7 @@ Read this top to bottom. Each step finishes before the next one starts.
 | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------- | ------------------------ |
 | **1**    | Generate starting risk factors (nutrients, etc.) from Box-Cox / logistic / regression models                                                                 | - (model CSVs only)                                 | Whole population         |
 | **2**    | Adjust **income only**                                                                                                                                       | Overall `Finch.FactorsMean.Male.csv` / `Female.csv` | Whole population         |
-| **3**    | Sort everyone by continuous income and split into **N equal rank buckets** (e.g. 5 quintiles). Each person gets `income_adjustment_stratum` = 0, 1, …, Nâˆ’1 | -                                                   | Whole population         |
+| **3**    | Sort everyone by continuous income and split into **N equal rank buckets** (e.g. 5 quintiles). Each person gets `income_adjustment_stratum` = 0, 1, …, N−1 | -                                                   | Whole population         |
 | **4a**   | Adjust **risk factors** (all nutrients - **not** income, **not** physical activity)                                                                          | Quintile **1** male/female tables                   | Only people in stratum 0 |
 | **4b**   | Adjust **physical activity** (if enabled in config)                                                                                                          | Quintile **1** male/female tables                   | Only people in stratum 0 |
 | **5a**   | Same as 4a                                                                                                                                                   | Quintile **2** tables                               | Only people in stratum 1 |
@@ -226,17 +179,9 @@ Step 4-5 - for Quintile2 only:
   … and so on for Quintile3, 4, 5
 ```
 
-```mermaid
-flowchart TD
-    S1[Step 1: Generate risk factors from regression] --> S2
-    S2[Step 2: Adjust income using OVERALL factors-mean tables] --> S3
-    S3[Step 3: Rank-split population into N income strata] --> S4
-    S4[Step 4: For Quintile 1 - adjust nutrients using Quintile1 tables] --> S5
-    S5[Step 5: For Quintile 1 - adjust PA using Quintile1 tables] --> S6
-    S6[Step 6: For Quintile 2 - adjust nutrients + PA using Quintile2 tables] --> S7
-    S7[... repeat for remaining quintiles ...] --> S8
-    S8[Final step: Assign income categories 3/4/5 for reporting]
-```
+| ![Income-stratum adjustment steps](../../images/income_stratum_steps.png) |
+|:-------------------------------------------------------------------------------:|
+| *FINCH income-stratum adjustment order: overall income, then per-stratum RF/PA* |
 
 **Yearly updates** follow the same ordering for non-trended adjustment; trended paths mirror this with the relevant `trended` flags.
 
@@ -366,13 +311,13 @@ Special cases:
 | …             | …                      | …                   | …                       |
 | **Sum**       |                        |                     | **Z for that nutrient** |
 
-```mermaid
-flowchart LR
-    CSV[CSV row: log_income] --> LOAD[Coefficient stored under name log_income]
-    LOAD --> EVAL[Look up person income]
-    EVAL --> LOG[Compute log income]
-    LOG --> SUM[Add beta × log income to linear sum]
-```
+| ![log_income coefficient pipeline](../../images/log_income_pipeline.png) |
+|:------------------------------------------------------------------------------:|
+| *How a `log_income` CSV row becomes a term in the linear sum* |
+
+| ![log_income load time vs evaluation](../../images/log_income_load_vs_eval.png) |
+|:-------------------------------------------------------------------------------------:|
+| *Load time stores the coefficient; evaluation looks up income, applies `ln`, and accumulates β·x* |
 
 ### 3.4 Code locations (for Mahima / developers)
 
@@ -460,7 +405,7 @@ Normalization is **only** for energy-intake naming (Section 4.4).
 
 ---
 
-### Q3: Is the policy model “BoxCox(Y) = β₀ + β₁ Xâ‚ + …” consistent with the code?
+### Q3: Is the policy model “BoxCox(Y) = β₀ + β₁ X₁ + …” consistent with the code?
 
 **Answer:** **Yes.**
 
@@ -557,11 +502,11 @@ Schema: `schemas/v1/config/project_requirements.json`.
 ### 6.3 How gender2 is computed (plain logic)
 
 ```text
-1. Read config:  project_requirements.demographics.gender2  â†’  "female" or "male"
+1. Read config:  project_requirements.demographics.gender2  →  "female" or "male"
 2. That setting means: which sex gets the value 1 for the gender2 row
 3. For each person:
-     if person.sex matches the configured indicator  â†’  gender2 = 1
-     else                                            â†’  gender2 = 0
+     if person.sex matches the configured indicator  →  gender2 = 1
+     else                                            →  gender2 = 0
 4. Add to linear sum:  coef_gender2 × gender2
 ```
 

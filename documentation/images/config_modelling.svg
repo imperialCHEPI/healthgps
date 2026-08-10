@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="280" viewBox="0 0 920 280" role="img" aria-labelledby="title desc">
+  <title id="title">config.json modelling</title>
+  <desc id="desc">Static and dynamic risk-factor models selected from config.json modelling.risk_factor_models</desc>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#4672c4"/>
+    </marker>
+  </defs>
+
+  <!-- Root -->
+  <rect x="20" y="105" width="170" height="50" rx="4" fill="#203864" stroke="#30518f"/>
+  <text x="105" y="135" text-anchor="middle" fill="#ffffff" font-family="Calibri, Arial, sans-serif" font-size="14" font-weight="bold">config.json modelling</text>
+
+  <!-- Split lines -->
+  <path d="M190 130 H230" stroke="#4672c4" stroke-width="1.5" fill="none"/>
+  <path d="M230 70 V190" stroke="#4672c4" stroke-width="1.5" fill="none"/>
+  <path d="M230 70 H260" stroke="#4672c4" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <path d="M230 190 H260" stroke="#4672c4" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- Static branch -->
+  <rect x="260" y="48" width="110" height="44" rx="3" fill="#dae2f3" stroke="#41719c"/>
+  <text x="315" y="75" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="13" font-weight="bold">static file</text>
+
+  <path d="M370 70 H400" stroke="#4672c4" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+
+  <rect x="400" y="40" width="200" height="60" rx="3" fill="#dae2f3" stroke="#41719c"/>
+  <text x="500" y="65" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="13" font-weight="bold">hlm / staticlinear</text>
+  <text x="500" y="85" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="12">(+ dummy)</text>
+
+  <path d="M600 70 H630" stroke="#4672c4" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+
+  <rect x="630" y="48" width="260" height="44" rx="3" fill="#ffffff" stroke="#c7c8c8"/>
+  <text x="760" y="75" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="13">Person.risk_factors at t0</text>
+
+  <!-- Dynamic branch -->
+  <rect x="260" y="168" width="110" height="44" rx="3" fill="#dae2f3" stroke="#41719c"/>
+  <text x="315" y="195" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="13" font-weight="bold">dynamic file</text>
+
+  <path d="M370 190 H400" stroke="#4672c4" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+
+  <rect x="400" y="160" width="200" height="60" rx="3" fill="#dae2f3" stroke="#41719c"/>
+  <text x="500" y="185" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="13" font-weight="bold">ebhlm / kevinhall</text>
+  <text x="500" y="205" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="12">(+ dummy)</text>
+
+  <path d="M600 190 H630" stroke="#4672c4" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+
+  <rect x="630" y="168" width="260" height="44" rx="3" fill="#ffffff" stroke="#c7c8c8"/>
+  <text x="760" y="195" text-anchor="middle" fill="#203864" font-family="Calibri, Arial, sans-serif" font-size="13">Person.risk_factors each year</text>
+</svg>
