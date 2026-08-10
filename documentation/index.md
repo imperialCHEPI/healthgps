@@ -117,6 +117,57 @@ The microsimulation follows a two-step process to capture time-serial and cross-
 |:-----------------------------------------------------------------:|
 | *Health-GPS Workflow Diagram* |
 
+The diagram below is the whole-picture sequence for one experiment: load inputs, initialise every person, then advance year by year until the configured end time. Baseline and intervention use the same module order; only policy levers and optional PIF differ. Module detail: [Models overview](user/models-overview.md). Person-field maths: [How Health-GPS models a person](technical/guides/how-healthgps-models-a-person.md).
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Host as Console host
+    participant Sim as Simulation
+    participant Demo as Demographics
+    participant SES as SES
+    participant RF as Risk factors
+    participant Dis as Diseases
+    participant Ana as Analysis
+    participant Out as File outputs
+
+    Note over Host,Out: Setup
+    Host->>Sim: Load config, datastore, static/dynamic model packs
+    Host->>Sim: Build baseline scenario (+ optional intervention)
+
+    rect rgba(226, 239, 217, 0.45)
+        Note over Sim,Ana: Initialisation once per run
+        Sim->>Demo: Assign age, gender, region, ethnicity
+        Demo-->>Sim: Core demographics on each Person
+        Sim->>SES: Draw ses ~ Normal(mu, sigma)
+        Sim->>RF: Static generate then dynamic generate
+        Note right of RF: Income, PA, foods/nutrients,<br/>height, weight, BMI as configured
+        RF-->>Sim: risk_factors (+ PA / income fields)
+        Sim->>Dis: Prevalence initialise from RR tables
+        Sim->>Ana: Initial population statistics
+    end
+
+    loop Each year from start_time to end_time
+        rect rgba(222, 235, 246, 0.45)
+            Note over Sim,Out: Yearly projection
+            Sim->>Demo: Deaths, age += 1, births
+            Sim->>Demo: Net migration in or out
+            Sim->>SES: Redraw ses for newborns only
+            Sim->>RF: Dynamic risk-factor update
+            Sim->>Dis: Remission then incidence (+ optional PIF)
+            Sim->>Ana: Publish year aggregates
+            Ana->>Out: JSON summary, main CSV
+            opt Income / ID tracking enabled
+                Ana->>Out: Income-stratum CSVs and/or IndividualIDTracking.csv
+            end
+        end
+    end
+
+    Note over Host,Out: Compare baseline vs intervention externally
+```
+
+*Whole-picture Health-GPS sequence: setup, one-time initialisation, then the yearly module loop that writes analysis outputs.*
+
 The initialisation sets the simulation world clock, in years, to the user’s defined start time, and requests the simulation modules to initialise the relevant properties of the virtual population individuals. The projection moves the simulation clock, in years, forwards until the user’s defined end time is reached, at which point the algorithm terminates.
 
 ## Data Sources
