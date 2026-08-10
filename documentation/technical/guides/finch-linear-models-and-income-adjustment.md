@@ -114,28 +114,9 @@ This way the virtual population can match nutrient and activity patterns **condi
 
 **FINCH example:** we use `income.categories = "5"` and `adjustment_income_stratum_count = 5` with quintile-specific factors-mean files - five final categories **and** five adjustment strata, but they serve different purposes.
 
-```mermaid
-flowchart LR
-    subgraph pop [Virtual population]
-        INC[Continuous income<br/>risk_factors income]
-    end
-
-    subgraph adj [Adjustment strata N=5]
-        Q1[Quintile1 expected tables]
-        Q2[Quintile2 expected tables]
-        Q5[Quintile5 expected tables]
-    end
-
-    subgraph final [Final categories]
-        CAT[person.income<br/>3/4/5 categories]
-    end
-
-    INC -->|equal rank split| adj
-    INC -->|equal rank split| CAT
-    Q1 -.->|adjust RF + PA only| pop
-    Q2 -.->|adjust RF + PA only| pop
-    Q5 -.->|adjust RF + PA only| pop
-```
+| ![Income adjustment strata vs final categories](../../images/finch/income_strata_5.png) |
+|:--------------------------------------------------------------------------------------:|
+| *Adjustment strata (N=5) calibrate RF + PA; equal-rank split also sets final `person.income` categories* |
 
 ### 2.3 Configuration example
 
