@@ -28,7 +28,7 @@ The root schema composes several sections. Optional blocks (such as **`project_r
 
 ```mermaid
 flowchart TB
-    ROOT["config.json<br/>$schema â†’ v1/config.json"]
+    ROOT["config.json<br/>$schema → v1/config.json"]
     ROOT --> PR[project_requirements]
     ROOT --> DATA[data]
     ROOT --> IN[inputs]

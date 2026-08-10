@@ -81,7 +81,7 @@ This way the virtual population can match nutrient and activity patterns **condi
 | Concept                     | Where in config                                                | What it does                                                                                                                                                 |
 | --------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Final income categories** | `project_requirements.income.categories` (`"3"`, `"4"`, `"5"`) | Sets discrete `person.income` for reporting and other model logic. Assigned by equal rank split after continuous income is set.                              |
-| **Adjustment strata**       | `modelling.baseline_adjustments.income_stratum_factors_mean`   | Rank buckets used **only** for factors-mean adjustment. Each bucket has its own expected CSV pair. Stored as `person.income_adjustment_stratum` (0 … Nâˆ’1). |
+| **Adjustment strata**       | `modelling.baseline_adjustments.income_stratum_factors_mean`   | Rank buckets used **only** for factors-mean adjustment. Each bucket has its own expected CSV pair. Stored as `person.income_adjustment_stratum` (0 … N−1). |
 
 **FINCH example:** we use `income.categories = "5"` and `adjustment_income_stratum_count = 5` with quintile-specific factors-mean files - five final categories **and** five adjustment strata, but they serve different purposes.
 
@@ -122,13 +122,13 @@ Under `modelling.baseline_adjustments` in `new_config.json`:
 
 | Rule              | Detail                                                                   |
 | ----------------- | ------------------------------------------------------------------------ |
-| `enabled = true`  | `adjustment_income_stratum_count` must be **â‰¥ 2**                      |
+| `enabled = true`  | `adjustment_income_stratum_count` must be **≥ 2**                      |
 | Strata count      | `strata.length` must **equal** `adjustment_income_stratum_count`         |
 | Each stratum      | Non-empty `id`, `factorsmean_male`, `factorsmean_female`                 |
-| Missing data      | Missing files or risk factors â†’ fail fast with stratum-specific errors |
+| Missing data      | Missing files or risk factors → fail fast with stratum-specific errors |
 | `enabled = false` | Legacy behaviour - overall male/female tables only                       |
 
-Schema: `schemas/v1/config/modelling.json` â†’ `baseline_adjustments.income_stratum_factors_mean`.
+Schema: `schemas/v1/config/modelling.json` → `baseline_adjustments.income_stratum_factors_mean`.
 
 **See also:** [Income quintile factor means plan](../plans/income-quintile-factor-means-plan.md) (implementation phases) · [Dynamic income categories plan](../plans/dynamic-income-categories-plan.md) (final `person.income` buckets)
 
@@ -149,7 +149,7 @@ Read this top to bottom. Each step finishes before the next one starts.
 | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------- | ------------------------ |
 | **1**    | Generate starting risk factors (nutrients, etc.) from Box-Cox / logistic / regression models                                                                 | - (model CSVs only)                                 | Whole population         |
 | **2**    | Adjust **income only**                                                                                                                                       | Overall `Finch.FactorsMean.Male.csv` / `Female.csv` | Whole population         |
-| **3**    | Sort everyone by continuous income and split into **N equal rank buckets** (e.g. 5 quintiles). Each person gets `income_adjustment_stratum` = 0, 1, …, Nâˆ’1 | -                                                   | Whole population         |
+| **3**    | Sort everyone by continuous income and split into **N equal rank buckets** (e.g. 5 quintiles). Each person gets `income_adjustment_stratum` = 0, 1, …, N−1 | -                                                   | Whole population         |
 | **4a**   | Adjust **risk factors** (all nutrients - **not** income, **not** physical activity)                                                                          | Quintile **1** male/female tables                   | Only people in stratum 0 |
 | **4b**   | Adjust **physical activity** (if enabled in config)                                                                                                          | Quintile **1** male/female tables                   | Only people in stratum 0 |
 | **5a**   | Same as 4a                                                                                                                                                   | Quintile **2** tables                               | Only people in stratum 1 |
@@ -405,7 +405,7 @@ Normalization is **only** for energy-intake naming (Section 4.4).
 
 ---
 
-### Q3: Is the policy model “BoxCox(Y) = β₀ + β₁ Xâ‚ + …” consistent with the code?
+### Q3: Is the policy model “BoxCox(Y) = β₀ + β₁ X₁ + …” consistent with the code?
 
 **Answer:** **Yes.**
 
@@ -502,11 +502,11 @@ Schema: `schemas/v1/config/project_requirements.json`.
 ### 6.3 How gender2 is computed (plain logic)
 
 ```text
-1. Read config:  project_requirements.demographics.gender2  â†’  "female" or "male"
+1. Read config:  project_requirements.demographics.gender2  →  "female" or "male"
 2. That setting means: which sex gets the value 1 for the gender2 row
 3. For each person:
-     if person.sex matches the configured indicator  â†’  gender2 = 1
-     else                                            â†’  gender2 = 0
+     if person.sex matches the configured indicator  →  gender2 = 1
+     else                                            →  gender2 = 0
 4. Add to linear sum:  coef_gender2 × gender2
 ```
 

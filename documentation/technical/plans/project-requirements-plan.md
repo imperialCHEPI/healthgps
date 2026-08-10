@@ -46,7 +46,7 @@ Place at the **start** of each project config for clarity. All fields are explic
 |---------------------------|--------|-------------|
 | `enabled`                 | boolean | Use income in the model. |
 | `type`                    | string | `"continuous"` \| `"categorical"`. |
-| `categories`              | string | `"3"` \| `"4"` (only when type is categorical, or for continuousâ†’category mapping). |
+| `categories`              | string | `"3"` \| `"4"` (only when type is categorical, or for continuous→category mapping). |
 | `adjust_to_factors_mean`  | boolean | Include income in factors-mean adjustment (initial). |
 | `trended`                 | boolean | Include income in trended adjustment. |
 

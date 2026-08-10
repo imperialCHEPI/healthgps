@@ -85,7 +85,7 @@ See [Update report](healthgps-update-report-2026-02-20.md) for diagrams aligned 
 | | |
 | --- | --- |
 | **Purpose** | Load and run registered **static** and **dynamic** model definitions on each person. |
-| **Config** | `modelling.risk_factor_models` map (`"static"` / `"dynamic"` â†’ file path), `modelling.risk_factors` hierarchy, `dynamic_risk_factor` name, `baseline_adjustments`. |
+| **Config** | `modelling.risk_factor_models` map (`"static"` / `"dynamic"` → file path), `modelling.risk_factors` hierarchy, `dynamic_risk_factor` name, `baseline_adjustments`. |
 | **Registration** | `register_risk_factor_model_definitions()` in `model_parser.cpp` reads each file’s **`ModelName`**. |
 | **Person fields** | `risk_factors` map (and model-specific fields such as `physical_activity`, height/weight where implemented). |
 | **Outputs** | Risk-factor distributions feed disease incidence; analysis aggregates RF exposure. |
@@ -178,7 +178,7 @@ Supported **`ModelName`** values are listed in `schemas/v1/config/models/static.
 | **Purpose** | Aggregate population statistics each time step; optional individual tracking events. |
 | **Inputs** | Full population, scenario id (baseline/intervention), run number, clock. |
 | **Bus messages** | `ResultEventMessage`; optional `IndividualTrackingEventMessage` when tracking enabled. |
-| **Host writers** | `ResultFileWriter` â†’ JSON + main CSV + optional income-stratum CSVs; `IndividualIDTrackingWriter` â†’ filtered per-person CSV. |
+| **Host writers** | `ResultFileWriter` → JSON + main CSV + optional income-stratum CSVs; `IndividualIDTrackingWriter` → filtered per-person CSV. |
 | **Config** | `output.folder`, `output.file_name`, `output.individual_id_tracking`, `project_requirements.income.income_based_csv_output`. |
 | **User doc** | [User Guide — Analysis](user/userguide.md#analysis), [Results](user/userguide.md#results) |
 
@@ -192,7 +192,7 @@ Same **person ID** in baseline and intervention for the initial cohort enables j
 | --- | --- |
 | **Purpose** | Baseline vs intervention: same module stack, different `Scenario` implementation (fiscal, marketing, food labelling, physical activity, etc.). |
 | **Config** | `running` intervention blocks, `modelling.policy_start_year`, policy CSVs in FINCH packs. |
-| **Sync** | Aggregate tables (e.g. net migration, residual mortality) can flow baseline â†’ intervention; not person-level clones. |
+| **Sync** | Aggregate tables (e.g. net migration, residual mortality) can flow baseline → intervention; not person-level clones. |
 | **Outputs** | Result rows tagged by **source** (baseline/intervention) in JSON/CSV. |
 
 ---
@@ -201,7 +201,7 @@ Same **person ID** in baseline and intervention for the initial cohort enables j
 
 | Item | Location |
 | ---- | -------- |
-| Model name â†’ loader | `src/HealthGPS.Input/model_parser.cpp` (`load_risk_model_definition`, `get_model_schema_version`) |
+| Model name → loader | `src/HealthGPS.Input/model_parser.cpp` (`load_risk_model_definition`, `get_model_schema_version`) |
 | Module interfaces | `src/HealthGPS/interfaces.h`, `risk_factor_model.h` |
 | Simulation order | `src/HealthGPS/simulation.cpp` |
 | Console registration | `src/HealthGPS.Console/program.cpp` |

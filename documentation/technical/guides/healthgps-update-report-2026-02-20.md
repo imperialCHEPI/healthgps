@@ -204,9 +204,9 @@ Health-GPS uses Intel TBB and core threading helpers in selected hot paths. The 
 | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------ |
 | **Static linear model** ([static_linear_model.cpp](../../../src/HealthGPS/static_linear_model.cpp))                                               | Sequential population loops                                         | Shared model state; ordering and reproducibility |
 | **Kevin Hall model** ([kevin_hall_model.cpp](../../../src/HealthGPS/kevin_hall_model.cpp))                                                        | Sequential per-person updates                                       | Shared parameters; temporal dependencies         |
-| **Simulation module order** ([simulation.cpp](../../../src/HealthGPS/simulation.cpp))                                                             | Strict Demographic â†’ SES â†’ Risk factor â†’ Disease â†’ Analysis | Cross-module data dependencies                   |
+| **Simulation module order** ([simulation.cpp](../../../src/HealthGPS/simulation.cpp))                                                             | Strict Demographic → SES → Risk factor → Disease → Analysis | Cross-module data dependencies                   |
 | **Repository / model parser** ([repository.cpp](../../../src/HealthGPS/repository.cpp), [model_parser.cpp](../../../src/HealthGPS.Input/model_parser.cpp)) | Single mutex on load/cache                                          | Cache consistency                                |
-| **SyncChannel** (baseline â†” intervention)                                                                                              | Synchronous send/receive for net immigration etc.                   | Deterministic scenario coupling                  |
+| **SyncChannel** (baseline ↔ intervention)                                                                                              | Synchronous send/receive for net immigration etc.                   | Deterministic scenario coupling                  |
 
 ### 4.3 Concurrency primitives
 

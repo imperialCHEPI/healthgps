@@ -149,7 +149,7 @@ Replace the flat load at ~~1864-1883 with a helper similar to Height (~~1901-193
 | Config input            | `adjustment_income_stratum_count` | Loaded shape per gender                                 |
 | ----------------------- | --------------------------------- | ------------------------------------------------------- |
 | Single `csv_file`       | any                               | One vector; broadcast to N if stratum mode on and N > 1 |
-| `Quintile1`…`QuintileN` | N                                 | N vectors; error if file count â‰ N                     |
+| `Quintile1`…`QuintileN` | N                                 | N vectors; error if file count ≠N                     |
 | Wrong count             | -                                 | Parse error with file count vs expected N               |
 
 - Load each file: `load_datatable_from_csv`, first column `double`, sort once at load.
