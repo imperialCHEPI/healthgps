@@ -14,6 +14,7 @@ Reach out if you need a code path, config walkthrough, or help debugging.
 
 | Document | Description |
 | -------- | ----------- |
+| [How Health-GPS models a person](guides/how-healthgps-models-a-person.md) | Person-centric map: age, gender, region, ethnicity, SES, income, PA, height, weight, risk factors, diseases, ID and migration |
 | [FINCH linear models and income-stratum adjustment](guides/finch-linear-models-and-income-adjustment.md) | Policy equations, predictor names (`log_income`, `gender2`), income-quintile factors-mean, Q&A |
 | [HealthGPS update report (20 Feb 2026)](guides/healthgps-update-report-2026-02-20.md) | Integrated changes, module order, config/schema, verification |
 | [Simulation models reference](guides/simulation-models-reference.md) | Per-module and per-ModelName inputs, outputs, schemas, code pointers |
@@ -41,6 +42,7 @@ Engineering design notes for developers. Written as ordinary markdown plans (sum
 
 | Topic | Start here | Then |
 | ----- | ---------- | ---- |
+| How a virtual person is built | [How Health-GPS models a person](guides/how-healthgps-models-a-person.md) | [Models overview](../user/models-overview.md) |
 | FINCH policy CSVs / `gender2` | [FINCH guide](guides/finch-linear-models-and-income-adjustment.md) | [Project requirements plan](plans/project-requirements-plan.md) |
 | Income quintile adjustment | [FINCH guide](guides/finch-linear-models-and-income-adjustment.md) | [Income quintile plan](plans/income-quintile-factor-means-plan.md) |
 | Kevin Hall height/weight | [Height quintile plan](plans/height-csv-quintile-plan.md) | [Weight quintile plan](plans/weight-quintile-plan.md) |

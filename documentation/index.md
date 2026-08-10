@@ -6,35 +6,36 @@
 
 **Health-GPS** is a modular and flexible microsimulation framework developed in collaboration between the Centre for Health Economics & Policy Innovation ([CHEPI](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/)), Imperial College London; and [INRAE](https://www.inrae.fr), France. It was created for the [STOP project](https://www.stopchildobesity.eu/) and now supports analysis of health and economic impacts of policies on *chronic diseases* and *obesity*, including childhood obesity in European settings.
 
-Health-GPS models the impacts of behavioural and metabolic risk factors on chronic diseases and measures lifelong outcomes so researchers can test the effectiveness of health policies and interventions. The framework has been extended for additional CHEPI-led work, including [FINCH](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/finch/), [JACARDI](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/jacardi/), and [JA PreventNCD](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/ja-prevent-ncd/). Project-specific inputs are maintained in [HealthGPS-examples](https://github.com/imperialCHEPI/healthgps-examples); the table below links each setting to a typical example folder.
+Health-GPS models the impacts of behavioural and metabolic risk factors on chronic diseases and measures lifelong outcomes so researchers can test the effectiveness of health policies and interventions. The framework has been extended for additional CHEPI-led work, including [FINCH](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/finch/), [GOLDFINCH](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/goldfinch/), [CoDiet](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/codiet/), [JACARDI](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/jacardi/), and [JA PreventNCD](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/ja-prevent-ncd/). Project-specific inputs are maintained in [HealthGPS-examples](https://github.com/imperialCHEPI/healthgps-examples); the table below links each setting to a typical example folder.
 
-| Setting / project       | More information                                                                                                                                                         | Example inputs ([HealthGPS-examples](https://github.com/imperialCHEPI/healthgps-examples))                          |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
-| STOP (France-style HLM) | [STOP project](https://www.stopchildobesity.eu/)                                                                                                                         | [HLM_France](https://github.com/imperialCHEPI/healthgps-examples/tree/main/HLM_France)                              |
-| India                   | [Update report (Feb 2026)](technical/guides/healthgps-update-report-2026-02-20.md)                                                                                       | [KevinHall_India](https://github.com/imperialCHEPI/healthgps-examples/tree/main/KevinHall_India)                    |
-| FINCH                   | [FINCH (CHEPI)](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/finch/)                  | [KevinHall_FINCH](https://github.com/imperialCHEPI/healthgps-examples/tree/main/KevinHall_FINCH)                    |
-| JACARDI                 | [JACARDI (CHEPI)](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/jacardi/)              | Use inputs published under [HealthGPS-examples](https://github.com/imperialCHEPI/healthgps-examples) for your study |
-| JA PreventNCD           | [JA PreventNCD (CHEPI)](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/ja-prevent-ncd/) | Use inputs published under [HealthGPS-examples](https://github.com/imperialCHEPI/healthgps-examples) for your study |
+| Setting / project       | More information                                                                                                                                                                                                       | Example inputs ([HealthGPS-examples](https://github.com/imperialCHEPI/healthgps-examples))       |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| STOP (France-style HLM) | [STOP project](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/stop/)                                                                  | [HLM_France](https://github.com/imperialCHEPI/healthgps-examples/tree/main/HLM_France)           |
+| India                   | [HFSS food tax modelling in India (CHEPI)](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/modelling-the-impact-tax-hfss-foods-india/) | [KevinHall_India](https://github.com/imperialCHEPI/healthgps-examples/tree/main/KevinHall_India) |
+| FINCH                   | [FINCH (CHEPI)](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/finch/)                                                                | [KevinHall_FINCH](https://github.com/imperialCHEPI/healthgps-examples/tree/main/KevinHall_FINCH) |
+| GOLDFINCH               | [GOLDFINCH (CHEPI)](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/goldfinch/)                                                        | Use inputs in progress                                                                           |
+| CoDiet                  | [CoDiet (CHEPI)](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/codiet/)                                                              | Use inputs in progress                                                                           |
+| JACARDI                 | [JACARDI (CHEPI)](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/jacardi/)                                                            | Use inputs in progress                                                                           |
+| JA PreventNCD           | [JA PreventNCD (CHEPI)](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/ja-prevent-ncd/)                                               | Use inputs in progress                                                                           |
 
-For FINCH-specific modelling (income, Kevin Hall, predictors), see the [FINCH guide](technical/guides/finch-linear-models-and-income-adjustment.md).
+For FINCH-specific modelling (income, Kevin Hall, predictors), see the [FINCH guide](technical/guides/finch-linear-models-and-income-adjustment.md). For a full map of how every person attribute is assigned and updated, see [How Health-GPS models a person](technical/guides/how-healthgps-models-a-person.md).
 
 Health-GPS creates a *virtual population* representative of a distinct country's population and simulates close to reality life histories from birth to death of each member of the population including key characteristics such as gender, age, socio-economic status, risk factors, and disease profiles. These characteristics evolve over time and are updated in discrete time *annually* using statistical and probabilistic models which are calibrated to reproduce key demographic and epidemiological statistics from the specific country.
-
 The model uses proprietary equations to account for a variety of complex interactions such as risk factor-disease interactions and disease-disease interactions. Modellers are then able to evaluate health-related policies by changing some of the parameters and comparing the outputs with a *baseline* simulation. The model produces detailed quantitative outputs covering demographics, risk factors, diseases, mortality, global health estimates and health care expenditure, which could then be used to complement qualitative policy evaluation tools.
 
 ## General Workflow
 
 The Health-GPS workflow is summarised below, datasets from many disconnected sources are used to define the various modules and components of the framework. Commonly used datasets are processed, aggregated, indexed by country, and stored in the backend *datastore*, while research specific datasets are analysed externally to build the *risk factors* and *socio-economic status* modules, design and parameterise *intervention* to be tested.
 
-| ![Health-GPS Workflow](images/general_workflow.svg) |
+| ![Health-GPS Workflow](images/general_workflow.png) |
 |:---------------------------------------------------:|
 | *Health-GPS General Workflow Diagram* |
 
-The simulation creates the virtual population, simulates the synthetic individuals over time, collects population statistics and publish to the outside world at the end of each simulated time step. It is the user's responsibility to analyse and quantify the model results, which are saved to a chosen output folder as **JSON and CSV**, and optionally **income-stratum CSVs** or **individual ID tracking** CSVs (same person IDs in baseline and intervention when tracking is enabled). See the [User Guide — Results](user/userguide.md#results) and [Policy Evaluation](#policy-evaluation) below.
+The simulation creates the virtual population, simulates the synthetic individuals over time, collects population statistics and publish to the outside world at the end of each simulated time step. It is the user's responsibility to analyse and quantify the model results, which are saved to a chosen output folder as **JSON and CSV**, and optionally **income-stratum CSVs** or **individual ID tracking** CSVs (same person IDs in baseline and intervention when tracking is enabled). See the [User Guide - Results](user/userguide.md#results) and [Policy Evaluation](#policy-evaluation) below.
 
 Health-GPS is a flexible and modular framework, written in modern C++, designed using object-oriented principles to provide the building blocks necessary to compose the overall microsimulation, several data sources, modules, and sub-model are required as shown below.
 
-| ![Health-GPS Concept](images/model_concept_diagram.svg) |
+| ![Health-GPS Concept](images/model_concept_diagram.png) |
 |:-------------------------------------------------------:|
 | *Health-GPS Concept Diagram* |
 
@@ -100,11 +101,120 @@ The choice of baseline scenario is critical for analyses as it serves as a refer
 
 The first run evaluates the no-intervention, *“baseline scenario”* where demographics, risk factors, and diseases are projected based solely on estimates from historical data. The second run evaluates the *“intervention scenario”* where a specific policy is applied to the same population with the aim of modifying the underlying trends and risk factor distribution.
 
+### Policy levers sequence
+
+Policies are configured in `running` (scenario type, `policy_start_year`) and in modelling CSVs (for example FINCH `policyeffect_model.csv` / `S*_policyeffect_model.csv`). The **same** module stack runs in both scenarios. Only the intervention scenario evaluates policy equations after the start year, and only intervention may apply optional PIF to disease incidence.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Cfg as config.json + policy CSVs
+    participant Host as Console host
+    participant Scn as Intervention scenario
+    participant RF as Risk-factor models
+    participant Pers as Person state
+    participant Dis as Disease models
+    participant Ana as Analysis
+
+    Cfg->>Host: running.policy_start_year, scenario type
+    Cfg->>Host: Policy coefficient CSVs / scenario class
+    Host->>Scn: Create Intervention Simulation
+
+    Note over Scn,Ana: Years before policy_start_year
+    loop Each year where time_now < policy_start_year
+        Scn->>RF: Dynamic update without policy effect
+        RF->>Pers: Update foods, PA, weight, BMI as usual
+        Scn->>Dis: Incidence without PIF
+        Scn->>Ana: Publish year (looks like baseline path)
+    end
+
+    Note over Scn,Ana: Policy window (time_now >= policy_start_year)
+    loop Each year in the policy window
+        Scn->>RF: Evaluate policy linear model on predictors
+        Note right of RF: e.g. intercept + beta * log_income,<br/>log_EnergyIntake, gender2, region dummies
+        RF->>Pers: Apply policy delta / trend to targeted risk factors
+        Note right of Pers: clamp to configured ranges<br/>optional factors-mean re-alignment
+        Scn->>Dis: Incidence with optional PIF
+        Note right of Dis: P := incidence * RR / meanRR * (1 - PIF)
+        Dis->>Pers: New active disease cases (or remissions)
+        Scn->>Ana: Publish intervention year aggregates
+    end
+
+    Ana-->>Host: Intervention JSON / CSV / optional ID tracking
+```
+
+*Policy sequence: before `policy_start_year` the intervention run follows the no-policy path; afterwards policy equations and optional PIF change risk factors and disease incidence. FINCH policy naming: [FINCH guide](technical/guides/finch-linear-models-and-income-adjustment.md).*
+
+### Baseline and intervention paired run
+
+When an intervention is configured, the **Runner** starts baseline and intervention simulations together (separate threads, separate `Person` populations). Synchronisation is **one-way: baseline → intervention** over a `SyncChannel`, and only **aggregate** tables are transferred (not individual people). Initial cohort person IDs match across scenarios (`id = slot + 1`) so optional ID tracking can compare the same starting individuals.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Host as Console / Runner
+    participant Base as Baseline Simulation
+    participant Chan as SyncChannel
+    participant Intv as Intervention Simulation
+    participant OutB as Baseline outputs
+    participant OutI as Intervention outputs
+
+    Host->>Base: Create Simulation(ScenarioType::baseline)
+    Host->>Intv: Create Simulation(ScenarioType::intervention)
+    Note over Base,Intv: Same config, datastore, seeds, population size<br/>Initial IDs 1..N match across scenarios
+
+    par Initialise both populations
+        Base->>Base: Demographics, SES, static+dynamic RF, diseases
+        Intv->>Intv: Same init order (no policy yet if before start year)
+    end
+
+    loop Each simulated year
+        rect rgba(226, 239, 217, 0.4)
+            Note over Base,Chan: Baseline computes shared aggregates
+            Base->>Base: Demographic update (deaths, age++, births)
+            Base->>Chan: Send ResidualMortalityMessage age x sex
+            Base->>Base: Net immigration vs expected population
+            Base->>Chan: Send NetImmigrationMessage age x sex
+            Base->>Base: SES, RF update, diseases (no policy / no PIF)
+            opt Factors-mean / Kevin Hall adjustments enabled
+                Base->>Chan: Send adjustment tables (RF means / weight)
+            end
+            Base->>OutB: Publish ResultEventMessage (+ optional tracking)
+        end
+
+        rect rgba(255, 242, 204, 0.55)
+            Note over Chan,Intv: Intervention receives aggregates, then applies policy
+            Chan-->>Intv: Residual mortality table
+            Chan-->>Intv: Net immigration table
+            opt Adjustment sync present
+                Chan-->>Intv: Factors-mean / Kevin Hall adjustment tables
+            end
+            Intv->>Intv: Demographic update using synced residual mortality
+            Intv->>Intv: Apply synced net migration
+            Intv->>Intv: SES, RF update
+            alt time_now >= policy_start_year
+                Intv->>Intv: Apply policy effects to risk factors
+                Intv->>Intv: Disease update with optional PIF
+            else before policy start
+                Intv->>Intv: Disease update without PIF
+            end
+            Intv->>OutI: Publish ResultEventMessage (+ optional tracking)
+        end
+    end
+
+    Note over Host,OutI: What is NOT synced
+    Note over Host,OutI: No Person objects, no IDs, no per-person region/ethnicity/RF copies
+
+    Host->>Host: External comparison: intervention minus baseline<br/>BoD, risk-factor means, HCE, optional matched IDs
+```
+
+*Paired baseline/intervention sequence: parallel runs, one-way aggregate sync on residual mortality, net immigration, and optional adjustment tables; policy and PIF only on the intervention side. See [same-person ID plan](technical/plans/same-person-id-baseline-intervention-plan.md).*
+
 ### Same person ID across baseline and intervention
 
-For the **initial cohort**, Health-GPS assigns each synthetic person a stable **person ID** (derived from their slot in the population) so the **same logical individual** shares the same ID in both baseline and intervention runs. That makes it possible to compare scenarios at the person level—for example in optional tracking output—not only from aggregate JSON and CSV summaries. Life paths can still **diverge** after the intervention is applied; matching IDs mean “same starting person for comparison”, not guaranteed identical outcomes.
+For the **initial cohort**, Health-GPS assigns each synthetic person a stable **person ID** (derived from their slot in the population) so the **same logical individual** shares the same ID in both baseline and intervention runs. That makes it possible to compare scenarios at the person level - for example in optional tracking output - not only from aggregate JSON and CSV summaries. Life paths can still **diverge** after the intervention is applied; matching IDs mean “same starting person for comparison”, not guaranteed identical outcomes.
 
-When you need filtered per-person time series (run, year, scenario, demographics, selected risk factors), enable **`output.individual_id_tracking`** in config. The model then writes an additional `*_IndividualIDTracking.csv` alongside the main results. Configuration, filters, and an example are in the [User Guide — Output](user/userguide.md#output) (FINCH example: `KevinHall_FINCH/config.json` in [HealthGPS-examples](https://github.com/imperialCHEPI/healthgps-examples/tree/main/KevinHall_FINCH)). Design notes: [same-person ID plan](technical/plans/same-person-id-baseline-intervention-plan.md), [individual ID tracking plan](technical/plans/individual-id-tracking-csv-plan.md).
+When you need filtered per-person time series (run, year, scenario, demographics, selected risk factors), enable `output.individual_id_tracking` in config. The model then writes an additional `*_IndividualIDTracking.csv` alongside the main results. Configuration, filters, and an example are in the [User Guide - Output](user/userguide.md#output) (FINCH example: `KevinHall_FINCH/config.json` in [HealthGPS-examples](https://github.com/imperialCHEPI/healthgps-examples/tree/main/KevinHall_FINCH)). Design notes: [same-person ID plan](technical/plans/same-person-id-baseline-intervention-plan.md), [individual ID tracking plan](technical/plans/individual-id-tracking-csv-plan.md).
 
 Finally, detailed analysis can be carried out, externally, to compare the two simulated scenarios results in terms of population demographics and burden of diseases to estimate the cost-effectiveness and impacts of the targeted intervention in tackling childhood obesity.
 
@@ -115,6 +225,59 @@ The microsimulation follows a two-step process to capture time-serial and cross-
 | ![Health-GPS Workflow Diagram](images/model_workflow_diagram.svg) |
 |:-----------------------------------------------------------------:|
 | *Health-GPS Workflow Diagram* |
+
+The diagram below is the whole-picture sequence for one experiment: load inputs, initialise every person, then advance year by year until the configured end time. Baseline and intervention use the same module order; only policy levers and optional PIF differ.
+
+**Risk-factor packs:** config has two slots historically named `static` and `dynamic`. Those are **pipeline roles** (initialisation-oriented pack vs time-update-oriented pack), not labels for individual nutrients. Both slots run at init and again each year; see [Models overview — static vs dynamic](user/models-overview.md#the-confusing-words-static-and-dynamic). Person-field maths: [How Health-GPS models a person](technical/guides/how-healthgps-models-a-person.md).
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Host as Console host
+    participant Sim as Simulation
+    participant Demo as Demographics
+    participant SES as SES
+    participant RF as Risk factors
+    participant Dis as Diseases
+    participant Ana as Analysis
+    participant Out as File outputs
+
+    Note over Host,Out: Setup
+    Host->>Sim: Load config, datastore, static/dynamic model packs
+    Host->>Sim: Build baseline scenario (+ optional intervention)
+
+    rect rgba(226, 239, 217, 0.45)
+        Note over Sim,Ana: Initialisation once per run
+        Sim->>Demo: Assign age, gender, region, ethnicity
+        Demo-->>Sim: Core demographics on each Person
+        Sim->>SES: Draw ses ~ Normal(mu, sigma)
+        Sim->>RF: Static generate then dynamic generate
+        Note right of RF: Income, PA, foods/nutrients,<br/>height, weight, BMI as configured
+        RF-->>Sim: risk_factors (+ PA / income fields)
+        Sim->>Dis: Prevalence initialise from RR tables
+        Sim->>Ana: Initial population statistics
+    end
+
+    loop Each year from start_time to end_time
+        rect rgba(222, 235, 246, 0.45)
+            Note over Sim,Out: Yearly projection
+            Sim->>Demo: Deaths, age += 1, births
+            Sim->>Demo: Net migration in or out
+            Sim->>SES: Redraw ses for newborns only
+            Sim->>RF: Dynamic risk-factor update
+            Sim->>Dis: Remission then incidence (+ optional PIF)
+            Sim->>Ana: Publish year aggregates
+            Ana->>Out: JSON summary, main CSV
+            opt Income / ID tracking enabled
+                Ana->>Out: Income-stratum CSVs and/or IndividualIDTracking.csv
+            end
+        end
+    end
+
+    Note over Host,Out: Compare baseline vs intervention externally
+```
+
+*Whole-picture Health-GPS sequence: setup, one-time initialisation, then the yearly module loop that writes analysis outputs.*
 
 The initialisation sets the simulation world clock, in years, to the user’s defined start time, and requests the simulation modules to initialise the relevant properties of the virtual population individuals. The projection moves the simulation clock, in years, forwards until the user’s defined end time is reached, at which point the algorithm terminates.
 
@@ -135,32 +298,15 @@ The reconcile process can be extremely laborious with each dataset having to be 
 
 All project docs live under `documentation/`. Start at [README.md](README.md).
 
-```mermaid
-flowchart TB
-    ROOT[documentation/README.md]
-    ROOT --> USER[user/]
-    ROOT --> DEV[developer/]
-    ROOT --> TECH[technical/]
-    USER --> GS[getstarted.md]
-    USER --> UG[userguide.md]
-    USER --> SCH[schemas.md]
-    USER --> MOD[models-overview.md]
-    DEV --> ARCH[architecture.md]
-    DEV --> DM[datamodel.md]
-    DEV --> DV[development.md]
-    DEV --> MSVC[msvc-windows-build-troubleshooting.md]
-    DEV --> DOCSDEP[docs-deploy-troubleshooting.md]
-    DEV --> GH[github-flow.md]
-    TECH --> GUIDES[guides/]
-    TECH --> MODELREF[simulation-models-reference.md]
-    TECH --> PLANS[plans/]
-```
+| ![Health-GPS Documentation Guide](images/documentation_guide.png) |
+|:--------------------------------------------------------:|
+| *Health-GPS Documentation Guide* |
 
-| Folder | Audience | Contents |
-| ------ | -------- | -------- |
-| [user/](user/) | Modellers, policy analysts | [Quick Start](user/getstarted.md), [User Guide](user/userguide.md), [Schemas](user/schemas.md), [Models overview](user/models-overview.md) — [user index](user/README.md) |
-| [developer/](developer/) | Software developers | Architecture, data model, build guide, [Pages deploy troubleshooting](developer/docs-deploy-troubleshooting.md), MSVC note, GitHub flow — [developer index](developer/README.md) |
-| [technical/](technical/) | Economists and developers | FINCH guide, [simulation models reference](technical/guides/simulation-models-reference.md), update reports, feature plans — [technical index](technical/README.md) |
+| Folder                   | Audience                   | Contents                                                                                                                                                                         |
+| ------------------------ | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [user/](user/)           | Modellers, policy analysts | [Quick Start](user/getstarted.md), [User Guide](user/userguide.md), [Schemas](user/schemas.md), [Models overview](user/models-overview.md) - [user index](user/README.md)        |
+| [developer/](developer/) | Software developers        | Architecture, data model, build guide, [Pages deploy troubleshooting](developer/docs-deploy-troubleshooting.md), MSVC note, GitHub flow - [developer index](developer/README.md) |
+| [technical/](technical/) | Economists and developers  | FINCH guide, [simulation models reference](technical/guides/simulation-models-reference.md), update reports, feature plans - [technical index](technical/README.md)              |
 
 ### Recommended starting points
 
@@ -169,7 +315,7 @@ flowchart TB
 - What changed in 2026 -> [Update report](technical/guides/healthgps-update-report-2026-02-20.md)
 - Threading and HPC sizing -> [Performance guide](technical/guides/performance-optimizations.md)
 - Building from source -> [Developer Guide](developer/development.md)
-- Per-person baseline vs intervention output -> [User Guide — Output](user/userguide.md#output)
+- Per-person baseline vs intervention output -> [User Guide - Output](user/userguide.md#output)
 - Config validation / `$schema` / v1 vs v2 -> [Configuration schemas](user/schemas.md)
 - Which model does what (HLM, Kevin Hall, …) -> [Models overview](user/models-overview.md)
 - Windows build fails (`cstdint` / `MSVCRTD.lib`) -> [MSVC troubleshooting](developer/msvc-windows-build-troubleshooting.md)

@@ -26,25 +26,9 @@ At startup the CLI parses JSON, resolves **`$ref`** links to sub-schemas (data, 
 
 The root schema composes several sections. Optional blocks (such as **`project_requirements`**, **`population_impact_fraction`**, or **`output.individual_id_tracking`**) extend behaviour for FINCH, India, PIF, and per-person tracking without replacing the core layout.
 
-```mermaid
-flowchart TB
-    ROOT["config.json<br/>$schema â†’ v1/config.json"]
-    ROOT --> PR[project_requirements]
-    ROOT --> DATA[data]
-    ROOT --> IN[inputs]
-    ROOT --> MOD[modelling]
-    ROOT --> RUN[running]
-    ROOT --> OUT[output]
-    ROOT --> PIF[population_impact_fraction]
-
-    PR --> PRsub["demographics, income, PA,<br/>risk_factors, trend, two_stage"]
-    DATA --> DATAref["config/data.json<br/>URL or local datastore"]
-    IN --> INref["config/inputs.json<br/>country, dataset CSV"]
-    MOD --> MODref["config/modelling.json"]
-    MODref --> MODELS["config/models/*.json<br/>HLM, Kevin Hall, dynamic, …"]
-    RUN --> RUNref["config/running.json<br/>seed, trials, interventions"]
-    OUT --> OUTref["config/output.json<br/>paths, comorbidities, ID tracking"]
-```
+| ![Top-level config.json schema structure](../images/schemas_overview.svg) |
+|:-------------------------------------------------------------------------:|
+| *Root `config.json` sections and linked sub-schemas (wide diagram — open the image for full size)* |
 
 | Section | Role |
 | ------- | ---- |
@@ -65,18 +49,11 @@ Worked JSON skeleton: [`examples/config_skeleton.json`](https://github.com/imper
 
 Downloaded or local datastore bundles describe countries, demographics, diseases, and analysis metadata in a separate index file. It uses its own root schema and is validated when the Console loads data.
 
-```mermaid
-flowchart LR
-    ZIP["data release .zip"]
-    ZIP --> IDX[data_index.json]
-    IDX --> C[country]
-    IDX --> D[demographic]
-    IDX --> DIS[diseases / disease]
-    IDX --> AN[analysis]
-    IDX --> PIFidx[population_impact_fraction]
-```
+| ![Data release zip and data_index.json](../images/data_release_zip.png) |
+|:----------------------------------------------------------------------:|
+| *Datastore bundle: `data_index.json` points at country, demographic, disease, analysis, and PIF tables* |
 
-See [User Guide - Backend storage](userguide.md#backend-storage) for how this connects to `config.json` â†’ `data`.
+See [User Guide - Backend storage](userguide.md#backend-storage) for how this connects to `config.json` `data`.
 
 ---
 
@@ -135,10 +112,10 @@ Schema URLs use the prefix `https://raw.githubusercontent.com/imperialCHEPI/heal
 
 | Topic | Document |
 | ----- | -------- |
-| Config sections and examples | [User Guide — Configuration](userguide.md#configuration) |
-| `project_requirements` | [User Guide — Project requirements](userguide.md#project-requirements) |
-| Output / ID tracking schema | [User Guide — Output](userguide.md#output) |
-| v1 â†’ unified migration | [Schema migration plan](../technical/plans/schema-migration-plan.md) |
+| Config sections and examples | [User Guide - Configuration](userguide.md#configuration) |
+| `project_requirements` | [User Guide - Project requirements](userguide.md#project-requirements) |
+| Output / ID tracking schema | [User Guide - Output](userguide.md#output) |
+| v1 unified migration | [Schema migration plan](../technical/plans/schema-migration-plan.md) |
 | Architecture / inputs | [Software Architecture](../developer/architecture.md) |
 
 ---

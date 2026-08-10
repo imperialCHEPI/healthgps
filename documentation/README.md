@@ -59,6 +59,7 @@ Section indexes: [user/README.md](user/README.md) · [developer/README.md](devel
 | Full user guide                                 | [User Guide](user/userguide.md)                                                |
 | Config JSON schemas (diagrams)                  | [Configuration schemas](user/schemas.md)                                       |
 | Models and module I/O (overview)                | [Models overview](user/models-overview.md)                                     |
+| How a virtual person is modelled                | [How Health-GPS models a person](technical/guides/how-healthgps-models-a-person.md) |
 | Simulation models (detail)                      | [Simulation models reference](technical/guides/simulation-models-reference.md) |
 | Build from source                               | [Developer Guide](developer/development.md)                                    |
 | Windows build broken (`cstdint`, `MSVCRTD.lib`) | [MSVC troubleshooting](developer/msvc-windows-build-troubleshooting.md)        |

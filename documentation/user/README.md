@@ -19,6 +19,7 @@ Guides for running Health-GPS (binaries or a local build).
 | ----- | ---------- | ---- |
 | First run | [Quick Start](getstarted.md) | [User Guide](userguide.md) |
 | Config / validation errors | [Configuration schemas](schemas.md) | [User Guide](userguide.md) |
+| How person attributes are assigned | [How Health-GPS models a person](../technical/guides/how-healthgps-models-a-person.md) | [Models overview](models-overview.md) |
 | FINCH / Kevin Hall inputs | [FINCH guide](../technical/guides/finch-linear-models-and-income-adjustment.md) | [Models overview](models-overview.md) |
 | Building from source | [Developer Guide](../developer/development.md) | [MSVC troubleshooting](../developer/msvc-windows-build-troubleshooting.md) |
 
