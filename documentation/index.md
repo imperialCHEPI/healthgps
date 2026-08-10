@@ -226,7 +226,9 @@ The microsimulation follows a two-step process to capture time-serial and cross-
 |:-----------------------------------------------------------------:|
 | *Health-GPS Workflow Diagram* |
 
-The diagram below is the whole-picture sequence for one experiment: load inputs, initialise every person, then advance year by year until the configured end time. Baseline and intervention use the same module order; only policy levers and optional PIF differ. Module detail: [Models overview](user/models-overview.md). Person-field maths: [How Health-GPS models a person](technical/guides/how-healthgps-models-a-person.md).
+The diagram below is the whole-picture sequence for one experiment: load inputs, initialise every person, then advance year by year until the configured end time. Baseline and intervention use the same module order; only policy levers and optional PIF differ.
+
+**Static vs dynamic risk factors:** at initialisation the risk-factor step runs the **static** model to set each person’s starting values, then may run a dynamic generate; in the yearly loop only the **dynamic** model updates those values over time. Plain-language comparison: [Models overview — Static vs dynamic](user/models-overview.md#static-vs-dynamic-risk-factor-models). Person-field maths: [How Health-GPS models a person](technical/guides/how-healthgps-models-a-person.md).
 
 ```mermaid
 sequenceDiagram

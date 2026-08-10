@@ -4,9 +4,9 @@
 
 # Models in Health-GPS
 
-Health-GPS is built from **top-level simulation modules** that act on each **person** every simulated year. Inside the risk-factor host module, JSON/CSV packs registered under `modelling.risk_factor_models` select a **static** implementation (initialise the population) and a **dynamic** implementation (update risk factors over time).
+Health-GPS is built from **top-level simulation modules** that act on each **person** every simulated year. Inside the risk-factor host module, JSON/CSV packs registered under `modelling.risk_factor_models` select a **static** implementation (set risk factors at the start) and a **dynamic** implementation (update them as time advances).
 
-This page summarises modules, model names, inputs, behaviour, and outputs. For file formats, coefficients, and FINCH-specific pipelines, see the **[Simulation models reference](../technical/guides/simulation-models-reference.md)** and the [User Guide](userguide.md).
+This page explains what each piece does in plain language. For file formats, coefficients, and FINCH-specific pipelines, see the **[Simulation models reference](../technical/guides/simulation-models-reference.md)** and the [User Guide](userguide.md).
 
 ---
 
@@ -31,36 +31,58 @@ Architecture diagrams (SVG): [modules](../images/modules_diagram.svg), [simulati
 
 ---
 
-## Risk-factor modules
+## Static vs dynamic risk-factor models
 
-Configured in `config.json` under `modelling.risk_factor_models`, for example `"static": "static_model.json"` and `"dynamic": "dynamic_model.json"`. The JSON **`ModelName`** field selects the implementation (validated against [`schemas/v1/config/models/static.json`](https://github.com/imperialCHEPI/healthgps/blob/main/schemas/v1/config/models/static.json) or [`dynamic.json`](https://github.com/imperialCHEPI/healthgps/blob/main/schemas/v1/config/models/dynamic.json)).
+This is the main distinction reviewers ask about.
 
-### Static risk-factor models
+| | **Static** risk-factor model | **Dynamic** risk-factor model |
+| - | ---------------------------- | ----------------------------- |
+| **When it runs** | Once at **initialisation** (and for newborns when they enter) | **Every simulated year** for people already in the population |
+| **Job** | Create the starting risk-factor profile for each person | Evolve those risk factors through time |
+| **Typical outputs** | Baseline nutrients, income, PA, BMI-related starting values | Yearly updates to weight, intake, height, or other RF trajectories |
+| **Config key** | `modelling.risk_factor_models.static` | `modelling.risk_factor_models.dynamic` |
+| **Example names** | `hlm`, `staticlinear`, `dummy` | `ebhlm`, `kevinhall`, `dummy` |
 
-Used at **initialisation** (and for newborn baseline factors where applicable). Typical `ModelName` values: **`hlm`**, **`staticlinear`**, **`dummy`**.
+In short: **static = starting values**; **dynamic = how those values change over years**. Both are chosen in `config.json`. They are separate files and can be different implementations (for example FINCH often pairs `staticlinear` with `kevinhall`).
 
-### Dynamic risk-factor models
-
-Used on **each simulated year** for active non-newborns (and model-specific newborn handling). Typical `ModelName` values: **`ebhlm`**, **`kevinhall`**, **`dummy`**.
-
-```mermaid
-flowchart LR
-    CFG["config.json modelling"]
-    CFG --> S[static file]
-    CFG --> D[dynamic file]
-    S --> SM["hlm / staticlinear / dummy"]
-    D --> DM["ebhlm / kevinhall / dummy"]
-    SM --> T0["Person.risk_factors at t0"]
-    DM --> TY["Person.risk_factors each year"]
+```json
+"modelling": {
+  "risk_factor_models": {
+    "static": "static_model.json",
+    "dynamic": "dynamic_model.json"
+  }
+}
 ```
+
+Each of those JSON files has a **`ModelName`** field (`hlm`, `staticlinear`, `kevinhall`, …). That name selects the C++ implementation. Schemas: [`static.json`](https://github.com/imperialCHEPI/healthgps/blob/main/schemas/v1/config/models/static.json), [`dynamic.json`](https://github.com/imperialCHEPI/healthgps/blob/main/schemas/v1/config/models/dynamic.json).
 
 | ![config.json modelling](../images/config_modelling.svg) |
 |:--------------------------------------------------------:|
-| *Health-GPS config.json modelling — static vs dynamic risk-factor models* |
+| *Static file sets `Person.risk_factors` at t0; dynamic file updates them each year* |
 
 ---
 
-## Inputs, model descriptions and outputs
+## What each model is (plain language)
+
+### Static models
+
+| Model | What it is | When you use it |
+| ----- | ---------- | --------------- |
+| **`hlm`** | Hierarchical linear model. Risk factors are drawn level-by-level from fitted regressions plus correlated residuals (STOP / France-style HLM packs). | France-style / STOP projects where the static pack is an HLM hierarchy. |
+| **`staticlinear`** | CSV-driven linear / Box-Cox baseline model. Builds correlated nutrients and related factors, then initialises income, PA, policies/trends, and optional mean adjustments (including income-stratum tables). | FINCH and India-style packs; the usual “rich” baseline initialiser. |
+| **`dummy`** | Test stub. Sets chosen factors to fixed values (optional simple policy shift in intervention). | Unit tests, smoke runs, minimal demos — not a scientific model. |
+
+### Dynamic models
+
+| Model | What it is | When you use it |
+| ----- | ---------- | --------------- |
+| **`ebhlm`** | Dynamic hierarchical / equation-based updater. Each year computes factor deltas from age/sex equations, adds bounded noise, applies intervention effects on deltas, then adjusts means toward expected tables. | Legacy dynamic HLM-style yearly updates (often paired with static `hlm`). |
+| **`kevinhall`** | Energy-balance model (Kevin Hall). Updates nutrient/energy intake, weight, height where configured, and BMI, with newborn handling and baseline/intervention sync. | FINCH and Kevin Hall India packs; physiological weight/intake trajectories. |
+| **`dummy`** | Same constant/policy stub as static, but run in the yearly update phase. | Tests that need a no-op or fixed dynamic update. |
+
+---
+
+## Inputs, behaviour and outputs (detail)
 
 ### Static models
 
