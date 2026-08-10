@@ -1,10 +1,10 @@
 # Dynamic Final Income Categories (3/4/5) + Stratum Adjustment
 
-**Author:** Mahima Ghosh
+## Global Health Policy Simulation model
+
+| [Home](../../index.md) | [Quick Start](../../user/getstarted.md) | [User Guide](../../user/userguide.md) | [Schemas](../../user/schemas.md) | [Models](../../user/models-overview.md) | [Architecture](../../developer/architecture.md) | [Data Model](../../developer/datamodel.md) | [Developer Guide](../../developer/development.md) | [Technical docs](../README.md) | [API](https://imperialchepi.github.io/healthgps/api/) |
 
 **Related:** [FINCH linear models guide](../guides/finch-linear-models-and-income-adjustment.md) | [Income quintile factor means plan](income-quintile-factor-means-plan.md) | [Technical index](../README.md) | [Documentation index](../../README.md)
-
-**Engineer:** Mahima - building this feature and the primary contact for questions on dynamic final income categories, income stratum adjustment integration, and related `config.json` / `project_requirements` behaviour.
 
 ## Plan summary
 
@@ -58,7 +58,7 @@ flowchart TD
 
 ## Phase 1 - Shared layout module (new)
 
-Add `[src/HealthGPS.Core/income_category_layout.h](src/HealthGPS.Core/income_category_layout.h)` + `[income_category_layout.cpp](src/HealthGPS.Core/income_category_layout.cpp)`; register in `[src/HealthGPS.Core/CMakeLists.txt](src/HealthGPS.Core/CMakeLists.txt)`.
+Add `[src/HealthGPS.Core/income_category_layout.h](../../../src/HealthGPS.Core/income_category_layout.h)` + `[income_category_layout.cpp](../../../src/HealthGPS.Core/income_category_layout.cpp)`; register in `[src/HealthGPS.Core/CMakeLists.txt](../../../src/HealthGPS.Core/CMakeLists.txt)`.
 
 ```cpp
 struct IncomeCategoryLayout {
@@ -87,13 +87,13 @@ double income_category_numeric(core::Income income, const IncomeCategoryLayout &
 - count 4 -> legacy 1, 2, 3, 4 (unchanged)
 - count 5 -> 1, 2, 3, 4, 5 (one-to-one)
 
-`Person::income_to_value()` in `[src/HealthGPS/person.cpp](src/HealthGPS/person.cpp)` stays unchanged for backward compatibility.
+`Person::income_to_value()` in `[src/HealthGPS/person.cpp](../../../src/HealthGPS/person.cpp)` stays unchanged for backward compatibility.
 
 ---
 
 ## Phase 2 - Config validation and schema
 
-**Parser** - `[src/HealthGPS.Input/model_parser.cpp](src/HealthGPS.Input/model_parser.cpp)`:
+**Parser** - `[src/HealthGPS.Input/model_parser.cpp](../../../src/HealthGPS.Input/model_parser.cpp)`:
 
 - Replace `must be "3" or "4"` with layout parse (`"5"` accepted).
 - `map_income_category`: add `"5"` branch accepting all five JSON keys (`low`, `lowermiddle`, `middle`, `uppermiddle`, `high`).
@@ -102,14 +102,14 @@ double income_category_numeric(core::Income income, const IncomeCategoryLayout &
 
 **Pass layout into models** - replace `std::string income_categories` with `IncomeCategoryLayout` in:
 
-- `[src/HealthGPS/static_linear_model.h](src/HealthGPS/static_linear_model.h)` / `.cpp` (both `StaticLinearModel` and `DynamicStaticLinearModel` constructors; member `income_category_layout_` replaces `income_categories_`).
-- `[src/HealthGPS.Input/model_parser.cpp](src/HealthGPS.Input/model_parser.cpp)` factory call (~line 1830).
+- `[src/HealthGPS/static_linear_model.h](../../../src/HealthGPS/static_linear_model.h)` / `.cpp` (both `StaticLinearModel` and `DynamicStaticLinearModel` constructors; member `income_category_layout_` replaces `income_categories_`).
+- `[src/HealthGPS.Input/model_parser.cpp](../../../src/HealthGPS.Input/model_parser.cpp)` factory call (~line 1830).
 
 **Schemas** (required for valid configs):
 
-- `[schemas/v1/config/project_requirements.json](schemas/v1/config/project_requirements.json)` - add `"5"` to enum.
-- `[schemas/v1/config.json](schemas/v1/config.json)` - same if `income_categories` documented there.
-- `[src/HealthGPS.Input/poco.h](src/HealthGPS.Input/poco.h)` - update comment on `categories` field (`"3" | "4" | "5"`).
+- `[schemas/v1/config/project_requirements.json](../../../schemas/v1/config/project_requirements.json)` - add `"5"` to enum.
+- `[schemas/v1/config.json](../../../schemas/v1/config.json)` - same if `income_categories` documented there.
+- `[src/HealthGPS.Input/poco.h](../../../src/HealthGPS.Input/poco.h)` - update comment on `categories` field (`"3" | "4" | "5"`).
 
 **Example config** - optional one-line note in `[examples/config_skeleton.json](examples/config_skeleton.json)` NOTES block only (no new doc file).
 
@@ -117,7 +117,7 @@ double income_category_numeric(core::Income income, const IncomeCategoryLayout &
 
 ## Phase 3 - Unify rank-bucket assignment in static model
 
-In `[src/HealthGPS/static_linear_model.cpp](src/HealthGPS/static_linear_model.cpp)`:
+In `[src/HealthGPS/static_linear_model.cpp](../../../src/HealthGPS/static_linear_model.cpp)`:
 
 1. **Extract generic helper** (anonymous namespace or small function in layout module):
 
@@ -148,18 +148,18 @@ No change to stratum adjustment gating (`income_stratum_adjustment_enabled_`, `a
 
 | File                                                                                            | Change                                                                                                                                                                                            |
 | ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `[src/HealthGPS/analysis_module.cpp](src/HealthGPS/analysis_module.cpp)`                        | `configured_income_strata` returns `layout.strata` from `project_requirements.income.categories`. Use `income_category_numeric` where category count is known for income-stratified output paths. |
-| `[src/HealthGPS.Console/result_file_writer.h/.cpp](src/HealthGPS.Console/result_file_writer.h)` | Store `IncomeCategoryLayout` instead of `std::string income_categories_`; `merge_configured_income_strata` and `income_category_numeric` delegate to layout.                                      |
-| `[src/HealthGPS.Console/program.cpp](src/HealthGPS.Console/program.cpp)`                        | Pass `income_category_layout_from_config(input.project_requirements().income.categories)` to `ResultFileWriter`.                                                                                  |
-| `[src/HealthGPS/kevin_hall_model.cpp](src/HealthGPS/kevin_hall_model.cpp)`                      | `print_weight_by_final_income_category_table` / `print_height_by_final_income_category_table`: take `IncomeCategoryLayout` (or parse once at call site from context); fix 5-way indexing.         |
+| `[src/HealthGPS/analysis_module.cpp](../../../src/HealthGPS/analysis_module.cpp)`                        | `configured_income_strata` returns `layout.strata` from `project_requirements.income.categories`. Use `income_category_numeric` where category count is known for income-stratified output paths. |
+| `[src/HealthGPS.Console/result_file_writer.h/.cpp](../../../src/HealthGPS.Console/result_file_writer.h)` | Store `IncomeCategoryLayout` instead of `std::string income_categories_`; `merge_configured_income_strata` and `income_category_numeric` delegate to layout.                                      |
+| `[src/HealthGPS.Console/program.cpp](../../../src/HealthGPS.Console/program.cpp)`                        | Pass `income_category_layout_from_config(input.project_requirements().income.categories)` to `ResultFileWriter`.                                                                                  |
+| `[src/HealthGPS/kevin_hall_model.cpp](../../../src/HealthGPS/kevin_hall_model.cpp)`                      | `print_weight_by_final_income_category_table` / `print_height_by_final_income_category_table`: take `IncomeCategoryLayout` (or parse once at call site from context); fix 5-way indexing.         |
 
-**Optional small win** - `[src/HealthGPS/data_series.cpp](src/HealthGPS/data_series.cpp)`: where analysis sets up channels, prefer `add_income_channels_for_categories(keys, layout.strata)` over hardcoded 5-enum loop (only if a natural call site exists after analysis refactor; skip if it adds scope).
+**Optional small win** - `[src/HealthGPS/data_series.cpp](../../../src/HealthGPS/data_series.cpp)`: where analysis sets up channels, prefer `add_income_channels_for_categories(keys, layout.strata)` over hardcoded 5-enum loop (only if a natural call site exists after analysis refactor; skip if it adds scope).
 
 ---
 
 ## Phase 5 - Tests
 
-**New unit test file** - `[src/HealthGPS.Tests/IncomeCategoryLayout.Test.cpp](src/HealthGPS.Tests/IncomeCategoryLayout.Test.cpp)`:
+**New unit test file** - `[src/HealthGPS.Tests/IncomeCategoryLayout.Test.cpp](../../../src/HealthGPS.Tests/IncomeCategoryLayout.Test.cpp)`:
 
 - Parse `"3"`, `"4"`, `"5"`; reject invalid values.
 - `income_table_index` / `income_from_equal_split_bucket` for each count.
@@ -167,12 +167,12 @@ No change to stratum adjustment gating (`income_stratum_adjustment_enabled_`, `a
 
 **Extend existing tests:**
 
-- `[src/HealthGPS.Tests/ResultFileWriter.Test.cpp](src/HealthGPS.Tests/ResultFileWriter.Test.cpp)` - `FiveIncomeCategoriesCreateAllStratumFiles` (5 CSV files, no spurious `MiddleIncome` unless in layout).
-- `[src/HealthGPS.Tests/IncomeStratumAdjustment.Test.cpp](src/HealthGPS.Tests/IncomeStratumAdjustment.Test.cpp)` - one test: `categories="5"` + `adjustment_income_stratum_count=5`; assert all five `person.income` values appear and adjustment strata 0..4 assigned.
-- `[src/HealthGPS.Tests/KevinHallHeight.Test.cpp](src/HealthGPS.Tests/KevinHallHeight.Test.cpp)` - mirror existing 3-category table test for `"5"` (height-by-final-income table present with 5 labels).
-- Update `[src/HealthGPS.Tests/IncomeStratumAdjustment.Test.cpp](src/HealthGPS.Tests/IncomeStratumAdjustment.Test.cpp)` `create_test_static_linear_model_bundle` to pass `IncomeCategoryLayout` instead of `"4"` string.
+- `[src/HealthGPS.Tests/ResultFileWriter.Test.cpp](../../../src/HealthGPS.Tests/ResultFileWriter.Test.cpp)` - `FiveIncomeCategoriesCreateAllStratumFiles` (5 CSV files, no spurious `MiddleIncome` unless in layout).
+- `[src/HealthGPS.Tests/IncomeStratumAdjustment.Test.cpp](../../../src/HealthGPS.Tests/IncomeStratumAdjustment.Test.cpp)` - one test: `categories="5"` + `adjustment_income_stratum_count=5`; assert all five `person.income` values appear and adjustment strata 0..4 assigned.
+- `[src/HealthGPS.Tests/KevinHallHeight.Test.cpp](../../../src/HealthGPS.Tests/KevinHallHeight.Test.cpp)` - mirror existing 3-category table test for `"5"` (height-by-final-income table present with 5 labels).
+- Update `[src/HealthGPS.Tests/IncomeStratumAdjustment.Test.cpp](../../../src/HealthGPS.Tests/IncomeStratumAdjustment.Test.cpp)` `create_test_static_linear_model_bundle` to pass `IncomeCategoryLayout` instead of `"4"` string.
 
-Register new test file in `[src/HealthGPS.Tests/CMakeLists.txt](src/HealthGPS.Tests/CMakeLists.txt)`.
+Register new test file in `[src/HealthGPS.Tests/CMakeLists.txt](../../../src/HealthGPS.Tests/CMakeLists.txt)`.
 
 ---
 

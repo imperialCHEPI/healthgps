@@ -1,10 +1,8 @@
 ## Global Health Policy Simulation model
 
-| [Home](../index.md) | [Quick Start](getstarted.md) | [User Guide](userguide.md) | [Software Architecture](../developer/architecture.md) | [Data Model](../developer/datamodel.md) | [Developer Guide](../developer/development.md) | [Technical docs](../technical/README.md) | [API (Pages)](https://imperialchepi.github.io/healthgps/api/) |
+| [Home](../index.md) | [Quick Start](getstarted.md) | [User Guide](userguide.md) | [Schemas](schemas.md) | [Models](models-overview.md) | [Architecture](../developer/architecture.md) | [Data Model](../developer/datamodel.md) | [Developer Guide](../developer/development.md) | [Technical docs](../technical/README.md) | [API](https://imperialchepi.github.io/healthgps/api/) |
 
 # Quick Start
-
-**Author:** Mahima Ghosh
 
 The *Health GPS* application provides a *Command Line Interface* (CLI) and runs on *Windows 10 (and newer)* and *Linux* devices. All supported options are provided to the model via a [configuration][configjson] file (JSON format), including population size, intervention scenarios and number of runs. Users are encouraged to start exploring the model by using the included example dataset, changing the provided configuration file, and running the model.
 
@@ -119,11 +117,11 @@ In a similar manner, the resulting dataset `df`, can be re-created and expanded 
 
 ---
 
-[← User documentation index](README.md) · [Documentation index](../README.md)
+[â† User documentation index](README.md) · [Documentation index](../README.md)
+
+[configjson]:https://github.com/imperialCHEPI/healthgps-examples/tree/main/HLM_France/config.json "Configuration file example"
+[examplesrepo]:https://github.com/imperialCHEPI/healthgps-examples "Health-GPS examples repository"
 
 ---
 
 **Author:** Mahima Ghosh
-
-[configjson]:https://github.com/imperialCHEPI/healthgps-examples/tree/main/HLM_France/config.json "Configuration file example"
-[examplesrepo]:https://github.com/imperialCHEPI/healthgps-examples "Health-GPS examples repository"

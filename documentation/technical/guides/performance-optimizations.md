@@ -1,6 +1,8 @@
 # Health-GPS performance and parallelization
 
-**Author:** Mahima Ghosh
+## Global Health Policy Simulation model
+
+| [Home](../../index.md) | [Quick Start](../../user/getstarted.md) | [User Guide](../../user/userguide.md) | [Schemas](../../user/schemas.md) | [Models](../../user/models-overview.md) | [Architecture](../../developer/architecture.md) | [Data Model](../../developer/datamodel.md) | [Developer Guide](../../developer/development.md) | [Technical docs](../README.md) | [API](https://imperialchepi.github.io/healthgps/api/) |
 
 **Related:** [HealthGPS update report](healthgps-update-report-2026-02-20.md) (section 4) · [Developer Guide](../../developer/development.md) · [MSVC troubleshooting](../../developer/msvc-windows-build-troubleshooting.md) · [Technical index](../README.md)
 
@@ -80,8 +82,6 @@ Do not expect near-linear speedup by raising `-T` beyond the work available per 
 | Output threading design | [Parallelize output writes plan](../plans/parallelize-output-writes-plan.md) |
 | Architecture / modules | [Software Architecture](../../developer/architecture.md) |
 | FINCH / large configs | [FINCH guide](finch-linear-models-and-income-adjustment.md) |
-
----
 
 ---
 

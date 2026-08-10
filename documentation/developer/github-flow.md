@@ -1,8 +1,8 @@
 # Health-GPS Project Model Branching Policy
 
-**Author:** Mahima Ghosh
+## Global Health Policy Simulation model
 
-| [Home](../index.md) | [Quick Start](../user/getstarted.md) | [User Guide](../user/userguide.md) | [Software Architecture](architecture.md) | [Data Model](datamodel.md) | [Developer Guide](development.md) | [Technical docs](../technical/README.md) | [API (Pages)](https://imperialchepi.github.io/healthgps/api/) |
+| [Home](../index.md) | [Quick Start](../user/getstarted.md) | [User Guide](../user/userguide.md) | [Schemas](../user/schemas.md) | [Models](../user/models-overview.md) | [Architecture](architecture.md) | [Data Model](datamodel.md) | [Developer Guide](development.md) | [Technical docs](../technical/README.md) | [API](https://imperialchepi.github.io/healthgps/api/) |
 
 Traditional Git-flow branching patterns are usually adopted by large software teams with
 complex release processes to support the deployment of multiple versions of the same
@@ -70,7 +70,7 @@ Finally, GitHub extensions are available for workflow integration with many popu
 
 ---
 
-[← Developer documentation index](README.md) · [Documentation index](../README.md)
+[â† Developer documentation index](README.md) · [Documentation index](../README.md)
 
 ---
 

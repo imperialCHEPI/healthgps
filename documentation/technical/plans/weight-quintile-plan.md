@@ -1,6 +1,8 @@
 # Weight quantiles by income adjustment stratum
 
-**Author:** Mahima Ghosh
+## Global Health Policy Simulation model
+
+| [Home](../../index.md) | [Quick Start](../../user/getstarted.md) | [User Guide](../../user/userguide.md) | [Schemas](../../user/schemas.md) | [Models](../../user/models-overview.md) | [Architecture](../../developer/architecture.md) | [Data Model](../../developer/datamodel.md) | [Developer Guide](../../developer/development.md) | [Technical docs](../README.md) | [API](https://imperialchepi.github.io/healthgps/api/) |
 
 **Related:** [Height CSV quintile plan](height-csv-quintile-plan.md) | [Income quintile factor means plan](income-quintile-factor-means-plan.md) | [FINCH guide](../guides/finch-linear-models-and-income-adjustment.md) | [Technical index](../README.md) | [Documentation index](../../README.md)
 
@@ -12,27 +14,27 @@
 
 ### Work items
 
-| Status | Item |
-| ------ | ---- |
-| Done | Extend v1/v2 kevinhall.json WeightQuantiles Female/Male oneOf: legacy csv_file \| Quintile1..N object |
-| In progress | Implement load_weight_quantiles_by_gender in model_parser.cpp with broadcast, count validation vs adjustment_income_stratum_count, sorted Quintile keys |
-| Planned | Change KevinHallModel/Definition to per-stratum quantile vectors + resolve_weight_quantiles_for_person + update initialise_weight/get_weight_quantile |
-| Planned | Add print_weight_stratum_assignment_table, print_weight_by_final_income_category_table, print_weight_summary_tables; call from generate and update paths (mirror height gating) |
-| Planned | Add parser/runtime tests for legacy, N files, broadcast, mismatch errors, and console table output where applicable |
-| Planned | Update FINCH dynamic_model.json when quintile CSVs exist; add weight_quantiles_quintile_plan.md |
+| Status | Item                                                                                                                                                                            |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Done   | Extend v1/v2 kevinhall.json WeightQuantiles Female/Male oneOf: legacy csv_file or Quintile1..N object                                                                            |
+| Done   | Implement load_weight_quantiles_by_gender in model_parser.cpp with broadcast, count validation vs adjustment_income_stratum_count, sorted Quintile keys                         |
+| Done   | Change KevinHallModel/Definition to per-stratum quantile vectors + resolve_weight_quantiles_for_person + update initialise_weight/get_weight_quantile                           |
+| Done   | Add print_weight_stratum_assignment_table, print_weight_by_final_income_category_table, print_weight_summary_tables; call from generate and update paths (mirror height gating) |
+| Done   | Add parser/runtime tests for legacy, N files, broadcast, mismatch errors, and console table output where applicable                                                             |
+| Done   | Update FINCH dynamic_model.json when quintile CSVs exist; add weight_quantiles_quintile_plan.md                                                                                 |
 
 ## Goal
 
 - Keep **legacy** `WeightQuantiles.Female` / `Male` as a single `csv_file` (e.g. `weight_quantiles_NCDRisk_female.csv`).
 - Add **stratum files**: `Female.Quintile1` -> `weight_quantiles_NCDRisk_female_quintile1.csv`, and the same for Male.
-- At **weight assignment**, use `person.income_adjustment_stratum` (from `adjustment_income_stratum_count` rank buckets) to choose which quantile curve to use-the same idea as height via `resolve_height_params_for_person` in [kevin_hall_model.cpp](src/HealthGPS/kevin_hall_model.cpp).
+- At **weight assignment**, use `person.income_adjustment_stratum` (from `adjustment_income_stratum_count` rank buckets) to choose which quantile curve to use-the same idea as height via `resolve_height_params_for_person` in [kevin_hall_model.cpp](../../../src/HealthGPS/kevin_hall_model.cpp).
 - **Final reporting income** stays on `project_requirements.income.categories` (`"3"` or `"4"`) on `person.income`; that does not change.
 
 Example: 5 adjustment strata for factors-mean / weight curves, 4 categories in ProjectRequirements for output.
 
 ## Pipeline order (static before dynamic)
 
-[RiskFactorModule](src/HealthGPS/riskfactor.cpp) always runs **static** then **Kevin Hall**. So when `initialise_weight` runs, the static model has already assigned `income_adjustment_stratum` and remapped `person.income` to 3 or 4 categories ([static_linear_model.cpp](src/HealthGPS/static_linear_model.cpp) ~786-905).
+[RiskFactorModule](../../../src/HealthGPS/riskfactor.cpp) always runs **static** then **Kevin Hall**. So when `initialise_weight` runs, the static model has already assigned `income_adjustment_stratum` and remapped `person.income` to 3 or 4 categories ([static_linear_model.cpp](../../../src/HealthGPS/static_linear_model.cpp) ~786-905).
 
 ## Lifecycle - initialize (`generate_risk_factors`)
 
@@ -98,9 +100,9 @@ flowchart TD
 
 ## Config and schema
 
-**Files:** [schemas/v2/config/models/kevinhall.json](schemas/v2/config/models/kevinhall.json), [schemas/v1/config/models/kevinhall.json](schemas/v1/config/models/kevinhall.json)
+**Files:** [schemas/v2/config/models/kevinhall.json](../../../schemas/v2/config/models/kevinhall.json), [schemas/v1/config/models/kevinhall.json](../../../schemas/v1/config/models/kevinhall.json)
 
-For `WeightQuantiles.Female` and `.Male`, use **`oneOf`**:
+For `WeightQuantiles.Female` and `.Male`, use `oneOf`:
 
 1. Legacy - `$ref` to `csv_file.json`
 2. Stratum - object with `Quintile1`, `Quintile2`, … each a `csv_file` block
@@ -127,12 +129,12 @@ For `WeightQuantiles.Female` and `.Male`, use **`oneOf`**:
 
 This is the approach to use unless requirements change later.
 
-| Approach | Config effort | Tradeoff |
-|----------|---------------|----------|
-| **Explicit `Quintile1`…`N` (chosen)** | Repeat `format` / `delimiter` / `columns` per file (or copy-paste blocks) | Same pattern as factors-mean strata in [examples/config_skeleton.json](examples/config_skeleton.json); schema can validate each file; wrong or missing file fails at load with a clear path |
-| **Name pattern** e.g. `…_quintile{n}.csv`, N from `adjustment_income_stratum_count` | One block per gender, fewer lines | Assumes rigid filenames; harder to mix non-standard names or skip a stratum |
-| **Ordered `files` array** | List filenames once, shared format on parent | Slightly shorter JSON, but still N filenames; new schema shape |
-| **Directory glob** | Almost nothing in JSON | Fragile ordering, accidental extra CSVs, weak validation |
+| Approach                                                                            | Config effort                                                             | Tradeoff                                                                                                                                                                                    |
+| ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Explicit** `Quintile1`**…**`N` **(chosen)**                                       | Repeat `format` / `delimiter` / `columns` per file (or copy-paste blocks) | Same pattern as factors-mean strata in [examples/config_skeleton.json](examples/config_skeleton.json); schema can validate each file; wrong or missing file fails at load with a clear path |
+| **Name pattern** e.g. `…_quintile{n}.csv`, N from `adjustment_income_stratum_count` | One block per gender, fewer lines                                         | Assumes rigid filenames; harder to mix non-standard names or skip a stratum                                                                                                                 |
+| **Ordered** `files` **array**                                                       | List filenames once, shared format on parent                              | Slightly shorter JSON, but still N filenames; new schema shape                                                                                                                              |
+| **Directory glob**                                                                  | Almost nothing in JSON                                                    | Fragile ordering, accidental extra CSVs, weak validation                                                                                                                                    |
 
 **Practical tip:** For FINCH, duplicate the existing `Female` / `Male` csv block five times, change `name` to `_quintile1` … `_quintile5`, and nest under `Quintile1` … `Quintile5`. No magic paths-the filenames in JSON are exactly what get loaded.
 
@@ -140,22 +142,22 @@ Factors-mean quintiles stay in **config.json** (`baseline_adjustments.income_str
 
 Update [dynamic_model.json](input-data/data/KevinHall_FINCH/dynamic_model.json) when quintile CSVs are in the data folder.
 
-## Parser ([model_parser.cpp](src/HealthGPS.Input/model_parser.cpp))
+## Parser ([model_parser.cpp](../../../src/HealthGPS.Input/model_parser.cpp))
 
-Replace the flat load at ~1864-1883 with a helper similar to Height (~1901-1937):
+Replace the flat load at ~~1864-1883 with a helper similar to Height (~~1901-1937):
 
-| Config input | `adjustment_income_stratum_count` | Loaded shape per gender |
-|--------------|-----------------------------------|-------------------------|
-| Single `csv_file` | any | One vector; broadcast to N if stratum mode on and N > 1 |
-| `Quintile1`…`QuintileN` | N | N vectors; error if file count ≠ N |
-| Wrong count | - | Parse error with file count vs expected N |
+| Config input            | `adjustment_income_stratum_count` | Loaded shape per gender                                 |
+| ----------------------- | --------------------------------- | ------------------------------------------------------- |
+| Single `csv_file`       | any                               | One vector; broadcast to N if stratum mode on and N > 1 |
+| `Quintile1`…`QuintileN` | N                                 | N vectors; error if file count â‰ N                     |
+| Wrong count             | -                                 | Parse error with file count vs expected N               |
 
 - Load each file: `load_datatable_from_csv`, first column `double`, sort once at load.
 - Order quintile keys numerically (`Quintile1`, `Quintile2`, …).
 - Read `config.modelling.baseline_adjustment.income_stratum_factors_mean` for `enabled` and `adjustment_income_stratum_count` (same as height ~1897-1899).
 - If multiple quintile files are configured but stratum adjustment is disabled, fail at parse time.
 
-## Runtime ([kevin_hall_model.h](src/HealthGPS/kevin_hall_model.h) / [kevin_hall_model.cpp](src/HealthGPS/kevin_hall_model.cpp))
+## Runtime ([kevin_hall_model.h](../../../src/HealthGPS/kevin_hall_model.h) / [kevin_hall_model.cpp](../../../src/HealthGPS/kevin_hall_model.cpp))
 
 **Storage** (mirror `height_params_`):
 
@@ -173,52 +175,64 @@ std::unordered_map<core::Gender, std::vector<std::vector<double>>> weight_quanti
 
 ## Console output tables (required)
 
-Mirror the height helpers in [kevin_hall_model.cpp](src/HealthGPS/kevin_hall_model.cpp) (~87-225, ~1176-1194). Not optional-needed to verify stratum weight assignment in the log.
+Mirror the height helpers in [kevin_hall_model.cpp](../../../src/HealthGPS/kevin_hall_model.cpp) (~87-225, ~1176-1194). Not optional-needed to verify stratum weight assignment in the log.
 
 **Gating** - reuse the same policy as `should_print_height_summary_tables` (~49-58):
 
 - Baseline scenario only
 - Start year and start year + 1 only (avoid flooding long runs)
 
-**Table 1 - `[WEIGHT STRATUM ASSIGNMENT]`** (by adjustment stratum)
+**Table 1 -** `[WEIGHT STRATUM ASSIGNMENT]` (by adjustment stratum)
 
 Modeled on `print_height_stratum_assignment_table`:
 
-| Column | Content |
-|--------|---------|
-| Bucket | `person.income_adjustment_stratum` (0..N-1) |
-| Stratum ID | `Quintile1` … `QuintileN` |
-| Count | Active people in bucket |
-| Quantile size | Number of values loaded for that stratum (sanity check) |
+| Column                  | Content                                                            |
+| ----------------------- | ------------------------------------------------------------------ |
+| Bucket                  | `person.income_adjustment_stratum` (0..N-1)                        |
+| Stratum ID              | `Quintile1` … `QuintileN`                                          |
+| Count                   | Active people in bucket                                            |
+| Quantile size           | Number of values loaded for that stratum (sanity check)            |
 | Weight Min / Max / Mean | From `person.risk_factors["Weight"]` after assignment in that step |
 
 Header note: uses `person.income_adjustment_stratum` from static model.
 
-**Table 2 - `[WEIGHT BY FINAL INCOME CATEGORY]`** (by output income)
+**Table 2 -** `[WEIGHT BY FINAL INCOME CATEGORY]` (by output income)
 
 Modeled on `print_height_by_final_income_category_table`:
 
-| Column | Content |
-|--------|---------|
-| Category | Low / LowerMid / UpperMid / High (4) or Low / Middle / High (3) |
-| Count | People in `person.income` category |
-| Weight Min / Max / Mean | After assignment |
+| Column                  | Content                                                         |
+| ----------------------- | --------------------------------------------------------------- |
+| Category                | Low / LowerMid / UpperMid / High (4) or Low / Middle / High (3) |
+| Count                   | People in `person.income` category                              |
+| Weight Min / Max / Mean | After assignment                                                |
 
 Header note: `person.income` from ProjectRequirements categories after static remapping.
 
 **Call sites** - add `print_weight_summary_tables(context, phase)` alongside existing height printing:
 
-| Phase string | When |
-|--------------|------|
-| `generate` | End of `generate_risk_factors` (~291) |
-| `update-newborns` | End of `update_newborns` (~370) |
+| Phase string      | When                                           |
+| ----------------- | ---------------------------------------------- |
+| `generate`        | End of `generate_risk_factors` (~291)          |
+| `update-newborns` | End of `update_newborns` (~370)                |
 | `update-children` | End of `update_non_newborns` child path (~441) |
 
 `bucket_count` for the stratum table: max loaded stratum count across genders (same as height ~1182-1186).
 
+### Example console output
+
+Income-stratum assignment (static model) selects the weight-quantile curve. Weight then prints `[WEIGHT STRATUM ASSIGNMENT]` and `[WEIGHT BY FINAL INCOME CATEGORY]` alongside the height tables.
+
+| ![Income-stratum assignment and delta/apply](../../images/finch/income-stratum-delta-apply-example.png) |
+| :----------------------------------------------------------------------------------------------------: |
+| *Income-stratum assignment buckets and sampled factor delta/apply rows (initial year)* |
+
+| ![Height and weight stratum assignment](../../images/finch/height-weight-stratum-assignment.png) |
+| :----------------------------------------------------------------------------------------------: |
+| *Weight stratum assignment and weight by final income category (year 2022, phase=generate); height tables appear in the same log* |
+
 ## Tests
 
-In [KevinHallHeight.Test.cpp](src/HealthGPS.Tests/KevinHallHeight.Test.cpp) and/or [KevinHallWeightValidation.Test.cpp](src/HealthGPS.Tests/KevinHallWeightValidation.Test.cpp):
+In [KevinHallHeight.Test.cpp](../../../src/HealthGPS.Tests/KevinHallHeight.Test.cpp) and/or [KevinHallWeightValidation.Test.cpp](../../../src/HealthGPS.Tests/KevinHallWeightValidation.Test.cpp):
 
 - Legacy single-file config still parses and runs
 - Five quintile files with `adjustment_income_stratum_count = 5`

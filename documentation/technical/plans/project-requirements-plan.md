@@ -1,6 +1,8 @@
 # Project requirements: config-driven behaviour (no project hacks)
 
-**Author:** Mahima Ghosh
+## Global Health Policy Simulation model
+
+| [Home](../../index.md) | [Quick Start](../../user/getstarted.md) | [User Guide](../../user/userguide.md) | [Schemas](../../user/schemas.md) | [Models](../../user/models-overview.md) | [Architecture](../../developer/architecture.md) | [Data Model](../../developer/datamodel.md) | [Developer Guide](../../developer/development.md) | [Technical docs](../README.md) | [API](https://imperialchepi.github.io/healthgps/api/) |
 
 **Related:** [FINCH linear models guide](../guides/finch-linear-models-and-income-adjustment.md) | [Schema migration plan](schema-migration-plan.md) | [Technical index](../README.md) | [Documentation index](../../README.md)
 
@@ -44,7 +46,7 @@ Place at the **start** of each project config for clarity. All fields are explic
 |---------------------------|--------|-------------|
 | `enabled`                 | boolean | Use income in the model. |
 | `type`                    | string | `"continuous"` \| `"categorical"`. |
-| `categories`              | string | `"3"` \| `"4"` (only when type is categorical, or for continuous→category mapping). |
+| `categories`              | string | `"3"` \| `"4"` (only when type is categorical, or for continuousâ†’category mapping). |
 | `adjust_to_factors_mean`  | boolean | Include income in factors-mean adjustment (initial). |
 | `trended`                 | boolean | Include income in trended adjustment. |
 
