@@ -1,15 +1,57 @@
+<style>
+  /* Mermaid diagrams: render at natural width; scroll horizontally when needed */
+  .mermaid-scroll {
+    overflow-x: auto;
+    max-width: 100%;
+    margin: 1em 0;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mermaid-scroll .mermaid svg {
+    display: block;
+    max-width: none !important;
+    height: auto;
+  }
+</style>
+
 <script type="module">
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
-  mermaid.initialize({ startOnLoad: false, theme: 'neutral' });
+
+  mermaid.initialize({
+    startOnLoad: false,
+    theme: 'neutral',
+    themeVariables: {
+      fontSize: '17px',
+    },
+    sequence: {
+      useMaxWidth: false,
+      diagramMarginX: 40,
+      diagramMarginY: 12,
+      actorMargin: 60,
+      width: 170,
+      height: 65,
+      boxMargin: 10,
+      boxTextMargin: 6,
+      noteMargin: 12,
+      messageMargin: 45,
+      mirrorActors: true,
+    },
+    flowchart: {
+      useMaxWidth: false,
+    },
+  });
 
   document.addEventListener('DOMContentLoaded', async () => {
     const blocks = document.querySelectorAll('pre > code.language-mermaid');
     for (const code of blocks) {
       const pre = code.parentElement;
+      const wrapper = document.createElement('div');
+      wrapper.className = 'mermaid-scroll';
       const div = document.createElement('div');
       div.className = 'mermaid';
       div.textContent = code.textContent;
-      pre.replaceWith(div);
+      wrapper.appendChild(div);
+      pre.replaceWith(wrapper);
     }
     if (document.querySelector('.mermaid')) {
       await mermaid.run({ querySelector: '.mermaid' });
