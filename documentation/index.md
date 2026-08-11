@@ -30,8 +30,8 @@ The model uses proprietary equations to account for a variety of complex interac
 The Health-GPS workflow is summarised below, datasets from many disconnected sources are used to define the various modules and components of the framework. Commonly used datasets are processed, aggregated, indexed by country, and stored in the backend *datastore*, while research specific datasets are analysed externally to build the *risk factors* and *socio-economic status* modules, design and parameterise *intervention* to be tested.
 
 
-| Health-GPS Workflow                   |
-| ------------------------------------- |
+| ![Health-GPS Workflow](images/general_workflow.png) |
+|:---------------------------------------------------:|
 | *Health-GPS General Workflow Diagram* |
 
 
@@ -40,8 +40,8 @@ The simulation creates the virtual population, simulates the synthetic individua
 Health-GPS is a flexible and modular framework, written in modern C++, designed using object-oriented principles to provide the building blocks necessary to compose the overall microsimulation, several data sources, modules, and sub-model are required as shown below.
 
 
-| Health-GPS Concept           |
-| ---------------------------- |
+| ![Health-GPS Concept](images/model_concept_diagram.png) |
+|:-------------------------------------------------------:|
 | *Health-GPS Concept Diagram* |
 
 
@@ -52,8 +52,8 @@ Health-GPS is a flexible and modular framework, written in modern C++, designed 
 The framework defines multi-dimensional interactions on *demographics*, *risk factors*, *diseases* and *intervention* modules as shown below. The model dynamics capture the effects of the various interacting modules overtime to stablish the population *baseline* projection and quantify the impact of *interventions* on risk factors, the *burden of diseases* (BoD) module estimate population outcomes such as risk factors, disease prevalence, and health care expenditure. Finally, *the different between the two scenarios* is the effect of the intervention.
 
 
-| Health-GPS Dynamics           |
-| ----------------------------- |
+| ![Health-GPS Dynamics](images/model_dynamics_diagram.svg) |
+|:---------------------------------------------------------:|
 | *Health-GPS Dynamics Diagram* |
 
 
@@ -85,8 +85,8 @@ The dynamics of risk factors modelling is a major challenge for health policy mo
 To represent childhood obesity, national dietary surveys from various European countries are analysed to build the risk factor model. Estimates of yearly changes in physical activity, diet, energy balance, and Body Mass Index (BMI) are created using dietary and anthropometric surveys. These include measures of physical activity expressed in metabolic equivalents (METs) and macronutrients intakes measures including grams of fat, carbohydrates, protein, fibre, salt, and sugar. The general concept for an EBM is shown below (top diagram), and a possible *Health-GPS* translation is provided for illustration purpose.
 
 
-| Energy Balance Model                     |
-| ---------------------------------------- |
+| ![Energy Balance Model](images/energy_balance_model.svg) |
+|:--------------------------------------------------------:|
 | *Energy balance model structure example* |
 
 
@@ -118,8 +118,8 @@ The first run evaluates the no-intervention, *“baseline scenario”* where dem
 Policies are configured in `running` (scenario type, `policy_start_year`) and in modelling CSVs (for example FINCH `policyeffect_model.csv` / `S*_policyeffect_model.csv`). The **same** module stack runs in both scenarios. Only the intervention scenario evaluates policy equations after the start year, and only intervention may apply optional PIF to disease incidence.
 
 
-| Policy levers sequence diagram   |
-| -------------------------------- |
+| ![Policy levers sequence diagram](images/policy_sequence.svg) |
+|:-------------------------------------------------------------:|
 | *Policy levers sequence diagram* |
 
 
@@ -130,8 +130,8 @@ Policies are configured in `running` (scenario type, `policy_start_year`) and in
 When an intervention is configured, the **Runner** starts baseline and intervention simulations together (separate threads, separate `Person` populations). Synchronisation is **one-way: baseline → intervention** over a `SyncChannel`, and only **aggregate** tables are transferred (not individual people). Initial cohort person IDs match across scenarios (`id = slot + 1`) so optional ID tracking can compare the same starting individuals.
 
 
-| Baseline and intervention paired run sequence diagram   |
-| ------------------------------------------------------- |
+| ![Baseline and intervention paired run sequence diagram](images/baseline_intervention_pair_sequence.svg) |
+|:--------------------------------------------------------------------------------------------------------:|
 | *Baseline and intervention paired run sequence diagram* |
 
 
@@ -150,8 +150,8 @@ Finally, detailed analysis can be carried out, externally, to compare the two si
 The microsimulation follows a two-step process to capture time-serial and cross-sectional correlations between risk factors, preserve the cross-sectional correlations between factors, and their hierarchical structure to allow changes to be propagated from lower to high level variables. The workflow consists of two main algorithms to *initialise* and *project* the virtual population over time respectively. Creating and *initialising* the virtual population is the first step of a simulation run, while the algorithm *projecting* the population over time is the core of the microsimulation as shown below.
 
 
-| Health-GPS Workflow Diagram   |
-| ----------------------------- |
+| ![Health-GPS Workflow Diagram](images/model_workflow_diagram.svg) |
+|:-----------------------------------------------------------------:|
 | *Health-GPS Workflow Diagram* |
 
 
@@ -160,8 +160,8 @@ The diagram below is the whole-picture sequence for one experiment: load inputs,
 **Risk-factor packs:** config has two slots historically named `static` and `dynamic`. Those are **pipeline roles** (initialisation-oriented pack vs time-update-oriented pack), not labels for individual nutrients. Both slots run at init and again each year; see [Models overview — static vs dynamic](user/models-overview.md#the-confusing-words-static-and-dynamic). Person-field maths: [How Health-GPS models a person](technical/guides/how-healthgps-models-a-person.md).
 
 
-| Health-GPS whole-picture sequence diagram   |
-| ------------------------------------------- |
+| ![Health-GPS whole-picture sequence diagram](images/wholepicture_HGPS.svg) |
+|:--------------------------------------------------------------------------:|
 | *Health-GPS whole-picture sequence diagram* |
 
 
@@ -175,8 +175,8 @@ Health-GPS makes use of various types of data such as cross-sectional and longit
 demographics, socio-economic, behavioural, risk exposure, diseases, healthcare delivery and expenditure from otherwise unconnected sources, the Health-GPS *data model* adopts the [ISO 3166](https://www.iso.org/iso-3166-country-codes.html) country code to link all datasets as shown below.
 
 
-| Health-GPS Data Sources          |
-| -------------------------------- |
+| ![Health-GPS Data Sources](images/model_datasources.svg) |
+|:--------------------------------------------------------:|
 | *Health-GPS Data Reconciliation* |
 
 
@@ -191,8 +191,8 @@ The reconcile process can be extremely laborious with each dataset having to be 
 All project docs live under `documentation/`. Start at [README.md](README.md).
 
 
-| Health-GPS Documentation Guide   |
-| -------------------------------- |
+| ![Health-GPS Documentation Guide](images/documentation_guide.png) |
+|:---------------------------------------------------------------:|
 | *Health-GPS Documentation Guide* |
 
 
