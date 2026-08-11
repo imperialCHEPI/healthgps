@@ -1,10 +1,9 @@
 <style>
-  /* Mermaid: fit content column; Visio-like canvas */
+  /* Mermaid: fit content column (no sideways scroll) */
   .mermaid-scroll {
-    overflow-x: auto;
+    overflow-x: hidden;
     max-width: 100%;
     margin: 1em 0;
-    -webkit-overflow-scrolling: touch;
     background: #ffffff;
     border: 1px solid #d8d8d8;
     border-radius: 2px;
@@ -40,6 +39,8 @@
   mermaid.initialize({
     startOnLoad: false,
     theme: 'base',
+    fontSize: 20,
+    fontFamily: 'Calibri, Candara, Segoe UI, sans-serif',
     themeVariables: {
       fontFamily: 'Calibri, Candara, Segoe UI, sans-serif',
       fontSize: '20px',
@@ -73,15 +74,21 @@
       useMaxWidth: true,
       diagramMarginX: 24,
       diagramMarginY: 16,
-      actorMargin: 48,
-      width: 155,
-      height: 55,
+      actorMargin: 56,
+      width: 190,
+      height: 70,
       boxMargin: 10,
-      boxTextMargin: 6,
-      noteMargin: 12,
-      messageMargin: 40,
+      boxTextMargin: 8,
+      noteMargin: 14,
+      messageMargin: 52,
       mirrorActors: true,
       messageAlign: 'center',
+      actorFontSize: 20,
+      actorFontFamily: 'Calibri, Candara, Segoe UI, sans-serif',
+      noteFontSize: 20,
+      noteFontFamily: 'Calibri, Candara, Segoe UI, sans-serif',
+      messageFontSize: 20,
+      messageFontFamily: 'Calibri, Candara, Segoe UI, sans-serif',
     },
     flowchart: {
       useMaxWidth: true,
