@@ -1,54 +1,99 @@
 <style>
-  /* Mermaid diagrams: render at natural width; scroll horizontally when needed */
-  .mermaid-scroll,
-  .wide-diagram-scroll {
-    overflow-x: auto;
+  /* Mermaid: fit content column (no sideways scroll) */
+  .mermaid-scroll {
+    overflow-x: hidden;
     max-width: 100%;
     margin: 1em 0;
-    -webkit-overflow-scrolling: touch;
+    background: #ffffff;
+    border: 1px solid #d8d8d8;
+    border-radius: 2px;
+    padding: 0.5rem 0.25rem;
   }
 
-  .mermaid-scroll .mermaid svg,
-  .wide-diagram-scroll img {
+  .mermaid-scroll .mermaid {
+    display: flex;
+    justify-content: center;
+  }
+
+  .mermaid-scroll .mermaid svg {
     display: block;
-    max-width: none !important;
+    max-width: 100% !important;
     height: auto;
+  }
+
+  /* Static figure SVGs that should still fit the column */
+  section img[src*="schemas_overview"],
+  section img[src*="initialise_sequence"] {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    margin: 0.75em auto;
   }
 </style>
 
 <script type="module">
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
 
+  /* Palette aligned with documentation/images/initialise_sequence.svg (Visio export) */
   mermaid.initialize({
     startOnLoad: false,
-    theme: 'neutral',
+    theme: 'base',
+    fontSize: 20,
+    fontFamily: 'Calibri, Candara, Segoe UI, sans-serif',
     themeVariables: {
-      fontSize: '17px',
+      fontFamily: 'Calibri, Candara, Segoe UI, sans-serif',
+      fontSize: '20px',
+      primaryColor: '#fbe5d5',
+      primaryTextColor: '#203864',
+      primaryBorderColor: '#595959',
+      secondaryColor: '#dae2f3',
+      tertiaryColor: '#fff2cc',
+      lineColor: '#595959',
+      textColor: '#203864',
+      mainBkg: '#fbe5d5',
+      secondBkg: '#dae2f3',
+      actorBkg: '#fbe5d5',
+      actorBorder: '#595959',
+      actorTextColor: '#203864',
+      actorLineColor: '#595959',
+      signalColor: '#595959',
+      signalTextColor: '#203864',
+      labelBoxBkgColor: '#fff2cc',
+      labelBoxBorderColor: '#595959',
+      labelTextColor: '#203864',
+      loopTextColor: '#203864',
+      noteBkgColor: '#dae2f3',
+      noteTextColor: '#203864',
+      noteBorderColor: '#595959',
+      activationBkgColor: '#d8d8d8',
+      activationBorderColor: '#595959',
+      sequenceNumberColor: '#ffffff',
     },
     sequence: {
-      useMaxWidth: false,
-      diagramMarginX: 40,
-      diagramMarginY: 12,
-      actorMargin: 60,
-      width: 170,
-      height: 65,
+      useMaxWidth: true,
+      diagramMarginX: 24,
+      diagramMarginY: 16,
+      actorMargin: 56,
+      width: 190,
+      height: 70,
       boxMargin: 10,
-      boxTextMargin: 6,
-      noteMargin: 12,
-      messageMargin: 45,
+      boxTextMargin: 8,
+      noteMargin: 14,
+      messageMargin: 52,
       mirrorActors: true,
+      messageAlign: 'center',
+      actorFontSize: 20,
+      actorFontFamily: 'Calibri, Candara, Segoe UI, sans-serif',
+      noteFontSize: 20,
+      noteFontFamily: 'Calibri, Candara, Segoe UI, sans-serif',
+      messageFontSize: 20,
+      messageFontFamily: 'Calibri, Candara, Segoe UI, sans-serif',
     },
     flowchart: {
-      useMaxWidth: false,
+      useMaxWidth: true,
     },
   });
-
-  const wideDiagramPatterns = [
-    'policy_sequence',
-    'baseline_intervention_pair_sequence',
-    'wholepicture_HGPS',
-    'schemas_overview',
-  ];
 
   document.addEventListener('DOMContentLoaded', async () => {
     const blocks = document.querySelectorAll('pre > code.language-mermaid');
@@ -65,19 +110,5 @@
     if (document.querySelector('.mermaid')) {
       await mermaid.run({ querySelector: '.mermaid' });
     }
-
-    document.querySelectorAll('section img').forEach((img) => {
-      const src = img.getAttribute('src') || '';
-      if (!wideDiagramPatterns.some((pattern) => src.includes(pattern))) {
-        return;
-      }
-      if (img.parentElement?.classList.contains('wide-diagram-scroll')) {
-        return;
-      }
-      const wrapper = document.createElement('div');
-      wrapper.className = 'wide-diagram-scroll';
-      img.parentNode.insertBefore(wrapper, img);
-      wrapper.appendChild(img);
-    });
   });
 </script>
