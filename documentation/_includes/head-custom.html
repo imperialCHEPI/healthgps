@@ -1,22 +1,28 @@
 <style>
-  /* Mermaid diagrams (if any remain as code blocks) */
+  /* Mermaid: fit content column; Visio-like canvas */
   .mermaid-scroll {
     overflow-x: auto;
     max-width: 100%;
     margin: 1em 0;
     -webkit-overflow-scrolling: touch;
+    background: #ffffff;
+    border: 1px solid #d8d8d8;
+    border-radius: 2px;
+    padding: 0.5rem 0.25rem;
+  }
+
+  .mermaid-scroll .mermaid {
+    display: flex;
+    justify-content: center;
   }
 
   .mermaid-scroll .mermaid svg {
     display: block;
-    max-width: none !important;
+    max-width: 100% !important;
     height: auto;
   }
 
-  /* Sequence / figure SVGs: fit the content column cleanly (no sideways scroll) */
-  section img[src*="policy_sequence"],
-  section img[src*="baseline_intervention_pair_sequence"],
-  section img[src*="wholepicture_HGPS"],
+  /* Static figure SVGs that should still fit the column */
   section img[src*="schemas_overview"],
   section img[src*="initialise_sequence"] {
     display: block;
@@ -30,24 +36,52 @@
 <script type="module">
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
 
+  /* Palette aligned with documentation/images/initialise_sequence.svg (Visio export) */
   mermaid.initialize({
     startOnLoad: false,
-    theme: 'neutral',
+    theme: 'base',
     themeVariables: {
+      fontFamily: 'Calibri, Candara, Segoe UI, sans-serif',
       fontSize: '17px',
+      primaryColor: '#fbe5d5',
+      primaryTextColor: '#203864',
+      primaryBorderColor: '#595959',
+      secondaryColor: '#dae2f3',
+      tertiaryColor: '#fff2cc',
+      lineColor: '#595959',
+      textColor: '#203864',
+      mainBkg: '#fbe5d5',
+      secondBkg: '#dae2f3',
+      actorBkg: '#fbe5d5',
+      actorBorder: '#595959',
+      actorTextColor: '#203864',
+      actorLineColor: '#595959',
+      signalColor: '#595959',
+      signalTextColor: '#203864',
+      labelBoxBkgColor: '#fff2cc',
+      labelBoxBorderColor: '#595959',
+      labelTextColor: '#203864',
+      loopTextColor: '#203864',
+      noteBkgColor: '#dae2f3',
+      noteTextColor: '#203864',
+      noteBorderColor: '#595959',
+      activationBkgColor: '#d8d8d8',
+      activationBorderColor: '#595959',
+      sequenceNumberColor: '#ffffff',
     },
     sequence: {
       useMaxWidth: true,
-      diagramMarginX: 40,
-      diagramMarginY: 12,
-      actorMargin: 60,
-      width: 170,
-      height: 65,
+      diagramMarginX: 24,
+      diagramMarginY: 16,
+      actorMargin: 48,
+      width: 155,
+      height: 55,
       boxMargin: 10,
       boxTextMargin: 6,
       noteMargin: 12,
-      messageMargin: 45,
+      messageMargin: 40,
       mirrorActors: true,
+      messageAlign: 'center',
     },
     flowchart: {
       useMaxWidth: true,
