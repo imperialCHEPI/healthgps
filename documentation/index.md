@@ -8,6 +8,7 @@
 
 Health-GPS models the impacts of behavioural and metabolic risk factors on chronic diseases and measures lifelong outcomes so researchers can test the effectiveness of health policies and interventions. The framework has been extended for additional CHEPI-led work, including [FINCH](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/finch/), [GOLDFINCH](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/goldfinch/), [CoDiet](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/codiet/), [JACARDI](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/jacardi/), and [JA PreventNCD](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/ja-prevent-ncd/). Project-specific inputs are maintained in [HealthGPS-examples](https://github.com/imperialCHEPI/healthgps-examples); the table below links each setting to a typical example folder.
 
+
 | Setting / project       | More information                                                                                                                                                                                                       | Example inputs ([HealthGPS-examples](https://github.com/imperialCHEPI/healthgps-examples))       |
 | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
 | STOP (France-style HLM) | [STOP project](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/stop/)                                                                  | [HLM_France](https://github.com/imperialCHEPI/healthgps-examples/tree/main/HLM_France)           |
@@ -18,6 +19,7 @@ Health-GPS models the impacts of behavioural and metabolic risk factors on chron
 | JACARDI                 | [JACARDI (CHEPI)](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/jacardi/)                                                            | Use inputs in progress                                                                           |
 | JA PreventNCD           | [JA PreventNCD (CHEPI)](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/ja-prevent-ncd/)                                               | Use inputs in progress                                                                           |
 
+
 For FINCH-specific modelling (income, Kevin Hall, predictors), see the [FINCH guide](technical/guides/finch-linear-models-and-income-adjustment.md). For a full map of how every person attribute is assigned and updated, see [How Health-GPS models a person](technical/guides/how-healthgps-models-a-person.md).
 
 Health-GPS creates a *virtual population* representative of a distinct country's population and simulates close to reality life histories from birth to death of each member of the population including key characteristics such as gender, age, socio-economic status, risk factors, and disease profiles. These characteristics evolve over time and are updated in discrete time *annually* using statistical and probabilistic models which are calibrated to reproduce key demographic and epidemiological statistics from the specific country.
@@ -27,25 +29,33 @@ The model uses proprietary equations to account for a variety of complex interac
 
 The Health-GPS workflow is summarised below, datasets from many disconnected sources are used to define the various modules and components of the framework. Commonly used datasets are processed, aggregated, indexed by country, and stored in the backend *datastore*, while research specific datasets are analysed externally to build the *risk factors* and *socio-economic status* modules, design and parameterise *intervention* to be tested.
 
-| ![Health-GPS Workflow](images/general_workflow.png) |
-|:---------------------------------------------------:|
+
+| Health-GPS Workflow                   |
+| ------------------------------------- |
 | *Health-GPS General Workflow Diagram* |
+
 
 The simulation creates the virtual population, simulates the synthetic individuals over time, collects population statistics and publish to the outside world at the end of each simulated time step. It is the user's responsibility to analyse and quantify the model results, which are saved to a chosen output folder as **JSON and CSV**, and optionally **income-stratum CSVs** or **individual ID tracking** CSVs (same person IDs in baseline and intervention when tracking is enabled). See the [User Guide - Results](user/userguide.md#results) and [Policy Evaluation](#policy-evaluation) below.
 
 Health-GPS is a flexible and modular framework, written in modern C++, designed using object-oriented principles to provide the building blocks necessary to compose the overall microsimulation, several data sources, modules, and sub-model are required as shown below.
 
-| ![Health-GPS Concept](images/model_concept_diagram.png) |
-|:-------------------------------------------------------:|
+
+| Health-GPS Concept           |
+| ---------------------------- |
 | *Health-GPS Concept Diagram* |
+
+
+
 
 ### Modules Dynamic
 
 The framework defines multi-dimensional interactions on *demographics*, *risk factors*, *diseases* and *intervention* modules as shown below. The model dynamics capture the effects of the various interacting modules overtime to stablish the population *baseline* projection and quantify the impact of *interventions* on risk factors, the *burden of diseases* (BoD) module estimate population outcomes such as risk factors, disease prevalence, and health care expenditure. Finally, *the different between the two scenarios* is the effect of the intervention.
 
-| ![Health-GPS Dynamics](images/model_dynamics_diagram.svg) |
-|:---------------------------------------------------------:|
+
+| Health-GPS Dynamics           |
+| ----------------------------- |
 | *Health-GPS Dynamics Diagram* |
+
 
 A brief overview of each module is provided next, the framework has been designed to allow module composition, modellers can experiment with different module implementations at run-time.
 
@@ -74,9 +84,11 @@ The dynamics of risk factors modelling is a major challenge for health policy mo
 
 To represent childhood obesity, national dietary surveys from various European countries are analysed to build the risk factor model. Estimates of yearly changes in physical activity, diet, energy balance, and Body Mass Index (BMI) are created using dietary and anthropometric surveys. These include measures of physical activity expressed in metabolic equivalents (METs) and macronutrients intakes measures including grams of fat, carbohydrates, protein, fibre, salt, and sugar. The general concept for an EBM is shown below (top diagram), and a possible *Health-GPS* translation is provided for illustration purpose.
 
-| ![Energy Balance Model](images/energy_balance_model.svg) |
-|:--------------------------------------------------------:|
+
+| Energy Balance Model                     |
+| ---------------------------------------- |
 | *Energy balance model structure example* |
+
 
 The calibration of the equations is carried out outside of the model by gender for children and adults separately to ensure capturing gender- and age-related differences. Emphasis is placed on capturing the rapid growth and changes in children BMIs. International anthropometric references are used to properly classify individuals as normal weight, overweight or obese. This classification is used throughout the simulation to identify children with growth problems and devise appropriate policies and interventions to tackle the health issues.
 
@@ -105,108 +117,23 @@ The first run evaluates the no-intervention, *“baseline scenario”* where dem
 
 Policies are configured in `running` (scenario type, `policy_start_year`) and in modelling CSVs (for example FINCH `policyeffect_model.csv` / `S*_policyeffect_model.csv`). The **same** module stack runs in both scenarios. Only the intervention scenario evaluates policy equations after the start year, and only intervention may apply optional PIF to disease incidence.
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Cfg as config.json + policy CSVs
-    participant Host as Console host
-    participant Scn as Intervention scenario
-    participant RF as Risk-factor models
-    participant Pers as Person state
-    participant Dis as Disease models
-    participant Ana as Analysis
 
-    Cfg->>Host: running.policy_start_year, scenario type
-    Cfg->>Host: Policy coefficient CSVs / scenario class
-    Host->>Scn: Create Intervention Simulation
+| Policy levers sequence diagram   |
+| -------------------------------- |
+| *Policy levers sequence diagram* |
 
-    Note over Scn,Ana: Years before policy_start_year
-    loop Each year where time_now < policy_start_year
-        Scn->>RF: Dynamic update without policy effect
-        RF->>Pers: Update foods, PA, weight, BMI as usual
-        Scn->>Dis: Incidence without PIF
-        Scn->>Ana: Publish year (looks like baseline path)
-    end
 
-    Note over Scn,Ana: Policy window (time_now >= policy_start_year)
-    loop Each year in the policy window
-        Scn->>RF: Evaluate policy linear model on predictors
-        Note right of RF: e.g. intercept + beta * log_income,<br/>log_EnergyIntake, gender2, region dummies
-        RF->>Pers: Apply policy delta / trend to targeted risk factors
-        Note right of Pers: clamp to configured ranges<br/>optional factors-mean re-alignment
-        Scn->>Dis: Incidence with optional PIF
-        Note right of Dis: P := incidence * RR / meanRR * (1 - PIF)
-        Dis->>Pers: New active disease cases (or remissions)
-        Scn->>Ana: Publish intervention year aggregates
-    end
-
-    Ana-->>Host: Intervention JSON / CSV / optional ID tracking
-```
-
-*Policy sequence: before `policy_start_year` the intervention run follows the no-policy path; afterwards policy equations and optional PIF change risk factors and disease incidence. FINCH policy naming: [FINCH guide](technical/guides/finch-linear-models-and-income-adjustment.md).*
+*Policy sequence: before* `policy_start_year` *the intervention run follows the no-policy path; afterwards policy equations and optional PIF change risk factors and disease incidence. FINCH policy naming: [FINCH guide](technical/guides/finch-linear-models-and-income-adjustment.md).*
 
 ### Baseline and intervention paired run
 
 When an intervention is configured, the **Runner** starts baseline and intervention simulations together (separate threads, separate `Person` populations). Synchronisation is **one-way: baseline → intervention** over a `SyncChannel`, and only **aggregate** tables are transferred (not individual people). Initial cohort person IDs match across scenarios (`id = slot + 1`) so optional ID tracking can compare the same starting individuals.
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Host as Console / Runner
-    participant Base as Baseline Simulation
-    participant Chan as SyncChannel
-    participant Intv as Intervention Simulation
-    participant OutB as Baseline outputs
-    participant OutI as Intervention outputs
 
-    Host->>Base: Create Simulation(ScenarioType::baseline)
-    Host->>Intv: Create Simulation(ScenarioType::intervention)
-    Note over Base,Intv: Same config, datastore, seeds, population size<br/>Initial IDs 1..N match across scenarios
+| Baseline and intervention paired run sequence diagram   |
+| ------------------------------------------------------- |
+| *Baseline and intervention paired run sequence diagram* |
 
-    par Initialise both populations
-        Base->>Base: Demographics, SES, static+dynamic RF, diseases
-        Intv->>Intv: Same init order (no policy yet if before start year)
-    end
-
-    loop Each simulated year
-        rect rgba(226, 239, 217, 0.4)
-            Note over Base,Chan: Baseline computes shared aggregates
-            Base->>Base: Demographic update (deaths, age++, births)
-            Base->>Chan: Send ResidualMortalityMessage age x sex
-            Base->>Base: Net immigration vs expected population
-            Base->>Chan: Send NetImmigrationMessage age x sex
-            Base->>Base: SES, RF update, diseases (no policy / no PIF)
-            opt Factors-mean / Kevin Hall adjustments enabled
-                Base->>Chan: Send adjustment tables (RF means / weight)
-            end
-            Base->>OutB: Publish ResultEventMessage (+ optional tracking)
-        end
-
-        rect rgba(255, 242, 204, 0.55)
-            Note over Chan,Intv: Intervention receives aggregates, then applies policy
-            Chan-->>Intv: Residual mortality table
-            Chan-->>Intv: Net immigration table
-            opt Adjustment sync present
-                Chan-->>Intv: Factors-mean / Kevin Hall adjustment tables
-            end
-            Intv->>Intv: Demographic update using synced residual mortality
-            Intv->>Intv: Apply synced net migration
-            Intv->>Intv: SES, RF update
-            alt time_now >= policy_start_year
-                Intv->>Intv: Apply policy effects to risk factors
-                Intv->>Intv: Disease update with optional PIF
-            else before policy start
-                Intv->>Intv: Disease update without PIF
-            end
-            Intv->>OutI: Publish ResultEventMessage (+ optional tracking)
-        end
-    end
-
-    Note over Host,OutI: What is NOT synced
-    Note over Host,OutI: No Person objects, no IDs, no per-person region/ethnicity/RF copies
-
-    Host->>Host: External comparison: intervention minus baseline<br/>BoD, risk-factor means, HCE, optional matched IDs
-```
 
 *Paired baseline/intervention sequence: parallel runs, one-way aggregate sync on residual mortality, net immigration, and optional adjustment tables; policy and PIF only on the intervention side. See [same-person ID plan](technical/plans/same-person-id-baseline-intervention-plan.md).*
 
@@ -222,60 +149,21 @@ Finally, detailed analysis can be carried out, externally, to compare the two si
 
 The microsimulation follows a two-step process to capture time-serial and cross-sectional correlations between risk factors, preserve the cross-sectional correlations between factors, and their hierarchical structure to allow changes to be propagated from lower to high level variables. The workflow consists of two main algorithms to *initialise* and *project* the virtual population over time respectively. Creating and *initialising* the virtual population is the first step of a simulation run, while the algorithm *projecting* the population over time is the core of the microsimulation as shown below.
 
-| ![Health-GPS Workflow Diagram](images/model_workflow_diagram.svg) |
-|:-----------------------------------------------------------------:|
+
+| Health-GPS Workflow Diagram   |
+| ----------------------------- |
 | *Health-GPS Workflow Diagram* |
+
 
 The diagram below is the whole-picture sequence for one experiment: load inputs, initialise every person, then advance year by year until the configured end time. Baseline and intervention use the same module order; only policy levers and optional PIF differ.
 
 **Risk-factor packs:** config has two slots historically named `static` and `dynamic`. Those are **pipeline roles** (initialisation-oriented pack vs time-update-oriented pack), not labels for individual nutrients. Both slots run at init and again each year; see [Models overview — static vs dynamic](user/models-overview.md#the-confusing-words-static-and-dynamic). Person-field maths: [How Health-GPS models a person](technical/guides/how-healthgps-models-a-person.md).
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Host as Console host
-    participant Sim as Simulation
-    participant Demo as Demographics
-    participant SES as SES
-    participant RF as Risk factors
-    participant Dis as Diseases
-    participant Ana as Analysis
-    participant Out as File outputs
 
-    Note over Host,Out: Setup
-    Host->>Sim: Load config, datastore, static/dynamic model packs
-    Host->>Sim: Build baseline scenario (+ optional intervention)
+| Health-GPS whole-picture sequence diagram   |
+| ------------------------------------------- |
+| *Health-GPS whole-picture sequence diagram* |
 
-    rect rgba(226, 239, 217, 0.45)
-        Note over Sim,Ana: Initialisation once per run
-        Sim->>Demo: Assign age, gender, region, ethnicity
-        Demo-->>Sim: Core demographics on each Person
-        Sim->>SES: Draw ses ~ Normal(mu, sigma)
-        Sim->>RF: Static generate then dynamic generate
-        Note right of RF: Income, PA, foods/nutrients,<br/>height, weight, BMI as configured
-        RF-->>Sim: risk_factors (+ PA / income fields)
-        Sim->>Dis: Prevalence initialise from RR tables
-        Sim->>Ana: Initial population statistics
-    end
-
-    loop Each year from start_time to end_time
-        rect rgba(222, 235, 246, 0.45)
-            Note over Sim,Out: Yearly projection
-            Sim->>Demo: Deaths, age += 1, births
-            Sim->>Demo: Net migration in or out
-            Sim->>SES: Redraw ses for newborns only
-            Sim->>RF: Dynamic risk-factor update
-            Sim->>Dis: Remission then incidence (+ optional PIF)
-            Sim->>Ana: Publish year aggregates
-            Ana->>Out: JSON summary, main CSV
-            opt Income / ID tracking enabled
-                Ana->>Out: Income-stratum CSVs and/or IndividualIDTracking.csv
-            end
-        end
-    end
-
-    Note over Host,Out: Compare baseline vs intervention externally
-```
 
 *Whole-picture Health-GPS sequence: setup, one-time initialisation, then the yearly module loop that writes analysis outputs.*
 
@@ -286,27 +174,37 @@ The initialisation sets the simulation world clock, in years, to the user’s de
 Health-GPS makes use of various types of data such as cross-sectional and longitudinal surveys to produce consistent estimates of a particular variable of interest. To reconcile large swathes of datasets describing determinants of health,
 demographics, socio-economic, behavioural, risk exposure, diseases, healthcare delivery and expenditure from otherwise unconnected sources, the Health-GPS *data model* adopts the [ISO 3166](https://www.iso.org/iso-3166-country-codes.html) country code to link all datasets as shown below.
 
-| ![Health-GPS Data Sources](images/model_datasources.svg) |
-|:--------------------------------------------------------:|
+
+| Health-GPS Data Sources          |
+| -------------------------------- |
 | *Health-GPS Data Reconciliation* |
+
 
 The reconcile process can be extremely laborious with each dataset having to be processed individually to for general data cleansing, map country code, use consistent unit of measurement, filling gaps, and smoothing. Health-GPS assumes complete datasets, all data processing must take place out outside of the model.
 
 ---
 
+
+
 ## Documentation map
 
 All project docs live under `documentation/`. Start at [README.md](README.md).
 
-| ![Health-GPS Documentation Guide](images/documentation_guide.png) |
-|:--------------------------------------------------------:|
+
+| Health-GPS Documentation Guide   |
+| -------------------------------- |
 | *Health-GPS Documentation Guide* |
+
+
 
 | Folder                   | Audience                   | Contents                                                                                                                                                                         |
 | ------------------------ | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [user/](user/)           | Modellers, policy analysts | [Quick Start](user/getstarted.md), [User Guide](user/userguide.md), [Schemas](user/schemas.md), [Models overview](user/models-overview.md) - [user index](user/README.md)        |
 | [developer/](developer/) | Software developers        | Architecture, data model, build guide, [Pages deploy troubleshooting](developer/docs-deploy-troubleshooting.md), MSVC note, GitHub flow - [developer index](developer/README.md) |
 | [technical/](technical/) | Economists and developers  | FINCH guide, [simulation models reference](technical/guides/simulation-models-reference.md), update reports, feature plans - [technical index](technical/README.md)              |
+
+
+
 
 ### Recommended starting points
 
@@ -322,7 +220,10 @@ All project docs live under `documentation/`. Start at [README.md](README.md).
 - Pages deploy failed (Configure HealthGPS) -> [Docs deploy troubleshooting](developer/docs-deploy-troubleshooting.md)
 - Documentation questions -> see **Author** at the bottom of each page ([documentation index](README.md))
 
+
+
 ### Cross-area navigation
+
 
 | From                                   | To                                                                                           |
 | -------------------------------------- | -------------------------------------------------------------------------------------------- |
@@ -330,6 +231,7 @@ All project docs live under `documentation/`. Start at [README.md](README.md).
 | [User index](user/README.md)           | [Developer index](developer/README.md) / [Technical index](technical/README.md)              |
 | [Developer index](developer/README.md) | [User index](user/README.md) / [MSVC note](developer/msvc-windows-build-troubleshooting.md)  |
 | [Technical index](technical/README.md) | [Developer Guide](developer/development.md) / [User Guide](user/userguide.md)                |
+
 
 ---
 

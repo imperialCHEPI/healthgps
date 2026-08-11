@@ -1,13 +1,15 @@
 <style>
   /* Mermaid diagrams: render at natural width; scroll horizontally when needed */
-  .mermaid-scroll {
+  .mermaid-scroll,
+  .wide-diagram-scroll {
     overflow-x: auto;
     max-width: 100%;
     margin: 1em 0;
     -webkit-overflow-scrolling: touch;
   }
 
-  .mermaid-scroll .mermaid svg {
+  .mermaid-scroll .mermaid svg,
+  .wide-diagram-scroll img {
     display: block;
     max-width: none !important;
     height: auto;
@@ -41,6 +43,13 @@
     },
   });
 
+  const wideDiagramPatterns = [
+    'policy_sequence',
+    'baseline_intervention_pair_sequence',
+    'wholepicture_HGPS',
+    'schemas_overview',
+  ];
+
   document.addEventListener('DOMContentLoaded', async () => {
     const blocks = document.querySelectorAll('pre > code.language-mermaid');
     for (const code of blocks) {
@@ -56,5 +65,19 @@
     if (document.querySelector('.mermaid')) {
       await mermaid.run({ querySelector: '.mermaid' });
     }
+
+    document.querySelectorAll('section img').forEach((img) => {
+      const src = img.getAttribute('src') || '';
+      if (!wideDiagramPatterns.some((pattern) => src.includes(pattern))) {
+        return;
+      }
+      if (img.parentElement?.classList.contains('wide-diagram-scroll')) {
+        return;
+      }
+      const wrapper = document.createElement('div');
+      wrapper.className = 'wide-diagram-scroll';
+      img.parentNode.insertBefore(wrapper, img);
+      wrapper.appendChild(img);
+    });
   });
 </script>
