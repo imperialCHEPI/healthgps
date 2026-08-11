@@ -1,7 +1,6 @@
 <style>
-  /* Mermaid diagrams: render at natural width; scroll horizontally when needed */
-  .mermaid-scroll,
-  .wide-diagram-scroll {
+  /* Mermaid diagrams (if any remain as code blocks) */
+  .mermaid-scroll {
     overflow-x: auto;
     max-width: 100%;
     margin: 1em 0;
@@ -14,17 +13,14 @@
     height: auto;
   }
 
-  /* Wide sequence SVGs: keep readable size; scroll sideways instead of shrinking */
-  .wide-diagram-scroll img {
-    display: block;
-    max-width: none !important;
-    width: auto;
-    height: auto;
-  }
-
-  /* Compact Visio-style diagrams can still fit the column */
+  /* Sequence / figure SVGs: fit the content column cleanly (no sideways scroll) */
+  section img[src*="policy_sequence"],
+  section img[src*="baseline_intervention_pair_sequence"],
+  section img[src*="wholepicture_HGPS"],
+  section img[src*="schemas_overview"],
   section img[src*="initialise_sequence"] {
     display: block;
+    width: 100%;
     max-width: 100%;
     height: auto;
     margin: 0.75em auto;
@@ -41,7 +37,7 @@
       fontSize: '17px',
     },
     sequence: {
-      useMaxWidth: false,
+      useMaxWidth: true,
       diagramMarginX: 40,
       diagramMarginY: 12,
       actorMargin: 60,
@@ -54,16 +50,9 @@
       mirrorActors: true,
     },
     flowchart: {
-      useMaxWidth: false,
+      useMaxWidth: true,
     },
   });
-
-  const wideDiagramPatterns = [
-    'policy_sequence',
-    'baseline_intervention_pair_sequence',
-    'wholepicture_HGPS',
-    'schemas_overview',
-  ];
 
   document.addEventListener('DOMContentLoaded', async () => {
     const blocks = document.querySelectorAll('pre > code.language-mermaid');
@@ -80,19 +69,5 @@
     if (document.querySelector('.mermaid')) {
       await mermaid.run({ querySelector: '.mermaid' });
     }
-
-    document.querySelectorAll('section img').forEach((img) => {
-      const src = img.getAttribute('src') || '';
-      if (!wideDiagramPatterns.some((pattern) => src.includes(pattern))) {
-        return;
-      }
-      if (img.parentElement?.classList.contains('wide-diagram-scroll')) {
-        return;
-      }
-      const wrapper = document.createElement('div');
-      wrapper.className = 'wide-diagram-scroll';
-      img.parentNode.insertBefore(wrapper, img);
-      wrapper.appendChild(img);
-    });
   });
 </script>
