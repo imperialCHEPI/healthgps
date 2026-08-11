@@ -8,11 +8,26 @@
     -webkit-overflow-scrolling: touch;
   }
 
-  .mermaid-scroll .mermaid svg,
-  .wide-diagram-scroll img {
+  .mermaid-scroll .mermaid svg {
     display: block;
     max-width: none !important;
     height: auto;
+  }
+
+  /* Wide sequence SVGs: keep readable size; scroll sideways instead of shrinking */
+  .wide-diagram-scroll img {
+    display: block;
+    max-width: none !important;
+    width: auto;
+    height: auto;
+  }
+
+  /* Compact Visio-style diagrams can still fit the column */
+  section img[src*="initialise_sequence"] {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 0.75em auto;
   }
 </style>
 
