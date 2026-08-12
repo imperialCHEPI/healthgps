@@ -135,7 +135,7 @@ sequenceDiagram
         RF->>Pers: Apply policy delta / trend to targeted risk factors
         Note right of Pers: clamp to configured ranges<br/>optional factors-mean re-alignment
         Scn->>Dis: Incidence with optional PIF
-        Note right of Dis: P := incidence * RR / meanRR * (1 - PIF)
+        Note right of Dis: P = incidence * RR / meanRR * (1 - PIF)
         Dis->>Pers: New active disease cases (or remissions)
         Scn->>Ana: Publish intervention year aggregates
     end
@@ -143,7 +143,7 @@ sequenceDiagram
     Ana-->>Host: Intervention JSON / CSV / optional ID tracking
 ```
 
-*Policy sequence: before `policy_start_year` the intervention run follows the no-policy path; afterwards policy equations and optional PIF change risk factors and disease incidence. FINCH policy naming: [FINCH guide](technical/guides/finch-linear-models-and-income-adjustment.md).*
+*Policy sequence: before* `policy_start_year` *the intervention run follows the no-policy path; afterwards policy equations and optional PIF change risk factors and disease incidence. FINCH policy naming: [FINCH guide](technical/guides/finch-linear-models-and-income-adjustment.md).*
 
 ### Baseline and intervention paired run
 
@@ -159,8 +159,8 @@ sequenceDiagram
     participant OutB as Baseline outputs
     participant OutI as Intervention outputs
 
-    Host->>Base: Create Simulation(ScenarioType::baseline)
-    Host->>Intv: Create Simulation(ScenarioType::intervention)
+    Host->>Base: Create Simulation baseline
+    Host->>Intv: Create Simulation intervention
     Note over Base,Intv: Same config, datastore, seeds, population size<br/>Initial IDs 1..N match across scenarios
 
     par Initialise both populations
@@ -169,37 +169,33 @@ sequenceDiagram
     end
 
     loop Each simulated year
-        rect rgba(226, 239, 217, 0.4)
-            Note over Base,Chan: Baseline computes shared aggregates
-            Base->>Base: Demographic update (deaths, age++, births)
-            Base->>Chan: Send ResidualMortalityMessage age x sex
-            Base->>Base: Net immigration vs expected population
-            Base->>Chan: Send NetImmigrationMessage age x sex
-            Base->>Base: SES, RF update, diseases (no policy / no PIF)
-            opt Factors-mean / Kevin Hall adjustments enabled
-                Base->>Chan: Send adjustment tables (RF means / weight)
-            end
-            Base->>OutB: Publish ResultEventMessage (+ optional tracking)
+        Note over Base,Chan: Baseline computes shared aggregates
+        Base->>Base: Demographic update (deaths, age++, births)
+        Base->>Chan: Send ResidualMortalityMessage age x sex
+        Base->>Base: Net immigration vs expected population
+        Base->>Chan: Send NetImmigrationMessage age x sex
+        Base->>Base: SES, RF update, diseases (no policy / no PIF)
+        opt Factors-mean / Kevin Hall adjustments enabled
+            Base->>Chan: Send adjustment tables (RF means / weight)
         end
+        Base->>OutB: Publish ResultEventMessage (+ optional tracking)
 
-        rect rgba(255, 242, 204, 0.55)
-            Note over Chan,Intv: Intervention receives aggregates, then applies policy
-            Chan-->>Intv: Residual mortality table
-            Chan-->>Intv: Net immigration table
-            opt Adjustment sync present
-                Chan-->>Intv: Factors-mean / Kevin Hall adjustment tables
-            end
-            Intv->>Intv: Demographic update using synced residual mortality
-            Intv->>Intv: Apply synced net migration
-            Intv->>Intv: SES, RF update
-            alt time_now >= policy_start_year
-                Intv->>Intv: Apply policy effects to risk factors
-                Intv->>Intv: Disease update with optional PIF
-            else before policy start
-                Intv->>Intv: Disease update without PIF
-            end
-            Intv->>OutI: Publish ResultEventMessage (+ optional tracking)
+        Note over Chan,Intv: Intervention receives aggregates, then applies policy
+        Chan-->>Intv: Residual mortality table
+        Chan-->>Intv: Net immigration table
+        opt Adjustment sync present
+            Chan-->>Intv: Factors-mean / Kevin Hall adjustment tables
         end
+        Intv->>Intv: Demographic update using synced residual mortality
+        Intv->>Intv: Apply synced net migration
+        Intv->>Intv: SES, RF update
+        alt time_now >= policy_start_year
+            Intv->>Intv: Apply policy effects to risk factors
+            Intv->>Intv: Disease update with optional PIF
+        else before policy start
+            Intv->>Intv: Disease update without PIF
+        end
+        Intv->>OutI: Publish ResultEventMessage (+ optional tracking)
     end
 
     Note over Host,OutI: What is NOT synced
@@ -246,11 +242,11 @@ sequenceDiagram
     Host->>Sim: Load config, datastore, static/dynamic model packs
     Host->>Sim: Build baseline scenario (+ optional intervention)
 
-    rect rgba(226, 239, 217, 0.45)
+    rect rgb(251, 229, 213)
         Note over Sim,Ana: Initialisation once per run
         Sim->>Demo: Assign age, gender, region, ethnicity
         Demo-->>Sim: Core demographics on each Person
-        Sim->>SES: Draw ses ~ Normal(mu, sigma)
+        Sim->>SES: Draw ses from Normal(mu, sigma)
         Sim->>RF: Static generate then dynamic generate
         Note right of RF: Income, PA, foods/nutrients,<br/>height, weight, BMI as configured
         RF-->>Sim: risk_factors (+ PA / income fields)
@@ -259,18 +255,16 @@ sequenceDiagram
     end
 
     loop Each year from start_time to end_time
-        rect rgba(222, 235, 246, 0.45)
-            Note over Sim,Out: Yearly projection
-            Sim->>Demo: Deaths, age += 1, births
-            Sim->>Demo: Net migration in or out
-            Sim->>SES: Redraw ses for newborns only
-            Sim->>RF: Dynamic risk-factor update
-            Sim->>Dis: Remission then incidence (+ optional PIF)
-            Sim->>Ana: Publish year aggregates
-            Ana->>Out: JSON summary, main CSV
-            opt Income / ID tracking enabled
-                Ana->>Out: Income-stratum CSVs and/or IndividualIDTracking.csv
-            end
+        Note over Sim,Out: Yearly projection
+        Sim->>Demo: Deaths, age + 1, births
+        Sim->>Demo: Net migration in or out
+        Sim->>SES: Redraw ses for newborns only
+        Sim->>RF: Dynamic risk-factor update
+        Sim->>Dis: Remission then incidence (+ optional PIF)
+        Sim->>Ana: Publish year aggregates
+        Ana->>Out: JSON summary, main CSV
+        opt Income / ID tracking enabled
+            Ana->>Out: Income-stratum CSVs and/or IndividualIDTracking.csv
         end
     end
 
@@ -299,7 +293,7 @@ The reconcile process can be extremely laborious with each dataset having to be 
 All project docs live under `documentation/`. Start at [README.md](README.md).
 
 | ![Health-GPS Documentation Guide](images/documentation_guide.png) |
-|:--------------------------------------------------------:|
+|:---------------------------------------------------------------:|
 | *Health-GPS Documentation Guide* |
 
 | Folder                   | Audience                   | Contents                                                                                                                                                                         |
