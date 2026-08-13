@@ -381,6 +381,259 @@ void print_income_stratum_adjustment_examples_table(
     std::osyncstream(std::cout) << out.str();
 }
 
+struct PolicyPredictorDetail {
+    std::string name;
+    double value{};
+    double coefficient{};
+    double contribution{};
+};
+
+struct PolicyApplyExampleRow {
+    std::size_t bucket{};
+    std::string stratum_id;
+    std::size_t person_id{};
+    std::string factor;
+    std::string sex;
+    int age{};
+    double gender2{};
+    double linear{};
+    double residual{};
+    double policy_pct{};
+    double current_value{};
+    double after_policy_value{};
+    double final_value{};
+    std::vector<PolicyPredictorDetail> predictor_details;
+};
+
+bool should_print_policy_debug_tables(const RuntimeContext &context, bool intervene) {
+    if (!intervene || context.scenario().type() != ScenarioType::intervention) {
+        return false;
+    }
+    const int current_year = context.time_now();
+    const int policy_start_year = static_cast<int>(context.inputs().run().policy_start_year);
+    return current_year == policy_start_year || current_year == (policy_start_year + 1);
+}
+
+std::size_t policy_debug_row_score(const PolicyApplyExampleRow &row) {
+    std::size_t score = static_cast<std::size_t>(row.bucket + 1u) * 2654435761u;
+    score ^= static_cast<std::size_t>(row.person_id) * 2246822519u;
+    score ^= static_cast<std::size_t>(row.age + 4099) * 3266489917u;
+    score ^= static_cast<std::size_t>(row.factor.size()) * 668265263u;
+    for (const char c : row.factor) {
+        score =
+            (score * 131u) ^ static_cast<std::size_t>(std::tolower(static_cast<unsigned char>(c)));
+    }
+    score ^= static_cast<std::size_t>(row.sex == "male" ? 17u : 31u);
+    return score;
+}
+
+void collect_policy_apply_debug_rows(
+    const Population &population, const std::vector<core::Identifier> &names,
+    const std::vector<IncomeStratumExpectedTableEntry> &stratum_tables,
+    core::Gender gender2_indicator, std::vector<PolicyApplyExampleRow> &rows_out) {
+    rows_out.clear();
+    rows_out.reserve(80);
+    std::vector<std::pair<std::size_t, PolicyApplyExampleRow>> scored_rows;
+    scored_rows.reserve(80);
+
+    constexpr std::size_t max_sampled_rows = 80u;
+    constexpr std::size_t sampling_stride = 97u;
+
+    for (const auto &person : population) {
+        if (!person.is_active()) {
+            continue;
+        }
+        const std::string sex_label = person.gender == core::Gender::male ? "male" : "female";
+        const double gender2_value = gender2_regression_value(person, gender2_indicator);
+
+        for (std::size_t i = 0; i < names.size(); ++i) {
+            const auto policy_name = core::Identifier{names[i].to_string() + "_policy"};
+            if (!person.risk_factors.contains(policy_name) ||
+                !person.risk_factors.contains(names[i])) {
+                continue;
+            }
+
+            PolicyApplyExampleRow row;
+            row.bucket =
+                person.has_income_adjustment_stratum ? person.income_adjustment_stratum : 0u;
+            if (person.has_income_adjustment_stratum && row.bucket < stratum_tables.size()) {
+                row.stratum_id = stratum_tables[row.bucket].first;
+            } else {
+                row.stratum_id = "n/a";
+            }
+            row.person_id = person.id();
+            row.factor = names[i].to_string();
+            row.sex = sex_label;
+            row.age = person.age;
+            row.gender2 = gender2_value;
+            row.policy_pct = person.risk_factors.at(policy_name);
+
+            const auto residual_name = core::Identifier{names[i].to_string() + "_policy_residual"};
+            row.residual = person.risk_factors.contains(residual_name)
+                               ? person.risk_factors.at(residual_name)
+                               : 0.0;
+
+            row.current_value = person.risk_factors.at(names[i]);
+            row.after_policy_value = row.current_value * (1.0 + row.policy_pct / 100.0);
+
+            const auto score = policy_debug_row_score(row);
+            if (score % sampling_stride != 0u) {
+                continue;
+            }
+            scored_rows.emplace_back(score, std::move(row));
+        }
+    }
+
+    if (scored_rows.empty()) {
+        return;
+    }
+
+    std::ranges::sort(scored_rows, [](const auto &lhs, const auto &rhs) {
+        if (lhs.first != rhs.first) {
+            return lhs.first < rhs.first;
+        }
+        return lhs.second.person_id < rhs.second.person_id;
+    });
+    if (scored_rows.size() > max_sampled_rows) {
+        scored_rows.resize(max_sampled_rows);
+    }
+
+    rows_out.reserve(scored_rows.size());
+    for (auto &[score, row] : scored_rows) {
+        (void)score;
+        rows_out.push_back(std::move(row));
+    }
+}
+
+std::vector<PolicyPredictorDetail>
+build_policy_predictor_details(const Person &person, const LinearModelParams &model,
+                               const LinearModelEvalOptions &options) {
+    const auto try_predictor_value =
+        [&person, &options](const core::Identifier &name) -> std::optional<double> {
+        try {
+            return get_linear_predictor_value(person, name, options);
+        } catch (const std::exception &) {
+            if (options.missing_predictor_fallback) {
+                return options.missing_predictor_fallback(name);
+            }
+            return std::nullopt;
+        }
+    };
+
+    std::vector<PolicyPredictorDetail> details;
+    details.reserve(model.coefficients.size() + model.log_coefficients.size() + 1u);
+    details.push_back({"Intercept", 1.0, model.intercept, model.intercept});
+
+    for (const auto &[name, coef] : model.coefficients) {
+        if (is_metadata_predictor(name)) {
+            continue;
+        }
+        const auto value = try_predictor_value(name);
+        if (!value.has_value()) {
+            continue;
+        }
+        details.push_back({name.to_string(), *value, coef, coef * *value});
+    }
+
+    for (const auto &[name, coef] : model.log_coefficients) {
+        auto value = try_predictor_value(name);
+        if (!value.has_value()) {
+            continue;
+        }
+        if (*value <= 0.0) {
+            *value = 1e-10;
+        }
+        const double log_value = std::log(*value);
+        details.push_back(
+            {fmt::format("log_{}", name.to_string()), log_value, coef, coef * log_value});
+    }
+
+    std::ranges::sort(details,
+                      [](const PolicyPredictorDetail &lhs, const PolicyPredictorDetail &rhs) {
+                          if (lhs.name == "Intercept") {
+                              return true;
+                          }
+                          if (rhs.name == "Intercept") {
+                              return false;
+                          }
+                          return lhs.name < rhs.name;
+                      });
+    return details;
+}
+
+void print_policy_sample_predictor_values(const std::vector<PolicyApplyExampleRow> &rows,
+                                          const std::vector<std::size_t> &selected_indices,
+                                          int year, core::Gender gender2_indicator) {
+    if (rows.empty() || selected_indices.empty()) {
+        return;
+    }
+
+    const auto gender2_label = gender2_indicator == core::Gender::male ? "male" : "female";
+    std::ostringstream out;
+    out << "\n[MAHIMA][POLICY PREDICTOR VALUES] Year " << year
+        << " gender2_indicator=" << gender2_label << '\n';
+    for (const auto idx : selected_indices) {
+        const auto &row = rows[idx];
+        if (row.predictor_details.empty()) {
+            continue;
+        }
+        out << "PersonID=" << row.person_id << " Factor=" << row.factor << " Sex=" << row.sex
+            << " Age=" << row.age << " Stratum=" << row.stratum_id
+            << " Linear=" << fmt::format("{:.5f}", row.linear)
+            << " Residual=" << fmt::format("{:.5f}", row.residual) << '\n';
+        out << std::setw(18) << std::left << "Predictor" << std::setw(14) << std::right << "Value"
+            << std::setw(14) << "Coefficient" << std::setw(14) << "Contribution" << '\n';
+        for (const auto &detail : row.predictor_details) {
+            out << std::setw(18) << std::left << detail.name << std::setw(14) << std::right
+                << fmt::format("{:.7f}", detail.value) << std::setw(14)
+                << fmt::format("{:.7f}", detail.coefficient) << std::setw(14)
+                << fmt::format("{:.7f}", detail.contribution) << '\n';
+        }
+        out << '\n';
+    }
+    std::osyncstream(std::cout) << out.str();
+}
+
+std::vector<std::size_t>
+select_policy_debug_row_indices(const std::vector<PolicyApplyExampleRow> &rows,
+                                std::size_t max_rows_to_print) {
+    std::vector<std::size_t> selected_indices;
+    selected_indices.reserve(std::min(max_rows_to_print, rows.size()));
+    if (rows.size() <= max_rows_to_print) {
+        for (std::size_t i = 0; i < rows.size(); ++i) {
+            selected_indices.push_back(i);
+        }
+        return selected_indices;
+    }
+
+    std::vector<std::pair<std::size_t, std::size_t>> scored_indices;
+    scored_indices.reserve(rows.size());
+    for (std::size_t i = 0; i < rows.size(); ++i) {
+        scored_indices.emplace_back(policy_debug_row_score(rows[i]), i);
+    }
+    std::ranges::sort(scored_indices, [](const auto &lhs, const auto &rhs) {
+        if (lhs.first != rhs.first) {
+            return lhs.first < rhs.first;
+        }
+        return lhs.second < rhs.second;
+    });
+    for (std::size_t i = 0; i < max_rows_to_print; ++i) {
+        selected_indices.push_back(scored_indices[i].second);
+    }
+    return selected_indices;
+}
+
+void print_policy_debug_tables(const std::vector<PolicyApplyExampleRow> &rows, int year,
+                               core::Gender gender2_indicator) {
+    if (rows.empty()) {
+        return;
+    }
+
+    constexpr std::size_t max_rows_to_print = 10u;
+    const auto selected_indices = select_policy_debug_row_indices(rows, max_rows_to_print);
+    print_policy_sample_predictor_values(rows, selected_indices, year, gender2_indicator);
+}
+
 } // namespace
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
@@ -1290,12 +1543,76 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 
     // Apply policies if intervening.
     if (has_active_policies_) {
+        std::vector<PolicyApplyExampleRow> policy_debug_rows;
+        const bool log_policy_examples = should_print_policy_debug_tables(context, intervene);
+        if (log_policy_examples) {
+            std::cout << "\n[MAHIMA][POLICY PREDICTOR VALUES] Year " << context.time_now()
+                      << " — collecting policy debug samples...\n";
+            collect_policy_apply_debug_rows(context.population(), names_,
+                                            income_stratum_expected_tables_, gender2_indicator_,
+                                            policy_debug_rows);
+        }
+
         for (auto &person : context.population()) {
             if (!person.is_active()) {
                 continue;
             }
 
             apply_policies(person, intervene);
+        }
+
+        if (log_policy_examples && !policy_debug_rows.empty()) {
+            try {
+                std::unordered_map<std::string, std::size_t> factor_index;
+                factor_index.reserve(names_.size());
+                for (std::size_t i = 0; i < names_.size(); ++i) {
+                    factor_index.emplace(names_[i].to_string(), i);
+                }
+
+                std::unordered_map<std::size_t, std::vector<double>> linear_by_person;
+                linear_by_person.reserve(policy_debug_rows.size());
+                for (auto &row : policy_debug_rows) {
+                    const auto person_it = std::find_if(
+                        context.population().begin(), context.population().end(),
+                        [&](const Person &person) { return person.id() == row.person_id; });
+                    if (person_it == context.population().end()) {
+                        continue;
+                    }
+
+                    const auto factor_it = factor_index.find(row.factor);
+                    if (factor_it == factor_index.end()) {
+                        continue;
+                    }
+
+                    const auto factor_idx = factor_it->second;
+                    const auto &factor_id = names_[factor_idx];
+                    if (person_it->risk_factors.contains(factor_id)) {
+                        row.final_value = person_it->risk_factors.at(factor_id);
+                    } else {
+                        row.final_value = row.after_policy_value;
+                    }
+
+                    if (!linear_by_person.contains(row.person_id)) {
+                        linear_by_person.emplace(
+                            row.person_id,
+                            compute_linear_models(context, *person_it, policy_models_));
+                    }
+                    const auto &linear = linear_by_person.at(row.person_id);
+                    if (factor_idx < linear.size()) {
+                        row.linear = linear[factor_idx];
+                    }
+
+                    row.predictor_details = build_policy_predictor_details(
+                        *person_it, policy_models_[factor_idx],
+                        linear_eval_options_for_person(context, *person_it));
+                }
+
+                print_policy_debug_tables(policy_debug_rows, context.time_now(),
+                                          gender2_indicator_);
+            } catch (const std::exception &ex) {
+                std::cout << "\n[MAHIMA][POLICY PREDICTOR VALUES] Debug output skipped: "
+                          << ex.what() << '\n';
+            }
         }
     }
 }
@@ -1775,43 +2092,7 @@ StaticLinearModel::compute_linear_models(RuntimeContext &context, Person &person
     std::vector<double> linear{};
     linear.reserve(names_.size());
 
-    // MAHIMA: Age for linear models is user-specific. If project_requirements.demographics
-    // max_age_for_linear_models is set and > 0, cap age to that value for age/age2/age3 terms.
-    const auto &req = context.inputs().project_requirements();
-    const auto &max_age_opt = req.demographics.max_age_for_linear_models;
-    std::optional<double> capped_age{};
-    if (max_age_opt.has_value() && *max_age_opt > 0) {
-        const auto person_age_d = static_cast<double>(person.age);
-        const auto cap_d = static_cast<double>(*max_age_opt);
-        capped_age = person_age_d < cap_d ? person_age_d : cap_d;
-    }
-
-    static const core::Identifier log_energy_intake_id("log_energy_intake");
-    static const core::Identifier energyintake_id("energyintake");
-
-    LinearModelEvalOptions options = base_linear_eval_options();
-    options.capped_age = capped_age;
-    options.missing_predictor_fallback =
-        [this, &context,
-         &person](const core::Identifier &coefficient_name) -> std::optional<double> {
-        try {
-            const std::string &coef_key = coefficient_name.to_string();
-            if (coefficient_name == log_energy_intake_id ||
-                core::case_insensitive::equals(coef_key, "log_energyintake")) {
-                double expected_value = get_expected(context, person.gender, person.age,
-                                                     energyintake_id, std::nullopt, false);
-                if (expected_value <= 0) {
-                    expected_value = 1e-10;
-                }
-                return std::log(expected_value);
-            }
-            double expected_value = get_expected(context, person.gender, person.age,
-                                                 coefficient_name, std::nullopt, false);
-            return expected_value;
-        } catch (...) {
-            return std::nullopt;
-        }
-    };
+    const LinearModelEvalOptions options = linear_eval_options_for_person(context, person);
 
     for (size_t i = 0; i < names_.size(); i++) {
         if (i >= models.size()) {
@@ -2359,6 +2640,46 @@ StaticLinearModel::build_extended_factors_list(RuntimeContext &context,
 LinearModelEvalOptions StaticLinearModel::base_linear_eval_options() const noexcept {
     LinearModelEvalOptions options;
     options.gender2_indicator = gender2_indicator_;
+    return options;
+}
+
+LinearModelEvalOptions StaticLinearModel::linear_eval_options_for_person(RuntimeContext &context,
+                                                                         Person &person) const {
+    const auto &req = context.inputs().project_requirements();
+    const auto &max_age_opt = req.demographics.max_age_for_linear_models;
+    std::optional<double> capped_age{};
+    if (max_age_opt.has_value() && *max_age_opt > 0) {
+        const auto person_age_d = static_cast<double>(person.age);
+        const auto cap_d = static_cast<double>(*max_age_opt);
+        capped_age = person_age_d < cap_d ? person_age_d : cap_d;
+    }
+
+    static const core::Identifier log_energy_intake_id("log_energy_intake");
+    static const core::Identifier energyintake_id("energyintake");
+
+    LinearModelEvalOptions options = base_linear_eval_options();
+    options.capped_age = capped_age;
+    options.missing_predictor_fallback =
+        [this, &context,
+         &person](const core::Identifier &coefficient_name) -> std::optional<double> {
+        try {
+            const std::string &coef_key = coefficient_name.to_string();
+            if (coefficient_name == log_energy_intake_id ||
+                core::case_insensitive::equals(coef_key, "log_energyintake")) {
+                double expected_value = get_expected(context, person.gender, person.age,
+                                                     energyintake_id, std::nullopt, false);
+                if (expected_value <= 0) {
+                    expected_value = 1e-10;
+                }
+                return std::log(expected_value);
+            }
+            double expected_value = get_expected(context, person.gender, person.age,
+                                                 coefficient_name, std::nullopt, false);
+            return expected_value;
+        } catch (...) {
+            return std::nullopt;
+        }
+    };
     return options;
 }
 
