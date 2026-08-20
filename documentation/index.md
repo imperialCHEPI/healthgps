@@ -18,7 +18,7 @@ Health-GPS models the impacts of behavioural and metabolic risk factors on chron
 | JACARDI                 | [JACARDI (CHEPI)](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/jacardi/)                                                            | Use inputs in progress                                                                           |
 | JA PreventNCD           | [JA PreventNCD (CHEPI)](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/research/ja-prevent-ncd/)                                               | Use inputs in progress                                                                           |
 
-For FINCH-specific modelling (income, Kevin Hall, predictors), see the [FINCH guide](technical/guides/finch-linear-models-and-income-adjustment.md). For a full map of how every person attribute is assigned and updated, see [How Health-GPS models a person](technical/guides/how-healthgps-models-a-person.md).
+For FINCH-specific modelling (income, Kevin Hall, predictors), see the [FINCH guide](technical/guides/finch-linear-models-and-income-adjustment.md). For a full map of how every person attribute is assigned and updated, see [How Health-GPS models a person](technical/guides/how-healthgps-models-a-person.md). For the C++ software design (host, modules, message bus, scenarios, parallelism), see [Software & Architecture](developer/architecture.md).
 
 Health-GPS creates a *virtual population* representative of a distinct country's population and simulates close to reality life histories from birth to death of each member of the population including key characteristics such as gender, age, socio-economic status, risk factors, and disease profiles. These characteristics evolve over time and are updated in discrete time *annually* using statistical and probabilistic models which are calibrated to reproduce key demographic and epidemiological statistics from the specific country.
 The model uses proprietary equations to account for a variety of complex interactions such as risk factor-disease interactions and disease-disease interactions. Modellers are then able to evaluate health-related policies by changing some of the parameters and comparing the outputs with a *baseline* simulation. The model produces detailed quantitative outputs covering demographics, risk factors, diseases, mortality, global health estimates and health care expenditure, which could then be used to complement qualitative policy evaluation tools.
@@ -299,7 +299,7 @@ All project docs live under `documentation/`. Start at [README.md](README.md).
 | Folder                   | Audience                   | Contents                                                                                                                                                                         |
 | ------------------------ | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [user/](user/)           | Modellers, policy analysts | [Quick Start](user/getstarted.md), [User Guide](user/userguide.md), [Schemas](user/schemas.md), [Models overview](user/models-overview.md) - [user index](user/README.md)        |
-| [developer/](developer/) | Software developers        | Architecture, data model, build guide, [Pages deploy troubleshooting](developer/docs-deploy-troubleshooting.md), MSVC note, GitHub flow - [developer index](developer/README.md) |
+| [developer/](developer/) | Software developers        | [Software & Architecture](developer/architecture.md), data model, build guide, [Pages deploy troubleshooting](developer/docs-deploy-troubleshooting.md), MSVC note, GitHub flow - [developer index](developer/README.md) |
 | [technical/](technical/) | Economists and developers  | FINCH guide, [simulation models reference](technical/guides/simulation-models-reference.md), update reports, feature plans - [technical index](technical/README.md)              |
 
 ### Recommended starting points
@@ -309,6 +309,7 @@ All project docs live under `documentation/`. Start at [README.md](README.md).
 - What changed in 2026 -> [Update report](technical/guides/healthgps-update-report-2026-02-20.md)
 - Threading and HPC sizing -> [Performance guide](technical/guides/performance-optimizations.md)
 - Building from source -> [Developer Guide](developer/development.md)
+- Software design / C++ architecture -> [Software & Architecture](developer/architecture.md)
 - Per-person baseline vs intervention output -> [User Guide - Output](user/userguide.md#output)
 - Config validation / `$schema` / v1 vs v2 -> [Configuration schemas](user/schemas.md)
 - Which model does what (HLM, Kevin Hall, …) -> [Models overview](user/models-overview.md)
