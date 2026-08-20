@@ -350,9 +350,6 @@ See [Developer Guide](development.md) for CMake presets, vcpkg, tests, and HPC n
 
 ---
 
-[cpp20]: https://en.cppreference.com/w/cpp/20 "C++ 20 standard features and compiler support"
-[adevs]: https://web.ornl.gov/~nutarojj/adevs "A Discrete EVent System simulator library"
-[devs]: https://doi.org/10.1016/j.ifacol.2017.08.672 "From Discrete Event Simulation to Discrete Event Specified Systems (DEVS)"
 
 ---
 
