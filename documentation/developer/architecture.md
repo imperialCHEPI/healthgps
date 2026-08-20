@@ -8,7 +8,24 @@ This page is the engineer-facing **software architecture** for Health-GPS: how t
 
 For build/CMake, see the [Developer Guide](development.md). For entity schemas in the Datastore, see the [Data Model](datamodel.md). For person-field maths and FINCH equations, use the [technical guides](../technical/README.md)—this page points at them instead of duplicating them.
 
-**Source layout**
+## Contents
+
+1. [Source layout](#source-layout)
+2. [Components](#components)
+3. [General workflow](#general-workflow)
+4. [Host application](#host-application)
+5. [Modules and factory](#modules-and-factory)
+6. [Data model overview](#data-model-overview)
+7. [Virtual population: initialise and update](#virtual-population-initialise-and-update)
+8. [Risk-factor pipeline](#risk-factor-pipeline)
+9. [Energy balance / Kevin Hall](#energy-balance--kevin-hall)
+10. [Message bus](#message-bus)
+11. [Policy levers](#policy-levers)
+12. [Baseline / intervention sync](#baseline--intervention-sync)
+13. [Parallelism](#parallelism)
+14. [Deployment](#deployment)
+
+## Source layout
 
 | Library | Path | Role |
 | ------- | ---- | ---- |
@@ -18,22 +35,6 @@ For build/CMake, see the [Developer Guide](development.md). For entity schemas i
 | Input | `src/HealthGPS.Input` | File `DataManager`, config/schema load, model registration |
 | ADEVS | `src/external/adevs` | Discrete-event clock used by `hgps::Simulation` |
 | Tests | `src/HealthGPS.Tests` | Unit / integration tests |
-
-### Contents
-
-1. [Components](#components)
-2. [General workflow](#general-workflow)
-3. [Host application](#host-application)
-4. [Modules and factory](#modules-and-factory)
-5. [Data model overview](#data-model-overview)
-6. [Virtual population: initialise and update](#virtual-population-initialise-and-update)
-7. [Risk-factor pipeline](#risk-factor-pipeline)
-8. [Energy balance / Kevin Hall](#energy-balance--kevin-hall)
-9. [Message bus](#message-bus)
-10. [Policy levers](#policy-levers)
-11. [Baseline / intervention sync](#baseline--intervention-sync)
-12. [Parallelism](#parallelism)
-13. [Deployment](#deployment)
 
 ---
 
@@ -70,7 +71,7 @@ At a high level a run:
 4. Builds a baseline `Simulation` (and optionally an intervention pair).
 5. Executes trial runs; analysis publishes yearly results; the host writes JSON/CSV (and optional income-stratum or individual ID-tracking CSVs).
 
-How to configure outputs as a modeller: [User Guide — Results](../user/userguide.md#results).
+How to configure outputs as a modeller: [User Guide - Results](../user/userguide.md#results).
 
 ---
 
@@ -121,7 +122,7 @@ Policy **scenarios** are *not* a `SimulationModuleType`; each `Simulation` owns 
 
 Default builders are registered in `get_default_simulation_module_factory` (`src/HealthGPS/simulation_module.cpp`): SES, Demographic, RiskFactor, Disease, Analysis.
 
-**Factory create order vs runtime call order**
+### Factory create order vs runtime call order
 
 In the `Simulation` constructor (`src/HealthGPS/simulation.cpp`), modules are created as: SES → Demographic → RiskFactor → Disease → Analysis. That is ownership/wiring order only.
 
@@ -307,13 +308,15 @@ Health-GPS uses **two levels** of parallelism.
 |:----------------------------------------------------------------------:|
 | *Runner scenario threads and population-level parallel loops* |
 
-**1. Simulation executive (`Runner`, `src/HealthGPS/runner.cpp`)**
+### Simulation executive (`Runner`)
+
+Code: `src/HealthGPS/runner.cpp`.
 
 - Baseline-only: one `std::jthread` per trial (`run(baseline, trial_runs)`), joined before the next trial.
 - Baseline + intervention: two `std::jthread`s per trial (baseline and intervention), same run seed, joined together (`run(baseline, intervention, trial_runs)`).
 - Each thread drives an ADEVS `Simulator` over that scenario’s `Simulation` (`run_model_thread`).
 
-**2. Population / module work (TBB)**
+### Population / module work (TBB)
 
 Modules use Intel oneTBB (`tbb::parallel_for_each`, `core::parallel_for`, and related) over people or table slices—for example demographics, disease models, analysis, and adjustable risk-factor code. The Console host can cap the TBB thread pool with `tbb::global_control` from CLI.
 
@@ -329,7 +332,7 @@ See [Developer Guide](development.md) for CMake presets, vcpkg, tests, and HPC n
 
 ---
 
-### Related documentation
+## Related documentation
 
 | Topic | Document |
 | ----- | -------- |
@@ -347,12 +350,6 @@ See [Developer Guide](development.md) for CMake presets, vcpkg, tests, and HPC n
 | Technical docs index | [technical/README.md](../technical/README.md) |
 | Documentation home | [documentation/README.md](../README.md) |
 | Site intro (Mermaid sequences) | [index.md](../index.md) |
-
----
-
-[cpp20]: https://en.cppreference.com/w/cpp/20 "C++ 20 standard features and compiler support"
-[adevs]: https://web.ornl.gov/~nutarojj/adevs "A Discrete EVent System simulator library"
-[devs]: https://doi.org/10.1016/j.ifacol.2017.08.672 "From Discrete Event Simulation to Discrete Event Specified Systems (DEVS)"
 
 ---
 
