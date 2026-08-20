@@ -17,7 +17,7 @@ Docs are split by **audience and job**, not by topic alone. The same subject (e.
 | Folder                       | Audience                                                         | What belongs here                                                                                                       | What does *not*                                                                                |
 | ---------------------------- | ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
 | **[user/](user/)**           | Modellers and analysts running Health-GPS                        | How to install/run, write config, choose modules/scenarios, read outputs, use schemas at a practical level              | Deep C++ design, feature implementation checklists, build-toolchain debugging                  |
-| **[developer/](developer/)** | Engineers building or changing the codebase                      | CMake/vcpkg/tests, architecture, data API, contribution flow, Windows/MSVC and Pages deploy troubleshooting             | End-user “how do I set `config.json`?” walkthroughs; FINCH equation detail; open feature plans |
+| **[developer/](developer/)** | Engineers building or changing the codebase                      | CMake/vcpkg/tests, [Software & Architecture](developer/architecture.md), data API, contribution flow, Windows/MSVC and Pages deploy troubleshooting | End-user “how do I set `config.json`?” walkthroughs; FINCH equation detail; open feature plans |
 | **[technical/](technical/)** | Engineers *and* advanced modellers who need implementation truth | Domain/project deep-dives (FINCH, update reports, model I/O reference) plus engineering **plans** for specific features | Generic “first run” material; repo-wide build instructions (those stay in `developer/`)        |
 
 **Why three top-level folders?** `user/` stays runnable and short. `developer/` stays about the product as software. `technical/` holds longer domain notes and design work that would clutter either of the other two, without forcing every modeller through CMake, or every contributor through FINCH nutrient equations.
@@ -64,7 +64,7 @@ Section indexes: [user/README.md](user/README.md) · [developer/README.md](devel
 | Build from source                               | [Developer Guide](developer/development.md)                                    |
 | Windows build broken (`cstdint`, `MSVCRTD.lib`) | [MSVC troubleshooting](developer/msvc-windows-build-troubleshooting.md)        |
 | Pages deploy failed (Configure HealthGPS)       | [Docs deploy troubleshooting](developer/docs-deploy-troubleshooting.md)        |
-| Architecture                                    | [Software Architecture](developer/architecture.md)                             |
+| Software & architecture (engineers)             | [Software & Architecture](developer/architecture.md)                           |
 | Data model                                      | [Data Model](developer/datamodel.md)                                           |
 | FINCH / Kevin Hall inputs                       | [FINCH guide](technical/guides/finch-linear-models-and-income-adjustment.md)   |
 | What changed in Feb 2026                        | [Update report](technical/guides/healthgps-update-report-2026-02-20.md)        |

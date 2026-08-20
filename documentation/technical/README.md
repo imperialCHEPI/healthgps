@@ -43,6 +43,7 @@ Engineering design notes for developers. Written as ordinary markdown plans (sum
 | Topic | Start here | Then |
 | ----- | ---------- | ---- |
 | How a virtual person is built | [How Health-GPS models a person](guides/how-healthgps-models-a-person.md) | [Models overview](../user/models-overview.md) |
+| C++ software design / modules | [Software & Architecture](../developer/architecture.md) | [Developer Guide](../developer/development.md) |
 | FINCH policy CSVs / `gender2` | [FINCH guide](guides/finch-linear-models-and-income-adjustment.md) | [Project requirements plan](plans/project-requirements-plan.md) |
 | Income quintile adjustment | [FINCH guide](guides/finch-linear-models-and-income-adjustment.md) | [Income quintile plan](plans/income-quintile-factor-means-plan.md) |
 | Kevin Hall height/weight | [Height quintile plan](plans/height-csv-quintile-plan.md) | [Weight quintile plan](plans/weight-quintile-plan.md) |
