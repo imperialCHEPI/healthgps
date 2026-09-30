@@ -4,8 +4,8 @@
 
 | [Home](../../index.md) | [Quick Start](../../user/getstarted.md) | [User Guide](../../user/userguide.md) | [Schemas](../../user/schemas.md) | [Models](../../user/models-overview.md) | [Architecture](../../developer/architecture.md) | [Data Model](../../developer/datamodel.md) | [Developer Guide](../../developer/development.md) | [Technical docs](../README.md) | [API](https://imperialchepi.github.io/healthgps/api/) |
 
-**Author:** Mahima Ghosh · **GitHub:** `jacardi` · **Branch prefix:** `jacardi/`
-**Status:** Design / planning (written and maintained by Mahima)
+**Author:** Mahima Ghosh · **GitHub:** `jacardi` · **Branch prefix:** `jacardi/`  
+**Status:** Design / planning (written and maintained by Mahima)  
 **Related:** [Technical index](../README.md) · [Project requirements plan](project-requirements-plan.md) · [Models overview](../../user/models-overview.md) · [How Health-GPS models a person](../guides/how-healthgps-models-a-person.md) · [Simulation models reference](../guides/simulation-models-reference.md) · [JACARDI-UKPDS-healthGPS](JACARDI-UKPDS-healthGPS.md) (Belgium diabetes submodel; restore/link when present on branch)
 
 **Goal:** Add one new CSV-driven risk-factor pathway for JACARDI so Slovenia and the other six countries can initialise and update people without forking France HLM/EBHLM or India/FINCH StaticLinear/KevinHall. Same codebase; opt-in by `ModelName` + country data pack. Belgium alone enables UKPDS later for now.
@@ -14,15 +14,15 @@
 
 ## 1. Country set and coexistence
 
-**Seven countries:** Romania, Slovenia, Belgium, Italy, Malta, Spain, Poland.
+**Seven countries:** Romania, Slovenia, Belgium, Italy, Malta, Spain, Poland.  
 **Not in scope:** Iceland.
 
-| Project                | Static slot      | Dynamic slot           | UKPDS             |
-| ---------------------- | ---------------- | ---------------------- | ----------------- |
-| France / STOP          | `hlm`            | `ebhlm`                | off               |
-| India / FINCH          | `staticlinear`   | `kevinhall`            | off               |
-| SI, RO, IT, MT, ES, PL | `JacardiModel`   | `JacardiModelUpdate`   | off               |
-| Belgium                | `JacardiModel`   | `JacardiModelUpdate`   | **on** when ready |
+| Project                | Static slot    | Dynamic slot         | UKPDS             |
+| ---------------------- | -------------- | -------------------- | ----------------- |
+| France / STOP          | `hlm`          | `ebhlm`              | off               |
+| India / FINCH          | `staticlinear` | `kevinhall`          | off               |
+| SI, RO, IT, MT, ES, PL | `JacardiModel` | `JacardiModelUpdate` | off               |
+| Belgium                | `JacardiModel` | `JacardiModelUpdate` | **on** when ready |
 
 Registration is **additive** in `src/HealthGPS.Input/model_parser.cpp`. Never replace existing names.
 
@@ -52,13 +52,13 @@ flowchart LR
 
 ---
 
-## 2. Pathway naming (locked)
+## 2. Pathway naming
 
 **Chosen `ModelName` pair** (matches Health-GPS PascalCase style like `StaticLinear` / `KevinHall`):
 
-| Slot | `ModelName` | C++ class (planned) |
-| ---- | ----------- | ------------------- |
-| Static (init-oriented) | `JacardiModel` | `JacardiModel` / `JacardiModelDefinition` |
+| Slot                      | `ModelName`          | C++ class (planned)                                   |
+| ------------------------- | -------------------- | ----------------------------------------------------- |
+| Static (init-oriented)    | `JacardiModel`       | `JacardiModel` / `JacardiModelDefinition`             |
 | Dynamic (update-oriented) | `JacardiModelUpdate` | `JacardiModelUpdate` / `JacardiModelUpdateDefinition` |
 
 Parser match is case-insensitive like other models (`jacardimodel` / `jacardimodelupdate`).
@@ -79,6 +79,18 @@ Config wiring example:
 ```
 
 Inside those files: `"ModelName": "JacardiModel"` and `"ModelName": "JacardiModelUpdate"`.
+
+**Source layout (separate files — same pattern as `static_linear_model` / `kevin_hall_model`):** do **not** put both models in one mega `.cpp`. Split by concern so helpers can grow without bloating either model.
+
+| Files | Owns |
+| ----- | ---- |
+| `src/HealthGPS/jacardi_model.h` / `.cpp` | `JacardiModel` + `JacardiModelDefinition` (static slot / init) |
+| `src/HealthGPS/jacardi_model_update.h` / `.cpp` | `JacardiModelUpdate` + `JacardiModelUpdateDefinition` (dynamic slot / yearly) |
+| `src/HealthGPS/jacardi_education_lifecycle.h` / `.cpp` | Shared SI-style education Part A/B (used by both models) |
+| `src/HealthGPS/jacardi_schedule.h` / `.cpp` | Schedule CSV load + method dispatch (linear / logistic / …) — add only when needed |
+| `src/HealthGPS.Input/` parser helpers (or thin functions in `model_parser.cpp`) | Load thin JSON → definition; CSV path resolution |
+
+Wire each pair in `src/HealthGPS/CMakeLists.txt` (and Input CMake if new parser sources). Register both `ModelName`s in `model_parser.cpp`. Later pieces (policy, UKPDS) stay in their **own** files — never dump into `jacardi_model.cpp`.
 
 ---
 
@@ -160,13 +172,13 @@ Exact `education` schema is new work — implement when coding; flags drive whet
 
 ## 4. Locked modelling decisions (Mariia / Mahima, Sep 2026)
 
-| Topic                | Decision                                                                   |
-| -------------------- | -------------------------------------------------------------------------- |
-| New pathway          | Yes — not StaticLinear, Kevin Hall, HLM, or EBHLM                          |
-| Names                | **`JacardiModel`** / **`JacardiModelUpdate`** (locked; see §2)             |
-| Country set          | RO, SI, BE, IT, MT, ES, PL                                                 |
-| Education reuse      | Shared lifecycle code; per-country CSVs                                    |
-| Residual correlation | Open — **default independent** until Mariia decides Cholesky / ICA / other |
+| Topic                | Decision                                                               |
+| -------------------- | ---------------------------------------------------------------------- |
+| New pathway          | Yes — not StaticLinear, Kevin Hall, HLM, or EBHLM                      |
+| Names                | `**JacardiModel**` / `**JacardiModelUpdate**` (locked; see §2)         |
+| Country set          | RO, SI, BE, IT, MT, ES, PL                                             |
+| Education reuse      | Shared lifecycle code; per-country CSVs                                |
+| Residual correlation | Open — **independent for now** until we decides Cholesky / ICA / other |
 
 ### Delivered SI education CSVs (validated)
 
@@ -253,7 +265,7 @@ flowchart TD
 
 | Phase | Work                                                      | Gate                     |
 | ----- | --------------------------------------------------------- | ------------------------ |
-| P0    | Register new ModelNames; CSV-slot schema; schedule walker | India/FINCH/France green |
+| P0    | Add `jacardi_model` + `jacardi_model_update` `.h/.cpp` pairs; register ModelNames; CSV-slot schema; shared education helper stub | India/FINCH/France green |
 | P1a   | SI education lifecycle + checks                           | Education fixture green  |
 | P1b   | SI employment → … → SBP → MI                              | SI smoke frozen          |
 | P2    | Romania pack                                              | SI + legacy + RO         |
@@ -281,38 +293,38 @@ Country ladder notes (data-driven; no new C++):
 
 Follow [JACARDI-UKPDS-healthGPS.md](JACARDI-UKPDS-healthGPS.md) when that file is on the branch (author Mahima; wiring **W1**, prior-year **S1**).
 
-| Topic                                     | Decision                                          |
-| ----------------------------------------- | ------------------------------------------------- |
-| Pre-diabetes RFs                          | `JacardiModel` / `JacardiModelUpdate` CSV packs   |
-| Default                                   | `ukpds.enabled: false` except BE                  |
-| Skip global clinical update for diabetics | Only when UKPDS on                                |
+| Topic                                     | Decision                                        |
+| ----------------------------------------- | ----------------------------------------------- |
+| Pre-diabetes RFs                          | `JacardiModel` / `JacardiModelUpdate` CSV packs |
+| Default                                   | `ukpds.enabled: false` except BE                |
+| Skip global clinical update for diabetics | Only when UKPDS on                              |
 
 ---
 
 ## 9. What I will not do
 
-- Per-country C++ or `if (country == "SVN")` in the core loop
-- Mapping JACARDI binaries into France HLM residuals
-- Kevin Hall diet path for JACARDI
-- Putting coefficients or probabilities as numbers in JSON
-- Using lowercase/`snake_case` ModelNames like `jacardi` / `jacardi_update` (use `JacardiModel` / `JacardiModelUpdate`)
-- Turning UKPDS on outside Belgium without an explicit ask
+- Per-country C++ or `if (country == "SVN")` in the core loop  
+- Mapping JACARDI binaries into France HLM residuals  
+- Kevin Hall diet path for JACARDI  
+- Putting coefficients or probabilities as numbers in JSON  
+- Using lowercase/`snake_case` ModelNames like `jacardi` / `jacardi_update` (use `JacardiModel` / `JacardiModelUpdate`)  
+- Turning UKPDS on outside Belgium without an explicit ask  
 - Merging a country pack without green prior fixtures
 
 ---
 
 ## 10. Complexity (my estimate)
 
-- Shared schedule walker + CSV loaders: moderate, small LOC if one dispatch loop
-- Per-country work after P1: mostly packs + fixtures
+- Shared schedule walker + CSV loaders: moderate, small LOC if one dispatch loop  
+- Per-country work after P1: mostly packs + fixtures  
 - UKPDS (P6): largest C++ piece; gated off by default
 
 ---
 
 ## 11. Execution order (Mahima)
 
-1. CSV-slot schema + thin SI config skeleton (`project_requirements` + file slots; `ModelName` = `JacardiModel` / `JacardiModelUpdate`).
-2. P0 engine stubs + register ModelNames.
+1. CSV-slot schema + SI config skeleton (`project_requirements` + file slots; `ModelName` = `JacardiModel` / `JacardiModelUpdate`).
+2. P0: separate `jacardi_model` + `jacardi_model_update` `.h/.cpp` pairs + register ModelNames (+ shared education helper file).
 3. P1a SI education from delivered CSVs.
 4. P1b rest of SI ladder as partner coeffs arrive.
 5. Roll out RO → IT/MT/ES → PL → BE → UKPDS → policy.
