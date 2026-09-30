@@ -275,7 +275,7 @@ Different [Data API][dataapi] implementations can be injected at construction; t
 | Topic | Document |
 | ----- | -------- |
 | Developer docs index | [developer/README.md](README.md) |
-| Architecture | [Software Architecture](architecture.md) |
+| Architecture | [Software & Architecture](architecture.md) |
 | Build guide | [Developer Guide](development.md) |
 | FINCH / income inputs | [FINCH guide](../technical/guides/finch-linear-models-and-income-adjustment.md) |
 | User guide | [User Guide](../user/userguide.md) |
