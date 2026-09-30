@@ -4,8 +4,8 @@
 
 | [Home](../../index.md) | [Quick Start](../../user/getstarted.md) | [User Guide](../../user/userguide.md) | [Schemas](../../user/schemas.md) | [Models](../../user/models-overview.md) | [Architecture](../../developer/architecture.md) | [Data Model](../../developer/datamodel.md) | [Developer Guide](../../developer/development.md) | [Technical docs](../README.md) | [API](https://imperialchepi.github.io/healthgps/api/) |
 
-**Author:** Mahima Ghosh · **GitHub:** `jacardi` · **Branch prefix:** `jacardi/`  
-**Status:** Design / planning (written and maintained by Mahima)  
+**Author:** Mahima Ghosh · **GitHub:** `jacardi` · **Branch prefix:** `jacardi/`
+**Status:** Design / planning (written and maintained by Mahima)
 **Related:** [Technical index](../README.md) · [Project requirements plan](project-requirements-plan.md) · [Models overview](../../user/models-overview.md) · [How Health-GPS models a person](../guides/how-healthgps-models-a-person.md) · [Simulation models reference](../guides/simulation-models-reference.md) · [JACARDI-UKPDS-healthGPS](JACARDI-UKPDS-healthGPS.md) (Belgium diabetes submodel; restore/link when present on branch)
 
 **Goal:** Add one new CSV-driven risk-factor pathway for JACARDI so Slovenia and the other six countries can initialise and update people without forking France HLM/EBHLM or India/FINCH StaticLinear/KevinHall. Same codebase; opt-in by `ModelName` + country data pack. Belgium alone enables UKPDS later for now.
@@ -14,7 +14,7 @@
 
 ## 1. Country set and coexistence
 
-**Seven countries:** Romania, Slovenia, Belgium, Italy, Malta, Spain, Poland.  
+**Seven countries:** Romania, Slovenia, Belgium, Italy, Malta, Spain, Poland.
 **Not in scope:** Iceland.
 
 | Project                | Static slot      | Dynamic slot           | UKPDS             |
