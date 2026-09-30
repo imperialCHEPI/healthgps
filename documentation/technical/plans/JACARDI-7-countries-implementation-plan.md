@@ -55,8 +55,8 @@ isProject: false
 
 | [Home](../../index.md) | [Quick Start](../../user/getstarted.md) | [User Guide](../../user/userguide.md) | [Schemas](../../user/schemas.md) | [Models](../../user/models-overview.md) | [Architecture](../../developer/architecture.md) | [Data Model](../../developer/datamodel.md) | [Developer Guide](../../developer/development.md) | [Technical docs](../README.md) | [API](https://imperialchepi.github.io/healthgps/api/) |
 
-**Author:** Mahima Ghosh · **GitHub:** `jacardi` · **Branch prefix:** `jacardi/`  
-**Status:** Design / planning (written and maintained by Mahima)  
+**Author:** Mahima Ghosh · **GitHub:** `jacardi` · **Branch prefix:** `jacardi/`
+**Status:** Design / planning (written and maintained by Mahima)
 **Related:** [Technical index](../README.md) · [Project requirements plan](project-requirements-plan.md) · [Models overview](../../user/models-overview.md) · [How Health-GPS models a person](../guides/how-healthgps-models-a-person.md) · [Simulation models reference](../guides/simulation-models-reference.md) · [JACARDI-UKPDS-healthGPS](JACARDI-UKPDS-healthGPS.md) (Belgium diabetes submodel; restore/link when present on branch)
 
 **Goal:** Add one new CSV-driven risk-factor pathway for JACARDI so Slovenia and the other six countries can initialise and update people without forking France HLM/EBHLM or India/FINCH StaticLinear/KevinHall. Same codebase; opt-in by `ModelName` + country data pack. Belgium alone enables UKPDS later.
@@ -65,7 +65,7 @@ isProject: false
 
 ## 1. Country set and coexistence
 
-**Seven countries:** Romania, Slovenia, Belgium, Italy, Malta, Spain, Poland.  
+**Seven countries:** Romania, Slovenia, Belgium, Italy, Malta, Spain, Poland.
 **Not in scope:** Iceland.
 
 | Project | Static slot | Dynamic slot | UKPDS |
@@ -333,32 +333,32 @@ Follow [JACARDI-UKPDS-healthGPS.md](JACARDI-UKPDS-healthGPS.md) when that file i
 
 ## 9. What I will not do
 
-- Per-country C++ or `if (country == "SVN")` in the core loop  
-- Mapping JACARDI binaries into France HLM residuals  
-- Kevin Hall diet path for JACARDI  
-- Putting coefficients or probabilities as numbers in JSON  
-- Naming the pathway `jacardi` / `jacardi_update`  
-- Turning UKPDS on outside Belgium without an explicit ask  
-- Merging a country pack without green prior fixtures  
+- Per-country C++ or `if (country == "SVN")` in the core loop
+- Mapping JACARDI binaries into France HLM residuals
+- Kevin Hall diet path for JACARDI
+- Putting coefficients or probabilities as numbers in JSON
+- Naming the pathway `jacardi` / `jacardi_update`
+- Turning UKPDS on outside Belgium without an explicit ask
+- Merging a country pack without green prior fixtures
 
 ---
 
 ## 10. Complexity (my estimate)
 
-- Shared schedule walker + CSV loaders: moderate, small LOC if one dispatch loop  
-- Per-country work after P1: mostly packs + fixtures  
-- UKPDS (P6): largest C++ piece; gated off by default  
+- Shared schedule walker + CSV loaders: moderate, small LOC if one dispatch loop
+- Per-country work after P1: mostly packs + fixtures
+- UKPDS (P6): largest C++ piece; gated off by default
 
 ---
 
 ## 11. Execution order (Mahima)
 
-1. **Choose pathway names** (§2) with the team.  
-2. Write CSV-slot schema + thin SI config skeleton (`project_requirements` + file slots).  
-3. P0 engine stubs + register ModelNames.  
-4. P1a SI education from delivered CSVs.  
-5. P1b rest of SI ladder as partner coeffs arrive.  
-6. Roll out RO → IT/MT/ES → PL → BE → UKPDS → policy.  
+1. **Choose pathway names** (§2) with the team.
+2. Write CSV-slot schema + thin SI config skeleton (`project_requirements` + file slots).
+3. P0 engine stubs + register ModelNames.
+4. P1a SI education from delivered CSVs.
+5. P1b rest of SI ladder as partner coeffs arrive.
+6. Roll out RO → IT/MT/ES → PL → BE → UKPDS → policy.
 7. Keep India/FINCH/France green at every merge.
 
 ---
