@@ -172,17 +172,20 @@ Exact `education` schema is new work — implement when coding; flags drive whet
 
 ## 4. Locked modelling decisions (Mariia / Mahima, Sep 2026)
 
-| Topic                | Decision                                                               |
-| -------------------- | ---------------------------------------------------------------------- |
-| New pathway          | Yes — not StaticLinear, Kevin Hall, HLM, or EBHLM                      |
-| Names                | `**JacardiModel**` / `**JacardiModelUpdate**` (locked; see §2)         |
-| Country set          | RO, SI, BE, IT, MT, ES, PL                                             |
-| Education reuse      | Shared lifecycle code; per-country CSVs                                |
-| Residual correlation | Open — **independent for now** until we decides Cholesky / ICA / other |
+| Topic | Decision |
+| ----- | -------- |
+| New pathway | Yes — not StaticLinear, Kevin Hall, HLM, or EBHLM |
+| ModelNames | **`JacardiModel`** / **`JacardiModelUpdate`** (see §2) |
+| Country set | RO, SI, BE, IT, MT, ES, PL |
+| Education reuse | Shared lifecycle code; per-country CSVs (same three-file pattern when ready) |
+| Residual correlation | **Independent for v1** — ship SI education without Cholesky/ICA; revisit later |
+| Simulation horizon | **Start 2025, end 2055** (30 years) for **all** JACARDI countries — config-driven; no engine complication |
+| Example pack layout | **One folder per country** in HealthGPS-examples: `Jacardi_Slovenia`, `Jacardi_Romania`, … (not a single `Jacardi_allCountries`) |
+| Missing education (ages 0–5) + employment | **v1:** employment model **skips** persons with missing education / below working age. **Likely next:** fix employment as unemployed/student for **age &lt; 18**; estimate employment only from **age 18+** |
 
 ### Delivered SI education CSVs (validated)
 
-Copy into the Slovenia pack when implementing:
+Copy into the `Jacardi_Slovenia` pack when implementing:
 
 | File                                     | Shape check                                                             |
 | ---------------------------------------- | ----------------------------------------------------------------------- |
@@ -212,6 +215,8 @@ Implement against `src/HealthGPS/risk_factor_model.h`:
 
 No per-country C++ subclasses. Predictor resolver expands `education_id` → ISCED dummies (`EducationISCED01`, …; no dummy for reference ISCED 3).
 
+**Employment (when added after education):** skip if education missing or age &lt; 18 in v1; design schedule/flags so switching to fixed under-18 status (unemployed/student) is config/CSV later, not a rewrite.
+
 ### Slovenia education rules (summary)
 
 | Phase                | Rule                                       |
@@ -233,17 +238,19 @@ Validation: monotonic education; no change at 31+; start-year 22+ shares ≈ loo
 
 ## 6. Country packs (isolation)
 
+HealthGPS-examples (same pattern as `KevinHall_FINCH` / `HLM_France`):
+
 ```text
-examples/jacardi_slovenia/   (or healthgps-examples)
-examples/jacardi_romania/
-examples/jacardi_belgium/      # ukpds.enabled true later
-examples/jacardi_italy/
-examples/jacardi_malta/
-examples/jacardi_spain/
-examples/jacardi_poland/
+Jacardi_Slovenia/     # first
+Jacardi_Romania/
+Jacardi_Belgium/      # ukpds.enabled true later
+Jacardi_Italy/
+Jacardi_Malta/
+Jacardi_Spain/
+Jacardi_Poland/
 ```
 
-Each pack: thin `config.json` + `project_requirements` + model JSON with **CSV slots only** + CSV folder. Changing RO cannot affect SI.
+Each pack: thin `config.json` (start **2025**, end **2055**) + `project_requirements` + model JSON with **CSV slots only** + education/coeff CSVs. Changing RO cannot affect SI.
 
 ---
 
@@ -323,11 +330,11 @@ Follow [JACARDI-UKPDS-healthGPS.md](JACARDI-UKPDS-healthGPS.md) when that file i
 
 ## 11. Execution order (Mahima)
 
-1. CSV-slot schema + SI config skeleton (`project_requirements` + file slots; `ModelName` = `JacardiModel` / `JacardiModelUpdate`).
+1. CSV-slot schema + **`Jacardi_Slovenia`** pack skeleton (start **2025**, end **2055**; `project_requirements` + file slots; `JacardiModel` / `JacardiModelUpdate`).
 2. P0: separate `jacardi_model` + `jacardi_model_update` `.h/.cpp` pairs + register ModelNames (+ shared education helper file).
-3. P1a SI education from delivered CSVs.
-4. P1b rest of SI ladder as partner coeffs arrive.
-5. Roll out RO → IT/MT/ES → PL → BE → UKPDS → policy.
+3. P1a SI education from delivered CSVs (employment still skipped for missing / under-18).
+4. P1b rest of SI ladder as partner coeffs arrive (employment from age 18+ when ready).
+5. Roll out `Jacardi_Romania` → IT/MT/ES → PL → BE → UKPDS → policy.
 6. Keep India/FINCH/France green at every merge.
 
 ---
