@@ -253,12 +253,14 @@ TEST(ConfigSchemaExpanded, PolicyAdjustmentInfoFromJson) {
 TEST(ConfigSchemaExpanded, SESInfoParametersEmpty) {
     json j = {{"function_name", "normal"}, {"function_parameters", json::array()}};
     SESInfo s = j.get<SESInfo>();
+    EXPECT_TRUE(s.enabled);
     EXPECT_TRUE(s.parameters.empty());
 }
 
 TEST(ConfigSchemaExpanded, SESInfoParametersSingle) {
     json j = {{"function_name", "fixed"}, {"function_parameters", json::array({1.0})}};
     SESInfo s = j.get<SESInfo>();
+    EXPECT_TRUE(s.enabled);
     EXPECT_EQ(1u, s.parameters.size());
     EXPECT_DOUBLE_EQ(1.0, s.parameters[0]);
 }

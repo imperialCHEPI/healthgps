@@ -399,10 +399,9 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-# VS Code files for those working on multiple tools
+# VS Code / Cursor: ignore local editor settings; keep shared extension recommendations
 .vscode/*
 !.vscode/extensions.json
-!.vscode/settings.json
 *.code-workspace
 
 # Local History for Visual Studio Code

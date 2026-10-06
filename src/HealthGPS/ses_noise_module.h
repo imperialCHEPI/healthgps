@@ -23,6 +23,13 @@ class SESNoiseModule final : public UpdatableModule {
     /// @throws std::invalid_argument for unknown model function or number of parameters mismatch.
     SESNoiseModule(std::string function, const std::vector<double> &parameters);
 
+    /// @brief Initialise a new instance of the SESNoiseModule class.
+    /// @param enabled When false, leave Person.ses at 0 (no draws)
+    /// @param function The model function identifier (ignored when disabled)
+    /// @param parameters The model function parameters (ignored when disabled)
+    /// @throws std::invalid_argument for unknown model function or number of parameters mismatch.
+    SESNoiseModule(bool enabled, std::string function, const std::vector<double> &parameters);
+
     SimulationModuleType type() const noexcept override;
 
     const std::string &name() const noexcept override;
@@ -32,6 +39,7 @@ class SESNoiseModule final : public UpdatableModule {
     void update_population(RuntimeContext &context) override;
 
   private:
+    bool enabled_{true};
     std::string function_;
     std::vector<double> parameters_;
     std::string name_{"SES"};
