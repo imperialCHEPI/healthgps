@@ -358,4 +358,33 @@ Follow [JACARDI-UKPDS-healthGPS.md](JACARDI-UKPDS-healthGPS.md) when that file i
 
 ---
 
+## 12. Progress board (GitHub Project)
+
+**Board:** [imperialCHEPI Project 7](https://github.com/orgs/imperialCHEPI/projects/7/views/1)
+
+Track chat + implementation work as cards on that board. Sync helper (creates draft items once you are logged into `gh`):
+
+`documentation/technical/plans/scripts/sync-jacardi-project7.ps1`
+
+### Done (chat / packs / schema)
+
+- [x] Lock static=init / dynamic=update; no `schedule.csv`; ladder order = `risk_factors[].level`
+- [x] `Jacardi_Template` + `Jacardi_Slovenia` packs (education CSVs + full ladder slots)
+- [x] Education Part A/B slot mapping (lookup / draw22 / upgrades)
+- [x] Optional `ses_model` (schema + engine; Jacardi omits; India/HLM unchanged)
+- [x] FactorsMean guidance for Jacardi (`file_names` omit; adjust flags)
+- [x] Examples CI lint + `config_skeleton*` exclude; plan markdownlint fixes
+
+### Next (engine)
+
+- [ ] P0 — register `JacardiModel` / `JacardiModelUpdate` + CMake
+- [ ] Ladder walker + CSV loaders (empirical / linear / logistic / multinomial)
+- [ ] Optional `baseline_adjustments.file_names` in parser (dry-run without stubs)
+- [ ] P1a SI education lifecycle from delivered CSVs
+- [ ] P1b SI ladder coeffs + MI disease + country packs → UKPDS/policy
+
+After running the sync script, paste each card URL next to the matching checkbox so the plan and Project 7 stay linked.
+
+---
+
 *Plan authored and maintained by **Mahima** · GitHub **jacardi** · JACARDI 7-country HealthGPS implementation.*
