@@ -55,7 +55,8 @@ flowchart LR
 ```
 
 **Host application, run loop, module order, and output:**
-<img width="1244" height="877" alt="image" src="https://github.com/user-attachments/assets/93fb636c-c846-46fd-a143-b0f3a84f9a92" />
+
+![Host application, run loop, module order, and output](documentation/images/architecture_diagrams/host_application_run_loop.png)
 
 **Person initialisation sequence (overview):**
 
