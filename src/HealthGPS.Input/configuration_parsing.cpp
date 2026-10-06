@@ -327,13 +327,17 @@ void load_modelling_info(const json &j, Configuration &config) {
         fmt::print(fmt::fg(fmt::color::red), "Could not load baseline adjustment: {}\n", e.what());
     }
 
-    try {
-        // SES mapping
-        // TODO: Maybe this needs its own helper function
-        config.ses = get(modelling, "ses_model").get<SESInfo>();
-    } catch (const std::exception &) {
-        success = false;
-        fmt::print(fmt::fg(fmt::color::red), "Could not load SES mappings");
+    // MAHIMA: ses_model is optional. Omit for JACARDI-style packs; leave Person.ses at 0.
+    // When present, parse it (enabled defaults to true for India/HLM backwards compatibility).
+    if (modelling.contains("ses_model")) {
+        try {
+            config.ses = modelling.at("ses_model").get<SESInfo>();
+        } catch (const std::exception &) {
+            success = false;
+            fmt::print(fmt::fg(fmt::color::red), "Could not load SES mappings\n");
+        }
+    } else {
+        config.ses = SESInfo{};
     }
 
     // policy_start_year is optional (schema default 0); missing key must not fail load

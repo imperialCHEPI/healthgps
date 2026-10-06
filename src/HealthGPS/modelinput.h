@@ -38,6 +38,10 @@ struct RunInfo {
 
 /// @brief Defines the socio-economic status (SES) model data type
 struct SESDefinition {
+    /// @brief When false, SES noise is not drawn (Person.ses stays 0).
+    /// Defaults true for programmatic/test construction; config maps SESInfo.enabled explicitly.
+    bool enabled{true};
+
     /// @brief Socio-economic status (SES) function identification
     std::string fuction_name;
 

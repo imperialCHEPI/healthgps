@@ -73,11 +73,25 @@ TEST(JsonParser, RiskFactorInfoRoundTripNoRange) {
 
 // --- SESInfo ---
 TEST(JsonParser, SESInfoRoundTrip) {
-    SESInfo p{"normal", {0.0, 1.0}};
+    SESInfo p{.enabled = true, .function = "normal", .parameters = {0.0, 1.0}};
     json j = p;
     SESInfo q = j.get<SESInfo>();
-    EXPECT_EQ(p.function, q.function);
-    EXPECT_EQ(p.parameters, q.parameters);
+    EXPECT_EQ(p, q);
+}
+
+TEST(JsonParser, SESInfoFromJsonDefaultsEnabledTrue) {
+    json j = {{"function_name", "normal"}, {"function_parameters", json::array({0.0, 1.0})}};
+    SESInfo s = j.get<SESInfo>();
+    EXPECT_TRUE(s.enabled);
+    EXPECT_EQ(s.function, "normal");
+}
+
+TEST(JsonParser, SESInfoFromJsonEnabledFalse) {
+    json j = {{"enabled", false},
+              {"function_name", "normal"},
+              {"function_parameters", json::array({0.0, 1.0})}};
+    SESInfo s = j.get<SESInfo>();
+    EXPECT_FALSE(s.enabled);
 }
 
 TEST(JsonParser, SESInfoFromJsonMissingKeyThrows) {

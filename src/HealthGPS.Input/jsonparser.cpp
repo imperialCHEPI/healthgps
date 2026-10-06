@@ -93,10 +93,14 @@ void from_json(const json &j, RiskFactorInfo &p) {
 
 // SES Model Information
 void to_json(json &j, const SESInfo &p) {
-    j = json{{"function_name", p.function}, {"function_parameters", p.parameters}};
+    j = json{{"enabled", p.enabled},
+             {"function_name", p.function},
+             {"function_parameters", p.parameters}};
 }
 
 void from_json(const json &j, SESInfo &p) {
+    // Presence of ses_model enables SES unless explicitly disabled (backwards compatible).
+    p.enabled = j.value("enabled", true);
     j.at("function_name").get_to(p.function);
     j.at("function_parameters").get_to(p.parameters);
 }

@@ -104,6 +104,7 @@ Keep host JSON for run control only:
 - `modelling.risk_factor_models.static` / `.dynamic` → paths to thin model files
 - diseases, output, interventions, optional `ukpds`
 - `project_requirements` — feature flags (see §3.3 and [project-requirements-plan.md](project-requirements-plan.md))
+- **Do not** include `modelling.ses_model` — continuous SES noise is unused; socioeconomic pathways use Education / Employment / … India/HLM packs that still need SES keep the optional block (defaults to enabled when present).
 
 **No scientific coefficients, probabilities, or residual banks in JSON.**
 
@@ -111,7 +112,7 @@ Keep host JSON for run control only:
 
 **Order of inclusion** lives in host `config.json` → `modelling.risk_factors[].level` (engine walks levels). **Do not** use a separate `schedule.csv`.
 
-**Static vs dynamic — same ladder, different CSVs**
+### Static vs dynamic — same ladder, different CSVs
 
 | Slot | File | Education | Other ladder vars |
 |------|------|-----------|-------------------|
@@ -158,6 +159,7 @@ Example update file (abbrev.):
 Caps such as age 110 / year 2110 come from the **data extent** (or a single optional CSV meta row later) — not hard-coded magic numbers in JSON if we can avoid them; document any unavoidable engine defaults in code comments + this plan.
 
 Country packs: `healthgps-examples/Jacardi_Template/`, `Jacardi_Slovenia/`, …
+
 ### 3.3 `project_requirements` for JACARDI
 
 Reuse the existing section so users turn characteristics on/off without country `if`s. Extend only where JACARDI needs new flags (keep [project-requirements-plan.md](project-requirements-plan.md) as the source of truth for shared fields).
