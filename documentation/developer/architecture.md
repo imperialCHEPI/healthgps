@@ -28,7 +28,7 @@ The Health-GPS framework adopts a modular design to specify the building blocks 
 - ***Inputs*** - configuration JSON (validated against schemas), model hierarchy and fitted parameters, disease selection, intervention scenario, and run-time settings. Project-specific CSVs (FINCH policy equations, income stratum tables, height/weight curves, PIF, and so on) are loaded through Input / modelling config, not only through the country Datastore.
 - ***Host Application*** - processes inputs, creates simulations, runs the experiment, and writes outputs.
 - ***Data Storage*** - country-indexed reference datasets (births, deaths, population, relative risks, epidemiology, disability weights, LMS, and related). Indexed by [ISO 3166](https://www.iso.org/iso-3166-country-codes.html) country code. New country files can be added without engine changes.
-- ***Risk Factors Module*** - hosts risk-factor models registered as static and/or dynamic. Implementations include hierarchical linear models (`StaticHierarchicalLinearModel`, `DynamicHierarchicalLinearModel`), static linear models used for FINCH-style pipelines (`StaticLinearModel`), and the Kevin Hall energy-balance model (`KevinHallModel`). Static models run at initialisation; dynamic models run on later yearly updates.
+- ***Risk Factors Module*** - hosts risk-factor models registered as static and/or dynamic. Implementations include hierarchical linear models (`StaticHierarchicalLinearModel`, `DynamicHierarchicalLinearModel`), static linear models used for FINCH-style pipelines (`StaticLinearModel`), and the Kevin Hall energy-balance model (`KevinHallModel`). Config has two packs (`RiskFactorModelType::Static` and `::Dynamic`); both run `generate` at initialisation and both run `update` on yearly steps—see [Risk-factor pipeline](#risk-factor-pipeline) and [Models overview](../user/models-overview.md#the-confusing-words-static-and-dynamic).
 - ***SES Module*** - assigns socio-economic status noise (`ses`) used as a continuous proxy. Income is modelled separately on `Person` (category, continuous value, optional adjustment stratum). See the [FINCH guide](../technical/guides/finch-linear-models-and-income-adjustment.md) and [update report](../technical/guides/healthgps-update-report-2026-02-20.md).
 - ***Demographics Module*** - population size, age, gender, births, deaths, and residual mortality; also drives net immigration. Person demographics can include sector, region, and ethnicity when configured.
 - ***Diseases Module*** - hosts disease sub-models (`others` and `cancers` groups). Optional population impact fraction (PIF) adjustment can modify incidence when configured.
@@ -77,7 +77,7 @@ All modules must initialise the virtual population at the beginning of the simul
 
 The two *host modules*, risk factor and disease respectively, are special containers for similar *sub-models* and likewise are responsible for managing the creation, ownership and execution order when requested by the simulation engine or other modules.
 
-The *risk factor* module hosts models supplied through configuration. Models implement `RiskFactorModel` with type `Static` or `Dynamic` (`src/HealthGPS/risk_factor_model.h`). Concrete types include hierarchical linear models, static linear models (FINCH-style), and Kevin Hall. Static models initialise the population; dynamic models update it each year.
+The *risk factor* module hosts models supplied through configuration. Models implement `RiskFactorModel` with type `Static` or `Dynamic` (`src/HealthGPS/risk_factor_model.h`). Concrete types include hierarchical linear models, static linear models (FINCH-style), and Kevin Hall. Both packs participate in initialisation (`generate`) and yearly update (`update`); see [Risk-factor pipeline](#risk-factor-pipeline).
 
 | ![Health-GPS Hierarchical Models](../images/hierarchical_model_interface.png) |
 |:--------------------------------------------------------------------------:|
@@ -222,7 +222,247 @@ The version of the *libraries* required by the application at runtime depends on
 
 ---
 
-### Related documentation
+## Detailed software architecture
+
+The sections above are the established architecture overview. The following expands them for engineers working in the current tree: library layout, Console compose path, factory vs runtime order, risk-factor packs, message types, sync payloads, and parallelism—using the SVG figure set under `documentation/images/architecture_diagrams/`.
+
+### Contents (detailed)
+
+1. [Source layout table](#source-layout-table)
+2. [Components (current diagram)](#components-current-diagram)
+3. [General workflow](#general-workflow)
+4. [Host application](#host-application)
+5. [Modules and factory](#modules-and-factory)
+6. [Data model overview](#data-model-overview)
+7. [Virtual population: initialise and update](#virtual-population-initialise-and-update)
+8. [Risk-factor pipeline](#risk-factor-pipeline)
+9. [Energy balance / Kevin Hall](#energy-balance--kevin-hall)
+10. [Message bus](#message-bus)
+11. [Policy levers](#policy-levers)
+12. [Baseline / intervention sync](#baseline--intervention-sync)
+13. [Parallelism](#parallelism)
+
+### Source layout table
+
+| Library | Path | Role |
+| ------- | ---- | ---- |
+| Host | `src/HealthGPS.Console` | CLI entry (`program.cpp`), event monitor, result writers |
+| Engine | `src/HealthGPS` | `Simulation`, `Runner`, modules, scenarios, message bus |
+| Core | `src/HealthGPS.Core` | `Datastore` contract, POCOs, shared types |
+| Input | `src/HealthGPS.Input` | File `DataManager`, config/schema load, model registration |
+| ADEVS | `src/external/adevs` | Discrete-event clock used by `hgps::Simulation` |
+| Tests | `src/HealthGPS.Tests` | Unit / integration tests |
+
+### Components (current diagram)
+
+| ![Health-GPS Components](../images/architecture_diagrams/fig_components.svg) |
+|:----------------------------------------------------------------------------:|
+| *Health-GPS microsimulation components* |
+
+Same four pieces as in the overview: Console host, engine, Core `Datastore`, Input `DataManager`. Country-indexed reference data go through the Datastore; project-specific modelling CSVs are loaded via Input / modelling config.
+
+### General workflow
+
+| ![Health-GPS General Workflow](../images/architecture_diagrams/fig_generalworkflow.svg) |
+|:---------------------------------------------------------------------------------------:|
+| *Health-GPS general workflow* |
+
+At a high level a run:
+
+1. Loads and validates config (JSON schemas) and datastore files.
+2. Registers risk-factor model definitions and builds the module factory.
+3. Creates the event bus, result writers, `Runner`, and a shared `SyncChannel`.
+4. Builds a baseline `Simulation` (and optionally an intervention pair).
+5. Executes trial runs; analysis publishes yearly results; the host writes JSON/CSV (and optional income-stratum or individual ID-tracking CSVs).
+
+How to configure outputs as a modeller: [User Guide - Results](../user/userguide.md#results).
+
+### Host application
+
+The Console host is the reference composition path. Entry point: `src/HealthGPS.Console/program.cpp`.
+
+| ![Health-GPS Host Application](../images/architecture_diagrams/fig_hostapp.svg) |
+|:------------------------------------------------------------------------------:|
+| *Console host: compose and run an experiment* |
+
+Typical compose order in `main`:
+
+1. Parse CLI / load config (`HealthGPS.Input` configuration helpers).
+2. Optionally cap TBB parallelism (`tbb::global_control` when `--threads` is set).
+3. Construct `input::DataManager` and wrap it in `hgps::CachedRepository`.
+4. `register_risk_factor_model_definitions(...)` then `get_default_simulation_module_factory(repository)`.
+5. Build `ModelInput` from config + country + diseases.
+6. Create `DefaultEventBus`, `EventMonitor`, `ResultFileWriter` (and optional `IndividualIDTrackingWriter`).
+7. Create `Runner` with a master seed generator.
+8. Create a shared `SyncChannel`.
+9. `create_baseline_simulation(...)`; if an intervention is active, also `create_intervention_simulation(...)` (both helpers live under `src/HealthGPS.Input/configuration.*`).
+10. `runner.run(baseline[, intervention], trial_runs)` then stop the event monitor.
+
+Dry-run mode validates inputs and exits before constructing the runner.
+
+### Modules and factory
+
+| ![Health-GPS Module Interface](../images/architecture_diagrams/fig_moduleiface.svg) |
+|:----------------------------------------------------------------------------------:|
+| *Simulation modules, factory, and repository access* |
+
+| Enum value | Typical class | Responsibility |
+| ---------- | ------------- | -------------- |
+| `RiskFactor` | `RiskFactorModule` | Hosts static + dynamic risk-factor model packs |
+| `SES` | SES noise module | Continuous `ses` noise on `Person` |
+| `Demographic` | `DemographicModule` | Age/gender, births/deaths, residual mortality, migration drivers |
+| `Disease` | Disease host | NCD (`others`) and `cancers` sub-models |
+| `Analysis` | `AnalysisModule` | BoD-style indicators; publishes result events |
+
+Default builders are registered in `get_default_simulation_module_factory` (`src/HealthGPS/simulation_module.cpp`): SES, Demographic, RiskFactor, Disease, Analysis.
+
+#### Factory create order vs runtime call order
+
+In the `Simulation` constructor (`src/HealthGPS/simulation.cpp`), modules are created as: SES → Demographic → RiskFactor → Disease → Analysis. That is ownership/wiring order only.
+
+Runtime call order is fixed in `initialise_population` / `update_population` (see overview and the next subsection). Do not assume factory registration order is the yearly update order.
+
+### Data model overview
+
+| ![Health-GPS Data Model](../images/architecture_diagrams/fig_datamodel.svg) |
+|:--------------------------------------------------------------------------:|
+| *Backend data model (conceptual)* |
+
+- Contract: `hgps::core::Datastore` — `src/HealthGPS.Core/datastore.h`
+- File implementation: `hgps::input::DataManager` — `src/HealthGPS.Input/datamanager.*`
+- Engine-facing cache: `Repository` / `CachedRepository` — `src/HealthGPS/repository.*`
+
+Entity relationships and field-level schema: **[Data Model](datamodel.md)**.
+
+### Virtual population: initialise and update
+
+| ![Person initialise / update](../images/architecture_diagrams/fig_personinit.svg) |
+|:--------------------------------------------------------------------------------:|
+| *Virtual population initialise and yearly update* |
+
+**Initialise** (`Simulation::initialise_population`) — order is required:
+
+1. Size and `reset_population`
+2. Demographic
+3. SES
+4. RiskFactor (static pack `generate`, then dynamic pack `generate`)
+5. Disease
+6. Analysis
+
+**Yearly update** (`Simulation::update_population`):
+
+1. Demographic (with disease for mortality)
+2. Net immigration (`update_net_immigration`)
+3. SES
+4. RiskFactor (static pack `update`, then dynamic pack `update`)
+5. Disease
+6. Analysis
+
+Per-attribute assignment and update maths: [How Health-GPS models a person](../technical/guides/how-healthgps-models-a-person.md).
+
+### Risk-factor pipeline
+
+Config exposes two risk-factor **slots** historically named `static` and `dynamic`. Those names are **pipeline roles** (packs registered as `RiskFactorModelType::Static` and `::Dynamic`), not labels for individual nutrients.
+
+| ![Risk-factor pipeline](../images/architecture_diagrams/fig_pipeline.svg) |
+|:------------------------------------------------------------------------:|
+| *Static and dynamic risk-factor packs inside RiskFactorModule* |
+
+`RiskFactorModule` (`src/HealthGPS/riskfactor.cpp`) always requires both packs:
+
+| Phase | Call order |
+| ----- | ---------- |
+| Initialise | Static `generate_risk_factors` → Dynamic `generate_risk_factors` |
+| Yearly update | Static `update_risk_factors` → Dynamic `update_risk_factors` |
+
+So both packs run at **initialisation and** on every yearly update. Do not read “static = init only” / “dynamic = update only”—that wording is obsolete relative to the code.
+
+Clarification for modellers: [Models overview — static vs dynamic](../user/models-overview.md#the-confusing-words-static-and-dynamic). Per-model I/O: [Simulation models reference](../technical/guides/simulation-models-reference.md).
+
+### Energy balance / Kevin Hall
+
+| ![Energy balance model](../images/architecture_diagrams/fig_ebm.svg) |
+|:-------------------------------------------------------------------:|
+| *Energy-balance / Kevin Hall placement in the framework* |
+
+`KevinHallModel` (`src/HealthGPS/kevin_hall_model.*`) usually sits in the dynamic pack and participates in generate/update like any other pack. When weight mean adjustment is enabled across paired scenarios, it exchanges aggregate tables over `SyncChannel` (`send_weight_adjustments` / `receive_weight_adjustments`)—see [Baseline / intervention sync](#baseline--intervention-sync).
+
+Equations and FINCH wiring: [simulation models reference](../technical/guides/simulation-models-reference.md), [FINCH guide](../technical/guides/finch-linear-models-and-income-adjustment.md).
+
+### Message bus
+
+| ![Message bus](../images/architecture_diagrams/fig_messagebus.svg) |
+|:-----------------------------------------------------------------:|
+| *Event aggregator / message bus* |
+
+| Piece | Location |
+| ----- | -------- |
+| Interface | `EventAggregator` — `event_aggregator.h` |
+| Default impl | `DefaultEventBus` — `event_bus.h` / `.cpp` |
+| Message base / types | `event_message.h` |
+| Host consumer | `EventMonitor` — `src/HealthGPS.Console/event_monitor.*` |
+
+| `EventType` | Typical use |
+| ----------- | ----------- |
+| `runner` | Executive start / run begin / finish / cancel (`Runner`) |
+| `info` | Progress and informational notices from the engine |
+| `result` | Yearly analysis aggregates → result file writer |
+| `individual_tracking` | Optional per-person tracking rows → ID-tracking CSV |
+| `error` | Error reporting |
+
+`EventMonitor` subscribes to all of the above. The Console path is in-process only; an external broker would be a custom-host design.
+
+### Policy levers
+
+| ![Policy levers](../images/architecture_diagrams/fig_policylevers.svg) |
+|:---------------------------------------------------------------------:|
+| *Baseline vs intervention policy scenarios* |
+
+| Kind | Examples | Notes |
+| ---- | -------- | ----- |
+| Baseline | `BaselineScenario` | Status-quo path; typically pass-through for policy apply |
+| Intervention | `SimplePolicyScenario`, `MarketingPolicyScenario`, `MarketingDynamicScenario`, `FoodLabellingScenario`, `PhysicalActivityScenario`, `FiscalPolicyScenario` | Built via `create_intervention_scenario` in Input configuration |
+
+Scenarios are **not** a `SimulationModuleType`. The same module stack runs in both scenarios; only intervention evaluates policy after `policy_start_year` and may apply optional PIF. FINCH policy CSVs: [FINCH guide](../technical/guides/finch-linear-models-and-income-adjustment.md).
+
+### Baseline / intervention sync
+
+| ![Policy sync](../images/architecture_diagrams/fig_policysync.svg) |
+|:-----------------------------------------------------------------:|
+| *One-way aggregate synchronisation baseline → intervention* |
+
+Sync is **one-way: baseline → intervention**, and transfers **aggregate tables only** (not individual people).
+
+| Message (conceptual) | Payload idea | Where |
+| -------------------- | ------------ | ----- |
+| Residual mortality | age × sex table | `demographic.cpp` send / receive |
+| Net immigration | age × sex counts | `simulation.cpp` (`NetImmigrationMessage`) |
+| Risk-factor mean adjustment | sex × age × factor table | `risk_factor_adjustable_model.cpp` |
+| Kevin Hall weight adjustment | sex × age weights | `kevin_hall_model.cpp` |
+
+Initial cohort person IDs can still match across scenarios for optional ID-tracking CSVs. Design notes: [same-person ID plan](../technical/plans/same-person-id-baseline-intervention-plan.md).
+
+### Parallelism
+
+| ![Parallel execution](../images/architecture_diagrams/fig_parallel.svg) |
+|:----------------------------------------------------------------------:|
+| *Runner scenario threads and population-level parallel loops* |
+
+#### Simulation executive (`Runner`)
+
+Code: `src/HealthGPS/runner.cpp`.
+
+- Baseline-only: one `std::jthread` per trial (`run(baseline, trial_runs)`), joined before the next trial.
+- Baseline + intervention: two `std::jthread`s per trial (baseline and intervention), same run seed, joined together.
+- Each thread drives an ADEVS `Simulator` over that scenario’s `Simulation` (`run_model_thread`).
+
+#### Population / module work (TBB)
+
+Modules use Intel oneTBB (`tbb::parallel_for_each`, `core::parallel_for`, and related) over people or table slices. The Console host can cap the pool with `tbb::global_control` from CLI. Sizing notes: [Performance optimizations](../technical/guides/performance-optimizations.md).
+
+---
+
+## Related documentation
 
 | Topic | Document |
 | ----- | -------- |
@@ -230,20 +470,25 @@ The version of the *libraries* required by the application at runtime depends on
 | Data model | [Data Model](datamodel.md) |
 | Build guide | [Developer Guide](development.md) |
 | GitHub flow | [GitHub Flow](github-flow.md) |
+| How a virtual person is modelled | [How Health-GPS models a person](../technical/guides/how-healthgps-models-a-person.md) |
+| Per-model inputs and outputs | [Simulation models reference](../technical/guides/simulation-models-reference.md) |
 | FINCH / income / predictors | [FINCH guide](../technical/guides/finch-linear-models-and-income-adjustment.md) |
+| Models overview (static vs dynamic) | [Models overview](../user/models-overview.md) |
 | Feb 2026 integrated changes | [Update report](../technical/guides/healthgps-update-report-2026-02-20.md) |
+| Threading and HPC sizing | [Performance guide](../technical/guides/performance-optimizations.md) |
 | Windows MSVC builds | [MSVC troubleshooting](msvc-windows-build-troubleshooting.md) |
 | Technical docs | [Technical documentation index](../technical/README.md) |
 | Documentation home | [documentation/README.md](../README.md) |
+| Site intro (Mermaid sequences) | [index.md](../index.md) |
 
 ---
 
-[cpp20]:https://en.cppreference.com/w/cpp/20 "C++ 20 standard features and compiler support"
-[kafka]:https://kafka.apache.org "Distributed event streaming platform"
-[broker]:https://www.rabbitmq.com "Message-broker with Advanced Message Queuing Protocol"
-[adevs]:https://web.ornl.gov/~nutarojj/adevs "A Discrete EVent System simulator library"
-[devs]:https://doi.org/10.1016/j.ifacol.2017.08.672 "From Discrete Event Simulation to Discrete Event Specified Systems (DEVS)"
-[adevsim]:https://github.com/imperialCHEPI/healthgps/blob/main/src/external/adevs/adevs_base.h "Vendored ADEVS headers under src/external/adevs"
+[cpp20]: https://en.cppreference.com/w/cpp/20 "C++ 20 standard features and compiler support"
+[kafka]: https://kafka.apache.org "Distributed event streaming platform"
+[broker]: https://www.rabbitmq.com "Message-broker with Advanced Message Queuing Protocol"
+[adevs]: https://web.ornl.gov/~nutarojj/adevs "A Discrete EVent System simulator library"
+[devs]: https://doi.org/10.1016/j.ifacol.2017.08.672 "From Discrete Event Simulation to Discrete Event Specified Systems (DEVS)"
+[adevsim]: https://github.com/imperialCHEPI/healthgps/blob/main/src/external/adevs/adevs_base.h "Vendored ADEVS headers under src/external/adevs"
 
 ---
 

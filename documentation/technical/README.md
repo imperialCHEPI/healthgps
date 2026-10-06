@@ -37,17 +37,20 @@ Engineering design notes for developers. Written as ordinary markdown plans (sum
 | [Parallelize output writes](plans/parallelize-output-writes-plan.md) | Result dispatch threading |
 | [Project requirements plan](plans/project-requirements-plan.md) | `project_requirements` schema |
 | [Schema migration plan](plans/schema-migration-plan.md) | Config v1 to v2 |
+| [JACARDI 7 countries implementation](plans/JACARDI-7-countries-implementation-plan.md) | New CSV pathway for SI/RO/BE/IT/MT/ES/PL; coexistence with India/FINCH/France; Belgium UKPDS hook |
 
 ## If you are working on
 
 | Topic | Start here | Then |
 | ----- | ---------- | ---- |
 | How a virtual person is built | [How Health-GPS models a person](guides/how-healthgps-models-a-person.md) | [Models overview](../user/models-overview.md) |
+| C++ software design / modules | [Software & Architecture](../developer/architecture.md) | [Developer Guide](../developer/development.md) |
 | FINCH policy CSVs / `gender2` | [FINCH guide](guides/finch-linear-models-and-income-adjustment.md) | [Project requirements plan](plans/project-requirements-plan.md) |
 | Income quintile adjustment | [FINCH guide](guides/finch-linear-models-and-income-adjustment.md) | [Income quintile plan](plans/income-quintile-factor-means-plan.md) |
 | Kevin Hall height/weight | [Height quintile plan](plans/height-csv-quintile-plan.md) | [Weight quintile plan](plans/weight-quintile-plan.md) |
 | Output / person IDs | [Individual ID tracking](plans/individual-id-tracking-csv-plan.md) | [Same person ID plan](plans/same-person-id-baseline-intervention-plan.md) |
 | What shipped in Feb 2026 | [Update report](guides/healthgps-update-report-2026-02-20.md) | [Performance notes](guides/performance-optimizations.md) |
+| JACARDI (7 countries / new pathway) | [JACARDI 7 countries implementation](plans/JACARDI-7-countries-implementation-plan.md) | [Project requirements](plans/project-requirements-plan.md) · UKPDS plan (`JACARDI-UKPDS-healthGPS.md`, when on branch) |
 | Windows build / MSVC | [MSVC troubleshooting](../developer/msvc-windows-build-troubleshooting.md) | [Developer Guide](../developer/development.md) |
 
 ---

@@ -35,8 +35,11 @@ struct SettingsInfo {
     auto operator<=>(const SettingsInfo &rhs) const = default;
 };
 
-//! Socio-economic status (SES) model inputs
+//! Socio-economic status (SES) model inputs.
+//! Optional in config: when omitted, enabled stays false and Person.ses is left at 0.
+//! When the ses_model object is present, enabled defaults to true (backwards compatible).
 struct SESInfo {
+    bool enabled{false};
     std::string function;
     std::vector<double> parameters;
 

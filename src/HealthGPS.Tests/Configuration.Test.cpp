@@ -637,7 +637,7 @@ TEST_F(ConfigParsingFixture, LoadModellingInfo) {
         .encoding = "UTF8",
         .file_names = {{"a", create_file_absolute()}, {"b", create_file_absolute()}},
         .income_stratum_factors_mean = {}};
-    const SESInfo ses_info{.function = "normal", .parameters = {0.0, 1.0}};
+    const SESInfo ses_info{.enabled = true, .function = "normal", .parameters = {0.0, 1.0}};
 
     const json valid_modelling_info = [&]() {
         json j;
@@ -657,6 +657,16 @@ TEST_F(ConfigParsingFixture, LoadModellingInfo) {
         EXPECT_EQ(config.modelling.risk_factor_models, risk_factor_models);
         EXPECT_EQ(config.modelling.baseline_adjustment, baseline_info);
         EXPECT_EQ(config.ses, ses_info);
+    }
+
+    // Missing ses_model is allowed (JACARDI / unused SES noise)
+    {
+        auto config = create_config();
+        auto j = valid_modelling_info;
+        j["modelling"].erase("ses_model");
+        EXPECT_NO_THROW(load_modelling_info(j, config));
+        EXPECT_FALSE(config.ses.enabled);
+        EXPECT_TRUE(config.ses.function.empty());
     }
 
     // No modelling key
@@ -781,7 +791,7 @@ TEST_F(ConfigParsingFixture, LoadModellingInfoOptionalPolicyStartYear) {
                                      .encoding = "UTF8",
                                      .file_names = {{"a", create_file_absolute()}},
                                      .income_stratum_factors_mean = {}};
-    const SESInfo ses_info{.function = "normal", .parameters = {0.0}};
+    const SESInfo ses_info{.enabled = true, .function = "normal", .parameters = {0.0, 1.0}};
     json j;
     j["modelling"]["risk_factors"] = risk_factors;
     j["modelling"]["risk_factor_models"] = risk_factor_models;

@@ -209,8 +209,9 @@ ModelInput create_model_input(core::DataTable &input_table, core::Country countr
                                  : static_cast<unsigned int>(config.start_time + 2),
     };
 
-    auto ses_mapping =
-        SESDefinition{.fuction_name = config.ses.function, .parameters = config.ses.parameters};
+    auto ses_mapping = SESDefinition{.enabled = config.ses.enabled,
+                                     .fuction_name = config.ses.function,
+                                     .parameters = config.ses.parameters};
 
     auto mapping = std::vector<MappingEntry>();
     for (const auto &item : config.modelling.risk_factors) {

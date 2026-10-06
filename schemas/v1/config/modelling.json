@@ -5,7 +5,13 @@
     "properties": {
         "ses_model": {
             "type": "object",
+            "description": "Optional continuous SES noise (Person.ses). Omit for projects that do not use SES as a predictor (e.g. JACARDI). When present, noise is drawn unless enabled is false. Existing India/HLM packs keep working by leaving this block as today.",
             "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "When false, the SES block is ignored and Person.ses stays 0. When omitted, defaults to true (backwards compatible)."
+                },
                 "function_name": {
                     "type": "string"
                 },
@@ -16,6 +22,10 @@
                     }
                 }
             },
+            "required": [
+                "function_name",
+                "function_parameters"
+            ],
             "additionalProperties": false
         },
         "policy_start_year": {
@@ -309,7 +319,6 @@
         }
     },
     "required": [
-        "ses_model",
         "risk_factors",
         "risk_factor_models",
         "baseline_adjustments"

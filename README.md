@@ -17,24 +17,24 @@ The *Health GPS microsimulation* is being developed in collaboration between the
 
 Full docs live under `[documentation/](documentation/README.md)`. Start there for indexes by audience.
 
-| Need                                            | Document                                                                                   |
-| ----------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| Documentation home                              | [documentation/README.md](documentation/README.md)                                         |
-| Site-style intro (diagrams)                     | [documentation/index.md](documentation/index.md)                                           |
-| First run / binaries                            | [Quick Start](documentation/user/getstarted.md)                                            |
-| Config, outputs, HPC                            | [User Guide](documentation/user/userguide.md)                                              |
-| JSON schemas (diagrams)                         | [Configuration schemas](documentation/user/schemas.md)                                     |
+| Need                                            | Document                                                                                                                                                |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Documentation home                              | [documentation/README.md](documentation/README.md)                                                                                                      |
+| Site-style intro (diagrams)                     | [documentation/index.md](documentation/index.md)                                                                                                        |
+| First run / binaries                            | [Quick Start](documentation/user/getstarted.md)                                                                                                         |
+| Config, outputs, HPC                            | [User Guide](documentation/user/userguide.md)                                                                                                           |
+| JSON schemas (diagrams)                         | [Configuration schemas](documentation/user/schemas.md)                                                                                                  |
 | Models and module I/O                           | [Models overview](documentation/user/models-overview.md) · [Simulation models reference](documentation/technical/guides/simulation-models-reference.md) |
-| Build from source / CMake                       | [Developer Guide](documentation/developer/development.md)                                  |
-| Architecture                                    | [Software Architecture](documentation/developer/architecture.md)                           |
-| Data model / Datastore                          | [Data Model](documentation/developer/datamodel.md)                                         |
-| Windows MSVC / Ninja (`cstdint`, `MSVCRTD.lib`) | [MSVC troubleshooting](documentation/developer/msvc-windows-build-troubleshooting.md)      |
-| GitHub Pages deploy failed                      | [Docs deploy troubleshooting](documentation/developer/docs-deploy-troubleshooting.md)    |
-| FINCH / income / predictors                     | [FINCH guide](documentation/technical/guides/finch-linear-models-and-income-adjustment.md) |
-| Feb 2026 integrated changes                     | [Update report](documentation/technical/guides/healthgps-update-report-2026-02-20.md)      |
-| Threading / HPC sizing                          | [Performance guide](documentation/technical/guides/performance-optimizations.md)           |
-| Feature plans                                   | [technical/README.md](documentation/technical/README.md)                                   |
-| Doxygen API (GitHub Pages)                      | [API](https://imperialchepi.github.io/healthgps/api/)                                      |
+| Build from source / CMake                       | [Developer Guide](documentation/developer/development.md)                                                                                               |
+| Architecture                                    | [Software Architecture](documentation/developer/architecture.md)                                                                                        |
+| Data model / Datastore                          | [Data Model](documentation/developer/datamodel.md)                                                                                                      |
+| Windows MSVC / Ninja (`cstdint`, `MSVCRTD.lib`) | [MSVC troubleshooting](documentation/developer/msvc-windows-build-troubleshooting.md)                                                                   |
+| GitHub Pages deploy failed                      | [Docs deploy troubleshooting](documentation/developer/docs-deploy-troubleshooting.md)                                                                   |
+| FINCH / income / predictors                     | [FINCH guide](documentation/technical/guides/finch-linear-models-and-income-adjustment.md)                                                              |
+| Feb 2026 integrated changes                     | [Update report](documentation/technical/guides/healthgps-update-report-2026-02-20.md)                                                                   |
+| Threading / HPC sizing                          | [Performance guide](documentation/technical/guides/performance-optimizations.md)                                                                        |
+| Feature plans                                   | [technical/README.md](documentation/technical/README.md)                                                                                                |
+| Doxygen API (GitHub Pages)                      | [API](https://imperialchepi.github.io/healthgps/api/)                                                                                                   |
 
 Published website: [https://imperialchepi.github.io/healthgps/](https://imperialchepi.github.io/healthgps/). It is rebuilt from `documentation/` by the [docs workflow](.github/workflows/docs.yml) on **release** or **manual dispatch**, not on every push. Until that workflow runs against the current tree, the live site may lag the repo (older flat page layout).
 
@@ -57,75 +57,106 @@ flowchart LR
 **Host application, run loop, module order, and output:**
 
 ```mermaid
-flowchart TB
-    subgraph host [Host Application]
-        MAIN["main (program.cpp)"]
-        CLI[Parse CLI options]
-        CFG[Load config JSON]
-        DATA[Load datatable / DataManager]
-        REPO[Repository + register risk factor definitions]
-        FACTORY[Module factory]
-        MODEL_INPUT[Create ModelInput]
-        BUS[Create EventBus]
-        WRITERS[Result + optional ID-tracking writers]
-        MONITOR[EventMonitor]
-        RUNNER[Runner]
-        CHAN[SyncChannel]
-        CREATE_BASE[Create baseline Simulation]
-        CREATE_POL[Create intervention Simulation if configured]
-        RUN[Runner.run: baseline and optionally intervention]
-        STOP[EventMonitor.stop]
-        EXIT[Exit]
-        MAIN --> CLI --> CFG --> DATA --> REPO --> FACTORY
-        FACTORY --> MODEL_INPUT
-        MODEL_INPUT --> BUS --> WRITERS --> MONITOR
-        MONITOR --> RUNNER --> CHAN --> CREATE_BASE --> CREATE_POL --> RUN --> STOP --> EXIT
-    end
+%% Generated by https://gitdiagram.com/imperialchepi/healthgps
+flowchart TD
 
-    subgraph runLoop [Per-trial run loop]
-        SETUP[Setup run: seed]
-        SIM_ADD[Add Simulation to ADEVS Simulator]
-        INIT[Simulation.init: initialise_population]
-        TICK[Simulation.update: update_population]
-        FINI[Simulation.fini: cleanup]
-        SETUP --> SIM_ADD --> INIT --> TICK
-        TICK --> TICK
-        TICK --> FINI
-    end
+subgraph group_host["Host and input"]
+  node_cli["CLI host<br/>[program.cpp]"]
+  node_configuration["Configuration<br/>[configuration.cpp]"]
+  node_model_parser["Model parser<br/>[model_parser.cpp]"]
+  node_data_manager["Data manager<br/>[datamanager.cpp]"]
+  node_repository["Cached repository<br/>[repository.cpp]"]
+  node_model_input["Model input<br/>[modelinput.h]"]
+end
 
-    subgraph initPop [initialise_population order]
-        D_INIT[Demographic]
-        SES_INIT[SES]
-        RF_INIT[Risk factor: static then dynamic]
-        DIS_INIT[Disease]
-        A_INIT[Analysis]
-        STATS[Print initial population statistics]
-        D_INIT --> SES_INIT --> RF_INIT --> DIS_INIT --> A_INIT --> STATS
-    end
+subgraph group_runtime["Simulation runtime"]
+  node_runner["Trial runner<br/>[runner.cpp]"]
+  node_simulation["Simulation engine<br/>[simulation.cpp]"]
+  node_runtime_context["Runtime context"]
+end
 
-    subgraph updatePop [update_population order]
-        D_UPD[Demographic update]
-        MIG[Net immigration]
-        SES_UPD[SES update]
-        RF_UPD[Risk factor update]
-        DIS_UPD[Disease update]
-        A_UPD[Analysis update: publish results]
-        D_UPD --> MIG --> SES_UPD --> RF_UPD --> DIS_UPD --> A_UPD
-    end
+subgraph group_domains["Population model"]
+  node_demographics["Demographics<br/>[demographic.cpp]"]
+  node_ses["Socioeconomic module"]
+  node_risk_factors["Risk factors<br/>[riskfactor.cpp]"]
+  node_disease["Disease models<br/>[disease.cpp]"]
+  node_scenarios["Policy scenarios"]
+end
 
-    subgraph output [Output]
-        PUB[Analysis publishes ResultEventMessage and optionally IndividualTrackingEventMessage]
-        DISPATCH[EventMonitor dispatch threads]
-        JSON_CSV[ResultFileWriter: JSON + main CSV + income CSVs]
-        TRACK[IndividualIDTrackingWriter: tracking CSV]
-        PUB --> DISPATCH --> JSON_CSV
-        PUB --> DISPATCH --> TRACK
-    end
+subgraph group_analysis["Analysis and output"]
+  node_analysis_module["Analysis module"]
+  node_event_bus["Event bus<br/>[event_bus.cpp]"]
+  node_event_monitor["Event monitor<br/>[event_monitor.cpp]"]
+  node_result_writer["Result writer"]
+  node_tracking_writer["ID tracking"]
+end
 
-    RUN --> runLoop
-    INIT --> initPop
-    TICK --> updatePop
-    A_UPD --> PUB
+subgraph group_foundation["Shared foundations"]
+  node_core_data["Core data types<br/>[forward_type.h]"]
+  node_income_layout["Income layout"]
+  node_string_util["String utilities<br/>[string_util.h]"]
+end
+
+node_researcher(("Researcher"))
+
+node_researcher -->|"starts run"| node_cli
+node_cli -->|"loads config"| node_configuration
+node_cli -->|"loads data"| node_data_manager
+node_configuration -->|"configures models"| node_model_parser
+node_cli -->|"creates inputs"| node_model_input
+node_data_manager -->|"supplies data"| node_repository
+node_repository -.->|"provides definitions"| node_model_input
+node_cli -->|"starts trials"| node_runner
+node_runner -->|"runs simulations"| node_simulation
+node_simulation -.->|"uses context"| node_runtime_context
+node_simulation -->|"initializes population"| node_demographics
+node_simulation -->|"updates population"| node_ses
+node_simulation -->|"updates population"| node_risk_factors
+node_simulation -->|"updates population"| node_disease
+node_simulation -.->|"applies intervention"| node_scenarios
+node_simulation -.->|"produces analysis"| node_analysis_module
+node_cli -->|"creates bus"| node_event_bus
+node_event_bus -->|"delivers events"| node_event_monitor
+node_event_bus -->|"delivers results"| node_result_writer
+node_event_bus -.->|"delivers tracking"| node_tracking_writer
+node_model_input -.->|"uses types"| node_core_data
+node_result_writer -->|"formats income output"| node_income_layout
+
+click node_cli "https://github.com/imperialchepi/healthgps/blob/main/src/HealthGPS.Console/program.cpp"
+click node_configuration "https://github.com/imperialchepi/healthgps/blob/main/src/HealthGPS.Input/configuration.cpp"
+click node_model_parser "https://github.com/imperialchepi/healthgps/blob/main/src/HealthGPS.Input/model_parser.cpp"
+click node_data_manager "https://github.com/imperialchepi/healthgps/blob/main/src/HealthGPS.Input/datamanager.cpp"
+click node_repository "https://github.com/imperialchepi/healthgps/blob/main/src/HealthGPS/repository.cpp"
+click node_model_input "https://github.com/imperialchepi/healthgps/blob/main/src/HealthGPS/modelinput.h"
+click node_runner "https://github.com/imperialchepi/healthgps/blob/main/src/HealthGPS/runner.cpp"
+click node_simulation "https://github.com/imperialchepi/healthgps/blob/main/src/HealthGPS/simulation.cpp"
+click node_runtime_context "https://github.com/imperialchepi/healthgps/blob/main/src/HealthGPS/runtime_context.cpp"
+click node_demographics "https://github.com/imperialchepi/healthgps/blob/main/src/HealthGPS/demographic.cpp"
+click node_ses "https://github.com/imperialchepi/healthgps/blob/main/src/HealthGPS/ses_noise_module.cpp"
+click node_risk_factors "https://github.com/imperialchepi/healthgps/blob/main/src/HealthGPS/riskfactor.cpp"
+click node_disease "https://github.com/imperialchepi/healthgps/blob/main/src/HealthGPS/disease.cpp"
+click node_scenarios "https://github.com/imperialchepi/healthgps/blob/main/src/HealthGPS/intervention_scenario.h"
+click node_analysis_module "https://github.com/imperialchepi/healthgps/blob/main/src/HealthGPS/analysis_module.cpp"
+click node_event_bus "https://github.com/imperialchepi/healthgps/blob/main/src/HealthGPS/event_bus.cpp"
+click node_event_monitor "https://github.com/imperialchepi/healthgps/blob/main/src/HealthGPS.Console/event_monitor.cpp"
+click node_result_writer "https://github.com/imperialchepi/healthgps/blob/main/src/HealthGPS.Console/result_file_writer.cpp"
+click node_tracking_writer "https://github.com/imperialchepi/healthgps/blob/main/src/HealthGPS.Console/individual_id_tracking_writer.cpp"
+click node_core_data "https://github.com/imperialchepi/healthgps/blob/main/src/HealthGPS.Core/forward_type.h"
+click node_income_layout "https://github.com/imperialchepi/healthgps/blob/main/src/HealthGPS.Core/income_category_layout.h"
+click node_string_util "https://github.com/imperialchepi/healthgps/blob/main/src/HealthGPS.Core/string_util.h"
+
+classDef toneNeutral fill:#f8fafc,stroke:#334155,stroke-width:1.5px,color:#0f172a
+classDef toneBlue fill:#dbeafe,stroke:#2563eb,stroke-width:1.5px,color:#172554
+classDef toneAmber fill:#fef3c7,stroke:#d97706,stroke-width:1.5px,color:#78350f
+classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
+classDef toneRose fill:#ffe4e6,stroke:#e11d48,stroke-width:1.5px,color:#881337
+classDef toneIndigo fill:#e0e7ff,stroke:#4f46e5,stroke-width:1.5px,color:#312e81
+classDef toneTeal fill:#ccfbf1,stroke:#0f766e,stroke-width:1.5px,color:#134e4a
+class node_cli,node_configuration,node_model_parser,node_data_manager,node_repository,node_model_input toneBlue
+class node_runner,node_simulation,node_runtime_context toneAmber
+class node_demographics,node_ses,node_risk_factors,node_disease,node_scenarios toneMint
+class node_analysis_module,node_event_bus,node_event_monitor,node_result_writer,node_tracking_writer toneRose
+class node_core_data,node_income_layout,node_string_util,node_researcher toneIndigo
 ```
 
 **Person initialisation sequence (overview):**
@@ -162,44 +193,6 @@ flowchart TB
     Q --> R[Disease Model]
 ```
 
-## Project Status and Recent Progress
-
-**Last updated**
-Significant progress has been made across the HealthGPS codebase. The following features and improvements are now **completed**:
-
-- Trended adjustment framework
-- Schema validation and dynamic schema handling
-- Risk factor configuration via external config files
-- Dynamic age caps and age limits
-- Income-based input and output files
-- Individual ID based tracking and output
-- Consistent data loading across modules
-- Log-transformed energy intake handling
-- FINCH-specific age cap implementation
-- Trended factor mean calculations
-
-These updates improve robustness, extensibility, and consistency across both baseline and intervention workflows.
-
----
-
-Detailed tables describing:
-
-- **Where parallelisation is applied**
-- **Population Impact Fraction (PIF) handling**
-- **Income and individual ID tracking mechanisms**
-
-are in the full [update report](documentation/technical/guides/healthgps-update-report-2026-02-20.md).
-
-Relevant design documents (under `documentation/technical/plans/`):
-
-- [Individual ID tracking](documentation/technical/plans/individual-id-tracking-csv-plan.md)
-- [Consistent person IDs across scenarios](documentation/technical/plans/same-person-id-baseline-intervention-plan.md)
-- [Income quintile factor means](documentation/technical/plans/income-quintile-factor-means-plan.md)
-- [Project requirements](documentation/technical/plans/project-requirements-plan.md)
-- [Performance / parallelization notes](documentation/technical/guides/performance-optimizations.md)
-
----
-
 ## Project Specific Requirements
 
 Health-GPS is driven by config flags (not hard-coded project names). Optional `project_requirements` in `config.json` controls demographics (region, ethnicity, `gender2`), income type and final category count (`3` / `4` / `5`), physical activity, trends, and two-stage logistic behaviour. See:
@@ -207,20 +200,6 @@ Health-GPS is driven by config flags (not hard-coded project names). Optional `p
 - [Project requirements plan](documentation/technical/plans/project-requirements-plan.md)
 - [User Guide: project requirements](documentation/user/userguide.md#project-requirements)
 - Schema: `schemas/v1/config/project_requirements.json`
-
----
-
-## FINCH: Age/Gender/Income-Based Model Validation
-
-As part of the **FINCH** project, income-stratum and quintile-based calibration adjust model outputs to better reflect observed distributions by:
-
-- Age
-- Gender
-- Income quintiles (or any number of income categories the user specifies)
-
-This enables income-stratified calibration and improves external validity when comparing model outputs against observed data.
-
-See the modeller-facing [FINCH guide](documentation/technical/guides/finch-linear-models-and-income-adjustment.md) and the [income quintile factor means plan](documentation/technical/plans/income-quintile-factor-means-plan.md).
 
 ## Quick Start
 
@@ -253,7 +232,7 @@ For more information, see the [documentation home](documentation/README.md), [Qu
 
 ## Development Tools
 
-The *Health GPS* software is written in modern, standard ANSI C++, targeting the [C++20 version]([https://en.cppreference.com/w/cpp/20](https://en.cppreference.com/w/cpp/20)) and using the C++Standard Library. The project is fully managed by [CMake](https://cmake.org/) and [Microsoft Visual Studio](https://visualstudio.microsoft.com), the code base is portable but requires a C++20 compatible compiler to build. The development toolset uses [Ninja](https://ninja-build.org/) for build, [vcpkg](https://github.com/microsoft/vcpkg) package manager for dependencies, [googletest](https://github.com/google/googletest) for unit testing and [GitHub Actions](https://docs.github.com/en/actions) for automated builds.
+The *Health GPS* software is written in modern, standard ANSI C++, targeting the [C++20 version](https://en.cppreference.com/w/cpp/20) and using the C++Standard Library. The project is fully managed by [CMake](https://cmake.org/) and [Microsoft Visual Studio](https://visualstudio.microsoft.com), the code base is portable but requires a C++20 compatible compiler to build. The development toolset uses [Ninja](https://ninja-build.org/) for build, [vcpkg](https://github.com/microsoft/vcpkg) package manager for dependencies, [googletest](https://github.com/google/googletest) for unit testing and [GitHub Actions](https://docs.github.com/en/actions) for automated builds.
 
 For more information, see the [Developer Guide](documentation/developer/development.md). On Windows, if CMake cannot find headers such as `cstdint` or linking fails on `MSVCRTD.lib`, see [MSVC / Ninja troubleshooting](documentation/developer/msvc-windows-build-troubleshooting.md).
 
