@@ -107,40 +107,57 @@ Keep host JSON for run control only:
 
 **No scientific coefficients, probabilities, or residual banks in JSON.**
 
-### 3.2 Model file = `ModelName` + CSV slots
+### 3.2 Model file = `ModelName` + CSV slots (no `schedule.csv`)
 
-Example (file info objects match existing Health-GPS CSV descriptors):
+**Order of inclusion** lives in host `config.json` → `modelling.risk_factors[].level` (engine walks levels). **Do not** use a separate `schedule.csv`.
+
+**Static vs dynamic — same ladder, different CSVs**
+
+| Slot | File | Education | Other ladder vars |
+|------|------|-----------|-------------------|
+| Static (init) | `jacardi_model.json` → `JacardiModel` | `lookup` only (Part A) | `*_coefs.csv` init slots |
+| Dynamic (update) | `jacardi_model_update.json` → `JacardiModelUpdate` | `draw_at_22` + `upgrade_transitions` (Part B) | `*_update_coefs.csv` yearly slots |
+
+Age/sex = UNDB / DemographicModule. **MI** = `running.diseases` + datastore RRs, not a Jacardi coef slot.
+
+When a partner delivers a CSV, put its **filename in the matching slot** only (init → static; yearly → dynamic). Coefficients / probabilities live in those CSVs — never as numbers in JSON.
+
+Example init file (abbrev.):
 
 ```json
 {
-  "$schema": "…/schemas/v1/config/models/jacardi_model.json",
   "ModelName": "JacardiModel",
-  "ScheduleFile": {
-    "name": "schedule.csv",
-    "format": "csv",
-    "delimiter": ",",
-    "encoding": "ASCII",
-    "columns": {
-      "order": "integer",
-      "name": "string",
-      "method": "string",
-      "file": "string"
-    }
+  "Education": {
+    "method": "empirical_lifecycle_init",
+    "lookup": { "name": "education_lookup.csv", "format": "csv", "delimiter": ",", "encoding": "ASCII" }
   },
-  "EducationLifecycle": {
-    "lookup": { "name": "education_lookup.csv", "format": "csv", "delimiter": ",", "encoding": "ASCII" },
-    "draw_at_22": { "name": "education_draw_at_22_ssp2.csv", "format": "csv", "delimiter": ",", "encoding": "ASCII" },
-    "upgrade_transitions": { "name": "education_upgrade_transitions_ssp2.csv", "format": "csv", "delimiter": ",", "encoding": "ASCII" }
+  "Employment": {
+    "method": "logistic",
+    "coefficients": { "name": "employment_coefs.csv", "format": "csv", "delimiter": ",", "encoding": "ASCII" }
   }
 }
 ```
 
-- `schedule.csv` lists ladder steps and points at coeff / prevalence CSVs.
-- Linear / logistic / multinomial **coefficients live only in those CSVs**.
-- Caps such as age 110 / year 2110 come from the **data extent** (or a single optional CSV meta row later) — not hard-coded magic numbers in JSON if we can avoid them; document any unavoidable engine defaults in code comments + this plan.
+Example update file (abbrev.):
 
-Dynamic companion file: same idea — `ModelName: JacardiModelUpdate`, CSV slots for yearly update behaviour (education Part B uses the education CSVs already loaded; newborns re-init schedule).
+```json
+{
+  "ModelName": "JacardiModelUpdate",
+  "Education": {
+    "method": "empirical_lifecycle_update",
+    "draw_at_22": { "name": "education_draw_at_22_ssp2.csv", "format": "csv", "delimiter": ",", "encoding": "ASCII" },
+    "upgrade_transitions": { "name": "education_upgrade_transitions_ssp2.csv", "format": "csv", "delimiter": ",", "encoding": "ASCII" }
+  },
+  "Employment": {
+    "method": "logistic",
+    "coefficients": { "name": "employment_update_coefs.csv", "format": "csv", "delimiter": ",", "encoding": "ASCII" }
+  }
+}
+```
 
+Caps such as age 110 / year 2110 come from the **data extent** (or a single optional CSV meta row later) — not hard-coded magic numbers in JSON if we can avoid them; document any unavoidable engine defaults in code comments + this plan.
+
+Country packs: `healthgps-examples/Jacardi_Template/`, `Jacardi_Slovenia/`, …
 ### 3.3 `project_requirements` for JACARDI
 
 Reuse the existing section so users turn characteristics on/off without country `if`s. Extend only where JACARDI needs new flags (keep [project-requirements-plan.md](project-requirements-plan.md) as the source of truth for shared fields).
