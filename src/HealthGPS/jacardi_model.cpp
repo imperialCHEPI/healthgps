@@ -23,8 +23,7 @@ void JacardiModel::generate_risk_factors(RuntimeContext &context) {
         if (!person.is_active()) {
             continue;
         }
-        set_person_education(person,
-                             education_->initialise(person.age, person.gender, rng));
+        set_person_education(person, education_->initialise(person.age, person.gender, rng));
     }
 }
 
@@ -35,13 +34,11 @@ void JacardiModel::update_risk_factors(RuntimeContext &context) {
         if (!person.is_active() || person_has_education(person)) {
             continue;
         }
-        set_person_education(person,
-                             education_->initialise(person.age, person.gender, rng));
+        set_person_education(person, education_->initialise(person.age, person.gender, rng));
     }
 }
 
-JacardiModelDefinition::JacardiModelDefinition(
-    std::shared_ptr<EducationLifecycleTables> education)
+JacardiModelDefinition::JacardiModelDefinition(std::shared_ptr<EducationLifecycleTables> education)
     : education_{std::move(education)} {}
 
 std::unique_ptr<RiskFactorModel> JacardiModelDefinition::create_model() const {

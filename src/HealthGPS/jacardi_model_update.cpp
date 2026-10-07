@@ -5,8 +5,7 @@
 
 namespace hgps {
 
-JacardiModelUpdate::JacardiModelUpdate(
-    std::shared_ptr<const EducationLifecycleTables> education)
+JacardiModelUpdate::JacardiModelUpdate(std::shared_ptr<const EducationLifecycleTables> education)
     : education_{std::move(education)} {
     if (!education_ || !education_->has_draw_at_22() || !education_->has_upgrades()) {
         throw core::HgpsException{
@@ -33,8 +32,7 @@ void JacardiModelUpdate::update_risk_factors(RuntimeContext &context) {
             continue;
         }
         const double current = get_person_education(person);
-        const double next =
-            education_->update(person.age, person.gender, year, current, rng);
+        const double next = education_->update(person.age, person.gender, year, current, rng);
         set_person_education(person, next);
     }
 }
@@ -43,8 +41,7 @@ JacardiModelUpdateDefinition::JacardiModelUpdateDefinition(
     std::shared_ptr<EducationLifecycleTables> education)
     : education_{std::move(education)} {}
 
-std::unique_ptr<RiskFactorModel>
-JacardiModelUpdateDefinition::create_model() const {
+std::unique_ptr<RiskFactorModel> JacardiModelUpdateDefinition::create_model() const {
     return std::make_unique<JacardiModelUpdate>(education_);
 }
 

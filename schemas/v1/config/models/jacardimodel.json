@@ -22,20 +22,42 @@
                 "lookup": {
                     "type": "object",
                     "properties": {
-                        "name": { "type": "string" },
-                        "format": { "type": "string" },
-                        "delimiter": { "type": "string" },
-                        "encoding": { "type": "string" },
-                        "columns": { "type": "object" }
+                        "name": {
+                            "type": "string"
+                        },
+                        "format": {
+                            "type": "string"
+                        },
+                        "delimiter": {
+                            "type": "string"
+                        },
+                        "encoding": {
+                            "type": "string"
+                        },
+                        "columns": {
+                            "type": "object"
+                        }
                     },
-                    "required": ["name", "format", "delimiter", "encoding", "columns"],
+                    "required": [
+                        "name",
+                        "format",
+                        "delimiter",
+                        "encoding",
+                        "columns"
+                    ],
                     "additionalProperties": false
                 }
             },
-            "required": ["method", "lookup"],
+            "required": [
+                "method",
+                "lookup"
+            ],
             "additionalProperties": false
         }
     },
-    "required": ["ModelName", "Education"],
+    "required": [
+        "ModelName",
+        "Education"
+    ],
     "additionalProperties": true
 }

@@ -43,7 +43,7 @@ std::uint64_t EducationLifecycleTables::key_year_gender(int year, int gender) no
 }
 
 std::uint64_t EducationLifecycleTables::key_upgrade(int year, int age, int gender,
-                                                     int from_id) noexcept {
+                                                    int from_id) noexcept {
     // year:12 | age:8 | gender:1 | from_id:4  (plenty for JACARDI ranges)
     return (static_cast<std::uint64_t>(year) << 13U) |
            (static_cast<std::uint64_t>(age & 0xff) << 5U) |
@@ -93,8 +93,8 @@ double EducationLifecycleTables::initialise(unsigned int age, core::Gender gende
     const int capped_age = static_cast<int>(age > max_lookup_age ? max_lookup_age : age);
     const auto it = lookup_.find(key_age_gender(capped_age, g));
     if (it == lookup_.end()) {
-        throw core::HgpsException{fmt::format(
-            "JACARDI education lookup missing age={} gender={}", capped_age, g)};
+        throw core::HgpsException{
+            fmt::format("JACARDI education lookup missing age={} gender={}", capped_age, g)};
     }
     return static_cast<double>(draw(it->second, rng));
 }
@@ -126,8 +126,8 @@ double EducationLifecycleTables::update(unsigned int age, core::Gender gender, i
         }
         const auto it = draw_at_22_.find(key_year_gender(sim_year, g));
         if (it == draw_at_22_.end()) {
-            throw core::HgpsException{fmt::format(
-                "JACARDI education draw_at_22 missing year={} gender={}", sim_year, g)};
+            throw core::HgpsException{
+                fmt::format("JACARDI education draw_at_22 missing year={} gender={}", sim_year, g)};
         }
         return static_cast<double>(draw(it->second, rng));
     }
@@ -141,8 +141,7 @@ double EducationLifecycleTables::update(unsigned int age, core::Gender gender, i
                 "JACARDI education upgrade: current education is missing at ages 23-30"};
         }
         const int from_id = static_cast<int>(current);
-        const auto it =
-            upgrades_.find(key_upgrade(sim_year, static_cast<int>(age), g, from_id));
+        const auto it = upgrades_.find(key_upgrade(sim_year, static_cast<int>(age), g, from_id));
         if (it == upgrades_.end()) {
             // No transition rows => stay put (never go down).
             return current;

@@ -8,10 +8,10 @@
 #include "HealthGPS.Core/income_category_layout.h"
 #include "HealthGPS.Core/scoped_timer.h"
 #include "HealthGPS.Core/string_util.h"
-#include "HealthGPS/predictor_resolver.h"
 #include "HealthGPS/jacardi_education_lifecycle.h"
 #include "HealthGPS/jacardi_model.h"
 #include "HealthGPS/jacardi_model_update.h"
+#include "HealthGPS/predictor_resolver.h"
 
 #include <Eigen/Cholesky>
 #include <Eigen/Dense>
@@ -2126,8 +2126,7 @@ std::unordered_map<std::uint64_t, EducationStratum> finalise_education_map(
 std::unordered_map<std::uint64_t, EducationStratum>
 load_education_lookup_table(const nlohmann::json &file_node,
                             const std::filesystem::path &root_path) {
-    const auto table =
-        load_datatable_from_csv(hgps::input::get_file_info(file_node, root_path));
+    const auto table = load_datatable_from_csv(hgps::input::get_file_info(file_node, root_path));
     std::unordered_map<std::uint64_t, std::vector<std::pair<int, double>>> raw;
     const auto n = table.num_rows();
     for (std::size_t i = 0; i < n; ++i) {
@@ -2135,8 +2134,8 @@ load_education_lookup_table(const nlohmann::json &file_node,
         const int gender = std::any_cast<int>(table.column("gender").value(i));
         const int education_id = std::any_cast<int>(table.column("education_id").value(i));
         const double probability = std::any_cast<double>(table.column("probability").value(i));
-        raw[hgps::EducationLifecycleTables::key_age_gender(age, gender)].emplace_back(
-            education_id, probability);
+        raw[hgps::EducationLifecycleTables::key_age_gender(age, gender)].emplace_back(education_id,
+                                                                                      probability);
     }
     return finalise_education_map(std::move(raw));
 }
@@ -2145,8 +2144,7 @@ load_education_lookup_table(const nlohmann::json &file_node,
 std::unordered_map<std::uint64_t, EducationStratum>
 load_education_draw_at_22_table(const nlohmann::json &file_node,
                                 const std::filesystem::path &root_path) {
-    const auto table =
-        load_datatable_from_csv(hgps::input::get_file_info(file_node, root_path));
+    const auto table = load_datatable_from_csv(hgps::input::get_file_info(file_node, root_path));
     std::unordered_map<std::uint64_t, std::vector<std::pair<int, double>>> raw;
     const auto n = table.num_rows();
     for (std::size_t i = 0; i < n; ++i) {
@@ -2164,8 +2162,7 @@ load_education_draw_at_22_table(const nlohmann::json &file_node,
 std::unordered_map<std::uint64_t, EducationStratum>
 load_education_upgrade_table(const nlohmann::json &file_node,
                              const std::filesystem::path &root_path) {
-    const auto table =
-        load_datatable_from_csv(hgps::input::get_file_info(file_node, root_path));
+    const auto table = load_datatable_from_csv(hgps::input::get_file_info(file_node, root_path));
     std::unordered_map<std::uint64_t, std::vector<std::pair<int, double>>> raw;
     const auto n = table.num_rows();
     for (std::size_t i = 0; i < n; ++i) {
@@ -2188,19 +2185,16 @@ load_jacardi_risk_model_definition(const nlohmann::json &opt, const Configuratio
     MEASURE_FUNCTION();
     // MAHIMA: Static slot — education Part A lookup only (ladder coefs land later).
     if (!opt.contains("Education") || !opt["Education"].contains("lookup")) {
-        throw hgps::core::HgpsException{
-            "JacardiModel requires Education.lookup CSV slot"};
+        throw hgps::core::HgpsException{"JacardiModel requires Education.lookup CSV slot"};
     }
 
     auto tables = std::make_shared<hgps::EducationLifecycleTables>();
-    tables->set_lookup(
-        load_education_lookup_table(opt["Education"]["lookup"], config.root_path));
+    tables->set_lookup(load_education_lookup_table(opt["Education"]["lookup"], config.root_path));
     return std::make_unique<hgps::JacardiModelDefinition>(std::move(tables));
 }
 
 std::unique_ptr<hgps::JacardiModelUpdateDefinition>
-load_jacardi_update_risk_model_definition(const nlohmann::json &opt,
-                                          const Configuration &config) {
+load_jacardi_update_risk_model_definition(const nlohmann::json &opt, const Configuration &config) {
     MEASURE_FUNCTION();
     // MAHIMA: Dynamic slot — education Part B tables only.
     if (!opt.contains("Education") || !opt["Education"].contains("draw_at_22") ||
@@ -2212,8 +2206,8 @@ load_jacardi_update_risk_model_definition(const nlohmann::json &opt,
     auto tables = std::make_shared<hgps::EducationLifecycleTables>();
     tables->set_draw_at_22(
         load_education_draw_at_22_table(opt["Education"]["draw_at_22"], config.root_path));
-    tables->set_upgrades(load_education_upgrade_table(opt["Education"]["upgrade_transitions"],
-                                                      config.root_path));
+    tables->set_upgrades(
+        load_education_upgrade_table(opt["Education"]["upgrade_transitions"], config.root_path));
     return std::make_unique<hgps::JacardiModelUpdateDefinition>(std::move(tables));
 }
 

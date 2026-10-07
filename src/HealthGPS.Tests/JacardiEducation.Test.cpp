@@ -14,8 +14,7 @@ using namespace hgps;
 
 namespace {
 
-EducationLifecycleTables::Stratum make_stratum(std::vector<int> ids,
-                                               std::vector<double> probs) {
+EducationLifecycleTables::Stratum make_stratum(std::vector<int> ids, std::vector<double> probs) {
     return EducationLifecycleTables::Stratum{std::move(ids), std::move(probs)};
 }
 
@@ -25,8 +24,7 @@ TEST(JacardiEducation, InitialiseAgeBands) {
     EducationLifecycleTables tables;
     // Lookup required only for ages 22+; provide a trivial one.
     std::unordered_map<std::uint64_t, EducationLifecycleTables::Stratum> lookup;
-    lookup.emplace(EducationLifecycleTables::key_age_gender(40, 1),
-                   make_stratum({3}, {1.0}));
+    lookup.emplace(EducationLifecycleTables::key_age_gender(40, 1), make_stratum({3}, {1.0}));
     tables.set_lookup(std::move(lookup));
 
     Random rng;
@@ -50,8 +48,7 @@ TEST(JacardiEducation, DrawNeverGoesBelowFromIdOnUpgrade) {
     Random rng;
     rng.seed(42);
     for (int i = 0; i < 50; ++i) {
-        const double next =
-            tables.update(25, core::Gender::female, 2030, 3.0, rng);
+        const double next = tables.update(25, core::Gender::female, 2030, 3.0, rng);
         EXPECT_GE(next, 3.0);
     }
 }
