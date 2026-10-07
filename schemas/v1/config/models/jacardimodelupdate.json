@@ -1,0 +1,53 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/config/models/jacardimodelupdate.json",
+    "type": "object",
+    "description": "JACARDI dynamic / yearly risk-factor model. Coefficients live in CSVs referenced by slots.",
+    "properties": {
+        "$schema": {
+            "type": "string"
+        },
+        "$comment": {
+            "type": "string"
+        },
+        "ModelName": {
+            "const": "JacardiModelUpdate"
+        },
+        "Education": {
+            "type": "object",
+            "properties": {
+                "method": {
+                    "type": "string"
+                },
+                "draw_at_22": {
+                    "type": "object",
+                    "properties": {
+                        "name": { "type": "string" },
+                        "format": { "type": "string" },
+                        "delimiter": { "type": "string" },
+                        "encoding": { "type": "string" },
+                        "columns": { "type": "object" }
+                    },
+                    "required": ["name", "format", "delimiter", "encoding", "columns"],
+                    "additionalProperties": false
+                },
+                "upgrade_transitions": {
+                    "type": "object",
+                    "properties": {
+                        "name": { "type": "string" },
+                        "format": { "type": "string" },
+                        "delimiter": { "type": "string" },
+                        "encoding": { "type": "string" },
+                        "columns": { "type": "object" }
+                    },
+                    "required": ["name", "format", "delimiter", "encoding", "columns"],
+                    "additionalProperties": false
+                }
+            },
+            "required": ["method", "draw_at_22", "upgrade_transitions"],
+            "additionalProperties": false
+        }
+    },
+    "required": ["ModelName", "Education"],
+    "additionalProperties": true
+}

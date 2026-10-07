@@ -1,0 +1,41 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/config/models/jacardimodel.json",
+    "type": "object",
+    "description": "JACARDI static / init risk-factor model. Coefficients live in CSVs referenced by slots.",
+    "properties": {
+        "$schema": {
+            "type": "string"
+        },
+        "$comment": {
+            "type": "string"
+        },
+        "ModelName": {
+            "const": "JacardiModel"
+        },
+        "Education": {
+            "type": "object",
+            "properties": {
+                "method": {
+                    "type": "string"
+                },
+                "lookup": {
+                    "type": "object",
+                    "properties": {
+                        "name": { "type": "string" },
+                        "format": { "type": "string" },
+                        "delimiter": { "type": "string" },
+                        "encoding": { "type": "string" },
+                        "columns": { "type": "object" }
+                    },
+                    "required": ["name", "format", "delimiter", "encoding", "columns"],
+                    "additionalProperties": false
+                }
+            },
+            "required": ["method", "lookup"],
+            "additionalProperties": false
+        }
+    },
+    "required": ["ModelName", "Education"],
+    "additionalProperties": true
+}
