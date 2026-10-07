@@ -2111,9 +2111,10 @@ EducationStratum finalise_education_stratum(std::vector<std::pair<int, double>> 
     return stratum;
 }
 
-// Take by value so the rvalue from the caller is consumed (cppcoreguidelines-rvalue-reference-param-not-moved).
-std::unordered_map<std::uint64_t, EducationStratum> finalise_education_map(
-    std::unordered_map<std::uint64_t, std::vector<std::pair<int, double>>> raw) {
+// Take by value so the rvalue from the caller is consumed
+// (cppcoreguidelines-rvalue-reference-param-not-moved).
+std::unordered_map<std::uint64_t, EducationStratum>
+finalise_education_map(std::unordered_map<std::uint64_t, std::vector<std::pair<int, double>>> raw) {
     std::unordered_map<std::uint64_t, EducationStratum> out;
     out.reserve(raw.size());
     for (auto &[key, rows] : raw) {
