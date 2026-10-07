@@ -198,15 +198,20 @@ BaselineInfo get_baseline_info(const json &j, const std::filesystem::path &base_
     get_to(adj, "format", info.format, success);
     get_to(adj, "delimiter", info.delimiter, success);
     get_to(adj, "encoding", info.encoding, success);
-    if (get_to(adj, "file_names", info.file_names, success)) {
-        // Rebase paths and check for errors
-        for (auto &[name, path] : info.file_names) {
-            try {
-                rebase_valid_path(path, base_dir);
-                fmt::print("{:<14}, file: {}\n", name, path.string());
-            } catch (const ConfigurationError &) {
-                fmt::print(fg(fmt::color::red), "Could not find file: {}\n", path.string());
-                success = false;
+
+    // MAHIMA: file_names is optional. JACARDI omits FactorsMean when adjustment is off.
+    // France / India / FINCH still supply file_names; their model loaders call
+    // load_risk_factor_expected() which fails clearly if keys are missing.
+    if (adj.contains("file_names")) {
+        if (get_to(adj, "file_names", info.file_names, success)) {
+            for (auto &[name, path] : info.file_names) {
+                try {
+                    rebase_valid_path(path, base_dir);
+                    fmt::print("{:<14}, file: {}\n", name, path.string());
+                } catch (const ConfigurationError &) {
+                    fmt::print(fg(fmt::color::red), "Could not find file: {}\n", path.string());
+                    success = false;
+                }
             }
         }
     }

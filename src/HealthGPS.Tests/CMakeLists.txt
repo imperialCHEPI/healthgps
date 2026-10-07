@@ -35,6 +35,7 @@ target_sources(
             "HierarchicalMapping.Test.cpp"
             "JsonParser.Test.cpp"
             "Identifier.Test.cpp"
+            "JacardiEducation.Test.cpp"
             "LifeTable.Test.cpp"
             "Map2d.Test.cpp"
             "Population.Test.cpp"

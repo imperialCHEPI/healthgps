@@ -10,6 +10,9 @@
         },
         {
             "$ref": "kevinhall.json"
+        },
+        {
+            "$ref": "jacardimodelupdate.json"
         }
     ]
 }

@@ -8,6 +8,9 @@
 #include "HealthGPS.Core/income_category_layout.h"
 #include "HealthGPS.Core/scoped_timer.h"
 #include "HealthGPS.Core/string_util.h"
+#include "HealthGPS/jacardi_education_lifecycle.h"
+#include "HealthGPS/jacardi_model.h"
+#include "HealthGPS/jacardi_model_update.h"
 #include "HealthGPS/predictor_resolver.h"
 
 #include <Eigen/Cholesky>
@@ -17,10 +20,14 @@
 #include <rapidcsv.h>
 
 #include <algorithm>
+#include <cstdint>
 #include <filesystem>
 #include <fstream>
 #include <optional>
 #include <ranges>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
 #if USE_TIMER
 #define MEASURE_FUNCTION()
@@ -498,6 +505,8 @@ constexpr int EBHLMModelSchemaVersion = 1;
 constexpr int KevinHallModelSchemaVersion = 2;
 constexpr int HLMModelSchemaVersion = 1;
 constexpr int StaticLinearModelSchemaVersion = 2;
+constexpr int JacardiModelSchemaVersion = 1;
+constexpr int JacardiModelUpdateSchemaVersion = 1;
 
 //! Get the latest schema version for the given model
 int get_model_schema_version(const std::string &model_name) {
@@ -515,6 +524,13 @@ int get_model_schema_version(const std::string &model_name) {
     }
     if (model_name == "staticlinear") {
         return StaticLinearModelSchemaVersion;
+    }
+    // MAHIMA: JACARDI pathway schemas
+    if (model_name == "jacardimodel") {
+        return JacardiModelSchemaVersion;
+    }
+    if (model_name == "jacardimodelupdate") {
+        return JacardiModelUpdateSchemaVersion;
     }
 
     throw std::invalid_argument(fmt::format("Unknown model: {}", model_name));
@@ -2079,6 +2095,123 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
 }
 // NOLINTEND(readability-function-cognitive-complexity)
 
+namespace {
+
+using EducationStratum = hgps::EducationLifecycleTables::Stratum;
+
+EducationStratum finalise_education_stratum(std::vector<std::pair<int, double>> rows) {
+    std::ranges::sort(rows, {}, &std::pair<int, double>::first);
+    EducationStratum stratum;
+    stratum.ids.reserve(rows.size());
+    stratum.probabilities.reserve(rows.size());
+    for (const auto &[id, probability] : rows) {
+        stratum.ids.push_back(id);
+        stratum.probabilities.push_back(probability);
+    }
+    return stratum;
+}
+
+// Take by value so the rvalue from the caller is consumed
+// (cppcoreguidelines-rvalue-reference-param-not-moved).
+std::unordered_map<std::uint64_t, EducationStratum>
+finalise_education_map(std::unordered_map<std::uint64_t, std::vector<std::pair<int, double>>> raw) {
+    std::unordered_map<std::uint64_t, EducationStratum> out;
+    out.reserve(raw.size());
+    for (auto &[key, rows] : raw) {
+        out.emplace(key, finalise_education_stratum(std::move(rows)));
+    }
+    return out;
+}
+
+/// MAHIMA: Load education_lookup.csv → age×gender strata (Part A).
+std::unordered_map<std::uint64_t, EducationStratum>
+load_education_lookup_table(const nlohmann::json &file_node,
+                            const std::filesystem::path &root_path) {
+    const auto table = load_datatable_from_csv(hgps::input::get_file_info(file_node, root_path));
+    std::unordered_map<std::uint64_t, std::vector<std::pair<int, double>>> raw;
+    const auto n = table.num_rows();
+    for (std::size_t i = 0; i < n; ++i) {
+        const auto age = std::any_cast<int>(table.column("age").value(i));
+        const auto gender = std::any_cast<int>(table.column("gender").value(i));
+        const auto education_id = std::any_cast<int>(table.column("education_id").value(i));
+        const auto probability = std::any_cast<double>(table.column("probability").value(i));
+        raw[hgps::EducationLifecycleTables::key_age_gender(age, gender)].emplace_back(education_id,
+                                                                                      probability);
+    }
+    return finalise_education_map(std::move(raw));
+}
+
+/// MAHIMA: Load education_draw_at_22_*.csv → year×gender strata (Part B age 22).
+std::unordered_map<std::uint64_t, EducationStratum>
+load_education_draw_at_22_table(const nlohmann::json &file_node,
+                                const std::filesystem::path &root_path) {
+    const auto table = load_datatable_from_csv(hgps::input::get_file_info(file_node, root_path));
+    std::unordered_map<std::uint64_t, std::vector<std::pair<int, double>>> raw;
+    const auto n = table.num_rows();
+    for (std::size_t i = 0; i < n; ++i) {
+        const auto year = std::any_cast<int>(table.column("year").value(i));
+        const auto gender = std::any_cast<int>(table.column("gender").value(i));
+        const auto education_id = std::any_cast<int>(table.column("education_id").value(i));
+        const auto probability = std::any_cast<double>(table.column("probability").value(i));
+        raw[hgps::EducationLifecycleTables::key_year_gender(year, gender)].emplace_back(
+            education_id, probability);
+    }
+    return finalise_education_map(std::move(raw));
+}
+
+/// MAHIMA: Load education_upgrade_transitions_*.csv → year×age×gender×from_id strata.
+std::unordered_map<std::uint64_t, EducationStratum>
+load_education_upgrade_table(const nlohmann::json &file_node,
+                             const std::filesystem::path &root_path) {
+    const auto table = load_datatable_from_csv(hgps::input::get_file_info(file_node, root_path));
+    std::unordered_map<std::uint64_t, std::vector<std::pair<int, double>>> raw;
+    const auto n = table.num_rows();
+    for (std::size_t i = 0; i < n; ++i) {
+        const auto year = std::any_cast<int>(table.column("year").value(i));
+        const auto age = std::any_cast<int>(table.column("age").value(i));
+        const auto gender = std::any_cast<int>(table.column("gender").value(i));
+        const auto from_id = std::any_cast<int>(table.column("from_id").value(i));
+        const auto to_id = std::any_cast<int>(table.column("to_id").value(i));
+        const auto probability = std::any_cast<double>(table.column("probability").value(i));
+        raw[hgps::EducationLifecycleTables::key_upgrade(year, age, gender, from_id)].emplace_back(
+            to_id, probability);
+    }
+    return finalise_education_map(std::move(raw));
+}
+
+} // namespace
+
+std::unique_ptr<hgps::JacardiModelDefinition>
+load_jacardi_risk_model_definition(const nlohmann::json &opt, const Configuration &config) {
+    MEASURE_FUNCTION();
+    // MAHIMA: Static slot — education Part A lookup only (ladder coefs land later).
+    if (!opt.contains("Education") || !opt["Education"].contains("lookup")) {
+        throw hgps::core::HgpsException{"JacardiModel requires Education.lookup CSV slot"};
+    }
+
+    auto tables = std::make_shared<hgps::EducationLifecycleTables>();
+    tables->set_lookup(load_education_lookup_table(opt["Education"]["lookup"], config.root_path));
+    return std::make_unique<hgps::JacardiModelDefinition>(std::move(tables));
+}
+
+std::unique_ptr<hgps::JacardiModelUpdateDefinition>
+load_jacardi_update_risk_model_definition(const nlohmann::json &opt, const Configuration &config) {
+    MEASURE_FUNCTION();
+    // MAHIMA: Dynamic slot — education Part B tables only.
+    if (!opt.contains("Education") || !opt["Education"].contains("draw_at_22") ||
+        !opt["Education"].contains("upgrade_transitions")) {
+        throw hgps::core::HgpsException{
+            "JacardiModelUpdate requires Education.draw_at_22 and upgrade_transitions CSV slots"};
+    }
+
+    auto tables = std::make_shared<hgps::EducationLifecycleTables>();
+    tables->set_draw_at_22(
+        load_education_draw_at_22_table(opt["Education"]["draw_at_22"], config.root_path));
+    tables->set_upgrades(
+        load_education_upgrade_table(opt["Education"]["upgrade_transitions"], config.root_path));
+    return std::make_unique<hgps::JacardiModelUpdateDefinition>(std::move(tables));
+}
+
 std::unique_ptr<hgps::RiskFactorModelDefinition>
 load_risk_model_definition(hgps::RiskFactorModelType model_type,
                            const std::filesystem::path &model_path, const Configuration &config) {
@@ -2098,6 +2231,9 @@ load_risk_model_definition(hgps::RiskFactorModelType model_type,
         if (model_name == "staticlinear") {
             return load_staticlinear_risk_model_definition(opt, config);
         }
+        if (model_name == "jacardimodel") {
+            return load_jacardi_risk_model_definition(opt, config);
+        }
 
         throw hgps::core::HgpsException{
             fmt::format("Static model name '{}' not recognised", model_name)};
@@ -2108,6 +2244,9 @@ load_risk_model_definition(hgps::RiskFactorModelType model_type,
         }
         if (model_name == "kevinhall") {
             return load_kevinhall_risk_model_definition(opt, config);
+        }
+        if (model_name == "jacardimodelupdate") {
+            return load_jacardi_update_risk_model_definition(opt, config);
         }
 
         throw hgps::core::HgpsException{
