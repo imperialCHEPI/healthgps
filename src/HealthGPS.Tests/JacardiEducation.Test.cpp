@@ -15,7 +15,8 @@ using namespace hgps;
 namespace {
 
 EducationLifecycleTables::Stratum make_stratum(std::vector<int> ids, std::vector<double> probs) {
-    return EducationLifecycleTables::Stratum{std::move(ids), std::move(probs)};
+    return EducationLifecycleTables::Stratum{.ids = std::move(ids),
+                                             .probabilities = std::move(probs)};
 }
 
 } // namespace

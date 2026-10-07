@@ -2100,8 +2100,7 @@ namespace {
 using EducationStratum = hgps::EducationLifecycleTables::Stratum;
 
 EducationStratum finalise_education_stratum(std::vector<std::pair<int, double>> rows) {
-    std::sort(rows.begin(), rows.end(),
-              [](const auto &a, const auto &b) { return a.first < b.first; });
+    std::ranges::sort(rows, {}, &std::pair<int, double>::first);
     EducationStratum stratum;
     stratum.ids.reserve(rows.size());
     stratum.probabilities.reserve(rows.size());
@@ -2112,8 +2111,9 @@ EducationStratum finalise_education_stratum(std::vector<std::pair<int, double>> 
     return stratum;
 }
 
+// Take by value so the rvalue from the caller is consumed (cppcoreguidelines-rvalue-reference-param-not-moved).
 std::unordered_map<std::uint64_t, EducationStratum> finalise_education_map(
-    std::unordered_map<std::uint64_t, std::vector<std::pair<int, double>>> &&raw) {
+    std::unordered_map<std::uint64_t, std::vector<std::pair<int, double>>> raw) {
     std::unordered_map<std::uint64_t, EducationStratum> out;
     out.reserve(raw.size());
     for (auto &[key, rows] : raw) {
@@ -2130,10 +2130,10 @@ load_education_lookup_table(const nlohmann::json &file_node,
     std::unordered_map<std::uint64_t, std::vector<std::pair<int, double>>> raw;
     const auto n = table.num_rows();
     for (std::size_t i = 0; i < n; ++i) {
-        const int age = std::any_cast<int>(table.column("age").value(i));
-        const int gender = std::any_cast<int>(table.column("gender").value(i));
-        const int education_id = std::any_cast<int>(table.column("education_id").value(i));
-        const double probability = std::any_cast<double>(table.column("probability").value(i));
+        const auto age = std::any_cast<int>(table.column("age").value(i));
+        const auto gender = std::any_cast<int>(table.column("gender").value(i));
+        const auto education_id = std::any_cast<int>(table.column("education_id").value(i));
+        const auto probability = std::any_cast<double>(table.column("probability").value(i));
         raw[hgps::EducationLifecycleTables::key_age_gender(age, gender)].emplace_back(education_id,
                                                                                       probability);
     }
@@ -2148,10 +2148,10 @@ load_education_draw_at_22_table(const nlohmann::json &file_node,
     std::unordered_map<std::uint64_t, std::vector<std::pair<int, double>>> raw;
     const auto n = table.num_rows();
     for (std::size_t i = 0; i < n; ++i) {
-        const int year = std::any_cast<int>(table.column("year").value(i));
-        const int gender = std::any_cast<int>(table.column("gender").value(i));
-        const int education_id = std::any_cast<int>(table.column("education_id").value(i));
-        const double probability = std::any_cast<double>(table.column("probability").value(i));
+        const auto year = std::any_cast<int>(table.column("year").value(i));
+        const auto gender = std::any_cast<int>(table.column("gender").value(i));
+        const auto education_id = std::any_cast<int>(table.column("education_id").value(i));
+        const auto probability = std::any_cast<double>(table.column("probability").value(i));
         raw[hgps::EducationLifecycleTables::key_year_gender(year, gender)].emplace_back(
             education_id, probability);
     }
@@ -2166,12 +2166,12 @@ load_education_upgrade_table(const nlohmann::json &file_node,
     std::unordered_map<std::uint64_t, std::vector<std::pair<int, double>>> raw;
     const auto n = table.num_rows();
     for (std::size_t i = 0; i < n; ++i) {
-        const int year = std::any_cast<int>(table.column("year").value(i));
-        const int age = std::any_cast<int>(table.column("age").value(i));
-        const int gender = std::any_cast<int>(table.column("gender").value(i));
-        const int from_id = std::any_cast<int>(table.column("from_id").value(i));
-        const int to_id = std::any_cast<int>(table.column("to_id").value(i));
-        const double probability = std::any_cast<double>(table.column("probability").value(i));
+        const auto year = std::any_cast<int>(table.column("year").value(i));
+        const auto age = std::any_cast<int>(table.column("age").value(i));
+        const auto gender = std::any_cast<int>(table.column("gender").value(i));
+        const auto from_id = std::any_cast<int>(table.column("from_id").value(i));
+        const auto to_id = std::any_cast<int>(table.column("to_id").value(i));
+        const auto probability = std::any_cast<double>(table.column("probability").value(i));
         raw[hgps::EducationLifecycleTables::key_upgrade(year, age, gender, from_id)].emplace_back(
             to_id, probability);
     }
