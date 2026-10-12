@@ -24,470 +24,480 @@
 
 #if USE_TIMER
 #define MEASURE_FUNCTION()
-hgps::core::ScopedTimer timer { __func__ }
+hgps::core::ScopedTimer timer{__func__}
 #else
 #define MEASURE_FUNCTION()
 #endif
 
 namespace {
 
-struct TwoColumnRegressionCsv {
-    hgps::LinearModelParams model;
-    std::optional<double> min_value;
-    std::optional<double> max_value;
-    std::optional<double> stddev;
-};
+    struct TwoColumnRegressionCsv {
+        hgps::LinearModelParams model;
+        std::optional<double> min_value;
+        std::optional<double> max_value;
+        std::optional<double> stddev;
+    };
 
-struct HeightRow {
-    double slope{};
-    double stddev{};
-};
+    struct HeightRow {
+        double slope{};
+        double stddev{};
+    };
 
-/// @brief Load factor,coefficient rows from a two-column regression CSV (no header row required).
-TwoColumnRegressionCsv load_two_column_regression_csv(const std::filesystem::path &path,
-                                                      char delimiter,
-                                                      const std::string &csv_filename) {
-    rapidcsv::Document doc(path.string(), rapidcsv::LabelParams(-1, -1),
-                           rapidcsv::SeparatorParams(delimiter));
+    /// @brief Load factor,coefficient rows from a two-column regression CSV (no header row
+    /// required).
+    TwoColumnRegressionCsv load_two_column_regression_csv(
+        const std::filesystem::path &path, char delimiter, const std::string &csv_filename) {
+        rapidcsv::Document doc(path.string(), rapidcsv::LabelParams(-1, -1),
+                               rapidcsv::SeparatorParams(delimiter));
 
-    if (doc.GetColumnCount() != 2) {
-        throw hgps::core::HgpsException{
-            fmt::format("Regression CSV file {} must have exactly 2 columns. Found {} columns",
-                        csv_filename, doc.GetColumnCount())};
-    }
-
-    TwoColumnRegressionCsv result;
-    size_t start_row = 0;
-    if (doc.GetRowCount() > 0) {
-        const auto first_cell = doc.GetCell<std::string>(0, 0);
-        if (hgps::core::case_insensitive::equals(first_cell, "Factor")) {
-            start_row = 1;
-        }
-    }
-
-    for (size_t row_idx = start_row; row_idx < doc.GetRowCount(); ++row_idx) {
-        auto factor_name = doc.GetCell<std::string>(0, row_idx);
-        auto coefficient_value = doc.GetCell<double>(1, row_idx);
-
-        if (hgps::core::case_insensitive::equals(factor_name, "Intercept")) {
-            result.model.intercept = coefficient_value;
-        } else if (hgps::core::case_insensitive::equals(factor_name, "min")) {
-            result.min_value = coefficient_value;
-        } else if (hgps::core::case_insensitive::equals(factor_name, "max")) {
-            result.max_value = coefficient_value;
-        } else if (hgps::core::case_insensitive::equals(factor_name, "stddev")) {
-            result.stddev = coefficient_value;
-        } else if (hgps::is_metadata_predictor(factor_name)) {
-            continue;
-        } else {
-            result.model.coefficients[hgps::core::Identifier(factor_name)] = coefficient_value;
-        }
-    }
-    return result;
-}
-
-// Load height parameters from CSV as (slope, stddev) rows.
-std::vector<HeightRow> load_height_params_csv(const std::filesystem::path &path, char delimiter,
-                                              const std::string &csv_filename) {
-    rapidcsv::Document doc(path.string(), rapidcsv::LabelParams(-1, -1),
-                           rapidcsv::SeparatorParams(delimiter));
-
-    const auto column_count = doc.GetColumnCount();
-    if (column_count != 2 && column_count != 3) {
-        throw hgps::core::HgpsException{
-            fmt::format("Height CSV file {} must have 2 columns (slope,std) or 3 columns "
-                        "(key,slope,std). Found {} columns",
-                        csv_filename, column_count)};
-    }
-    const std::size_t slope_column = column_count == 3 ? 1u : 0u;
-    const std::size_t std_column = column_count == 3 ? 2u : 1u;
-
-    std::size_t start_row = 0;
-    if (doc.GetRowCount() > 0) {
-        const auto slope_header = doc.GetCell<std::string>(slope_column, 0);
-        const auto std_header = doc.GetCell<std::string>(std_column, 0);
-        const bool has_header = hgps::core::case_insensitive::equals(slope_header, "slope") &&
-                                (hgps::core::case_insensitive::equals(std_header, "std") ||
-                                 hgps::core::case_insensitive::equals(std_header, "stddev"));
-        if (has_header) {
-            start_row = 1;
-        }
-    }
-
-    std::vector<HeightRow> rows;
-    rows.reserve(doc.GetRowCount());
-    for (std::size_t row_idx = start_row; row_idx < doc.GetRowCount(); ++row_idx) {
-        rows.push_back(HeightRow{.slope = doc.GetCell<double>(slope_column, row_idx),
-                                 .stddev = doc.GetCell<double>(std_column, row_idx)});
-    }
-
-    if (rows.empty()) {
-        throw hgps::core::HgpsException{
-            fmt::format("Height CSV file {} does not contain any data rows", csv_filename)};
-    }
-
-    return rows;
-}
-
-//
-bool is_weight_quantile_csv_file_block(const nlohmann::json &node) {
-    return node.is_object() && node.contains("name") && node.contains("format");
-}
-
-std::optional<std::size_t> parse_weight_quintile_key_index(const std::string &key) {
-    static constexpr std::string_view prefix = "Quintile";
-    if (!key.starts_with(prefix)) {
-        return std::nullopt;
-    }
-    const auto suffix = key.substr(prefix.size());
-    if (suffix.empty()) {
-        return std::nullopt;
-    }
-    for (const char ch : suffix) {
-        if (ch < '0' || ch > '9') {
-            return std::nullopt;
-        }
-    }
-    try {
-        const auto index = std::stoull(suffix);
-        if (index == 0) {
-            return std::nullopt;
-        }
-        return static_cast<std::size_t>(index - 1);
-    } catch (...) {
-        return std::nullopt;
-    }
-}
-
-std::vector<double> load_sorted_weight_quantiles_from_table(const hgps::core::DataTable &table) {
-    std::vector<double> quantiles;
-    quantiles.reserve(table.num_rows());
-    for (std::size_t row = 0; row < table.num_rows(); ++row) {
-        quantiles.push_back(std::any_cast<double>(table.column(0).value(row)));
-    }
-    std::ranges::sort(quantiles);
-    return quantiles;
-}
-
-std::vector<double> load_sorted_weight_quantiles_from_csv(const hgps::input::FileInfo &file_info) {
-    const auto table = load_datatable_from_csv(file_info);
-    if (table.num_rows() == 0) {
-        throw hgps::core::HgpsException{
-            fmt::format("Weight quantile CSV '{}' does not contain any data rows",
-                        file_info.name.filename().string())};
-    }
-    return load_sorted_weight_quantiles_from_table(table);
-}
-
-std::vector<std::vector<double>> load_gender_weight_quantiles_by_stratum(
-    const nlohmann::json &gender_node, const std::filesystem::path &root_path,
-    std::string_view gender_label, bool stratum_enabled, std::size_t stratum_count) {
-    if (is_weight_quantile_csv_file_block(gender_node)) {
-        const auto file_info = hgps::input::get_file_info(gender_node, root_path);
-        const auto quantiles = load_sorted_weight_quantiles_from_csv(file_info);
-        const std::size_t broadcast_count =
-            (stratum_enabled && stratum_count > 1u) ? stratum_count : 1u;
-        return std::vector<std::vector<double>>(broadcast_count, quantiles);
-    }
-
-    if (!gender_node.is_object()) {
-        throw hgps::core::HgpsException{fmt::format(
-            "WeightQuantiles.{} must be a csv_file block or Quintile1..N object", gender_label)};
-    }
-
-    if (!stratum_enabled) {
-        throw hgps::core::HgpsException{
-            fmt::format("WeightQuantiles.{} uses Quintile1..N files but "
-                        "baseline_adjustments.income_stratum_factors_mean.enabled is false",
-                        gender_label)};
-    }
-
-    if (stratum_count < 2u) {
-        throw hgps::core::HgpsException{fmt::format(
-            "WeightQuantiles.{} uses Quintile1..N files but adjustment_income_stratum_count "
-            "must be >= 2",
-            gender_label)};
-    }
-
-    std::vector<std::pair<std::size_t, std::string>> quintile_keys;
-    for (const auto &[key, value] : gender_node.items()) {
-        const auto index = parse_weight_quintile_key_index(key);
-        if (!index.has_value()) {
-            throw hgps::core::HgpsException{fmt::format(
-                "WeightQuantiles.{} contains unsupported key '{}'. Use Quintile1, Quintile2, ...",
-                gender_label, key)};
-        }
-        if (!is_weight_quantile_csv_file_block(value)) {
+        if (doc.GetColumnCount() != 2) {
             throw hgps::core::HgpsException{
-                fmt::format("WeightQuantiles.{}.{} must be a csv_file block", gender_label, key)};
+                fmt::format("Regression CSV file {} must have exactly 2 columns. Found {} columns",
+                            csv_filename, doc.GetColumnCount())};
         }
-        quintile_keys.emplace_back(index.value(), key);
-    }
 
-    if (quintile_keys.size() != stratum_count) {
-        throw hgps::core::HgpsException{fmt::format(
-            "WeightQuantiles.{} defines {} quintile file(s) but adjustment_income_stratum_count "
-            "is {}. Provide exactly {} Quintile keys or use a single legacy csv_file.",
-            gender_label, quintile_keys.size(), stratum_count, stratum_count)};
-    }
-
-    std::ranges::sort(quintile_keys,
-                      [](const auto &lhs, const auto &rhs) { return lhs.first < rhs.first; });
-
-    for (std::size_t i = 0; i < quintile_keys.size(); ++i) {
-        if (quintile_keys[i].first != i) {
-            throw hgps::core::HgpsException{fmt::format(
-                "WeightQuantiles.{} quintile keys must be contiguous Quintile1..Quintile{}",
-                gender_label, stratum_count)};
-        }
-    }
-
-    std::vector<std::vector<double>> by_stratum;
-    by_stratum.reserve(stratum_count);
-    for (const auto &[index, key] : quintile_keys) {
-        (void)index;
-        const auto file_info = hgps::input::get_file_info(gender_node.at(key), root_path);
-        by_stratum.push_back(load_sorted_weight_quantiles_from_csv(file_info));
-    }
-    return by_stratum;
-}
-
-char parse_delimiter_char(const std::string &delimiter) {
-    if (delimiter == "\\t") {
-        return '\t';
-    }
-    return delimiter.empty() ? ',' : delimiter.front();
-}
-
-/// @brief Map legacy policy CSV row names for log(energy intake) to the canonical predictor name.
-/// @details Other policy row names are kept as in the CSV. Only energy-intake log predictors are
-/// normalized so evaluation always uses `log_energy_intake` with `EnergyIntake` on the person.
-std::string normalize_policy_coefficient_row(const std::string &raw_row_name) {
-    if (hgps::core::case_insensitive::equals(raw_row_name, "EnergyIntake")) {
-        return "log_energy_intake";
-    }
-    const std::string lower = hgps::core::to_lower(raw_row_name);
-    if (lower == "log_energyintake" || lower == "log_energy_intake") {
-        return "log_energy_intake";
-    }
-    return raw_row_name;
-}
-
-struct StaticLinearLoadSummary {
-    bool matrix_based{false};
-    std::string boxcox_file;
-    size_t boxcox_rows{0};
-    size_t boxcox_cols{0};
-    std::string policy_file;
-    size_t policy_coef_types{0};
-    std::vector<std::string> policy_coefficient_rows;
-    std::string logistic_file;
-    size_t logistic_coef_rows{0};
-    size_t logistic_rf_count{0};
-    size_t risk_factor_count{0};
-    size_t boxcox_coef_types{0};
-    std::vector<std::string> with_logistic;
-    std::vector<std::string> without_logistic;
-    std::string income_categories;
-    std::string income_type;
-    bool pa_enabled{false};
-    std::string pa_type;
-    std::string pa_csv;
-    double pa_intercept{0};
-    size_t pa_coef_count{0};
-    double pa_min{0};
-    double pa_max{0};
-    double pa_stddev{0};
-    std::string income_csv;
-    double income_intercept{0};
-    size_t income_coef_count{0};
-    std::vector<std::string> income_predictors;
-    std::vector<std::string> income_metadata;
-    std::vector<std::string> pa_predictors;
-    std::vector<std::string> pa_metadata;
-    std::string region_file;
-    size_t region_rows{0};
-    size_t region_cols{0};
-    std::string ethnicity_file;
-    size_t ethnicity_rows{0};
-    size_t ethnicity_cols{0};
-};
-
-std::optional<StaticLinearLoadSummary> g_pending_static_linear_summary;
-
-// ASCII box drawing only (Windows console often mangles UTF-8 box-drawing characters).
-constexpr size_t k_summary_box_inner_width = 78;
-
-void print_summary_border() {
-    fmt::print("+{}+\n", std::string(k_summary_box_inner_width + 2, '-'));
-}
-
-void print_box_row(const std::string &text) {
-    fmt::print("| {:<{}} |\n", text, k_summary_box_inner_width);
-}
-
-void print_box_section(const std::string &title) {
-    std::string line = "+- " + title + ' ';
-    const size_t total_width = k_summary_box_inner_width + 2;
-    if (line.size() < total_width) {
-        line.append(total_width - line.size(), '-');
-    }
-    line.push_back('+');
-    fmt::print("{}\n", line);
-}
-
-void print_wrapped_factor_list(const std::string &prefix, const std::vector<std::string> &items) {
-    if (items.empty()) {
-        return;
-    }
-    std::string line = prefix;
-    line += items.front();
-    for (size_t i = 1; i < items.size(); ++i) {
-        const std::string next = ", " + items[i];
-        if (line.size() + next.size() > k_summary_box_inner_width) {
-            print_box_row(line);
-            line = std::string(4, ' ') + items[i];
-        } else {
-            line += next;
-        }
-    }
-    print_box_row(line);
-}
-
-void collect_regression_csv_factors(const hgps::LinearModelParams &model,
-                                    std::vector<std::string> &predictors_out,
-                                    std::vector<std::string> &metadata_out) {
-    predictors_out.clear();
-    metadata_out.clear();
-    predictors_out.reserve(model.coefficients.size() + model.log_coefficients.size());
-    metadata_out.reserve(4);
-
-    for (const auto &[id, value] : model.coefficients) {
-        const std::string name = id.to_string();
-        if (hgps::is_metadata_predictor(name)) {
-            metadata_out.push_back(fmt::format("{}={:.6g}", name, value));
-        } else {
-            predictors_out.push_back(name);
-        }
-    }
-    for (const auto &[id, coef] : model.log_coefficients) {
-        predictors_out.push_back(fmt::format("log:{} ({:.6g})", id.to_string(), coef));
-    }
-
-    std::ranges::sort(predictors_out);
-    std::ranges::sort(metadata_out);
-}
-
-void append_unique_metadata(std::vector<std::string> &metadata_out, const std::string &name,
-                            double value) {
-    const std::string entry = fmt::format("{}={:.6g}", name, value);
-    if (std::ranges::find(metadata_out, entry) != metadata_out.end()) {
-        return;
-    }
-    const std::string prefix = name + '=';
-    for (auto &item : metadata_out) {
-        if (item.starts_with(prefix)) {
-            item = entry;
-            return;
-        }
-    }
-    metadata_out.push_back(entry);
-    std::ranges::sort(metadata_out);
-}
-
-void print_regression_csv_factors(const std::vector<std::string> &predictors,
-                                  const std::vector<std::string> &metadata) {
-    if (!predictors.empty()) {
-        print_box_row(fmt::format("  Predictors ({})  :", predictors.size()));
-        print_wrapped_factor_list("    ", predictors);
-    } else {
-        print_box_row("  Predictors         : (none)");
-    }
-    if (!metadata.empty()) {
-        print_box_row("  CSV metadata       :");
-        print_wrapped_factor_list("    ", metadata);
-    }
-}
-
-void print_static_linear_load_summary(const StaticLinearLoadSummary &summary) {
-    fmt::print("\n");
-    print_summary_border();
-    print_box_row(" Static linear model configuration");
-    print_box_section("Risk factors");
-
-    if (summary.matrix_based) {
-        print_box_row(fmt::format("  Box-Cox CSV        : {} ({} rows x {} cols)",
-                                  summary.boxcox_file, summary.boxcox_rows, summary.boxcox_cols));
-        if (!summary.policy_file.empty()) {
-            print_box_row(fmt::format("  Policy CSV         : {} ({} coefficient types)",
-                                      summary.policy_file, summary.policy_coef_types));
-            if (!summary.policy_coefficient_rows.empty()) {
-                print_box_row("  Policy coef. rows  :");
-                print_wrapped_factor_list("    ", summary.policy_coefficient_rows);
+        TwoColumnRegressionCsv result;
+        size_t start_row = 0;
+        if (doc.GetRowCount() > 0) {
+            const auto first_cell = doc.GetCell<std::string>(0, 0);
+            if (hgps::core::case_insensitive::equals(first_cell, "Factor")) {
+                start_row = 1;
             }
         }
-        if (!summary.logistic_file.empty()) {
-            print_box_row(fmt::format("  Logistic CSV       : {} ({} types, {} outcomes)",
-                                      summary.logistic_file, summary.logistic_coef_rows,
-                                      summary.logistic_rf_count));
+
+        for (size_t row_idx = start_row; row_idx < doc.GetRowCount(); ++row_idx) {
+            auto factor_name = doc.GetCell<std::string>(0, row_idx);
+            auto coefficient_value = doc.GetCell<double>(1, row_idx);
+
+            if (hgps::core::case_insensitive::equals(factor_name, "Intercept")) {
+                result.model.intercept = coefficient_value;
+            } else if (hgps::core::case_insensitive::equals(factor_name, "min")) {
+                result.min_value = coefficient_value;
+            } else if (hgps::core::case_insensitive::equals(factor_name, "max")) {
+                result.max_value = coefficient_value;
+            } else if (hgps::core::case_insensitive::equals(factor_name, "stddev")) {
+                result.stddev = coefficient_value;
+            } else if (hgps::is_metadata_predictor(factor_name)) {
+                continue;
+            } else {
+                result.model.coefficients[hgps::core::Identifier(factor_name)] = coefficient_value;
+            }
         }
-        print_box_row(
-            fmt::format("  Outcomes loaded    : {} risk factors", summary.risk_factor_count));
-        print_box_row(
-            fmt::format("  Box-Cox predictors : {} coefficient types", summary.boxcox_coef_types));
-        if (!summary.with_logistic.empty()) {
-            print_box_row(fmt::format("  Two-stage ({} outcomes):", summary.with_logistic.size()));
-            print_wrapped_factor_list("    ", summary.with_logistic);
+        return result;
+    }
+
+    // Load height parameters from CSV as (slope, stddev) rows.
+    std::vector<HeightRow> load_height_params_csv(const std::filesystem::path &path, char delimiter,
+                                                  const std::string &csv_filename) {
+        rapidcsv::Document doc(path.string(), rapidcsv::LabelParams(-1, -1),
+                               rapidcsv::SeparatorParams(delimiter));
+
+        const auto column_count = doc.GetColumnCount();
+        if (column_count != 2 && column_count != 3) {
+            throw hgps::core::HgpsException{
+                fmt::format("Height CSV file {} must have 2 columns (slope,std) or 3 columns "
+                            "(key,slope,std). Found {} columns",
+                            csv_filename, column_count)};
         }
-        if (!summary.without_logistic.empty()) {
+        const std::size_t slope_column = column_count == 3 ? 1u : 0u;
+        const std::size_t std_column = column_count == 3 ? 2u : 1u;
+
+        std::size_t start_row = 0;
+        if (doc.GetRowCount() > 0) {
+            const auto slope_header = doc.GetCell<std::string>(slope_column, 0);
+            const auto std_header = doc.GetCell<std::string>(std_column, 0);
+            const bool has_header = hgps::core::case_insensitive::equals(slope_header, "slope") &&
+                                    (hgps::core::case_insensitive::equals(std_header, "std") ||
+                                     hgps::core::case_insensitive::equals(std_header, "stddev"));
+            if (has_header) {
+                start_row = 1;
+            }
+        }
+
+        std::vector<HeightRow> rows;
+        rows.reserve(doc.GetRowCount());
+        for (std::size_t row_idx = start_row; row_idx < doc.GetRowCount(); ++row_idx) {
+            rows.push_back(HeightRow{.slope = doc.GetCell<double>(slope_column, row_idx),
+                                     .stddev = doc.GetCell<double>(std_column, row_idx)});
+        }
+
+        if (rows.empty()) {
+            throw hgps::core::HgpsException{
+                fmt::format("Height CSV file {} does not contain any data rows", csv_filename)};
+        }
+
+        return rows;
+    }
+
+    //
+    bool is_weight_quantile_csv_file_block(const nlohmann::json &node) {
+        return node.is_object() && node.contains("name") && node.contains("format");
+    }
+
+    std::optional<std::size_t> parse_weight_quintile_key_index(const std::string &key) {
+        static constexpr std::string_view prefix = "Quintile";
+        if (!key.starts_with(prefix)) {
+            return std::nullopt;
+        }
+        const auto suffix = key.substr(prefix.size());
+        if (suffix.empty()) {
+            return std::nullopt;
+        }
+        for (const char ch : suffix) {
+            if (ch < '0' || ch > '9') {
+                return std::nullopt;
+            }
+        }
+        try {
+            const auto index = std::stoull(suffix);
+            if (index == 0) {
+                return std::nullopt;
+            }
+            return static_cast<std::size_t>(index - 1);
+        } catch (...) {
+            return std::nullopt;
+        }
+    }
+
+    std::vector<double> load_sorted_weight_quantiles_from_table(
+        const hgps::core::DataTable &table) {
+        std::vector<double> quantiles;
+        quantiles.reserve(table.num_rows());
+        for (std::size_t row = 0; row < table.num_rows(); ++row) {
+            quantiles.push_back(std::any_cast<double>(table.column(0).value(row)));
+        }
+        std::ranges::sort(quantiles);
+        return quantiles;
+    }
+
+    std::vector<double> load_sorted_weight_quantiles_from_csv(
+        const hgps::input::FileInfo &file_info) {
+        const auto table = load_datatable_from_csv(file_info);
+        if (table.num_rows() == 0) {
+            throw hgps::core::HgpsException{
+                fmt::format("Weight quantile CSV '{}' does not contain any data rows",
+                            file_info.name.filename().string())};
+        }
+        return load_sorted_weight_quantiles_from_table(table);
+    }
+
+    std::vector<std::vector<double>> load_gender_weight_quantiles_by_stratum(
+        const nlohmann::json &gender_node, const std::filesystem::path &root_path,
+        std::string_view gender_label, bool stratum_enabled, std::size_t stratum_count) {
+        if (is_weight_quantile_csv_file_block(gender_node)) {
+            const auto file_info = hgps::input::get_file_info(gender_node, root_path);
+            const auto quantiles = load_sorted_weight_quantiles_from_csv(file_info);
+            const std::size_t broadcast_count =
+                (stratum_enabled && stratum_count > 1u) ? stratum_count : 1u;
+            return std::vector<std::vector<double>>(broadcast_count, quantiles);
+        }
+
+        if (!gender_node.is_object()) {
+            throw hgps::core::HgpsException{
+                fmt::format("WeightQuantiles.{} must be a csv_file block or Quintile1..N object",
+                            gender_label)};
+        }
+
+        if (!stratum_enabled) {
+            throw hgps::core::HgpsException{
+                fmt::format("WeightQuantiles.{} uses Quintile1..N files but "
+                            "baseline_adjustments.income_stratum_factors_mean.enabled is false",
+                            gender_label)};
+        }
+
+        if (stratum_count < 2u) {
+            throw hgps::core::HgpsException{fmt::format(
+                "WeightQuantiles.{} uses Quintile1..N files but adjustment_income_stratum_count "
+                "must be >= 2",
+                gender_label)};
+        }
+
+        std::vector<std::pair<std::size_t, std::string>> quintile_keys;
+        for (const auto &[key, value] : gender_node.items()) {
+            const auto index = parse_weight_quintile_key_index(key);
+            if (!index.has_value()) {
+                throw hgps::core::HgpsException{
+                    fmt::format("WeightQuantiles.{} contains unsupported key '{}'. Use Quintile1, "
+                                "Quintile2, ...",
+                                gender_label, key)};
+            }
+            if (!is_weight_quantile_csv_file_block(value)) {
+                throw hgps::core::HgpsException{fmt::format(
+                    "WeightQuantiles.{}.{} must be a csv_file block", gender_label, key)};
+            }
+            quintile_keys.emplace_back(index.value(), key);
+        }
+
+        if (quintile_keys.size() != stratum_count) {
+            throw hgps::core::HgpsException{fmt::format(
+                "WeightQuantiles.{} defines {} quintile file(s) but "
+                "adjustment_income_stratum_count "
+                "is {}. Provide exactly {} Quintile keys or use a single legacy csv_file.",
+                gender_label, quintile_keys.size(), stratum_count, stratum_count)};
+        }
+
+        std::ranges::sort(quintile_keys,
+                          [](const auto &lhs, const auto &rhs) { return lhs.first < rhs.first; });
+
+        for (std::size_t i = 0; i < quintile_keys.size(); ++i) {
+            if (quintile_keys[i].first != i) {
+                throw hgps::core::HgpsException{fmt::format(
+                    "WeightQuantiles.{} quintile keys must be contiguous Quintile1..Quintile{}",
+                    gender_label, stratum_count)};
+            }
+        }
+
+        std::vector<std::vector<double>> by_stratum;
+        by_stratum.reserve(stratum_count);
+        for (const auto &[index, key] : quintile_keys) {
+            (void)index;
+            const auto file_info = hgps::input::get_file_info(gender_node.at(key), root_path);
+            by_stratum.push_back(load_sorted_weight_quantiles_from_csv(file_info));
+        }
+        return by_stratum;
+    }
+
+    char parse_delimiter_char(const std::string &delimiter) {
+        if (delimiter == "\\t") {
+            return '\t';
+        }
+        return delimiter.empty() ? ',' : delimiter.front();
+    }
+
+    /// @brief Map legacy policy CSV row names for log(energy intake) to the canonical predictor
+    /// name.
+    /// @details Other policy row names are kept as in the CSV. Only energy-intake log predictors
+    /// are normalized so evaluation always uses `log_energy_intake` with `EnergyIntake` on the
+    /// person.
+    std::string normalize_policy_coefficient_row(const std::string &raw_row_name) {
+        if (hgps::core::case_insensitive::equals(raw_row_name, "EnergyIntake")) {
+            return "log_energy_intake";
+        }
+        const std::string lower = hgps::core::to_lower(raw_row_name);
+        if (lower == "log_energyintake" || lower == "log_energy_intake") {
+            return "log_energy_intake";
+        }
+        return raw_row_name;
+    }
+
+    struct StaticLinearLoadSummary {
+        bool matrix_based{false};
+        std::string boxcox_file;
+        size_t boxcox_rows{0};
+        size_t boxcox_cols{0};
+        std::string policy_file;
+        size_t policy_coef_types{0};
+        std::vector<std::string> policy_coefficient_rows;
+        std::string logistic_file;
+        size_t logistic_coef_rows{0};
+        size_t logistic_rf_count{0};
+        size_t risk_factor_count{0};
+        size_t boxcox_coef_types{0};
+        std::vector<std::string> with_logistic;
+        std::vector<std::string> without_logistic;
+        std::string income_categories;
+        std::string income_type;
+        bool pa_enabled{false};
+        std::string pa_type;
+        std::string pa_csv;
+        double pa_intercept{0};
+        size_t pa_coef_count{0};
+        double pa_min{0};
+        double pa_max{0};
+        double pa_stddev{0};
+        std::string income_csv;
+        double income_intercept{0};
+        size_t income_coef_count{0};
+        std::vector<std::string> income_predictors;
+        std::vector<std::string> income_metadata;
+        std::vector<std::string> pa_predictors;
+        std::vector<std::string> pa_metadata;
+        std::string region_file;
+        size_t region_rows{0};
+        size_t region_cols{0};
+        std::string ethnicity_file;
+        size_t ethnicity_rows{0};
+        size_t ethnicity_cols{0};
+    };
+
+    std::optional<StaticLinearLoadSummary> g_pending_static_linear_summary;
+
+    // ASCII box drawing only (Windows console often mangles UTF-8 box-drawing characters).
+    constexpr size_t k_summary_box_inner_width = 78;
+
+    void print_summary_border() {
+        fmt::print("+{}+\n", std::string(k_summary_box_inner_width + 2, '-'));
+    }
+
+    void print_box_row(const std::string &text) {
+        fmt::print("| {:<{}} |\n", text, k_summary_box_inner_width);
+    }
+
+    void print_box_section(const std::string &title) {
+        std::string line = "+- " + title + ' ';
+        const size_t total_width = k_summary_box_inner_width + 2;
+        if (line.size() < total_width) {
+            line.append(total_width - line.size(), '-');
+        }
+        line.push_back('+');
+        fmt::print("{}\n", line);
+    }
+
+    void print_wrapped_factor_list(const std::string &prefix,
+                                   const std::vector<std::string> &items) {
+        if (items.empty()) {
+            return;
+        }
+        std::string line = prefix;
+        line += items.front();
+        for (size_t i = 1; i < items.size(); ++i) {
+            const std::string next = ", " + items[i];
+            if (line.size() + next.size() > k_summary_box_inner_width) {
+                print_box_row(line);
+                line = std::string(4, ' ') + items[i];
+            } else {
+                line += next;
+            }
+        }
+        print_box_row(line);
+    }
+
+    void collect_regression_csv_factors(const hgps::LinearModelParams &model,
+                                        std::vector<std::string> &predictors_out,
+                                        std::vector<std::string> &metadata_out) {
+        predictors_out.clear();
+        metadata_out.clear();
+        predictors_out.reserve(model.coefficients.size() + model.log_coefficients.size());
+        metadata_out.reserve(4);
+
+        for (const auto &[id, value] : model.coefficients) {
+            const std::string name = id.to_string();
+            if (hgps::is_metadata_predictor(name)) {
+                metadata_out.push_back(fmt::format("{}={:.6g}", name, value));
+            } else {
+                predictors_out.push_back(name);
+            }
+        }
+        for (const auto &[id, coef] : model.log_coefficients) {
+            predictors_out.push_back(fmt::format("log:{} ({:.6g})", id.to_string(), coef));
+        }
+
+        std::ranges::sort(predictors_out);
+        std::ranges::sort(metadata_out);
+    }
+
+    void append_unique_metadata(std::vector<std::string> & metadata_out, const std::string &name,
+                                double value) {
+        const std::string entry = fmt::format("{}={:.6g}", name, value);
+        if (std::ranges::find(metadata_out, entry) != metadata_out.end()) {
+            return;
+        }
+        const std::string prefix = name + '=';
+        for (auto &item : metadata_out) {
+            if (item.starts_with(prefix)) {
+                item = entry;
+                return;
+            }
+        }
+        metadata_out.push_back(entry);
+        std::ranges::sort(metadata_out);
+    }
+
+    void print_regression_csv_factors(const std::vector<std::string> &predictors,
+                                      const std::vector<std::string> &metadata) {
+        if (!predictors.empty()) {
+            print_box_row(fmt::format("  Predictors ({})  :", predictors.size()));
+            print_wrapped_factor_list("    ", predictors);
+        } else {
+            print_box_row("  Predictors         : (none)");
+        }
+        if (!metadata.empty()) {
+            print_box_row("  CSV metadata       :");
+            print_wrapped_factor_list("    ", metadata);
+        }
+    }
+
+    void print_static_linear_load_summary(const StaticLinearLoadSummary &summary) {
+        fmt::print("\n");
+        print_summary_border();
+        print_box_row(" Static linear model configuration");
+        print_box_section("Risk factors");
+
+        if (summary.matrix_based) {
+            print_box_row(fmt::format("  Box-Cox CSV        : {} ({} rows x {} cols)",
+                                      summary.boxcox_file, summary.boxcox_rows,
+                                      summary.boxcox_cols));
+            if (!summary.policy_file.empty()) {
+                print_box_row(fmt::format("  Policy CSV         : {} ({} coefficient types)",
+                                          summary.policy_file, summary.policy_coef_types));
+                if (!summary.policy_coefficient_rows.empty()) {
+                    print_box_row("  Policy coef. rows  :");
+                    print_wrapped_factor_list("    ", summary.policy_coefficient_rows);
+                }
+            }
+            if (!summary.logistic_file.empty()) {
+                print_box_row(fmt::format("  Logistic CSV       : {} ({} types, {} outcomes)",
+                                          summary.logistic_file, summary.logistic_coef_rows,
+                                          summary.logistic_rf_count));
+            }
             print_box_row(
-                fmt::format("  Box-Cox only ({} outcomes):", summary.without_logistic.size()));
-            print_wrapped_factor_list("    ", summary.without_logistic);
+                fmt::format("  Outcomes loaded    : {} risk factors", summary.risk_factor_count));
+            print_box_row(fmt::format("  Box-Cox predictors : {} coefficient types",
+                                      summary.boxcox_coef_types));
+            if (!summary.with_logistic.empty()) {
+                print_box_row(
+                    fmt::format("  Two-stage ({} outcomes):", summary.with_logistic.size()));
+                print_wrapped_factor_list("    ", summary.with_logistic);
+            }
+            if (!summary.without_logistic.empty()) {
+                print_box_row(
+                    fmt::format("  Box-Cox only ({} outcomes):", summary.without_logistic.size()));
+                print_wrapped_factor_list("    ", summary.without_logistic);
+            }
         }
-    }
 
-    print_box_section("Income");
-    print_box_row(
-        fmt::format("  Categories         : {} (project_requirements)", summary.income_categories));
-    print_box_row(fmt::format("  Mode               : {}", summary.income_type));
-    if (!summary.income_csv.empty()) {
-        print_box_row(fmt::format("  Regression CSV     : {}", summary.income_csv));
-        print_box_row(fmt::format("  Intercept          : {:.6g}", summary.income_intercept));
-        print_regression_csv_factors(summary.income_predictors, summary.income_metadata);
-    }
-
-    print_box_section("Physical activity");
-    if (summary.pa_enabled) {
-        print_box_row(
-            fmt::format("  Mode               : {} (project_requirements)", summary.pa_type));
-        if (!summary.pa_csv.empty()) {
-            print_box_row(fmt::format("  Regression CSV     : {}", summary.pa_csv));
-            print_box_row(fmt::format("  Intercept          : {:.6g}", summary.pa_intercept));
-            print_regression_csv_factors(summary.pa_predictors, summary.pa_metadata);
-            print_box_row(fmt::format("  Applied range      : {:.6g} - {:.6g}", summary.pa_min,
-                                      summary.pa_max));
-            print_box_row(fmt::format("  Applied stddev     : {:.6g}", summary.pa_stddev));
+        print_box_section("Income");
+        print_box_row(fmt::format("  Categories         : {} (project_requirements)",
+                                  summary.income_categories));
+        print_box_row(fmt::format("  Mode               : {}", summary.income_type));
+        if (!summary.income_csv.empty()) {
+            print_box_row(fmt::format("  Regression CSV     : {}", summary.income_csv));
+            print_box_row(fmt::format("  Intercept          : {:.6g}", summary.income_intercept));
+            print_regression_csv_factors(summary.income_predictors, summary.income_metadata);
         }
-    } else {
-        print_box_row("  Disabled in project_requirements");
-    }
 
-    if (!summary.region_file.empty() || !summary.ethnicity_file.empty()) {
-        print_box_section("Demographics (assignment CSVs)");
-        if (!summary.region_file.empty()) {
-            print_box_row(fmt::format("  Region             : {} ({} rows x {} cols)",
-                                      summary.region_file, summary.region_rows,
-                                      summary.region_cols));
+        print_box_section("Physical activity");
+        if (summary.pa_enabled) {
+            print_box_row(
+                fmt::format("  Mode               : {} (project_requirements)", summary.pa_type));
+            if (!summary.pa_csv.empty()) {
+                print_box_row(fmt::format("  Regression CSV     : {}", summary.pa_csv));
+                print_box_row(fmt::format("  Intercept          : {:.6g}", summary.pa_intercept));
+                print_regression_csv_factors(summary.pa_predictors, summary.pa_metadata);
+                print_box_row(fmt::format("  Applied range      : {:.6g} - {:.6g}", summary.pa_min,
+                                          summary.pa_max));
+                print_box_row(fmt::format("  Applied stddev     : {:.6g}", summary.pa_stddev));
+            }
+        } else {
+            print_box_row("  Disabled in project_requirements");
         }
-        if (!summary.ethnicity_file.empty()) {
-            print_box_row(fmt::format("  Ethnicity          : {} ({} rows x {} cols)",
-                                      summary.ethnicity_file, summary.ethnicity_rows,
-                                      summary.ethnicity_cols));
-        }
-    }
 
-    print_summary_border();
-}
+        if (!summary.region_file.empty() || !summary.ethnicity_file.empty()) {
+            print_box_section("Demographics (assignment CSVs)");
+            if (!summary.region_file.empty()) {
+                print_box_row(fmt::format("  Region             : {} ({} rows x {} cols)",
+                                          summary.region_file, summary.region_rows,
+                                          summary.region_cols));
+            }
+            if (!summary.ethnicity_file.empty()) {
+                print_box_row(fmt::format("  Ethnicity          : {} ({} rows x {} cols)",
+                                          summary.ethnicity_file, summary.ethnicity_rows,
+                                          summary.ethnicity_cols));
+            }
+        }
+
+        print_summary_border();
+    }
 
 } // namespace
 
