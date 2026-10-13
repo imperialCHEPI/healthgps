@@ -157,8 +157,8 @@ TEST(TestHealthGPS_Disease, ContainsAgeGenderHandlesSexSpecificRows) {
     auto data = std::map<int, std::map<core::Gender, DiseaseMeasure>>{
         {40, {{core::Gender::female, DiseaseMeasure(std::map<int, double>{{1, 0.01}})}}},
     };
-    auto info = core::DiseaseInfo{.code = core::Identifier{"cervicalcancer"},
-                                  .name = "Cervical cancer"};
+    auto info =
+        core::DiseaseInfo{.code = core::Identifier{"cervicalcancer"}, .name = "Cervical cancer"};
     auto table = DiseaseTable(info, std::move(measures), std::move(data));
 
     EXPECT_TRUE(table.contains(40));
@@ -175,8 +175,8 @@ TEST(TestHealthGPS_Disease, PrevalenceSkipCoverageExpectedFemaleOnly) {
         {40, {{core::Gender::female, DiseaseMeasure(std::map<int, double>{{1, 0.01}})}}},
         {41, {{core::Gender::female, DiseaseMeasure(std::map<int, double>{{1, 0.02}})}}},
     };
-    auto info = core::DiseaseInfo{.code = core::Identifier{"cervicalcancer"},
-                                  .name = "Cervical cancer"};
+    auto info =
+        core::DiseaseInfo{.code = core::Identifier{"cervicalcancer"}, .name = "Cervical cancer"};
     auto table = DiseaseTable(info, std::move(measures), std::move(data));
     const auto msg = table.describe_prevalence_skip_coverage();
     EXPECT_NE(msg.find("EXPECTED"), std::string::npos);
@@ -195,8 +195,7 @@ TEST(TestHealthGPS_Disease, PrevalenceSkipCoverageWarningMissingAges) {
          {{core::Gender::male, DiseaseMeasure(std::map<int, double>{{1, 0.02}})},
           {core::Gender::female, DiseaseMeasure(std::map<int, double>{{1, 0.02}})}}},
     };
-    auto info =
-        core::DiseaseInfo{.code = core::Identifier{"diabetes"}, .name = "Diabetes"};
+    auto info = core::DiseaseInfo{.code = core::Identifier{"diabetes"}, .name = "Diabetes"};
     auto table = DiseaseTable(info, std::move(measures), std::move(data));
     const auto msg = table.describe_prevalence_skip_coverage();
     EXPECT_NE(msg.find("WARNING"), std::string::npos);

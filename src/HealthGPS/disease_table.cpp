@@ -82,27 +82,23 @@ std::string DiseaseTable::describe_prevalence_skip_coverage() const {
 
     if (male_ages == 0 && female_ages > 0) {
         if (missing_ages > 0) {
-            return fmt::format(
-                "{} : WARNING — female-only table but {} age(s) missing in [{}, {}] "
-                "(sex-limited OK; age gaps look like a CSV error)",
-                code, missing_ages, min_age, max_age);
+            return fmt::format("{} : WARNING — female-only table but {} age(s) missing in [{}, {}] "
+                               "(sex-limited OK; age gaps look like a CSV error)",
+                               code, missing_ages, min_age, max_age);
         }
-        return fmt::format(
-            "{} : EXPECTED — female-only table; males skipped at prevalence init "
-            "(sex-limited disease, not a missing file)",
-            code);
+        return fmt::format("{} : EXPECTED — female-only table; males skipped at prevalence init "
+                           "(sex-limited disease, not a missing file)",
+                           code);
     }
     if (female_ages == 0 && male_ages > 0) {
         if (missing_ages > 0) {
-            return fmt::format(
-                "{} : WARNING — male-only table but {} age(s) missing in [{}, {}] "
-                "(sex-limited OK; age gaps look like a CSV error)",
-                code, missing_ages, min_age, max_age);
+            return fmt::format("{} : WARNING — male-only table but {} age(s) missing in [{}, {}] "
+                               "(sex-limited OK; age gaps look like a CSV error)",
+                               code, missing_ages, min_age, max_age);
         }
-        return fmt::format(
-            "{} : EXPECTED — male-only table; females skipped at prevalence init "
-            "(sex-limited disease, not a missing file)",
-            code);
+        return fmt::format("{} : EXPECTED — male-only table; females skipped at prevalence init "
+                           "(sex-limited disease, not a missing file)",
+                           code);
     }
     if (missing_ages > 0) {
         return fmt::format(
@@ -110,9 +106,8 @@ std::string DiseaseTable::describe_prevalence_skip_coverage() const {
             "(possible disease CSV gap — verify input files)",
             code, missing_ages, min_age, max_age);
     }
-    return fmt::format(
-        "{} : OK — both sexes covered; contiguous ages [{}, {}] in prevalence table", code,
-        min_age, max_age);
+    return fmt::format("{} : OK — both sexes covered; contiguous ages [{}, {}] in prevalence table",
+                       code, min_age, max_age);
 }
 
 const std::map<std::string, int> &DiseaseTable::measures() const noexcept { return measures_; }

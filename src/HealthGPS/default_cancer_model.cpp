@@ -35,8 +35,7 @@ void DefaultCancerModel::initialise_disease_status(RuntimeContext &context) {
     auto relative_risk_table = calculate_average_relative_risk(context);
     for (auto &person : context.population()) {
         // MAHIMA: Skip ages/sexes missing from disease CSV (cervical D705 = female-only).
-        if (!person.is_active() ||
-            !definition_.get().table().contains(person.age, person.gender)) {
+        if (!person.is_active() || !definition_.get().table().contains(person.age, person.gender)) {
             continue;
         }
 
