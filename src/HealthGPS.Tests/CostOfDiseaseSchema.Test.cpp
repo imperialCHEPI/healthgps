@@ -14,12 +14,8 @@ namespace {
 
 // MAHIMA: Minimal valid data_index.json so DataManager can open a temp store.
 void write_minimal_index(const std::filesystem::path &root) {
-    json meta = {{"format", "csv"},
-                 {"delimiter", ","},
-                 {"encoding", "UTF8"},
-                 {"description", "test"},
-                 {"source", "test"},
-                 {"url", "https://example.com"},
+    json meta = {{"format", "csv"},       {"delimiter", ","}, {"encoding", "UTF8"},
+                 {"description", "test"}, {"source", "test"}, {"url", "https://example.com"},
                  {"license", "N/A"}};
 
     json index;
@@ -35,15 +31,12 @@ void write_minimal_index(const std::filesystem::path &root) {
     index["demographic"]["age_limits"] = {0, 110};
     index["demographic"]["time_limits"] = {1950, 2100};
     index["demographic"]["projections"] = 2022;
-    index["demographic"]["population"] = {{"description", "test"},
-                                          {"path", "population"},
-                                          {"file_name", "P{COUNTRY_CODE}.csv"}};
-    index["demographic"]["mortality"] = {{"description", "test"},
-                                         {"path", "mortality"},
-                                         {"file_name", "M{COUNTRY_CODE}.csv"}};
-    index["demographic"]["indicators"] = {{"description", "test"},
-                                          {"path", "indicators"},
-                                          {"file_name", "Pi{COUNTRY_CODE}.csv"}};
+    index["demographic"]["population"] = {
+        {"description", "test"}, {"path", "population"}, {"file_name", "P{COUNTRY_CODE}.csv"}};
+    index["demographic"]["mortality"] = {
+        {"description", "test"}, {"path", "mortality"}, {"file_name", "M{COUNTRY_CODE}.csv"}};
+    index["demographic"]["indicators"] = {
+        {"description", "test"}, {"path", "indicators"}, {"file_name", "Pi{COUNTRY_CODE}.csv"}};
 
     index["diseases"] = meta;
     index["diseases"]["path"] = "diseases";

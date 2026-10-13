@@ -211,9 +211,10 @@ void print_demographic_population_init_summary(const DemographicPopulationInitSu
     }
 
     // MAHIMA: Education assignment is not done in DemographicModule; flag is informational.
-    print_demographic_box_row(summary.education_enabled
-                                   ? "  Education          : enabled (via Jacardi risk-factor models)"
-                                   : "  Education          : disabled");
+    print_demographic_box_row(
+        summary.education_enabled
+            ? "  Education          : enabled (via Jacardi risk-factor models)"
+            : "  Education          : disabled");
 
     print_demographic_border();
     std::fflush(stdout);
