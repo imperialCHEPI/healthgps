@@ -100,6 +100,27 @@ When/if we parallelise: give each worker its own `Random` (seeded from a parent 
 
 ---
 
+## Demographic status box
+
+When `project_requirements.demographics.education` is true and `Education` is in `modelling.risk_factors`, the Demographic module console box shows:
+
+```text
++- Education assignment --------------------------------------------------------+
+|   Status             : enabled (lifecycle via JacardiModel / JacardiModelUpdate) |
+```
+
+(alongside Region / Ethnicity). Assignment itself is still done by Jacardi risk-factor models, not DemographicModule.
+
+---
+
+## Cost-of-disease `invalid stod` (Jacardi data pack)
+
+`DataManager::load_cost_of_diseases` used to read hardcoded CSV columns `[6]=age`, `[8]=gender_id`, `[12]=mean` (France/UK layout). Jacardi `BoD705.csv` uses a different order — index 12 is the string `"All causes"`, so `std::stod` threw **`invalid stod argument`** while building the Analysis module.
+
+**Fix:** map columns by name (`age`, `gender_id`, `mean`). Regression tests: `CostOfDiseaseSchema.*`.
+
+---
+
 ## Code map
 
 | File | Role |
@@ -108,9 +129,11 @@ When/if we parallelise: give each worker its own `Random` (seeded from a parent 
 | `src/HealthGPS/jacardi_model.*` | Static slot — Part A generate/update |
 | `src/HealthGPS/jacardi_model_update.*` | Dynamic slot — Part B yearly |
 | `src/HealthGPS.Input/model_parser.cpp` | `load_jacardi_*` CSV loaders |
+| `src/HealthGPS.Input/datamanager.cpp` | Cost-of-disease loader (named columns) |
 | `src/HealthGPS/analysis_module.cpp` | Result CSV channels; skips non-finite Education |
+| `src/HealthGPS/demographic.cpp` | Console Education assignment status |
 
-Tests: [jacardi-education-loader-tests.md](jacardi-education-loader-tests.md) (`--gtest_filter=Jacardi*`).
+Tests: [jacardi-education-loader-tests.md](jacardi-education-loader-tests.md) (`--gtest_filter=Jacardi*`); also `CostOfDiseaseSchema*` / `DemographicSummary*`.
 
 ---
 

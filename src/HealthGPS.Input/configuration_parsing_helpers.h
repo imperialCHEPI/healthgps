@@ -158,6 +158,10 @@ inline void parse_project_requirements_block(const nlohmann::json &pr, ProjectRe
     req.demographics.gender = d["gender"].get<bool>();
     req.demographics.region = d["region"].get<bool>();
     req.demographics.ethnicity = d["ethnicity"].get<bool>();
+    // MAHIMA: Optional — JACARDI packs set education true; others omit / leave false.
+    if (d.contains("education") && !d["education"].is_null()) {
+        req.demographics.education = d["education"].get<bool>();
+    }
     if (d.contains("max_age_for_linear_models") && !d["max_age_for_linear_models"].is_null()) {
         req.demographics.max_age_for_linear_models = d["max_age_for_linear_models"].get<int>();
     }

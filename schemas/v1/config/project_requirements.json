@@ -24,6 +24,10 @@
                     "type": "boolean",
                     "description": "Use ethnicity (FINCH/PIF: true, India: false)"
                 },
+                "education": {
+                    "type": "boolean",
+                    "description": "Use education lifecycle (JACARDI: true; France/India/FINCH: omit or false). Assignment is via JacardiModel risk-factor models, not DemographicModule."
+                },
                 "max_age_for_linear_models": {
                     "type": "integer",
                     "minimum": 1,

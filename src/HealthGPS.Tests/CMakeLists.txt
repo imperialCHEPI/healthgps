@@ -37,6 +37,7 @@ target_sources(
             "Identifier.Test.cpp"
             "JacardiEducation.Test.cpp"
             "JacardiModel.Test.cpp"
+            "CostOfDiseaseSchema.Test.cpp"
             "LifeTable.Test.cpp"
             "Map2d.Test.cpp"
             "Population.Test.cpp"
