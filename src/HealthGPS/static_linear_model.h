@@ -290,6 +290,10 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @brief Base linear-model options from project_requirements (gender2 indicator, etc.).
     LinearModelEvalOptions base_linear_eval_options() const noexcept;
 
+    /// @brief Per-person linear-model options (capped age, missing-predictor fallback).
+    LinearModelEvalOptions linear_eval_options_for_person(RuntimeContext &context,
+                                                          Person &person) const;
+
     /// @brief Initialise physical activity using continuous model approach (FINCH method)
     /// @param context The runtime context
     /// @param person The person to initialise physical activity for
