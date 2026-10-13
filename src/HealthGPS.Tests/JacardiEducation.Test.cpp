@@ -31,8 +31,8 @@ TEST(JacardiEducation, InitialiseAgeBands) {
 
     Random rng;
     rng.seed(1);
-    EXPECT_TRUE(std::isnan(tables.initialise(EducationLifecycleTables::age_missing_max,
-                                             core::Gender::male, rng)));
+    EXPECT_TRUE(std::isnan(
+        tables.initialise(EducationLifecycleTables::age_missing_max, core::Gender::male, rng)));
     EXPECT_DOUBLE_EQ(EducationLifecycleTables::primary_education_id,
                      tables.initialise(10, core::Gender::female, rng));
     EXPECT_DOUBLE_EQ(EducationLifecycleTables::secondary_education_id,
@@ -113,8 +113,8 @@ TEST(JacardiEducation, UpdateAgeMilestonesAndCaps) {
 
     Random rng;
     rng.seed(1);
-    EXPECT_TRUE(std::isnan(tables.update(3, core::Gender::male, 2026,
-                                         EducationLifecycleTables::missing, rng)));
+    EXPECT_TRUE(std::isnan(
+        tables.update(3, core::Gender::male, 2026, EducationLifecycleTables::missing, rng)));
     EXPECT_DOUBLE_EQ(2.0, tables.update(6, core::Gender::male, 2026, 0.0, rng));
     EXPECT_DOUBLE_EQ(7.0, tables.update(10, core::Gender::male, 2026, 7.0, rng));
     EXPECT_DOUBLE_EQ(3.0, tables.update(19, core::Gender::male, 2026, 2.0, rng));
@@ -132,9 +132,9 @@ TEST(JacardiEducation, UpgradeWithMissingCurrentThrows) {
     tables.set_upgrades(
         {{EducationLifecycleTables::key_upgrade(2026, 25, 0, 3), make_stratum({4}, {1.0})}});
     Random rng;
-    EXPECT_THROW(tables.update(25, core::Gender::female, 2026,
-                               EducationLifecycleTables::missing, rng),
-                 core::HgpsException);
+    EXPECT_THROW(
+        tables.update(25, core::Gender::female, 2026, EducationLifecycleTables::missing, rng),
+        core::HgpsException);
 }
 
 TEST(JacardiEducation, PersonEducationHelpers) {

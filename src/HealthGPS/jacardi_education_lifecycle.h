@@ -35,13 +35,13 @@ class EducationLifecycleTables {
     static constexpr int max_update_year = 2110;
 
     // MAHIMA: Retunable age rules (Part A / Part B). Change here when partners revise policy.
-    static constexpr unsigned int age_missing_max = 5U;     // 0..5 → no education
-    static constexpr unsigned int age_set_primary = 6U;     // Part B only: turn 6 → id 2
-    static constexpr unsigned int age_primary_max = 18U;    // Part A: 6..18 → id 2; Part B: hold
-    static constexpr unsigned int age_set_secondary = 19U;  // Part B only: turn 19 → id 3
-    static constexpr unsigned int age_secondary_max = 21U;  // Part A: 19..21 → id 3; Part B: hold
-    static constexpr unsigned int age_draw = 22U;           // Part B: redraw from year×gender CSV
-    static constexpr unsigned int age_upgrade_max = 30U;    // Part B: 23..30 upgrade transitions
+    static constexpr unsigned int age_missing_max = 5U;    // 0..5 → no education
+    static constexpr unsigned int age_set_primary = 6U;    // Part B only: turn 6 → id 2
+    static constexpr unsigned int age_primary_max = 18U;   // Part A: 6..18 → id 2; Part B: hold
+    static constexpr unsigned int age_set_secondary = 19U; // Part B only: turn 19 → id 3
+    static constexpr unsigned int age_secondary_max = 21U; // Part A: 19..21 → id 3; Part B: hold
+    static constexpr unsigned int age_draw = 22U;          // Part B: redraw from year×gender CSV
+    static constexpr unsigned int age_upgrade_max = 30U;   // Part B: 23..30 upgrade transitions
     static constexpr double primary_education_id = 2.0;
     static constexpr double secondary_education_id = 3.0;
 

@@ -53,54 +53,44 @@ void write_text(const std::filesystem::path &path, std::string_view text) {
 
 void write_jacardi_education_csvs(const std::filesystem::path &dir) {
     // MAHIMA: Minimal strata covering init ages + Part B years used in tests.
-    write_text(dir / "education_lookup.csv",
-               "age,gender,education_id,probability\n"
-               "22,0,3,1.0\n"
-               "22,1,3,1.0\n"
-               "40,0,4,1.0\n"
-               "40,1,4,1.0\n"
-               "110,0,5,1.0\n"
-               "110,1,5,1.0\n");
-    write_text(dir / "education_draw_at_22.csv",
-               "year,gender,education_id,probability\n"
-               "2026,0,3,1.0\n"
-               "2026,1,3,1.0\n"
-               "2110,0,3,1.0\n"
-               "2110,1,3,1.0\n");
-    write_text(dir / "education_upgrades.csv",
-               "year,age,gender,from_id,to_id,probability\n"
-               "2026,25,0,3,4,1.0\n"
-               "2026,25,1,3,4,1.0\n");
+    write_text(dir / "education_lookup.csv", "age,gender,education_id,probability\n"
+                                             "22,0,3,1.0\n"
+                                             "22,1,3,1.0\n"
+                                             "40,0,4,1.0\n"
+                                             "40,1,4,1.0\n"
+                                             "110,0,5,1.0\n"
+                                             "110,1,5,1.0\n");
+    write_text(dir / "education_draw_at_22.csv", "year,gender,education_id,probability\n"
+                                                 "2026,0,3,1.0\n"
+                                                 "2026,1,3,1.0\n"
+                                                 "2110,0,3,1.0\n"
+                                                 "2110,1,3,1.0\n");
+    write_text(dir / "education_upgrades.csv", "year,age,gender,from_id,to_id,probability\n"
+                                               "2026,25,0,3,4,1.0\n"
+                                               "2026,25,1,3,4,1.0\n");
 }
 
 // MAHIMA: Build slot JSON with locals so nested braces stay MSVC-friendly.
 json make_static_model_json() {
-    const auto lookup = file_slot(
-        "education_lookup.csv",
-        json{{"age", "integer"},
-             {"gender", "integer"},
-             {"education_id", "integer"},
-             {"probability", "double"}});
+    const auto lookup = file_slot("education_lookup.csv", json{{"age", "integer"},
+                                                               {"gender", "integer"},
+                                                               {"education_id", "integer"},
+                                                               {"probability", "double"}});
     return json{{"ModelName", "JacardiModel"},
-                {"Education",
-                 {{"method", "empirical_lifecycle_init"}, {"lookup", lookup}}}};
+                {"Education", {{"method", "empirical_lifecycle_init"}, {"lookup", lookup}}}};
 }
 
 json make_update_model_json() {
-    const auto draw = file_slot(
-        "education_draw_at_22.csv",
-        json{{"year", "integer"},
-             {"gender", "integer"},
-             {"education_id", "integer"},
-             {"probability", "double"}});
-    const auto upgrades = file_slot(
-        "education_upgrades.csv",
-        json{{"year", "integer"},
-             {"age", "integer"},
-             {"gender", "integer"},
-             {"from_id", "integer"},
-             {"to_id", "integer"},
-             {"probability", "double"}});
+    const auto draw = file_slot("education_draw_at_22.csv", json{{"year", "integer"},
+                                                                 {"gender", "integer"},
+                                                                 {"education_id", "integer"},
+                                                                 {"probability", "double"}});
+    const auto upgrades = file_slot("education_upgrades.csv", json{{"year", "integer"},
+                                                                   {"age", "integer"},
+                                                                   {"gender", "integer"},
+                                                                   {"from_id", "integer"},
+                                                                   {"to_id", "integer"},
+                                                                   {"probability", "double"}});
     return json{{"ModelName", "JacardiModelUpdate"},
                 {"Education",
                  {{"method", "empirical_lifecycle_update"},
@@ -134,9 +124,8 @@ TEST(JacardiModelParser, LoadsStaticDefinitionFromCsvSlots) {
     JacardiTempDir dir;
     write_jacardi_education_csvs(dir.path());
 
-    auto definition =
-        hgps::input::load_jacardi_risk_model_definition(make_static_model_json(),
-                                                        make_config(dir.path()));
+    auto definition = hgps::input::load_jacardi_risk_model_definition(make_static_model_json(),
+                                                                      make_config(dir.path()));
     ASSERT_NE(definition, nullptr);
 
     auto model = definition->create_model();
@@ -160,25 +149,23 @@ TEST(JacardiModelParser, LoadsUpdateDefinitionFromCsvSlots) {
 }
 
 TEST(JacardiModelParser, StaticMissingEducationThrows) {
-    EXPECT_THROW(hgps::input::load_jacardi_risk_model_definition(json{{"ModelName", "JacardiModel"}},
-                                                                 make_config(".")),
+    EXPECT_THROW(hgps::input::load_jacardi_risk_model_definition(
+                     json{{"ModelName", "JacardiModel"}}, make_config(".")),
                  core::HgpsException);
 }
 
 TEST(JacardiModelParser, UpdateMissingEducationThrows) {
-    EXPECT_THROW(
-        hgps::input::load_jacardi_update_risk_model_definition(json{{"ModelName", "JacardiModelUpdate"}},
-                                                               make_config(".")),
-        core::HgpsException);
+    EXPECT_THROW(hgps::input::load_jacardi_update_risk_model_definition(
+                     json{{"ModelName", "JacardiModelUpdate"}}, make_config(".")),
+                 core::HgpsException);
 }
 
 TEST(JacardiModelRuntime, GenerateAssignsEducationByAge) {
     JacardiTempDir dir;
     write_jacardi_education_csvs(dir.path());
 
-    auto definition =
-        hgps::input::load_jacardi_risk_model_definition(make_static_model_json(),
-                                                        make_config(dir.path()));
+    auto definition = hgps::input::load_jacardi_risk_model_definition(make_static_model_json(),
+                                                                      make_config(dir.path()));
     auto model = definition->create_model();
 
     core::DataTable data;
@@ -211,9 +198,8 @@ TEST(JacardiModelRuntime, StaticUpdateFillsMissingEducationOnly) {
     JacardiTempDir dir;
     write_jacardi_education_csvs(dir.path());
 
-    auto definition =
-        hgps::input::load_jacardi_risk_model_definition(make_static_model_json(),
-                                                        make_config(dir.path()));
+    auto definition = hgps::input::load_jacardi_risk_model_definition(make_static_model_json(),
+                                                                      make_config(dir.path()));
     auto model = definition->create_model();
 
     core::DataTable data;
@@ -242,9 +228,8 @@ TEST(JacardiModelRuntime, DynamicUpdateAppliesPartB) {
     JacardiTempDir dir;
     write_jacardi_education_csvs(dir.path());
 
-    auto static_def =
-        hgps::input::load_jacardi_risk_model_definition(make_static_model_json(),
-                                                        make_config(dir.path()));
+    auto static_def = hgps::input::load_jacardi_risk_model_definition(make_static_model_json(),
+                                                                      make_config(dir.path()));
     auto update_def = hgps::input::load_jacardi_update_risk_model_definition(
         make_update_model_json(), make_config(dir.path()));
     auto static_model = static_def->create_model();
