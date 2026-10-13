@@ -80,8 +80,8 @@ std::string DiseaseTable::describe_prevalence_skip_coverage() const {
     const int min_age = data_.begin()->first;
     const int max_age = data_.rbegin()->first;
     // MAHIMA: Widen before subtract (bugprone-misplaced-widening-cast); ages are non-negative.
-    const auto span = static_cast<std::size_t>(max_age) - static_cast<std::size_t>(min_age) +
-                      std::size_t{1};
+    const auto span =
+        static_cast<std::size_t>(max_age) - static_cast<std::size_t>(min_age) + std::size_t{1};
     const std::size_t missing_ages = span > data_.size() ? span - data_.size() : 0u;
 
     if (male_ages == 0 && female_ages > 0) {
