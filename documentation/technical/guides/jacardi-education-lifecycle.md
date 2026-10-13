@@ -119,6 +119,8 @@ When `project_requirements.demographics.education` is true and `Education` is in
 
 **Fix:** map columns by name (`age`, `gender_id`, `mean`). Regression tests: `CostOfDiseaseSchema.*`.
 
+Slovenia disease skip report / BoD / hierarchy notes: [jacardi-slovenia-run-fixes.md](jacardi-slovenia-run-fixes.md).
+
 ---
 
 ## Code map
@@ -132,8 +134,9 @@ When `project_requirements.demographics.education` is true and `Education` is in
 | `src/HealthGPS.Input/datamanager.cpp` | Cost-of-disease loader (named columns) |
 | `src/HealthGPS/analysis_module.cpp` | Result CSV channels; skips non-finite Education |
 | `src/HealthGPS/demographic.cpp` | Console Education assignment status |
+| `src/HealthGPS/disease.cpp` / `disease_table.cpp` | One-shot prevalence skip coverage report |
 
-Tests: [jacardi-education-loader-tests.md](jacardi-education-loader-tests.md) (`--gtest_filter=Jacardi*`); also `CostOfDiseaseSchema*` / `DemographicSummary*`.
+Tests: [jacardi-education-loader-tests.md](jacardi-education-loader-tests.md) (`--gtest_filter=Jacardi*`); also `CostOfDiseaseSchema*` / `DemographicSummary*` / `PrevalenceSkipCoverage*`.
 
 ---
 

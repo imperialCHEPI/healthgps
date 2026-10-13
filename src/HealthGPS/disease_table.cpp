@@ -55,6 +55,66 @@ std::size_t DiseaseTable::cols() const noexcept {
 
 bool DiseaseTable::contains(const int age) const noexcept { return data_.contains(age); }
 
+bool DiseaseTable::contains(int age, core::Gender gender) const noexcept {
+    const auto age_it = data_.find(age);
+    return age_it != data_.end() && age_it->second.contains(gender);
+}
+
+std::string DiseaseTable::describe_prevalence_skip_coverage() const {
+    const auto code = info_.code.to_string();
+    if (data_.empty()) {
+        return fmt::format("{} : ERROR — empty prevalence table (check disease data files)", code);
+    }
+
+    std::size_t male_ages = 0;
+    std::size_t female_ages = 0;
+    for (const auto &entry : data_) {
+        const auto &sexes = entry.second;
+        male_ages += sexes.contains(core::Gender::male) ? 1u : 0u;
+        female_ages += sexes.contains(core::Gender::female) ? 1u : 0u;
+    }
+
+    // MAHIMA: Constructor enforces same #genders per age — sex holes show up as whole ages missing.
+    const int min_age = data_.begin()->first;
+    const int max_age = data_.rbegin()->first;
+    const auto span = static_cast<std::size_t>(max_age - min_age + 1);
+    const std::size_t missing_ages = span > data_.size() ? span - data_.size() : 0u;
+
+    if (male_ages == 0 && female_ages > 0) {
+        if (missing_ages > 0) {
+            return fmt::format(
+                "{} : WARNING — female-only table but {} age(s) missing in [{}, {}] "
+                "(sex-limited OK; age gaps look like a CSV error)",
+                code, missing_ages, min_age, max_age);
+        }
+        return fmt::format(
+            "{} : EXPECTED — female-only table; males skipped at prevalence init "
+            "(sex-limited disease, not a missing file)",
+            code);
+    }
+    if (female_ages == 0 && male_ages > 0) {
+        if (missing_ages > 0) {
+            return fmt::format(
+                "{} : WARNING — male-only table but {} age(s) missing in [{}, {}] "
+                "(sex-limited OK; age gaps look like a CSV error)",
+                code, missing_ages, min_age, max_age);
+        }
+        return fmt::format(
+            "{} : EXPECTED — male-only table; females skipped at prevalence init "
+            "(sex-limited disease, not a missing file)",
+            code);
+    }
+    if (missing_ages > 0) {
+        return fmt::format(
+            "{} : WARNING — both sexes present but {} age row(s) missing in [{}, {}] "
+            "(possible disease CSV gap — verify input files)",
+            code, missing_ages, min_age, max_age);
+    }
+    return fmt::format(
+        "{} : OK — both sexes covered; contiguous ages [{}, {}] in prevalence table", code,
+        min_age, max_age);
+}
+
 const std::map<std::string, int> &DiseaseTable::measures() const noexcept { return measures_; }
 
 int DiseaseTable::at(const std::string &measure) const { return measures_.at(measure); }

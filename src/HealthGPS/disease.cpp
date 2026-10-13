@@ -3,7 +3,9 @@
 #include "lms_model.h"
 #include "weight_model.h"
 
+#include <fmt/color.h>
 #include <oneapi/tbb/parallel_for_each.h>
+#include <string>
 
 namespace hgps {
 
@@ -30,17 +32,31 @@ DiseaseModule::operator[](const core::Identifier &disease_id) const {
 }
 
 void DiseaseModule::initialise_population(RuntimeContext &context) {
-    // Initialise disease status based on prevalence
+    // MAHIMA: One-shot before prevalence loops — expected sex-limited skips vs CSV holes.
+    fmt::print(fg(fmt::color::cyan),
+               "\nDisease prevalence coverage (printed once at disease init):\n");
+    for (const auto &model : models_) {
+        const auto line = model.second->prevalence_skip_coverage_message();
+        if (line.find("ERROR") != std::string::npos) {
+            fmt::print(fg(fmt::color::orange_red), "  {}\n", line);
+        } else if (line.find("WARNING") != std::string::npos) {
+            fmt::print(fg(fmt::color::yellow), "  {}\n", line);
+        } else if (line.find("EXPECTED") != std::string::npos) {
+            fmt::print(fg(fmt::color::light_sky_blue), "  {}\n", line);
+        } else {
+            fmt::print(fg(fmt::color::light_green), "  {}\n", line);
+        }
+    }
+    fmt::print("\n");
+
     for (auto &model : models_) {
         model.second->initialise_disease_status(context);
     }
 
-    // Recalculate relative risks once diseases status were generated
     for (auto &model : models_) {
         model.second->initialise_average_relative_risk(context);
     }
 
-    // After initialising with prevalence, do a 'dry run' to simulate incidence.
     for (auto &model : models_) {
         model.second->update_disease_status(context);
     }

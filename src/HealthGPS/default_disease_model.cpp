@@ -3,6 +3,7 @@
 #include "person.h"
 #include "runtime_context.h"
 
+#include <cmath>
 #include <fmt/color.h>
 #include <iostream>
 #include <oneapi/tbb/parallel_for_each.h>
@@ -25,12 +26,18 @@ const core::Identifier &DefaultDiseaseModel::disease_type() const noexcept {
     return definition_.get().identifier().code;
 }
 
+std::string DefaultDiseaseModel::prevalence_skip_coverage_message() const {
+    return definition_.get().table().describe_prevalence_skip_coverage();
+}
+
 void DefaultDiseaseModel::initialise_disease_status(RuntimeContext &context) {
     int prevalence_id = definition_.get().table().at(MeasureKey::prevalence);
 
     auto relative_risk_table = calculate_average_relative_risk(context);
     for (auto &person : context.population()) {
-        if (!person.is_active() || !definition_.get().table().contains(person.age)) {
+        // MAHIMA: Skip age×sex cells missing from disease CSV.
+        if (!person.is_active() ||
+            !definition_.get().table().contains(person.age, person.gender)) {
             continue;
         }
 
@@ -155,7 +162,7 @@ double DefaultDiseaseModel::calculate_relative_risk_for_risk_factors(const Perso
 
     double relative_risk = 1.0;
     for (const auto &[factor_name, factor_value] : person.risk_factors) {
-        if (!relative_risk_tables.contains(factor_name)) {
+        if (!relative_risk_tables.contains(factor_name) || !std::isfinite(factor_value)) {
             continue;
         }
 
@@ -163,6 +170,9 @@ double DefaultDiseaseModel::calculate_relative_risk_for_risk_factors(const Perso
             weight_classifier_.adjust_risk_factor_value(person, factor_name, factor_value));
 
         const auto &rr_table = relative_risk_tables.at(factor_name);
+        if (!rr_table.contains(person.gender)) {
+            continue;
+        }
         relative_risk *= rr_table.at(person.gender)(person.age, factor_value_adjusted);
     }
 
@@ -267,6 +277,11 @@ void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
         // Skip if the person already has the disease.
         if (auto it = person.diseases.find(disease_code);
             it != person.diseases.end() && it->second.status == DiseaseStatus::active) {
+            continue;
+        }
+
+        // MAHIMA: Skip age×sex cells missing from disease CSV.
+        if (!table.contains(person.age, person.gender)) {
             continue;
         }
 

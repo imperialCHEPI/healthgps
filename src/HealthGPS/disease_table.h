@@ -80,6 +80,13 @@ class DiseaseTable {
     /// @return true if the age entry exists; otherwise, false.
     bool contains(const int age) const noexcept;
 
+    /// MAHIMA: Some diseases (e.g. cervical cancer) only store one sex in the CSV.
+    bool contains(int age, core::Gender gender) const noexcept;
+
+    /// MAHIMA: One-shot skip classification for prevalence init (expected sex-limited vs CSV holes).
+    /// @return Human-readable line: "code : EXPECTED|WARNING|ERROR|OK — …"
+    std::string describe_prevalence_skip_coverage() const;
+
     /// @brief Gets the measures to identifier mapping
     /// @return Measures identifiers
     const std::map<std::string, int> &measures() const noexcept;

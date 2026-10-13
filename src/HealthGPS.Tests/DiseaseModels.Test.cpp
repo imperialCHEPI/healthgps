@@ -149,6 +149,75 @@ TEST(TestHealthGPS_Disease, AccessDiseaseTableOutOfBoundThrows) {
     ASSERT_THROW(table(2, core::Gender::unknown), std::out_of_range);
 }
 
+TEST(TestHealthGPS_Disease, ContainsAgeGenderHandlesSexSpecificRows) {
+    using namespace hgps;
+
+    // MAHIMA: Cervical-style table — age present but only female cells.
+    auto measures = std::map<std::string, int>{{"prevalence", 1}};
+    auto data = std::map<int, std::map<core::Gender, DiseaseMeasure>>{
+        {40, {{core::Gender::female, DiseaseMeasure(std::map<int, double>{{1, 0.01}})}}},
+    };
+    auto info = core::DiseaseInfo{.code = core::Identifier{"cervicalcancer"},
+                                  .name = "Cervical cancer"};
+    auto table = DiseaseTable(info, std::move(measures), std::move(data));
+
+    EXPECT_TRUE(table.contains(40));
+    EXPECT_TRUE(table.contains(40, core::Gender::female));
+    EXPECT_FALSE(table.contains(40, core::Gender::male));
+    EXPECT_FALSE(table.contains(41, core::Gender::female));
+}
+
+// MAHIMA: One-shot coverage strings — EXPECTED sex-limited vs WARNING CSV holes.
+TEST(TestHealthGPS_Disease, PrevalenceSkipCoverageExpectedFemaleOnly) {
+    using namespace hgps;
+    auto measures = std::map<std::string, int>{{"prevalence", 1}};
+    auto data = std::map<int, std::map<core::Gender, DiseaseMeasure>>{
+        {40, {{core::Gender::female, DiseaseMeasure(std::map<int, double>{{1, 0.01}})}}},
+        {41, {{core::Gender::female, DiseaseMeasure(std::map<int, double>{{1, 0.02}})}}},
+    };
+    auto info = core::DiseaseInfo{.code = core::Identifier{"cervicalcancer"},
+                                  .name = "Cervical cancer"};
+    auto table = DiseaseTable(info, std::move(measures), std::move(data));
+    const auto msg = table.describe_prevalence_skip_coverage();
+    EXPECT_NE(msg.find("EXPECTED"), std::string::npos);
+    EXPECT_NE(msg.find("female-only"), std::string::npos);
+}
+
+TEST(TestHealthGPS_Disease, PrevalenceSkipCoverageWarningMissingAges) {
+    using namespace hgps;
+    auto measures = std::map<std::string, int>{{"prevalence", 1}};
+    // MAHIMA: Ages 40 and 42 present, 41 missing — constructor allows this; flags CSV gap.
+    auto data = std::map<int, std::map<core::Gender, DiseaseMeasure>>{
+        {40,
+         {{core::Gender::male, DiseaseMeasure(std::map<int, double>{{1, 0.01}})},
+          {core::Gender::female, DiseaseMeasure(std::map<int, double>{{1, 0.01}})}}},
+        {42,
+         {{core::Gender::male, DiseaseMeasure(std::map<int, double>{{1, 0.02}})},
+          {core::Gender::female, DiseaseMeasure(std::map<int, double>{{1, 0.02}})}}},
+    };
+    auto info =
+        core::DiseaseInfo{.code = core::Identifier{"diabetes"}, .name = "Diabetes"};
+    auto table = DiseaseTable(info, std::move(measures), std::move(data));
+    const auto msg = table.describe_prevalence_skip_coverage();
+    EXPECT_NE(msg.find("WARNING"), std::string::npos);
+    EXPECT_NE(msg.find("diabetes"), std::string::npos);
+}
+
+TEST(TestHealthGPS_Disease, PrevalenceSkipCoverageOkBothSexes) {
+    using namespace hgps;
+    auto measures = std::map<std::string, int>{{"prevalence", 1}};
+    auto data = std::map<int, std::map<core::Gender, DiseaseMeasure>>{
+        {40,
+         {{core::Gender::male, DiseaseMeasure(std::map<int, double>{{1, 0.01}})},
+          {core::Gender::female, DiseaseMeasure(std::map<int, double>{{1, 0.01}})}}},
+    };
+    auto info = core::DiseaseInfo{.code = core::Identifier{"colorectalcancer"},
+                                  .name = "Colorectal cancer"};
+    auto table = DiseaseTable(info, std::move(measures), std::move(data));
+    const auto msg = table.describe_prevalence_skip_coverage();
+    EXPECT_NE(msg.find("OK"), std::string::npos);
+}
+
 TEST(TestHealthGPS_Disease, CreateMonotonicVector) {
     using namespace hgps;
 
