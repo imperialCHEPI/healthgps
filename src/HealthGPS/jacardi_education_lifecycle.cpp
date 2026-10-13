@@ -2,13 +2,14 @@
 
 #include "HealthGPS.Core/exception.h"
 #include "HealthGPS.Core/identifier.h"
-#include "HealthGPS.Core/string_util.h"
 
 #include <cmath>
 #include <fmt/format.h>
 
 namespace hgps {
 namespace {
+// MAHIMA: Canonical risk-factor key written to output CSVs as mean_Education / std_Education
+// when "Education" is listed under modelling.risk_factors in config.json.
 const auto education_factor = core::Identifier{"Education"};
 } // namespace
 
@@ -34,6 +35,7 @@ int EducationLifecycleTables::gender_code(core::Gender gender) {
     throw core::HgpsException{"JACARDI education: unknown gender"};
 }
 
+// MAHIMA: Pack age|gender into one hash key (age << 1 | gender_bit). O(1) lookup.
 std::uint64_t EducationLifecycleTables::key_age_gender(int age, int gender) noexcept {
     return (static_cast<std::uint64_t>(age) << 1U) | static_cast<std::uint64_t>(gender & 1);
 }
@@ -42,9 +44,10 @@ std::uint64_t EducationLifecycleTables::key_year_gender(int year, int gender) no
     return (static_cast<std::uint64_t>(year) << 1U) | static_cast<std::uint64_t>(gender & 1);
 }
 
+// MAHIMA: Pack year|age|gender|from_id for upgrade strata. Immutable map → concurrent reads OK.
 std::uint64_t EducationLifecycleTables::key_upgrade(int year, int age, int gender,
                                                     int from_id) noexcept {
-    // year:12 | age:8 | gender:1 | from_id:4  (plenty for JACARDI ranges)
+    // year:12 | age:8 | gender:1 | from_id:4
     return (static_cast<std::uint64_t>(year) << 13U) |
            (static_cast<std::uint64_t>(age & 0xff) << 5U) |
            (static_cast<std::uint64_t>(gender & 1) << 4U) |
@@ -56,6 +59,7 @@ int EducationLifecycleTables::draw(const Stratum &stratum, Random &rng) {
         throw core::HgpsException{"JACARDI education DRAW: empty stratum"};
     }
 
+    // MAHIMA: Inverse CDF — walk cumulative probability until u falls in a bin.
     const double u = rng.next_double(); // [0, 1)
     double running = 0.0;
     int last_positive = stratum.ids.back();
@@ -70,19 +74,22 @@ int EducationLifecycleTables::draw(const Stratum &stratum, Random &rng) {
             return stratum.ids[i];
         }
     }
+    // Mass < 1 or floating noise: land on last id with p > 0.
     return last_positive;
 }
 
 double EducationLifecycleTables::initialise(unsigned int age, core::Gender gender,
                                             Random &rng) const {
-    if (age <= 5U) {
+    // MAHIMA: Part A — start-year / newborn assignment (no year dimension).
+    // Ages 0..5 missing; 6..18 fixed id 2; 19..21 fixed id 3; 22+ empirical lookup by age×gender.
+    if (age <= age_missing_max) {
         return missing;
     }
-    if (age <= 18U) {
-        return 2.0;
+    if (age <= age_primary_max) {
+        return primary_education_id;
     }
-    if (age <= 21U) {
-        return 3.0;
+    if (age <= age_secondary_max) {
+        return secondary_education_id;
     }
 
     if (lookup_.empty()) {
@@ -101,26 +108,28 @@ double EducationLifecycleTables::initialise(unsigned int age, core::Gender gende
 
 double EducationLifecycleTables::update(unsigned int age, core::Gender gender, int year,
                                         double current, Random &rng) const {
-    if (age <= 5U) {
-        return current; // stays missing
+    // MAHIMA: Part B — one yearly step AFTER age has already been incremented.
+    // Only milestone ages change the value; otherwise hold `current` (never decrease).
+    if (age <= age_missing_max) {
+        return current; // still missing
     }
-    if (age == 6U) {
-        return 2.0;
+    if (age == age_set_primary) {
+        return primary_education_id;
     }
-    if (age <= 18U) {
+    if (age <= age_primary_max) {
         return current;
     }
-    if (age == 19U) {
-        return 3.0;
+    if (age == age_set_secondary) {
+        return secondary_education_id;
     }
-    if (age <= 21U) {
+    if (age <= age_secondary_max) {
         return current;
     }
 
     const int sim_year = year > max_update_year ? max_update_year : year;
     const int g = gender_code(gender);
 
-    if (age == 22U) {
+    if (age == age_draw) {
         if (draw_at_22_.empty()) {
             throw core::HgpsException{"JACARDI education Part B: draw_at_22 table not loaded"};
         }
@@ -132,7 +141,7 @@ double EducationLifecycleTables::update(unsigned int age, core::Gender gender, i
         return static_cast<double>(draw(it->second, rng));
     }
 
-    if (age <= 30U) {
+    if (age <= age_upgrade_max) {
         if (upgrades_.empty()) {
             throw core::HgpsException{"JACARDI education Part B: upgrade table not loaded"};
         }
@@ -143,14 +152,15 @@ double EducationLifecycleTables::update(unsigned int age, core::Gender gender, i
         const int from_id = static_cast<int>(current);
         const auto it = upgrades_.find(key_upgrade(sim_year, static_cast<int>(age), g, from_id));
         if (it == upgrades_.end()) {
-            // No transition rows => stay put (never go down).
+            // No CSV rows for this stratum → stay put.
             return current;
         }
         const int to_id = draw(it->second, rng);
+        // Never go down: clamp drawn to_id to at least from_id.
         return static_cast<double>(to_id < from_id ? from_id : to_id);
     }
 
-    return current; // 31+: fixed for life
+    return current; // 31+: education fixed for life
 }
 
 void set_person_education(Person &person, double education_id) {
@@ -166,7 +176,10 @@ double get_person_education(const Person &person) {
 }
 
 bool person_has_education(const Person &person) {
-    return person.risk_factors.contains(education_factor);
+    // MAHIMA: NaN for ages 0–5 must count as missing so static update can fill after ageing,
+    // and so analysis skips them when computing mean_Education.
+    const auto it = person.risk_factors.find(education_factor);
+    return it != person.risk_factors.end() && std::isfinite(it->second);
 }
 
 } // namespace hgps

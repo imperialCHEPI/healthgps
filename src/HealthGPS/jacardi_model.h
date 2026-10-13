@@ -8,7 +8,9 @@
 
 namespace hgps {
 
-/// MAHIMA: JACARDI static / init pathway (ModelName: JacardiModel).
+/// MAHIMA: JACARDI static / init pathway (`ModelName`: JacardiModel).
+/// Writes `Person.risk_factors["Education"]` via Part A so Analysis can emit
+/// `mean_Education` / `std_Education` when Education is in modelling.risk_factors.
 class JacardiModel final : public RiskFactorModel {
   public:
     explicit JacardiModel(std::shared_ptr<const EducationLifecycleTables> education);
@@ -16,10 +18,10 @@ class JacardiModel final : public RiskFactorModel {
     RiskFactorModelType type() const noexcept override;
     std::string name() const noexcept override;
 
-    /// Part A education for the full population at simulation start.
+    /// Part A for the full active population at simulation start.
     void generate_risk_factors(RuntimeContext &context) override;
 
-    /// Part A for people who still lack Education (e.g. newborns).
+    /// Part A only for people still missing a finite Education (e.g. newborns).
     void update_risk_factors(RuntimeContext &context) override;
 
   private:

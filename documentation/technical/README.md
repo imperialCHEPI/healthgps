@@ -19,6 +19,8 @@ Reach out if you need a code path, config walkthrough, or help debugging.
 | [HealthGPS update report (20 Feb 2026)](guides/healthgps-update-report-2026-02-20.md) | Integrated changes, module order, config/schema, verification |
 | [Simulation models reference](guides/simulation-models-reference.md) | Per-module and per-ModelName inputs, outputs, schemas, code pointers |
 | [Performance optimizations](guides/performance-optimizations.md) | Parallelisation and runtime notes |
+| [JACARDI education lifecycle](guides/jacardi-education-lifecycle.md) | Part A/B logic, output `mean_Education`, threading notes, retunable age thresholds |
+| [JACARDI education loader tests](guides/jacardi-education-loader-tests.md) | P0/P1a gtest coverage for Jacardi loaders, Part A/B education, Codecov patch |
 
 ---
 
@@ -50,7 +52,7 @@ Engineering design notes for developers. Written as ordinary markdown plans (sum
 | Kevin Hall height/weight | [Height quintile plan](plans/height-csv-quintile-plan.md) | [Weight quintile plan](plans/weight-quintile-plan.md) |
 | Output / person IDs | [Individual ID tracking](plans/individual-id-tracking-csv-plan.md) | [Same person ID plan](plans/same-person-id-baseline-intervention-plan.md) |
 | What shipped in Feb 2026 | [Update report](guides/healthgps-update-report-2026-02-20.md) | [Performance notes](guides/performance-optimizations.md) |
-| JACARDI (7 countries / new pathway) | [JACARDI 7 countries implementation](plans/JACARDI-7-countries-implementation-plan.md) | [Project requirements](plans/project-requirements-plan.md) · UKPDS plan (`JACARDI-UKPDS-healthGPS.md`, when on branch) |
+| JACARDI (7 countries / new pathway) | [JACARDI 7 countries implementation](plans/JACARDI-7-countries-implementation-plan.md) | [Education lifecycle](guides/jacardi-education-lifecycle.md) · [Loader tests](guides/jacardi-education-loader-tests.md) · [Project requirements](plans/project-requirements-plan.md) · UKPDS plan (`JACARDI-UKPDS-healthGPS.md`, when on branch) |
 | Windows build / MSVC | [MSVC troubleshooting](../developer/msvc-windows-build-troubleshooting.md) | [Developer Guide](../developer/development.md) |
 
 ---

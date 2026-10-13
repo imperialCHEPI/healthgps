@@ -308,8 +308,13 @@ void AnalysisModule::publish_individual_tracking_if_enabled(RuntimeContext &cont
         row.income_category = income_category_to_string(entity.income);
         for (const auto &name : risk_factor_names) {
             core::Identifier key(name);
+            // MAHIMA: Omit non-finite Education (ages 0–5) so IndividualIDTracking CSV
+            // gets a blank cell instead of "nan".
             if (entity.risk_factors.contains(key)) {
-                row.risk_factors[name] = entity.risk_factors.at(key);
+                const double value = entity.risk_factors.at(key);
+                if (std::isfinite(value)) {
+                    row.risk_factors[name] = value;
+                }
             }
         }
         rows.push_back(std::move(row));
@@ -491,9 +496,12 @@ void AnalysisModule::calculate_income_based_statistics(RuntimeContext &context,
             if (factor.level() > 0) {
                 // Check if risk factor exists before accessing (some risk factors may not be
                 // initialized for all projects)
+                // MAHIMA: Skip NaN Education (ages 0–5) in income-stratified averages too.
                 if (person.risk_factors.contains(factor.key())) {
-                    risk_factors_by_income[factor.key()][income][person.gender] +=
-                        person.risk_factors.at(factor.key());
+                    const double value = person.risk_factors.at(factor.key());
+                    if (std::isfinite(value)) {
+                        risk_factors_by_income[factor.key()][income][person.gender] += value;
+                    }
                 }
             }
         }
@@ -903,10 +911,14 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
                 fkey_lower == "income_category" || fkey_lower == "income") {
                 continue;
             }
-            // Check if risk factor exists before accessing (channel keys stored lowercase)
+            // Check if risk factor exists before accessing (channel keys stored lowercase).
+            // MAHIMA: Skip non-finite values (e.g. Education NaN for ages 0–5) so mean_*
+            // columns in the result CSV are not poisoned to NaN.
             if (person.risk_factors.contains(factor.key())) {
-                double factor_value = person.risk_factors.at(factor.key());
-                series(gender, core::to_lower("mean_" + fkey)).at(age) += factor_value;
+                const double factor_value = person.risk_factors.at(factor.key());
+                if (std::isfinite(factor_value)) {
+                    series(gender, core::to_lower("mean_" + fkey)).at(age) += factor_value;
+                }
             }
         }
 
@@ -1890,12 +1902,14 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
             }
 
             // Check if risk factor exists before accessing (some risk factors may not be
-            // initialized for all projects)
+            // initialized for all projects).
+            // MAHIMA: Skip non-finite (Education missing) so std_* CSV columns stay valid.
             if (person.risk_factors.contains(factor.key())) {
                 const double value = person.risk_factors.at(factor.key());
-                accumulate_squared_diffs(factor.key().to_string(), sex, age, value);
+                if (std::isfinite(value)) {
+                    accumulate_squared_diffs(factor.key().to_string(), sex, age, value);
+                }
             }
-            // If risk factor doesn't exist, skip it
         }
 
         // NEW: Calculate standard deviation for demographic factors (only if data exists)

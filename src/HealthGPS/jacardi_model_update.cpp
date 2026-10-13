@@ -20,11 +20,13 @@ RiskFactorModelType JacardiModelUpdate::type() const noexcept {
 std::string JacardiModelUpdate::name() const noexcept { return "JacardiModelUpdate"; }
 
 void JacardiModelUpdate::generate_risk_factors(RuntimeContext & /*context*/) {
-    // MAHIMA: Education init lives in JacardiModel (static slot).
+    // MAHIMA: Start-year Education is owned by JacardiModel (static slot). No-op here.
 }
 
 void JacardiModelUpdate::update_risk_factors(RuntimeContext &context) {
-    // MAHIMA: Part B — run after DemographicModule has aged everyone by one year.
+    // MAHIMA: Part B after DemographicModule has aged everyone by one year.
+    // Serial loop — shared Random; tables are read-only and would be fine under parallel
+    // reads, but RNG is not. Keep serial until thread-local Random exists.
     auto &rng = context.random();
     const int year = context.time_now();
     for (auto &person : context.population()) {

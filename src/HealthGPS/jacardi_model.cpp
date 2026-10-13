@@ -17,7 +17,8 @@ RiskFactorModelType JacardiModel::type() const noexcept { return RiskFactorModel
 std::string JacardiModel::name() const noexcept { return "JacardiModel"; }
 
 void JacardiModel::generate_risk_factors(RuntimeContext &context) {
-    // MAHIMA: Part A — assign education once for everyone in the start year.
+    // MAHIMA: Part A for everyone at simulation start (serial: shared Random is not thread-safe;
+    // work per person is tiny vs disease/analysis, so parallelising is not worth it yet).
     auto &rng = context.random();
     for (auto &person : context.population()) {
         if (!person.is_active()) {
@@ -28,7 +29,8 @@ void JacardiModel::generate_risk_factors(RuntimeContext &context) {
 }
 
 void JacardiModel::update_risk_factors(RuntimeContext &context) {
-    // MAHIMA: Newborns / anyone without Education get Part A for their current age.
+    // MAHIMA: Fill Education only when still missing (newborns / ages that stayed NaN).
+    // People who already have a finite id are left alone — Part B owns yearly changes.
     auto &rng = context.random();
     for (auto &person : context.population()) {
         if (!person.is_active() || person_has_education(person)) {
