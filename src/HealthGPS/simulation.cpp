@@ -143,19 +143,10 @@ void Simulation::initialise_population() {
 
     context_.reset_population(virtual_pop_size);
 
-    // Gender - Age, must be first
     demographic_->initialise_population(context_);
-
-    // Social economics status
     ses_->initialise_population(context_);
-
-    // Generate risk factors;
     risk_factor_->initialise_population(context_);
-
-    // Initialise diseases
     disease_->initialise_population(context_);
-
-    // Initialise analysis
     analysis_->initialise_population(context_);
 
     print_initial_population_statistics();

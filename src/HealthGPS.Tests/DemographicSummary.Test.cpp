@@ -66,15 +66,21 @@ std::shared_ptr<hgps::ModelInput> create_demographic_test_input(hgps::core::Data
     auto settings = Settings{uk, 0.1f, IntegerInterval(0, 30)};
     auto info = RunInfo{.start_time = 2018, .stop_time = 2025, .seed = std::nullopt};
     auto ses = SESDefinition{.fuction_name = "normal", .parameters = std::vector<double>{0.0, 1.0}};
-    auto mapping = HierarchicalMapping(std::vector<MappingEntry>{});
 
     auto project_requirements = hgps::input::ProjectRequirements{};
     project_requirements.demographics.region = true;
     project_requirements.demographics.ethnicity = true;
+    project_requirements.demographics.education = true;
+
+    // MAHIMA: Education must be in mapping for the demographic box "enabled" path.
+    auto mapping = HierarchicalMapping(std::vector<MappingEntry>{
+        MappingEntry{"Education", 1},
+    });
 
     const std::vector<core::DiseaseInfo> diseases;
-    return std::make_shared<hgps::ModelInput>(data, settings, info, ses, mapping, diseases,
-                                              project_requirements, hgps::input::PIFInfo{});
+    return std::make_shared<hgps::ModelInput>(data, settings, info, ses, std::move(mapping),
+                                              diseases, project_requirements,
+                                              hgps::input::PIFInfo{});
 }
 
 std::unique_ptr<hgps::DemographicModule>
@@ -106,6 +112,8 @@ TEST(DemographicSummary, ModuleLoadSummaryBox) {
     EXPECT_NE(output.find("Region assignment"), std::string::npos);
     EXPECT_NE(output.find("region1"), std::string::npos);
     EXPECT_NE(output.find("Ethnicity assignment"), std::string::npos);
+    EXPECT_NE(output.find("Education assignment"), std::string::npos);
+    EXPECT_NE(output.find("JacardiModel"), std::string::npos);
 }
 
 TEST(DemographicSummary, PopulationInitAssignsRegionAndEthnicity) {
@@ -129,6 +137,7 @@ TEST(DemographicSummary, PopulationInitAssignsRegionAndEthnicity) {
     const auto output = capture_stdout([&] { pop_module->initialise_population(context); });
 
     EXPECT_NE(output.find("Demographic population init"), std::string::npos);
+    EXPECT_NE(output.find("Education"), std::string::npos);
     for (const auto &person : context.population()) {
         EXPECT_FALSE(person.region.empty());
         EXPECT_FALSE(person.ethnicity.empty());

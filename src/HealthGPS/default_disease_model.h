@@ -27,6 +27,9 @@ class DefaultDiseaseModel final : public DiseaseModel {
     /// @return The disease type identifier
     const core::Identifier &disease_type() const noexcept override;
 
+    /// MAHIMA: Prevalence table skip coverage for the one-shot DiseaseModule report.
+    std::string prevalence_skip_coverage_message() const override;
+
     /// @brief Initialises the disease status of the population (from prevalence).
     /// Disease start_time = 0 disambiguates from incidence cases on start year.
     /// Must be followed by:

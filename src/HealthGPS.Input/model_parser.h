@@ -2,6 +2,8 @@
 
 #include "HealthGPS/dummy_model.h"
 #include "HealthGPS/dynamic_hierarchical_linear_model.h"
+#include "HealthGPS/jacardi_model.h"
+#include "HealthGPS/jacardi_model_update.h"
 #include "HealthGPS/kevin_hall_model.h"
 #include "HealthGPS/risk_factor_adjustable_model.h"
 #include "HealthGPS/static_hierarchical_linear_model.h"
@@ -54,6 +56,14 @@ load_ebhlm_risk_model_definition(const nlohmann::json &opt, const Configuration 
 /// @return An instance of the hgps::KevinHallModelDefinition type
 std::unique_ptr<hgps::KevinHallModelDefinition>
 load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configuration &config);
+
+/// @brief Loads JACARDI static (init) model — education Part A + future ladder slots
+std::unique_ptr<hgps::JacardiModelDefinition>
+load_jacardi_risk_model_definition(const nlohmann::json &opt, const Configuration &config);
+
+/// @brief Loads JACARDI dynamic (update) model — education Part B + future ladder slots
+std::unique_ptr<hgps::JacardiModelUpdateDefinition>
+load_jacardi_update_risk_model_definition(const nlohmann::json &opt, const Configuration &config);
 
 /// @brief Loads a risk model definition from a JSON file
 /// @param model_type The type of model to load
