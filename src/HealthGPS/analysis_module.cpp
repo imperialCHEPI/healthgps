@@ -1045,9 +1045,8 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
 void mark_zero_education_means_as_missing(DataSeries &series) {
     static constexpr auto mean_key = "mean_education";
     static constexpr auto std_key = "std_education";
-    const bool has_mean =
-        std::find(series.channels().begin(), series.channels().end(), mean_key) !=
-        series.channels().end();
+    const bool has_mean = std::find(series.channels().begin(), series.channels().end(), mean_key) !=
+                          series.channels().end();
     if (!has_mean) {
         return;
     }
