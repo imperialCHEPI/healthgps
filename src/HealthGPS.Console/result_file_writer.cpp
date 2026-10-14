@@ -1,4 +1,5 @@
 #include <chrono>
+#include <cmath>
 #include <ctime>
 #include <fstream>
 #include <sstream>
@@ -18,6 +19,17 @@
 #include "HealthGPS/data_series.h"
 
 namespace hgps {
+
+namespace {
+// MAHIMA: CSV text only — non-finite doubles (e.g. missing Education mean) become "NA", not "nan".
+void append_csv_number(std::ostream &out, double value) {
+    if (std::isfinite(value)) {
+        out << value;
+    } else {
+        out << "NA";
+    }
+}
+} // namespace
 
 ResultFileWriter::ResultFileWriter(const std::filesystem::path &file_name, ExperimentInfo info,
                                    bool write_income_csv,
@@ -265,8 +277,10 @@ void ResultFileWriter::write_csv_channels(const hgps::ResultEventMessage &messag
         fss << message.source << sep << message.run_number << sep << message.model_time << sep
             << "female" << sep << index;
         for (const auto &key : series.channels()) {
-            mss << sep << series.at(Gender::male, key).at(index);
-            fss << sep << series.at(Gender::female, key).at(index);
+            mss << sep;
+            append_csv_number(mss, series.at(Gender::male, key).at(index));
+            fss << sep;
+            append_csv_number(fss, series.at(Gender::female, key).at(index));
         }
 
         csvstream_ << mss.str() << '\n' << fss.str() << '\n';
@@ -421,7 +435,8 @@ void ResultFileWriter::write_income_csv_data(const hgps::ResultEventMessage &mes
                 } catch (const std::out_of_range &) {
                     // NOLINTNEXTLINE(bugprone-empty-catch) missing value → use 0.0
                 }
-                ss << sep << val;
+                ss << sep;
+                append_csv_number(ss, val);
             }
             income_csv << ss.str() << '\n';
         };

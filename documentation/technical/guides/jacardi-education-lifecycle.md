@@ -69,8 +69,8 @@ Then the main results CSV includes **`mean_Education`** and **`std_Education`** 
 
 | Detail | Behaviour |
 | ------ | --------- |
-| Ages 0–5 | Education is NaN on the person; analysis **skips** non-finite values so means are not poisoned. Age bands 0–5 therefore show **0** (no finite contributors), not a real education id. |
-| Ages 6+ | Finite ids contribute to the age×sex mean as usual. |
+| Ages 0–5 | Education is NaN on the person; analysis **skips** non-finite values. With no finite contributors, `mean_Education` / `std_Education` become NaN in-series and the **CSV writes `NA`** (not `0`, not `nan`). |
+| Ages 6+ | Finite ids (1–7) contribute to the age×sex mean as usual. Real `std_Education = 0` (everyone same id) stays `0`. |
 | Individual tracking | List `"Education"` under `output.individual_id_tracking.risk_factors`, or leave that list empty to take all mapping factors with `level > 0`. Missing/NaN cells are omitted (blank), not `"nan"`. |
 
 Without `Education` in `modelling.risk_factors`, **no Education columns appear** — the engine only exports mapped factors.
@@ -132,7 +132,8 @@ Slovenia disease skip report / BoD / hierarchy notes: [jacardi-slovenia-run-fixe
 | `src/HealthGPS/jacardi_model_update.*` | Dynamic slot — Part B yearly |
 | `src/HealthGPS.Input/model_parser.cpp` | `load_jacardi_*` CSV loaders |
 | `src/HealthGPS.Input/datamanager.cpp` | Cost-of-disease loader (named columns) |
-| `src/HealthGPS/analysis_module.cpp` | Result CSV channels; skips non-finite Education |
+| `src/HealthGPS/analysis_module.cpp` | Result CSV channels; skips non-finite Education; zero means → NaN for CSV `NA` |
+| `src/HealthGPS.Console/result_file_writer.cpp` | Writes `NA` for non-finite CSV cells |
 | `src/HealthGPS/demographic.cpp` | Console Education assignment status |
 | `src/HealthGPS/disease.cpp` / `disease_table.cpp` | One-shot prevalence skip coverage report |
 
