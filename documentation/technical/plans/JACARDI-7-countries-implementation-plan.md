@@ -6,7 +6,7 @@
 
 **Author:** Mahima Ghosh · **GitHub:** `jacardi` · **Branch prefix:** `jacardi/`
 **Status:** Design / planning (written and maintained by Mahima)
-**Related:** [Technical index](../README.md) · [Project requirements plan](project-requirements-plan.md) · [Models overview](../../user/models-overview.md) · [How Health-GPS models a person](../guides/how-healthgps-models-a-person.md) · [Simulation models reference](../guides/simulation-models-reference.md) · [JACARDI-UKPDS-healthGPS](JACARDI-UKPDS-healthGPS.md) (Belgium diabetes submodel; restore/link when present on branch)
+**Related:** [Technical index](../README.md) · [Project requirements plan](project-requirements-plan.md) · [Models overview](../../user/models-overview.md) · [How Health-GPS models a person](../guides/how-healthgps-models-a-person.md) · [Simulation models reference](../guides/simulation-models-reference.md) · [JACARDI education lifecycle](../guides/jacardi-education-lifecycle.md) · [JACARDI education loader tests](../guides/jacardi-education-loader-tests.md) · [JACARDI-UKPDS-healthGPS](JACARDI-UKPDS-healthGPS.md) (Belgium diabetes submodel; restore/link when present on branch)
 
 **Goal:** Add one new CSV-driven risk-factor pathway for JACARDI so Slovenia and the other six countries can initialise and update people without forking France HLM/EBHLM or India/FINCH StaticLinear/KevinHall. Same codebase; opt-in by `ModelName` + country data pack. Belgium alone enables UKPDS later for now.
 
@@ -111,6 +111,8 @@ Keep host JSON for run control only:
 ### 3.2 Model file = `ModelName` + CSV slots (no `schedule.csv`)
 
 **Order of inclusion** lives in host `config.json` → `modelling.risk_factors[].level` (engine walks levels). **Do not** use a separate `schedule.csv`.
+
+**Output columns:** list `{ "name": "Education", "level": 1, ... }` under `modelling.risk_factors` so the results CSV gets `mean_Education` / `std_Education`. Details: [education lifecycle guide](../guides/jacardi-education-lifecycle.md#output-csv-columns).
 
 ### Static vs dynamic — same ladder, different CSVs
 
@@ -292,7 +294,7 @@ flowchart TD
 | Phase | Work                                                      | Gate                     |
 | ----- | --------------------------------------------------------- | ------------------------ |
 | P0    | Add `jacardi_model` + `jacardi_model_update` `.h/.cpp` pairs; register ModelNames; CSV-slot schema; shared education helper stub | India/FINCH/France green |
-| P1a   | SI education lifecycle + checks                           | Education fixture green  |
+| P1a   | SI education lifecycle + checks                           | `Jacardi*` gtests green ([loader tests](../guides/jacardi-education-loader-tests.md)) |
 | P1b   | SI employment → … → SBP → MI                              | SI smoke frozen          |
 | P2    | Romania pack                                              | SI + legacy + RO         |
 | P3    | IT / MT / ES packs                                        | Prior fixtures           |

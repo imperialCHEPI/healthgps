@@ -7,6 +7,8 @@
 #include "risk_factor_model.h"
 #include "runtime_context.h"
 
+#include <string>
+
 namespace hgps {
 
 /// @brief Health GPS simulation modules types enumeration
@@ -103,6 +105,10 @@ class DiseaseModel {
     /// @brief Gets the model disease type unique identifier
     /// @return The disease type identifier
     virtual const core::Identifier &disease_type() const noexcept = 0;
+
+    /// MAHIMA: One-shot line for DiseaseModule — expected sex-limited skip vs CSV data gaps.
+    /// @return Message from DiseaseTable::describe_prevalence_skip_coverage()
+    virtual std::string prevalence_skip_coverage_message() const = 0;
 
     /// @brief Initialises the population disease status.
     /// @param context The simulation run-time context

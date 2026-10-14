@@ -3,11 +3,15 @@
 #include "HealthGPS.Console/model_info.h"
 #include "HealthGPS.Console/result_file_writer.h"
 #include "HealthGPS.Core/income_category_layout.h"
+#include "HealthGPS/analysis_module.h"
+#include "HealthGPS/data_series.h"
 #include "HealthGPS/result_message.h"
 
 #include <chrono>
+#include <cmath>
 #include <filesystem>
 #include <fstream>
+#include <limits>
 
 namespace {
 std::vector<std::string> read_lines(const std::filesystem::path &path) {
@@ -20,6 +24,86 @@ std::vector<std::string> read_lines(const std::filesystem::path &path) {
     return lines;
 }
 } // namespace
+
+// MAHIMA: mean_education 0 (ages 0-5, no finite ids) → NaN; real std=0 with mean 2 stays 0.
+TEST(ResultFileWriter, ZeroEducationMeanMarkedMissingKeepsRealStdZero) {
+    using namespace hgps;
+    using namespace hgps::core;
+
+    DataSeries series(5u);
+    series.add_channels({"mean_education", "std_education"});
+    series(Gender::male, "mean_education").at(3) = 0.0;
+    series(Gender::male, "std_education").at(3) = 0.0;
+    series(Gender::male, "mean_education").at(4) = 2.0;
+    series(Gender::male, "std_education").at(4) = 0.0;
+
+    mark_zero_education_means_as_missing(series);
+
+    EXPECT_TRUE(std::isnan(series(Gender::male, "mean_education").at(3)));
+    EXPECT_TRUE(std::isnan(series(Gender::male, "std_education").at(3)));
+    EXPECT_DOUBLE_EQ(2.0, series(Gender::male, "mean_education").at(4));
+    EXPECT_DOUBLE_EQ(0.0, series(Gender::male, "std_education").at(4));
+}
+
+TEST(ResultFileWriter, CsvWritesNaForNonFiniteEducation) {
+    using namespace hgps;
+    using namespace hgps::core;
+
+    const auto temp_dir =
+        std::filesystem::temp_directory_path() /
+        ("healthgps_edu_na_" +
+         std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()));
+    std::filesystem::create_directories(temp_dir);
+    const auto base_file = temp_dir / "result.json";
+
+    auto result = ModelResult(2u);
+    result.series.add_channels({"count", "mean_education", "std_education"});
+    result.series.at(Gender::male, "count").at(0) = 1.0;
+    result.series.at(Gender::female, "count").at(0) = 1.0;
+    result.series.at(Gender::male, "mean_education").at(0) =
+        std::numeric_limits<double>::quiet_NaN();
+    result.series.at(Gender::male, "std_education").at(0) =
+        std::numeric_limits<double>::quiet_NaN();
+    result.series.at(Gender::female, "mean_education").at(0) = 2.0;
+    result.series.at(Gender::female, "std_education").at(0) = 0.0;
+    result.series.at(Gender::male, "count").at(1) = 1.0;
+    result.series.at(Gender::female, "count").at(1) = 1.0;
+    result.series.at(Gender::male, "mean_education").at(1) = 3.0;
+    result.series.at(Gender::male, "std_education").at(1) = 0.0;
+    result.series.at(Gender::female, "mean_education").at(1) = 3.0;
+    result.series.at(Gender::female, "std_education").at(1) = 0.0;
+
+    const auto message = ResultEventMessage("baseline", 1u, 2025, std::move(result));
+    auto info = ExperimentInfo{
+        .model = "test", .version = "1", .intervention = "none", .job_id = 1, .seed = 1u};
+
+    {
+        auto writer = ResultFileWriter(base_file, info, false);
+        writer.write(message);
+    }
+
+    const auto lines = read_lines(temp_dir / "result.csv");
+    ASSERT_GE(lines.size(), 2u);
+
+    bool saw_na_row = false;
+    bool saw_finite_edu = false;
+    for (const auto &line : lines) {
+        if (line.find("mean_education") != std::string::npos) {
+            continue; // header
+        }
+        if (line.find(",NA,NA") != std::string::npos || line.find(",NA\n") != std::string::npos ||
+            line.find(",NA,") != std::string::npos) {
+            saw_na_row = true;
+        }
+        if (line.find(",2,") != std::string::npos || line.find(",3,") != std::string::npos) {
+            saw_finite_edu = true;
+        }
+    }
+    EXPECT_TRUE(saw_na_row);
+    EXPECT_TRUE(saw_finite_edu);
+
+    std::filesystem::remove_all(temp_dir);
+}
 
 TEST(ResultFileWriter, IncomeCsvIncludesZeroCountAgeGenderRows) {
     using namespace hgps;

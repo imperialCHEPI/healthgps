@@ -250,7 +250,17 @@ DiseaseEntity DataManager::get_disease(const DiseaseInfo &info, const Country &c
         auto gender = static_cast<core::Gender>(std::stoi(row[mapping["gender_id"]]));
         auto measure_id = std::stoi(row[mapping["measure_id"]]);
         auto measure_name = core::to_lower(row[mapping["measure"]]);
-        auto measure_value = std::stod(row[mapping["mean"]]);
+        // MAHIMA: Diagnose empty/non-numeric mean cells (common "invalid stod argument" source).
+        const auto &mean_raw = row[mapping["mean"]];
+        double measure_value = 0.0;
+        try {
+            measure_value = std::stod(mean_raw);
+        } catch (const std::exception &) {
+            throw std::runtime_error(fmt::format(
+                "invalid stod on disease prevalence mean: file='{}' row={} age={} gender_id={} "
+                "measure='{}' mean_raw='{}'",
+                filename, i, age, static_cast<int>(gender), measure_name, mean_raw));
+        }
 
         if (!result.measures.contains(measure_name)) {
             result.measures.emplace(measure_name, measure_id);
@@ -421,11 +431,20 @@ CancerParameterEntity DataManager::get_disease_parameter(const DiseaseInfo &info
             create_fields_index_mapping(doc.GetColumnNames(), {"Time", "Male", "Female"});
         for (size_t i = 0; i < doc.GetRowCount(); i++) {
             auto row = doc.GetRow<std::string>(i);
-            lookup.emplace_back(LookupGenderValue{
-                .value = std::stoi(row[mapping["Time"]]),
-                .male = std::stod(row[mapping["Male"]]),
-                .female = std::stod(row[mapping["Female"]]),
-            });
+            // MAHIMA: Surface bad Male/Female cells instead of bare "invalid stod argument".
+            try {
+                lookup.emplace_back(LookupGenderValue{
+                    .value = std::stoi(row[mapping["Time"]]),
+                    .male = std::stod(row[mapping["Male"]]),
+                    .female = std::stod(row[mapping["Female"]]),
+                });
+            } catch (const std::exception &) {
+                throw std::runtime_error(fmt::format(
+                    "invalid stod on cancer parameter CSV: file='{}' row={} Time='{}' Male='{}' "
+                    "Female='{}'",
+                    file_name.string(), i, row[mapping["Time"]], row[mapping["Male"]],
+                    row[mapping["Female"]]));
+            }
         }
 
         if (file.key() == "distribution") {
@@ -556,16 +575,31 @@ DataManager::load_cost_of_diseases(const Country &country, const nlohmann::json 
     }
 
     rapidcsv::Document doc(filename);
+    // MAHIMA: Use column names — legacy BoD CSVs and Jacardi BoD{code}.csv differ in column
+    // order. Hardcoded [6]/[8]/[12] read gender_id/age_group_id/"All causes" on Jacardi files
+    // and throw bare "invalid stod argument".
+    const auto mapping =
+        create_fields_index_mapping(doc.GetColumnNames(), {"age", "gender_id", "mean"});
     std::map<int, std::map<Gender, double>> result;
     for (size_t i = 0; i < doc.GetRowCount(); i++) {
         auto row = doc.GetRow<std::string>(i);
-        if (row.size() < 13) {
+        if (row.size() <= mapping.at("mean")) {
             continue;
         }
 
-        auto age = std::stoi(row[6]);
-        auto gender = static_cast<core::Gender>(std::stoi(row[8]));
-        result[age][gender] = std::stod(row[12]);
+        const auto &age_raw = row[mapping.at("age")];
+        const auto &gender_raw = row[mapping.at("gender_id")];
+        const auto &mean_raw = row[mapping.at("mean")];
+        try {
+            const auto age = std::stoi(age_raw);
+            const auto gender = static_cast<core::Gender>(std::stoi(gender_raw));
+            result[age][gender] = std::stod(mean_raw);
+        } catch (const std::exception &) {
+            throw std::runtime_error(fmt::format(
+                "invalid numeric cell on cost-of-disease CSV: file='{}' row={} age_raw='{}' "
+                "gender_id_raw='{}' mean_raw='{}'",
+                filename, i, age_raw, gender_raw, mean_raw));
+        }
     }
 
     return result;

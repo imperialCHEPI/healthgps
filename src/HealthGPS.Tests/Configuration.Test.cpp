@@ -387,6 +387,19 @@ TEST_F(ConfigParsingFixture, GetBaseLineInfo) {
     EXPECT_THROW(get_baseline_info(j, tmp_path()), ConfigurationError);
 }
 
+TEST_F(ConfigParsingFixture, GetBaseLineInfo_FileNamesOptional) {
+    // MAHIMA: JACARDI-style configs omit FactorsMean paths when adjustment is off.
+    json j;
+    j["baseline_adjustments"]["format"] = "csv";
+    j["baseline_adjustments"]["delimiter"] = ",";
+    j["baseline_adjustments"]["encoding"] = "ASCII";
+
+    BaselineInfo info;
+    EXPECT_NO_THROW(info = get_baseline_info(j, tmp_path()));
+    EXPECT_TRUE(info.file_names.empty());
+    EXPECT_EQ(info.format, "csv");
+}
+
 /// Phase 1: income_stratum_factors_mean enabled requires adjustment_income_stratum_count ==
 /// strata.size().
 TEST_F(ConfigParsingFixture, GetBaseLineInfo_IncomeStratumCountMismatchThrows) {

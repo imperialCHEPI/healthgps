@@ -3,6 +3,7 @@
 #include "person.h"
 #include "runtime_context.h"
 
+#include <cmath>
 #include <fmt/color.h>
 #include <iostream>
 #include <oneapi/tbb/parallel_for_each.h>
@@ -25,12 +26,16 @@ const core::Identifier &DefaultCancerModel::disease_type() const noexcept {
     return definition_.get().identifier().code;
 }
 
+std::string DefaultCancerModel::prevalence_skip_coverage_message() const {
+    return definition_.get().table().describe_prevalence_skip_coverage();
+}
+
 void DefaultCancerModel::initialise_disease_status(RuntimeContext &context) {
     int prevalence_id = definition_.get().table().at(MeasureKey::prevalence);
-
     auto relative_risk_table = calculate_average_relative_risk(context);
     for (auto &person : context.population()) {
-        if (!person.is_active() || !definition_.get().table().contains(person.age)) {
+        // MAHIMA: Skip ages/sexes missing from disease CSV (cervical D705 = female-only).
+        if (!person.is_active() || !definition_.get().table().contains(person.age, person.gender)) {
             continue;
         }
 
@@ -165,7 +170,7 @@ double DefaultCancerModel::calculate_relative_risk_for_risk_factors(const Person
 
     double relative_risk = 1.0;
     for (const auto &[factor_name, factor_value] : person.risk_factors) {
-        if (!relative_risk_tables.contains(factor_name)) {
+        if (!relative_risk_tables.contains(factor_name) || !std::isfinite(factor_value)) {
             continue;
         }
 
@@ -173,6 +178,10 @@ double DefaultCancerModel::calculate_relative_risk_for_risk_factors(const Person
             weight_classifier_.adjust_risk_factor_value(person, factor_name, factor_value));
 
         const auto &rr_table = relative_risk_tables.at(factor_name);
+        // MAHIMA: RR CSVs may exist for only one sex.
+        if (!rr_table.contains(person.gender)) {
+            continue;
+        }
         relative_risk *= rr_table.at(person.gender)(person.age, factor_value_adjusted);
     }
 
@@ -282,6 +291,11 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
             continue;
         }
 
+        // MAHIMA: Sex-specific diseases (cervical) omit male CSV rows — skip those cells.
+        if (!table.contains(person.age, person.gender)) {
+            continue;
+        }
+
         double relative_risk = 1.0;
         relative_risk *= calculate_relative_risk_for_risk_factors(person);
         relative_risk *= calculate_relative_risk_for_diseases(person);
@@ -323,6 +337,11 @@ int DefaultCancerModel::calculate_time_since_onset(RuntimeContext &context,
         sum += p;
         values.emplace_back(item.first);
         cumulative.emplace_back(sum);
+    }
+
+    // MAHIMA: Empty PDF would make values.back() abort inside next_empirical_discrete.
+    if (values.empty()) {
+        return 0;
     }
 
     return context.random().next_empirical_discrete(values, cumulative);
