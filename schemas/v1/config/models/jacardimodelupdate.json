@@ -22,7 +22,7 @@
                 },
                 "lookup": {
                     "type": "object",
-                    "description": "Optional Part A lookup — used if someone 20+ is still missing education.",
+                    "description": "Optional Part A lookup \u2014 used if someone 20+ is still missing education.",
                     "properties": {
                         "name": {
                             "type": "string"

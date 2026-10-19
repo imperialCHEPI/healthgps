@@ -117,8 +117,8 @@ TEST(JacardiEducation, UpdateAgeMilestonesAndCaps) {
     EXPECT_TRUE(std::isnan(
         tables.update(18, core::Gender::male, 2026, EducationLifecycleTables::missing, rng)));
     // year 9999 capped to 2110 for draw_at_19 key
-    EXPECT_DOUBLE_EQ(3.0, tables.update(19, core::Gender::male, 9999,
-                                        EducationLifecycleTables::missing, rng));
+    EXPECT_DOUBLE_EQ(
+        3.0, tables.update(19, core::Gender::male, 9999, EducationLifecycleTables::missing, rng));
     EXPECT_DOUBLE_EQ(3.0, tables.update(20, core::Gender::male, 2026, 3.0, rng));
     EXPECT_DOUBLE_EQ(3.0, tables.update(25, core::Gender::male, 2026, 3.0, rng));
     EXPECT_DOUBLE_EQ(4.0, tables.update(40, core::Gender::male, 2026, 4.0, rng));
