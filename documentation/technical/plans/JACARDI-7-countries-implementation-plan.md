@@ -6,7 +6,7 @@
 
 **Author:** Mahima Ghosh · **GitHub:** `jacardi` · **Branch prefix:** `jacardi/`
 **Status:** Design / planning (written and maintained by Mahima)
-**Related:** [Technical index](../README.md) · [Project requirements plan](project-requirements-plan.md) · [Models overview](../../user/models-overview.md) · [How Health-GPS models a person](../guides/how-healthgps-models-a-person.md) · [Simulation models reference](../guides/simulation-models-reference.md) · [JACARDI education lifecycle](../guides/jacardi-education-lifecycle.md) · [JACARDI education loader tests](../guides/jacardi-education-loader-tests.md) · [JACARDI-UKPDS-healthGPS](JACARDI-UKPDS-healthGPS.md) (Belgium diabetes submodel; restore/link when present on branch)
+**Related:** [Technical index](../README.md) · [Project requirements plan](project-requirements-plan.md) · [Models overview](../../user/models-overview.md) · [How Health-GPS models a person](../guides/how-healthgps-models-a-person.md) · [Simulation models reference](../guides/simulation-models-reference.md) · [JACARDI Slovenia education](../guides/jacardi-slovenia-education.md) · [JACARDI employment static](../guides/jacardi-employment-static.md) · [JACARDI-UKPDS-healthGPS](JACARDI-UKPDS-healthGPS.md) (Belgium diabetes submodel; restore/link when present on branch)
 
 **Goal:** Add one new CSV-driven risk-factor pathway for JACARDI so Slovenia and the other six countries can initialise and update people without forking France HLM/EBHLM or India/FINCH StaticLinear/KevinHall. Same codebase; opt-in by `ModelName` + country data pack. Belgium alone enables UKPDS later for now.
 
@@ -112,7 +112,7 @@ Keep host JSON for run control only:
 
 **Order of inclusion** lives in host `config.json` → `modelling.risk_factors[].level` (engine walks levels). **Do not** use a separate `schedule.csv`.
 
-**Output columns:** list `{ "name": "Education", "level": 1, ... }` under `modelling.risk_factors` so the results CSV gets `mean_Education` / `std_Education`. Details: [education lifecycle guide](../guides/jacardi-education-lifecycle.md#output-csv-columns).
+**Output columns:** list `{ "name": "Education", "level": 1, ... }` under `modelling.risk_factors` so the results CSV gets `mean_Education` / `std_Education`. Details: [Slovenia education guide](../guides/jacardi-slovenia-education.md#4-engine-wiring-i-use).
 
 ### Static vs dynamic — same ladder, different CSVs
 
@@ -202,11 +202,11 @@ Exact `education` schema is new work — implement when coding; flags drive whet
 | Residual correlation | **Independent for v1** — ship SI education without Cholesky/ICA; revisit later |
 | Simulation horizon | **Start 2025, end 2055** (30 years) for **all** JACARDI countries — config-driven; no engine complication |
 | Example pack layout | **One folder per country** in HealthGPS-examples: `Jacardi_Slovenia`, `Jacardi_Romania`, … (not a single `Jacardi_allCountries`) |
-| Missing education (ages 0–5) + employment | **v1:** employment model **skips** persons with missing education / below working age. **Likely next:** fix employment as unemployed/student for **age &lt; 18**; estimate employment only from **age 18+** |
+| Missing education (ages 0–5) + employment | Education missing 0–5. Employment missing **0–18** (16 Oct static pack). Draw employment only for **19+** after education is set. |
 
-### Delivered SI education CSVs (validated)
+### Delivered SI education CSVs (validated) — KEEP
 
-Copy into the `Jacardi_Slovenia` pack when implementing:
+Still required. **Do not delete** when employment arrives.
 
 | File                                     | Shape check                                                             |
 | ---------------------------------------- | ----------------------------------------------------------------------- |
@@ -214,7 +214,20 @@ Copy into the `Jacardi_Slovenia` pack when implementing:
 | `education_draw_at_22_ssp2.csv`          | years 2025–2110; probs sum to 1 per year×gender                         |
 | `education_upgrade_transitions_ssp2.csv` | years 2026–2110; ages 23–30; probs sum to 1 per year×age×gender×from_id |
 
-Algorithm: economist `EDUCATION_ALGORITHM.md` (Part A init, Part B yearly). Supersedes older 1–9 / init-only notes under `examples/hlm_no_diet_bmi_only/EDUCATION_CSV_FORMAT.md`.
+Algorithm: economist education Part A/B. Guide: [jacardi-slovenia-education.md](../guides/jacardi-slovenia-education.md).
+
+### Delivered SI employment static CSVs (16 Oct 2026) — P1b next
+
+Received in `healthgps-examples/Jacardi_Slovenia/`. **Not a replacement for education.** Guide: [jacardi-employment-static.md](../guides/jacardi-employment-static.md). Partner text: `EMPLOYMENT_STATIC_ALGORITHM.md`.
+
+| File | Role |
+| ---- | ---- |
+| `employment_static_coefs.csv` | Multinomial logit coefs (6 detailed categories × factors) |
+| `employment_4cat_recode.csv` | Map `employment_id` 1–6 → `employment4_id` 1–4 |
+| `employment_static_check.csv` | Golden SCORE probs by age × gender × education_id |
+| `EMPLOYMENT_STATIC_ALGORITHM.md` | Part A / temporary Part B hold / spline + SchoolFade |
+
+Supersedes older plan sketch of binary `logistic` + `employment_coefs.csv` + age². Engine work still pending (P1b). Yearly employment transitions = separate future package (replaces Part B “keep last year” only).
 
 ---
 
@@ -231,12 +244,12 @@ Implement against `src/HealthGPS/risk_factor_model.h`:
 | `education_lifecycle` | SI-style Part A/B                                           |
 | `empirical`           | Simple age×sex categorical draw (other countries if needed) |
 | `linear`              | Continuous (HLS, PA, BMI, SBP, HbA1c, …)                    |
-| `logistic`            | Binary (employment, medication)                             |
-| `multinomial`         | Smoking categories                                          |
+| `logistic`            | Binary (medication; older employment sketch)                |
+| `multinomial`         | Smoking; **SI employment static** (6-cat SCORE + DRAW)      |
 
-No per-country C++ subclasses. Predictor resolver expands `education_id` → ISCED dummies (`EducationISCED01`, …; no dummy for reference ISCED 3).
+No per-country C++ subclasses. Predictor resolver expands `education_id` → ISCED dummies (`EducationISCED01`, …; no dummy for reference ISCED 3). Also needs age RCS / `SchoolFade` for employment SCORE.
 
-**Employment (when added after education):** skip if education missing or age &lt; 18 in v1; design schedule/flags so switching to fixed under-18 status (unemployed/student) is config/CSV later, not a rewrite.
+**Employment static (P1b, after education):** ages 0–18 missing; 19+ multinomial from `employment_static_coefs.csv`, DRAW `employment_id`, recode to `employment4_id`. Part B: first assign at 19, then **hold** until yearly package arrives (build hold so it is easy to swap). Details: [jacardi-employment-static.md](../guides/jacardi-employment-static.md).
 
 ### Slovenia education rules (summary)
 
@@ -294,8 +307,8 @@ flowchart TD
 | Phase | Work                                                      | Gate                     |
 | ----- | --------------------------------------------------------- | ------------------------ |
 | P0    | Add `jacardi_model` + `jacardi_model_update` `.h/.cpp` pairs; register ModelNames; CSV-slot schema; shared education helper stub | India/FINCH/France green |
-| P1a   | SI education lifecycle + checks                           | `Jacardi*` gtests green ([loader tests](../guides/jacardi-education-loader-tests.md)) |
-| P1b   | SI employment → … → SBP → MI                              | SI smoke frozen          |
+| P1a   | SI education lifecycle + checks                           | `Jacardi*` gtests green ([Slovenia education](../guides/jacardi-slovenia-education.md)) |
+| P1b   | SI **employment static** (16 Oct pack) → then HLS → … → SBP → MI | SCORE matches `employment_static_check.csv`; education CSVs untouched ([employment guide](../guides/jacardi-employment-static.md)) |
 | P2    | Romania pack                                              | SI + legacy + RO         |
 | P3    | IT / MT / ES packs                                        | Prior fixtures           |
 | P4    | Poland when CSVs complete                                 | Prior + PL               |
