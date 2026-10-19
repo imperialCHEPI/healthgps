@@ -5,7 +5,7 @@
 | [Home](../../index.md) | [Quick Start](../../user/getstarted.md) | [User Guide](../../user/userguide.md) | [Schemas](../../user/schemas.md) | [Models](../../user/models-overview.md) | [Architecture](../../developer/architecture.md) | [Data Model](../../developer/datamodel.md) | [Developer Guide](../../developer/development.md) | [Technical docs](../README.md) | [API](https://imperialchepi.github.io/healthgps/api/) |
 
 **Author:** Mahima Ghosh · **GitHub:** `jacardi` · **Branch prefix:** `jacardi/`
-**Status:** Design / planning (written and maintained by Mahima) 
+**Status:** Design / planning (written and maintained by Mahima)
 
 **Related:** [Technical index](../README.md) · [JACARDI 7 countries](JACARDI-7-countries-implementation-plan.md) · [Slovenia education guide](../guides/jacardi-slovenia-education.md) · [Employment static guide](../guides/jacardi-employment-static.md) · [Slovenia run fixes](../guides/jacardi-slovenia-run-fixes.md) · [Project requirements](project-requirements-plan.md) · [JACARDI-UKPDS-healthGPS](JACARDI-UKPDS-healthGPS.md)
 
@@ -15,10 +15,7 @@ Partner algorithm (examples pack): `EMPLOYMENT_STATIC_ALGORITHM.md` (16 October 
 
 ---
 
-
-
 ## 1. Where this sits
-
 
 | Phase   | Work                                       | Status                                                                |
 | ------- | ------------------------------------------ | --------------------------------------------------------------------- |
@@ -26,7 +23,6 @@ Partner algorithm (examples pack): `EMPLOYMENT_STATIC_ALGORITHM.md` (16 October 
 | **P1b** | **Slovenia employment static (this plan)** | **Planned**                                                           |
 | Later   | Yearly employment transitions              | Replaces Part B step 3 only                                           |
 | Later   | HLS → … → MI                               | Separate CSV deliveries                                               |
-
 
 ```mermaid
 flowchart LR
@@ -39,13 +35,9 @@ flowchart LR
   Emp -.-> Ladder
 ```
 
-
-
 Employment needs **age, gender, and education_id**, so it always runs **after** education.
 
 ---
-
-
 
 ## 2. Plan summary
 
@@ -54,7 +46,6 @@ Employment needs **age, gender, and education_id**, so it always runs **after** 
 **Overview:** Wire a CSV-driven multinomial employment assigner into the existing Jacardi pathway. Two person fields (`EmploymentDetailed` 1–6, `Employment` 1–4). Part A at start; Part B first-draw at 19+ then hold. Gtest SCORE against `employment_static_check.csv`.
 
 ### Work items
-
 
 | Status  | Item                                                                                            |
 | ------- | ----------------------------------------------------------------------------------------------- |
@@ -65,22 +56,16 @@ Employment needs **age, gender, and education_id**, so it always runs **after** 
 | Planned | Expand [employment guide](../guides/jacardi-employment-static.md); keep this plan linked        |
 | Planned | Slovenia pack: point JSON slots at partner CSVs (filenames unchanged for now)                   |
 
-
 ---
-
-
 
 ## 3. Coding (two ids per person)
 
 Both missing below age 19 (NaN on `Person.risk_factors`).
 
-
 | Engine / CSV name                      | Range | Role                                      |
 | -------------------------------------- | ----- | ----------------------------------------- |
 | `EmploymentDetailed` / `employment_id` | 1–6   | Drawn; kept for future yearly package     |
 | `Employment` / `employment4_id`        | 1–4   | Recoded; health models and primary output |
-
-
 
 | employment_id | Detailed                  | employment4_id | 4-category          |
 | ------------- | ------------------------- | -------------- | ------------------- |
@@ -90,7 +75,6 @@ Both missing below age 19 (NaN on `Person.risk_factors`).
 | 4             | Unable to work (health)   | 4              | Not in labour force |
 | 5             | Student                   | 3              | Student             |
 | 6             | Domestic / other inactive | 4              | Not in labour force |
-
 
 CSV gender: **0 = female**, **1 = male**. Education ids **1–7** as in the education package.
 
@@ -106,10 +90,7 @@ CSV gender: **0 = female**, **1 = male**. Education ids **1–7** as in the educ
 
 ---
 
-
-
 ## 4. Pack files (do not rename in engine work)
-
 
 | File                             | What it is                                                                      | Used in                             |
 | -------------------------------- | ------------------------------------------------------------------------------- | ----------------------------------- |
@@ -118,16 +99,11 @@ CSV gender: **0 = female**, **1 = male**. Education ids **1–7** as in the educ
 | `employment_static_check.csv`    | Golden `p_1`…`p_6` and `q_1`…`q_4` by age × gender × education_id               | **Tests only** (not a runtime slot) |
 | `EMPLOYMENT_STATIC_ALGORITHM.md` | Partner rules                                                                   | Docs / source of truth              |
 
-
 Names stay as partner delivered until Mahima renames manually; JSON slots will follow whatever names are on disk.
 
 ---
 
-
-
 ## 5. SCORE / DRAW / Part A / Part B
-
-
 
 ### Predictors
 
@@ -150,14 +126,10 @@ Inverse-CDF over categories 1…6; one uniform draw per person. Then recode via 
 
 ### Part A (start year)
 
-
 | Age  | Rule                  |
 | ---- | --------------------- |
 | 0–18 | missing               |
 | 19+  | SCORE → DRAW → recode |
-
-
-
 
 ### Part B (yearly, until yearly package)
 
@@ -182,8 +154,6 @@ flowchart TD
   FirstQ -->|yes| Hold
 ```
 
-
-
 Births: no employment status until 19. Immigration clones: copy both ids; no redraw.
 
 ---
@@ -191,7 +161,6 @@ Births: no employment status until 19. Immigration clones: copy both ids; no red
 ## 6. Engine design
 
 No per-country `if (SVN)`. Same pattern as education helper + Jacardi models.
-
 
 | Piece                                                | Role                                                             |
 | ---------------------------------------------------- | ---------------------------------------------------------------- |
@@ -201,9 +170,6 @@ No per-country `if (SVN)`. Same pattern as education helper + Jacardi models.
 | `model_parser.cpp` `load_jacardi_*`                  | Load Employment CSV slots                                        |
 | Schemas `jacardimodel.json` (+ update if needed)     | Slot shape                                                       |
 | Serial person loops                                  | Shared `context.random()` is not thread-safe (same as education) |
-
-
-
 
 ### Config shape (static)
 
@@ -231,17 +197,13 @@ Dynamic slot: until yearly package, method is hold-only (share loaded tables fro
 
 ---
 
-
-
 ## 7. Tests and gate
-
 
 | Suite                     | Covers                                                                                                                                      |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | `JacardiEmployment` (new) | RCS at 60; woman 19 education_id 2 → p_5 ≈ 0.879; SCORE vs `employment_static_check.csv`; missing 0–18; recode; Part B first-draw then hold |
 | Existing `Jacardi*`       | Must stay green (education regression)                                                                                                      |
 | France / India packs      | Untouched; stay green                                                                                                                       |
-
 
 ```powershell
 cmake --build out/build/windows-release --target HealthGPS.Tests -j 8
@@ -250,10 +212,7 @@ cmake --build out/build/windows-release --target HealthGPS.Tests -j 8
 
 ---
 
-
-
 ## 8. Documentation links (keep in sync)
-
 
 | Document                                                          | Role                                                |
 | ----------------------------------------------------------------- | --------------------------------------------------- |
@@ -263,10 +222,7 @@ cmake --build out/build/windows-release --target HealthGPS.Tests -j 8
 | [7 countries plan](JACARDI-7-countries-implementation-plan.md)    | Parent rollout; P1b row points here                 |
 | [Technical README](../README.md)                                  | Index entry                                         |
 
-
 ---
-
-
 
 ## 9. What I will not do in P1b
 
@@ -278,8 +234,6 @@ cmake --build out/build/windows-release --target HealthGPS.Tests -j 8
 - Trusting employment trends over time while Part B step 3 is still hold
 
 ---
-
-
 
 ## 10. Execution order (Mahima)
 
