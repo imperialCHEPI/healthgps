@@ -24,8 +24,9 @@ EducationLifecycleTables::Stratum make_stratum(std::vector<int> ids, std::vector
 
 TEST(JacardiEducation, InitialiseAgeBands) {
     EducationLifecycleTables tables;
-    // Lookup required only for ages 22+; provide a trivial one.
+    // MAHIMA: 15 Oct — lookup from age 19+; ages 0–18 missing.
     std::unordered_map<std::uint64_t, EducationLifecycleTables::Stratum> lookup;
+    lookup.emplace(EducationLifecycleTables::key_age_gender(19, 1), make_stratum({3}, {1.0}));
     lookup.emplace(EducationLifecycleTables::key_age_gender(40, 1), make_stratum({3}, {1.0}));
     tables.set_lookup(std::move(lookup));
 
@@ -33,10 +34,8 @@ TEST(JacardiEducation, InitialiseAgeBands) {
     rng.seed(1);
     EXPECT_TRUE(std::isnan(
         tables.initialise(EducationLifecycleTables::age_missing_max, core::Gender::male, rng)));
-    EXPECT_DOUBLE_EQ(EducationLifecycleTables::primary_education_id,
-                     tables.initialise(10, core::Gender::female, rng));
-    EXPECT_DOUBLE_EQ(EducationLifecycleTables::secondary_education_id,
-                     tables.initialise(20, core::Gender::male, rng));
+    EXPECT_TRUE(std::isnan(tables.initialise(10, core::Gender::female, rng)));
+    EXPECT_DOUBLE_EQ(3.0, tables.initialise(19, core::Gender::male, rng));
     EXPECT_DOUBLE_EQ(3.0, tables.initialise(40, core::Gender::male, rng));
 }
 
@@ -46,7 +45,7 @@ TEST(JacardiEducation, DrawNeverGoesBelowFromIdOnUpgrade) {
     // from_id=3 can go to 3 or 5
     upgrades.emplace(EducationLifecycleTables::key_upgrade(2030, 25, 0, 3),
                      make_stratum({3, 5}, {0.5, 0.5}));
-    tables.set_draw_at_22(
+    tables.set_draw_at_19(
         {{EducationLifecycleTables::key_year_gender(2030, 0), make_stratum({3}, {1.0})}});
     tables.set_upgrades(std::move(upgrades));
 
@@ -105,7 +104,7 @@ TEST(JacardiEducation, InitialiseCapsAgeAt110) {
 
 TEST(JacardiEducation, UpdateAgeMilestonesAndCaps) {
     EducationLifecycleTables tables;
-    tables.set_draw_at_22(
+    tables.set_draw_at_19(
         {{EducationLifecycleTables::key_year_gender(2110, 1), make_stratum({3}, {1.0})}});
     // Non-empty map but no row for (2026,25,male,3) → stay put.
     tables.set_upgrades(
@@ -115,19 +114,19 @@ TEST(JacardiEducation, UpdateAgeMilestonesAndCaps) {
     rng.seed(1);
     EXPECT_TRUE(std::isnan(
         tables.update(3, core::Gender::male, 2026, EducationLifecycleTables::missing, rng)));
-    EXPECT_DOUBLE_EQ(2.0, tables.update(6, core::Gender::male, 2026, 0.0, rng));
-    EXPECT_DOUBLE_EQ(7.0, tables.update(10, core::Gender::male, 2026, 7.0, rng));
-    EXPECT_DOUBLE_EQ(3.0, tables.update(19, core::Gender::male, 2026, 2.0, rng));
+    EXPECT_TRUE(std::isnan(
+        tables.update(18, core::Gender::male, 2026, EducationLifecycleTables::missing, rng)));
+    // year 9999 capped to 2110 for draw_at_19 key
+    EXPECT_DOUBLE_EQ(
+        3.0, tables.update(19, core::Gender::male, 9999, EducationLifecycleTables::missing, rng));
     EXPECT_DOUBLE_EQ(3.0, tables.update(20, core::Gender::male, 2026, 3.0, rng));
-    // year 9999 capped to 2110 for draw_at_22 key
-    EXPECT_DOUBLE_EQ(3.0, tables.update(22, core::Gender::male, 9999, 3.0, rng));
     EXPECT_DOUBLE_EQ(3.0, tables.update(25, core::Gender::male, 2026, 3.0, rng));
     EXPECT_DOUBLE_EQ(4.0, tables.update(40, core::Gender::male, 2026, 4.0, rng));
 }
 
-TEST(JacardiEducation, UpgradeWithMissingCurrentThrows) {
+TEST(JacardiEducation, UpgradeWithMissingCurrentThrowsWithoutLookup) {
     EducationLifecycleTables tables;
-    tables.set_draw_at_22(
+    tables.set_draw_at_19(
         {{EducationLifecycleTables::key_year_gender(2026, 0), make_stratum({3}, {1.0})}});
     tables.set_upgrades(
         {{EducationLifecycleTables::key_upgrade(2026, 25, 0, 3), make_stratum({4}, {1.0})}});
@@ -135,6 +134,20 @@ TEST(JacardiEducation, UpgradeWithMissingCurrentThrows) {
     EXPECT_THROW(
         tables.update(25, core::Gender::female, 2026, EducationLifecycleTables::missing, rng),
         core::HgpsException);
+}
+
+TEST(JacardiEducation, UpgradeMissingUsesLookupWhenPresent) {
+    EducationLifecycleTables tables;
+    tables.set_lookup(
+        {{EducationLifecycleTables::key_age_gender(25, 0), make_stratum({5}, {1.0})}});
+    tables.set_draw_at_19(
+        {{EducationLifecycleTables::key_year_gender(2026, 0), make_stratum({3}, {1.0})}});
+    tables.set_upgrades(
+        {{EducationLifecycleTables::key_upgrade(2026, 25, 0, 5), make_stratum({5}, {1.0})}});
+    Random rng;
+    rng.seed(1);
+    EXPECT_DOUBLE_EQ(
+        5.0, tables.update(25, core::Gender::female, 2026, EducationLifecycleTables::missing, rng));
 }
 
 TEST(JacardiEducation, PersonEducationHelpers) {
@@ -145,7 +158,7 @@ TEST(JacardiEducation, PersonEducationHelpers) {
     EXPECT_TRUE(person_has_education(person));
     EXPECT_DOUBLE_EQ(5.0, get_person_education(person));
 
-    // MAHIMA: NaN is stored but must count as missing (ages 0–5 / output skip).
+    // MAHIMA: NaN is stored but must count as missing (ages 0–18 / output skip).
     set_person_education(person, EducationLifecycleTables::missing);
     EXPECT_FALSE(person_has_education(person));
     EXPECT_TRUE(std::isnan(get_person_education(person)));

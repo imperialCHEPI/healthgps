@@ -12,14 +12,14 @@
 
 namespace hgps {
 
-/// MAHIMA: Slovenia-style education lifecycle for JACARDI.
+/// MAHIMA: Slovenia-style education lifecycle for JACARDI (partner algo 15 Oct 2026).
 ///
 /// Two phases (same tables object, different call sites):
 /// - Part A (`initialise`) — start year + newborns without a finite Education value.
 /// - Part B (`update`) — every year after DemographicModule ages people.
 ///
 /// Values live on `Person.risk_factors["Education"]` as education_id 1..7.
-/// Ages 0–5 use NaN (= missing). CSV gender codes: 1 = male, 0 = female.
+/// Ages 0–18 use NaN (= missing). CSV gender codes: 1 = male, 0 = female.
 ///
 /// Threading: tables are immutable after load → safe for concurrent reads.
 /// Do NOT parallelise the person loops while they share one `Random` — RNG is not
@@ -34,16 +34,10 @@ class EducationLifecycleTables {
     static constexpr int max_lookup_age = 110;
     static constexpr int max_update_year = 2110;
 
-    // MAHIMA: Retunable age rules (Part A / Part B). Change here when partners revise policy.
-    static constexpr unsigned int age_missing_max = 5U;    // 0..5 → no education
-    static constexpr unsigned int age_set_primary = 6U;    // Part B only: turn 6 → id 2
-    static constexpr unsigned int age_primary_max = 18U;   // Part A: 6..18 → id 2; Part B: hold
-    static constexpr unsigned int age_set_secondary = 19U; // Part B only: turn 19 → id 3
-    static constexpr unsigned int age_secondary_max = 21U; // Part A: 19..21 → id 3; Part B: hold
-    static constexpr unsigned int age_draw = 22U;          // Part B: redraw from year×gender CSV
-    static constexpr unsigned int age_upgrade_max = 30U;   // Part B: 23..30 upgrade transitions
-    static constexpr double primary_education_id = 2.0;
-    static constexpr double secondary_education_id = 3.0;
+    // MAHIMA: 15 Oct 2026 — missing through 18; first draw at 19; upgrades 20–30; fixed 31+.
+    static constexpr unsigned int age_missing_max = 18U; // 0..18 → no education
+    static constexpr unsigned int age_draw = 19U;        // Part B: draw from year×gender CSV
+    static constexpr unsigned int age_upgrade_max = 30U; // Part B: 20..30 upgrade transitions
 
     /// One empirical stratum: sorted education ids + matching probabilities (sum ≈ 1).
     struct Stratum {
@@ -52,11 +46,11 @@ class EducationLifecycleTables {
     };
 
     void set_lookup(std::unordered_map<std::uint64_t, Stratum> table);
-    void set_draw_at_22(std::unordered_map<std::uint64_t, Stratum> table);
+    void set_draw_at_19(std::unordered_map<std::uint64_t, Stratum> table);
     void set_upgrades(std::unordered_map<std::uint64_t, Stratum> table);
 
     bool has_lookup() const noexcept { return !lookup_.empty(); }
-    bool has_draw_at_22() const noexcept { return !draw_at_22_.empty(); }
+    bool has_draw_at_19() const noexcept { return !draw_at_19_.empty(); }
     bool has_upgrades() const noexcept { return !upgrades_.empty(); }
 
     /// Part A — assign education once for a person at a given age.
@@ -76,7 +70,7 @@ class EducationLifecycleTables {
 
   private:
     std::unordered_map<std::uint64_t, Stratum> lookup_;
-    std::unordered_map<std::uint64_t, Stratum> draw_at_22_;
+    std::unordered_map<std::uint64_t, Stratum> draw_at_19_;
     std::unordered_map<std::uint64_t, Stratum> upgrades_;
 };
 

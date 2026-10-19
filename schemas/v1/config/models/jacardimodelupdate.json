@@ -15,11 +15,41 @@
         },
         "Education": {
             "type": "object",
+            "description": "Part B education (15 Oct 2026): draw_at_19 + upgrades; optional lookup for rare 20+ missing fill.",
             "properties": {
                 "method": {
                     "type": "string"
                 },
-                "draw_at_22": {
+                "lookup": {
+                    "type": "object",
+                    "description": "Optional Part A lookup \u2014 used if someone 20+ is still missing education.",
+                    "properties": {
+                        "name": {
+                            "type": "string"
+                        },
+                        "format": {
+                            "type": "string"
+                        },
+                        "delimiter": {
+                            "type": "string"
+                        },
+                        "encoding": {
+                            "type": "string"
+                        },
+                        "columns": {
+                            "type": "object"
+                        }
+                    },
+                    "required": [
+                        "name",
+                        "format",
+                        "delimiter",
+                        "encoding",
+                        "columns"
+                    ],
+                    "additionalProperties": false
+                },
+                "draw_at_19": {
                     "type": "object",
                     "properties": {
                         "name": {
@@ -78,7 +108,7 @@
             },
             "required": [
                 "method",
-                "draw_at_22",
+                "draw_at_19",
                 "upgrade_transitions"
             ],
             "additionalProperties": false

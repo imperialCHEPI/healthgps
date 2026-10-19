@@ -114,7 +114,7 @@ class AnalysisModule final : public UpdatableModule {
 std::unique_ptr<AnalysisModule> build_analysis_module(Repository &repository,
                                                       const ModelInput &config);
 
-/// MAHIMA: Education ids are 1..7. mean_education == 0 means no finite contributors (ages 0-5).
+/// MAHIMA: Education ids are 1..7. mean_education == 0 means no finite contributors (ages 0-18).
 /// Replace those means (and paired std) with NaN so CSV can emit "NA"; keep real std==0 when
 /// mean>0.
 void mark_zero_education_means_as_missing(DataSeries &series);

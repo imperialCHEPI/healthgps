@@ -9,7 +9,7 @@
 namespace hgps {
 
 /// MAHIMA: JACARDI dynamic / yearly pathway (`ModelName`: JacardiModelUpdate).
-/// Part B education milestones (age 6 / 19 / 22 / 23–30) after each ageing step.
+/// Part B education (15 Oct 2026): draw at 19; upgrades 20–30; fixed after 30.
 class JacardiModelUpdate final : public RiskFactorModel {
   public:
     explicit JacardiModelUpdate(std::shared_ptr<const EducationLifecycleTables> education);

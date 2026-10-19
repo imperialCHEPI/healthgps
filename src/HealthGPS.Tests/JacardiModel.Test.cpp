@@ -52,20 +52,24 @@ void write_text(const std::filesystem::path &path, std::string_view text) {
 }
 
 void write_jacardi_education_csvs(const std::filesystem::path &dir) {
-    // MAHIMA: Minimal strata covering init ages + Part B years used in tests.
+    // MAHIMA: Minimal strata for 15 Oct rules — lookup from 19+; draw at 19; upgrades 20–30.
     write_text(dir / "education_lookup.csv", "age,gender,education_id,probability\n"
-                                             "22,0,3,1.0\n"
-                                             "22,1,3,1.0\n"
+                                             "19,0,3,1.0\n"
+                                             "19,1,3,1.0\n"
+                                             "20,0,3,1.0\n"
+                                             "20,1,3,1.0\n"
                                              "40,0,4,1.0\n"
                                              "40,1,4,1.0\n"
                                              "110,0,5,1.0\n"
                                              "110,1,5,1.0\n");
-    write_text(dir / "education_draw_at_22.csv", "year,gender,education_id,probability\n"
+    write_text(dir / "education_draw_at_19.csv", "year,gender,education_id,probability\n"
                                                  "2026,0,3,1.0\n"
                                                  "2026,1,3,1.0\n"
                                                  "2110,0,3,1.0\n"
                                                  "2110,1,3,1.0\n");
     write_text(dir / "education_upgrades.csv", "year,age,gender,from_id,to_id,probability\n"
+                                               "2026,20,0,3,4,1.0\n"
+                                               "2026,20,1,3,4,1.0\n"
                                                "2026,25,0,3,4,1.0\n"
                                                "2026,25,1,3,4,1.0\n");
 }
@@ -81,7 +85,11 @@ json make_static_model_json() {
 }
 
 json make_update_model_json() {
-    const auto draw = file_slot("education_draw_at_22.csv", json{{"year", "integer"},
+    const auto lookup = file_slot("education_lookup.csv", json{{"age", "integer"},
+                                                               {"gender", "integer"},
+                                                               {"education_id", "integer"},
+                                                               {"probability", "double"}});
+    const auto draw = file_slot("education_draw_at_19.csv", json{{"year", "integer"},
                                                                  {"gender", "integer"},
                                                                  {"education_id", "integer"},
                                                                  {"probability", "double"}});
@@ -94,7 +102,8 @@ json make_update_model_json() {
     return json{{"ModelName", "JacardiModelUpdate"},
                 {"Education",
                  {{"method", "empirical_lifecycle_update"},
-                  {"draw_at_22", draw},
+                  {"lookup", lookup},
+                  {"draw_at_19", draw},
                   {"upgrade_transitions", upgrades}}}};
 }
 
@@ -180,16 +189,16 @@ TEST(JacardiModelRuntime, GenerateAssignsEducationByAge) {
     context.population()[0].gender = core::Gender::male;
     context.population()[0].age = 3; // missing
     context.population()[1].gender = core::Gender::female;
-    context.population()[1].age = 12; // 2
+    context.population()[1].age = 12; // still missing (0–18)
     context.population()[2].gender = core::Gender::male;
-    context.population()[2].age = 20; // 3
+    context.population()[2].age = 19; // lookup -> 3
     context.population()[3].gender = core::Gender::female;
     context.population()[3].age = 40; // lookup -> 4
 
     model->generate_risk_factors(context);
 
     EXPECT_TRUE(std::isnan(get_person_education(context.population()[0])));
-    EXPECT_DOUBLE_EQ(2.0, get_person_education(context.population()[1]));
+    EXPECT_TRUE(std::isnan(get_person_education(context.population()[1])));
     EXPECT_DOUBLE_EQ(3.0, get_person_education(context.population()[2]));
     EXPECT_DOUBLE_EQ(4.0, get_person_education(context.population()[3]));
 }
@@ -212,16 +221,16 @@ TEST(JacardiModelRuntime, StaticUpdateFillsMissingEducationOnly) {
     context.random().seed(2);
 
     context.population()[0].gender = core::Gender::male;
-    context.population()[0].age = 12;
+    context.population()[0].age = 40;
     set_person_education(context.population()[0], 5.0); // already set
 
     context.population()[1].gender = core::Gender::female;
-    context.population()[1].age = 12; // newborn-style missing Education
+    context.population()[1].age = 40; // missing Education → Part A lookup
 
     model->update_risk_factors(context);
 
     EXPECT_DOUBLE_EQ(5.0, get_person_education(context.population()[0]));
-    EXPECT_DOUBLE_EQ(2.0, get_person_education(context.population()[1]));
+    EXPECT_DOUBLE_EQ(4.0, get_person_education(context.population()[1]));
 }
 
 TEST(JacardiModelRuntime, DynamicUpdateAppliesPartB) {
@@ -241,25 +250,28 @@ TEST(JacardiModelRuntime, DynamicUpdateAppliesPartB) {
     SyncChannel channel;
     auto scenario = std::make_unique<BaselineScenario>(channel);
     RuntimeContext context{bus, inputs, std::move(scenario)};
-    context.reset_population(3);
+    context.reset_population(4);
     context.random().seed(3);
     context.set_current_time(2026);
 
-    // Age 6 -> set 2; age 22 draw -> 3; age 25 upgrade 3->4
+    // Age 18 stays missing; age 19 draw -> 3; age 25 upgrade 3->4;
+    // age 40 missing → optional update lookup Part A -> 4
     context.population()[0].gender = core::Gender::male;
-    context.population()[0].age = 6;
+    context.population()[0].age = 18;
     context.population()[1].gender = core::Gender::female;
-    context.population()[1].age = 22;
-    set_person_education(context.population()[1], 3.0);
+    context.population()[1].age = 19;
     context.population()[2].gender = core::Gender::male;
     context.population()[2].age = 25;
     set_person_education(context.population()[2], 3.0);
+    context.population()[3].gender = core::Gender::female;
+    context.population()[3].age = 40;
 
     update_model->generate_risk_factors(context); // no-op
     update_model->update_risk_factors(context);
 
-    EXPECT_DOUBLE_EQ(2.0, get_person_education(context.population()[0]));
+    EXPECT_TRUE(std::isnan(get_person_education(context.population()[0])));
     EXPECT_DOUBLE_EQ(3.0, get_person_education(context.population()[1]));
     EXPECT_DOUBLE_EQ(4.0, get_person_education(context.population()[2]));
+    EXPECT_DOUBLE_EQ(4.0, get_person_education(context.population()[3]));
     EXPECT_EQ("JacardiModel", static_model->name());
 }
