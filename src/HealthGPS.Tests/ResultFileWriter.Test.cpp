@@ -25,7 +25,7 @@ std::vector<std::string> read_lines(const std::filesystem::path &path) {
 }
 } // namespace
 
-// MAHIMA: mean_education 0 (ages 0-5, no finite ids) → NaN; real std=0 with mean 2 stays 0.
+// MAHIMA: mean_education 0 (ages 0-18, no finite ids) → NaN; real std=0 with mean 2 stays 0.
 TEST(ResultFileWriter, ZeroEducationMeanMarkedMissingKeepsRealStdZero) {
     using namespace hgps;
     using namespace hgps::core;

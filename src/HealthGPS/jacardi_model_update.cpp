@@ -7,9 +7,9 @@ namespace hgps {
 
 JacardiModelUpdate::JacardiModelUpdate(std::shared_ptr<const EducationLifecycleTables> education)
     : education_{std::move(education)} {
-    if (!education_ || !education_->has_draw_at_22() || !education_->has_upgrades()) {
+    if (!education_ || !education_->has_draw_at_19() || !education_->has_upgrades()) {
         throw core::HgpsException{
-            "JacardiModelUpdate requires draw_at_22 and upgrade education tables"};
+            "JacardiModelUpdate requires draw_at_19 and upgrade education tables"};
     }
 }
 

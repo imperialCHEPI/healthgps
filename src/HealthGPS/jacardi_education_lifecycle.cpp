@@ -17,8 +17,8 @@ void EducationLifecycleTables::set_lookup(std::unordered_map<std::uint64_t, Stra
     lookup_ = std::move(table);
 }
 
-void EducationLifecycleTables::set_draw_at_22(std::unordered_map<std::uint64_t, Stratum> table) {
-    draw_at_22_ = std::move(table);
+void EducationLifecycleTables::set_draw_at_19(std::unordered_map<std::uint64_t, Stratum> table) {
+    draw_at_19_ = std::move(table);
 }
 
 void EducationLifecycleTables::set_upgrades(std::unordered_map<std::uint64_t, Stratum> table) {
@@ -80,16 +80,9 @@ int EducationLifecycleTables::draw(const Stratum &stratum, Random &rng) {
 
 double EducationLifecycleTables::initialise(unsigned int age, core::Gender gender,
                                             Random &rng) const {
-    // MAHIMA: Part A — start-year / newborn assignment (no year dimension).
-    // Ages 0..5 missing; 6..18 fixed id 2; 19..21 fixed id 3; 22+ empirical lookup by age×gender.
+    // MAHIMA: Part A (15 Oct 2026) — 0..18 missing; 19+ DRAW from lookup (age capped at 110).
     if (age <= age_missing_max) {
         return missing;
-    }
-    if (age <= age_primary_max) {
-        return primary_education_id;
-    }
-    if (age <= age_secondary_max) {
-        return secondary_education_id;
     }
 
     if (lookup_.empty()) {
@@ -108,35 +101,32 @@ double EducationLifecycleTables::initialise(unsigned int age, core::Gender gende
 
 double EducationLifecycleTables::update(unsigned int age, core::Gender gender, int year,
                                         double current, Random &rng) const {
-    // MAHIMA: Part B — one yearly step AFTER age has already been incremented.
-    // Only milestone ages change the value; otherwise hold `current` (never decrease).
+    // MAHIMA: Part B (15 Oct 2026) after ageing — missing 0..18; draw at 19; upgrades 20..30;
+    // fixed 31+. Never decrease on upgrade.
     if (age <= age_missing_max) {
         return current; // still missing
     }
-    if (age == age_set_primary) {
-        return primary_education_id;
-    }
-    if (age <= age_primary_max) {
-        return current;
-    }
-    if (age == age_set_secondary) {
-        return secondary_education_id;
-    }
-    if (age <= age_secondary_max) {
-        return current;
+
+    // MAHIMA: 19+ but still missing (should be rare) → Part A lookup when available.
+    if (!std::isfinite(current) && age != age_draw) {
+        if (!lookup_.empty()) {
+            return initialise(age, gender, rng);
+        }
+        throw core::HgpsException{
+            "JACARDI education Part B: education missing at age 20+ without lookup table"};
     }
 
     const int sim_year = year > max_update_year ? max_update_year : year;
     const int g = gender_code(gender);
 
     if (age == age_draw) {
-        if (draw_at_22_.empty()) {
-            throw core::HgpsException{"JACARDI education Part B: draw_at_22 table not loaded"};
+        if (draw_at_19_.empty()) {
+            throw core::HgpsException{"JACARDI education Part B: draw_at_19 table not loaded"};
         }
-        const auto it = draw_at_22_.find(key_year_gender(sim_year, g));
-        if (it == draw_at_22_.end()) {
+        const auto it = draw_at_19_.find(key_year_gender(sim_year, g));
+        if (it == draw_at_19_.end()) {
             throw core::HgpsException{
-                fmt::format("JACARDI education draw_at_22 missing year={} gender={}", sim_year, g)};
+                fmt::format("JACARDI education draw_at_19 missing year={} gender={}", sim_year, g)};
         }
         return static_cast<double>(draw(it->second, rng));
     }
@@ -144,10 +134,6 @@ double EducationLifecycleTables::update(unsigned int age, core::Gender gender, i
     if (age <= age_upgrade_max) {
         if (upgrades_.empty()) {
             throw core::HgpsException{"JACARDI education Part B: upgrade table not loaded"};
-        }
-        if (!std::isfinite(current)) {
-            throw core::HgpsException{
-                "JACARDI education upgrade: current education is missing at ages 23-30"};
         }
         const int from_id = static_cast<int>(current);
         const auto it = upgrades_.find(key_upgrade(sim_year, static_cast<int>(age), g, from_id));
@@ -176,8 +162,8 @@ double get_person_education(const Person &person) {
 }
 
 bool person_has_education(const Person &person) {
-    // MAHIMA: NaN for ages 0–5 must count as missing so static update can fill after ageing,
-    // and so analysis skips them when computing mean_Education.
+    // MAHIMA: NaN for ages 0–18 must count as missing so static update can fill after ageing
+    // into 19+, and so analysis skips them when computing mean_Education.
     const auto it = person.risk_factors.find(education_factor);
     return it != person.risk_factors.end() && std::isfinite(it->second);
 }

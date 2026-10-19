@@ -309,7 +309,7 @@ void AnalysisModule::publish_individual_tracking_if_enabled(RuntimeContext &cont
         row.income_category = income_category_to_string(entity.income);
         for (const auto &name : risk_factor_names) {
             core::Identifier key(name);
-            // MAHIMA: Omit non-finite Education (ages 0–5) so IndividualIDTracking CSV
+            // MAHIMA: Omit non-finite Education (ages 0–18) so IndividualIDTracking CSV
             // gets a blank cell instead of "nan".
             if (entity.risk_factors.contains(key)) {
                 const double value = entity.risk_factors.at(key);
@@ -497,7 +497,7 @@ void AnalysisModule::calculate_income_based_statistics(RuntimeContext &context,
             if (factor.level() > 0) {
                 // Check if risk factor exists before accessing (some risk factors may not be
                 // initialized for all projects)
-                // MAHIMA: Skip NaN Education (ages 0–5) in income-stratified averages too.
+                // MAHIMA: Skip NaN Education (ages 0–18) in income-stratified averages too.
                 if (person.risk_factors.contains(factor.key())) {
                     const double value = person.risk_factors.at(factor.key());
                     if (std::isfinite(value)) {
@@ -913,7 +913,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
                 continue;
             }
             // Check if risk factor exists before accessing (channel keys stored lowercase).
-            // MAHIMA: Skip non-finite values (e.g. Education NaN for ages 0–5) so mean_*
+            // MAHIMA: Skip non-finite values (e.g. Education NaN for ages 0–18) so mean_*
             // columns in the result CSV are not poisoned to NaN.
             if (person.risk_factors.contains(factor.key())) {
                 const double factor_value = person.risk_factors.at(factor.key());
@@ -1038,7 +1038,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
         calculate_income_based_population_statistics(context, series);
     }
 
-    // MAHIMA: Ages 0-5 Education was skipped as NaN → mean stayed 0; map to NaN for CSV "NA".
+    // MAHIMA: Ages 0-18 Education skipped as NaN → mean stayed 0; map to NaN for CSV "NA".
     mark_zero_education_means_as_missing(series);
 }
 

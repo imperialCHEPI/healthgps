@@ -2141,9 +2141,9 @@ load_education_lookup_table(const nlohmann::json &file_node,
     return finalise_education_map(std::move(raw));
 }
 
-/// MAHIMA: Load education_draw_at_22_*.csv → year×gender strata (Part B age 22).
+/// MAHIMA: Load education_draw_at_19_*.csv → year×gender strata (Part B age 19).
 std::unordered_map<std::uint64_t, EducationStratum>
-load_education_draw_at_22_table(const nlohmann::json &file_node,
+load_education_draw_at_19_table(const nlohmann::json &file_node,
                                 const std::filesystem::path &root_path) {
     const auto table = load_datatable_from_csv(hgps::input::get_file_info(file_node, root_path));
     std::unordered_map<std::uint64_t, std::vector<std::pair<int, double>>> raw;
@@ -2197,16 +2197,21 @@ load_jacardi_risk_model_definition(const nlohmann::json &opt, const Configuratio
 std::unique_ptr<hgps::JacardiModelUpdateDefinition>
 load_jacardi_update_risk_model_definition(const nlohmann::json &opt, const Configuration &config) {
     MEASURE_FUNCTION();
-    // MAHIMA: Dynamic slot — education Part B tables only.
-    if (!opt.contains("Education") || !opt["Education"].contains("draw_at_22") ||
+    // MAHIMA: Dynamic slot — education Part B tables only (15 Oct 2026: draw_at_19).
+    if (!opt.contains("Education") || !opt["Education"].contains("draw_at_19") ||
         !opt["Education"].contains("upgrade_transitions")) {
         throw hgps::core::HgpsException{
-            "JacardiModelUpdate requires Education.draw_at_22 and upgrade_transitions CSV slots"};
+            "JacardiModelUpdate requires Education.draw_at_19 and upgrade_transitions CSV slots"};
     }
 
     auto tables = std::make_shared<hgps::EducationLifecycleTables>();
-    tables->set_draw_at_22(
-        load_education_draw_at_22_table(opt["Education"]["draw_at_22"], config.root_path));
+    // MAHIMA: Optional lookup so Part B can Part-A-fill rare 20+ missing (partner 15 Oct note).
+    if (opt["Education"].contains("lookup")) {
+        tables->set_lookup(
+            load_education_lookup_table(opt["Education"]["lookup"], config.root_path));
+    }
+    tables->set_draw_at_19(
+        load_education_draw_at_19_table(opt["Education"]["draw_at_19"], config.root_path));
     tables->set_upgrades(
         load_education_upgrade_table(opt["Education"]["upgrade_transitions"], config.root_path));
     return std::make_unique<hgps::JacardiModelUpdateDefinition>(std::move(tables));

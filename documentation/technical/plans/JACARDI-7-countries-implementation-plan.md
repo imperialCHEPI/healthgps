@@ -119,7 +119,7 @@ Keep host JSON for run control only:
 | Slot | File | Education | Other ladder vars |
 |------|------|-----------|-------------------|
 | Static (init) | `jacardi_model.json` → `JacardiModel` | `lookup` only (Part A) | `*_coefs.csv` init slots |
-| Dynamic (update) | `jacardi_model_update.json` → `JacardiModelUpdate` | `draw_at_22` + `upgrade_transitions` (Part B) | `*_update_coefs.csv` yearly slots |
+| Dynamic (update) | `jacardi_model_update.json` → `JacardiModelUpdate` | `draw_at_19` + `upgrade_transitions` (Part B) | `*_update_coefs.csv` yearly slots |
 
 Age/sex = UNDB / DemographicModule. **MI** = `running.diseases` + datastore RRs, not a Jacardi coef slot.
 
@@ -148,7 +148,7 @@ Example update file (abbrev.):
   "ModelName": "JacardiModelUpdate",
   "Education": {
     "method": "empirical_lifecycle_update",
-    "draw_at_22": { "name": "education_draw_at_22_ssp2.csv", "format": "csv", "delimiter": ",", "encoding": "ASCII" },
+    "draw_at_19": { "name": "education_draw_at_19_ssp2.csv", "format": "csv", "delimiter": ",", "encoding": "ASCII" },
     "upgrade_transitions": { "name": "education_upgrade_transitions_ssp2.csv", "format": "csv", "delimiter": ",", "encoding": "ASCII" }
   },
   "Employment": {
@@ -202,19 +202,19 @@ Exact `education` schema is new work — implement when coding; flags drive whet
 | Residual correlation | **Independent for v1** — ship SI education without Cholesky/ICA; revisit later |
 | Simulation horizon | **Start 2025, end 2055** (30 years) for **all** JACARDI countries — config-driven; no engine complication |
 | Example pack layout | **One folder per country** in HealthGPS-examples: `Jacardi_Slovenia`, `Jacardi_Romania`, … (not a single `Jacardi_allCountries`) |
-| Missing education (ages 0–5) + employment | Education missing 0–5. Employment missing **0–18** (16 Oct static pack). Draw employment only for **19+** after education is set. |
+| Missing education + employment | Education missing **0–18** (15 Oct). Employment missing **0–18**; draw employment for **19+** after education. |
 
-### Delivered SI education CSVs (validated) — KEEP
+### Delivered SI education CSVs (15 Oct 2026) — KEEP
 
 Still required. **Do not delete** when employment arrives.
 
 | File                                     | Shape check                                                             |
 | ---------------------------------------- | ----------------------------------------------------------------------- |
-| `education_lookup.csv`                   | ages 22–110; gender 0/1; ids 1–7; probs sum to 1 per age×gender         |
-| `education_draw_at_22_ssp2.csv`          | years 2025–2110; probs sum to 1 per year×gender                         |
-| `education_upgrade_transitions_ssp2.csv` | years 2026–2110; ages 23–30; probs sum to 1 per year×age×gender×from_id |
+| `education_lookup.csv`                   | ages **19–110**; gender 0/1; ids 1–7; probs sum to 1 per age×gender     |
+| `education_draw_at_19_ssp2.csv`          | years 2025–2110; probs sum to 1 per year×gender                         |
+| `education_upgrade_transitions_ssp2.csv` | years 2026–2110; ages **20–30**; probs sum to 1 per year×age×gender×from_id |
 
-Algorithm: economist education Part A/B. Guide: [jacardi-slovenia-education.md](../guides/jacardi-slovenia-education.md).
+Algorithm: `EDUCATION_ALGORITHM.md` (15 Oct). Guide: [jacardi-slovenia-education.md](../guides/jacardi-slovenia-education.md).
 
 ### Delivered SI employment static CSVs (16 Oct 2026) — P1b next
 
@@ -251,22 +251,19 @@ No per-country C++ subclasses. Predictor resolver expands `education_id` → ISC
 
 **Employment static (P1b, after education):** ages 0–18 missing; 19+ multinomial from `employment_static_coefs.csv`, DRAW `employment_id`, recode to `employment4_id`. Part B: first assign at 19, then **hold** until yearly package arrives (build hold so it is easy to swap). Details: [jacardi-employment-static.md](../guides/jacardi-employment-static.md).
 
-### Slovenia education rules (summary)
+### Slovenia education rules (summary, 15 Oct 2026)
 
-| Phase                | Rule                                       |
-| -------------------- | ------------------------------------------ |
-| Ages 0–5             | missing                                    |
-| 6–18                 | id = 2                                     |
-| 19–21                | id = 3                                     |
-| 22+ at start         | DRAW from lookup (age capped at table max) |
-| Age 6 / 19 each year | set 2 / 3                                  |
-| Age 22 each year     | DRAW from draw_at_22                       |
-| Ages 23–30           | DRAW upgrade transitions; never decrease   |
-| 31+                  | fixed                                      |
-| Births               | missing at 0                               |
-| Immigration clones   | copy education; no redraw                  |
+| Phase              | Rule                                       |
+| ------------------ | ------------------------------------------ |
+| Ages 0–18          | missing                                    |
+| 19+ at start       | DRAW from lookup (age capped at 110)       |
+| Age 19 each year   | DRAW from draw_at_19                       |
+| Ages 20–30         | DRAW upgrade transitions; never decrease   |
+| 31+                | fixed                                      |
+| Births             | missing at 0                               |
+| Immigration clones | copy education; no redraw                  |
 
-Validation: monotonic education; no change at 31+; start-year 22+ shares ≈ lookup by age band×gender.
+Validation: nobody under 19 has an id; monotonic education; no change at 31+; start-year 19+ shares ≈ lookup.
 
 ---
 
