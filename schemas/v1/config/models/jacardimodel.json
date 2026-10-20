@@ -64,11 +64,11 @@
                     "description": "Expected: multinomial_static"
                 },
                 "coefficients": {
-                    "description": "employment_static_coefs.csv — Category x Factor x Coefficient for SCORE",
+                    "description": "employment_static_coefs.csv \u2014 Category x Factor x Coefficient for SCORE",
                     "$ref": "../csv_file.json"
                 },
                 "recode": {
-                    "description": "employment_4cat_recode.csv — employment_id 1-6 to employment4_id 1-4",
+                    "description": "employment_4cat_recode.csv \u2014 employment_id 1-6 to employment4_id 1-4",
                     "$ref": "../csv_file.json"
                 }
             },

@@ -122,7 +122,7 @@
                     "description": "Expected: multinomial_static (first draw + temporary hold until yearly transitions replace hold)"
                 },
                 "coefficients": {
-                    "description": "Same employment_static_coefs.csv as JacardiModel — needed for first draw at 19",
+                    "description": "Same employment_static_coefs.csv as JacardiModel \u2014 needed for first draw at 19",
                     "$ref": "../csv_file.json"
                 },
                 "recode": {
