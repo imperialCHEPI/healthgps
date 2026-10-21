@@ -36,6 +36,7 @@ target_sources(
             "JsonParser.Test.cpp"
             "Identifier.Test.cpp"
             "JacardiEducation.Test.cpp"
+            "JacardiEmployment.Test.cpp"
             "JacardiModel.Test.cpp"
             "CostOfDiseaseSchema.Test.cpp"
             "LifeTable.Test.cpp"
@@ -78,6 +79,10 @@ FetchContent_Declare(
     URL_HASH SHA256=b68abc8d40b937d377aa7357bff66a1f4f5196da5b867f7ca88d02b37d2ebb5c)
 FetchContent_MakeAvailable(test_data)
 target_compile_definitions(HealthGPS.Tests PRIVATE "-DTEST_DATA_PATH=\"${test_data_SOURCE_DIR}\"")
+# MAHIMA: Local JACARDI employment SCORE/recode fixtures (not the remote datastore zip).
+target_compile_definitions(
+    HealthGPS.Tests
+    PRIVATE "-DJACARDI_EMPLOYMENT_FIXTURE_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/data/jacardi/employment\"")
 
 target_link_libraries(
     HealthGPS.Tests

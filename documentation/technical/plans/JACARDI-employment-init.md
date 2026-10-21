@@ -5,8 +5,7 @@
 | [Home](../../index.md) | [Quick Start](../../user/getstarted.md) | [User Guide](../../user/userguide.md) | [Schemas](../../user/schemas.md) | [Models](../../user/models-overview.md) | [Architecture](../../developer/architecture.md) | [Data Model](../../developer/datamodel.md) | [Developer Guide](../../developer/development.md) | [Technical docs](../README.md) | [API](https://imperialchepi.github.io/healthgps/api/) |
 
 **Author:** Mahima Ghosh · **GitHub:** `jacardi` · **Branch prefix:** `jacardi/`
-**Status:** Design / planning (written and maintained by Mahima)
-
+**Status:** Implemented (P1b static) — yearly employment package still pending
 **Related:** [Technical index](../README.md) · [JACARDI 7 countries](JACARDI-7-countries-implementation-plan.md) · [Slovenia education guide](../guides/jacardi-slovenia-education.md) · [Employment static guide](../guides/jacardi-employment-static.md) · [Slovenia run fixes](../guides/jacardi-slovenia-run-fixes.md) · [Project requirements](project-requirements-plan.md) · [JACARDI-UKPDS-healthGPS](JACARDI-UKPDS-healthGPS.md)
 
 **Goal:** Add Slovenia **employment static** (first assignment) as the next ladder step after education in `JacardiModel` / `JacardiModelUpdate`. Multinomial SCORE → DRAW detailed id → recode to 4 categories. Keep education CSVs and code as-is. Temporary Part B hold until the yearly employment package arrives.
@@ -20,7 +19,7 @@ Partner algorithm (examples pack): `EMPLOYMENT_STATIC_ALGORITHM.md` (16 October 
 | Phase   | Work                                       | Status                                                                |
 | ------- | ------------------------------------------ | --------------------------------------------------------------------- |
 | P1a     | Slovenia education (15 Oct rules)          | Done — see [education guide](../guides/jacardi-slovenia-education.md) |
-| **P1b** | **Slovenia employment static (this plan)** | **Planned**                                                           |
+| **P1b** | **Slovenia employment static (this plan)** | **Done (engine + tests; yearly hold still temporary)**                |
 | Later   | Yearly employment transitions              | Replaces Part B step 3 only                                           |
 | Later   | HLS → … → MI                               | Separate CSV deliveries                                               |
 
@@ -47,14 +46,14 @@ Employment needs **age, gender, and education_id**, so it always runs **after** 
 
 ### Work items
 
-| Status  | Item                                                                                            |
-| ------- | ----------------------------------------------------------------------------------------------- |
-| Planned | Helper `jacardi_employment_static.*` — RCS / SchoolFade / SCORE / DRAW / recode / Part A+B hold |
-| Planned | Parser + schema Employment slots on `JacardiModel` (`coefficients`, `recode`)                   |
-| Planned | Call employment after education in `JacardiModel` and `JacardiModelUpdate`                      |
-| Planned | Gtests: spline golden, check CSV SCORE, missing 0–18, hold, recode                              |
-| Planned | Expand [employment guide](../guides/jacardi-employment-static.md); keep this plan linked        |
-| Planned | Slovenia pack: point JSON slots at partner CSVs (filenames unchanged for now)                   |
+| Status | Item |
+| ------ | ---- |
+| Done | Helper `jacardi_employment_static.*` — RCS / SchoolFade / SCORE / DRAW / recode / Part A+B hold |
+| Done | Parser + schema Employment slots on `JacardiModel` / `JacardiModelUpdate` (`coefficients`, `recode`) |
+| Done | Call employment after education in `JacardiModel` and `JacardiModelUpdate` |
+| Done | Gtests: spline golden, check CSV SCORE, missing 0–18, hold, recode (`JacardiEmployment`) |
+| Done | Expand [employment guide](../guides/jacardi-employment-static.md); keep this plan linked |
+| Done | Slovenia pack: Employment slots + partner CSVs in `healthgps-examples/Jacardi_Slovenia/` |
 
 ---
 

@@ -36,6 +36,8 @@ target_sources(
             "kevin_hall_model.h"
             "jacardi_education_lifecycle.cpp"
             "jacardi_education_lifecycle.h"
+            "jacardi_employment_static.cpp"
+            "jacardi_employment_static.h"
             "jacardi_model.cpp"
             "jacardi_model.h"
             "jacardi_model_update.cpp"

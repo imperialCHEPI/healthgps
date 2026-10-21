@@ -157,13 +157,14 @@ TEST(JacardiModelParser, LoadsUpdateDefinitionFromCsvSlots) {
     EXPECT_EQ("JacardiModelUpdate", model->name());
 }
 
-TEST(JacardiModelParser, StaticMissingEducationThrows) {
+TEST(JacardiModelParser, StaticMissingEducationAndEmploymentThrows) {
+    // MAHIMA: Ladder steps are opt-in; empty model (no Education, no Employment) must fail.
     EXPECT_THROW(hgps::input::load_jacardi_risk_model_definition(
                      json{{"ModelName", "JacardiModel"}}, make_config(".")),
                  core::HgpsException);
 }
 
-TEST(JacardiModelParser, UpdateMissingEducationThrows) {
+TEST(JacardiModelParser, UpdateMissingEducationAndEmploymentThrows) {
     EXPECT_THROW(hgps::input::load_jacardi_update_risk_model_definition(
                      json{{"ModelName", "JacardiModelUpdate"}}, make_config(".")),
                  core::HgpsException);
