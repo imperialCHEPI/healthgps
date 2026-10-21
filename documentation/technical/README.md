@@ -41,7 +41,7 @@ Engineering design notes for developers. Written as ordinary markdown plans (sum
 | [Project requirements plan](plans/project-requirements-plan.md) | `project_requirements` schema |
 | [Schema migration plan](plans/schema-migration-plan.md) | Config v1 to v2 |
 | [JACARDI 7 countries implementation](plans/JACARDI-7-countries-implementation-plan.md) | New CSV pathway for SI/RO/BE/IT/MT/ES/PL; coexistence with India/FINCH/France; Belgium UKPDS hook |
-| [JACARDI employment static (P1b)](plans/JACARDI-employment-static-plan.md) | Slovenia employment first assignment: multinomial SCORE/DRAW, 4-cat recode, temporary Part B hold |
+| [JACARDI employment static (P1b)](plans/JACARDI-employment-init.md) | Slovenia employment first assignment: multinomial SCORE/DRAW, 4-cat recode, temporary Part B hold |
 
 ## If you are working on
 
@@ -54,7 +54,7 @@ Engineering design notes for developers. Written as ordinary markdown plans (sum
 | Kevin Hall height/weight | [Height quintile plan](plans/height-csv-quintile-plan.md) | [Weight quintile plan](plans/weight-quintile-plan.md) |
 | Output / person IDs | [Individual ID tracking](plans/individual-id-tracking-csv-plan.md) | [Same person ID plan](plans/same-person-id-baseline-intervention-plan.md) |
 | What shipped in Feb 2026 | [Update report](guides/healthgps-update-report-2026-02-20.md) | [Performance notes](guides/performance-optimizations.md) |
-| JACARDI (7 countries / new pathway) | [JACARDI 7 countries implementation](plans/JACARDI-7-countries-implementation-plan.md) | [Slovenia education](guides/jacardi-slovenia-education.md) · [Employment static plan](plans/JACARDI-employment-static-plan.md) · [Employment static guide](guides/jacardi-employment-static.md) · [Slovenia run fixes](guides/jacardi-slovenia-run-fixes.md) · [Project requirements](plans/project-requirements-plan.md) · UKPDS plan (`JACARDI-UKPDS-healthGPS.md`, when on branch) |
+| JACARDI (7 countries / new pathway) | [JACARDI 7 countries implementation](plans/JACARDI-7-countries-implementation-plan.md) | [Slovenia education](guides/jacardi-slovenia-education.md) · [Employment init plan](plans/JACARDI-employment-init.md) · [Employment static guide](guides/jacardi-employment-static.md) · [Slovenia run fixes](guides/jacardi-slovenia-run-fixes.md) · [Project requirements](plans/project-requirements-plan.md) · UKPDS plan (`JACARDI-UKPDS-healthGPS.md`, when on branch) |
 | Windows build / MSVC | [MSVC troubleshooting](../developer/msvc-windows-build-troubleshooting.md) | [Developer Guide](../developer/development.md) |
 
 ---

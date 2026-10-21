@@ -9,6 +9,7 @@
 #include "HealthGPS.Core/scoped_timer.h"
 #include "HealthGPS.Core/string_util.h"
 #include "HealthGPS/jacardi_education_lifecycle.h"
+#include "HealthGPS/jacardi_employment_static.h"
 #include "HealthGPS/jacardi_model.h"
 #include "HealthGPS/jacardi_model_update.h"
 #include "HealthGPS/predictor_resolver.h"
@@ -20,11 +21,13 @@
 #include <rapidcsv.h>
 
 #include <algorithm>
+#include <array>
 #include <cstdint>
 #include <filesystem>
 #include <fstream>
 #include <optional>
 #include <ranges>
+#include <string>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -2179,42 +2182,119 @@ load_education_upgrade_table(const nlohmann::json &file_node,
     return finalise_education_map(std::move(raw));
 }
 
+/// MAHIMA: Load employment_static_coefs.csv → Category → Factor/Coefficient terms.
+std::shared_ptr<hgps::EmploymentStaticTables>
+load_employment_static_tables(const nlohmann::json &employment_node,
+                              const std::filesystem::path &root_path) {
+    if (!employment_node.contains("coefficients") || !employment_node.contains("recode")) {
+        throw hgps::core::HgpsException{
+            "JACARDI Employment requires coefficients and recode CSV slots"};
+    }
+
+    const auto coef_table = load_datatable_from_csv(
+        hgps::input::get_file_info(employment_node["coefficients"], root_path));
+    std::unordered_map<int, std::vector<hgps::EmploymentStaticTables::FactorTerm>> by_category;
+    const auto n_coef = coef_table.num_rows();
+    for (std::size_t i = 0; i < n_coef; ++i) {
+        const auto category = std::any_cast<int>(coef_table.column("Category").value(i));
+        const auto factor = std::any_cast<std::string>(coef_table.column("Factor").value(i));
+        const auto coefficient = std::any_cast<double>(coef_table.column("Coefficient").value(i));
+        by_category[category].push_back(
+            hgps::EmploymentStaticTables::FactorTerm{.factor = factor, .coefficient = coefficient});
+    }
+
+    const auto recode_table =
+        load_datatable_from_csv(hgps::input::get_file_info(employment_node["recode"], root_path));
+    std::array<int, hgps::EmploymentStaticTables::category_count + 1> recode{};
+    const auto n_recode = recode_table.num_rows();
+    for (std::size_t i = 0; i < n_recode; ++i) {
+        const auto detailed = std::any_cast<int>(recode_table.column("employment_id").value(i));
+        const auto cat4 = std::any_cast<int>(recode_table.column("employment4_id").value(i));
+        if (detailed < hgps::EmploymentStaticTables::category_min ||
+            detailed > hgps::EmploymentStaticTables::category_max) {
+            throw hgps::core::HgpsException{
+                fmt::format("JACARDI employment recode: employment_id {} out of 1..6", detailed)};
+        }
+        recode[static_cast<std::size_t>(detailed)] = cat4;
+    }
+
+    auto tables = std::make_shared<hgps::EmploymentStaticTables>();
+    tables->set_coefficients(std::move(by_category));
+    tables->set_recode(recode);
+    return tables;
+}
+
+std::shared_ptr<hgps::EducationLifecycleTables>
+load_optional_education_static(const nlohmann::json &opt, const std::filesystem::path &root_path) {
+    if (!opt.contains("Education")) {
+        return nullptr;
+    }
+    if (!opt["Education"].contains("lookup")) {
+        throw hgps::core::HgpsException{
+            "JacardiModel Education present but missing lookup CSV slot"};
+    }
+    auto tables = std::make_shared<hgps::EducationLifecycleTables>();
+    tables->set_lookup(load_education_lookup_table(opt["Education"]["lookup"], root_path));
+    return tables;
+}
+
+std::shared_ptr<hgps::EducationLifecycleTables>
+load_optional_education_update(const nlohmann::json &opt, const std::filesystem::path &root_path) {
+    if (!opt.contains("Education")) {
+        return nullptr;
+    }
+    if (!opt["Education"].contains("draw_at_19") ||
+        !opt["Education"].contains("upgrade_transitions")) {
+        throw hgps::core::HgpsException{
+            "JacardiModelUpdate Education requires draw_at_19 and upgrade_transitions CSV slots"};
+    }
+    auto tables = std::make_shared<hgps::EducationLifecycleTables>();
+    if (opt["Education"].contains("lookup")) {
+        tables->set_lookup(load_education_lookup_table(opt["Education"]["lookup"], root_path));
+    }
+    tables->set_draw_at_19(
+        load_education_draw_at_19_table(opt["Education"]["draw_at_19"], root_path));
+    tables->set_upgrades(
+        load_education_upgrade_table(opt["Education"]["upgrade_transitions"], root_path));
+    return tables;
+}
+
+std::shared_ptr<hgps::EmploymentStaticTables>
+load_optional_employment(const nlohmann::json &opt, const std::filesystem::path &root_path) {
+    if (!opt.contains("Employment")) {
+        return nullptr;
+    }
+    return load_employment_static_tables(opt["Employment"], root_path);
+}
+
 } // namespace
 
 std::unique_ptr<hgps::JacardiModelDefinition>
 load_jacardi_risk_model_definition(const nlohmann::json &opt, const Configuration &config) {
     MEASURE_FUNCTION();
-    // MAHIMA: Static slot — education Part A lookup only (ladder coefs land later).
-    if (!opt.contains("Education") || !opt["Education"].contains("lookup")) {
-        throw hgps::core::HgpsException{"JacardiModel requires Education.lookup CSV slot"};
+    // MAHIMA: Opt-in ladder — Education and/or Employment; at least one required.
+    auto education = load_optional_education_static(opt, config.root_path);
+    auto employment = load_optional_employment(opt, config.root_path);
+    if (!education && !employment) {
+        throw hgps::core::HgpsException{
+            "JacardiModel requires Education and/or Employment CSV slots"};
     }
-
-    auto tables = std::make_shared<hgps::EducationLifecycleTables>();
-    tables->set_lookup(load_education_lookup_table(opt["Education"]["lookup"], config.root_path));
-    return std::make_unique<hgps::JacardiModelDefinition>(std::move(tables));
+    return std::make_unique<hgps::JacardiModelDefinition>(std::move(education),
+                                                          std::move(employment));
 }
 
 std::unique_ptr<hgps::JacardiModelUpdateDefinition>
 load_jacardi_update_risk_model_definition(const nlohmann::json &opt, const Configuration &config) {
     MEASURE_FUNCTION();
-    // MAHIMA: Dynamic slot — education Part B tables only (15 Oct 2026: draw_at_19).
-    if (!opt.contains("Education") || !opt["Education"].contains("draw_at_19") ||
-        !opt["Education"].contains("upgrade_transitions")) {
+    // MAHIMA: Opt-in Part B — Education and/or Employment; at least one required.
+    auto education = load_optional_education_update(opt, config.root_path);
+    auto employment = load_optional_employment(opt, config.root_path);
+    if (!education && !employment) {
         throw hgps::core::HgpsException{
-            "JacardiModelUpdate requires Education.draw_at_19 and upgrade_transitions CSV slots"};
+            "JacardiModelUpdate requires Education and/or Employment CSV slots"};
     }
-
-    auto tables = std::make_shared<hgps::EducationLifecycleTables>();
-    // MAHIMA: Optional lookup so Part B can Part-A-fill rare 20+ missing (partner 15 Oct note).
-    if (opt["Education"].contains("lookup")) {
-        tables->set_lookup(
-            load_education_lookup_table(opt["Education"]["lookup"], config.root_path));
-    }
-    tables->set_draw_at_19(
-        load_education_draw_at_19_table(opt["Education"]["draw_at_19"], config.root_path));
-    tables->set_upgrades(
-        load_education_upgrade_table(opt["Education"]["upgrade_transitions"], config.root_path));
-    return std::make_unique<hgps::JacardiModelUpdateDefinition>(std::move(tables));
+    return std::make_unique<hgps::JacardiModelUpdateDefinition>(std::move(education),
+                                                                std::move(employment));
 }
 
 std::unique_ptr<hgps::RiskFactorModelDefinition>
