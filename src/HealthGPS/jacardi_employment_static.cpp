@@ -33,7 +33,8 @@ double pos_cube(double z) {
 // MAHIMA: Split out of factor_value for clang-tidy complexity. Use optional — NOT NaN —
 // because Gender=0 / SchoolFade=0 / AgeRcs=0 are valid finite zeros.
 std::optional<double> age_named_factor(std::string_view factor,
-                                      const EmploymentStaticTables::AgeFactors &age_f, int gender) {
+                                       const EmploymentStaticTables::AgeFactors &age_f,
+                                       int gender) {
     if (factor == "Intercept") {
         return 1.0;
     }
@@ -116,7 +117,8 @@ EmploymentStaticTables::AgeFactors EmploymentStaticTables::compute_age_factors(i
     out.school_fade = (std::max)(0.0, 22.0 - out.age) / 3.0;
     for (int j = 0; j < 5; ++j) {
         const double tj = k_knots[static_cast<std::size_t>(j)];
-        // MAHIMA: Parentheses make '-'/'+'/ '*'/'/' order explicit (clang-tidy math-missing-parens).
+        // MAHIMA: Parentheses make '-'/'+'/ '*'/'/' order explicit (clang-tidy
+        // math-missing-parens).
         const double term =
             pos_cube(out.age - tj) -
             (pos_cube(out.age - k_knot_penultimate) * (k_knot_last - tj) / k_knot_span) +
