@@ -24,7 +24,9 @@ namespace {
 #error "JACARDI_EMPLOYMENT_FIXTURE_DIR must be set by CMake"
 #endif
 
-std::filesystem::path fixture_dir() { return std::filesystem::path{JACARDI_EMPLOYMENT_FIXTURE_DIR}; }
+std::filesystem::path fixture_dir() {
+    return std::filesystem::path{JACARDI_EMPLOYMENT_FIXTURE_DIR};
+}
 
 json file_slot(const std::string &name, const json &columns) {
     return json{{"name", name},
@@ -43,9 +45,8 @@ std::shared_ptr<EmploymentStaticTables> load_fixture_tables() {
         coef_info.name = root / "employment_static_coefs.csv";
         coef_info.format = "csv";
         coef_info.delimiter = ",";
-        coef_info.columns = {{"Category", "integer"},
-                             {"Factor", "string"},
-                             {"Coefficient", "double"}};
+        coef_info.columns = {
+            {"Category", "integer"}, {"Factor", "string"}, {"Coefficient", "double"}};
         const auto table = hgps::input::load_datatable_from_csv(coef_info);
         std::unordered_map<int, std::vector<EmploymentStaticTables::FactorTerm>> by_cat;
         for (std::size_t i = 0; i < table.num_rows(); ++i) {
@@ -109,15 +110,9 @@ TEST(JacardiEmployment, ScoreMatchesCheckCsvSampleRows) {
     check_info.name = fixture_dir() / "employment_static_check.csv";
     check_info.format = "csv";
     check_info.delimiter = ",";
-    check_info.columns = {{"age", "integer"},
-                          {"gender", "integer"},
-                          {"education_id", "integer"},
-                          {"p_1", "double"},
-                          {"p_2", "double"},
-                          {"p_3", "double"},
-                          {"p_4", "double"},
-                          {"p_5", "double"},
-                          {"p_6", "double"}};
+    check_info.columns = {{"age", "integer"}, {"gender", "integer"}, {"education_id", "integer"},
+                          {"p_1", "double"},  {"p_2", "double"},     {"p_3", "double"},
+                          {"p_4", "double"},  {"p_5", "double"},     {"p_6", "double"}};
     const auto check = hgps::input::load_datatable_from_csv(check_info);
 
     // MAHIMA: Spot-check every 40th row across the golden file (full scan is fine but slower).
@@ -134,8 +129,8 @@ TEST(JacardiEmployment, ScoreMatchesCheckCsvSampleRows) {
             const auto col = fmt::format("p_{}", c + 1);
             const auto expected = std::any_cast<double>(check.column(col).value(i));
             EXPECT_NEAR(expected, probs[static_cast<std::size_t>(c)], 1e-6)
-                << "row=" << i << " age=" << age << " gender=" << gender
-                << " edu=" << education_id << " cat=" << (c + 1);
+                << "row=" << i << " age=" << age << " gender=" << gender << " edu=" << education_id
+                << " cat=" << (c + 1);
         }
     }
 }
@@ -170,16 +165,16 @@ TEST(JacardiEmployment, PartBFirstAssignThenHold) {
 
 TEST(JacardiEmployment, ParserLoadsEmploymentOnlyStatic) {
     const auto root = fixture_dir();
-    json model{
-        {"ModelName", "JacardiModel"},
-        {"Employment",
-         {{"method", "multinomial_static"},
-          {"coefficients",
-           file_slot("employment_static_coefs.csv", json{{"Category", "integer"},
-                                                         {"Factor", "string"},
-                                                         {"Coefficient", "double"}})},
-          {"recode", file_slot("employment_4cat_recode.csv", json{{"employment_id", "integer"},
-                                                                  {"employment4_id", "integer"}})}}}};
+    json model{{"ModelName", "JacardiModel"},
+               {"Employment",
+                {{"method", "multinomial_static"},
+                 {"coefficients",
+                  file_slot("employment_static_coefs.csv", json{{"Category", "integer"},
+                                                                {"Factor", "string"},
+                                                                {"Coefficient", "double"}})},
+                 {"recode",
+                  file_slot("employment_4cat_recode.csv",
+                            json{{"employment_id", "integer"}, {"employment4_id", "integer"}})}}}};
     hgps::input::Configuration config;
     config.root_path = root;
     auto definition = hgps::input::load_jacardi_risk_model_definition(model, config);

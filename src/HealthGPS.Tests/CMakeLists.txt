@@ -82,7 +82,8 @@ target_compile_definitions(HealthGPS.Tests PRIVATE "-DTEST_DATA_PATH=\"${test_da
 # MAHIMA: Local JACARDI employment SCORE/recode fixtures (not the remote datastore zip).
 target_compile_definitions(
     HealthGPS.Tests
-    PRIVATE "-DJACARDI_EMPLOYMENT_FIXTURE_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/data/jacardi/employment\"")
+    PRIVATE
+        "-DJACARDI_EMPLOYMENT_FIXTURE_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/data/jacardi/employment\"")
 
 target_link_libraries(
     HealthGPS.Tests

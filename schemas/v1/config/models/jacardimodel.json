@@ -65,7 +65,7 @@
                 },
                 "coefficients": {
                     "type": "object",
-                    "description": "employment_static_coefs.csv — Category, Factor (string), Coefficient for SCORE",
+                    "description": "employment_static_coefs.csv \u2014 Category, Factor (string), Coefficient for SCORE",
                     "properties": {
                         "name": {
                             "type": "string"
@@ -94,7 +94,7 @@
                 },
                 "recode": {
                     "type": "object",
-                    "description": "employment_4cat_recode.csv — employment_id 1-6 to employment4_id 1-4",
+                    "description": "employment_4cat_recode.csv \u2014 employment_id 1-6 to employment4_id 1-4",
                     "properties": {
                         "name": {
                             "type": "string"

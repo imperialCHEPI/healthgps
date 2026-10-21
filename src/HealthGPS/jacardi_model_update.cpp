@@ -8,8 +8,7 @@ namespace hgps {
 JacardiModelUpdate::JacardiModelUpdate(std::shared_ptr<const EducationLifecycleTables> education,
                                        std::shared_ptr<const EmploymentStaticTables> employment)
     : education_{std::move(education)}, employment_{std::move(employment)} {
-    const bool has_edu =
-        education_ && education_->has_draw_at_19() && education_->has_upgrades();
+    const bool has_edu = education_ && education_->has_draw_at_19() && education_->has_upgrades();
     const bool has_emp =
         employment_ && employment_->has_coefficients() && employment_->has_recode();
     if (!has_edu && !has_emp) {

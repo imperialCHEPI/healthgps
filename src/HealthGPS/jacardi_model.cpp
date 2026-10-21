@@ -42,8 +42,8 @@ void JacardiModel::apply_employment_part_a(Person &person, Random &rng) const {
         }
         education_id = static_cast<int>(get_person_education(person));
     }
-    set_person_employment(person, employment_->initialise(person.age, person.gender, education_id,
-                                                          rng));
+    set_person_employment(person,
+                          employment_->initialise(person.age, person.gender, education_id, rng));
 }
 
 void JacardiModel::generate_risk_factors(RuntimeContext &context) {
@@ -74,9 +74,8 @@ void JacardiModel::update_risk_factors(RuntimeContext &context) {
     }
 }
 
-JacardiModelDefinition::JacardiModelDefinition(
-    std::shared_ptr<EducationLifecycleTables> education,
-    std::shared_ptr<EmploymentStaticTables> employment)
+JacardiModelDefinition::JacardiModelDefinition(std::shared_ptr<EducationLifecycleTables> education,
+                                               std::shared_ptr<EmploymentStaticTables> employment)
     : education_{std::move(education)}, employment_{std::move(employment)} {}
 
 std::unique_ptr<RiskFactorModel> JacardiModelDefinition::create_model() const {

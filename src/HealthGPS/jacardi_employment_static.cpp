@@ -56,16 +56,17 @@ EmploymentStaticTables::AgeFactors EmploymentStaticTables::compute_age_factors(i
     out.school_fade = (std::max)(0.0, 22.0 - out.age) / 3.0;
     for (int j = 0; j < 5; ++j) {
         const double tj = k_knots[static_cast<std::size_t>(j)];
-        const double term = pos_cube(out.age - tj) -
-                            pos_cube(out.age - k_knot_penultimate) * (k_knot_last - tj) / k_knot_span +
-                            pos_cube(out.age - k_knot_last) * (k_knot_penultimate - tj) / k_knot_span;
+        const double term =
+            pos_cube(out.age - tj) -
+            pos_cube(out.age - k_knot_penultimate) * (k_knot_last - tj) / k_knot_span +
+            pos_cube(out.age - k_knot_last) * (k_knot_penultimate - tj) / k_knot_span;
         out.age_rcs[static_cast<std::size_t>(j)] = term / k_rcs_scale;
     }
     return out;
 }
 
 double EmploymentStaticTables::factor_value(const std::string &factor, const AgeFactors &age_f,
-                                              int gender, int education_id) {
+                                            int gender, int education_id) {
     // MAHIMA: Product factors A*B = value(A)*value(B); recurse once on each side.
     const auto star = factor.find('*');
     if (star != std::string::npos) {
@@ -196,18 +197,20 @@ int EmploymentStaticTables::recode(int employment_id) const {
     return recode_[static_cast<std::size_t>(employment_id)];
 }
 
-EmploymentStaticTables::Assignment
-EmploymentStaticTables::assign_draw(unsigned int age, core::Gender gender, int education_id,
-                                    Random &rng) const {
+EmploymentStaticTables::Assignment EmploymentStaticTables::assign_draw(unsigned int age,
+                                                                       core::Gender gender,
+                                                                       int education_id,
+                                                                       Random &rng) const {
     const auto probs = score_probabilities(age, gender, education_id);
     const int detailed = draw_category(probs, rng);
     return Assignment{.detailed_id = static_cast<double>(detailed),
                       .cat4_id = static_cast<double>(recode(detailed))};
 }
 
-EmploymentStaticTables::Assignment
-EmploymentStaticTables::initialise(unsigned int age, core::Gender gender, int education_id,
-                                    Random &rng) const {
+EmploymentStaticTables::Assignment EmploymentStaticTables::initialise(unsigned int age,
+                                                                      core::Gender gender,
+                                                                      int education_id,
+                                                                      Random &rng) const {
     // MAHIMA: Part A — 0..18 missing; 19+ SCORE/DRAW/recode (age capped inside SCORE).
     if (age <= age_missing_max) {
         return Assignment{};
