@@ -7,7 +7,10 @@
 #include <array>
 #include <cmath>
 #include <fmt/format.h>
+#include <optional>
+#include <ranges>
 #include <string>
+#include <string_view>
 
 namespace hgps {
 namespace {
@@ -25,6 +28,63 @@ constexpr double k_knot_span = 14.0; // 80 - 66
 double pos_cube(double z) {
     const double p = (std::max)(z, 0.0);
     return p * p * p;
+}
+
+// MAHIMA: Split out of factor_value for clang-tidy complexity. Use optional — NOT NaN —
+// because Gender=0 / SchoolFade=0 / AgeRcs=0 are valid finite zeros.
+std::optional<double> age_named_factor(std::string_view factor,
+                                      const EmploymentStaticTables::AgeFactors &age_f, int gender) {
+    if (factor == "Intercept") {
+        return 1.0;
+    }
+    if (factor == "Age") {
+        return age_f.age;
+    }
+    if (factor == "AgeRcs1") {
+        return age_f.age_rcs[0];
+    }
+    if (factor == "AgeRcs2") {
+        return age_f.age_rcs[1];
+    }
+    if (factor == "AgeRcs3") {
+        return age_f.age_rcs[2];
+    }
+    if (factor == "AgeRcs4") {
+        return age_f.age_rcs[3];
+    }
+    if (factor == "AgeRcs5") {
+        return age_f.age_rcs[4];
+    }
+    if (factor == "SchoolFade") {
+        return age_f.school_fade;
+    }
+    if (factor == "Gender") {
+        return static_cast<double>(gender);
+    }
+    return std::nullopt;
+}
+
+// MAHIMA: education_id 1..7 → ISCED dummies; ISCED 3 (id 3) is reference (no factor).
+std::optional<double> education_dummy(std::string_view factor, int education_id) {
+    if (factor == "EducationISCED01") {
+        return education_id == 1 ? 1.0 : 0.0;
+    }
+    if (factor == "EducationISCED2") {
+        return education_id == 2 ? 1.0 : 0.0;
+    }
+    if (factor == "EducationISCED5") {
+        return education_id == 4 ? 1.0 : 0.0;
+    }
+    if (factor == "EducationISCED6") {
+        return education_id == 5 ? 1.0 : 0.0;
+    }
+    if (factor == "EducationISCED7") {
+        return education_id == 6 ? 1.0 : 0.0;
+    }
+    if (factor == "EducationISCED8") {
+        return education_id == 7 ? 1.0 : 0.0;
+    }
+    return std::nullopt;
 }
 
 } // namespace
@@ -56,10 +116,11 @@ EmploymentStaticTables::AgeFactors EmploymentStaticTables::compute_age_factors(i
     out.school_fade = (std::max)(0.0, 22.0 - out.age) / 3.0;
     for (int j = 0; j < 5; ++j) {
         const double tj = k_knots[static_cast<std::size_t>(j)];
+        // MAHIMA: Parentheses make '-'/'+'/ '*'/'/' order explicit (clang-tidy math-missing-parens).
         const double term =
             pos_cube(out.age - tj) -
-            pos_cube(out.age - k_knot_penultimate) * (k_knot_last - tj) / k_knot_span +
-            pos_cube(out.age - k_knot_last) * (k_knot_penultimate - tj) / k_knot_span;
+            (pos_cube(out.age - k_knot_penultimate) * (k_knot_last - tj) / k_knot_span) +
+            (pos_cube(out.age - k_knot_last) * (k_knot_penultimate - tj) / k_knot_span);
         out.age_rcs[static_cast<std::size_t>(j)] = term / k_rcs_scale;
     }
     return out;
@@ -76,53 +137,12 @@ double EmploymentStaticTables::factor_value(const std::string &factor, const Age
                factor_value(right, age_f, gender, education_id);
     }
 
-    if (factor == "Intercept") {
-        return 1.0;
+    if (const auto age_val = age_named_factor(factor, age_f, gender)) {
+        return *age_val;
     }
-    if (factor == "Age") {
-        return age_f.age;
+    if (const auto edu_val = education_dummy(factor, education_id)) {
+        return *edu_val;
     }
-    if (factor == "AgeRcs1") {
-        return age_f.age_rcs[0];
-    }
-    if (factor == "AgeRcs2") {
-        return age_f.age_rcs[1];
-    }
-    if (factor == "AgeRcs3") {
-        return age_f.age_rcs[2];
-    }
-    if (factor == "AgeRcs4") {
-        return age_f.age_rcs[3];
-    }
-    if (factor == "AgeRcs5") {
-        return age_f.age_rcs[4];
-    }
-    if (factor == "SchoolFade") {
-        return age_f.school_fade;
-    }
-    if (factor == "Gender") {
-        return static_cast<double>(gender);
-    }
-    // MAHIMA: education_id 1..7 → ISCED dummies; ISCED 3 (id 3) is reference (no factor).
-    if (factor == "EducationISCED01") {
-        return education_id == 1 ? 1.0 : 0.0;
-    }
-    if (factor == "EducationISCED2") {
-        return education_id == 2 ? 1.0 : 0.0;
-    }
-    if (factor == "EducationISCED5") {
-        return education_id == 4 ? 1.0 : 0.0;
-    }
-    if (factor == "EducationISCED6") {
-        return education_id == 5 ? 1.0 : 0.0;
-    }
-    if (factor == "EducationISCED7") {
-        return education_id == 6 ? 1.0 : 0.0;
-    }
-    if (factor == "EducationISCED8") {
-        return education_id == 7 ? 1.0 : 0.0;
-    }
-
     throw core::HgpsException{fmt::format("JACARDI employment: unknown factor '{}'", factor)};
 }
 
@@ -154,7 +174,7 @@ EmploymentStaticTables::score_probabilities(unsigned int age, core::Gender gende
     }
 
     // MAHIMA: Softmax with max-subtraction for numerical stability (same idea as income logits).
-    const double max_score = *std::max_element(scores.begin(), scores.end());
+    const double max_score = *std::ranges::max_element(scores);
     double sum_exp = 0.0;
     std::array<double, category_count> probs{};
     for (std::size_t i = 0; i < scores.size(); ++i) {
