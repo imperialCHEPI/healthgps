@@ -161,7 +161,9 @@ Older sketch (`logistic` + `employment_coefs.csv` + age²) is **outdated**.
 
 SCORE tests read CSVs from **`healthgps-examples/Jacardi_Slovenia/`** (sibling checkout; override with
 `-DJACARDI_SLOVENIA_DIR=...`). AgeRcs / SchoolFade do not need the pack; if the pack is missing,
-CSV tests `GTEST_SKIP` and CMake only warns (configure still succeeds).
+CSV tests `GTEST_SKIP` in the test body (not a helper — `GTEST_SKIP` only returns from the
+current function) and CMake only warns (configure still succeeds). CI has no examples checkout,
+so those five tests skip there; locally with the sibling pack they run and check SCORE.
 
 ```powershell
 cmake --build out/build/windows-release --target HealthGPS.Tests -j 8

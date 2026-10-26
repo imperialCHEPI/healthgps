@@ -29,20 +29,13 @@ std::filesystem::path fixture_dir() {
     return std::filesystem::path{JACARDI_EMPLOYMENT_FIXTURE_DIR};
 }
 
-// MAHIMA: Pack CSVs live in examples repo — skip SCORE tests if sibling checkout missing.
-void skip_if_no_slovenia_pack() {
+// MAHIMA: Pack CSVs live in healthgps-examples — must GTEST_SKIP in the TEST body itself
+// (GTEST_SKIP only returns from the current function; a helper would not stop the test).
+bool slovenia_pack_available() {
     const auto root = fixture_dir();
-    if (root.empty() || !std::filesystem::exists(root / "employment_static_coefs.csv") ||
-        !std::filesystem::exists(root / "employment_4cat_recode.csv") ||
-        !std::filesystem::exists(root / "employment_static_check.csv")) {
-        fmt::print(stderr,
-                   "JacardiEmployment: skipping CSV tests — Slovenia pack not found "
-                   "(JACARDI_EMPLOYMENT_FIXTURE_DIR='{}')\n",
-                   root.string());
-        std::fflush(stderr);
-        GTEST_SKIP() << "Jacardi_Slovenia employment CSVs not available; clone "
-                        "healthgps-examples as sibling or -DJACARDI_SLOVENIA_DIR=...";
-    }
+    return !root.empty() && std::filesystem::exists(root / "employment_static_coefs.csv") &&
+           std::filesystem::exists(root / "employment_4cat_recode.csv") &&
+           std::filesystem::exists(root / "employment_static_check.csv");
 }
 
 json file_slot(const std::string &name, const json &columns) {
@@ -115,7 +108,9 @@ TEST(JacardiEmployment, SchoolFadeAges19To22) {
 }
 
 TEST(JacardiEmployment, Woman19Isced2StudentProbNear0879) {
-    skip_if_no_slovenia_pack();
+    if (!slovenia_pack_available()) {
+        GTEST_SKIP() << "Jacardi_Slovenia employment CSVs not available";
+    }
     auto tables = load_fixture_tables();
     const auto probs = tables->score_probabilities(19, core::Gender::female, 2);
     // MAHIMA: Partner example — woman 19 education_id 2 → p_5 (Student) ≈ 0.879
@@ -123,7 +118,9 @@ TEST(JacardiEmployment, Woman19Isced2StudentProbNear0879) {
 }
 
 TEST(JacardiEmployment, ScoreMatchesCheckCsvSampleRows) {
-    skip_if_no_slovenia_pack();
+    if (!slovenia_pack_available()) {
+        GTEST_SKIP() << "Jacardi_Slovenia employment CSVs not available";
+    }
     auto tables = load_fixture_tables();
     hgps::input::FileInfo check_info;
     check_info.name = fixture_dir() / "employment_static_check.csv";
@@ -155,7 +152,9 @@ TEST(JacardiEmployment, ScoreMatchesCheckCsvSampleRows) {
 }
 
 TEST(JacardiEmployment, InitialiseMissingUnder19AndRecode) {
-    skip_if_no_slovenia_pack();
+    if (!slovenia_pack_available()) {
+        GTEST_SKIP() << "Jacardi_Slovenia employment CSVs not available";
+    }
     auto tables = load_fixture_tables();
     Random rng;
 
@@ -171,7 +170,9 @@ TEST(JacardiEmployment, InitialiseMissingUnder19AndRecode) {
 }
 
 TEST(JacardiEmployment, PartBFirstAssignThenHold) {
-    skip_if_no_slovenia_pack();
+    if (!slovenia_pack_available()) {
+        GTEST_SKIP() << "Jacardi_Slovenia employment CSVs not available";
+    }
     auto tables = load_fixture_tables();
     Random rng;
 
@@ -185,7 +186,9 @@ TEST(JacardiEmployment, PartBFirstAssignThenHold) {
 }
 
 TEST(JacardiEmployment, ParserLoadsEmploymentOnlyStatic) {
-    skip_if_no_slovenia_pack();
+    if (!slovenia_pack_available()) {
+        GTEST_SKIP() << "Jacardi_Slovenia employment CSVs not available";
+    }
     const auto root = fixture_dir();
     json model{{"ModelName", "JacardiModel"},
                {"Employment",
