@@ -92,11 +92,10 @@ if(EXISTS "${JACARDI_SLOVENIA_DIR}/employment_static_coefs.csv"
     message(STATUS "JACARDI employment fixtures: ${JACARDI_EMPLOYMENT_FIXTURE_DIR}")
 else()
     message(
-        WARNING
-            "JACARDI employment pack not found at ${JACARDI_SLOVENIA_DIR} "
-            "(need employment_static_coefs.csv, employment_4cat_recode.csv, "
-            "employment_static_check.csv). JacardiEmployment CSV tests will GTEST_SKIP. "
-            "Clone healthgps-examples as a sibling or pass -DJACARDI_SLOVENIA_DIR=...")
+        WARNING "JACARDI employment pack not found at ${JACARDI_SLOVENIA_DIR} "
+                "(need employment_static_coefs.csv, employment_4cat_recode.csv, "
+                "employment_static_check.csv). JacardiEmployment CSV tests will GTEST_SKIP. "
+                "Clone healthgps-examples as a sibling or pass -DJACARDI_SLOVENIA_DIR=...")
 endif()
 target_compile_definitions(
     HealthGPS.Tests
