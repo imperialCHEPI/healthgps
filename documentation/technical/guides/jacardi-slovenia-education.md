@@ -2,9 +2,9 @@
 
 **Author:** Mahima Ghosh
 
-| [Home](../../index.md) | [Technical docs](../README.md) | [JACARDI 7-country plan](../plans/JACARDI-7-countries-implementation-plan.md) | [User output](../../user/userguide.md#output) | [Employment init plan](../plans/JACARDI-employment-init.md) | [Employment static guide](jacardi-employment-static.md) |
+| [Home](../../index.md) | [Technical docs](../README.md) | [JACARDI 7-country plan](../plans/JACARDI-7-countries-implementation-plan.md) | [User output](../../user/userguide.md#output) | [Employment static](jacardi-employment-static.md) |
 
-I keep Slovenia education in **this single document**: algorithm (partner **15 October 2026**), pack files, engine wiring, CSV output, tests, and plan. Employment is separate — [plan](../plans/JACARDI-employment-init.md) · [guide](jacardi-employment-static.md).
+I keep Slovenia education in **this single document**: algorithm (partner **15 October 2026**), pack files, engine wiring, CSV output, tests, and plan. Employment is separate — [jacardi-employment-static.md](jacardi-employment-static.md).
 
 Partner source in the examples pack: `EDUCATION_ALGORITHM.md` (replaces 29 September 2026).
 
@@ -136,7 +136,7 @@ cmake --build out/build/windows-release --target HealthGPS.Tests -j 8
 | Phase | What I do | Gate |
 | ----- | --------- | ---- |
 | **Education 15 Oct** | Missing 0–18; draw at 19; upgrades 20–30; new CSVs + `draw_at_19` slot | Green `Jacardi*` + Slovenia smoke |
-| **P1b (next)** | Employment static after education | [Employment plan](../plans/JACARDI-employment-init.md) · [guide](jacardi-employment-static.md) |
+| **P1b** | Employment static after education | [Employment guide](jacardi-employment-static.md) |
 | Later | HLS → … → MI | Per ladder CSV deliveries |
 
 Models that use education should apply to people aged **19+** until partners optionally add under-19 values (e.g. mother’s education).

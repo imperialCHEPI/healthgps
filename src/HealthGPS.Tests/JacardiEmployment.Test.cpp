@@ -1,6 +1,5 @@
 #include "pch.h"
 
-#include "HealthGPS.Core/exception.h"
 #include "HealthGPS.Input/configuration.h"
 #include "HealthGPS.Input/csvparser.h"
 #include "HealthGPS.Input/model_parser.h"
@@ -9,6 +8,7 @@
 
 #include <array>
 #include <cmath>
+#include <cstdio>
 #include <filesystem>
 #include <fmt/format.h>
 #include <nlohmann/json.hpp>
@@ -20,12 +20,29 @@ using json = nlohmann::json;
 
 namespace {
 
+// MAHIMA: Set by CMake to healthgps-examples/Jacardi_Slovenia (or empty → skip CSV tests).
 #ifndef JACARDI_EMPLOYMENT_FIXTURE_DIR
-#error "JACARDI_EMPLOYMENT_FIXTURE_DIR must be set by CMake"
+#define JACARDI_EMPLOYMENT_FIXTURE_DIR ""
 #endif
 
 std::filesystem::path fixture_dir() {
     return std::filesystem::path{JACARDI_EMPLOYMENT_FIXTURE_DIR};
+}
+
+// MAHIMA: Pack CSVs live in examples repo — skip SCORE tests if sibling checkout missing.
+void skip_if_no_slovenia_pack() {
+    const auto root = fixture_dir();
+    if (root.empty() || !std::filesystem::exists(root / "employment_static_coefs.csv") ||
+        !std::filesystem::exists(root / "employment_4cat_recode.csv") ||
+        !std::filesystem::exists(root / "employment_static_check.csv")) {
+        fmt::print(stderr,
+                   "JacardiEmployment: skipping CSV tests — Slovenia pack not found "
+                   "(JACARDI_EMPLOYMENT_FIXTURE_DIR='{}')\n",
+                   root.string());
+        std::fflush(stderr);
+        GTEST_SKIP() << "Jacardi_Slovenia employment CSVs not available; clone "
+                        "healthgps-examples as sibling or -DJACARDI_SLOVENIA_DIR=...";
+    }
 }
 
 json file_slot(const std::string &name, const json &columns) {
@@ -36,7 +53,7 @@ json file_slot(const std::string &name, const json &columns) {
                 {"columns", columns}};
 }
 
-// MAHIMA: Load partner coefs + recode the same way the parser does (direct CSV → tables).
+// MAHIMA: Load partner coefs + recode from Jacardi_Slovenia (same files the engine uses).
 std::shared_ptr<EmploymentStaticTables> load_fixture_tables() {
     const auto root = fixture_dir();
     auto tables = std::make_shared<EmploymentStaticTables>();
@@ -98,6 +115,7 @@ TEST(JacardiEmployment, SchoolFadeAges19To22) {
 }
 
 TEST(JacardiEmployment, Woman19Isced2StudentProbNear0879) {
+    skip_if_no_slovenia_pack();
     auto tables = load_fixture_tables();
     const auto probs = tables->score_probabilities(19, core::Gender::female, 2);
     // MAHIMA: Partner example — woman 19 education_id 2 → p_5 (Student) ≈ 0.879
@@ -105,6 +123,7 @@ TEST(JacardiEmployment, Woman19Isced2StudentProbNear0879) {
 }
 
 TEST(JacardiEmployment, ScoreMatchesCheckCsvSampleRows) {
+    skip_if_no_slovenia_pack();
     auto tables = load_fixture_tables();
     hgps::input::FileInfo check_info;
     check_info.name = fixture_dir() / "employment_static_check.csv";
@@ -136,6 +155,7 @@ TEST(JacardiEmployment, ScoreMatchesCheckCsvSampleRows) {
 }
 
 TEST(JacardiEmployment, InitialiseMissingUnder19AndRecode) {
+    skip_if_no_slovenia_pack();
     auto tables = load_fixture_tables();
     Random rng;
 
@@ -151,6 +171,7 @@ TEST(JacardiEmployment, InitialiseMissingUnder19AndRecode) {
 }
 
 TEST(JacardiEmployment, PartBFirstAssignThenHold) {
+    skip_if_no_slovenia_pack();
     auto tables = load_fixture_tables();
     Random rng;
 
@@ -164,6 +185,7 @@ TEST(JacardiEmployment, PartBFirstAssignThenHold) {
 }
 
 TEST(JacardiEmployment, ParserLoadsEmploymentOnlyStatic) {
+    skip_if_no_slovenia_pack();
     const auto root = fixture_dir();
     json model{{"ModelName", "JacardiModel"},
                {"Employment",
