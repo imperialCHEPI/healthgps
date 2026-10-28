@@ -1,61 +1,65 @@
-# JACARDI Slovenia employment (static package, 16 Oct 2026)
+# JACARDI Slovenia employment — plan and technical guide
 
 **Author:** Mahima Ghosh
 
-| [Home](../../index.md) | [Technical docs](../README.md) | [JACARDI 7-country plan](../plans/JACARDI-7-countries-implementation-plan.md) | [Employment static plan (P1b)](../plans/JACARDI-employment-static-plan.md) | [Slovenia education](jacardi-slovenia-education.md) |
+| [Home](../../index.md) | [Technical docs](../README.md) | [JACARDI 7-country plan](../plans/JACARDI-7-countries-implementation-plan.md) | [Slovenia education](jacardi-slovenia-education.md) | [Slovenia run fixes](jacardi-slovenia-run-fixes.md) |
 
-**Implementation plan (source of work items):** [JACARDI-employment-static-plan.md](../plans/JACARDI-employment-static-plan.md)
+I keep Slovenia employment static in **this single document**: algorithm (partner **16 October 2026**), pack files, engine wiring, tests, config checklist, and plan status. Education is separate — [jacardi-slovenia-education.md](jacardi-slovenia-education.md).
 
-Partner algorithm (examples pack, not this repo): `healthgps-examples/Jacardi_Slovenia/EMPLOYMENT_STATIC_ALGORITHM.md`.
+Partner source in the examples pack: `EMPLOYMENT_STATIC_ALGORITHM.md`. Keep all three education CSVs.
 
-**These files are not education.** They are the next ladder step after Education. Keep all three education CSVs. CSV filenames stay as partner delivered until renamed manually.
+**Status:** P1b static **done** (engine + tests). Yearly employment transitions still pending (Part B hold is temporary).
 
 ---
 
-## What you received vs what stays
+## 1. Where employment sits
+
+| Phase | Work | Status |
+| ----- | ---- | ------ |
+| P1a | Slovenia education (15 Oct) | Done — [education guide](jacardi-slovenia-education.md) |
+| **P1b** | **Employment static (this doc)** | **Done** — yearly hold still temporary |
+| Later | Yearly employment transitions | Replaces Part B step 3 only |
+| Later | HLS → … → MI | Separate CSV deliveries |
+
+Employment needs **age, gender, and education_id** — always runs **after** education.
 
 ```mermaid
 flowchart LR
-  Edu[Education Part A/B<br/>KEEP three CSVs]
-  Emp[Employment static<br/>NEW four files]
-  Yearly[Employment yearly<br/>NOT arrived yet]
+  Edu[Education P1a KEEP]
+  Emp[Employment static P1b]
+  Yearly[Employment yearly NOT yet]
+  Ladder[HLS meds SBP MI later]
   Edu --> Emp
   Emp -.-> Yearly
+  Emp -.-> Ladder
 ```
 
-| Keep (education - 15 Oct rules) | New (employment static - not coded yet) | Later |
-| -------------------------------- | ---------------------------------------- | ----- |
-| `education_lookup.csv` | `employment_static_coefs.csv` | Yearly transitions package |
-| `education_draw_at_19_ssp2.csv` | `employment_4cat_recode.csv` | Replaces Part B step 3 hold |
-| `education_upgrade_transitions_ssp2.csv` | `employment_static_check.csv` | |
-| | `EMPLOYMENT_STATIC_ALGORITHM.md` | |
+---
 
-**Do not delete** the education files.
+## 2. Pack files
+
+| File | Role | Runtime? |
+| ---- | ---- | -------- |
+| `employment_static_coefs.csv` | Multinomial logit: Category × Factor × Coefficient | Yes — SCORE |
+| `employment_4cat_recode.csv` | Map employment_id 1–6 → employment4_id 1–4 (“4cat” = four categories) | Yes — after every draw |
+| `employment_static_check.csv` | Golden `p_1`…`p_6` / `q_1`…`q_4` | Tests only (same Slovenia pack) |
+| `EMPLOYMENT_STATIC_ALGORITHM.md` | Partner rules | Docs |
+
+Do **not** delete education CSVs when employment arrives.
 
 ---
 
-## What the three CSVs are
+## 3. Two ids per person
 
-| File | Meaning | Runtime? |
-| ---- | ------- | -------- |
-| `employment_static_coefs.csv` | Multinomial logit coefficients (Category × Factor × Coefficient) for SCORE | Yes — SCORE |
-| `employment_4cat_recode.csv` | Maps detailed employment_id 1–6 → collapsed employment4_id 1–4 (“4cat” = four categories) | Yes — after every draw |
-| `employment_static_check.csv` | Golden probabilities `p_1`…`p_6` and `q_1`…`q_4` by age × gender × education_id | No — gtests only |
+Both missing below age 19 (NaN on `Person.risk_factors`).
 
----
+| Engine name | Range | Role |
+| ----------- | ----- | ---- |
+| `EmploymentDetailed` | 1–6 | Drawn; kept for future yearly package |
+| `Employment` | 1–4 | Recoded; health models and primary output |
 
-## Plain-language algorithm
-
-Employment needs **age, gender, and education_id** (so it runs **after** education).
-
-1. Ages **0-18**: no employment (`missing` / NaN), both ids.
-2. Ages **19+**: compute multinomial scores from `employment_static_coefs.csv` (age capped at 80, RCS splines, education dummies, `SchoolFade` for 19-21).
-3. Softmax → 6 probabilities → **DRAW** one `employment_id` (1-6).
-4. Recode with `employment_4cat_recode.csv` → `employment4_id` (1-4). Downstream health models use the 4-cat id.
-5. Part B until yearly package: under 19 missing; first time at 19+ draw like Part A; **everyone else keep last year** (temporary hold - partner said swap this out later).
-
-| employment_id | Detailed | employment4_id | 4-cat |
-| ------------- | -------- | -------------- | ----- |
+| employment_id | Detailed | employment4_id | 4-category |
+| ------------- | -------- | -------------- | ---------- |
 | 1 | Employed | 1 | Employed |
 | 2 | Unemployed | 2 | Unemployed |
 | 3 | Retired | 4 | Not in labour force |
@@ -63,27 +67,137 @@ Employment needs **age, gender, and education_id** (so it runs **after** educati
 | 5 | Student | 3 | Student |
 | 6 | Domestic / other inactive | 4 | Not in labour force |
 
-Check file: SCORE probs for age × gender × education_id must match `employment_static_check.csv` (`p_1`…`p_6`, `q_1`…`q_4`).
+CSV gender: **0 = female**, **1 = male**. Education ids **1–7**.
 
 ---
 
-## What we are supposed to do (engine work - not started)
+## 4. SCORE / DRAW / Part A / Part B
 
-Full work items, config shape, tests, and execution order: **[JACARDI employment static plan](../plans/JACARDI-employment-static-plan.md)**.
+### Predictors
 
-| Step | Action |
-| ---- | ------ |
-| 1 | Keep education as-is (P1a done). |
-| 2 | Wire **P1b employment static** into `JacardiModel` / `JacardiModelUpdate` after education. |
-| 3 | Point `jacardi_model.json` Employment slot at the partner filenames (older `employment_coefs.csv` + binary `logistic` sketch is outdated). |
-| 4 | Store both ids on the person: `EmploymentDetailed` (1-6) and `Employment` (1-4); export via `modelling.risk_factors`. |
-| 5 | Implement Part B step 3 as a **swappable hold** so the yearly package can replace it without rewriting Parts A / B1-2. |
-| 6 | Gtest SCORE against `employment_static_check.csv` (woman 19 ISCED2 → student ≈ 0.879). |
-| 7 | Wait for yearly employment package before trusting employment trends over time. |
+Age `a` capped at **80**:
 
-Hierarchy note: older notes said `Employment = age + age² + sex + education`. The delivered static model is **multinomial logit + 5 age RCS terms + SchoolFade**, not age².
+- `Intercept`, `Age`, `AgeRcs1`…`AgeRcs5` (knots 21, 24, 28, 43, 55, 66, 80)
+- `SchoolFade` = max(0, 22 − a) / 3 (ages 19–21)
+- `Gender`; education dummies (ISCED 3 = reference)
+- Interactions e.g. `Age*Gender`, `EducationISCED2*SchoolFade`
 
-Partner source of truth in the examples pack: `EMPLOYMENT_STATIC_ALGORITHM.md` (16 Oct 2026).
+Golden RCS at a = 60: 17.0408, 13.4030, 9.4134, 1.4114, 0.0359.
+
+### SCORE / DRAW
+
+Linear score per category → softmax → six probs (same idea as categorical income). Inverse-CDF draw over 1…6; then recode.
+
+### Part A (start)
+
+| Age | Rule |
+| --- | ---- |
+| 0–18 | missing |
+| 19+ | SCORE → DRAW → recode |
+
+### Part B (yearly, until yearly package)
+
+1. Under 19 → missing
+2. No status yet and age 19+ → same as Part A
+3. Everyone else → **hold last year** (TEMPORARY; swappable)
+
+```mermaid
+flowchart TD
+  AfterEdu[After education]
+  AgeQ{age 0 to 18?}
+  Miss[Both ids NaN]
+  FirstQ{Has employment yet?}
+  ScoreDraw[SCORE DRAW recode]
+  Hold[Hold last year TEMP]
+  AfterEdu --> AgeQ
+  AgeQ -->|yes| Miss
+  AgeQ -->|no| FirstQ
+  FirstQ -->|no| ScoreDraw
+  FirstQ -->|yes| Hold
+```
+
+Births: missing until 19. Immigration clones: copy both ids; no redraw.
+
+---
+
+## 5. Engine wiring
+
+| Piece | Role |
+| ----- | ---- |
+| `jacardi_employment_static.*` | RCS / SchoolFade / SCORE / DRAW / recode / Part A+B hold |
+| `jacardi_model.*` | After education Part A → employment Part A |
+| `jacardi_model_update.*` | After education Part B → employment Part B |
+| `model_parser.cpp` | Opt-in Education and/or Employment CSV slots |
+| Schemas `jacardimodel*.json` | If a step is present, its filenames are required |
+
+```json
+"Employment": {
+  "method": "multinomial_static",
+  "coefficients": { "name": "employment_static_coefs.csv", "format": "csv", "delimiter": ",", "encoding": "ASCII", "columns": { "Category": "integer", "Factor": "string", "Coefficient": "double" } },
+  "recode": { "name": "employment_4cat_recode.csv", "format": "csv", "delimiter": ",", "encoding": "ASCII", "columns": { "employment_id": "integer", "employment4_id": "integer" } }
+}
+```
+
+```json
+"risk_factors": [
+  { "name": "Education", "level": 1, "range": [1, 7] },
+  { "name": "EmploymentDetailed", "level": 2, "range": [1, 6] },
+  { "name": "Employment", "level": 2, "range": [1, 4] }
+]
+```
+
+Shared `context.random()` is not thread-safe — person loops stay **serial**.
+
+Older sketch (`logistic` + `employment_coefs.csv` + age²) is **outdated**.
+
+---
+
+## 6. Tests
+
+| Suite | Covers |
+| ----- | ------ |
+| `JacardiEmployment` | RCS at 60; woman 19 edu 2 → p_5 ≈ 0.879; check CSV SCORE; missing/hold/recode |
+| `Jacardi*` | Education + model runtime regression |
+
+SCORE tests read CSVs from **`healthgps-examples/Jacardi_Slovenia/`** (sibling checkout; override with
+`-DJACARDI_SLOVENIA_DIR=...`). AgeRcs / SchoolFade do not need the pack; if the pack is missing,
+CSV tests `GTEST_SKIP` in the test body (not a helper — `GTEST_SKIP` only returns from the
+current function) and CMake only warns (configure still succeeds). CI has no examples checkout,
+so those five tests skip there; locally with the sibling pack they run and check SCORE.
+
+```powershell
+cmake --build out/build/windows-release --target HealthGPS.Tests -j 8
+.\out\build\windows-release\src\HealthGPS.Tests\HealthGPS.Tests.exe --gtest_filter=Jacardi*
+```
+
+---
+
+## 7. Work items (P1b)
+
+| Status | Item |
+| ------ | ---- |
+| Done | Helper `jacardi_employment_static.*` |
+| Done | Parser + schema Employment slots |
+| Done | Wire after education in JacardiModel / Update |
+| Done | Gtests + check CSV fixture |
+| Done | Slovenia pack Employment JSON + CSVs |
+| Later | Yearly employment transitions (replace hold) |
+
+### Out of scope for P1b
+
+- Yearly transitions; HLS / meds / SBP / MI
+- Country `if`s; coefficients as numbers in JSON
+- Trusting employment trends while Part B is still hold
+
+---
+
+## 8. Config checklist
+
+1. `jacardi_model.json` → Employment `multinomial_static` + coefficients + recode
+2. `jacardi_model_update.json` → same Employment slots
+3. `modelling.risk_factors` lists `EmploymentDetailed` and `Employment`
+4. Coefs + recode CSVs on disk in the pack
+5. Education CSVs still present
 
 ---
 

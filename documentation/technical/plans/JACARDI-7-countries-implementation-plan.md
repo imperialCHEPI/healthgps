@@ -6,7 +6,7 @@
 
 **Author:** Mahima Ghosh · **GitHub:** `jacardi` · **Branch prefix:** `jacardi/`
 **Status:** Design / planning (written and maintained by Mahima)
-**Related:** [Technical index](../README.md) · [Project requirements plan](project-requirements-plan.md) · [Models overview](../../user/models-overview.md) · [How Health-GPS models a person](../guides/how-healthgps-models-a-person.md) · [Simulation models reference](../guides/simulation-models-reference.md) · [JACARDI Slovenia education](../guides/jacardi-slovenia-education.md) · [JACARDI employment static plan](JACARDI-employment-static-plan.md) · [JACARDI employment static guide](../guides/jacardi-employment-static.md) · [JACARDI-UKPDS-healthGPS](JACARDI-UKPDS-healthGPS.md) (Belgium diabetes submodel; restore/link when present on branch)
+**Related:** [Technical index](../README.md) · [Project requirements plan](project-requirements-plan.md) · [Models overview](../../user/models-overview.md) · [How Health-GPS models a person](../guides/how-healthgps-models-a-person.md) · [Simulation models reference](../guides/simulation-models-reference.md) · [JACARDI Slovenia education](../guides/jacardi-slovenia-education.md) · [JACARDI employment static](../guides/jacardi-employment-static.md) · [JACARDI-UKPDS-healthGPS](JACARDI-UKPDS-healthGPS.md) (Belgium diabetes submodel; restore/link when present on branch)
 
 **Goal:** Add one new CSV-driven risk-factor pathway for JACARDI so Slovenia and the other six countries can initialise and update people without forking France HLM/EBHLM or India/FINCH StaticLinear/KevinHall. Same codebase; opt-in by `ModelName` + country data pack. Belgium alone enables UKPDS later for now.
 
@@ -218,7 +218,7 @@ Algorithm: `EDUCATION_ALGORITHM.md` (15 Oct). Guide: [jacardi-slovenia-education
 
 ### Delivered SI employment static CSVs (16 Oct 2026) — P1b next
 
-Received in `healthgps-examples/Jacardi_Slovenia/`. **Not a replacement for education.** Plan: [JACARDI-employment-static-plan.md](JACARDI-employment-static-plan.md). Guide: [jacardi-employment-static.md](../guides/jacardi-employment-static.md). Partner text: `EMPLOYMENT_STATIC_ALGORITHM.md`.
+Received in `healthgps-examples/Jacardi_Slovenia/`. **Not a replacement for education.** Single doc: [jacardi-employment-static.md](../guides/jacardi-employment-static.md). Partner text: `EMPLOYMENT_STATIC_ALGORITHM.md`.
 
 | File | Role |
 | ---- | ---- |
@@ -249,7 +249,7 @@ Implement against `src/HealthGPS/risk_factor_model.h`:
 
 No per-country C++ subclasses. Predictor resolver expands `education_id` → ISCED dummies (`EducationISCED01`, …; no dummy for reference ISCED 3). Also needs age RCS / `SchoolFade` for employment SCORE.
 
-**Employment static (P1b, after education):** ages 0–18 missing; 19+ multinomial from `employment_static_coefs.csv`, DRAW `employment_id`, recode to `employment4_id`. Part B: first assign at 19, then **hold** until yearly package arrives (build hold so it is easy to swap). Details: [employment plan](JACARDI-employment-static-plan.md) · [guide](../guides/jacardi-employment-static.md).
+**Employment static (P1b, after education):** ages 0–18 missing; 19+ multinomial from `employment_static_coefs.csv`, DRAW `employment_id`, recode to `employment4_id`. Part B: first assign at 19, then **hold** until yearly package arrives (build hold so it is easy to swap). Details: [employment guide](../guides/jacardi-employment-static.md).
 
 ### Slovenia education rules (summary, 15 Oct 2026)
 
@@ -305,7 +305,7 @@ flowchart TD
 | ----- | --------------------------------------------------------- | ------------------------ |
 | P0    | Add `jacardi_model` + `jacardi_model_update` `.h/.cpp` pairs; register ModelNames; CSV-slot schema; shared education helper stub | India/FINCH/France green |
 | P1a   | SI education lifecycle + checks                           | `Jacardi*` gtests green ([Slovenia education](../guides/jacardi-slovenia-education.md)) |
-| P1b   | SI **employment static** (16 Oct pack) → then HLS → … → SBP → MI | SCORE matches `employment_static_check.csv`; education CSVs untouched ([employment plan](JACARDI-employment-static-plan.md) · [guide](../guides/jacardi-employment-static.md)) |
+| P1b   | SI **employment static** (16 Oct pack) → then HLS → … → SBP → MI | SCORE matches `employment_static_check.csv`; education CSVs untouched ([employment guide](../guides/jacardi-employment-static.md)) |
 | P2    | Romania pack                                              | SI + legacy + RO         |
 | P3    | IT / MT / ES packs                                        | Prior fixtures           |
 | P4    | Poland when CSVs complete                                 | Prior + PL               |

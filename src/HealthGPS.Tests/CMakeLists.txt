@@ -36,6 +36,7 @@ target_sources(
             "JsonParser.Test.cpp"
             "Identifier.Test.cpp"
             "JacardiEducation.Test.cpp"
+            "JacardiEmployment.Test.cpp"
             "JacardiModel.Test.cpp"
             "CostOfDiseaseSchema.Test.cpp"
             "LifeTable.Test.cpp"
@@ -78,6 +79,27 @@ FetchContent_Declare(
     URL_HASH SHA256=b68abc8d40b937d377aa7357bff66a1f4f5196da5b867f7ca88d02b37d2ebb5c)
 FetchContent_MakeAvailable(test_data)
 target_compile_definitions(HealthGPS.Tests PRIVATE "-DTEST_DATA_PATH=\"${test_data_SOURCE_DIR}\"")
+# MAHIMA: Employment SCORE fixtures live in healthgps-examples/Jacardi_Slovenia (not duplicated
+# under Tests). Override with -DJACARDI_SLOVENIA_DIR=... if the pack is not a sibling checkout.
+if(NOT DEFINED JACARDI_SLOVENIA_DIR)
+    set(JACARDI_SLOVENIA_DIR "${CMAKE_SOURCE_DIR}/../healthgps-examples/Jacardi_Slovenia")
+endif()
+set(JACARDI_EMPLOYMENT_FIXTURE_DIR "")
+if(EXISTS "${JACARDI_SLOVENIA_DIR}/employment_static_coefs.csv"
+   AND EXISTS "${JACARDI_SLOVENIA_DIR}/employment_4cat_recode.csv"
+   AND EXISTS "${JACARDI_SLOVENIA_DIR}/employment_static_check.csv")
+    set(JACARDI_EMPLOYMENT_FIXTURE_DIR "${JACARDI_SLOVENIA_DIR}")
+    message(STATUS "JACARDI employment fixtures: ${JACARDI_EMPLOYMENT_FIXTURE_DIR}")
+else()
+    message(
+        WARNING "JACARDI employment pack not found at ${JACARDI_SLOVENIA_DIR} "
+                "(need employment_static_coefs.csv, employment_4cat_recode.csv, "
+                "employment_static_check.csv). JacardiEmployment CSV tests will GTEST_SKIP. "
+                "Clone healthgps-examples as a sibling or pass -DJACARDI_SLOVENIA_DIR=...")
+endif()
+target_compile_definitions(
+    HealthGPS.Tests
+    PRIVATE "-DJACARDI_EMPLOYMENT_FIXTURE_DIR=\"${JACARDI_EMPLOYMENT_FIXTURE_DIR}\"")
 
 target_link_libraries(
     HealthGPS.Tests

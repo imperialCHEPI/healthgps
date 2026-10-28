@@ -2,7 +2,7 @@
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/config/models/jacardimodel.json",
     "type": "object",
-    "description": "JACARDI static / init risk-factor model. Include Education and/or Employment only when using them. If a step is present, its CSV slots are required.",
+    "description": "JACARDI static / init risk-factor model. Ladder steps are opt-in: include Education and/or Employment only when using them. If a step is present, its CSV slots are required.",
     "properties": {
         "$schema": {
             "type": "string"
@@ -57,19 +57,69 @@
         },
         "Employment": {
             "type": "object",
-            "description": "If using employment: method + coefficients + recode filenames required. Part A SCORE/DRAW then 4-cat recode.",
+            "description": "If using employment (P1b, 16 Oct 2026): method + coefficients + recode filenames required. Part A SCORE/DRAW then 4-cat recode.",
             "properties": {
                 "method": {
                     "type": "string",
                     "description": "Expected: multinomial_static"
                 },
                 "coefficients": {
-                    "description": "employment_static_coefs.csv \u2014 Category x Factor x Coefficient for SCORE",
-                    "$ref": "../csv_file.json"
+                    "type": "object",
+                    "description": "employment_static_coefs.csv \u2014 Category, Factor (string), Coefficient for SCORE",
+                    "properties": {
+                        "name": {
+                            "type": "string"
+                        },
+                        "format": {
+                            "type": "string"
+                        },
+                        "delimiter": {
+                            "type": "string"
+                        },
+                        "encoding": {
+                            "type": "string"
+                        },
+                        "columns": {
+                            "type": "object"
+                        }
+                    },
+                    "required": [
+                        "name",
+                        "format",
+                        "delimiter",
+                        "encoding",
+                        "columns"
+                    ],
+                    "additionalProperties": false
                 },
                 "recode": {
+                    "type": "object",
                     "description": "employment_4cat_recode.csv \u2014 employment_id 1-6 to employment4_id 1-4",
-                    "$ref": "../csv_file.json"
+                    "properties": {
+                        "name": {
+                            "type": "string"
+                        },
+                        "format": {
+                            "type": "string"
+                        },
+                        "delimiter": {
+                            "type": "string"
+                        },
+                        "encoding": {
+                            "type": "string"
+                        },
+                        "columns": {
+                            "type": "object"
+                        }
+                    },
+                    "required": [
+                        "name",
+                        "format",
+                        "delimiter",
+                        "encoding",
+                        "columns"
+                    ],
+                    "additionalProperties": false
                 }
             },
             "required": [
