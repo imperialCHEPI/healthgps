@@ -1065,7 +1065,8 @@ void mark_zero_missing_factor_means_as_missing(DataSeries &series) {
     for (const auto *stem : stems) {
         const auto mean_key = std::string{"mean_"} + stem;
         const auto std_key = std::string{"std_"} + stem;
-        // MAHIMA: Prefer ranges::find to match clang-tidy modernize-use-ranges elsewhere in this file.
+        // MAHIMA: Prefer ranges::find to match clang-tidy modernize-use-ranges elsewhere in this
+        // file.
         if (std::ranges::find(channels, mean_key) == channels.end()) {
             continue;
         }
