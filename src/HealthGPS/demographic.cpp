@@ -118,9 +118,11 @@ struct DemographicModuleLoadSummary {
     bool ethnicity_loaded{false};
     size_t ethnicity_age_groups{0};
     std::vector<std::string> ethnicity_names;
-    // MAHIMA: Education is assigned by Jacardi risk-factor models, not this module.
+    // MAHIMA: Education/employment assigned by Jacardi risk-factor models, not this module.
     bool education_required{false};
     bool education_in_mapping{false};
+    bool employment_required{false};
+    bool employment_in_mapping{false};
 };
 
 void print_demographic_module_load_summary(const DemographicModuleLoadSummary &summary) {
@@ -153,13 +155,25 @@ void print_demographic_module_load_summary(const DemographicModuleLoadSummary &s
         print_wrapped_list("  Ethnicities        : ", summary.ethnicity_names);
     }
 
-    // MAHIMA: Education is a JACARDI feature flag — assignment lives in JacardiModel*, not here.
+    // MAHIMA: Education/employment are JACARDI flags — assignment lives in JacardiModel*, not here.
     print_demographic_box_section("Education assignment");
     if (!summary.education_required) {
         print_demographic_box_row("  Status             : disabled (project_requirements)");
     } else if (!summary.education_in_mapping) {
         print_demographic_box_row(
             "  Status             : enabled, but Education missing from modelling.risk_factors");
+    } else {
+        print_demographic_box_row(
+            "  Status             : enabled (lifecycle via JacardiModel / JacardiModelUpdate)");
+    }
+
+    print_demographic_box_section("Employment assignment");
+    if (!summary.employment_required) {
+        print_demographic_box_row("  Status             : disabled (project_requirements)");
+    } else if (!summary.employment_in_mapping) {
+        print_demographic_box_row(
+            "  Status             : enabled, but Employment / EmploymentDetailed missing from "
+            "modelling.risk_factors");
     } else {
         print_demographic_box_row(
             "  Status             : enabled (lifecycle via JacardiModel / JacardiModelUpdate)");
@@ -180,6 +194,7 @@ struct DemographicPopulationInitSummary {
     bool ethnicity_data_ok{false};
     size_t ethnicity_prevalence_ages{0};
     bool education_enabled{false};
+    bool employment_enabled{false};
 };
 
 void print_demographic_population_init_summary(const DemographicPopulationInitSummary &summary) {
@@ -210,11 +225,15 @@ void print_demographic_population_init_summary(const DemographicPopulationInitSu
                                               summary.ethnicity_prevalence_ages));
     }
 
-    // MAHIMA: Education assignment is not done in DemographicModule; flag is informational.
+    // MAHIMA: Education/employment assignment is not done in DemographicModule; flags informational.
     print_demographic_box_row(
         summary.education_enabled
             ? "  Education          : enabled (via Jacardi risk-factor models)"
             : "  Education          : disabled");
+    print_demographic_box_row(
+        summary.employment_enabled
+            ? "  Employment         : enabled (via Jacardi risk-factor models)"
+            : "  Employment         : disabled");
 
     print_demographic_border();
     std::fflush(stdout);
@@ -348,6 +367,7 @@ void DemographicModule::initialise_population(RuntimeContext &context) {
     init_summary.ethnicity_data_ok = !ethnicity_prevalence_.empty();
     init_summary.ethnicity_prevalence_ages = ethnicity_prevalence_.size();
     init_summary.education_enabled = demographics_req.education;
+    init_summary.employment_enabled = demographics_req.employment;
     print_demographic_population_init_summary(init_summary);
     for (auto entry_count = 1; auto &entry : age_gender_dist) {
         auto num_males = static_cast<int>(std::round(pop_size * entry.second.males));
@@ -891,13 +911,22 @@ std::unique_ptr<DemographicModule> build_population_module(Repository &repositor
     load_summary.region_required = config.project_requirements().demographics.region;
     load_summary.ethnicity_required = config.project_requirements().demographics.ethnicity;
     load_summary.education_required = config.project_requirements().demographics.education;
-    // MAHIMA: Confirm Education is mapped so result CSVs get mean_Education / std_Education.
+    load_summary.employment_required = config.project_requirements().demographics.employment;
+    // MAHIMA: Confirm Education / Employment factors mapped for result CSV means.
+    bool has_education = false;
+    bool has_employment = false;
+    bool has_employment_detailed = false;
     for (const auto &entry : config.risk_mapping().entries()) {
         if (core::case_insensitive::equals(entry.name(), "Education")) {
-            load_summary.education_in_mapping = true;
-            break;
+            has_education = true;
+        } else if (core::case_insensitive::equals(entry.name(), "Employment")) {
+            has_employment = true;
+        } else if (core::case_insensitive::equals(entry.name(), "EmploymentDetailed")) {
+            has_employment_detailed = true;
         }
     }
+    load_summary.education_in_mapping = has_education;
+    load_summary.employment_in_mapping = has_employment && has_employment_detailed;
 
     const auto &region_data = repository.get_region_prevalence();
     if (!region_data.empty()) {

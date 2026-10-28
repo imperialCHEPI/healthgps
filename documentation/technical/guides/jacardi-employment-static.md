@@ -128,6 +128,7 @@ Births: missing until 19. Immigration clones: copy both ids; no redraw.
 | `jacardi_model.*` | After education Part A → employment Part A |
 | `jacardi_model_update.*` | After education Part B → employment Part B |
 | `model_parser.cpp` | Opt-in Education and/or Employment CSV slots |
+| `demographic.cpp` | Console Employment box when `project_requirements.demographics.employment` is true |
 | Schemas `jacardimodel*.json` | If a step is present, its filenames are required |
 
 ```json
@@ -181,6 +182,7 @@ cmake --build out/build/windows-release --target HealthGPS.Tests -j 8
 | Done | Wire after education in JacardiModel / Update |
 | Done | Gtests + check CSV fixture |
 | Done | Slovenia pack Employment JSON + CSVs |
+| Done | Console Employment assignment box (`project_requirements.demographics.employment`) |
 | Later | Yearly employment transitions (replace hold) |
 
 ### Out of scope for P1b
@@ -196,8 +198,9 @@ cmake --build out/build/windows-release --target HealthGPS.Tests -j 8
 1. `jacardi_model.json` → Employment `multinomial_static` + coefficients + recode
 2. `jacardi_model_update.json` → same Employment slots
 3. `modelling.risk_factors` lists `EmploymentDetailed` and `Employment`
-4. Coefs + recode CSVs on disk in the pack
-5. Education CSVs still present
+4. `project_requirements.demographics.employment`: `true` (console Employment assignment box)
+5. Coefs + recode CSVs on disk in the pack
+6. Education CSVs still present
 
 ---
 

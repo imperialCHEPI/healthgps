@@ -231,6 +231,9 @@ struct ProjectRequirements {
         /// MAHIMA: JACARDI education lifecycle (Person.risk_factors["Education"]).
         /// Optional in schema; default false so France/India/FINCH configs stay valid.
         bool education{false};
+        /// MAHIMA: JACARDI employment static (EmploymentDetailed 1–6 + Employment 1–4).
+        /// Optional; default false. Assignment via JacardiModel*, not DemographicModule.
+        bool employment{false};
         /// Optional. If set and > 0, cap age to this value in linear models (age/age2/age3). Else
         /// no cap.
         std::optional<int> max_age_for_linear_models;
