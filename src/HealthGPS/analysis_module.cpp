@@ -1065,10 +1065,11 @@ void mark_zero_missing_factor_means_as_missing(DataSeries &series) {
     for (const auto *stem : stems) {
         const auto mean_key = std::string{"mean_"} + stem;
         const auto std_key = std::string{"std_"} + stem;
-        if (std::find(channels.begin(), channels.end(), mean_key) == channels.end()) {
+        // MAHIMA: Prefer ranges::find to match clang-tidy modernize-use-ranges elsewhere in this file.
+        if (std::ranges::find(channels, mean_key) == channels.end()) {
             continue;
         }
-        const bool has_std = std::find(channels.begin(), channels.end(), std_key) != channels.end();
+        const bool has_std = std::ranges::find(channels, std_key) != channels.end();
 
         for (const auto gender : {core::Gender::male, core::Gender::female}) {
             mark_vec(series(gender, mean_key), has_std ? &series(gender, std_key) : nullptr);
