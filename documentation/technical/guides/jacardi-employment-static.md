@@ -128,6 +128,9 @@ Births: missing until 19. Immigration clones: copy both ids; no redraw.
 | `jacardi_model.*` | After education Part A → employment Part A |
 | `jacardi_model_update.*` | After education Part B → employment Part B |
 | `model_parser.cpp` | Opt-in Education and/or Employment CSV slots |
+| `demographic.cpp` | Console Employment box when `project_requirements.demographics.employment` is true |
+| `analysis_module.cpp` | `mean_employment` / `mean_employmentdetailed`; zero mean (ages 0–18) → NaN for CSV `NA` |
+| `result_file_writer.cpp` | Writes `NA` for non-finite CSV cells |
 | Schemas `jacardimodel*.json` | If a step is present, its filenames are required |
 
 ```json
@@ -148,6 +151,11 @@ Births: missing until 19. Immigration clones: copy both ids; no redraw.
 
 Shared `context.random()` is not thread-safe — person loops stay **serial**.
 
+| Output detail | Behaviour I ship |
+| ------------- | ---------------- |
+| Ages 0–18 | Both ids NaN on person; no finite contributors → CSV **`NA`** for mean/std |
+| Ages 19+ | Finite ids enter `mean_employment` / `mean_employmentdetailed`; real std `0` stays `0` |
+
 Older sketch (`logistic` + `employment_coefs.csv` + age²) is **outdated**.
 
 ---
@@ -157,6 +165,7 @@ Older sketch (`logistic` + `employment_coefs.csv` + age²) is **outdated**.
 | Suite | Covers |
 | ----- | ------ |
 | `JacardiEmployment` | RCS at 60; woman 19 edu 2 → p_5 ≈ 0.879; check CSV SCORE; missing/hold/recode |
+| `ResultFileWriter` | Zero mean → NaN for education + employment channels; CSV `NA` |
 | `Jacardi*` | Education + model runtime regression |
 
 SCORE tests read CSVs from **`healthgps-examples/Jacardi_Slovenia/`** (sibling checkout; override with
@@ -181,6 +190,8 @@ cmake --build out/build/windows-release --target HealthGPS.Tests -j 8
 | Done | Wire after education in JacardiModel / Update |
 | Done | Gtests + check CSV fixture |
 | Done | Slovenia pack Employment JSON + CSVs |
+| Done | Console Employment assignment box (`project_requirements.demographics.employment`) |
+| Done | Result CSV `NA` for under-19 employment means (shared with Education) |
 | Later | Yearly employment transitions (replace hold) |
 
 ### Out of scope for P1b
@@ -196,8 +207,9 @@ cmake --build out/build/windows-release --target HealthGPS.Tests -j 8
 1. `jacardi_model.json` → Employment `multinomial_static` + coefficients + recode
 2. `jacardi_model_update.json` → same Employment slots
 3. `modelling.risk_factors` lists `EmploymentDetailed` and `Employment`
-4. Coefs + recode CSVs on disk in the pack
-5. Education CSVs still present
+4. `project_requirements.demographics.employment`: `true` (console Employment assignment box)
+5. Coefs + recode CSVs on disk in the pack
+6. Education CSVs still present
 
 ---
 

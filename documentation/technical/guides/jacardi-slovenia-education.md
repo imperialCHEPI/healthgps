@@ -97,7 +97,7 @@ Births enter missing at age 0. Immigration clones copy Education; I do not redra
 | `jacardi_model.*` | Static slot — Part A generate / fill-missing update |
 | `jacardi_model_update.*` | Dynamic slot — Part B yearly |
 | `model_parser.cpp` `load_jacardi_*` | Load CSV slots (`draw_at_19`, upgrades) |
-| `demographic.cpp` | Console Education box when project_requirements says so |
+| `demographic.cpp` | Console Education (and Employment) box when project_requirements says so |
 | `analysis_module.cpp` | Means/std; skip non-finite; zero mean → NaN for CSV `NA` |
 | `result_file_writer.cpp` | Writes `NA` for non-finite CSV cells |
 
@@ -122,7 +122,7 @@ Shared `context.random()` is not thread-safe — education person loops stay **s
 | ---- | ----- | ------ |
 | `JacardiEducation.Test.cpp` | `JacardiEducation` | Missing 0–18, draw at 19, upgrades 20–30, never-down |
 | `JacardiModel.Test.cpp` | `JacardiModelParser` / `JacardiModelRuntime` | `draw_at_19` slot load; Part A/B runtime |
-| `ResultFileWriter.Test.cpp` | `ZeroEducation*` / `CsvWritesNa*` | Zero mean → NaN; CSV `NA` |
+| `ResultFileWriter.Test.cpp` | `ZeroMissingFactor*` / `CsvWritesNa*` | Zero mean → NaN (Education + Employment); CSV `NA` |
 
 ```powershell
 cmake --build out/build/windows-release --target HealthGPS.Tests -j 8

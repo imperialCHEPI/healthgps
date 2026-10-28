@@ -71,10 +71,13 @@ std::shared_ptr<hgps::ModelInput> create_demographic_test_input(hgps::core::Data
     project_requirements.demographics.region = true;
     project_requirements.demographics.ethnicity = true;
     project_requirements.demographics.education = true;
+    project_requirements.demographics.employment = true;
 
-    // MAHIMA: Education must be in mapping for the demographic box "enabled" path.
+    // MAHIMA: Education + Employment factors must be mapped for demographic box "enabled" path.
     auto mapping = HierarchicalMapping(std::vector<MappingEntry>{
         MappingEntry{"Education", 1},
+        MappingEntry{"EmploymentDetailed", 2},
+        MappingEntry{"Employment", 2},
     });
 
     const std::vector<core::DiseaseInfo> diseases;
@@ -113,6 +116,7 @@ TEST(DemographicSummary, ModuleLoadSummaryBox) {
     EXPECT_NE(output.find("region1"), std::string::npos);
     EXPECT_NE(output.find("Ethnicity assignment"), std::string::npos);
     EXPECT_NE(output.find("Education assignment"), std::string::npos);
+    EXPECT_NE(output.find("Employment assignment"), std::string::npos);
     EXPECT_NE(output.find("JacardiModel"), std::string::npos);
 }
 
@@ -138,6 +142,7 @@ TEST(DemographicSummary, PopulationInitAssignsRegionAndEthnicity) {
 
     EXPECT_NE(output.find("Demographic population init"), std::string::npos);
     EXPECT_NE(output.find("Education"), std::string::npos);
+    EXPECT_NE(output.find("Employment"), std::string::npos);
     for (const auto &person : context.population()) {
         EXPECT_FALSE(person.region.empty());
         EXPECT_FALSE(person.ethnicity.empty());

@@ -28,6 +28,10 @@
                     "type": "boolean",
                     "description": "Use education lifecycle (JACARDI: true; France/India/FINCH: omit or false). Assignment is via JacardiModel risk-factor models, not DemographicModule."
                 },
+                "employment": {
+                    "type": "boolean",
+                    "description": "Use employment static (JACARDI: true; others omit or false). Assigns EmploymentDetailed (1-6) and Employment (1-4) via JacardiModel / JacardiModelUpdate, not DemographicModule."
+                },
                 "max_age_for_linear_models": {
                     "type": "integer",
                     "minimum": 1,
