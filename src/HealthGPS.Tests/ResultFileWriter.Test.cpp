@@ -25,24 +25,41 @@ std::vector<std::string> read_lines(const std::filesystem::path &path) {
 }
 } // namespace
 
-// MAHIMA: mean_education 0 (ages 0-18, no finite ids) → NaN; real std=0 with mean 2 stays 0.
-TEST(ResultFileWriter, ZeroEducationMeanMarkedMissingKeepsRealStdZero) {
+// MAHIMA: mean_* == 0 (ages 0–18, no finite ids) → NaN; real std=0 with mean>0 stays 0.
+TEST(ResultFileWriter, ZeroMissingFactorMeansMarkedMissingKeepsRealStdZero) {
     using namespace hgps;
     using namespace hgps::core;
 
     DataSeries series(5u);
-    series.add_channels({"mean_education", "std_education"});
+    series.add_channels({"mean_education", "std_education", "mean_employment", "std_employment",
+                         "mean_employmentdetailed", "std_employmentdetailed"});
     series(Gender::male, "mean_education").at(3) = 0.0;
     series(Gender::male, "std_education").at(3) = 0.0;
     series(Gender::male, "mean_education").at(4) = 2.0;
     series(Gender::male, "std_education").at(4) = 0.0;
+    series(Gender::female, "mean_employment").at(3) = 0.0;
+    series(Gender::female, "std_employment").at(3) = 0.0;
+    series(Gender::female, "mean_employment").at(4) = 3.0;
+    series(Gender::female, "std_employment").at(4) = 0.0;
+    series(Gender::male, "mean_employmentdetailed").at(3) = 0.0;
+    series(Gender::male, "std_employmentdetailed").at(3) = 0.0;
+    series(Gender::male, "mean_employmentdetailed").at(4) = 5.0;
+    series(Gender::male, "std_employmentdetailed").at(4) = 0.0;
 
-    mark_zero_education_means_as_missing(series);
+    mark_zero_missing_factor_means_as_missing(series);
 
     EXPECT_TRUE(std::isnan(series(Gender::male, "mean_education").at(3)));
     EXPECT_TRUE(std::isnan(series(Gender::male, "std_education").at(3)));
     EXPECT_DOUBLE_EQ(2.0, series(Gender::male, "mean_education").at(4));
     EXPECT_DOUBLE_EQ(0.0, series(Gender::male, "std_education").at(4));
+    EXPECT_TRUE(std::isnan(series(Gender::female, "mean_employment").at(3)));
+    EXPECT_TRUE(std::isnan(series(Gender::female, "std_employment").at(3)));
+    EXPECT_DOUBLE_EQ(3.0, series(Gender::female, "mean_employment").at(4));
+    EXPECT_DOUBLE_EQ(0.0, series(Gender::female, "std_employment").at(4));
+    EXPECT_TRUE(std::isnan(series(Gender::male, "mean_employmentdetailed").at(3)));
+    EXPECT_TRUE(std::isnan(series(Gender::male, "std_employmentdetailed").at(3)));
+    EXPECT_DOUBLE_EQ(5.0, series(Gender::male, "mean_employmentdetailed").at(4));
+    EXPECT_DOUBLE_EQ(0.0, series(Gender::male, "std_employmentdetailed").at(4));
 }
 
 TEST(ResultFileWriter, CsvWritesNaForNonFiniteEducation) {

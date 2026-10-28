@@ -122,7 +122,7 @@ Shared `context.random()` is not thread-safe — education person loops stay **s
 | ---- | ----- | ------ |
 | `JacardiEducation.Test.cpp` | `JacardiEducation` | Missing 0–18, draw at 19, upgrades 20–30, never-down |
 | `JacardiModel.Test.cpp` | `JacardiModelParser` / `JacardiModelRuntime` | `draw_at_19` slot load; Part A/B runtime |
-| `ResultFileWriter.Test.cpp` | `ZeroEducation*` / `CsvWritesNa*` | Zero mean → NaN; CSV `NA` |
+| `ResultFileWriter.Test.cpp` | `ZeroMissingFactor*` / `CsvWritesNa*` | Zero mean → NaN (Education + Employment); CSV `NA` |
 
 ```powershell
 cmake --build out/build/windows-release --target HealthGPS.Tests -j 8

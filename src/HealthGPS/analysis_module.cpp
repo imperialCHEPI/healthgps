@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <array>
 #include <atomic>
 #include <cmath>
 #include <cstdint>
@@ -7,6 +8,7 @@
 #include <iostream>
 #include <limits>
 #include <oneapi/tbb/parallel_for_each.h>
+#include <string>
 #include <unordered_set>
 #include <utility>
 
@@ -1038,21 +1040,15 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
         calculate_income_based_population_statistics(context, series);
     }
 
-    // MAHIMA: Ages 0-18 Education skipped as NaN → mean stayed 0; map to NaN for CSV "NA".
-    mark_zero_education_means_as_missing(series);
+    // MAHIMA: Ages 0–18 Education/Employment skipped as NaN → mean stayed 0; map to NaN for CSV.
+    mark_zero_missing_factor_means_as_missing(series);
 }
 
-void mark_zero_education_means_as_missing(DataSeries &series) {
-    static constexpr auto mean_key = "mean_education";
-    static constexpr auto std_key = "std_education";
-    const bool has_mean = std::find(series.channels().begin(), series.channels().end(), mean_key) !=
-                          series.channels().end();
-    if (!has_mean) {
-        return;
-    }
-    const bool has_std = std::find(series.channels().begin(), series.channels().end(), std_key) !=
-                         series.channels().end();
+void mark_zero_missing_factor_means_as_missing(DataSeries &series) {
+    // MAHIMA: Channel stems match core::to_lower("mean_" + factor.name) from risk_mapping.
+    static constexpr std::array stems{"education", "employment", "employmentdetailed"};
     const double missing = std::numeric_limits<double>::quiet_NaN();
+    const auto &channels = series.channels();
 
     const auto mark_vec = [&](std::vector<double> &mean_vals, std::vector<double> *std_vals) {
         for (std::size_t i = 0; i < mean_vals.size(); ++i) {
@@ -1066,19 +1062,28 @@ void mark_zero_education_means_as_missing(DataSeries &series) {
         }
     };
 
-    for (const auto gender : {core::Gender::male, core::Gender::female}) {
-        mark_vec(series(gender, mean_key), has_std ? &series(gender, std_key) : nullptr);
-    }
+    for (const auto *stem : stems) {
+        const auto mean_key = std::string{"mean_"} + stem;
+        const auto std_key = std::string{"std_"} + stem;
+        if (std::find(channels.begin(), channels.end(), mean_key) == channels.end()) {
+            continue;
+        }
+        const bool has_std = std::find(channels.begin(), channels.end(), std_key) != channels.end();
 
-    for (const auto income : series.get_available_income_categories()) {
         for (const auto gender : {core::Gender::male, core::Gender::female}) {
-            if (!series.has_income_channel(gender, income, mean_key)) {
-                continue;
+            mark_vec(series(gender, mean_key), has_std ? &series(gender, std_key) : nullptr);
+        }
+
+        for (const auto income : series.get_available_income_categories()) {
+            for (const auto gender : {core::Gender::male, core::Gender::female}) {
+                if (!series.has_income_channel(gender, income, mean_key)) {
+                    continue;
+                }
+                mark_vec(series.at(gender, income, mean_key),
+                         has_std && series.has_income_channel(gender, income, std_key)
+                             ? &series.at(gender, income, std_key)
+                             : nullptr);
             }
-            mark_vec(series.at(gender, income, mean_key),
-                     has_std && series.has_income_channel(gender, income, std_key)
-                         ? &series.at(gender, income, std_key)
-                         : nullptr);
         }
     }
 }
