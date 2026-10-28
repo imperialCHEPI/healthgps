@@ -3,6 +3,8 @@
 #include "HealthGPS.Core/exception.h"
 #include "predictor_resolver.h"
 
+#include <fmt/format.h>
+
 namespace hgps {
 
 std::map<core::Identifier, std::function<double(const Person &)>> Person::current_dispatcher{
@@ -73,7 +75,17 @@ double Person::get_risk_factor_value(const core::Identifier &key) const {
     if (auto derived = resolve_derived_predictor(*this, key.to_string())) {
         return *derived;
     }
-    throw std::out_of_range("Risk factor not found: " + key.to_string());
+    // MAHIMA: Name the person and the likely cause. A bare "not found" forced line-by-line prints.
+    const char *sex = "unknown";
+    if (gender == core::Gender::male) {
+        sex = "male";
+    } else if (gender == core::Gender::female) {
+        sex = "female";
+    }
+    throw std::out_of_range(fmt::format(
+        "Risk factor not found: {}. It is not stored on this person (age {}, {}). "
+        "The input column may be entirely null, or the risk-factor model did not assign it.",
+        key.to_string(), age, sex));
 }
 
 float Person::gender_to_value() const { return gender_to_value(gender); }

@@ -2,6 +2,9 @@
 
 #include "HealthGPS/relative_risk.h"
 
+#include <stdexcept>
+#include <string>
+
 hgps::RelativeRiskLookup create_test_relative_risk_table() {
     using namespace hgps;
     using namespace hgps::core;
@@ -37,6 +40,34 @@ TEST(TestRelativeRiskLookup, CreateEmptyStorage) {
     ASSERT_EQ(1, lut.columns());
     ASSERT_EQ(1, lut.size());
     ASSERT_EQ(0, lut(0, 0));
+}
+
+TEST(TestRelativeRiskLookup, MissingAgeNamesTheAge) {
+    auto lut = create_test_relative_risk_table();
+    try {
+        (void)lut(6, 25.0f);
+        FAIL() << "age 6 is not a row in the test table";
+    } catch (const std::out_of_range &ex) {
+        const auto text = std::string{ex.what()};
+        EXPECT_NE(text.find("age 6"), std::string::npos);
+        EXPECT_NE(text.find("table ages"), std::string::npos);
+    }
+}
+
+TEST(TestRelativeRiskLookup, RequireRelativeRiskNamesTheFactor) {
+    using namespace hgps;
+    auto lut = create_test_relative_risk_table();
+    const core::Identifier bmi{"BMI"};
+    try {
+        (void)require_relative_risk(lut, bmi, 6, core::Gender::female, 27.5f);
+        FAIL() << "age 6 is not a row in the test table";
+    } catch (const std::out_of_range &ex) {
+        const auto text = std::string{ex.what()};
+        EXPECT_NE(text.find("bmi"), std::string::npos);
+        EXPECT_NE(text.find("age 6"), std::string::npos);
+        EXPECT_NE(text.find("female"), std::string::npos);
+        EXPECT_NE(text.find("27.5"), std::string::npos);
+    }
 }
 
 TEST(TestRelativeRiskLookup, ExactValueLookup) {

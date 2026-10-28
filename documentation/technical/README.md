@@ -22,6 +22,7 @@ Reach out if you need a code path, config walkthrough, or help debugging.
 | [JACARDI Slovenia education](guides/jacardi-slovenia-education.md) | Single SI education plan + guide: Part A/B, CSVs, output `NA`, tests, P1a/P1b boundary |
 | [JACARDI employment static](guides/jacardi-employment-static.md) | Single SI employment plan + guide: SCORE/DRAW/recode, Part A/B hold, wiring, tests |
 | [JACARDI Slovenia run fixes](guides/jacardi-slovenia-run-fixes.md) | BoD named columns, disease skip report (EXPECTED vs WARNING) |
+| [When a run stops](guides/failure-reporting.md) | Phase and exception text instead of a silent exit; `-T` minimum of 2 |
 
 ---
 
@@ -53,7 +54,8 @@ Engineering design notes for developers. Written as ordinary markdown plans (sum
 | Kevin Hall height/weight | [Height quintile plan](plans/height-csv-quintile-plan.md) | [Weight quintile plan](plans/weight-quintile-plan.md) |
 | Output / person IDs | [Individual ID tracking](plans/individual-id-tracking-csv-plan.md) | [Same person ID plan](plans/same-person-id-baseline-intervention-plan.md) |
 | What shipped in Feb 2026 | [Update report](guides/healthgps-update-report-2026-02-20.md) | [Performance notes](guides/performance-optimizations.md) |
-| JACARDI (7 countries / new pathway) | [JACARDI 7 countries implementation](plans/JACARDI-7-countries-implementation-plan.md) | [Slovenia education](guides/jacardi-slovenia-education.md) · [Employment static](guides/jacardi-employment-static.md) · [Slovenia run fixes](guides/jacardi-slovenia-run-fixes.md) · [Project requirements](plans/project-requirements-plan.md) · UKPDS plan (`JACARDI-UKPDS-healthGPS.md`, when on branch) |
+| JACARDI (7 countries / new pathway) | [JACARDI 7 countries implementation](plans/JACARDI-7-countries-implementation-plan.md) | [Slovenia education](guides/jacardi-slovenia-education.md) · [Employment static](guides/jacardi-employment-static.md) · [Slovenia run fixes](guides/jacardi-slovenia-run-fixes.md) · [When a run stops](guides/failure-reporting.md) · [Project requirements](plans/project-requirements-plan.md) · UKPDS plan (`JACARDI-UKPDS-healthGPS.md`, when on branch) |
+| Run exits with no message | [When a run stops](guides/failure-reporting.md) | [Performance guide](guides/performance-optimizations.md) |
 | Windows build / MSVC | [MSVC troubleshooting](../developer/msvc-windows-build-troubleshooting.md) | [Developer Guide](../developer/development.md) |
 
 ---

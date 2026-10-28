@@ -14,6 +14,7 @@ Docs for building Health-GPS, reading the architecture, and contributing.
 | [Windows MSVC / Ninja troubleshooting](msvc-windows-build-troubleshooting.md) | `cstdint`, `MSVCRTD.lib`, broken toolsets |
 | [GitHub Pages docs deploy troubleshooting](docs-deploy-troubleshooting.md) | Jekyll OK but Configure HealthGPS fails |
 | [GitHub Flow](github-flow.md) | Branching and pull requests |
+| [When a run stops](../technical/guides/failure-reporting.md) | Why the console now prints the failing step and the exception |
 
 ## If you are working on
 

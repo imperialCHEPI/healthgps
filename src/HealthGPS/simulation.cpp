@@ -2,6 +2,7 @@
 #include "HealthGPS.Core/thread_util.h"
 #include "HealthGPS.Core/univariate_summary.h"
 #include "converter.h"
+#include "failure_report.h"
 #include "info_message.h"
 #include "mtrandom.h"
 #include "static_linear_model.h"
@@ -9,11 +10,14 @@
 #include "univariate_visitor.h"
 
 #include <algorithm>
+#include <cstdio>
 #include <fmt/format.h>
 #include <iostream>
 #include <memory>
+#include <mutex>
 #include <oneapi/tbb/parallel_for_each.h>
 #include <stdexcept>
+#include <unordered_set>
 
 namespace { // anonymous namespace
 
@@ -132,6 +136,7 @@ void Simulation::fini(adevs::Time clock) {
 
 void Simulation::initialise_population() {
     /* Note: order is very important */
+    SimulationPhase phase{"initialise_population"};
 
     // Create virtual population
     const auto &inputs = context_.inputs();
@@ -143,35 +148,65 @@ void Simulation::initialise_population() {
 
     context_.reset_population(virtual_pop_size);
 
-    demographic_->initialise_population(context_);
-    ses_->initialise_population(context_);
-    risk_factor_->initialise_population(context_);
-    disease_->initialise_population(context_);
-    analysis_->initialise_population(context_);
-
-    print_initial_population_statistics();
+    {
+        SimulationPhase step{"demographic"};
+        demographic_->initialise_population(context_);
+    }
+    {
+        SimulationPhase step{"ses"};
+        ses_->initialise_population(context_);
+    }
+    {
+        SimulationPhase step{"risk_factor"};
+        risk_factor_->initialise_population(context_);
+    }
+    {
+        SimulationPhase step{"disease"};
+        disease_->initialise_population(context_);
+    }
+    {
+        SimulationPhase step{"analysis"};
+        analysis_->initialise_population(context_);
+    }
+    {
+        SimulationPhase step{"population summary"};
+        print_initial_population_statistics();
+    }
 }
 
 void Simulation::update_population() {
     /* Note: order is very important */
+    SimulationPhase phase{fmt::format("update_population year {}", context_.time_now())};
 
-    // update basic information: demographics + diseases
-    demographic_->update_population(context_, *disease_);
+    {
+        SimulationPhase step{"demographic"};
+        demographic_->update_population(context_, *disease_);
+    }
 
-    // Calculate the net immigration by gender and age, update the population accordingly
-    update_net_immigration();
+    {
+        SimulationPhase step{"net immigration"};
+        update_net_immigration();
+    }
 
-    // update population socio-economic status
-    ses_->update_population(context_);
+    {
+        SimulationPhase step{"ses"};
+        ses_->update_population(context_);
+    }
 
-    // Update population risk factors
-    risk_factor_->update_population(context_);
+    {
+        SimulationPhase step{"risk_factor"};
+        risk_factor_->update_population(context_);
+    }
 
-    // Update diseases status: remission and incidence
-    disease_->update_population(context_);
+    {
+        SimulationPhase step{"disease"};
+        disease_->update_population(context_);
+    }
 
-    // Publish results to data logger
-    analysis_->update_population(context_);
+    {
+        SimulationPhase step{"analysis"};
+        analysis_->update_population(context_);
+    }
 }
 
 void Simulation::update_net_immigration() {
@@ -378,8 +413,23 @@ void hgps::Simulation::print_initial_population_statistics() {
 
             try {
                 sim_summary[entry.name()].append(entity.get_risk_factor_value(entry.key()));
-            } catch (const std::exception &) {
-                // NOLINTNEXTLINE(bugprone-empty-catch) factor not present – skip
+            } catch (const std::exception &ex) {
+                // MAHIMA: Still skip the cell, but say which factor and why the first time.
+                static std::mutex reported_mutex;
+                static std::unordered_set<std::string> reported;
+                const auto factor_name = entry.name();
+                bool first = false;
+                {
+                    const std::lock_guard lock{reported_mutex};
+                    first = reported.insert(factor_name).second;
+                }
+                if (first) {
+                    fmt::print(stderr,
+                               "WARNING: simulated population is missing '{}' so that column is "
+                               "omitted from the summary. Reason: {}\n",
+                               factor_name, ex.what());
+                    std::fflush(stderr);
+                }
             }
         }
     }

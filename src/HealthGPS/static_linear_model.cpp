@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <cctype>
 #include <cmath>
+#include <cstdio>
 #include <fmt/core.h>
 #include <iomanip>
 #include <iostream>
@@ -23,6 +24,7 @@
 #include <syncstream>
 #include <tuple>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 
 namespace { // anonymous namespace
@@ -33,6 +35,29 @@ template <typename T> std::shared_ptr<T> create_shared_from_unique(std::unique_p
 }
 
 constexpr size_t k_trend_box_inner_width = 78;
+
+// MAHIMA: Optional expected-table probe. Print the lookup error once instead of catch (...) with no
+// text.
+template <typename Probe> bool probe_optional_lookup(Probe &&probe, std::string_view skipped_what) {
+    try {
+        std::forward<Probe>(probe)();
+        return true;
+    } catch (const std::exception &ex) {
+        static std::mutex seen_mutex;
+        static std::unordered_set<std::string> seen;
+        bool first = false;
+        {
+            const std::lock_guard lock{seen_mutex};
+            first = seen.insert(std::string{skipped_what}).second;
+        }
+        if (first) {
+            fmt::print(stderr, "WARNING: {} skipped because the lookup failed: {}\n", skipped_what,
+                       ex.what());
+            std::fflush(stderr);
+        }
+        return false;
+    }
+}
 
 std::mutex &trend_validation_console_mutex() {
     static std::mutex mutex;
@@ -761,12 +786,11 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
             req.physical_activity.enabled && req.physical_activity.adjust_to_factors_mean;
         bool pa_in_expected = false;
         if (adjust_pa) {
-            try {
-                get_expected(context, core::Gender::male, 0, pa_id, std::nullopt, false);
-                pa_in_expected = true;
-            } catch (...) {
-                pa_in_expected = false;
-            }
+            pa_in_expected = probe_optional_lookup(
+                [&] {
+                    (void)get_expected(context, core::Gender::male, 0, pa_id, std::nullopt, false);
+                },
+                "Physical activity adjustment (not in the expected table)");
         }
         const std::vector<core::Identifier> pa_only_factors{pa_id};
         const std::vector<core::DoubleInterval> pa_only_ranges =
@@ -912,12 +936,12 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
             bool adjust_pa = req.physical_activity.enabled && req.physical_activity.trended;
             bool pa_in_expected = false;
             if (adjust_pa) {
-                try {
-                    get_expected(context, core::Gender::male, 0, pa_id, std::nullopt, false);
-                    pa_in_expected = true;
-                } catch (...) {
-                    pa_in_expected = false;
-                }
+                pa_in_expected = probe_optional_lookup(
+                    [&] {
+                        (void)get_expected(context, core::Gender::male, 0, pa_id, std::nullopt,
+                                           false);
+                    },
+                    "Physical activity adjustment (not in the expected table)");
             }
             const std::vector<core::Identifier> pa_only_factors{pa_id};
             const std::vector<core::DoubleInterval> pa_only_ranges =
@@ -1070,12 +1094,11 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             req.physical_activity.enabled && req.physical_activity.adjust_to_factors_mean;
         bool pa_in_expected = false;
         if (adjust_pa) {
-            try {
-                get_expected(context, core::Gender::male, 0, pa_id, std::nullopt, false);
-                pa_in_expected = true;
-            } catch (...) {
-                pa_in_expected = false;
-            }
+            pa_in_expected = probe_optional_lookup(
+                [&] {
+                    (void)get_expected(context, core::Gender::male, 0, pa_id, std::nullopt, false);
+                },
+                "Physical activity adjustment (not in the expected table)");
         }
         const std::vector<core::Identifier> pa_only_factors{pa_id};
         const std::vector<core::DoubleInterval> pa_only_ranges =
@@ -1213,12 +1236,12 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             bool adjust_pa = req.physical_activity.enabled && req.physical_activity.trended;
             bool pa_in_expected = false;
             if (adjust_pa) {
-                try {
-                    get_expected(context, core::Gender::male, 0, pa_id, std::nullopt, false);
-                    pa_in_expected = true;
-                } catch (...) {
-                    pa_in_expected = false;
-                }
+                pa_in_expected = probe_optional_lookup(
+                    [&] {
+                        (void)get_expected(context, core::Gender::male, 0, pa_id, std::nullopt,
+                                           false);
+                    },
+                    "Physical activity adjustment (not in the expected table)");
             }
             const std::vector<core::Identifier> pa_only_factors{pa_id};
             const std::vector<core::DoubleInterval> pa_only_ranges =
@@ -1808,24 +1831,32 @@ StaticLinearModel::compute_linear_models(RuntimeContext &context, Person &person
             double expected_value = get_expected(context, person.gender, person.age,
                                                  coefficient_name, std::nullopt, false);
             return expected_value;
-        } catch (...) {
+        } catch (const std::exception &ex) {
+            // MAHIMA: The caller still treats this as "no fallback", but the first miss is visible.
+            static std::once_flag once;
+            std::call_once(once, [&] {
+                fmt::print(stderr,
+                           "WARNING: missing-predictor fallback could not read the expected table "
+                           "for '{}': {}\n",
+                           coefficient_name.to_string(), ex.what());
+                std::fflush(stderr);
+            });
             return std::nullopt;
         }
     };
 
     for (size_t i = 0; i < names_.size(); i++) {
         if (i >= models.size()) {
-            std::cout << "\nERROR: compute_linear_models - Index " << i
-                      << " is out of bounds for models vector of size " << models.size();
-            continue;
+            throw std::out_of_range(fmt::format(
+                "Linear model index {} is outside the model list of size {}.", i, models.size()));
         }
 
         try {
             linear.emplace_back(evaluate_linear_model(person, models[i], options));
         } catch (const std::exception &e) {
-            std::cout << "\n[MISSING_FACTOR] Factor missing for model " << names_[i].to_string()
-                      << " (i=" << i << ") - " << e.what();
-            throw;
+            throw std::runtime_error(
+                fmt::format("Linear model for factor '{}' failed (index {} of {}): {}",
+                            names_[i].to_string(), i, models.size(), e.what()));
         }
     }
 
@@ -2323,22 +2354,29 @@ StaticLinearModel::build_extended_factors_list(RuntimeContext &context,
     bool add_income =
         for_trended_adjustment ? req.income.trended : req.income.adjust_to_factors_mean;
     if (!income_in_base && req.income.enabled && add_income) {
-        try {
-            get_expected(context, core::Gender::male, 0, income_id, std::nullopt, false);
+        const bool income_in_expected = probe_optional_lookup(
+            [&] {
+                (void)get_expected(context, core::Gender::male, 0, income_id, std::nullopt, false);
+            },
+            "Income factors-mean adjustment (not in the expected table)");
+        if (income_in_expected) {
             extended_factors.push_back(income_id);
             if (!base_ranges.empty()) {
                 extended_ranges.emplace_back(0.0, 1e9); // no effective clamp for continuous income
             }
-        } catch (...) {
-            // Income not in expected table - skip
         }
     }
 
     bool add_pa = for_trended_adjustment ? req.physical_activity.trended
                                          : req.physical_activity.adjust_to_factors_mean;
     if (!pa_in_base && req.physical_activity.enabled && add_pa) {
-        try {
-            get_expected(context, core::Gender::male, 0, PhysicalActivity_id, std::nullopt, false);
+        const bool pa_in_expected = probe_optional_lookup(
+            [&] {
+                (void)get_expected(context, core::Gender::male, 0, PhysicalActivity_id,
+                                   std::nullopt, false);
+            },
+            "Physical activity factors-mean adjustment (not in the expected table)");
+        if (pa_in_expected) {
             extended_factors.push_back(PhysicalActivity_id);
             if (!base_ranges.empty()) {
                 const auto pa_range = get_physical_activity_mapping_range(context);
@@ -2348,8 +2386,6 @@ StaticLinearModel::build_extended_factors_list(RuntimeContext &context,
                     extended_ranges.push_back(base_ranges.back());
                 }
             }
-        } catch (...) {
-            // Physical activity not in expected table - skip
         }
     }
 

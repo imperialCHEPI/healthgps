@@ -1,4 +1,6 @@
 #include "riskfactor.h"
+#include "failure_report.h"
+
 #include <iostream>
 
 namespace hgps {
@@ -44,28 +46,21 @@ RiskFactorModel &RiskFactorModule::at(const RiskFactorModelType &model_type) con
 
 void RiskFactorModule::initialise_population(RuntimeContext &context) {
     if (!models_.contains(RiskFactorModelType::Static)) {
-        std::cout << " ERROR: Static model not found!";
-        throw std::runtime_error("Static model not found in RiskFactorModule");
+        throw std::runtime_error("Static risk-factor model is missing from RiskFactorModule.");
     }
-    try {
-        auto &static_model = models_.at(RiskFactorModelType::Static);
-        static_model->generate_risk_factors(context);
-    } catch (const std::exception &e) {
-        std::cout << " ERROR: Exception in static model: " << e.what();
-        throw;
+    {
+        // MAHIMA: Phase name is printed if generate_risk_factors throws (for example a missing
+        // BMI).
+        SimulationPhase step{"static risk-factor model"};
+        models_.at(RiskFactorModelType::Static)->generate_risk_factors(context);
     }
 
     if (!models_.contains(RiskFactorModelType::Dynamic)) {
-        std::cout << " ERROR: Dynamic model not found!";
-        throw std::runtime_error("Dynamic model not found in RiskFactorModule");
+        throw std::runtime_error("Dynamic risk-factor model is missing from RiskFactorModule.");
     }
-
-    try {
-        auto &dynamic_model = models_.at(RiskFactorModelType::Dynamic);
-        dynamic_model->generate_risk_factors(context);
-    } catch (const std::exception &e) {
-        std::cout << " ERROR: Exception in dynamic model: " << e.what();
-        throw;
+    {
+        SimulationPhase step{"dynamic risk-factor model"};
+        models_.at(RiskFactorModelType::Dynamic)->generate_risk_factors(context);
     }
 }
 
