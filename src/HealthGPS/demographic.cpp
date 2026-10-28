@@ -225,7 +225,8 @@ void print_demographic_population_init_summary(const DemographicPopulationInitSu
                                               summary.ethnicity_prevalence_ages));
     }
 
-    // MAHIMA: Education/employment assignment is not done in DemographicModule; flags informational.
+    // MAHIMA: Education/employment assignment is not done in DemographicModule; flags
+    // informational.
     print_demographic_box_row(
         summary.education_enabled
             ? "  Education          : enabled (via Jacardi risk-factor models)"
