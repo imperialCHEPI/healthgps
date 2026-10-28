@@ -1,6 +1,7 @@
 #include "default_disease_model.h"
 #include "HealthGPS.Input/pif_data.h"
 #include "person.h"
+#include "relative_risk.h"
 #include "runtime_context.h"
 
 #include <cmath>
@@ -172,7 +173,8 @@ double DefaultDiseaseModel::calculate_relative_risk_for_risk_factors(const Perso
         if (!rr_table.contains(person.gender)) {
             continue;
         }
-        relative_risk *= rr_table.at(person.gender)(person.age, factor_value_adjusted);
+        relative_risk *= require_relative_risk(rr_table.at(person.gender), factor_name, person.age,
+                                               person.gender, factor_value_adjusted);
     }
 
     return relative_risk;

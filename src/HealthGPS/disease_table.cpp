@@ -4,6 +4,38 @@
 #include <stdexcept>
 #include <utility>
 
+namespace {
+
+const char *sex_label(hgps::core::Gender gender) noexcept {
+    switch (gender) {
+    case hgps::core::Gender::male:
+        return "male";
+    case hgps::core::Gender::female:
+        return "female";
+    default:
+        return "unknown";
+    }
+}
+
+// MAHIMA: map::at says "invalid map key". Name the disease, age, and sex instead.
+template <typename Table>
+auto &measure_at(Table &data, const hgps::core::DiseaseInfo &info, int age,
+                 hgps::core::Gender gender) {
+    const auto age_it = data.find(age);
+    if (age_it == data.end()) {
+        throw std::out_of_range(fmt::format("Disease '{}' has no row for age {}.",
+                                            info.code.to_string(), age));
+    }
+    const auto sex_it = age_it->second.find(gender);
+    if (sex_it == age_it->second.end()) {
+        throw std::out_of_range(fmt::format("Disease '{}' has no {} row at age {}.",
+                                            info.code.to_string(), sex_label(gender), age));
+    }
+    return sex_it->second;
+}
+
+} // namespace
+
 namespace hgps {
 /* --------------------   Disease Measure Implementation ----------------- */
 
@@ -11,9 +43,16 @@ DiseaseMeasure::DiseaseMeasure(std::map<int, double> measures) : measures_{std::
 
 std::size_t DiseaseMeasure::size() const noexcept { return measures_.size(); }
 
-double DiseaseMeasure::at(const int measure_id) const { return measures_.at(measure_id); }
+double DiseaseMeasure::at(const int measure_id) const {
+    const auto it = measures_.find(measure_id);
+    if (it == measures_.end()) {
+        throw std::out_of_range(
+            fmt::format("Disease row has no measure id {}.", measure_id));
+    }
+    return it->second;
+}
 
-double DiseaseMeasure::operator[](const int measure_id) const { return measures_.at(measure_id); }
+double DiseaseMeasure::operator[](const int measure_id) const { return at(measure_id); }
 
 /* --------------------   Disease Table Implementation ----------------- */
 
@@ -116,16 +155,23 @@ std::string DiseaseTable::describe_prevalence_skip_coverage() const {
 
 const std::map<std::string, int> &DiseaseTable::measures() const noexcept { return measures_; }
 
-int DiseaseTable::at(const std::string &measure) const { return measures_.at(measure); }
+int DiseaseTable::at(const std::string &measure) const {
+    const auto it = measures_.find(measure);
+    if (it == measures_.end()) {
+        throw std::out_of_range(fmt::format("Disease '{}' table has no '{}' measure column.",
+                                            info_.code.to_string(), measure));
+    }
+    return it->second;
+}
 
-int DiseaseTable::operator[](const std::string &measure) const { return measures_.at(measure); }
+int DiseaseTable::operator[](const std::string &measure) const { return at(measure); }
 
 DiseaseMeasure &DiseaseTable::operator()(const int age, const core::Gender gender) {
-    return data_.at(age).at(gender);
+    return measure_at(data_, info_, age, gender);
 }
 
 const DiseaseMeasure &DiseaseTable::operator()(const int age, const core::Gender gender) const {
-    return data_.at(age).at(gender);
+    return measure_at(data_, info_, age, gender);
 }
 
 } // namespace hgps

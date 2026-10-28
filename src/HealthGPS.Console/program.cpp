@@ -6,6 +6,7 @@
 #include "HealthGPS.Input/model_parser.h"
 #include "HealthGPS/api.h"
 #include "HealthGPS/event_bus.h"
+#include "HealthGPS/failure_report.h"
 #include "command_options.h"
 #include "event_monitor.h"
 #include "individual_id_tracking_writer.h"
@@ -15,6 +16,7 @@
 #include <fmt/color.h>
 
 #include <chrono>
+#include <cstdio>
 #include <cstdlib>
 #include <ctime>
 #include <oneapi/tbb/global_control.h>
@@ -76,6 +78,9 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
     using namespace hgps;
     using namespace hgps::input;
 
+    // MAHIMA: Covers noexcept violations and any exception that still escapes a worker.
+    install_failure_terminate_handler();
+
     // Create CLI options and validate minimum arguments
     auto options = create_options();
     if (argc < 2) {
@@ -92,8 +97,9 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
             return exit_application(EXIT_SUCCESS);
         }
     } catch (const std::exception &ex) {
-        fmt::print(fg(fmt::color::red), "\nInvalid command line argument: {}\n", ex.what());
+        report_failure(fmt::format("Invalid command line argument: {}", ex.what()));
         fmt::print("\n{}\n", options.help());
+        std::fflush(stdout);
         return exit_application(EXIT_FAILURE);
     }
 
@@ -114,16 +120,16 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
         config = get_configuration(cmd_args.config_source, cmd_args.output_folder, cmd_args.job_id,
                                    cmd_args.verbose);
     } catch (const std::exception &ex) {
-        fmt::print(fg(fmt::color::red), "\n\nInvalid configuration - {}.\n", ex.what());
+        report_failure(fmt::format("Invalid configuration - {}.", ex.what()));
         return exit_application(EXIT_FAILURE);
     }
 
     // Load input data file into a datatable asynchronous
     auto table_future = core::run_async(load_datatable_from_csv, config.file);
 
-#ifdef CATCH_EXCEPTIONS
+    // MAHIMA: Always report. Release-only CATCH_EXCEPTIONS used to rethrow, and the
+    // worker thread died before that handler ran, so the console returned with no reason.
     try {
-#endif
         // In future, we want users to supply the data source via the config file only, but for now
         // we also allow passing it via a command line argument. Sanity check: Make sure they only
         // do one of these things!
@@ -232,14 +238,13 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
         fmt::print(fg(fmt::color::light_green), "\nCompleted, elapsed time : {}ms\n\n", runtime);
         event_monitor.stop();
 
-#ifdef CATCH_EXCEPTIONS
     } catch (const std::exception &ex) {
-        fmt::print(fg(fmt::color::red), "\n\nFailed with message: {}.\n\n", ex.what());
-
-        // Rethrow exception so it can be handled by OS's default handler
-        throw;
+        report_failure(ex.what());
+        return exit_application(EXIT_FAILURE);
+    } catch (...) {
+        report_failure(format_unknown_failure(current_simulation_phase()));
+        return exit_application(EXIT_FAILURE);
     }
-#endif // CATCH_EXCEPTIONS
 
     return exit_application(EXIT_SUCCESS);
 }

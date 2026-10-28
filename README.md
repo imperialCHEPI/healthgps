@@ -120,7 +120,7 @@ First argument path: built executable HealthGPS.Console.exe.
 -T: number of threads TBB may use for parallel work (example: 2).
 If you omit -T, the model uses the maximum parallelism available on your machine (effectively up to the number of logical CPUs), subject to TBB defaults.
 
-NOTE: If you specify the number of threads, a minimum of 2 threads is required.
+NOTE: If you specify the number of threads, a minimum of 2 threads is required. `-T 1` now exits with that reason instead of stopping with no message. Other failures print the simulation step and the exception text. See [When a run stops](documentation/technical/guides/failure-reporting.md).
 
 Adjust the two paths to match where you built Health-GPS and where your `config.json` lives (e.g. PowerShell):
 
