@@ -15,9 +15,9 @@
 #include <iostream>
 #include <memory>
 #include <mutex>
-#include <unordered_set>
 #include <oneapi/tbb/parallel_for_each.h>
 #include <stdexcept>
+#include <unordered_set>
 
 namespace { // anonymous namespace
 

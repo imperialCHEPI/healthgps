@@ -49,7 +49,8 @@ void RiskFactorModule::initialise_population(RuntimeContext &context) {
         throw std::runtime_error("Static risk-factor model is missing from RiskFactorModule.");
     }
     {
-        // MAHIMA: Phase name is printed if generate_risk_factors throws (for example a missing BMI).
+        // MAHIMA: Phase name is printed if generate_risk_factors throws (for example a missing
+        // BMI).
         SimulationPhase step{"static risk-factor model"};
         models_.at(RiskFactorModelType::Static)->generate_risk_factors(context);
     }

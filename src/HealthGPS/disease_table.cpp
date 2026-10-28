@@ -23,8 +23,8 @@ auto &measure_at(Table &data, const hgps::core::DiseaseInfo &info, int age,
                  hgps::core::Gender gender) {
     const auto age_it = data.find(age);
     if (age_it == data.end()) {
-        throw std::out_of_range(fmt::format("Disease '{}' has no row for age {}.",
-                                            info.code.to_string(), age));
+        throw std::out_of_range(
+            fmt::format("Disease '{}' has no row for age {}.", info.code.to_string(), age));
     }
     const auto sex_it = age_it->second.find(gender);
     if (sex_it == age_it->second.end()) {
@@ -46,8 +46,7 @@ std::size_t DiseaseMeasure::size() const noexcept { return measures_.size(); }
 double DiseaseMeasure::at(const int measure_id) const {
     const auto it = measures_.find(measure_id);
     if (it == measures_.end()) {
-        throw std::out_of_range(
-            fmt::format("Disease row has no measure id {}.", measure_id));
+        throw std::out_of_range(fmt::format("Disease row has no measure id {}.", measure_id));
     }
     return it->second;
 }

@@ -120,8 +120,9 @@ double Runner::run(Simulation &baseline, Simulation &intervention, const unsigne
 
         std::exception_ptr baseline_error;
         std::exception_ptr intervention_error;
-        auto base_worker = std::jthread(&Runner::run_model_thread, this, source_.get_token(),
-                                        std::ref(baseline), run, run_seed, std::ref(baseline_error));
+        auto base_worker =
+            std::jthread(&Runner::run_model_thread, this, source_.get_token(), std::ref(baseline),
+                         run, run_seed, std::ref(baseline_error));
 
         auto policy_worker =
             std::jthread(&Runner::run_model_thread, this, source_.get_token(),
@@ -170,9 +171,9 @@ void Runner::run_model_thread(const std::stop_token &token, Simulation &model, u
         }
 
         ElapsedTime elapsed = std::chrono::steady_clock::now() - run_start;
-        notify(std::make_unique<RunnerEventMessage>(
-            fmt::format("{} - {}", runner_id_, model.name()), RunnerAction::run_end, run,
-            elapsed.count()));
+        notify(
+            std::make_unique<RunnerEventMessage>(fmt::format("{} - {}", runner_id_, model.name()),
+                                                 RunnerAction::run_end, run, elapsed.count()));
     } catch (const std::exception &ex) {
         error = std::make_exception_ptr(
             std::runtime_error(format_failure(current_simulation_phase(), ex)));

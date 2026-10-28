@@ -36,9 +36,9 @@ template <typename T> std::shared_ptr<T> create_shared_from_unique(std::unique_p
 
 constexpr size_t k_trend_box_inner_width = 78;
 
-// MAHIMA: Optional expected-table probe. Print the lookup error once instead of catch (...) with no text.
-template <typename Probe>
-bool probe_optional_lookup(Probe &&probe, std::string_view skipped_what) {
+// MAHIMA: Optional expected-table probe. Print the lookup error once instead of catch (...) with no
+// text.
+template <typename Probe> bool probe_optional_lookup(Probe &&probe, std::string_view skipped_what) {
     try {
         std::forward<Probe>(probe)();
         return true;
@@ -1854,9 +1854,9 @@ StaticLinearModel::compute_linear_models(RuntimeContext &context, Person &person
         try {
             linear.emplace_back(evaluate_linear_model(person, models[i], options));
         } catch (const std::exception &e) {
-            throw std::runtime_error(fmt::format(
-                "Linear model for factor '{}' failed (index {} of {}): {}", names_[i].to_string(),
-                i, models.size(), e.what()));
+            throw std::runtime_error(
+                fmt::format("Linear model for factor '{}' failed (index {} of {}): {}",
+                            names_[i].to_string(), i, models.size(), e.what()));
         }
     }
 

@@ -86,9 +86,9 @@ float RelativeRiskLookup::lookup_value(const int age, const float value) const {
 
     const auto row_it = rows_index_.find(age);
     if (row_it == rows_index_.end()) {
-        throw std::out_of_range(fmt::format(
-            "Relative risk lookup has no row for age {} (table ages {} to {}).", age,
-            rows_index_.begin()->first, rows_index_.rbegin()->first));
+        throw std::out_of_range(
+            fmt::format("Relative risk lookup has no row for age {} (table ages {} to {}).", age,
+                        rows_index_.begin()->first, rows_index_.rbegin()->first));
     }
 
     const auto row_index = row_it->second;

@@ -49,7 +49,8 @@ void validate_requested_thread_count(std::size_t requested);
 /// @brief Write a failure banner and flush, so a crash cannot discard it.
 void report_failure(std::string_view message);
 
-/// @brief Last-resort printer for std::terminate (noexcept violations and escaped thread exceptions).
+/// @brief Last-resort printer for std::terminate (noexcept violations and escaped thread
+/// exceptions).
 void install_failure_terminate_handler();
 
 } // namespace hgps
