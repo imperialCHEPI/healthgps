@@ -28,7 +28,7 @@ For Linux:
 
 Output data will be written to a subfolder of your home directory, `healthgps/results/france`.
 
-Optional: validate a config without running trials: `HealthGPS.Console -c path/to/config.json --dry-run`. Limit CPU threads with `-T` (see [performance guide](../technical/guides/performance-optimizations.md)).
+Optional: validate a config without running trials: `HealthGPS.Console -c path/to/config.json --dry-run`. Limit CPU threads with `-T` (minimum 2 when set; see [performance guide](../technical/guides/performance-optimizations.md)). If a run stops, the console prints the step and the reason ([when a run stops](../technical/guides/failure-reporting.md)).
 
 ## Results
 

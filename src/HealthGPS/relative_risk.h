@@ -54,6 +54,11 @@ class RelativeRiskLookup {
     /// @throws std::out_of_range for row breakpoint value outside of the bounds.
     float operator()(const int age, const float value) const;
 
+    /// @brief True when the table has a row for this age.
+    /// @param age Row breakpoint to test.
+    /// @return true when age is a row in the table.
+    bool contains_age(const int age) const noexcept;
+
     /// @brief Checks if the lookup contains a value with specific breakpoints
     /// @param age The row value
     /// @param value The column value
@@ -74,6 +79,17 @@ using RelativeRiskTableMap = std::map<core::Identifier, FloatAgeGenderTable>;
 /// @brief Defines the relative risk factor lookup type
 using RelativeRiskLookupMap =
     std::map<core::Identifier, std::map<core::Gender, RelativeRiskLookup>>;
+
+/// @brief Read one relative-risk cell, or throw a message that names the factor, age, and sex.
+/// @param lookup Sex-specific relative-risk table.
+/// @param factor Risk-factor key (for example BMI).
+/// @param age Person age.
+/// @param gender Person sex.
+/// @param value Risk-factor value used for the column lookup.
+/// @return Relative risk multiplier.
+/// @throws std::out_of_range when the table has no row for age, or the table is empty.
+float require_relative_risk(const RelativeRiskLookup &lookup, const core::Identifier &factor,
+                            int age, core::Gender gender, float value);
 
 /// @brief Defines the relative risk factors data type
 struct RelativeRisk {

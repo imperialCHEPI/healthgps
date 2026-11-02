@@ -1,9 +1,11 @@
 #include "disease.h"
 #include "disease_registry.h"
+#include "failure_report.h"
 #include "lms_model.h"
 #include "weight_model.h"
 
 #include <fmt/color.h>
+#include <fmt/format.h>
 #include <oneapi/tbb/parallel_for_each.h>
 #include <string>
 
@@ -50,20 +52,27 @@ void DiseaseModule::initialise_population(RuntimeContext &context) {
     fmt::print("\n");
 
     for (auto &model : models_) {
+        // MAHIMA: The phase name is what the failure banner prints if this disease throws.
+        SimulationPhase phase{
+            fmt::format("initialise_disease_status '{}'", model.first.to_string())};
         model.second->initialise_disease_status(context);
     }
 
     for (auto &model : models_) {
+        SimulationPhase phase{
+            fmt::format("initialise_average_relative_risk '{}'", model.first.to_string())};
         model.second->initialise_average_relative_risk(context);
     }
 
     for (auto &model : models_) {
+        SimulationPhase phase{fmt::format("update_disease_status '{}'", model.first.to_string())};
         model.second->update_disease_status(context);
     }
 }
 
 void DiseaseModule::update_population(RuntimeContext &context) {
     for (auto &model : models_) {
+        SimulationPhase phase{fmt::format("update_disease_status '{}'", model.first.to_string())};
         model.second->update_disease_status(context);
     }
 }

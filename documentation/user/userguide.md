@@ -728,7 +728,7 @@ For instructions on how to install and run *Health GPS*, see [Quick Start](getst
 | `--storage` | `-s` | Deprecated override for datastore root; use `data.source` in config instead |
 | `--output` | `-o` | Override output folder from config |
 | `--jobid` | `-j` | Batch / array job index appended to output file names |
-| `--threads` | `-T` | Cap TBB threads (`0` = no cap). See [performance guide](../technical/guides/performance-optimizations.md) |
+| `--threads` | `-T` | Cap TBB threads (`0` = no cap, minimum `2` when set). See [performance guide](../technical/guides/performance-optimizations.md) and [when a run stops](../technical/guides/failure-reporting.md) |
 | `--dry-run` | | Validate inputs and exit without running trials |
 | `--verbose` | | Extra logging |
 

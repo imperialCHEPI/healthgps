@@ -308,6 +308,7 @@ All project docs live under `documentation/`. Start at [README.md](README.md).
 - FINCH / Kevin Hall inputs -> [FINCH linear models guide](technical/guides/finch-linear-models-and-income-adjustment.md)
 - What changed in 2026 -> [Update report](technical/guides/healthgps-update-report-2026-02-20.md)
 - Threading and HPC sizing -> [Performance guide](technical/guides/performance-optimizations.md)
+- Run stopped with no message -> [When a run stops](technical/guides/failure-reporting.md)
 - Building from source -> [Developer Guide](developer/development.md)
 - Software design / C++ architecture -> [Software & Architecture](developer/architecture.md)
 - Per-person baseline vs intervention output -> [User Guide - Output](user/userguide.md#output)

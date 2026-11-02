@@ -37,7 +37,7 @@ HealthGPS.Console -c path/to/config.json -T 64
 ```
 
 - **`0`** (default): no explicit cap; TBB may use all visible CPU cores on the node.
-- **Positive value**: sets `tbb::global_control::max_allowed_parallelism` in `src/HealthGPS.Console/program.cpp`.
+- **Positive value**: sets `tbb::global_control::max_allowed_parallelism` in `src/HealthGPS.Console/program.cpp`. The minimum when a cap is set is **2**. `-T 1` exits immediately and prints why. See [When a run stops](failure-reporting.md).
 
 On HPC, request **`ncpus`** in PBS (or your scheduler) to match what you pass to `-T`. Requesting 256 cores but limiting to 64 wastes queue priority; requesting 8 cores and omitting `-T` can oversubscribe the allocation.
 

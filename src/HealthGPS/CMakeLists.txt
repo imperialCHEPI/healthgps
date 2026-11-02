@@ -46,6 +46,8 @@ target_sources(
             "error_message.h"
             "event_bus.cpp"
             "event_bus.h"
+            "failure_report.cpp"
+            "failure_report.h"
             "event_subscriber.cpp"
             "fiscal_scenario.cpp"
             "fiscal_scenario.h"

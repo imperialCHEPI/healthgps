@@ -30,6 +30,8 @@ Console strings use ASCII `-` only (UTF-8 em dash shows as `ÔÇö` on some Wind
 
 Per-person skips use `DiseaseTable::contains(age, gender)`. Regression: `TestHealthGPS_Disease.PrevalenceSkipCoverage*`.
 
+If the process then returns to the shell with no further line, the failure is reported with the disease step and the exception text. See [When a run stops](failure-reporting.md).
+
 ```mermaid
 flowchart TD
   Init[DiseaseModule::initialise_population]

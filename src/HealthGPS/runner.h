@@ -3,6 +3,7 @@
 #include "simulation.h"
 
 #include <atomic>
+#include <exception>
 #include <functional>
 #include <memory>
 #include <stop_token>
@@ -36,6 +37,7 @@ class Runner {
     /// @param trial_runs Experiment number of runs
     /// @return The experiment total elapsed time, in milliseconds
     /// @throws std::invalid_argument for non-baseline scenario type or negative number of runs.
+    /// @throws std::runtime_error when the simulation thread stops, with the phase and reason.
     double run(Simulation &baseline, const unsigned int trial_runs);
 
     /// @brief Run an experiment for baseline and intervention scenarios
@@ -44,6 +46,7 @@ class Runner {
     /// @param trial_runs Experiment number of runs
     /// @return The experiment total elapsed time, in milliseconds
     /// @throws std::invalid_argument for scenario type mismatch or negative number of runs.
+    /// @throws std::runtime_error when a simulation thread stops, with the phase and reason.
     double run(Simulation &baseline, Simulation &intervention, const unsigned int trial_runs);
 
     /// @brief Gets a value indicating whether an experiment is current running.
@@ -61,7 +64,7 @@ class Runner {
     std::string runner_id_{};
 
     void run_model_thread(const std::stop_token &token, Simulation &model, unsigned int run,
-                          unsigned int seed);
+                          unsigned int seed, std::exception_ptr &error);
 
     void notify(std::unique_ptr<hgps::EventMessage> message);
 };

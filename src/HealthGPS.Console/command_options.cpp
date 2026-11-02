@@ -1,4 +1,5 @@
 #include "command_options.h"
+#include "HealthGPS/failure_report.h"
 #include "version.h"
 
 #include <fmt/color.h>
@@ -20,7 +21,7 @@ cxxopts::Options create_options() {
         ("dry-run",  "Check the input files without running a simulation",
             cxxopts::value<bool>()->default_value("false"))
         ("o,output", "Path to output folder", cxxopts::value<std::string>())
-        ("T,threads", "The maximum number of threads to create (0: no limit, default).",
+        ("T,threads", "Maximum TBB threads. 0 means no cap. Minimum is 2 when set.",
             cxxopts::value<size_t>())
         ("verbose", "Print more information about progress",
             cxxopts::value<bool>()->default_value("false"))
@@ -93,6 +94,8 @@ std::optional<CommandOptions> parse_arguments(cxxopts::Options &options, int arg
 
     if (result.count("threads")) {
         cmd.num_threads = result["threads"].as<size_t>();
+        // MAHIMA: Reject -T 1 here so the process exits with a reason instead of hanging.
+        validate_requested_thread_count(cmd.num_threads);
     }
 
     return cmd;

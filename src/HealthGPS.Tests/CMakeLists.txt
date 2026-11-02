@@ -31,6 +31,7 @@ target_sources(
             "Repository.Test.cpp"
             "DiseaseModels.Test.cpp"
             "EventAggregator.Test.cpp"
+            "FailureReport.Test.cpp"
             "Simulation.Test.cpp"
             "HierarchicalMapping.Test.cpp"
             "JsonParser.Test.cpp"
