@@ -403,18 +403,18 @@ Whether income and physical activity are adjusted to factors mean for **India** 
 
 The following test files were updated or added to cover the integrated behaviour:
 
-| Test file                                                                                | Coverage area                          |
+| Test file | Coverage area |
 | ---------------------------------------------------------------------------------------- | -------------------------------------- |
-| [Population.Test.cpp](../../../src/HealthGPS.Tests/Population.Test.cpp)                           | Person ID assignment                   |
-| [ConfigSchemaExpanded.Test.cpp](../../../src/HealthGPS.Tests/ConfigSchemaExpanded.Test.cpp)       | Extended config/schema                 |
-| [RepositoryPIF.Test.cpp](../../../src/HealthGPS.Tests/RepositoryPIF.Test.cpp)                     | PIF data loading                       |
-| [PIFIntegration.Test.cpp](../../../src/HealthGPS.Tests/PIFIntegration.Test.cpp)                   | PIF integration                        |
-| [PIFData.Test.cpp](../../../src/HealthGPS.Tests/PIFData.Test.cpp)                                 | PIF data structures                    |
-| [DiseaseModelPIF.Test.cpp](../../../src/HealthGPS.Tests/DiseaseModelPIF.Test.cpp)                 | Disease + PIF                          |
-| [DataManagerPIF.Test.cpp](../../../src/HealthGPS.Tests/DataManagerPIF.Test.cpp)                   | Data manager PIF                       |
-| [ConfigurationPIF.Test.cpp](../../../src/HealthGPS.Tests/ConfigurationPIF.Test.cpp)               | Config PIF options                     |
-| [Simulation.Test.cpp](../../../src/HealthGPS.Tests/Simulation.Test.cpp)                           | Simulation integration (where touched) |
-| [PredictorResolver.Test.cpp](../../../src/HealthGPS.Tests/PredictorResolver.Test.cpp)             | Predictor naming and `gender2`         |
+| [Population.Test.cpp](../../../src/HealthGPS.Tests/Population.Test.cpp) | Person ID assignment |
+| [ConfigSchemaExpanded.Test.cpp](../../../src/HealthGPS.Tests/ConfigSchemaExpanded.Test.cpp) | Extended config/schema |
+| [RepositoryPIF.Test.cpp](../../../src/HealthGPS.Tests/RepositoryPIF.Test.cpp) | PIF data loading |
+| [PIFIntegration.Test.cpp](../../../src/HealthGPS.Tests/PIFIntegration.Test.cpp) | PIF integration |
+| [PIFData.Test.cpp](../../../src/HealthGPS.Tests/PIFData.Test.cpp) | PIF data structures |
+| [DiseaseModelPIF.Test.cpp](../../../src/HealthGPS.Tests/DiseaseModelPIF.Test.cpp) | Disease + PIF |
+| [DataManagerPIF.Test.cpp](../../../src/HealthGPS.Tests/DataManagerPIF.Test.cpp) | Data manager PIF |
+| [ConfigurationPIF.Test.cpp](../../../src/HealthGPS.Tests/ConfigurationPIF.Test.cpp) | Config PIF options |
+| [Simulation.Test.cpp](../../../src/HealthGPS.Tests/Simulation.Test.cpp) | Simulation integration (where touched) |
+| [PredictorResolver.Test.cpp](../../../src/HealthGPS.Tests/PredictorResolver.Test.cpp) | Predictor naming and `gender2` |
 | [IncomeStratumAdjustment.Test.cpp](../../../src/HealthGPS.Tests/IncomeStratumAdjustment.Test.cpp) | Income-stratum factors-mean adjustment |
 
 Example runs and configuration: [quick start](../../user/getstarted.md).

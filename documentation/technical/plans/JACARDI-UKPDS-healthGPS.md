@@ -586,7 +586,7 @@ flowchart LR
 #### Diagram name → Git branch mapping
 
 | Diagram branch ID | Real Git branch |
-|---|---|
+| --- | --- |
 | `ukpds_scaffold` | `jacardi/ukpds-scaffold` |
 | `ukpds_data` | `jacardi/ukpds-data` |
 | `ukpds_config` | `jacardi/ukpds-config` |
