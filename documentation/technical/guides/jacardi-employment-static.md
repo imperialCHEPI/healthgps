@@ -10,6 +10,8 @@ Partner source in the examples pack: `EMPLOYMENT_STATIC_ALGORITHM.md`. Keep all 
 
 **Status:** P1b static **done** (engine + tests). Yearly employment transitions still pending (Part B hold is temporary).
 
+A local screen sample of Education, EmploymentDetailed, and Employment after Part A, plus counts and percent by age band and sex, is in [Slovenia education, section 8](jacardi-slovenia-education.md#8-local-screen-check-do-not-merge). That print is for debugging and should not be merged to main.
+
 ---
 
 ## 1. Where employment sits

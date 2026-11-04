@@ -9,6 +9,8 @@
 
 namespace hgps {
 
+class Population;
+
 /// MAHIMA: JACARDI static / init pathway (`ModelName`: JacardiModel).
 /// Opt-in ladder: Education and/or Employment. Employment runs after Education.
 class JacardiModel final : public RiskFactorModel {
@@ -32,6 +34,11 @@ class JacardiModel final : public RiskFactorModel {
     std::shared_ptr<const EducationLifecycleTables> education_;
     std::shared_ptr<const EmploymentStaticTables> employment_;
 };
+
+/// DEBUG local (do not merge). One male and one female from age bands 0-18, 19-30, 31-64, 65+,
+/// then counts and percent of each Education, EmploymentDetailed, and Employment id in that
+/// band and sex. Start-year Part A only.
+[[nodiscard]] std::string format_education_employment_sample(const Population &population);
 
 class JacardiModelDefinition final : public RiskFactorModelDefinition {
   public:
