@@ -8,6 +8,7 @@
 #include "HealthGPS/jacardi_education_lifecycle.h"
 #include "HealthGPS/jacardi_model.h"
 #include "HealthGPS/jacardi_model_update.h"
+#include "HealthGPS/population.h"
 
 #include <cmath>
 #include <filesystem>
@@ -275,4 +276,65 @@ TEST(JacardiModelRuntime, DynamicUpdateAppliesPartB) {
     EXPECT_DOUBLE_EQ(4.0, get_person_education(context.population()[2]));
     EXPECT_DOUBLE_EQ(4.0, get_person_education(context.population()[3]));
     EXPECT_EQ("JacardiModel", static_model->name());
+}
+
+TEST(JacardiModel, EducationEmploymentSampleCoversAgeBands) {
+    Population population{4};
+    population[0].gender = core::Gender::male;
+    population[0].age = 10;
+    population[1].gender = core::Gender::female;
+    population[1].age = 40;
+    set_person_education(population[1], 5.0);
+    set_person_employment(population[1],
+                          EmploymentStaticTables::Assignment{.detailed_id = 2.0, .cat4_id = 1.0});
+    population[2].gender = core::Gender::male;
+    population[2].age = 70;
+    set_person_education(population[2], 7.0);
+    set_person_employment(population[2],
+                          EmploymentStaticTables::Assignment{.detailed_id = 6.0, .cat4_id = 4.0});
+    population[3].gender = core::Gender::unknown;
+    population[3].age = 25;
+    set_person_education(population[3], 3.0);
+
+    const auto text = format_education_employment_sample(population);
+    EXPECT_NE(text.find("DEBUG local (do not merge)"), std::string::npos);
+    EXPECT_NE(text.find("missing"), std::string::npos);
+    EXPECT_NE(text.find("40"), std::string::npos);
+    EXPECT_NE(text.find("5"), std::string::npos);
+    EXPECT_EQ(text.find("25"), std::string::npos);
+    EXPECT_NE(text.find("skipped unknown gender: 1"), std::string::npos);
+
+    const auto education = text.find("Education counts");
+    const auto detailed = text.find("EmploymentDetailed counts");
+    const auto employment = text.find("Employment counts");
+    ASSERT_NE(education, std::string::npos);
+    ASSERT_LT(education, detailed);
+    ASSERT_LT(detailed, employment);
+    const auto education_block = text.substr(education, detailed - education);
+    const auto detailed_block = text.substr(detailed, employment - detailed);
+
+    // No one in 19-30, so that band is omitted. Age 10 male is 100% education-missing.
+    EXPECT_EQ(education_block.find("19-30"), std::string::npos);
+    const auto young = education_block.find("0-18");
+    ASSERT_NE(young, std::string::npos);
+    const auto young_end = education_block.find('\n', young);
+    const auto young_line = education_block.substr(young, young_end - young);
+    EXPECT_NE(young_line.find("1 (100.0%)"), std::string::npos) << young_line;
+
+    // Age 40 female, education 5. Columns: missing, 1, 2, 3, 4, then 5 at 100%.
+    const auto mid = education_block.find("31-64");
+    ASSERT_NE(mid, std::string::npos);
+    const auto mid_end = education_block.find('\n', mid);
+    const auto mid_line = education_block.substr(mid, mid_end - mid);
+    EXPECT_NE(mid_line.find("0 (0.0%) |     0 (0.0%) |     0 (0.0%) |     0 (0.0%) |     "
+                            "0 (0.0%) |   1 (100.0%)"),
+              std::string::npos)
+        << mid_line;
+
+    // Age 70 male, detailed id 6, then other is 0%.
+    const auto older = detailed_block.find("65+");
+    ASSERT_NE(older, std::string::npos);
+    const auto older_end = detailed_block.find('\n', older);
+    const auto older_line = detailed_block.substr(older, older_end - older);
+    EXPECT_NE(older_line.find("1 (100.0%) |     0 (0.0%)"), std::string::npos) << older_line;
 }

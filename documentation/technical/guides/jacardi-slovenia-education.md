@@ -143,7 +143,33 @@ Models that use education should apply to people aged **19+** until partners opt
 
 ---
 
-## 8. Config checklist
+## 8. Local screen check (do not merge)
+
+After Part A, the console prints at most eight people: one male and one female in ages 0–18, 19–30, 31–64, and 65+. Under that, it prints how many people of each age band and sex landed in each Education, EmploymentDetailed, and Employment id, and that count as a percent of the band and sex. Yearly updates are not printed.
+
+Ages 0–18 should be 100% missing. Ages 19+ should be 0% missing and 0% in `other` (a finite id outside 1–7, 1–6, or 1–4). The percent is the share of draws, not a check that the mode was chosen.
+
+```text
+DEBUG local (do not merge) - Education / Employment after JacardiModel Part A (start year only)
+    id  age sex      education   emp_detailed   employment
+     2   10 male       missing        missing      missing
+counts by age band and sex. Percent is of people in that band and sex.
+Education counts
+band   | sex    |     n |      missing |            1 |          ...
+0-18   | male   |     1 |   1 (100.0%) |    0 (0.0%)  |          ...
+```
+
+```mermaid
+flowchart LR
+  PartA[JacardiModel Part A] --> Sample[Up to 8 people]
+  PartA --> Shares[Counts and percent by age band and sex]
+  Sample --> Later[Disease and analysis continue]
+  Shares --> Later
+```
+
+This print is for a local look at assignment. It is not a result file and should not be merged to main.
+
+## 9. Config checklist
 
 1. `jacardi_model.json` → `Education.lookup` → `education_lookup.csv`
 2. `jacardi_model_update.json` → `Education.draw_at_19` → `education_draw_at_19_ssp2.csv` + `upgrade_transitions` (+ optional `lookup`)
