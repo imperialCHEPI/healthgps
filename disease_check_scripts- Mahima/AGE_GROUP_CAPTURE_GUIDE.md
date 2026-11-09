@@ -7,7 +7,7 @@ This guide helps you capture data for **all ages** by running the simulation mul
 ## Age Groups to Capture
 
 | Group | Age Range | Expected Records | Notes |
-|-------|-----------|------------------|-------|
+| ------- | ----------- | ------------------ | ------- |
 | 1 | 0-20 | ~15,000-20,000 | Children & young adults |
 | 2 | 21-30 | ~8,000-12,000 | Young adults |
 | 3 | 31-40 | ~8,000-12,000 | Middle-aged adults |
@@ -118,7 +118,7 @@ Each CSV contains these **economist-friendly columns**:
 ## Quick Reference
 
 | Edit These Lines | Age Group | Expected Time |
-|------------------|-----------|---------------|
+| ------------------ | ----------- | --------------- |
 | `min_age = 0; max_age = 20;` | 0-20 | 5-10 min |
 | `min_age = 21; max_age = 30;` | 21-30 | 3-5 min |
 | `min_age = 31; max_age = 40;` | 31-40 | 3-5 min |
