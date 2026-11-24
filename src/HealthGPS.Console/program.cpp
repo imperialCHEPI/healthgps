@@ -19,6 +19,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
+#include <future>
 #include <oneapi/tbb/global_control.h>
 #include <optional>
 
@@ -124,8 +125,12 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
         return exit_application(EXIT_FAILURE);
     }
 
-    // Load input data file into a datatable asynchronous
-    auto table_future = core::run_async(load_datatable_from_csv, config.file);
+    // MAHIMA: Optional dataset — empty table when inputs.dataset is omitted (JACARDI packs).
+    // DataTable is move-only; load async only when a file was configured.
+    std::future<core::DataTable> table_future;
+    if (config.file.has_value()) {
+        table_future = core::run_async(load_datatable_from_csv, *config.file);
+    }
 
     // MAHIMA: Always report. Release-only CATCH_EXCEPTIONS used to rethrow, and the
     // worker thread died before that handler ran, so the console returned with no reason.
@@ -167,11 +172,13 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
             return exit_application(EXIT_FAILURE);
         }
 
-        // Request input datatable instance, wait, if not completed.
-        auto input_table = table_future.get();
-
-        // Print out the datatable structure information
-        std::cout << input_table;
+        core::DataTable input_table;
+        if (config.file.has_value()) {
+            input_table = table_future.get();
+            std::cout << input_table;
+        } else {
+            fmt::print("Input dataset omitted — using empty table (UNDB population only).\n");
+        }
 
         // Create complete model input from configuration
         auto model_input = std::make_shared<ModelInput>(

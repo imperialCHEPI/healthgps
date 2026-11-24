@@ -2,7 +2,38 @@
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/config/models/jacardimodelupdate.json",
     "type": "object",
-    "description": "JACARDI dynamic / yearly risk-factor model. Ladder steps are opt-in: include Education and/or Employment only when using them. If a step is present, its CSV slots are required.",
+    "description": "JACARDI dynamic / yearly risk-factor model. Ladder steps are opt-in. Employment may be SI hold (coefs+recode) or BE yearly (extra optional slots).",
+    "$defs": {
+        "jacardiCsvSlot": {
+            "type": "object",
+            "description": "Named CSV slot (name/format/delimiter/encoding/columns). Column value types are free-form strings.",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "format": {
+                    "type": "string"
+                },
+                "delimiter": {
+                    "type": "string"
+                },
+                "encoding": {
+                    "type": "string"
+                },
+                "columns": {
+                    "type": "object"
+                }
+            },
+            "required": [
+                "name",
+                "format",
+                "delimiter",
+                "encoding",
+                "columns"
+            ],
+            "additionalProperties": false
+        }
+    },
     "properties": {
         "$schema": {
             "type": "string"
@@ -15,95 +46,19 @@
         },
         "Education": {
             "type": "object",
-            "description": "If using education Part B (15 Oct 2026): method + draw_at_19 + upgrade_transitions required; optional lookup for rare 20+ missing fill.",
+            "description": "Part B: method + draw_at_19 + upgrade_transitions required; optional lookup for rare 20+ missing fill.",
             "properties": {
                 "method": {
                     "type": "string"
                 },
                 "lookup": {
-                    "type": "object",
-                    "description": "Optional Part A lookup \u2014 used if someone 20+ is still missing education.",
-                    "properties": {
-                        "name": {
-                            "type": "string"
-                        },
-                        "format": {
-                            "type": "string"
-                        },
-                        "delimiter": {
-                            "type": "string"
-                        },
-                        "encoding": {
-                            "type": "string"
-                        },
-                        "columns": {
-                            "type": "object"
-                        }
-                    },
-                    "required": [
-                        "name",
-                        "format",
-                        "delimiter",
-                        "encoding",
-                        "columns"
-                    ],
-                    "additionalProperties": false
+                    "$ref": "#/$defs/jacardiCsvSlot"
                 },
                 "draw_at_19": {
-                    "type": "object",
-                    "properties": {
-                        "name": {
-                            "type": "string"
-                        },
-                        "format": {
-                            "type": "string"
-                        },
-                        "delimiter": {
-                            "type": "string"
-                        },
-                        "encoding": {
-                            "type": "string"
-                        },
-                        "columns": {
-                            "type": "object"
-                        }
-                    },
-                    "required": [
-                        "name",
-                        "format",
-                        "delimiter",
-                        "encoding",
-                        "columns"
-                    ],
-                    "additionalProperties": false
+                    "$ref": "#/$defs/jacardiCsvSlot"
                 },
                 "upgrade_transitions": {
-                    "type": "object",
-                    "properties": {
-                        "name": {
-                            "type": "string"
-                        },
-                        "format": {
-                            "type": "string"
-                        },
-                        "delimiter": {
-                            "type": "string"
-                        },
-                        "encoding": {
-                            "type": "string"
-                        },
-                        "columns": {
-                            "type": "object"
-                        }
-                    },
-                    "required": [
-                        "name",
-                        "format",
-                        "delimiter",
-                        "encoding",
-                        "columns"
-                    ],
-                    "additionalProperties": false
+                    "$ref": "#/$defs/jacardiCsvSlot"
                 }
             },
             "required": [
@@ -115,75 +70,69 @@
         },
         "Employment": {
             "type": "object",
-            "description": "If using employment Part B (16 Oct 2026): method + coefficients + recode filenames required. First SCORE/DRAW at 19+ when missing; else temporary hold until yearly package.",
+            "description": "Part B: method + coefficients + recode required (first draw at 19 / hold). Optional BE yearly slots are accepted by schema; engine uses coefs+recode until yearly package is wired.",
             "properties": {
                 "method": {
                     "type": "string",
-                    "description": "Expected: multinomial_static (first draw + temporary hold until yearly transitions replace hold)"
+                    "description": "multinomial_static (SI hold) or multinomial_yearly (BE pack)"
                 },
                 "coefficients": {
-                    "type": "object",
-                    "description": "Same employment_static_coefs.csv as JacardiModel \u2014 needed for first draw at 19",
-                    "properties": {
-                        "name": {
-                            "type": "string"
-                        },
-                        "format": {
-                            "type": "string"
-                        },
-                        "delimiter": {
-                            "type": "string"
-                        },
-                        "encoding": {
-                            "type": "string"
-                        },
-                        "columns": {
-                            "type": "object"
-                        }
-                    },
-                    "required": [
-                        "name",
-                        "format",
-                        "delimiter",
-                        "encoding",
-                        "columns"
-                    ],
-                    "additionalProperties": false
+                    "$ref": "#/$defs/jacardiCsvSlot"
                 },
                 "recode": {
-                    "type": "object",
-                    "description": "Same employment_4cat_recode.csv as JacardiModel",
-                    "properties": {
-                        "name": {
-                            "type": "string"
-                        },
-                        "format": {
-                            "type": "string"
-                        },
-                        "delimiter": {
-                            "type": "string"
-                        },
-                        "encoding": {
-                            "type": "string"
-                        },
-                        "columns": {
-                            "type": "object"
-                        }
-                    },
-                    "required": [
-                        "name",
-                        "format",
-                        "delimiter",
-                        "encoding",
-                        "columns"
-                    ],
-                    "additionalProperties": false
+                    "$ref": "#/$defs/jacardiCsvSlot"
+                },
+                "knots": {
+                    "$ref": "#/$defs/jacardiCsvSlot"
+                },
+                "pension_step": {
+                    "$ref": "#/$defs/jacardiCsvSlot"
+                },
+                "yearly_coefficients": {
+                    "$ref": "#/$defs/jacardiCsvSlot"
+                },
+                "yearly_knots": {
+                    "$ref": "#/$defs/jacardiCsvSlot"
+                },
+                "yearly_anchors": {
+                    "$ref": "#/$defs/jacardiCsvSlot"
+                },
+                "education_map": {
+                    "$ref": "#/$defs/jacardiCsvSlot"
+                },
+                "start_duration_shares": {
+                    "$ref": "#/$defs/jacardiCsvSlot"
+                },
+                "statutory_retirement": {
+                    "$ref": "#/$defs/jacardiCsvSlot"
                 }
             },
             "required": [
                 "method",
                 "coefficients",
                 "recode"
+            ],
+            "additionalProperties": false
+        },
+        "MotherGroup": {
+            "type": "object",
+            "description": "Optional mother-group update (BE). Schema accepts slots; engine load is separate work.",
+            "properties": {
+                "method": {
+                    "type": "string"
+                },
+                "newborn": {
+                    "$ref": "#/$defs/jacardiCsvSlot"
+                },
+                "draw_at_19_by_mother": {
+                    "$ref": "#/$defs/jacardiCsvSlot"
+                },
+                "upgrade_transitions_by_mother": {
+                    "$ref": "#/$defs/jacardiCsvSlot"
+                }
+            },
+            "required": [
+                "method"
             ],
             "additionalProperties": false
         }

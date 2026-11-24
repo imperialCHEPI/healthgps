@@ -282,13 +282,19 @@ void load_input_info(const json &j, Configuration &config) {
     const auto inputs = get(j, "inputs");
     bool success = true;
 
-    // Input dataset file
-    try {
-        config.file = get_file_info(get(inputs, "dataset"), config.root_path);
-        fmt::print("Input dataset file: {}\n", config.file.name.string());
-    } catch (const std::exception &e) {
-        success = false;
-        fmt::print(fg(fmt::color::red), "Could not load dataset file: {}\n", e.what());
+    // MAHIMA: dataset is optional — JACARDI packs may omit Country.DataFile.csv.
+    // If present, the named file must exist (same as before).
+    if (inputs.contains("dataset") && !inputs["dataset"].is_null()) {
+        try {
+            config.file = get_file_info(inputs["dataset"], config.root_path);
+            fmt::print("Input dataset file: {}\n", config.file->name.string());
+        } catch (const std::exception &e) {
+            success = false;
+            fmt::print(fg(fmt::color::red), "Could not load dataset file: {}\n", e.what());
+        }
+    } else {
+        config.file = std::nullopt;
+        fmt::print("Input dataset file: (omitted)\n");
     }
 
     // Settings

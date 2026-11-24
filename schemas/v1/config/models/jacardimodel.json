@@ -2,7 +2,38 @@
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/config/models/jacardimodel.json",
     "type": "object",
-    "description": "JACARDI static / init risk-factor model. Ladder steps are opt-in: include Education and/or Employment only when using them. If a step is present, its CSV slots are required.",
+    "description": "JACARDI static / init risk-factor model. Ladder steps are opt-in: include Education and/or Employment only when using them. CSV column types may include string (Factor names).",
+    "$defs": {
+        "jacardiCsvSlot": {
+            "type": "object",
+            "description": "Named CSV slot (name/format/delimiter/encoding/columns). Column value types are free-form strings (integer, double, string).",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "format": {
+                    "type": "string"
+                },
+                "delimiter": {
+                    "type": "string"
+                },
+                "encoding": {
+                    "type": "string"
+                },
+                "columns": {
+                    "type": "object"
+                }
+            },
+            "required": [
+                "name",
+                "format",
+                "delimiter",
+                "encoding",
+                "columns"
+            ],
+            "additionalProperties": false
+        }
+    },
     "properties": {
         "$schema": {
             "type": "string"
@@ -15,117 +46,73 @@
         },
         "Education": {
             "type": "object",
-            "description": "If using education: method + lookup filename required.",
+            "description": "SI lookup: method + lookup. BE equations: method + coefficients + knots. At least one CSV pathway should be present; engine currently loads lookup when present.",
             "properties": {
                 "method": {
                     "type": "string"
                 },
                 "lookup": {
-                    "type": "object",
-                    "properties": {
-                        "name": {
-                            "type": "string"
-                        },
-                        "format": {
-                            "type": "string"
-                        },
-                        "delimiter": {
-                            "type": "string"
-                        },
-                        "encoding": {
-                            "type": "string"
-                        },
-                        "columns": {
-                            "type": "object"
-                        }
-                    },
-                    "required": [
-                        "name",
-                        "format",
-                        "delimiter",
-                        "encoding",
-                        "columns"
-                    ],
-                    "additionalProperties": false
+                    "$ref": "#/$defs/jacardiCsvSlot"
+                },
+                "coefficients": {
+                    "$ref": "#/$defs/jacardiCsvSlot",
+                    "description": "Optional BE multinomial equations coefs"
+                },
+                "knots": {
+                    "$ref": "#/$defs/jacardiCsvSlot",
+                    "description": "Optional BE age knots for education RCS"
                 }
             },
             "required": [
-                "method",
-                "lookup"
+                "method"
             ],
             "additionalProperties": false
         },
         "Employment": {
             "type": "object",
-            "description": "If using employment (P1b, 16 Oct 2026): method + coefficients + recode filenames required. Part A SCORE/DRAW then 4-cat recode.",
+            "description": "Employment Part A: method + coefficients + recode required. Optional BE knots / pension_step CSVs (schema accepts; yearly package may use them later).",
             "properties": {
                 "method": {
                     "type": "string",
                     "description": "Expected: multinomial_static"
                 },
                 "coefficients": {
-                    "type": "object",
-                    "description": "employment_static_coefs.csv \u2014 Category, Factor (string), Coefficient for SCORE",
-                    "properties": {
-                        "name": {
-                            "type": "string"
-                        },
-                        "format": {
-                            "type": "string"
-                        },
-                        "delimiter": {
-                            "type": "string"
-                        },
-                        "encoding": {
-                            "type": "string"
-                        },
-                        "columns": {
-                            "type": "object"
-                        }
-                    },
-                    "required": [
-                        "name",
-                        "format",
-                        "delimiter",
-                        "encoding",
-                        "columns"
-                    ],
-                    "additionalProperties": false
+                    "$ref": "#/$defs/jacardiCsvSlot",
+                    "description": "employment_static_coefs.csv"
                 },
                 "recode": {
-                    "type": "object",
-                    "description": "employment_4cat_recode.csv \u2014 employment_id 1-6 to employment4_id 1-4",
-                    "properties": {
-                        "name": {
-                            "type": "string"
-                        },
-                        "format": {
-                            "type": "string"
-                        },
-                        "delimiter": {
-                            "type": "string"
-                        },
-                        "encoding": {
-                            "type": "string"
-                        },
-                        "columns": {
-                            "type": "object"
-                        }
-                    },
-                    "required": [
-                        "name",
-                        "format",
-                        "delimiter",
-                        "encoding",
-                        "columns"
-                    ],
-                    "additionalProperties": false
+                    "$ref": "#/$defs/jacardiCsvSlot",
+                    "description": "employment_4cat_recode.csv"
+                },
+                "knots": {
+                    "$ref": "#/$defs/jacardiCsvSlot",
+                    "description": "Optional employment_static_knots.csv (BE)"
+                },
+                "pension_step": {
+                    "$ref": "#/$defs/jacardiCsvSlot",
+                    "description": "Optional employment_pension_step_ages.csv (BE)"
                 }
             },
             "required": [
                 "method",
                 "coefficients",
                 "recode"
+            ],
+            "additionalProperties": false
+        },
+        "MotherGroup": {
+            "type": "object",
+            "description": "Optional mother-group init (BE). Schema accepts slots; engine load is separate work.",
+            "properties": {
+                "method": {
+                    "type": "string"
+                },
+                "start": {
+                    "$ref": "#/$defs/jacardiCsvSlot"
+                }
+            },
+            "required": [
+                "method"
             ],
             "additionalProperties": false
         }

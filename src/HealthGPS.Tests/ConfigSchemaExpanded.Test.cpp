@@ -336,6 +336,69 @@ TEST(ConfigSchemaExpanded, ProjectRequirementsDefaultRiskFactors) {
     EXPECT_TRUE(req.risk_factors.trended);
 }
 
+TEST(ConfigSchemaExpanded, ProjectRequirementsDisabledIncomeNeedsOnlyEnabled) {
+    // MAHIMA: enabled false → omit type/categories/adjust/trended; defaults apply.
+    const json pr = {
+        {"demographics",
+         {{"age", true}, {"gender", true}, {"region", false}, {"ethnicity", false}}},
+        {"income", {{"enabled", false}}},
+        {"physical_activity", {{"enabled", false}}},
+        {"risk_factors", {{"adjust_to_factors_mean", false}, {"trended", false}}},
+        {"trend", {{"enabled", false}}},
+        {"two_stage", {{"use_logistic", false}}}};
+    ProjectRequirements req{};
+    EXPECT_NO_THROW(parse_project_requirements_block(pr, req));
+    EXPECT_FALSE(req.income.enabled);
+    EXPECT_FALSE(req.income.income_based_csv_output);
+    EXPECT_FALSE(req.physical_activity.enabled);
+    EXPECT_FALSE(req.trend.enabled);
+    EXPECT_EQ("null", req.trend.type);
+}
+
+TEST(ConfigSchemaExpanded, ProjectRequirementsEnabledIncomeRequiresTypeAndCategories) {
+    const json pr = {
+        {"demographics",
+         {{"age", true}, {"gender", true}, {"region", false}, {"ethnicity", false}}},
+        {"income", {{"enabled", true}}},
+        {"physical_activity", {{"enabled", false}}},
+        {"risk_factors", {{"adjust_to_factors_mean", false}, {"trended", false}}},
+        {"trend", {{"enabled", false}}},
+        {"two_stage", {{"use_logistic", false}}}};
+    ProjectRequirements req{};
+    EXPECT_THROW(parse_project_requirements_block(pr, req), ConfigurationError);
+}
+
+TEST(ConfigSchemaExpanded, ProjectRequirementsEnabledIncomeFullStillParses) {
+    const json pr = {
+        {"demographics",
+         {{"age", true}, {"gender", true}, {"region", true}, {"ethnicity", true}}},
+        {"income",
+         {{"enabled", true},
+          {"type", "continuous"},
+          {"categories", "4"},
+          {"adjust_to_factors_mean", true},
+          {"trended", false},
+          {"income_based_csv_output", true}}},
+        {"physical_activity",
+         {{"enabled", true},
+          {"type", "continuous"},
+          {"adjust_to_factors_mean", true},
+          {"trended", false}}},
+        {"risk_factors", {{"adjust_to_factors_mean", true}, {"trended", true}}},
+        {"trend", {{"enabled", true}, {"type", "income_trend"}}},
+        {"two_stage", {{"use_logistic", false}}}};
+    ProjectRequirements req{};
+    EXPECT_NO_THROW(parse_project_requirements_block(pr, req));
+    EXPECT_TRUE(req.income.enabled);
+    EXPECT_EQ("continuous", req.income.type);
+    EXPECT_EQ("4", req.income.categories);
+    EXPECT_TRUE(req.income.adjust_to_factors_mean);
+    EXPECT_TRUE(req.physical_activity.enabled);
+    EXPECT_EQ("continuous", req.physical_activity.type);
+    EXPECT_TRUE(req.trend.enabled);
+    EXPECT_EQ("income_trend", req.trend.type);
+}
+
 TEST(ConfigSchemaExpanded, ProjectRequirementsDefaultTrend) {
     ProjectRequirements req{};
     EXPECT_FALSE(req.trend.enabled);

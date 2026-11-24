@@ -35,7 +35,7 @@ The root schema composes several sections. Optional blocks (such as **`project_r
 | `version` | Config format version (see root schema `const`) |
 | `project_requirements` | Per-project switches: demographics dimensions, income categories, PA, trends ([schema](https://github.com/imperialCHEPI/healthgps/blob/main/schemas/v1/config/project_requirements.json)) |
 | `data` | Where to fetch or find the backend datastore |
-| `inputs` | Country code, population fraction, age range, validation CSV |
+| `inputs` | Country code, population fraction, age range; optional `dataset` CSV (omit when no DataFile) |
 | `modelling` | SES, risk-factor hierarchy, model file references, baseline adjustments |
 | `running` | Random seeds, trial count, baseline/intervention scenarios |
 | `output` | Result folder, filenames, optional individual ID tracking |
