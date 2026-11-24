@@ -610,7 +610,11 @@ TEST_F(ConfigParsingFixture, LoadInputInfo) {
         j["inputs"]["settings"] = settings_info;
         EXPECT_NO_THROW(load_input_info(j, config));
         ASSERT_TRUE(config.file.has_value());
-        EXPECT_EQ(*config.file, file_info);
+        // MAHIMA: bugprone-unchecked-optional-access does not treat ASSERT_TRUE(has_value())
+        // as a control-flow guard for *optional on the next line, so re-check before deref.
+        if (config.file.has_value()) {
+            EXPECT_EQ(*config.file, file_info);
+        }
         EXPECT_EQ(config.settings, settings_info);
     }
 
