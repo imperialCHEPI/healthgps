@@ -338,14 +338,13 @@ TEST(ConfigSchemaExpanded, ProjectRequirementsDefaultRiskFactors) {
 
 TEST(ConfigSchemaExpanded, ProjectRequirementsDisabledIncomeNeedsOnlyEnabled) {
     // MAHIMA: enabled false → omit type/categories/adjust/trended; defaults apply.
-    const json pr = {
-        {"demographics",
-         {{"age", true}, {"gender", true}, {"region", false}, {"ethnicity", false}}},
-        {"income", {{"enabled", false}}},
-        {"physical_activity", {{"enabled", false}}},
-        {"risk_factors", {{"adjust_to_factors_mean", false}, {"trended", false}}},
-        {"trend", {{"enabled", false}}},
-        {"two_stage", {{"use_logistic", false}}}};
+    const json pr = {{"demographics",
+                      {{"age", true}, {"gender", true}, {"region", false}, {"ethnicity", false}}},
+                     {"income", {{"enabled", false}}},
+                     {"physical_activity", {{"enabled", false}}},
+                     {"risk_factors", {{"adjust_to_factors_mean", false}, {"trended", false}}},
+                     {"trend", {{"enabled", false}}},
+                     {"two_stage", {{"use_logistic", false}}}};
     ProjectRequirements req{};
     EXPECT_NO_THROW(parse_project_requirements_block(pr, req));
     EXPECT_FALSE(req.income.enabled);
@@ -356,22 +355,20 @@ TEST(ConfigSchemaExpanded, ProjectRequirementsDisabledIncomeNeedsOnlyEnabled) {
 }
 
 TEST(ConfigSchemaExpanded, ProjectRequirementsEnabledIncomeRequiresTypeAndCategories) {
-    const json pr = {
-        {"demographics",
-         {{"age", true}, {"gender", true}, {"region", false}, {"ethnicity", false}}},
-        {"income", {{"enabled", true}}},
-        {"physical_activity", {{"enabled", false}}},
-        {"risk_factors", {{"adjust_to_factors_mean", false}, {"trended", false}}},
-        {"trend", {{"enabled", false}}},
-        {"two_stage", {{"use_logistic", false}}}};
+    const json pr = {{"demographics",
+                      {{"age", true}, {"gender", true}, {"region", false}, {"ethnicity", false}}},
+                     {"income", {{"enabled", true}}},
+                     {"physical_activity", {{"enabled", false}}},
+                     {"risk_factors", {{"adjust_to_factors_mean", false}, {"trended", false}}},
+                     {"trend", {{"enabled", false}}},
+                     {"two_stage", {{"use_logistic", false}}}};
     ProjectRequirements req{};
     EXPECT_THROW(parse_project_requirements_block(pr, req), ConfigurationError);
 }
 
 TEST(ConfigSchemaExpanded, ProjectRequirementsEnabledIncomeFullStillParses) {
     const json pr = {
-        {"demographics",
-         {{"age", true}, {"gender", true}, {"region", true}, {"ethnicity", true}}},
+        {"demographics", {{"age", true}, {"gender", true}, {"region", true}, {"ethnicity", true}}},
         {"income",
          {{"enabled", true},
           {"type", "continuous"},
