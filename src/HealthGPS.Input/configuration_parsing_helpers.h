@@ -13,7 +13,7 @@
 #include "HealthGPS.Core/income_category_layout.h"
 
 #include <fmt/color.h>
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include <nlohmann/json.hpp>
 
 #include <filesystem>

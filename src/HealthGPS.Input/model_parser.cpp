@@ -17,7 +17,9 @@
 #include <Eigen/Cholesky>
 #include <Eigen/Dense>
 #include <fmt/color.h>
-#include <fmt/core.h>
+#include <fmt/format.h>
+// MAHIMA: fmt 12 moved fmt::join into fmt/ranges.h.
+#include <fmt/ranges.h>
 #include <rapidcsv.h>
 
 #include <algorithm>

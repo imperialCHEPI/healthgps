@@ -17,7 +17,8 @@ constexpr const char *SchemaURLPrefix =
     "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/";
 
 json resolve_uri(const uri &uri, const std::filesystem::path &program_directory) {
-    const auto &uri_str = uri.string();
+    // MAHIMA: jsoncons 1.x includes the JSON pointer fragment on $ref URIs.
+    const auto uri_str = hgps::input::strip_schema_fragment(uri.string());
     if (!uri_str.starts_with(SchemaURLPrefix)) {
         throw std::runtime_error(fmt::format("Unable to load URL: {}", uri_str));
     }
@@ -35,6 +36,15 @@ json resolve_uri(const uri &uri, const std::filesystem::path &program_directory)
 } // anonymous namespace
 
 namespace hgps::input {
+std::string strip_schema_fragment(std::string_view uri) {
+    // MAHIMA: The file on disk is the path before '#'. O(n) in the URI length.
+    const auto fragment_at = uri.find('#');
+    if (fragment_at == std::string_view::npos) {
+        return std::string{uri};
+    }
+    return std::string{uri.substr(0, fragment_at)};
+}
+
 void validate_json(std::istream &is, const std::string &schema_file_name, int schema_version) {
     const auto data = json::parse(is);
 

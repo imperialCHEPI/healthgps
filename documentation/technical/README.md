@@ -23,6 +23,7 @@ Reach out if you need a code path, config walkthrough, or help debugging.
 | [JACARDI employment static](guides/jacardi-employment-static.md) | Single SI employment plan + guide: SCORE/DRAW/recode, Part A/B hold, wiring, tests |
 | [JACARDI Slovenia run fixes](guides/jacardi-slovenia-run-fixes.md) | BoD named columns, disease skip report (EXPECTED vs WARNING) |
 | [When a run stops](guides/failure-reporting.md) | Phase and exception text instead of a silent exit; `-T` minimum of 2 |
+| [vcpkg baseline, November 2026](guides/vcpkg-baseline-2026-11.md) | Dependency pin, port versions, and the fmt / Eigen / schema edits |
 
 ---
 
@@ -57,6 +58,7 @@ Engineering design notes for developers. Written as ordinary markdown plans (sum
 | JACARDI (7 countries / new pathway) | [JACARDI 7 countries implementation](plans/JACARDI-7-countries-implementation-plan.md) | [Slovenia education](guides/jacardi-slovenia-education.md) · [Employment static](guides/jacardi-employment-static.md) · [Slovenia run fixes](guides/jacardi-slovenia-run-fixes.md) · [When a run stops](guides/failure-reporting.md) · [Project requirements](plans/project-requirements-plan.md) · UKPDS plan (`JACARDI-UKPDS-healthGPS.md`, when on branch) |
 | Run exits with no message | [When a run stops](guides/failure-reporting.md) | [Performance guide](guides/performance-optimizations.md) |
 | Windows build / MSVC | [MSVC troubleshooting](../developer/msvc-windows-build-troubleshooting.md) | [Developer Guide](../developer/development.md) |
+| Dependency pin / vcpkg | [vcpkg baseline, November 2026](guides/vcpkg-baseline-2026-11.md) | [Developer Guide](../developer/development.md) |
 
 ---
 

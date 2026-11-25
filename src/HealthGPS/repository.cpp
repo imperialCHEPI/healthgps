@@ -3,7 +3,7 @@
 #include "HealthGPS.Input/pif_data.h"
 #include "converter.h"
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include <stdexcept>
 
 namespace hgps {

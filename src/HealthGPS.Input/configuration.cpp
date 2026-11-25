@@ -157,7 +157,8 @@ Configuration get_configuration(const std::string &config_source,
         load_output_info(opt, config, output_folder);
     } catch (const ConfigurationError &e) {
         success = false;
-        fmt::print(fg(fmt::color::red), e.what());
+        // MAHIMA: fmt 12 requires a constant format string. e.what() is runtime text.
+        fmt::print(fg(fmt::color::red), "{}", e.what());
     }
 
     if (!success) {

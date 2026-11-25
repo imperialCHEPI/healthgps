@@ -8,6 +8,8 @@
 #include <climits>
 #include <cstdio>
 #include <fmt/format.h>
+// MAHIMA: fmt 12 moved fmt::join into fmt/ranges.h.
+#include <fmt/ranges.h>
 #include <functional>
 #include <limits>
 #include <mutex>

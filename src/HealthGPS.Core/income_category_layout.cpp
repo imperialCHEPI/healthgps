@@ -2,7 +2,8 @@
 
 #include "exception.h"
 
-#include <fmt/core.h>
+// MAHIMA: fmt 12 keeps fmt::format in fmt/format.h. fmt/core.h no longer provides it.
+#include <fmt/format.h>
 
 namespace hgps::core {
 

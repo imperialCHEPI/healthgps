@@ -2,6 +2,8 @@ find_package(fmt CONFIG REQUIRED)
 find_package(crossguid CONFIG REQUIRED)
 find_package(OpenSSL CONFIG REQUIRED)
 find_package(platform_folders CONFIG REQUIRED)
+# MAHIMA: Eigen 5 headers live under include/eigen3. The Eigen3::Eigen target adds that path.
+find_package(Eigen3 CONFIG REQUIRED)
 
 add_library(HealthGPS STATIC "")
 target_compile_features(HealthGPS PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
@@ -157,6 +159,8 @@ target_sources(
 
 target_link_libraries(HealthGPS PRIVATE HealthGPS.Core fmt::fmt crossguid OpenSSL::Crypto
                                         sago::platform_folders)
+# MAHIMA: PUBLIC so files that include static_linear_model.h can see Eigen/Dense.
+target_link_libraries(HealthGPS PUBLIC Eigen3::Eigen)
 target_include_directories(HealthGPS PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 
 set(ROOT_NAMESPACE hgps)

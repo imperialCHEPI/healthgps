@@ -22,7 +22,7 @@ In addition, you will also need:
 
 We use vcpkg for building and bundling this project's dependencies so you will need to install it. Follow [the instructions on the vcpkg website](https://vcpkg.io/en/getting-started) to get started.
 
-Once you have installed vcpkg, you will also need to ensure that the `VCPKG_ROOT` environment variable is set to the installation directory.
+Once you have installed vcpkg, you will also need to ensure that the `VCPKG_ROOT` environment variable is set to the installation directory. The ports are pinned by the baseline in `vcpkg.json`. The November 2026 pin, and the source edits it required, are in [vcpkg baseline, November 2026](../technical/guides/vcpkg-baseline-2026-11.md).
 
 ### Downloading the source code
 
