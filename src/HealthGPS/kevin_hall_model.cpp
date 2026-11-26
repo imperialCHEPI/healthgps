@@ -6,13 +6,12 @@
 #include "sync_message.h"
 
 #include <algorithm>
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include <iomanip>
 #include <iostream>
 #include <iterator>
 #include <limits>
 #include <sstream>
-#include <syncstream>
 #include <unordered_map>
 #include <utility>
 
@@ -1189,7 +1188,8 @@ void KevinHallModel::validate_weight_in_config_range(const RuntimeContext &conte
                                                                *range, above_maximum);
 
     if (above_maximum) {
-        std::osyncstream(std::cout) << "\n[WEIGHT RANGE WARNING] " << message << '\n';
+        // MAHIMA: std::osyncstream blocks when gtest CaptureStdout redirects stdout.
+        std::cout << "\n[WEIGHT RANGE WARNING] " << message << '\n' << std::flush;
         return;
     }
 

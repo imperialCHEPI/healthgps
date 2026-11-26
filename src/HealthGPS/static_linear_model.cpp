@@ -13,7 +13,7 @@
 #include <cctype>
 #include <cmath>
 #include <cstdio>
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include <iomanip>
 #include <iostream>
 #include <limits>

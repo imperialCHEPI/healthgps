@@ -9,7 +9,7 @@
 #include <oneapi/tbb/parallel_for_each.h>
 
 #include <fmt/color.h>
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include <nlohmann/json.hpp>
 
 #include "result_file_writer.h"

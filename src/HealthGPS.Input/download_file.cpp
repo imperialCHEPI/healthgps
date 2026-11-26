@@ -38,7 +38,9 @@ void download_file(const std::string &url, const std::filesystem::path &download
         throw std::runtime_error(fmt::format("Failed to create file {}", download_path.string()));
     }
 
-    fmt::println("Downloading data from {}", url);
+    // MAHIMA: fmt 12's println has a constexpr branch that MSVC /Od reports as C4702.
+    // /WX turns that into a Windows debug CI failure. print with a newline is the same text.
+    fmt::print("Downloading data from {}\n", url);
 
     curlpp::Cleanup cleanup;
 

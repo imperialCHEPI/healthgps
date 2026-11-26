@@ -11,6 +11,7 @@ Docs for building Health-GPS, reading the architecture, and contributing.
 | [Software & Architecture](architecture.md) | Full engineer-facing software architecture: components, host, modules, pipeline, bus, scenarios, parallelism |
 | [Data Model](datamodel.md) | Backend Data API and entity schema |
 | [Developer Guide](development.md) | C++20, CMake presets, vcpkg, tests, HPC |
+| [vcpkg baseline, November 2026](../technical/guides/vcpkg-baseline-2026-11.md) | Port versions after the November 2026 baseline, and the source edits |
 | [Windows MSVC / Ninja troubleshooting](msvc-windows-build-troubleshooting.md) | `cstdint`, `MSVCRTD.lib`, broken toolsets |
 | [GitHub Pages docs deploy troubleshooting](docs-deploy-troubleshooting.md) | Jekyll OK but Configure HealthGPS fails |
 | [GitHub Flow](github-flow.md) | Branching and pull requests |
@@ -20,7 +21,7 @@ Docs for building Health-GPS, reading the architecture, and contributing.
 
 | Topic | Start here | Then |
 | ----- | ---------- | ---- |
-| Build / CMake / vcpkg | [Developer Guide](development.md) | [MSVC troubleshooting](msvc-windows-build-troubleshooting.md) |
+| Build / CMake / vcpkg | [Developer Guide](development.md) | [vcpkg baseline, November 2026](../technical/guides/vcpkg-baseline-2026-11.md) |
 | Docs site / Pages deploy | [Docs deploy troubleshooting](docs-deploy-troubleshooting.md) | [Developer Guide](development.md#building-api-documentation) |
 | Module / software design | [Software & Architecture](architecture.md) | [Update report](../technical/guides/healthgps-update-report-2026-02-20.md) |
 | Datastore | [Data Model](datamodel.md) | [User Guide](../user/userguide.md) |

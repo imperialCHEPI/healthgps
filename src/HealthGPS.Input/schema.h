@@ -4,12 +4,18 @@
 
 #include <filesystem>
 #include <string>
+#include <string_view>
 
 namespace hgps::input {
 /// @brief Validate a JSON stream against the specified schema
 /// @param is The input stream for the JSON file
 /// @param schema_file_name The name of the JSON schema file
 /// @param schema_version The version of the schema file
+/// @brief Schema URL with any JSON pointer fragment removed.
+/// @param uri Absolute or relative schema URI
+/// @return The same URI, cut at the first '#'
+std::string strip_schema_fragment(std::string_view uri);
+
 void validate_json(std::istream &is, const std::string &schema_file_name, int schema_version);
 
 /// @brief Load a JSON file and validate against the specified schema

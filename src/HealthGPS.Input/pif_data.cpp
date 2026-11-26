@@ -1,6 +1,6 @@
 #include "pif_data.h"
 #include <algorithm>
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 namespace hgps::input {
 

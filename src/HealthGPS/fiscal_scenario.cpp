@@ -1,7 +1,7 @@
 #include "fiscal_scenario.h"
 #include "HealthGPS.Core/string_util.h"
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include <stdexcept>
 
 namespace hgps {

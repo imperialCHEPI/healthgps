@@ -3,7 +3,7 @@
 #include "risk_factor_adjustable_model.h"
 
 #include "sync_message.h"
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <algorithm>
 #include <atomic>

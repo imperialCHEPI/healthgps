@@ -7,7 +7,7 @@
 #include "HealthGPS/runner_message.h"
 
 #include <fmt/color.h>
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 namespace hgps {
 EventMonitor::EventMonitor(hgps::EventAggregator &event_bus, ResultWriter &result_writer,
