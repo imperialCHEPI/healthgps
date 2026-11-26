@@ -65,6 +65,7 @@ The high-level structure of the [configuration][configjson] file used to create 
             "country_code": "FRA",
             "size_fraction": 0.0001,
             "age_range": [0, 100]
+
         }
     },
     "modelling": {
@@ -106,7 +107,7 @@ The ***data*** section tells *Health GPS* where the [backend data storage](#back
 
 ### Inputs
 
-The ***inputs*** section sets the target country information, the *file* sub-section provides details of data used to fit the model, including file name, format, and variable data type mapping with the model internal types: *string, integer, float, double*. The user's data is required only to provide a visual validation of the initial virtual population created by the model, this feature should be made optional in the future, the following example illustrates the data file definition:
+The ***inputs*** section sets the target country (`settings`: country code, size fraction, age range). The optional **`dataset`** block points at a survey/microdata CSV (`Country.DataFile.csv`) used mainly for visual validation of the initial virtual population. **Omit `dataset` entirely** when the pack has no DataFile (e.g. JACARDI); population size still comes from UNDB via `settings`. If `dataset` is present, the named file must exist on disk. Example with a DataFile:
 
 ```json
 ...
@@ -364,11 +365,15 @@ Advanced projects (FINCH, Kevin Hall, India-style configs) should set optional *
 | Sub-block | Typical use |
 | --------- | ----------- |
 | `demographics` | Whether region / ethnicity apply; optional `gender2` predictor encoding and age caps for linear models |
-| `income` | Enabled, continuous vs categorical, **final** category count `"3"` / `"4"` / `"5"`, factors-mean / trended flags, optional income-based CSV output |
-| `physical_activity` | Simple vs continuous PA, adjustment / trend flags |
+| `income` | `enabled` required. If **false**, omit the rest. If **true**, require `type` + `categories`; `adjust_to_factors_mean` / `trended` / `income_based_csv_output` optional |
+| `physical_activity` | Same pattern: disabled → only `enabled`; enabled → require `type`; adjust/trended optional |
 | `risk_factors` | Whether nutrient / base RFs enter factors-mean and trended adjustment |
-| `trend` | `null`, UPF-style, or `income_trend` |
+| `trend` | Disabled → only `enabled`; enabled → require `type` (`null`, UPF-style, or `income_trend`) |
 | `two_stage` | Logistic stage for zero vs non-zero (when used) |
+
+Full configs that still list every income/PA/trend field remain valid. JACARDI-style packs can use `"income": { "enabled": false }` without filler fields.
+
+**`inputs.dataset`** (survey / `Country.DataFile.csv`) is **optional**. France/India/FINCH keep it. JACARDI packs may omit it and rely on UNDB population sizing; if the key is present, the named file must exist on disk.
 
 The block is optional; legacy France-style configs without it still validate. Full schema: `schemas/v1/config/project_requirements.json`. Worked examples: `examples/config_skeleton.json`, FINCH packs under `input-data/data/`. Modeller walkthrough: [FINCH linear models guide](../technical/guides/finch-linear-models-and-income-adjustment.md) and [project requirements plan](../technical/plans/project-requirements-plan.md).
 

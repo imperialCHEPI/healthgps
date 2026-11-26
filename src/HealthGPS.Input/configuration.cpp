@@ -128,13 +128,12 @@ Configuration get_configuration(const std::string &config_source,
         config.data_source = get_data_source_from_json(opt["data"], config.root_path);
     }
 
-    // input dataset file
+    // input settings (+ optional dataset)
     try {
         load_input_info(opt, config);
-        fmt::print("Input dataset file: {}\n", config.file.name.string());
     } catch (const std::exception &e) {
         success = false;
-        fmt::print(fg(fmt::color::red), "Could not load dataset file: {}\n", e.what());
+        fmt::print(fg(fmt::color::red), "Could not load input settings: {}\n", e.what());
     }
 
     // Modelling information

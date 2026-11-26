@@ -609,7 +609,12 @@ TEST_F(ConfigParsingFixture, LoadInputInfo) {
         j["inputs"]["dataset"] = file_info;
         j["inputs"]["settings"] = settings_info;
         EXPECT_NO_THROW(load_input_info(j, config));
-        EXPECT_EQ(config.file, file_info);
+        ASSERT_TRUE(config.file.has_value());
+        // MAHIMA: bugprone-unchecked-optional-access does not treat ASSERT_TRUE(has_value())
+        // as a control-flow guard for *optional on the next line, so re-check before deref.
+        if (config.file.has_value()) {
+            EXPECT_EQ(*config.file, file_info);
+        }
         EXPECT_EQ(config.settings, settings_info);
     }
 
@@ -621,12 +626,14 @@ TEST_F(ConfigParsingFixture, LoadInputInfo) {
         EXPECT_THROW(load_input_info(j, config), ConfigurationError);
     }
 
-    // Missing dataset
+    // MAHIMA: dataset omitted is OK — settings alone load.
     {
         auto config = create_config();
         json j;
         j["inputs"]["settings"] = settings_info;
-        EXPECT_THROW(load_input_info(j, config), ConfigurationError);
+        EXPECT_NO_THROW(load_input_info(j, config));
+        EXPECT_FALSE(config.file.has_value());
+        EXPECT_EQ(config.settings, settings_info);
     }
 
     // Missing settings

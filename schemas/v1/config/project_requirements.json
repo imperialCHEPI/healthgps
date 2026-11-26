@@ -2,7 +2,7 @@
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/config/project_requirements.json",
     "type": "object",
-    "description": "Per-project requirements: demographics, income, physical activity, risk factors, trend, two-stage. Code uses these flags instead of project-specific hacks (India/FINCH/PIF).",
+    "description": "Per-project requirements: demographics, income, physical activity, risk factors, trend, two-stage. Code uses these flags instead of project-specific hacks (India/FINCH/PIF). When a feature is disabled, only enabled is required; detail fields stay optional with engine defaults (backwards compatible with full blocks).",
     "properties": {
         "demographics": {
             "type": "object",
@@ -56,7 +56,7 @@
         },
         "income": {
             "type": "object",
-            "description": "Income assignment and adjustment",
+            "description": "Income assignment and adjustment. If enabled is false, only enabled is required. If enabled is true, type and categories are required; adjust/trended/output flags are optional (default false/true as documented).",
             "properties": {
                 "enabled": {
                     "type": "boolean",
@@ -68,7 +68,7 @@
                         "continuous",
                         "categorical"
                     ],
-                    "description": "continuous = regression then categories; categorical = logits/softmax only"
+                    "description": "continuous = regression then categories; categorical = logits/softmax only. Required when enabled is true."
                 },
                 "categories": {
                     "type": "string",
@@ -77,34 +77,50 @@
                         "4",
                         "5"
                     ],
-                    "description": "Number of income categories (3, 4, or 5)"
+                    "description": "Number of income categories (3, 4, or 5). Required when enabled is true."
                 },
                 "adjust_to_factors_mean": {
                     "type": "boolean",
-                    "description": "Include income in factors-mean (baseline) adjustment"
+                    "description": "Include income in factors-mean (baseline) adjustment. Optional; default false."
                 },
                 "trended": {
                     "type": "boolean",
-                    "description": "Include income in trended adjustment"
+                    "description": "Include income in trended adjustment. Optional; default false."
                 },
                 "income_based_csv_output": {
                     "type": "boolean",
                     "default": true,
-                    "description": "When true, write income-based CSV files (categorize results by income_category, one file per category). When false, do not write these files."
+                    "description": "When true, write income-based CSV files (categorize results by income_category, one file per category). When false, do not write these files. Optional; default true when enabled, ignored when disabled."
                 }
             },
             "required": [
-                "enabled",
-                "type",
-                "categories",
-                "adjust_to_factors_mean",
-                "trended"
+                "enabled"
             ],
-            "additionalProperties": false
+            "additionalProperties": false,
+            "allOf": [
+                {
+                    "if": {
+                        "properties": {
+                            "enabled": {
+                                "const": true
+                            }
+                        },
+                        "required": [
+                            "enabled"
+                        ]
+                    },
+                    "then": {
+                        "required": [
+                            "type",
+                            "categories"
+                        ]
+                    }
+                }
+            ]
         },
         "physical_activity": {
             "type": "object",
-            "description": "Physical activity assignment and adjustment",
+            "description": "Physical activity assignment and adjustment. If enabled is false, only enabled is required. If enabled is true, type is required; adjust/trended are optional (default false).",
             "properties": {
                 "enabled": {
                     "type": "boolean",
@@ -116,24 +132,40 @@
                         "simple",
                         "continuous"
                     ],
-                    "description": "simple = log-normal from factors mean; continuous = region/ethnicity/income model"
+                    "description": "simple = log-normal from factors mean; continuous = region/ethnicity/income model. Required when enabled is true."
                 },
                 "adjust_to_factors_mean": {
                     "type": "boolean",
-                    "description": "Include PA in factors-mean (baseline) adjustment"
+                    "description": "Include PA in factors-mean (baseline) adjustment. Optional; default false."
                 },
                 "trended": {
                     "type": "boolean",
-                    "description": "Include PA in trended adjustment"
+                    "description": "Include PA in trended adjustment. Optional; default false."
                 }
             },
             "required": [
-                "enabled",
-                "type",
-                "adjust_to_factors_mean",
-                "trended"
+                "enabled"
             ],
-            "additionalProperties": false
+            "additionalProperties": false,
+            "allOf": [
+                {
+                    "if": {
+                        "properties": {
+                            "enabled": {
+                                "const": true
+                            }
+                        },
+                        "required": [
+                            "enabled"
+                        ]
+                    },
+                    "then": {
+                        "required": [
+                            "type"
+                        ]
+                    }
+                }
+            ]
         },
         "risk_factors": {
             "type": "object",
@@ -154,7 +186,7 @@
         },
         "trend": {
             "type": "object",
-            "description": "Time trend for expected values",
+            "description": "Time trend for expected values. If enabled is false, only enabled is required (type defaults to null). If enabled is true, type is required.",
             "properties": {
                 "enabled": {
                     "type": "boolean",
@@ -169,14 +201,32 @@
                         "UPFTrend",
                         "income_trend"
                     ],
-                    "description": "null = no trend; trend, upf_trend or UPFTrend = UPF trends; income_trend = income-based"
+                    "description": "null = no trend; trend, upf_trend or UPFTrend = UPF trends; income_trend = income-based. Required when enabled is true."
                 }
             },
             "required": [
-                "enabled",
-                "type"
+                "enabled"
             ],
-            "additionalProperties": false
+            "additionalProperties": false,
+            "allOf": [
+                {
+                    "if": {
+                        "properties": {
+                            "enabled": {
+                                "const": true
+                            }
+                        },
+                        "required": [
+                            "enabled"
+                        ]
+                    },
+                    "then": {
+                        "required": [
+                            "type"
+                        ]
+                    }
+                }
+            ]
         },
         "two_stage": {
             "type": "object",
