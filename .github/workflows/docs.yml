@@ -4,11 +4,11 @@ on:
   push:
     branches: [main]
     paths:
-      - "documentation/**"
-      - "src/**"
-      - "README.md"
-      - "cmake/Doxygen.cmake"
-      - ".github/workflows/docs.yml"
+      - documentation/**
+      - src/**
+      - README.md
+      - cmake/Doxygen.cmake
+      - .github/workflows/docs.yml
   release:
     types: [published]
   workflow_dispatch:
