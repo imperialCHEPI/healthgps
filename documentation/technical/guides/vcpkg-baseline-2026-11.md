@@ -45,7 +45,7 @@ curlpp and crossguid did not publish a newer port. They are still rebuilt agains
 
 ## Source changes that keep the new ports compiling
 
-fmt 12 no longer exports `fmt::format` from `fmt/core.h`, and `fmt::join` lives in `fmt/ranges.h`. A call that passed `e.what()` as the format string is now `"{}"` plus the message, because the format string has to be a compile-time constant.
+fmt 12 no longer exports `fmt::format` from `fmt/core.h`, and `fmt::join` lives in `fmt/ranges.h`. A call that passed `e.what()` as the format string is now `"{}"` plus the message, because the format string has to be a compile-time constant. `fmt::println` is not used. With MSVC `/Od` and `/WX`, its constexpr UTF-8 branch is unreachable code (`C4702`) inside the fmt header, and that fails the Windows debug CI build. The download log uses `fmt::print` with a newline instead.
 
 Eigen 5 headers are under `include/eigen3`. `HealthGPS` links `Eigen3::Eigen` so `#include <Eigen/Dense>` resolves. The calls in use are `MatrixXd`, `VectorXd`, `LLT`, and `NullaryExpr`. Those APIs are unchanged.
 
