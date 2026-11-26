@@ -171,26 +171,72 @@ inline void parse_project_requirements_block(const nlohmann::json &pr, ProjectRe
     if (d.contains("gender2") && !d["gender2"].is_null()) {
         req.demographics.gender2 = d["gender2"].get<std::string>();
     }
+    // MAHIMA: Income/PA/trend — when enabled is false only that flag is required; detail
+    // fields optional with struct defaults. When enabled is true, require type (/categories).
     const auto &inc = pr["income"];
     req.income.enabled = inc["enabled"].get<bool>();
-    req.income.type = inc["type"].get<std::string>();
-    req.income.categories = inc["categories"].get<std::string>();
-    req.income.adjust_to_factors_mean = inc["adjust_to_factors_mean"].get<bool>();
-    req.income.trended = inc["trended"].get<bool>();
-    if (inc.contains("income_based_csv_output")) {
+    if (req.income.enabled) {
+        if (!inc.contains("type") || !inc.contains("categories")) {
+            throw ConfigurationError{
+                "project_requirements.income.enabled is true but type and/or categories missing"};
+        }
+        req.income.type = inc["type"].get<std::string>();
+        req.income.categories = inc["categories"].get<std::string>();
+    } else {
+        if (inc.contains("type") && !inc["type"].is_null()) {
+            req.income.type = inc["type"].get<std::string>();
+        }
+        if (inc.contains("categories") && !inc["categories"].is_null()) {
+            req.income.categories = inc["categories"].get<std::string>();
+        }
+        req.income.income_based_csv_output = false;
+    }
+    if (inc.contains("adjust_to_factors_mean") && !inc["adjust_to_factors_mean"].is_null()) {
+        req.income.adjust_to_factors_mean = inc["adjust_to_factors_mean"].get<bool>();
+    }
+    if (inc.contains("trended") && !inc["trended"].is_null()) {
+        req.income.trended = inc["trended"].get<bool>();
+    }
+    if (inc.contains("income_based_csv_output") && !inc["income_based_csv_output"].is_null()) {
         req.income.income_based_csv_output = inc["income_based_csv_output"].get<bool>();
     }
+
     const auto &pa = pr["physical_activity"];
     req.physical_activity.enabled = pa["enabled"].get<bool>();
-    req.physical_activity.type = pa["type"].get<std::string>();
-    req.physical_activity.adjust_to_factors_mean = pa["adjust_to_factors_mean"].get<bool>();
-    req.physical_activity.trended = pa["trended"].get<bool>();
+    if (req.physical_activity.enabled) {
+        if (!pa.contains("type")) {
+            throw ConfigurationError{
+                "project_requirements.physical_activity.enabled is true but type is missing"};
+        }
+        req.physical_activity.type = pa["type"].get<std::string>();
+    } else if (pa.contains("type") && !pa["type"].is_null()) {
+        req.physical_activity.type = pa["type"].get<std::string>();
+    }
+    if (pa.contains("adjust_to_factors_mean") && !pa["adjust_to_factors_mean"].is_null()) {
+        req.physical_activity.adjust_to_factors_mean = pa["adjust_to_factors_mean"].get<bool>();
+    }
+    if (pa.contains("trended") && !pa["trended"].is_null()) {
+        req.physical_activity.trended = pa["trended"].get<bool>();
+    }
+
     const auto &rf = pr["risk_factors"];
     req.risk_factors.adjust_to_factors_mean = rf["adjust_to_factors_mean"].get<bool>();
     req.risk_factors.trended = rf["trended"].get<bool>();
+
     const auto &tr = pr["trend"];
     req.trend.enabled = tr["enabled"].get<bool>();
-    req.trend.type = tr["type"].get<std::string>();
+    if (req.trend.enabled) {
+        if (!tr.contains("type")) {
+            throw ConfigurationError{
+                "project_requirements.trend.enabled is true but type is missing"};
+        }
+        req.trend.type = tr["type"].get<std::string>();
+    } else if (tr.contains("type") && !tr["type"].is_null()) {
+        req.trend.type = tr["type"].get<std::string>();
+    } else {
+        req.trend.type = "null";
+    }
+
     const auto &ts = pr["two_stage"];
     req.two_stage.use_logistic = ts["use_logistic"].get<bool>();
     if (ts.contains("logistic_file") && !ts["logistic_file"].is_null()) {

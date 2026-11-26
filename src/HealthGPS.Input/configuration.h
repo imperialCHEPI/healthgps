@@ -31,8 +31,8 @@ struct Configuration {
     /// @brief Static data source for the simulation (either URL or path)
     std::unique_ptr<DataSource> data_source;
 
-    /// @brief The input data file details
-    FileInfo file;
+    /// @brief Optional survey/microdata CSV (omit for JACARDI-style packs with no DataFile)
+    std::optional<FileInfo> file;
 
     /// @brief Experiment population settings
     SettingsInfo settings;

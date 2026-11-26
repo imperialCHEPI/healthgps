@@ -2231,9 +2231,13 @@ load_optional_education_static(const nlohmann::json &opt, const std::filesystem:
     if (!opt.contains("Education")) {
         return nullptr;
     }
+    // MAHIMA: SI uses lookup; BE equations (coefficients/knots) are schema-valid but not
+    // loaded yet — skip Education so Employment-only packs can still initialise.
     if (!opt["Education"].contains("lookup")) {
-        throw hgps::core::HgpsException{
-            "JacardiModel Education present but missing lookup CSV slot"};
+        fmt::print(fg(fmt::color::dark_salmon),
+                   "JacardiModel Education has no lookup slot (equations not loaded yet); "
+                   "skipping Education init.\n");
+        return nullptr;
     }
     auto tables = std::make_shared<hgps::EducationLifecycleTables>();
     tables->set_lookup(load_education_lookup_table(opt["Education"]["lookup"], root_path));

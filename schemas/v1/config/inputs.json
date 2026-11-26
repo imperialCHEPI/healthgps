@@ -2,9 +2,11 @@
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/config/inputs.json",
     "type": "object",
+    "description": "Population settings and optional microdata CSV. dataset may be omitted (e.g. JACARDI packs that use UNDB only); if present, the named file must exist on disk.",
     "properties": {
         "dataset": {
-            "$ref": "csv_file.json"
+            "$ref": "csv_file.json",
+            "description": "Optional survey/microdata CSV (e.g. France.DataFile.csv). Omit when the pack has no DataFile; population size still comes from UNDB via settings."
         },
         "settings": {
             "type": "object",
@@ -19,8 +21,16 @@
                     "$ref": "../age_range.json"
                 }
             },
+            "required": [
+                "country_code",
+                "size_fraction",
+                "age_range"
+            ],
             "additionalProperties": false
         }
     },
+    "required": [
+        "settings"
+    ],
     "additionalProperties": false
 }

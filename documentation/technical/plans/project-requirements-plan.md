@@ -47,12 +47,15 @@ Place at the **start** of each project config for clarity. All fields are explic
 | `enabled`                 | boolean | Use income in the model. |
 | `type`                    | string | `"continuous"` \| `"categorical"`. |
 | `categories`              | string | `"3"` \| `"4"` (only when type is categorical, or for continuous→category mapping). |
-| `adjust_to_factors_mean`  | boolean | Include income in factors-mean adjustment (initial). |
-| `trended`                 | boolean | Include income in trended adjustment. |
+| `adjust_to_factors_mean`  | boolean | Include income in factors-mean adjustment (initial). Optional; default false. |
+| `trended`                 | boolean | Include income in trended adjustment. Optional; default false. |
+
+**Required fields:** always `enabled`. If `enabled` is **true**, also require `type` and `categories`. If `enabled` is **false**, omit the rest (JACARDI-style). Full FINCH/India blocks that still set every field remain valid.
 
 - **FINCH:** type=continuous, adjust_to_factors_mean=true, trended=true (if trend enabled).
 - **India:** type=categorical, adjust_to_factors_mean=false, trended=false.
 - **PIF:** as per project (can match India or a variant).
+- **JACARDI:** `"income": { "enabled": false }`.
 
 - Code: use these flags instead of inferring from `is_continuous_income_model_` and hacks; `build_extended_factors_list(for_trended_adjustment)` and initial adjustment both read from here.
 
@@ -61,9 +64,9 @@ Place at the **start** of each project config for clarity. All fields are explic
 | Field                      | Type    | Description |
 |---------------------------|---------|-------------|
 | `enabled`                 | boolean | Use physical activity (have PA models). |
-| `type`                    | string  | `"simple"` \| `"continuous"` (which PA model). |
-| `adjust_to_factors_mean`  | boolean | Include PA in factors-mean adjustment (initial). |
-| `trended`                 | boolean | Include PA in trended adjustment. |
+| `type`                    | string  | `"simple"` \| `"continuous"` (which PA model). Required when enabled. |
+| `adjust_to_factors_mean`  | boolean | Include PA in factors-mean adjustment (initial). Optional; default false. |
+| `trended`                 | boolean | Include PA in trended adjustment. Optional; default false. |
 
 - **FINCH:** enabled=true, type=continuous, adjust_to_factors_mean=true, trended=false (per your “do not include in trended” rule).
 - **India:** enabled=true, type=simple, adjust_to_factors_mean=true, trended=false.
@@ -84,7 +87,7 @@ Place at the **start** of each project config for clarity. All fields are explic
 | Field     | Type   | Description |
 |----------|--------|-------------|
 | `enabled`| boolean | Use any trend (UPF or income trend). |
-| `type`   | string | `"null"` \| `"trend"` \| `"income_trend"` (when enabled). |
+| `type`   | string | `"null"` \| `"trend"` \| `"income_trend"` (when enabled). Required when `enabled` is true; omit when false (defaults to `"null"`). |
 
 - Can keep current top-level `trend_type` in config and derive `trend.enabled` from it, or move everything under `project_requirements.trend`.
 
