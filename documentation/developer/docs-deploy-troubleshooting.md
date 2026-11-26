@@ -4,21 +4,19 @@
 
 | [Home](../index.md) | [Quick Start](../user/getstarted.md) | [User Guide](../user/userguide.md) | [Schemas](../user/schemas.md) | [Models](../user/models-overview.md) | [Architecture](architecture.md) | [Data Model](datamodel.md) | [Developer Guide](development.md) | [Technical docs](../technical/README.md) | [API](https://imperialchepi.github.io/healthgps/api/) |
 
-**Last updated:** July 2026
+**Last updated:** November 2026
 
 ## Why this exists
 
-The public site ([imperialchepi.github.io/healthgps](https://imperialchepi.github.io/healthgps/)) is built by the **Deploy Jekyll and Doxygen** workflow (`.github/workflows/docs.yml`). It does **not** run on every push to `main`. It runs on:
+The public site ([imperialchepi.github.io/healthgps](https://imperialchepi.github.io/healthgps/)) is built by the **Deploy Jekyll and Doxygen** workflow (`.github/workflows/docs.yml`). A push to `main` that changes the site or the API publishes it. A release and a manual **Run workflow** still do the same. How that choice is made is in [How the website updates](pages-publish.md).
 
-- a published **release**, or
-- a manual **workflow_dispatch** from the Actions tab
-
-Markdown/Jekyll and the Doxygen API are built in the same job. If CMake configure fails, the whole deploy fails — including the markdown site — even when Jekyll itself succeeded.
+A documentation-only push reuses the stored API HTML and does not run vcpkg. When the API is rebuilt, Jekyll and Doxygen are still one job. If CMake configure fails, the whole deploy fails, including the markdown site, even when Jekyll itself succeeded.
 
 ### Related documentation
 
 | Topic | Document |
 | ----- | -------- |
+| When the site publishes | [How the website updates](pages-publish.md) |
 | Local API build | [Developer Guide](development.md#building-api-documentation) |
 | Docs layout / API note | [documentation/README.md](../README.md) |
 | Workflow file | [`.github/workflows/docs.yml`](../../.github/workflows/docs.yml) |
@@ -51,6 +49,8 @@ The annotation often only says `Process completed with exit code 1` on the Confi
 
 The live Pages site keeps the **previous** successful deploy until a new run succeeds.
 
+A documentation-only run does not show **Install VCPKG** or **Configure HealthGPS**. That is expected. Those steps run when the API is rebuilt.
+
 ---
 
 ## 2. What usually went wrong
@@ -61,7 +61,7 @@ The docs job configures the C++ project with:
 cmake --preset=linux-release -DBUILD_DOC=ON
 ```
 
-so Doxygen can build `/api`. That needs a working **vcpkg** install on the runner.
+so Doxygen can build `/api`. That needs a working **vcpkg** install on the runner. This configure step runs only when the API is rebuilt. A documentation-only push skips it.
 
 A common failure mode is the docs workflow using a **different vcpkg binary-cache setup** than CI:
 
@@ -95,7 +95,7 @@ In `.github/workflows/docs.yml`, keep vcpkg caching in sync with `.github/workfl
 - `VCPKG_BINARY_SOURCES: clear;x-gha,readwrite`
 - A step that exports `ACTIONS_CACHE_URL` and `ACTIONS_RUNTIME_TOKEN` before Install VCPKG / Configure
 
-Commit, push to `main`, then re-run **Deploy Jekyll and Doxygen** (Actions → workflow → **Run workflow**).
+Commit and push to `main`. That push publishes the site when it touches `documentation/`, `src/`, the root `README.md`, `cmake/Doxygen.cmake`, or this workflow. **Run workflow** still does a full API rebuild.
 
 ### 3.3 If Configure still fails
 
@@ -126,7 +126,7 @@ Remember nested paths under `user/`, `developer/`, and `technical/` may differ f
 - [ ] Read the Configure log (not only the annotation)
 - [ ] `docs.yml` vcpkg cache matches `ci.yml` (`x-gha` + cache env export)
 - [ ] Same commit’s CI configure is green (or understand why it isn’t)
-- [ ] Re-run **Deploy Jekyll and Doxygen** after the fix
+- [ ] Push the fix to `main`, or use **Run workflow** for a full API rebuild
 - [ ] Confirm `/` and `/api/` on Pages
 
 ---

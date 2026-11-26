@@ -1,69 +1,150 @@
 name: Deploy Jekyll and Doxygen
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - documentation/**
+      - src/**
+      - README.md
+      - cmake/Doxygen.cmake
+      - .github/workflows/docs.yml
   release:
     types: [published]
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
+  actions: read
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
   group: pages
   cancel-in-progress: false
 
 jobs:
-  # Build job
   build:
     runs-on: ubuntu-latest
     env:
       VCPKG_ROOT: vcpkg
-      # Match CI: GitHub Actions cache for vcpkg binaries (nuget,GitHub needs extra auth and often fails here)
       VCPKG_BINARY_SOURCES: clear;x-gha,readwrite
     steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-      - name: Setup Pages
-        uses: actions/configure-pages@v6
-      - name: Build with Jekyll
-        uses: actions/jekyll-build-pages@v1
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/configure-pages@v6
+
+      # MAHIMA: A docs-only push skips vcpkg. A release, a manual run, or an API
+      # change still builds Doxygen. README.md is an API input.
+      - name: Decide what to rebuild
+        id: scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" != "push" ]; then
+            echo "api=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          before="${{ github.event.before }}"
+          if [ "$before" = "0000000000000000000000000000000000000000" ] \
+            || ! git cat-file -e "${before}^{commit}" 2>/dev/null; then
+            echo "api=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          files="$(git diff --name-only "$before" "${{ github.sha }}")"
+          echo "$files"
+          if printf '%s\n' "$files" | grep -Eq '^(src/|README\.md$|cmake/Doxygen\.cmake$)'; then
+            echo "api=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "api=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/jekyll-build-pages@v1
         with:
           source: ./documentation
           destination: ./_site
-      - name: Install build dependencies
+
+      # MAHIMA: Reuse the last API HTML so a markdown edit does not rebuild OpenSSL.
+      - name: Restore previous API docs
+        id: restore_api
+        if: steps.scope.outputs.api != 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          sudo apt update
-          sudo apt upgrade -y
-          sudo apt install --no-install-recommends build-essential ninja-build doxygen graphviz
+          set -euo pipefail
+          echo "found=false" >> "$GITHUB_OUTPUT"
+          if ! id="$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts?name=doxygen-api&per_page=100" \
+            --jq '[.artifacts[] | select(.expired == false and .name == "doxygen-api")] | sort_by(.created_at) | last | .id')"; then
+            echo "Could not list stored API docs. This run will build Doxygen."
+            exit 0
+          fi
+          if [ -z "${id}" ] || [ "${id}" = "null" ]; then
+            echo "No stored API docs. This run will build Doxygen."
+            exit 0
+          fi
+          if ! run_id="$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${id}" --jq '.workflow_run.id')"; then
+            echo "Could not read the stored API run. This run will build Doxygen."
+            exit 0
+          fi
+          if ! gh run download "$run_id" --name doxygen-api --dir doxygen-restore; then
+            echo "Could not download stored API docs. This run will build Doxygen."
+            exit 0
+          fi
+          index="$(find doxygen-restore -name index.html -print -quit)"
+          if [ -z "${index}" ]; then
+            echo "Stored API docs have no index.html. This run will build Doxygen."
+            exit 0
+          fi
+          mkdir -p _site/api
+          cp -a "$(dirname "${index}")/." _site/api/
+          echo "found=true" >> "$GITHUB_OUTPUT"
+
+      - name: Install build dependencies
+        if: steps.scope.outputs.api == 'true' || steps.restore_api.outputs.found != 'true'
+        run: sudo apt update && sudo apt upgrade -y && sudo apt install --no-install-recommends build-essential ninja-build doxygen graphviz
+
       - name: Export GitHub Actions cache environment variables
+        if: steps.scope.outputs.api == 'true' || steps.restore_api.outputs.found != 'true'
         uses: actions/github-script@v9
         with:
           script: |
             core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
             core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+
       - name: Install VCPKG
+        if: steps.scope.outputs.api == 'true' || steps.restore_api.outputs.found != 'true'
         run: |
           git clone https://github.com/Microsoft/vcpkg.git
           cd vcpkg
           ./bootstrap-vcpkg.sh -disableMetrics
+
       - name: Configure HealthGPS
-        run: |
-          cmake --preset=linux-release -DBUILD_DOC=ON
+        if: steps.scope.outputs.api == 'true' || steps.restore_api.outputs.found != 'true'
+        run: cmake --preset=linux-release -DBUILD_DOC=ON
+
       - name: Build with doxygen
+        id: doxygen
+        if: steps.scope.outputs.api == 'true' || steps.restore_api.outputs.found != 'true'
         run: |
           ninja -C out/build/linux-release/ doxygen-docs
-          sudo cp -r out/build/linux-release/src/html _site/api
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v5
+          rm -rf doxygen-html
+          mkdir -p doxygen-html _site/api
+          cp -a out/build/linux-release/src/html/. doxygen-html/
+          sudo cp -a doxygen-html/. _site/api/
 
-  # Deployment job
+      - uses: actions/upload-artifact@v7
+        if: steps.doxygen.outcome == 'success'
+        with:
+          name: doxygen-api
+          path: doxygen-html
+          retention-days: 90
+          if-no-files-found: error
+
+      - uses: actions/upload-pages-artifact@v5
+
   deploy:
     environment:
       name: github-pages
@@ -71,6 +152,5 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Deploy to GitHub Pages
+      - uses: actions/deploy-pages@v5
         id: deployment
-        uses: actions/deploy-pages@v5

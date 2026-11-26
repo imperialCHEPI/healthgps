@@ -93,9 +93,12 @@ ctest --preset='core-test-linux'
 API documentation for the latest version of Health-GPS [is available on the
 GitHub Pages site](https://imperialchepi.github.io/healthgps/).
 
-The public site is published by **Deploy Jekyll and Doxygen** (release or manual
-workflow run), not on every push. If that workflow fails at **Configure HealthGPS**,
-see [Docs deploy troubleshooting](docs-deploy-troubleshooting.md).
+The public site is published by **Deploy Jekyll and Doxygen** on a push to `main`
+that changes the site or the API, and also on a release or a manual run. A
+documentation-only push does not rebuild the API. See
+[How the website updates](pages-publish.md). If that workflow fails at
+**Configure HealthGPS**, see
+[Docs deploy troubleshooting](docs-deploy-troubleshooting.md).
 
 If you wish to build documentation locally, you need [Doxygen](https://www.doxygen.nl/) installed.
 
