@@ -63,6 +63,7 @@ Section indexes: [user/README.md](user/README.md) · [developer/README.md](devel
 | Simulation models (detail)                      | [Simulation models reference](technical/guides/simulation-models-reference.md) |
 | Build from source                               | [Developer Guide](developer/development.md)                                    |
 | Windows build broken (`cstdint`, `MSVCRTD.lib`) | [MSVC troubleshooting](developer/msvc-windows-build-troubleshooting.md)        |
+| Site publish / phone layout                     | [How the website updates](developer/pages-publish.md)                          |
 | Pages deploy failed (Configure HealthGPS)       | [Docs deploy troubleshooting](developer/docs-deploy-troubleshooting.md)        |
 | Software & architecture (engineers)             | [Software & Architecture](developer/architecture.md)                           |
 | Data model                                      | [Data Model](developer/datamodel.md)                                           |

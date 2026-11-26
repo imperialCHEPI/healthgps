@@ -3,18 +3,22 @@
 
 @import "{{ site.theme }}";
 
-.wrapper {
-  width:1200px;
-  // left side is 270
-  // 1200-270 = 930
-  // 30px free room
-  margin:0 auto;
-}
+// MAHIMA: The theme stacks the sidebar at 960px. These widths stay desktop-only,
+// otherwise a phone draws the article 900px wide and off the left edge.
+@media screen and (min-width: 961px) {
+  .wrapper {
+    width: 1200px;
+    // left side is 270
+    // 1200-270 = 930
+    // 30px free room
+    margin: 0 auto;
+  }
 
-section {
-  width:900px;
-  float:right;
-  padding-bottom:50px;
+  section {
+    width: 900px;
+    float: right;
+    padding-bottom: 50px;
+  }
 }
 
 body {
@@ -34,4 +38,28 @@ body > *:first-child {
 
 body > *:last-child {
   margin-bottom: 0 !important;
+}
+
+// MAHIMA: Phone and tablet. Undo the wide columns and let wide tables scroll.
+@media screen and (max-width: 960px) {
+  .wrapper {
+    width: auto;
+    margin: 0;
+  }
+
+  section {
+    width: auto;
+    float: none;
+    padding-bottom: 24px;
+  }
+
+  body {
+    padding: 16px;
+  }
+
+  section table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+  }
 }
