@@ -51,6 +51,8 @@ The live Pages site keeps the **previous** successful deploy until a new run suc
 
 A documentation-only run does not show **Install VCPKG** or **Configure HealthGPS**. That is expected. Those steps run when the API is rebuilt.
 
+**Build with doxygen** can print many `warning:` lines and still succeed. `mkdir: Permission denied` on `_site/api` is a separate failure: the Jekyll action owns `_site`, so the copy into it has to use `sudo`.
+
 ---
 
 ## 2. What usually went wrong
